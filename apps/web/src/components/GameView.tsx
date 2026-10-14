@@ -6,6 +6,7 @@ import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { AlienNotes } from "./AlienNotes";
+import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView } from "./BoardView";
 import { HandDock, type HandSelection } from "./HandDock";
@@ -101,6 +102,7 @@ export function GameView({
     <div className="game">
       <header className="topbar" aria-label="Round, turn, current player and moves">
         <div className="toprow">
+          <BarFold />
           <div className="counter">
             <span className="label">Round</span>
             <span className="big">

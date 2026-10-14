@@ -983,14 +983,16 @@ button:disabled {
   transition: transform 0.15s;
   transition-delay: 0s;
 }
-.rcard:hover {
-  z-index: 20;
-}
-.rcard:hover img {
-  transform: scale(2.4);
-  transform-origin: top left;
-  transition-delay: 1s;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+@media (hover: hover) {
+  .rcard:hover {
+    z-index: 20;
+  }
+  .rcard:hover img {
+    transform: scale(2.4);
+    transform-origin: top left;
+    transition-delay: 1s;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  }
 }
 .rcard figcaption {
   position: absolute;
@@ -1320,12 +1322,14 @@ button:disabled {
   border-radius: 4px;
   transition: transform 0.15s;
 }
-.logcard:hover {
-  transform: scale(3);
-  transform-origin: left center;
-  position: relative;
-  z-index: 40;
-  transition-delay: 0.6s;
+@media (hover: hover) {
+  .logcard:hover {
+    transform: scale(3);
+    transform-origin: left center;
+    position: relative;
+    z-index: 40;
+    transition-delay: 0.6s;
+  }
 }
 
 /* the gold scoring tiles beside the board, and one enlarged */
@@ -1381,5 +1385,45 @@ button:disabled {
   }
   50% {
     stroke-opacity: 0.35;
+  }
+}
+
+/* a picture enlarged by a tap (touch screens): in the middle of the window, away after a few seconds or when tapped */
+.tapzoom {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+.tapzoom img {
+  width: min(88vw, 440px);
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.8);
+}
+
+/* the button that folds the bar on top: only on phones */
+.barfold {
+  display: none;
+}
+@media (max-width: 760px) {
+  .barfold {
+    display: inline-flex;
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+  }
+  .topbar .toprow .extra {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
+  .topbar.collapsed .movebar,
+  .topbar.collapsed .scorechips,
+  .topbar.collapsed .toprow .extra {
+    display: none;
   }
 }

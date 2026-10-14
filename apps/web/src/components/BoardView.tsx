@@ -29,6 +29,7 @@ import {
   sectorDegrees,
 } from "@/lib/geometry";
 import type { Spot } from "@/lib/targets";
+import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -143,6 +144,7 @@ export function BoardView({
               transform={`translate(${place.x} ${place.y}) rotate(${place.rotation}) scale(${GOLD.scale}) translate(${-GOLD.w / 2} ${-GOLD.h / 2})`}
               className="goldtile"
               onPointerEnter={(e) => {
+                if (e.pointerType === "touch") return; // a tap shows it (onClick) and it goes away by itself
                 const { clientX: x, clientY: y } = e;
                 clearTimeout(goldTimer.current);
                 goldTimer.current = setTimeout(() => setGoldZoom({ i, x, y }), 1000);
@@ -151,7 +153,13 @@ export function BoardView({
                 clearTimeout(goldTimer.current);
                 setGoldZoom(null);
               }}
-              onClick={(e) => setGoldZoom(goldZoom?.i === i ? null : { i, x: e.clientX, y: e.clientY })}
+              onClick={(e) => {
+                clearTimeout(goldTimer.current);
+                if (goldZoom?.i === i) return setGoldZoom(null);
+                setGoldZoom({ i, x: e.clientX, y: e.clientY });
+                // on a touch screen the enlarged tile goes away after a few seconds, or when it is tapped
+                if (touchScreen()) goldTimer.current = setTimeout(() => setGoldZoom(null), ZOOM_SECONDS * 1000);
+              }}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setGoldZoom(goldZoom?.i === i ? null : { i, x: 400, y: 200 })}
             >
               <image href={info.src} x={0} y={0} width={GOLD.w} height={GOLD.h} />
@@ -431,6 +439,7 @@ export function BoardView({
           tile={s.gold_tiles[goldZoom.i] as { tile: string; side: string }}
           markers={s.gold_tiles[goldZoom.i]?.markers ?? []}
           at={goldZoom}
+          onClose={() => setGoldZoom(null)}
           colorOf={color}
           whoOf={who}
         />
@@ -444,22 +453,30 @@ function GoldZoom({
   tile,
   markers,
   at,
+  onClose,
   colorOf,
   whoOf,
 }: {
   tile: { tile: string; side: string };
   markers: number[];
   at: { x: number; y: number };
+  onClose: () => void;
   colorOf: (i: number) => PieceColor;
   whoOf: (i: number) => string;
 }) {
   const info = GOLD_TILES[`${tile.tile}-${tile.side}`];
   if (!info || typeof document === "undefined") return null;
-  const width = 480;
+  const width = Math.min(480, window.innerWidth - 16);
   const left = Math.max(8, Math.min(at.x + 18, window.innerWidth - width - 8));
   const top = Math.max(8, Math.min(at.y - 120, window.innerHeight - 440));
   return createPortal(
-    <div className="goldzoom" style={{ left, top, width }} role="tooltip">
+    // biome-ignore lint/a11y/useKeyWithClickEvents: it goes away by itself, and when the pointer leaves the tile
+    <div
+      className="goldzoom"
+      style={{ left, top, width, pointerEvents: touchScreen() ? "auto" : undefined }}
+      role="tooltip"
+      onClick={onClose}
+    >
       <svg viewBox={`0 0 ${GOLD.w} ${GOLD.h}`} role="img" aria-label={`Gold scoring tile ${tile.tile}`}>
         <PieceDefs />
         <image href={info.src} x={0} y={0} width={GOLD.w} height={GOLD.h} />

@@ -9,6 +9,7 @@ import { useBottomSpace, useDock } from "@/lib/useDock";
 import { type ReactNode, useEffect, useRef } from "react";
 import assets from "../generated/assets.json";
 import { Changes } from "./Reward";
+import { TapZoomImage } from "./TapZoom";
 
 export interface LogEntry {
   seq: number;
@@ -48,7 +49,7 @@ function rivalLine(ev: GameEvent): ReactNode {
         <span className="rivalplay">
           plays action card <b>{String(ev.card)}</b>
           {RIVAL_CARDS[String(ev.card)] ? (
-            <img src={RIVAL_CARDS[String(ev.card)]} alt="" width={44} height={49} className="logcard" />
+            <TapZoomImage src={RIVAL_CARDS[String(ev.card)] as string} alt="" width={44} height={49} className="logcard" />
           ) : null}
         </span>
       );

@@ -5,6 +5,7 @@ import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
 import { ScoreIcon } from "./Icons";
 import { DataToken, Marker, PieceDefs, pieceColor } from "./Pieces";
+import { TapZoomImage } from "./TapZoom";
 
 const W = 1000;
 const H = 325;
@@ -139,7 +140,7 @@ function Rival({ view }: { view: View }) {
             {r.used.map((id, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: the same card cannot be played twice in a round, but the order is the identity
               <figure key={`${id}-${i}`} className="rcard" title={`Card ${id}`}>
-                <img src={RIVAL_CARDS[id]} alt={`Rival action card ${id}`} width={330} height={367} loading="lazy" decoding="async" />
+                <TapZoomImage src={RIVAL_CARDS[id] as string} alt={`Rival action card ${id}`} width={330} height={367} />
                 <figcaption>{i + 1}</figcaption>
               </figure>
             ))}
@@ -148,7 +149,7 @@ function Rival({ view }: { view: View }) {
         <div className="rcgroup">
           <h4>Action deck</h4>
           <figure className="rcard rcpile" title={`${view.counts.rival_deck} cards left in the rival's deck`}>
-            <img src={RIVAL_CARDS.back} alt="The rival's action deck" width={330} height={367} loading="lazy" decoding="async" />
+            <TapZoomImage src={RIVAL_CARDS.back as string} alt="The rival's action deck" width={330} height={367} />
             <figcaption className="rccount">{view.counts.rival_deck}</figcaption>
           </figure>
         </div>

@@ -2,6 +2,7 @@
 // A card image (generated/assets.json). A hidden card ("?") is shown as a card back. The files are WebP images with the hash of their content
 // in the name, so Cloudflare and the browser keep them for good. Hovering a card shows it large beside it.
 import { cardName } from "@/lib/moves";
+import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
@@ -24,6 +25,12 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
     if (timer.current !== null) clearTimeout(timer.current);
     timer.current = null;
     setZoom(null);
+  };
+  // on a touch screen the enlarged card goes away after a few seconds, or when it is tapped
+  const showOnTouch = () => {
+    cancel();
+    show();
+    timer.current = setTimeout(cancel, ZOOM_SECONDS * 1000);
   };
   useEffect(
     () => () => {
@@ -60,6 +67,7 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
 
   return (
     <>
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: a zoom of a picture for touch screens; the picture is not an action */}
       <img
         ref={img}
         className={size ? `cardimg card-${size}` : "cardimg"}
@@ -71,21 +79,25 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
         loading="lazy"
         decoding="async"
         onMouseEnter={() => {
+          if (touchScreen()) return; // a tap makes the browser fake a hover that would stay: touch has its own way (onClick)
           cancel();
           timer.current = setTimeout(show, HOVER_DELAY_MS);
         }}
         onMouseLeave={cancel}
+        onClick={() => touchScreen() && showOnTouch()}
       />
       {zoom
         ? // in the page itself, so that no transform of the card or its panel moves it
           createPortal(
+            // biome-ignore lint/a11y/useKeyWithClickEvents: a zoom of a picture for touch screens; the picture is not an action
             <img
               className="cardzoom"
               src={src}
               alt=""
               width={zoom.w}
               height={Math.round(zoom.w * RATIO)}
-              style={{ left: zoom.x, top: zoom.y }}
+              style={{ left: zoom.x, top: zoom.y, pointerEvents: touchScreen() ? "auto" : undefined }}
+              onClick={cancel}
             />,
             document.body,
           )
