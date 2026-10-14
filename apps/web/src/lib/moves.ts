@@ -1,5 +1,7 @@
 // Words for the legal moves the engine offers. The UI offers only these moves (decision D10); it never works out a rule itself.
 import cards from "../generated/cards.json";
+import organizations from "../generated/organizations.json";
+import quickStart from "../generated/quick-start.json";
 
 export type Move = { type: string } & Record<string, unknown>;
 
@@ -10,6 +12,17 @@ export function cardName(id: unknown): string {
   const c = CARDS[String(id)];
   return c ? `${c.name} (${String(id)})` : String(id);
 }
+
+const ORGS = organizations as unknown as Record<string, { name: string; number: number; abilities: Record<string, string> }>;
+const QUICK = quickStart as unknown as Record<string, { marks: string; lower: { effect: string; n: number }[] }>;
+export const ORG_NAMES: Record<string, string> = Object.fromEntries(Object.entries(ORGS).map(([id, o]) => [id, o.name]));
+const orgName = (id: unknown): string => ORGS[String(id)]?.name ?? String(id);
+const quickText = (id: unknown): string => {
+  const q = QUICK[String(id)];
+  if (!q) return String(id);
+  const gains = q.lower.map((e) => `${e.n} ${e.effect === "score" ? "VP" : e.effect.replace("_", " ")}`).join(", ");
+  return `${String(id)}${q.marks ? `: mark ${q.marks}` : ""}${gains ? `; gain ${gains}` : ""}`;
+};
 
 const cap = (s: unknown): string => {
   const t = String(s);
@@ -57,6 +70,11 @@ export const LABELS: Record<string, Label> = {
   skip_tuck: () => "Do not tuck a card",
   discard: (m) => `Discard ${cardName(m.card)}`,
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
+  choose_org: (m) =>
+    `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
+  choose_quick: (m) => `Keep the quick start card ${quickText(m.card)}`,
+  org_free: (m) => orgFreeLabel(m),
+  scan_token: (m) => `Discard a signal token and ${source(m.source)} for a signal`,
   choose_gold: (m) => `Mark the ${String(m.tile)} gold scoring tile`,
   orbit: (m) => `Orbit ${m.at === "pluto" ? "Pluto " : ""}with probe ${String(m.probe)} (1 credit, 1 energy)`,
   land: (m) => `Land ${m.at === "pluto" ? "on Pluto " : ""}with probe ${String(m.probe)}${m.moon ? ` on ${String(m.moon)}` : ""}`,
@@ -103,6 +121,18 @@ export const LABELS: Record<string, Label> = {
   remove_lander: (m) => `Remove your lander ${m.moon ? `on ${String(m.moon)}` : `at ${planet(m.planet)}`}`,
 };
 
+function orgFreeLabel(m: Move): string {
+  const org = String(m.org);
+  const name = orgName(org);
+  if (org === "fenwick_research_center") return `${name}: spend 1 publicity for ${source(m.source)}, then gain its free-action corner`;
+  if (org === "mission_relay") return `${name}: spend 2 publicity for ${source(m.source)}, then gain its income resource`;
+  if (org === "stratus_core") return `${name}: gain the free-action corners of all cards in the card row`;
+  if (org === "deep_sky_survey") return `${name}: switch ${cardName(m.card)} with card ${Number(m.row) + 1} of the card row`;
+  if (org === "sentinel_probe_network") return `${name}: gain the free-action corner of the card you played`;
+  if (org === "turing_systems") return `${name}: use the ${String(m.tech)} tech this turn`;
+  return `${name}: use the once-per-round ability`;
+}
+
 export function describeMove(m: Move): string {
   const label = LABELS[m.type];
   return label ? label(m) : `${m.type} ${JSON.stringify(Object.fromEntries(Object.entries(m).filter(([k]) => k !== "type")))}`;
@@ -119,6 +149,7 @@ export const FREE_ACTION_TYPES = new Set([
   "place_lower",
   "complete_mission",
   "deliver_sample",
+  "org_free",
 ]);
 
 export function groupMoves(moves: Move[], pending: boolean, answeringFree = false): { title: string; moves: Move[] }[] {

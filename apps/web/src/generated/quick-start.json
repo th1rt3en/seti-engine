@@ -1,0 +1,285 @@
+{
+  "SR.1": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      }
+    ],
+    "marks": "in the discovery space of the right species"
+  },
+  "SR.10": {
+    "lower": [
+      {
+        "effect": "signal_token",
+        "n": 1
+      },
+      {
+        "effect": "data",
+        "n": 1
+      }
+    ],
+    "marks": "in Vega"
+  },
+  "SR.11": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 4
+      },
+      {
+        "effect": "publicity",
+        "n": 2
+      }
+    ],
+    "marks": "at Saturn"
+  },
+  "SR.12": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      },
+      {
+        "effect": "energy",
+        "n": 1
+      }
+    ],
+    "marks": "at Venus"
+  },
+  "SR.13": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      },
+      {
+        "effect": "data",
+        "n": 1
+      }
+    ],
+    "marks": "at Jupiter"
+  },
+  "SR.14": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      },
+      {
+        "effect": "credit",
+        "n": 1
+      }
+    ],
+    "marks": "at Mercury"
+  },
+  "SR.15": {
+    "lower": [],
+    "marks": "at Uranus"
+  },
+  "SR.16": {
+    "lower": [],
+    "marks": "at Neptune"
+  },
+  "SR.17": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      },
+      {
+        "effect": "card",
+        "n": 1
+      }
+    ],
+    "marks": "at Mars"
+  },
+  "SR.18": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "credit",
+        "n": 1
+      },
+      {
+        "effect": "card",
+        "n": 1
+      }
+    ],
+    "marks": null
+  },
+  "SR.19": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "energy",
+        "n": 1
+      },
+      {
+        "effect": "card",
+        "n": 1
+      }
+    ],
+    "marks": null
+  },
+  "SR.2": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      }
+    ],
+    "marks": "in the discovery space of the right species"
+  },
+  "SR.20": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 4
+      },
+      {
+        "effect": "signal_token",
+        "n": 1
+      },
+      {
+        "effect": "publicity",
+        "n": 1
+      }
+    ],
+    "marks": null
+  },
+  "SR.21": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 3
+      },
+      {
+        "effect": "publicity",
+        "n": 3
+      }
+    ],
+    "marks": null
+  },
+  "SR.3": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in Barnard's Star"
+  },
+  "SR.4": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in Proxima Centauri"
+  },
+  "SR.5": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in Sirius A"
+  },
+  "SR.6": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in Procyon"
+  },
+  "SR.7": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in Kepler 22"
+  },
+  "SR.8": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in 61 Virginis"
+  },
+  "SR.9": {
+    "lower": [
+      {
+        "effect": "score",
+        "n": 2
+      },
+      {
+        "effect": "data",
+        "n": 2
+      }
+    ],
+    "marks": "in Beta Pictoris"
+  }
+}

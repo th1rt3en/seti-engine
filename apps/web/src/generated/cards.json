@@ -1753,5 +1753,23 @@
     "name": "Gateway to Mars",
     "sector": "blue",
     "species": null
+  },
+  "SR.15": {
+    "cost": 0,
+    "deck": "quick",
+    "free": [],
+    "income": "card",
+    "name": "Quick start SR.15",
+    "sector": null,
+    "species": null
+  },
+  "SR.16": {
+    "cost": 0,
+    "deck": "quick",
+    "free": [],
+    "income": "data",
+    "name": "Quick start SR.16",
+    "sector": null,
+    "species": null
   }
 }

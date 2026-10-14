@@ -5,9 +5,10 @@ import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 // (`view.trackers`); nothing is worked out here.
 import { PLAYER_COLOR } from "@/lib/geometry";
 import { cardName } from "@/lib/moves";
+import { ORG_NAMES } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon } from "./Icons";
+import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 
 const KINDS = [
   { key: "credit", label: "Credits", icon: <CreditIcon size={18} /> },
@@ -152,6 +153,18 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             ? row(
                 labelled(<ExofossilIcon size={18} />, "Exofossils"),
                 s.players.map((p) => p.exofossils),
+              )
+            : null}
+          {s.options.expansion
+            ? row(
+                labelled(<SignalTokenIcon size={18} />, "Signal tokens"),
+                s.players.map((p) => p.signal_tokens),
+              )
+            : null}
+          {s.options.organizations
+            ? row(
+                labelled(<span className="muted small">Org</span>, "Organization"),
+                s.players.map((p) => (p.organization ? (ORG_NAMES[p.organization] ?? p.organization) : "—")),
               )
             : null}
           {row(

@@ -123,6 +123,18 @@ export function ExofossilIcon({ size = SIZE }: { size?: number }) {
   );
 }
 
+/** A signal token of the Space Agencies expansion. */
+export function SignalTokenIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="signal token" className="resicon">
+      <title>Signal token</title>
+      <circle cx="12" cy="12" r="10" fill="#7c4dff" stroke="#3b1f99" strokeWidth="1.4" />
+      <path d="M7 12a5 5 0 0 1 10 0M9.500 12a2.500 2.500 0 0 1 5 0" fill="none" stroke="#fff" strokeWidth="1.500" strokeLinecap="round" />
+      <circle cx="12" cy="12.500" r="1.200" fill="#fff" />
+    </svg>
+  );
+}
+
 /** A trace of life: three dots in the colours of the three kinds. */
 export function TraceIcon({ size = SIZE }: { size?: number }) {
   return (

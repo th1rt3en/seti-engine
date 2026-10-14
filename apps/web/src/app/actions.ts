@@ -81,6 +81,22 @@ export async function createGameAction(form: FormData): Promise<void> {
   const players = Math.min(4, Math.max(1, Number(field(form, "players")) || 2));
   const difficulty = Math.min(5, Math.max(1, Number(field(form, "difficulty")) || 3));
   const rated = form.get("rated") === "on" && players >= 2;
+  const sandbox = players === 1 && form.get("sandbox") === "on";
+  // the Space Agencies expansion: organizations need 2 to 4 players or the sandbox, the neutral pieces 1 to 2 (D35)
+  const expansion = form.get("expansion") === "on";
+  const organizations = expansion && form.get("organizations") === "on" && (players > 1 || sandbox);
+  const expansionOptions = expansion
+    ? {
+        expansion: true,
+        ...(organizations
+          ? {
+              organizations: true,
+              beginner_organizations: form.get("beginner") === "on",
+              neutral_quick_start: players <= 2 && form.get("neutral") === "on",
+            }
+          : {}),
+      }
+    : {};
   const preset = CLOCK_PRESETS[field(form, "clock")] ?? CLOCK_PRESETS.none;
   const reply = await createGame(user, {
     options: {
@@ -90,6 +106,7 @@ export async function createGameAction(form: FormData): Promise<void> {
         ? { sandbox_species: [field(form, "species1") || null, field(form, "species2") || null] }
         : {}),
       promo_cards: form.get("promo") === "on",
+      ...expansionOptions,
     },
     clock: (preset as NonNullable<typeof preset>).clock,
     rated,

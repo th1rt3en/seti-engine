@@ -19,7 +19,7 @@ import { loadConfig } from "@/lib/config";
 import { SqliteDb, migrationSql } from "@/lib/db";
 import { engineAuth } from "@/lib/engineAuth";
 import { LABELS, cardName, describeMove, groupMoves } from "@/lib/moves";
-import { leaderboard, lobbyGames, profile } from "@/lib/queries";
+import { computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { createGame, gameMeta } from "@/lib/worker";
 import { importSPKI, jwtVerify } from "jose";
@@ -187,7 +187,15 @@ describe("lobby, leaderboard and profile", () => {
     const { db } = await seed();
     const games = await lobbyGames(db);
     expect(games).toHaveLength(1);
-    expect(games[0]).toMatchObject({ id: "open", rated: true, players: 3, seats: ["Ann"], clock: "24 h per turn", host: "Ann" });
+    expect(games[0]).toMatchObject({
+      id: "open",
+      rated: true,
+      players: 3,
+      seats: ["Ann"],
+      clock: "24 h per turn",
+      host: "Ann",
+      expansion: false,
+    });
   });
 
   it("ranks registered players by rating (guests are left out)", async () => {
@@ -316,5 +324,38 @@ describe("clock presets (D26, D34)", () => {
       "4 days + 12 h per turn",
     );
     expect(describeClock(JSON.stringify({ kind: "none" }))).toBe("no clock");
+  });
+});
+
+describe("profile statistics", () => {
+  const row = (rank: number | null, score: number | null, rated: number, options: object) => ({
+    rank,
+    score,
+    rated_counted: rated,
+    options_json: JSON.stringify(options),
+  });
+
+  it("counts wins, the win rate and the games by number of players, leaving the sandbox out", () => {
+    const s = computeStats([
+      row(1, 120, 1, { players: 2 }),
+      row(2, 90, 1, { players: 3, expansion: true }),
+      row(1, 100, 0, { players: 1 }),
+      row(1, 10, 0, { players: 1, sandbox: true }),
+    ]);
+    expect(s).toMatchObject({
+      games: 3,
+      wins: 2,
+      winRate: 67,
+      ratedGames: 2,
+      ratedWins: 1,
+      avgScore: 103,
+      bestScore: 120,
+      expansionGames: 1,
+    });
+    expect(s.byPlayers).toEqual({ "2": { games: 1, wins: 1 }, "3": { games: 1, wins: 0 }, solo: { games: 1, wins: 1 } });
+  });
+
+  it("has no win rate without a game", () => {
+    expect(computeStats([])).toMatchObject({ games: 0, winRate: null, avgScore: null, bestScore: null });
   });
 });

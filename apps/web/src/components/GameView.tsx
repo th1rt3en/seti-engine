@@ -3,13 +3,14 @@
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
 // everything comes from the engine's view.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { ORG_NAMES } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
 import { HandDock, type HandSelection } from "./HandDock";
-import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon } from "./Icons";
+import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
@@ -132,6 +133,7 @@ export function GameView({
               <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
                 {s.rival && p.index === s.rival.index ? "Rival" : (names[p.index] ?? `Player ${p.index + 1}`)}
+                {p.organization ? <span className="orgname">{ORG_NAMES[p.organization] ?? p.organization}</span> : null}
                 <span className="res" title="Victory points">
                   <ScoreIcon size={20} />
                   <b>{p.score}</b>
@@ -146,6 +148,12 @@ export function GameView({
                       <EnergyIcon size={18} />
                       <b>{p.energy}</b>
                     </span>
+                    {s.options.expansion ? (
+                      <span className="res" title="Signal tokens">
+                        <SignalTokenIcon size={18} />
+                        <b>{p.signal_tokens}</b>
+                      </span>
+                    ) : null}
                     {oumuamua ? (
                       <span className="res" title="Exofossils">
                         <ExofossilIcon size={18} />

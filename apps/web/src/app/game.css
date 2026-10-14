@@ -1702,3 +1702,11 @@ button:disabled {
 .playerboard .pbspace.pickable:focus circle {
   fill: #1a2a55;
 }
+
+.orgname {
+  font-size: 11px;
+  color: #c4a8ff;
+  border: 1px solid rgba(167, 129, 255, 0.5);
+  border-radius: 999px;
+  padding: 0 6px;
+}

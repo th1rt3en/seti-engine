@@ -1,7 +1,18 @@
 // Gains and costs as small icons with a number: the log shows what a move gave and took, and the confirmation of a move shows what it costs and
 // what it gives. The kinds are the engine's ("vp", "credit", "energy", "publicity", "data", "card", ...).
 import type { ReactNode } from "react";
-import { AlienCardIcon, CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, TraceIcon } from "./Icons";
+import {
+  AlienCardIcon,
+  CreditIcon,
+  DataIcon,
+  DeckCardIcon,
+  EnergyIcon,
+  ExofossilIcon,
+  PublicityIcon,
+  ScoreIcon,
+  SignalTokenIcon,
+  TraceIcon,
+} from "./Icons";
 
 const ICONS: Record<string, (size: number) => ReactNode> = {
   vp: (s) => <ScoreIcon size={s} />,
@@ -14,6 +25,7 @@ const ICONS: Record<string, (size: number) => ReactNode> = {
   alien_card: (s) => <AlienCardIcon size={s} />,
   exofossil: (s) => <ExofossilIcon size={s} />,
   trace: (s) => <TraceIcon size={s} />,
+  signal_token: (s) => <SignalTokenIcon size={s} />,
 };
 
 const NAMES: Record<string, string> = {
@@ -27,6 +39,7 @@ const NAMES: Record<string, string> = {
   alien_card: "alien card",
   exofossil: "exofossil",
   trace: "trace",
+  signal_token: "signal token",
 };
 
 /** One amount with its icon: "+2" with the globe, "−1" with a credit. `signed` shows a plus sign for a gain. */

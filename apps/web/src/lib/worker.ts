@@ -10,7 +10,17 @@ export interface Clock {
 }
 
 export interface NewGame {
-  options: { players: number; difficulty?: number; promo_cards?: boolean; sandbox?: boolean; sandbox_species?: (string | null)[] };
+  options: {
+    players: number;
+    difficulty?: number;
+    promo_cards?: boolean;
+    sandbox?: boolean;
+    sandbox_species?: (string | null)[];
+    expansion?: boolean;
+    organizations?: boolean;
+    beginner_organizations?: boolean;
+    neutral_quick_start?: boolean;
+  };
   clock: Clock;
   rated: boolean;
 }

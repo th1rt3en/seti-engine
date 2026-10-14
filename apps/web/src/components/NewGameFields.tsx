@@ -18,6 +18,11 @@ export function NewGameFields({
   const [sandbox, setSandbox] = useState(false);
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
+  // the Space Agencies expansion (D35): its organization module needs 2 to 4 players or the sandbox; the neutral pieces are for 1 to 2 players
+  const [expansion, setExpansion] = useState(false);
+  const [organizations, setOrganizations] = useState(false);
+  const orgsAllowed = !solo || sandbox;
+  const orgsOn = expansion && organizations && orgsAllowed;
   const SPECIES = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"];
   const speciesSelect = (name: string, label: string, value: string, onChange: (v: string) => void, taken: string) => (
     <label>
@@ -97,6 +102,46 @@ export function NewGameFields({
       <label className="row">
         <input type="checkbox" name="promo" /> Include the two promo cards
       </label>
+      <fieldset className="expansion">
+        <legend>Space Agencies expansion</legend>
+        <label className="row">
+          <input type="checkbox" name="expansion" checked={expansion} onChange={(e) => setExpansion(e.target.checked)} /> Include the Space
+          Agencies expansion
+        </label>
+        {expansion ? (
+          <>
+            <label className="row">
+              <input
+                type="checkbox"
+                name="organizations"
+                checked={organizations && orgsAllowed}
+                disabled={!orgsAllowed}
+                onChange={(e) => setOrganizations(e.target.checked)}
+              />{" "}
+              Organizations and quick start cards (4 rounds)
+            </label>
+            {orgsAllowed ? null : (
+              <p className="small muted">Organizations are not available against the solo rival yet; use the sandbox.</p>
+            )}
+            {orgsOn ? (
+              <>
+                <label className="row">
+                  <input type="checkbox" name="beginner" /> First game: organizations 1 to 4 and two quick start cards
+                </label>
+                {players <= 2 ? (
+                  <label className="row">
+                    <input type="checkbox" name="neutral" /> Neutral quick start pieces (1 to 2 players)
+                  </label>
+                ) : null}
+              </>
+            ) : null}
+            <p className="small muted">
+              The 42 new cards and the three new alien species are not in the game yet. For now the expansion adds signal tokens and the
+              organization module.
+            </p>
+          </>
+        ) : null}
+      </fieldset>
     </>
   );
 }
