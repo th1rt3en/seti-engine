@@ -213,11 +213,6 @@ td {
   object-fit: cover;
   transition: transform 0.12s;
 }
-.cardimg:hover {
-  transform: scale(1.8);
-  z-index: 5;
-  position: relative;
-}
 .cardback {
   display: inline-flex;
   align-items: center;
