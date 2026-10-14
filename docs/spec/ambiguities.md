@@ -314,3 +314,21 @@ Entry format:
 - Proposed ruling: that mapping; a trace gained in any way (also from a quick start card at setup? no: setup marks give no benefits) reactivates the matching inactive tile.
 - Questions for the owner: confirm the colors of the three tiles.
 
+## A-038: Rewards of the reward spaces of Cosmos Strategy Group and Helion Assembly
+- Status: proposed (the engine uses this reading)
+- Rule IDs affected: EXP-ORG-11, EXP-ORG-13
+- Rulebook page and text: R16 p.2 and p.8 (pictures and FAQ): Cosmos Strategy Group shows three reward spaces (credit, publicity, data) that a card of a matching sector color marks (black matches all); Helion Assembly shows three spaces (energy for a probe tech, a signal token for a scan tech, data for a computer tech). The amounts are not legible in the picture; the extracted data names the resources only (Helion: "grants 1 energy", "1 signal token", "1 data").
+- Readings: (1) every space gives 1 of its resource; (2) some give more.
+- Consequence: the resources gained.
+- Proposed ruling: reading 1. Marking is a choice (the rule says "may").
+- Questions for the owner: confirm the amounts, and for Cosmos which color maps to which space (yellow to credit, red to publicity, blue to data, as in the extracted data).
+
+## A-039: Orbital Dynamics' once-per-round free action
+- Status: open
+- Rule IDs affected: EXP-ORG-13 (Orbital Dynamics)
+- Rulebook page and text: R16 p.2 (picture): "Once per round: move at most 2 different probes of yours with 1 step each".
+- Readings: (1) each step costs 1 movement as a normal move would, but needs no energy or movement point (a normal move cost, including leaving an asteroid field or the extra cost of leaving a planet, is still paid from nowhere, i.e. free); (2) each step is a move that only costs what the board space adds (visiting publicity icons, asteroid leaving costs); (3) a step is exactly 1 movement point, gained for free, spent as usual.
+- Consequence: whether the action can move a probe out of an asteroid field or from a planet, and whether publicity is gained from the spaces entered.
+- Proposed ruling: none yet; the engine does not offer this action until the owner rules.
+- Questions for the owner: choose the reading.
+

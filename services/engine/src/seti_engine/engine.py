@@ -155,6 +155,8 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
         return [{"type": "resolve_sector", "sector": i} for i in d.data["sectors"] if i in state.completed]
     if d.kind in ("choose_org", "choose_quick"):
         return orgs.choose_moves(state, d)  # EXP-ORG-04
+    if d.kind == "org_mark":
+        return orgs.mark_moves(state, d)  # EXP-ORG-11
     if d.kind == "setup_tuck":
         return [{"type": "tuck", "card": c} for c in dict.fromkeys(p.hand)]
     if d.kind == "income_tuck":
@@ -260,6 +262,9 @@ def _main_moves(state: GameState, p: PlayerState) -> list[Action]:
                 for moon in tables.planet_info(planet)["moons"]:
                     if moon not in state.planets[planet].moon_landers:
                         out.append({"type": "land", "probe": pr.id, "moon": moon})
+    out += orgs.main_moves(
+        state, p, sum(1 for pr in probes_in_space(state, p) if not pr.capsule) < probe_limit(p), techs.research_moves(state, p)
+    )  # EXP-ORG-12, EXP-ORG-13
     out += _pluto_moves(state, p)  # PROMO-02
     if p.credits >= 1 and p.energy >= 2:
         out.append({"type": "scan"})  # SCAN-01
@@ -450,6 +455,8 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     elif t == "play_card":
         s.main_done = True
         cards.play(s, p, a["card"], events)
+    elif t == "org_main":
+        _org_main(s, p, a, events)
     elif t == "complete_mission":
         cards.complete_quick(s, p, a["card"], events)
     elif t == "deliver_sample":
@@ -531,6 +538,31 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         _place_data(s, p, events)
     elif t == "org_free":
         orgs.free_action(s, p, a, events)  # EXP-ORG-10
+
+
+def _org_main(s: GameState, p: PlayerState, a: Action, events: list[dict[str, Any]]) -> None:
+    """EXP-ORG-12, EXP-ORG-13: Xenolab's discounted actions (the tile flips inactive) and Futurespan's prepared card played for free."""
+    s.main_done = True
+    if a["org"] == "futurespan_institute":
+        cid = p.org_data.pop("fs_card")
+        p.org_data.pop("fs_token")
+        p.hand.append(cid)  # the prepared card is not in the hand, so it goes back for the play
+        cards.play(s, p, cid, events, free=True)
+        return
+    p.org_data["tiles"][a["tile"]] = False
+    if a["tile"] == "launch":
+        effects.pay(p, credits=1)
+        effects.launch_probe(s, p, events)
+    elif a["tile"] == "scan":
+        effects.pay(p, energy=2)
+        techs.start_scan(s, p)
+        events.append({"type": "scan", "player": p.index})
+        cards.fire(s, p, [{"e": "scan"}], events)
+    else:
+        effects.pay(p, publicity=4)
+        _rotate(s, events)
+        techs.take_tech(s, p, a["stack"], events)
+        cards.fire(s, p, [{"e": "tech", "cat": s.tech_stacks[a["stack"]].category}], events)
 
 
 def _orbit_land_free_moves(s: GameState, p: PlayerState, d: Decision) -> list[Action]:
@@ -655,7 +687,8 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
         return
     if d.kind in ("choose_org", "choose_quick"):
         orgs.resolve_choice(s, p, d, a, events)
-        pass
+    elif d.kind == "org_mark":
+        orgs.resolve_mark(s, p, a)
     elif t == "tuck":
         effects.tuck_card(s, p, a["card"])
         events.append({"type": "tuck", "player": p.index, "card": a["card"]})

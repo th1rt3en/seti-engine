@@ -74,6 +74,16 @@ export const LABELS: Record<string, Label> = {
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
   choose_quick: (m) => `Keep the quick start card ${quickText(m.card)}`,
   org_free: (m) => orgFreeLabel(m),
+  org_mark: (m) => `Mark the ${String(m.space).replace("_", " ")} reward space on your organization and gain it`,
+  org_skip: () => "Do not mark a reward space",
+  org_main: (m) =>
+    m.org === "futurespan_institute"
+      ? "Futurespan Institute: play the prepared card for free"
+      : m.tile === "launch"
+        ? "Xenolab: launch a probe (1 credit, flips the launch tile)"
+        : m.tile === "scan"
+          ? "Xenolab: scan (2 energy, flips the scan tile)"
+          : `Xenolab: research the tech in stack ${Number(m.stack) + 1} (4 publicity, flips the research tile)`,
   scan_token: (m) => `Discard a signal token and ${source(m.source)} for a signal`,
   choose_gold: (m) => `Mark the ${String(m.tile)} gold scoring tile`,
   orbit: (m) => `Orbit ${m.at === "pluto" ? "Pluto " : ""}with probe ${String(m.probe)} (1 credit, 1 energy)`,
@@ -129,6 +139,13 @@ function orgFreeLabel(m: Move): string {
   if (org === "stratus_core") return `${name}: gain the free-action corners of all cards in the card row`;
   if (org === "deep_sky_survey") return `${name}: switch ${cardName(m.card)} with card ${Number(m.row) + 1} of the card row`;
   if (org === "sentinel_probe_network") return `${name}: gain the free-action corner of the card you played`;
+  if (org === "futurespan_institute")
+    return m.delay
+      ? `${name}: move the token 3 spaces farther and gain a card`
+      : `${name}: prepare ${cardName(m.card)} (the token goes 10 points per credit of cost + 5 ahead)`;
+  if (org === "cosmos_strategy_group") return `${name}: gain ${source(m.source)} and clear your marked reward spaces`;
+  if (org === "helion_assembly")
+    return `${name}: destroy your ${String(m.tech)} tech, tuck ${cardName(m.card)} for income and clear your marked reward spaces`;
   if (org === "turing_systems") return `${name}: use the ${String(m.tech)} tech this turn`;
   return `${name}: use the once-per-round ability`;
 }

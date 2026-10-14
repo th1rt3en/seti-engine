@@ -205,12 +205,14 @@ def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events)
     """Mark a trace on the space `a` names; it counts for the color of that space (CARD-46, A-017, A-022)."""
     from . import (
         cards,  # noqa: PLC0415 - cards imports this module
+        orgs,  # noqa: PLC0415 - orgs imports this module
         species,  # noqa: PLC0415 - species imports this module
     )
 
     slot = s.species[a["slot"]]
     kind = a["color"]  # A-017, A-022: every space, overflow ones too, has a color; a trace counts for the color of its space
     p.trace_log.append((a["slot"], kind))
+    orgs.on_trace(p, kind)  # Xenolab (EXP-ORG-13)
     if a["space"] == "board":
         species.mark_board_space(s, p, a["slot"], a["color"], a["index"], events)
     elif a["space"] == "sample":  # a Mascamite sample token on a blue space (ALIEN-MASC-05)

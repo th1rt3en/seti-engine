@@ -91,6 +91,6 @@ The three species are mixed with the five originals (EXP-03). Their boards, rewa
 
 ## Implementation status (engine)
 
-Implemented and tested: EXP-01, EXP-SIG-01, EXP-SIG-02, EXP-ORG-02 to EXP-ORG-08, EXP-ORG-10, EXP-QS-01 to EXP-QS-04 (neutral pieces; a neutral marker never wins a sector), the setup choices, the `beginner_organizations` option, and the powers of Fenwick Research Center, Stratus Core, Deep Sky Survey, Turing Systems, Sentinel Probe Network, Mission Relay and Orbital Dynamics' probe limit and two starting probes.
+Implemented and tested (`services/engine/tests/test_expansion.py`): EXP-01, EXP-SIG-01, EXP-SIG-02, EXP-ORG-02 to EXP-ORG-12, EXP-QS-01 to EXP-QS-04 (a neutral marker never wins a sector), the setup choices, the `beginner_organizations` option, and every organization except Orbital Dynamics' free action: Fenwick Research Center, Stratus Core, Deep Sky Survey, Turing Systems, Sentinel Probe Network, Mission Relay, Cosmos Strategy Group and Helion Assembly (reward spaces with 1 of each resource, A-038), Xenolab (action tiles, A-037), Futurespan Institute (prepared card, A-036), and Orbital Dynamics' probe limit and two starting probes.
 
-Not yet implemented: the free action of Orbital Dynamics; the reward spaces of Cosmos Strategy Group and Helion Assembly (EXP-ORG-11) and Helion's free action; Xenolab's action tiles (A-037); Futurespan Institute's prepared card (EXP-ORG-12); the solo game with organizations (EXP-SOLO-*, A-033, A-034); the 42 cards and the three species (A-028, A-032); the promo card (A-035).
+Not yet implemented: the free action of Orbital Dynamics (A-039); the solo game with organizations (EXP-SOLO-*, A-033, A-034); the 42 cards and the three species (A-028, A-032); the promo card (A-035).

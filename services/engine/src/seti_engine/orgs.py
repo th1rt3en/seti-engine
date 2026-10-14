@@ -233,10 +233,30 @@ def on_launch(s: GameState, p: PlayerState, events: Events) -> None:
         rewards.mark_signal(s, p, solar.earth(s)[1], events)
 
 
+HELION_SPACES = {"probe": "energy", "telescope": "signal_token", "computer": "data"}  # EXP-ORG-11, A-038
+COSMOS_SPACES = {"credit": ("yellow", "black"), "publicity": ("red", "black"), "data": ("blue", "black")}  # A-038
+
+
 def on_tech(s: GameState, p: PlayerState, category: str) -> None:
-    """Turing Systems: when you research a computer tech, gain 1 publicity."""
+    """Turing Systems: when you research a computer tech, gain 1 publicity. Helion Assembly: when you develop a tech you may mark the
+    matching reward space (EXP-ORG-11)."""
     if p.organization == "turing_systems" and category == "computer":
         effects.gain_publicity(s, p)
+    if p.organization == "helion_assembly" and HELION_SPACES[category] not in p.org_marks:
+        s.pending.append(Decision(kind="org_mark", player=p.index, data={"spaces": [HELION_SPACES[category]]}))
+
+
+def mark_moves(s: GameState, d: Decision) -> list[Action]:
+    return [*({"type": "org_mark", "space": x} for x in d.data["spaces"]), {"type": "org_skip"}]
+
+
+def resolve_mark(s: GameState, p: PlayerState, a: Action) -> None:
+    """Mark a reward space of Cosmos Strategy Group or Helion Assembly and gain its reward (1 of the resource, A-038)."""
+    if a["type"] == "org_skip":
+        return
+    space = a["space"]
+    p.org_marks.append(space)
+    rewards.grant(s, p, [{"t": space}], [])
 
 
 def on_mission_played(s: GameState, p: PlayerState) -> None:
@@ -249,6 +269,39 @@ def on_card_played(s: GameState, p: PlayerState, cid: str, alien: bool) -> None:
     """Sentinel Probe Network keeps the corner of the last non-alien card played as a main action, for its free action."""
     if p.organization == "sentinel_probe_network" and not alien:
         p.org_data["corner"] = cid
+    if p.organization == "cosmos_strategy_group":  # EXP-ORG-13: a card played as a main action may mark a matching reward space
+        sector = tables.cards()[cid]["sector"]
+        spaces = [x for x, colors in COSMOS_SPACES.items() if sector in colors and x not in p.org_marks]
+        if spaces:
+            s.pending.append(Decision(kind="org_mark", player=p.index, data={"spaces": spaces}))
+
+
+XENO_TILES = {"launch": "blue", "scan": "yellow", "research": "pink"}  # A-037: the trace color that flips the tile active again
+
+
+def on_trace(p: PlayerState, color: str) -> None:
+    """Xenolab: when you gain the trace shown on an inactive tile, flip it back to active (the trace is still gained)."""
+    if p.organization == "xenolab":
+        for tile, c in XENO_TILES.items():
+            if c == color:
+                p.org_data["tiles"][tile] = True
+
+
+def main_moves(s: GameState, p: PlayerState, can_launch: bool, research: list[Action]) -> list[Action]:
+    """Xenolab's active tiles are discounted main actions (EXP-ORG-13); Futurespan's prepared card is played for free once the score reaches
+    the token (EXP-ORG-12)."""
+    out: list[Action] = []
+    if p.organization == "xenolab":
+        tiles = p.org_data["tiles"]
+        if tiles["launch"] and p.credits >= 1 and can_launch:
+            out.append({"type": "org_main", "org": "xenolab", "tile": "launch"})
+        if tiles["scan"] and p.energy >= 2:
+            out.append({"type": "org_main", "org": "xenolab", "tile": "scan"})
+        if tiles["research"] and p.publicity >= 4:
+            out += [{"type": "org_main", "org": "xenolab", "tile": "research", "stack": m["stack"]} for m in research]
+    if p.organization == "futurespan_institute" and p.org_data.get("fs_card") and p.score >= p.org_data["fs_token"]:
+        out.append({"type": "org_main", "org": "futurespan_institute"})
+    return out
 
 
 def end_turn(s: GameState, p: PlayerState) -> None:
@@ -266,11 +319,24 @@ def _sources(s: GameState) -> list[str]:
     return ["deck", *(f"row:{i}" for i in range(len(s.card_row)))]
 
 
+def prepare_cost(cid: str) -> int:
+    """The cost of a card for Futurespan: credits, or energy for a Centaurian card (A-036 c)."""
+    return int(tables.cards()[cid]["cost"])
+
+
 def free_moves(s: GameState, p: PlayerState) -> list[Action]:
-    if p.organization is None or p.org_used:
+    if p.organization is None:
         return []
     o = p.organization
     base: Action = {"type": "org_free", "org": o}
+    if o == "futurespan_institute":
+        if not p.org_data.get("fs_card"):  # EXP-ORG-12: one prepared card at a time
+            return [{**base, "card": c} for c in dict.fromkeys(p.hand)]
+        if not p.org_used:  # once per round while the token is on the scoring track: 3 spaces farther, and a card
+            return [{**base, "delay": True}]
+        return []
+    if p.org_used:
+        return []
     if o == "fenwick_research_center" and p.publicity >= 1:
         return [{**base, "source": x} for x in _sources(s)]
     if o == "mission_relay" and p.publicity >= 2:
@@ -279,6 +345,11 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
         return [base]
     if o == "deep_sky_survey" and p.hand and s.card_row:
         return [{**base, "card": c, "row": i} for c in dict.fromkeys(p.hand) for i in range(len(s.card_row))]
+    if o == "cosmos_strategy_group":
+        return [{**base, "source": x} for x in _sources(s)]
+    if o == "helion_assembly" and p.hand:
+        techs = [t for t in p.techs if t.startswith(("probe-", "telescope-")) and t not in p.org_data.get("disabled", [])]
+        return [{**base, "tech": t, "card": c} for t in techs for c in dict.fromkeys(p.hand)]
     if o == "sentinel_probe_network" and p.org_data.get("corner"):
         return [base]
     if o == "turing_systems":
@@ -295,6 +366,17 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
     from . import cards  # noqa: PLC0415 - cards imports this module
 
     o = a["org"]
+    if o == "futurespan_institute":
+        if a.get("delay"):  # EXP-ORG-12
+            p.org_used = True
+            p.org_data["fs_token"] += 3
+            effects.draw_random_card(s, p)  # A-036 (e): a random card of the deck
+        else:
+            p.hand.remove(a["card"])
+            p.org_data["fs_card"] = a["card"]
+            p.org_data["fs_token"] = p.score + 10 * prepare_cost(a["card"]) + 5  # A-036 (c)
+        events.append({"type": "org_free", "player": p.index, "org": o})
+        return
     p.org_used = True
     events.append({"type": "org_free", "player": p.index, "org": o})
     if o == "fenwick_research_center":  # spend 1 publicity: a card, then its free-action corner
@@ -315,6 +397,13 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         p.hand.remove(a["card"])
         s.card_row[i], swapped = a["card"], s.card_row[i]
         p.hand.append(swapped)
+    elif o == "cosmos_strategy_group":  # a card from the row or the deck, then every marked reward space is cleared
+        effects.take_from_row_or_deck(s, p, a["source"])
+        p.org_marks = []
+    elif o == "helion_assembly":  # destroy a tech, tuck a card for income, clear the marked spaces
+        p.org_data.setdefault("disabled", []).append(a["tech"])
+        effects.tuck_card(s, p, a["card"])
+        p.org_marks = []
     elif o == "sentinel_probe_network":
         cards.gain_corner(s, p, p.org_data.pop("corner"))
     elif o == "turing_systems":  # until the end of the turn, as if researched, without the immediate bonuses

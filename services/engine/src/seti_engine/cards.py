@@ -45,9 +45,10 @@ def play_moves(s: GameState, p: PlayerState) -> list[Action]:
     ]
 
 
-def play(s: GameState, p: PlayerState, cid: str, events: Events) -> None:
-    """PLAY-01: pay the cost, then resolve the effect. The card goes to the discard pile afterwards unless it stays (PLAY-02)."""
-    cost = card_cost(cid)
+def play(s: GameState, p: PlayerState, cid: str, events: Events, free: bool = False) -> None:
+    """PLAY-01: pay the cost, then resolve the effect. The card goes to the discard pile afterwards unless it stays (PLAY-02). `free` is
+    Futurespan Institute's prepared card (EXP-ORG-12)."""
+    cost = 0 if free else card_cost(cid)
     if pays_energy(cid):
         effects.pay(p, energy=cost)
     else:
