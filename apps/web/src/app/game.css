@@ -1651,3 +1651,10 @@ button:disabled {
     display: none;
   }
 }
+
+/* a move that cannot be taken back asks for a confirmation first */
+.confirm.warn {
+  flex-wrap: wrap;
+  border-left: 4px solid #e0a030;
+  padding-left: 10px;
+}

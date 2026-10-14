@@ -10,6 +10,8 @@ const TRACE_COLORS = ["pink", "yellow", "blue"];
 
 /** What the engine says about a move (see move_notes.py). */
 export type Note = {
+  /** The move shows something hidden and cannot be taken back: ask for a confirmation first (UNDO-01). */
+  irreversible?: boolean;
   action?: "orbit" | "land";
   planet?: string;
   moon?: string | null;

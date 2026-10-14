@@ -263,7 +263,15 @@ describe("words for the moves (decision D10)", () => {
       ["Free actions", 1],
       ["Turn", 1],
     ]);
-    expect(groupMoves(moves, true)).toHaveLength(1);
+    // the answers to a decision are one group; the free actions that may interrupt it (FREE-00) and the undo have groups of their own
+    expect(groupMoves([{ type: "scan_earth" }, { type: "scan_done" }], true)).toHaveLength(1);
+    expect(groupMoves([{ type: "scan_earth" }, { type: "move_energy" }, { type: "undo" }], true).map((g) => g.title)).toEqual([
+      "Your choice",
+      "Free actions",
+      "Undo",
+    ]);
+    // the free actions that are answers to a decision of their own (data overflow) stay with it
+    expect(groupMoves([{ type: "place_data" }, { type: "data_done" }], true, true)).toHaveLength(1);
   });
 });
 

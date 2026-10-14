@@ -8,6 +8,7 @@ import {
   groupMoves,
   handHint,
   handMoveText,
+  irreversibleText,
   isHandMove,
   sameMove,
 } from "@/lib/moves";
@@ -128,6 +129,7 @@ export function GameClient({
           setPickedBuy(null);
           setPickedOffer(null);
           setPendingMove(null);
+          setUnsure(null);
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
@@ -187,7 +189,22 @@ export function GameClient({
   }, [choosing, viewer]);
 
   const send = useCallback((msg: unknown) => socket.current?.send(JSON.stringify(msg)), []);
-  const play = (move: Move) => send({ t: "action", seq: seq.current, action: move });
+  // a move that shows something hidden cannot be taken back: the player confirms it first (UNDO-01)
+  const [unsure, setUnsure] = useState<Move | null>(null);
+  const play = (move: Move) => {
+    const current = latest.current;
+    const at = current ? (current.legal as Move[]).findIndex((l) => sameMove(l, move)) : -1;
+    const note = at >= 0 ? (current?.notes[at] as Note | null | undefined) : null;
+    if (note?.irreversible) {
+      setUnsure(move);
+      return;
+    }
+    send({ t: "action", seq: seq.current, action: move });
+  };
+  const playConfirmed = (move: Move) => {
+    setUnsure(null);
+    send({ t: "action", seq: seq.current, action: move });
+  };
 
   if (view === null) {
     return (
@@ -319,9 +336,24 @@ export function GameClient({
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
+      {unsure ? (
+        <div className="confirmbar">
+          <div className="confirm warn">
+            <span>
+              <b>Cannot be undone.</b> {irreversibleText(unsure)} Continue with “{describeMove(unsure)}”?
+            </span>
+            <button type="button" className="primary" onClick={() => playConfirmed(unsure)}>
+              Continue
+            </button>
+            <button type="button" className="secondary" onClick={() => setUnsure(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : null}
       {mine.length > 0 && !ended ? (
         <div className="movegroups">
-          {groupMoves(otherMoves, pending).map((g) => (
+          {groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow").map((g) => (
             <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
               <div className="moves">
                 {g.moves.map((m, i) => {
