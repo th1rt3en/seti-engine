@@ -1620,3 +1620,34 @@ button:disabled {
     user-select: none;
   }
 }
+
+/* the group of free actions: a title that folds it on a phone (on a wide window it is a plain label and the moves always show) */
+.glabel.groupfold {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: default;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+}
+.glabel.groupfold [aria-hidden="true"] {
+  display: none;
+}
+@media (max-width: 760px) {
+  .glabel.groupfold {
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 6px 4px;
+    color: var(--fg, inherit);
+  }
+  .glabel.groupfold [aria-hidden="true"] {
+    display: inline;
+  }
+  .mgroup.foldable.folded .moves {
+    display: none;
+  }
+}

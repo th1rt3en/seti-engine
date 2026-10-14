@@ -21,6 +21,7 @@ import assets from "../generated/assets.json";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
+import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SpotPrompt } from "./SpotPrompt";
@@ -321,8 +322,7 @@ export function GameClient({
       {mine.length > 0 && !ended ? (
         <div className="movegroups">
           {groupMoves(otherMoves, pending).map((g) => (
-            <div key={g.title} className="mgroup">
-              <span className="glabel">{g.title}</span>
+            <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
               <div className="moves">
                 {g.moves.map((m, i) => {
                   const idle = m.type === "move_energy" && noProbe;
@@ -343,7 +343,7 @@ export function GameClient({
                   );
                 })}
               </div>
-            </div>
+            </MoveGroup>
           ))}
           {reach.length > 0 ? (
             <div className="mgroup moveui">
