@@ -1380,7 +1380,7 @@ button:disabled {
   }
 }
 
-/* a picture enlarged by a tap (touch screens): in the middle of the window, away after a few seconds or when tapped */
+/* a picture enlarged by holding it (touch screens): in the middle of the window, away after a few seconds or when tapped */
 .tapzoom {
   position: fixed;
   inset: 0;
@@ -1608,4 +1608,46 @@ button:disabled {
 }
 .samplespaces li.taken {
   opacity: 0.7;
+}
+
+/* touch screens: holding a card shows it enlarged, so the phone's own menu and text selection for a held picture must stay away */
+@media (pointer: coarse) {
+  .cardimg,
+  .logcard,
+  .tapzoomable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* the group of free actions: a title that folds it on a phone (on a wide window it is a plain label and the moves always show) */
+.glabel.groupfold {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: default;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+}
+.glabel.groupfold [aria-hidden="true"] {
+  display: none;
+}
+@media (max-width: 760px) {
+  .glabel.groupfold {
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 6px 4px;
+    color: var(--fg, inherit);
+  }
+  .glabel.groupfold [aria-hidden="true"] {
+    display: inline;
+  }
+  .mgroup.foldable.folded > :not(.glabel) {
+    display: none;
+  }
 }
