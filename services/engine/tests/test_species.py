@@ -134,13 +134,13 @@ def test_trace_on_a_board_counts_for_missions() -> None:
 # --- Anomalies -------------------------------------------------------------------------------------------------------------------
 
 
-def test_anomalies_are_placed_opposite_earth_and_two_sectors_either_side() -> None:
+def test_anomalies_are_placed_in_earths_sector_and_three_sectors_either_side() -> None:
     """ALIEN-ANO-01: the placement is logged with each token's sector, color, face and reward."""
     r = discover(game(), 0)
     s = r.state
     e = solar.earth(s)[1]
     toks = s.species[0].extra["tokens"]
-    assert sorted(t["sector"] for t in toks) == sorted([(e + 4) % 8, (e + 2) % 8, (e - 2) % 8])
+    assert sorted(t["sector"] for t in toks) == sorted([e, (e + 3) % 8, (e - 3) % 8])
     assert sorted(t["color"] for t in toks) == ["blue", "pink", "yellow"]
     placed = [x for x in r.events if x["type"] == "anomalies_placed"]
     assert len(placed) == 1 and placed[0]["earth_sector"] == e

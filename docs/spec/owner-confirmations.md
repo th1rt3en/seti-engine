@@ -31,4 +31,4 @@ The owner confirmed every row of the alien species, solo and scoring, and card d
 
 ## Anomaly token placement, 2026-10-14
 
-The owner corrected ALIEN-ANO-01: the tokens go opposite Earth and 2 sectors clockwise and counter-clockwise of Earth (earlier text said Earth's sector and 3 either side). The rule sheet PDF is not in the repo (`docs/rules/` is absent), so this was not re-checked against the sheet; the owner should confirm against it. Placement and each resolution are logged.
+The owner re-checked ALIEN-ANO-01 against the rulebook: one token in Earth's sector, the others 3 sectors either side. The spec text was right and is unchanged. Placement (`anomalies_placed`) and each resolution (`anomaly`) are now written to the log.

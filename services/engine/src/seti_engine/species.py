@@ -163,11 +163,11 @@ def _token_reward(color: str, side: int) -> list[dict[str, Any]]:
 
 
 def _setup_anomalies(s: GameState, slot: SpeciesSlot, events: Events) -> None:
-    """ALIEN-ANO-01: one token opposite Earth, the other two 2 sectors clockwise and counter-clockwise of Earth (owner, 2026-10-14)."""
+    """ALIEN-ANO-01: one token in Earth's sector, the other two 3 sectors clockwise and counter-clockwise of Earth."""
     from . import solar  # noqa: PLC0415
 
     earth_sector = solar.earth(s)[1]
-    sectors = [(earth_sector + 4) % 8, (earth_sector + 2) % 8, (earth_sector - 2) % 8]
+    sectors = [earth_sector, (earth_sector + 3) % 8, (earth_sector - 3) % 8]
     cols = rng.shuffled(s, list(COLORS))  # which anomaly goes where is not ruled: seeded random order (A-004)
     slot.extra["tokens"] = [{"sector": sec, "color": col, "side": rng.below(s, 2)} for sec, col in zip(sectors, cols, strict=True)]
     events.append(
