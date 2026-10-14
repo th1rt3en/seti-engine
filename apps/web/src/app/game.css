@@ -1647,7 +1647,7 @@ button:disabled {
   .glabel.groupfold [aria-hidden="true"] {
     display: inline;
   }
-  .mgroup.foldable.folded .moves {
+  .mgroup.foldable.folded > :not(.glabel) {
     display: none;
   }
 }

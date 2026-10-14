@@ -346,8 +346,7 @@ export function GameClient({
             </MoveGroup>
           ))}
           {reach.length > 0 ? (
-            <div className="mgroup moveui">
-              <span className="glabel">Move a probe</span>
+            <MoveGroup title="Move a probe" count={reach.length} foldable forceOpen={pickedProbe !== null} className="moveui">
               <div className="moves">
                 {reach.map((r) => {
                   const at = v.state.probes.find((x) => x.id === r.probe);
@@ -395,7 +394,7 @@ export function GameClient({
                     ? "No space is in reach: add energy."
                     : "Click a highlighted space; its number is what the move costs."}
               </span>
-            </div>
+            </MoveGroup>
           ) : null}
           {resourceTrades.map((list) => (
             <div key={String(list[0]?.give)} className="mgroup">
