@@ -1380,7 +1380,7 @@ button:disabled {
   }
 }
 
-/* a picture enlarged by a tap (touch screens): in the middle of the window, away after a few seconds or when tapped */
+/* a picture enlarged by holding it (touch screens): in the middle of the window, away after a few seconds or when tapped */
 .tapzoom {
   position: fixed;
   inset: 0;
@@ -1608,4 +1608,15 @@ button:disabled {
 }
 .samplespaces li.taken {
   opacity: 0.7;
+}
+
+/* touch screens: holding a card shows it enlarged, so the phone's own menu and text selection for a held picture must stay away */
+@media (pointer: coarse) {
+  .cardimg,
+  .logcard,
+  .tapzoomable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }

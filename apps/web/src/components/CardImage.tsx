@@ -2,7 +2,7 @@
 // A card image (generated/assets.json). A hidden card ("?") is shown as a card back. The files are WebP images with the hash of their content
 // in the name, so Cloudflare and the browser keep them for good. Hovering a card shows it large beside it.
 import { cardName } from "@/lib/moves";
-import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
+import { ZOOM_SECONDS, touchScreen, useLongPress } from "@/lib/touch";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
@@ -13,6 +13,8 @@ const zoomWidth = (): number => Math.round(Math.min(500, Math.max(320, window.in
 const RATIO = 1040 / 747;
 /** The enlarged card appears when the pointer has rested on a card this long. */
 const HOVER_DELAY_MS = 1000;
+/** The finger that held a card lifts over the enlarged card: that click must not close it at once. */
+const RELEASE_GUARD_MS = 600;
 
 /** Where the card is shown decides its size (CSS classes that follow the width of the window); `width` is used when no size is given. */
 export type CardSize = "hand" | "mission" | "row";
@@ -27,9 +29,11 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
     setZoom(null);
   };
   // on a touch screen the enlarged card goes away after a few seconds, or when it is tapped
+  const opened = useRef(0);
   const showOnTouch = () => {
     cancel();
     show();
+    opened.current = Date.now();
     timer.current = setTimeout(cancel, ZOOM_SECONDS * 1000);
   };
   useEffect(
@@ -38,6 +42,7 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
     },
     [],
   );
+  const longPress = useLongPress(() => touchScreen() && showOnTouch());
   const height = Math.round(width * RATIO);
   const src = CARDS[id];
 
@@ -67,8 +72,8 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
 
   return (
     <>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: a zoom of a picture for touch screens; the picture is not an action */}
       <img
+        {...longPress}
         ref={img}
         className={size ? `cardimg card-${size}` : "cardimg"}
         src={src}
@@ -83,8 +88,7 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
           cancel();
           timer.current = setTimeout(show, HOVER_DELAY_MS);
         }}
-        onMouseLeave={cancel}
-        onClick={() => touchScreen() && showOnTouch()}
+        onMouseLeave={() => !touchScreen() && cancel()}
       />
       {zoom
         ? // in the page itself, so that no transform of the card or its panel moves it
@@ -97,7 +101,7 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
               width={zoom.w}
               height={Math.round(zoom.w * RATIO)}
               style={{ left: zoom.x, top: zoom.y, pointerEvents: touchScreen() ? "auto" : undefined }}
-              onClick={cancel}
+              onClick={() => Date.now() - opened.current > RELEASE_GUARD_MS && cancel()}
             />,
             document.body,
           )
