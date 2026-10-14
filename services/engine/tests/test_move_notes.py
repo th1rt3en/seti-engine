@@ -133,3 +133,21 @@ def test_taking_an_alien_card_says_which_species_and_which_card_lies_face_up() -
     by_source = {m["source"]: n for m, n in zip(legal, notes, strict=True)}
     assert by_source["deck"] == {"slot": 1, "alien": "deck", "card": None}  # the card on the deck is not named
     assert by_source["face_up"] == {"slot": 1, "alien": "face_up", "card": "ET.3"}
+
+
+def test_a_signal_in_the_sector_of_oumuamua_names_the_sector_and_tells_the_tile_from_the_sector() -> None:
+    """ALIEN-OUM-03: the same sector, two places: the sector itself and the tile of 'Oumuamua."""
+    from seti_engine import species
+    from seti_engine.models import Decision
+
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    s.species[0].species = "oumuamua"
+    species._discover(s, 0, [])
+    s.pending = [Decision(kind="oumuamua_signal", player=pl, data={})]
+    legal = legal_moves(s)
+    notes = projection.move_notes.notes(s, legal)
+    by_where = {m["where"]: n for m, n in zip(legal, notes, strict=True)}
+    sector = species.oumuamua_sector(s)
+    assert by_where["sector"] == {"sector": sector, "star": s.sectors[sector].star, "color": s.sectors[sector].color}  # type: ignore[index]
+    assert by_where["tile"]["oumuamua_tile"] is True and by_where["tile"]["sector"] == sector

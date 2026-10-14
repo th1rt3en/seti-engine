@@ -673,7 +673,9 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
         picks = [{"type": "hand_signal", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
         return [*picks, {"type": "hand_signal_done"}]
     if d.kind == "mission_trigger":
-        return [{"type": "cover", "card": c, "circle": i} for c, i in d.data["options"]] + [{"type": "decline_cover"}]
+        # CARD-12, CARD-15: a circle that an earlier decision of the same action covered (or of a completed mission) is no longer offered
+        open_circles = [(c, i) for c, i in d.data["options"] if any(m.card == c and not m.used[i] for m in p.missions)]
+        return [{"type": "cover", "card": c, "circle": i} for c, i in open_circles] + [{"type": "decline_cover"}]
     if d.kind == "remove_orbiter":
         return remove_orbiter_moves(s, p)
     if d.kind == "remove_lander":

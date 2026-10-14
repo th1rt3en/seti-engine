@@ -2,7 +2,7 @@
 // and says what each one means (`view.notes`, from move_notes.py); this file only says where on the picture each of them is, so that the board can
 // highlight the place and the player can click it. A move that has no place here stays a button of the bar.
 import type { View } from "@seti/protocol";
-import { ALIEN, ALIEN_COLUMN, ALIEN_TOP, DISCOVERY, MOON, PLANET, RING_BOUNDS, alienColumn, polar } from "./geometry";
+import { ALIEN, ALIEN_COLUMN, ALIEN_TOP, DISCOVERY, MOON, OUMUAMUA_TILE, PLANET, RING_BOUNDS, alienColumn, polar } from "./geometry";
 import type { Move } from "./moves";
 import { SPECIES_SPACES } from "./speciesSpaces";
 
@@ -23,6 +23,7 @@ export type Note = {
   space?: string;
   rewards?: { t: string; n: number }[];
   alien?: "deck" | "face_up";
+  oumuamua_tile?: boolean;
   card?: string | null;
 } | null;
 
@@ -88,6 +89,11 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const k = st.landers.length;
         spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: pos.x - pos.r * 0.55 + k * 84, y: pos.y + pos.r * 0.22 + 20, r: 76 } };
       }
+    } else if (n.oumuamua_tile) {
+      // the data slot of the 'Oumuamua tile on disc 3: it turns with the disc (the turn of the disc is in `view.state.disc_angles`)
+      const turn = 45 * (s.disc_angles[2] ?? 0);
+      const mid = polar(OUMUAMUA_TILE.radius, (OUMUAMUA_TILE.degrees[1] ?? 165) + turn);
+      spot = { id: "oumuamua-tile", shape: { kind: "circle", x: mid.x, y: mid.y, r: 135 } };
     } else if (n.sector !== undefined) {
       spot = { id: `sector:${n.sector}`, shape: { kind: "path", d: sectorPath(n.sector) } };
     } else if (n.space && n.slot !== undefined && n.color) {

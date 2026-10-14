@@ -35,6 +35,13 @@ export function SpotPrompt({ note }: { note: Note }) {
       </span>
     );
   }
+  if (note.oumuamua_tile) {
+    return (
+      <span className="spotprompt">
+        Confirm marking signal on the <b>'Oumuamua tile</b> (in the {note.star} sector)?
+      </span>
+    );
+  }
   if (note.star) {
     return (
       <span className="spotprompt">

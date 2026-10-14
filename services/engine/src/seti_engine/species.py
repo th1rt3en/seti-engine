@@ -119,7 +119,8 @@ def resolve_discoveries(s: GameState, events: Events) -> bool:
     """Resolve species whose three discovery spaces are full, after the turn and its milestones. Returns True if one was resolved."""
     found = False
     for i, slot in enumerate(s.species):
-        if slot.complete and not slot.discovered:
+        # the three spaces decide, not the flag set when the last was filled: a species whose spaces are full is always revealed (ALIEN-01)
+        if not slot.discovered and (slot.complete or all(x is not None for x in slot.discovery_spaces)):
             found = True
             _discover(s, i, events)
     return found

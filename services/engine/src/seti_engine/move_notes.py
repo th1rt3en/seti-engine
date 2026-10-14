@@ -70,6 +70,15 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
     if kind in ("mark_signal", "scan_earth"):
         sector = state.sectors[move["sector"]]
         return {"sector": move["sector"], "star": sector.star, "color": sector.color}
+    if kind == "signal_where":  # ALIEN-OUM-03: a signal in the sector with 'Oumuamua: in the sector, or on the tile
+        at = species.oumuamua_sector(state)
+        if at is None:
+            return None
+        sector = state.sectors[at]
+        note: dict[str, Any] = {"sector": at, "star": sector.star, "color": sector.color}
+        if move["where"] == "tile":
+            note["oumuamua_tile"] = True
+        return note
     if kind == "take_alien":  # the top of the deck of a species (hidden), or the card that lies face up
         slot_index = state.pending[0].data["slot"]
         face_up = state.species[slot_index].face_up

@@ -8,6 +8,7 @@ function view(legal: Record<string, unknown>[], notes: (Record<string, unknown> 
     state: {
       planets: { mars: { orbiters: [0], landers: [], moon_landers: {} }, saturn: { orbiters: [], landers: [], moon_landers: {} } },
       species: [{ species: "mascamites" }, { species: "anomalies" }],
+      disc_angles: [0, 0, 2],
     },
     legal,
     notes,
@@ -82,5 +83,24 @@ describe("the deck of a species", () => {
     expect(handled.size).toBe(2);
     const [deck, faceUp] = spots.map((s) => (s.shape.kind === "rect" ? s.shape : null));
     expect(deck && faceUp && faceUp.y > deck.y && faceUp.x === deck.x).toBe(true); // one under the other, in a column
+  });
+});
+
+describe("a signal in the sector with 'Oumuamua", () => {
+  it("is made in the sector or on the tile, two places", () => {
+    const v = view(
+      [
+        { type: "signal_where", where: "sector" },
+        { type: "signal_where", where: "tile" },
+      ],
+      [
+        { sector: 4, star: "Vega", color: "red" },
+        { sector: 4, star: "Vega", color: "red", oumuamua_tile: true },
+      ],
+    );
+    const { spots, handled } = buildSpots(v);
+    expect(spots.map((s) => s.id)).toEqual(["sector:4", "oumuamua-tile"]);
+    expect(spots.map((s) => s.shape.kind)).toEqual(["path", "circle"]);
+    expect(handled.size).toBe(2);
   });
 });
