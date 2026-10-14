@@ -1,9 +1,8 @@
 """Alien species: boards, alien card decks, discovery and the per-species rules.
 
 Spec: aliens.md (ALIEN-01 to ALIEN-06, ALIEN-ANO-*, ALIEN-CEN-*), board-alien-species.md (ALIEN-DATA-10 to 13), faq.md (FAQ-40, FAQ-41).
-Implemented so far: the boards and trace marking for all species, the card decks, discovery, Anomalies and the Centaurian message
-milestones. Still to do (PROGRESS.md): Mascamite samples, 'Oumuamua tile and exofossil signals, Exertian cards and danger,
-alien card effects.
+Implemented: the boards and trace marking for all five base species, the card decks and every alien card effect, discovery, Anomalies,
+Centaurian messages, Exertian cards and danger, Mascamite samples and capsules, and the 'Oumuamua tile and exofossils.
 """
 
 from __future__ import annotations

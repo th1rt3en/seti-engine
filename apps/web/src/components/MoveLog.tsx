@@ -103,6 +103,8 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
       return `${who} wins the sector of ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
     case "discovered":
       return `${cap(ev.species)} is discovered`;
+    case "pluto":
+      return `${who} plays Not a planet since 2006: Pluto can now be orbited or landed on by them (outermost ring)`;
     case "anomalies_placed":
       return `anomaly tokens placed: ${(ev.tokens as AnomalyToken[]).map((k) => `${cap(k.color)} in ${sectorName(ctx, k.sector)} (${rewardText(k.reward)})`).join("; ")}`;
     case "messages_placed":

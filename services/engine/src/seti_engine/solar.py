@@ -94,20 +94,27 @@ def rotate(state: GameState) -> list[tuple[int, str]]:
     disc arrives over it, in which case it is pushed one space further in the rotation direction, for free (A-007).
     """
     rotating = state.rotations % 3 + 1
-    before = {p.id: (visible(state, p.ring, p.sector)[0]) for p in state.probes}
-    for d in range(1, rotating + 1):
-        state.disc_angles[d - 1] = (state.disc_angles[d - 1] + 1) % 8
+    gains = rotate_discs(state, set(range(1, rotating + 1)), 1)
     state.rotations += 1
+    return gains
+
+
+def rotate_discs(state: GameState, discs: set[int], step: int) -> list[tuple[int, str]]:
+    """Turn the given discs by one step (+1 is the direction of a rotation, -1 the other way); see `rotate` for what happens to probes.
+    The sandbox (D33) uses this for any disc and any direction."""
+    before = {p.id: (visible(state, p.ring, p.sector)[0]) for p in state.probes}
+    for d in discs:
+        state.disc_angles[d - 1] = (state.disc_angles[d - 1] + step) % 8
     gains: list[tuple[int, str]] = []
     state.pushed = []
     for p in state.probes:
         k0 = before[p.id]
-        if k0 <= rotating:
-            p.sector = (p.sector + 1) % 8  # the cell moved with its disc and carried the probe
+        if k0 in discs:
+            p.sector = (p.sector + step) % 8  # the cell moved with its disc and carried the probe
             continue
         disc_now = visible(state, p.ring, p.sector)[0]
-        if disc_now != k0:  # a solid cell of a rotating disc arrived: pushed along the rotation
-            p.sector = (p.sector + 1) % 8
+        if disc_now != k0 and disc_now in discs:  # a solid cell of a rotating disc arrived: pushed along the rotation
+            p.sector = (p.sector + step) % 8
             cell = visible(state, p.ring, p.sector)[1]
             state.pushed.append((p.player, cell))
             if has_publicity_icon(cell):

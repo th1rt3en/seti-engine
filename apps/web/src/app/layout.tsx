@@ -55,7 +55,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             This is an unofficial, fan-made, non-commercial project. It is not affiliated with, endorsed by or sponsored by Czech Games
             Edition (CGE). SETI: Search for Extraterrestrial Intelligence and its artwork, names and rules belong to their respective
             owners. If CGE asks us to take the project down or remove content, we will do so promptly. Takedown contact:{" "}
-            <strong>to be added by the owner before any public launch</strong>.
+            <a href="mailto:seti.web.tobiko11@gmail.com">seti.web.tobiko11@gmail.com</a>.
           </p>
         </footer>
       </body>

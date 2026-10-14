@@ -8,11 +8,13 @@ import {
   groupMoves,
   handHint,
   handMoveText,
+  irreversibleText,
   isHandMove,
   sameMove,
 } from "@/lib/moves";
 import { type Note, buildSpots } from "@/lib/targets";
 import { TECH_INFO, techName } from "@/lib/techs";
+import { useTurnSound } from "@/lib/turnSound";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
@@ -24,6 +26,7 @@ import { SampleReward } from "./Mascamites";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
+import { SandboxPanel } from "./Sandbox";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradeButtons } from "./Trade";
 
@@ -40,6 +43,12 @@ const GOLD_INFO = assets.gold as Record<string, { per: string; values: number[] 
 const minutes = (ms: number | null | undefined): string => {
   if (ms == null) return "";
   const total = Math.floor(Math.abs(ms) / 1000);
+  if (total >= 86400) {
+    // turn-based clocks run for days: "3d 9h" (D34)
+    const d = Math.floor(total / 86400);
+    const hh = Math.floor((total % 86400) / 3600);
+    return `${ms < 0 ? "-" : ""}${d}d ${hh}h`;
+  }
   const h = Math.floor(total / 3600);
   const mm = String(Math.floor((total % 3600) / 60)).padStart(h > 0 ? 2 : 1, "0");
   const ss = String(total % 60).padStart(2, "0");
@@ -128,6 +137,7 @@ export function GameClient({
           setPickedBuy(null);
           setPickedOffer(null);
           setPendingMove(null);
+          setUnsure(null);
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
@@ -187,7 +197,26 @@ export function GameClient({
   }, [choosing, viewer]);
 
   const send = useCallback((msg: unknown) => socket.current?.send(JSON.stringify(msg)), []);
-  const play = (move: Move) => send({ t: "action", seq: seq.current, action: move });
+  // a move that shows something hidden cannot be taken back: the player confirms it first (UNDO-01)
+  const [unsure, setUnsure] = useState<Move | null>(null);
+  const play = (move: Move) => {
+    const current = latest.current;
+    const at = current ? (current.legal as Move[]).findIndex((l) => sameMove(l, move)) : -1;
+    const note = at >= 0 ? (current?.notes[at] as Note | null | undefined) : null;
+    if (note?.irreversible) {
+      setUnsure(move);
+      return;
+    }
+    send({ t: "action", seq: seq.current, action: move });
+  };
+  const playConfirmed = (move: Move) => {
+    setUnsure(null);
+    send({ t: "action", seq: seq.current, action: move });
+  };
+
+  // D34: a ting when it becomes the player's turn to act
+  const myTurn = view !== null && view.view.viewer !== null && view.view.to_act === view.view.viewer && !ended;
+  const [soundOn, toggleSound] = useTurnSound(myTurn);
 
   if (view === null) {
     return (
@@ -221,9 +250,11 @@ export function GameClient({
   // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
   const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
   const placed = new Set([...handled].map((i) => mine[i]));
+  const sandboxMarker = mine.find((m) => m.type === "sandbox");
   const otherMoves = mine.filter(
     (m) =>
       !placed.has(m) &&
+      m.type !== "sandbox" &&
       m.type !== "take_round_card" &&
       m.type !== "place_computer_tech" &&
       m.type !== "choose_gold" &&
@@ -319,9 +350,27 @@ export function GameClient({
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
+      {sandboxMarker && !ended ? (
+        <SandboxPanel marker={sandboxMarker as never} send={(a) => send({ t: "action", seq: seq.current, action: a })} handCards={hand} />
+      ) : null}
+      {unsure ? (
+        <div className="confirmbar">
+          <div className="confirm warn">
+            <span>
+              <b>Cannot be undone.</b> {irreversibleText(unsure)} Continue with “{describeMove(unsure)}”?
+            </span>
+            <button type="button" className="primary" onClick={() => playConfirmed(unsure)}>
+              Continue
+            </button>
+            <button type="button" className="secondary" onClick={() => setUnsure(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : null}
       {mine.length > 0 && !ended ? (
         <div className="movegroups">
-          {groupMoves(otherMoves, pending).map((g) => (
+          {groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow").map((g) => (
             <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
               <div className="moves">
                 {g.moves.map((m, i) => {
@@ -623,6 +672,17 @@ export function GameClient({
         : null}
     </>
   );
+  const soundButton = (
+    <button
+      type="button"
+      className="secondary small soundtoggle"
+      aria-pressed={soundOn}
+      title={soundOn ? "A ting plays when it is your turn: click to switch it off" : "Click to hear a ting when it is your turn"}
+      onClick={toggleSound}
+    >
+      {soundOn ? "🔔 Sound on" : "🔕 Sound off"}
+    </button>
+  );
   const clocks = view.remaining ? (
     <span className="clocks">
       {left.map((r, i) => (
@@ -666,6 +726,7 @@ export function GameClient({
             onShow={setBoardPlayer}
             onClose={() => setBoardOpen(false)}
             choice={slotChoice}
+            onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
           />
         ) : null
       }
@@ -702,6 +763,7 @@ export function GameClient({
       topExtra={
         <>
           {clocks}
+          {v.viewer !== null ? soundButton : null}
           {v.state.players.length > 0 ? (
             <button type="button" className="secondary small" onClick={() => setBoardOpen(!boardOpen)}>
               Player boards

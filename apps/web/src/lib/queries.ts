@@ -57,10 +57,25 @@ export async function lobbyGames(db: Db, limit = 50): Promise<LobbyGame[]> {
   return out.filter((g) => g.seats.length < g.players);
 }
 
+/** A length of time in words for the lobby: "5 min", "1 min 30 s", "3 days", "9 h". */
+export function spanText(ms: number): string {
+  const s = Math.round(ms / 1000);
+  const parts: string[] = [];
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (d > 0) parts.push(`${d} day${d === 1 ? "" : "s"}`);
+  if (h > 0) parts.push(`${h} h`);
+  if (m > 0) parts.push(`${m} min`);
+  if (sec > 0) parts.push(`${sec} s`);
+  return parts.join(" ") || "0 s";
+}
+
 export function describeClock(json: string): string {
   const c = JSON.parse(json) as { kind: string; ms?: number; initialMs?: number; incrementMs?: number };
   if (c.kind === "per_turn") return `${Math.round((c.ms ?? 0) / 3_600_000)} h per turn`;
-  if (c.kind === "bank") return `${Math.round((c.initialMs ?? 0) / 60_000)} min + ${Math.round((c.incrementMs ?? 0) / 1000)} s`;
+  if (c.kind === "bank") return `${spanText(c.initialMs ?? 0)} + ${spanText(c.incrementMs ?? 0)} per turn`;
   return "no clock";
 }
 

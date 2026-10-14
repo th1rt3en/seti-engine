@@ -15,7 +15,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from . import alien_steps, cards, effects, objectives, rewards, rival, scoring, solar, species, tables, techs
+from . import alien_steps, cards, effects, objectives, rewards, rival, sandbox, scoring, solar, species, tables, techs
 from .models import Decision, GameState, Options, PlayerState, Probe
 from .setup import new_game
 
@@ -108,18 +108,42 @@ def legal_moves(state: GameState) -> list[Action]:
     if state.phase == "finished":
         return []
     if state.pending:
-        return _decision_moves(state, state.pending[0])
+        d = state.pending[0]
+        answers = _decision_moves(state, d)
+        if _can_interrupt(state, d):  # FREE-00: a free action may interrupt the main action
+            answers += [m for m in _free_moves(state, state.players[state.current_player]) if m not in answers]
+        if _can_undo(state) and d.player == state.current_player:
+            answers.append({"type": "undo"})  # UNDO-01
+        return answers
     if state.phase != "play":
         return []
     p = state.players[state.current_player]
     moves: list[Action] = _free_moves(state, p)
-    if state.undo is not None:
+    if _can_undo(state):
         moves.append({"type": "undo"})  # UNDO-01
     if not state.main_done:
         moves += _main_moves(state, p)
     else:
         moves.append({"type": "end_turn"})
+    if state.options.sandbox:
+        moves.append(sandbox.marker(state))  # D33
     return moves
+
+
+def _can_interrupt(state: GameState, d: Decision) -> bool:
+    """FREE-00: a decision of the main action can be interrupted by a free action; one of a free action, of resolving sectors, milestones or
+    passing cannot."""
+    return (
+        state.phase == "play"
+        and state.stage is None
+        and not state.free_active
+        and d.player == state.current_player
+        and not rival.is_rival(state, state.current_player)
+    )
+
+
+def _can_undo(state: GameState) -> bool:
+    return state.phase == "play" and state.undo is not None and len(state.undo_log) > 0 and state.stage in (None, "sectors")
 
 
 def _decision_moves(state: GameState, d: Decision) -> list[Action]:
@@ -231,12 +255,33 @@ def _main_moves(state: GameState, p: PlayerState) -> list[Action]:
                 for moon in tables.planet_info(planet)["moons"]:
                     if moon not in state.planets[planet].moon_landers:
                         out.append({"type": "land", "probe": pr.id, "moon": moon})
+    out += _pluto_moves(state, p)  # PROMO-02
     if p.credits >= 1 and p.energy >= 2:
         out.append({"type": "scan"})  # SCAN-01
     if p.publicity >= techs.RESEARCH_COST:
         out += techs.research_moves(state, p)  # TECHACT-01
     if techs.can_analyze(p):
         out.append({"type": "analyze"})  # ANALYZE-01
+    return out
+
+
+OUTERMOST_RING = 4  # the ring of Uranus and Neptune
+
+
+def _pluto_moves(state: GameState, p: PlayerState) -> list[Action]:
+    """PROMO-02, FAQ-C300: the owner of SE EN 01 may orbit or land at Pluto with a probe on any space of the outermost ring: one orbiter
+    and one lander at most, at the normal costs."""
+    if state.pluto_owner != p.index or "pluto" not in state.planets:
+        return []
+    st = state.planets["pluto"]
+    out: list[Action] = []
+    for pr in probes_in_space(state, p):
+        if pr.capsule or pr.ring != OUTERMOST_RING:
+            continue
+        if not st.orbiters and p.credits >= 1 and p.energy >= 1:
+            out.append({"type": "orbit", "probe": pr.id, "at": "pluto"})
+        if not st.landers and p.energy >= land_cost(state, p, "pluto"):
+            out.append({"type": "land", "probe": pr.id, "at": "pluto"})
     return out
 
 
@@ -257,34 +302,104 @@ def land_cost(state: GameState, p: PlayerState, planet: str) -> int:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
+FREE_TYPES = frozenset(
+    {"move_energy", "move_probe", "buy_card", "exchange", "discard_free", "place_data", "place_lower", "complete_mission", "deliver_sample"}
+)  # the free actions (FREE-01 to FREE-07, TECH-21)
+# moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
+NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lower", "launch", "undo", "sandbox"})
+
+
 def apply(state: GameState, action: Action) -> StepResult:
     legal = legal_moves(state)
-    if action not in legal:
+    if sandbox.is_sandbox_action(action):  # D33: too many to list, so they are checked on their own
+        why = sandbox.check(state, action)
+        if why is not None:
+            raise IllegalAction(f"{action} is not allowed: {why}")
+    elif action not in legal:
         raise IllegalAction(f"{action} is not legal; legal moves: {legal}")
-    if action == {"type": "undo"}:  # UNDO-01: back to the state before the last exchange that can be taken back
-        assert state.undo is not None
-        back = GameState.model_validate(state.undo)
+    if action == {"type": "undo"}:  # UNDO-01: back to the state before the last move; the moves before it are played again
+        back = _undo(state)
         return StepResult(state=back, events=[{"type": "undo", "player": state.current_player}], legal=legal_moves(back))
-    s = state.model_copy(deep=True)
-    events: list[dict[str, Any]] = []
-    if s.pending:
-        _resolve_decision(s, action, events)
-    else:
-        _do_action(s, action, events)
-    _advance(s, events)
-    objectives.check_thresholds(s)  # SOLO-OBJ-04: reaching a level marks the task at once
+    s, events = _step(state, action)
     events += _deltas(state, s)
-    s.undo = _snapshot(state) if _undoable(state, action) else None
+    # UNDO-01 (owner, 2026-10-14): every move can be taken back unless it shows something hidden (a card drawn from the deck, a card of the
+    # round pile, a species revealed, the next tech tile) or the turn moves on
+    if (
+        state.phase != "play"
+        or _reveals(state, s)
+        or (s.round, s.turn, s.current_player, s.phase) != (state.round, state.turn, state.current_player, state.phase)
+        or state.stage not in (None, "sectors")
+        or s.stage not in (None, "sectors")
+    ):
+        s.undo, s.undo_log = None, []
+    elif state.undo is None:
+        s.undo, s.undo_log = _snapshot(state), [action]
+    else:
+        s.undo, s.undo_log = state.undo, [*state.undo_log, action]
     return StepResult(state=s, events=events, legal=legal_moves(s))
 
 
-def _undoable(state: GameState, action: Action) -> bool:
-    """UNDO-01 (owner request 2026-10-14): a trade for 1 credit or 1 energy shows nothing hidden and can be taken back.
+def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, Any]]]:
+    """Play one legal action on a copy of the state and run the automatic steps after it. No undo bookkeeping."""
+    s = state.model_copy(deep=True)
+    events: list[dict[str, Any]] = []
+    if s.pending and action not in _decision_moves(s, s.pending[0]):
+        # FREE-00: a free action in the middle of the main action; the decisions of the main action wait until the free action is done
+        s.stashed, s.pending = s.pending, []
+        s.free_active = True
+        _do_action(s, action, events)
+    elif s.pending:
+        _resolve_decision(s, action, events)
+    elif sandbox.is_sandbox_action(action):
+        sandbox.apply_action(s, action, events)
+    else:
+        _do_action(s, action, events)
+        if action["type"] in FREE_TYPES:
+            s.free_active = True
+    _advance(s, events)
+    objectives.check_thresholds(s)  # SOLO-OBJ-04: reaching a level marks the task at once
+    return s, events
 
-    A trade for a card is not on this list: a card taken from the card row is replaced at once from the deck (RES-04), which shows the top
-    card of the deck, and a card from the deck is hidden. Whether the row may wait until the end of the turn is open (A-026).
-    """
-    return not state.pending and action["type"] == "exchange" and action["get"] in ("credit", "energy")
+
+def _undo(state: GameState) -> GameState:
+    assert state.undo is not None
+    base = GameState.model_validate(state.undo)
+    log = state.undo_log[:-1]
+    s = base
+    for a in log:
+        s, _ = _step(s, a)
+    s.undo, s.undo_log = (state.undo, log) if log else (None, [])
+    return s
+
+
+def _hidden(s: GameState) -> tuple[Any, ...]:
+    """Everything a player may not see (CLAUDE.md rule 6, projection.py): if a move changes it, the move showed something."""
+    return (
+        s.deck,
+        s.end_of_round_stacks,
+        s.aside,
+        [(sl.discovered, sl.deck, sl.face_up) for sl in s.species],
+        [len(st.tiles) for st in s.tech_stacks],
+        s.rival.deck if s.rival else None,
+        s.objectives.stack if s.objectives else None,
+        [(sl.extra.get("samples"), sl.extra.get("sample_spaces")) for sl in s.species if sl.species == "mascamites"],
+        any(d.kind in ("mascamite_sample", "take_round_card") for d in s.pending),  # the player looks at the samples, at the round pile
+    )
+
+
+def _reveals(before: GameState, after: GameState) -> bool:
+    return _hidden(before) != _hidden(after)
+
+
+def reveals(state: GameState, action: Action) -> bool:
+    """Would this move show something hidden, so that it could not be taken back? The page warns before such a move (UNDO-01)."""
+    if action["type"] in NEVER_REVEAL:
+        return False
+    try:
+        after, _ = _step(state, action)
+    except Exception:  # a move that cannot be tried out here is not announced as one that shows something
+        return False
+    return _reveals(state, after)
 
 
 def _snapshot(state: GameState) -> dict[str, Any]:
@@ -412,7 +527,7 @@ def _orbit_land_free_moves(s: GameState, p: PlayerState, d: Decision) -> list[Ac
 def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = False, opts: dict[str, Any] | None = None) -> None:
     """ORBIT-01 to ORBIT-05."""
     probe = next(pr for pr in s.probes if pr.id == a["probe"])
-    planet = planet_at(s, probe)
+    planet = "pluto" if a.get("at") == "pluto" else planet_at(s, probe)
     assert planet is not None
     data = tables.planet_info(planet)
     if not free:
@@ -438,7 +553,7 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
     """LAND-01 to LAND-06. A moon landing gives the moon's rewards only (ambiguity A-016). `free` is a landing from a card effect."""
     opts = opts or {}
     probe = next(pr for pr in s.probes if pr.id == a["probe"])
-    planet = planet_at(s, probe)
+    planet = "pluto" if a.get("at") == "pluto" else planet_at(s, probe)
     assert planet is not None
     data = tables.planet_info(planet)
     if not free:
@@ -588,7 +703,13 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
 
 def _advance(s: GameState, events: list[dict[str, Any]]) -> None:
     """Run the automatic steps of a turn until the engine needs a choice or the next player's turn begins."""
-    while not s.pending:
+    while True:
+        if not s.pending and s.stashed:  # the free action that interrupted the main action is done (FREE-00)
+            s.pending, s.stashed = s.stashed, []
+            s.free_active = False
+        if s.pending:
+            return
+        s.free_active = False
         if (
             s.rival is not None
             and s.phase == "play"
@@ -601,6 +722,15 @@ def _advance(s: GameState, events: list[dict[str, Any]]) -> None:
             continue
         if s.queue or s.playing is not None:
             cards.run_queue(s, events)
+            continue
+        if s.main_done and s.completed and s.stage in (None, "sectors"):
+            # SECTOR-10, TURN-05, A-005 (owner, 2026-10-14): the sectors the main action completed are resolved right after it; the free
+            # actions that follow cannot change them
+            s.stage = "sectors"
+            _resolve_completed_sector(s, events)
+            continue
+        if s.stage == "sectors":
+            s.stage = None
             continue
         if s.stage == "pass":
             p = s.players[s.current_player]
@@ -621,11 +751,8 @@ def _advance(s: GameState, events: list[dict[str, Any]]) -> None:
                     return
             s.stage = "turn_end"
         elif s.stage == "turn_end":
-            if s.completed:  # TURN-04, TURN-05, SECTOR-10: completed sectors first, in the order the player chooses
-                if len(s.completed) > 1 and not rival.is_rival(s, s.current_player):
-                    s.pending.append(Decision(kind="sector_order", player=s.current_player, data={"sectors": list(s.completed)}))
-                    continue
-                rewards.resolve_sector(s, s.completed.pop(0), events)  # one sector, or the rival's (lowest completed first)
+            if s.completed:  # sectors completed after that (the rival's, a pass, a free action at the end): the same way
+                _resolve_completed_sector(s, events)
                 continue
             if not _resolve_milestones(s, events):
                 return
@@ -634,6 +761,14 @@ def _advance(s: GameState, events: list[dict[str, Any]]) -> None:
             _next_turn(s, events)
         else:
             return
+
+
+def _resolve_completed_sector(s: GameState, events: list[dict[str, Any]]) -> None:
+    """TURN-05: the player chooses which completed sector is resolved next (the last one is resolved without asking)."""
+    if len(s.completed) > 1 and not rival.is_rival(s, s.current_player):
+        s.pending.append(Decision(kind="sector_order", player=s.current_player, data={"sectors": list(s.completed)}))
+        return
+    rewards.resolve_sector(s, s.completed.pop(0), events)  # one sector, or the rival's (lowest completed first)
 
 
 def _rotate(s: GameState, events: list[dict[str, Any]]) -> None:
@@ -701,6 +836,7 @@ def _next_turn(s: GameState, events: list[dict[str, Any]]) -> None:
     if s.rival is not None and s.current_player != s.rival.index:
         objectives.end_turn(s)  # SOLO-OBJ-05
     s.stage = None
+    s.undo, s.undo_log = None, []  # UNDO-01: nothing is taken back across turns
     s.main_done = False
     s.turn_fx = []
     s.turn_completed = False

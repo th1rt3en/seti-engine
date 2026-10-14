@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from test_engine import begin, do, with_state
+from test_engine import begin, decisions, do, with_state
 
 from seti_engine import effects, rewards, solar, species, tables
 from seti_engine.engine import StepResult, apply, legal_moves
@@ -64,7 +64,7 @@ def test_discovered_board_offers_spaces_of_the_matching_color() -> None:
     """LIFE-04, FAQ-41: any empty space of the color on a discovered board, plus the other species' discovery space and overflow."""
     s = discover(game(), 0).state.model_copy(deep=True)
     trace_decision(s, "yellow")
-    moves = legal_moves(s)
+    moves = decisions(legal_moves(s))
     board = [m for m in moves if m["space"] == "board"]
     assert (
         {m["index"] for m in board} == {0, 1, 2, 3, 4} and {m["color"] for m in board} == {"yellow"} and {m["slot"] for m in board} == {0}
@@ -88,7 +88,7 @@ def test_marking_a_board_space_gives_its_reward_and_blocks_it() -> None:
     mark(s, 0, "pink", 1)
     assert p.score == score + 3 and s.species[0].board["pink"][1] == [p.index] and p.trace_log[-1] == (0, "pink")
     trace_decision(s, "pink")
-    assert 1 not in {m["index"] for m in legal_moves(s) if m["space"] == "board"}
+    assert 1 not in {m["index"] for m in decisions(legal_moves(s)) if m["space"] == "board"}
 
 
 def test_top_capsule_can_be_marked_again_and_later_markers_are_higher() -> None:
@@ -108,7 +108,7 @@ def test_alien_card_reward_lets_the_player_draw_from_the_deck_or_the_face_up_car
     pl = s.current_player
     face_up, hand = s.species[0].face_up, len(s.players[pl].hand)
     mark(s, 0, "pink", 3)
-    assert s.pending[0].kind == "take_alien_card" and {m["source"] for m in legal_moves(s)} == {"deck", "face_up"}
+    assert s.pending[0].kind == "take_alien_card" and {m["source"] for m in decisions(legal_moves(s))} == {"deck", "face_up"}
     r = do(with_state(s), "take_alien", source="face_up")
     assert face_up in r.state.players[pl].hand and len(r.state.players[pl].hand) == hand + 1
     assert r.state.species[0].face_up is not None and r.state.species[0].face_up != face_up
@@ -230,9 +230,9 @@ def test_centaurian_spaces_cost_data_from_the_pool() -> None:
     p = s.players[s.current_player]
     p.data_pool = 0
     trace_decision(s, "pink")
-    assert not {m["index"] for m in legal_moves(s) if m["space"] == "board"} & {0, 1}
+    assert not {m["index"] for m in decisions(legal_moves(s)) if m["space"] == "board"} & {0, 1}
     p.data_pool = 3
-    assert {0, 1} <= {m["index"] for m in legal_moves(s) if m["space"] == "board"}
+    assert {0, 1} <= {m["index"] for m in decisions(legal_moves(s)) if m["space"] == "board"}
     mark(s, 0, "pink", 1)
     assert p.data_pool == 0 and p.score >= 15
 
@@ -316,10 +316,10 @@ def test_oumuamua_board_spaces_cost_exofossils() -> None:
     p = s.players[s.current_player]
     p.exofossils = 0
     trace_decision(s, "pink")
-    assert not {m["index"] for m in legal_moves(s) if m["space"] == "board"} & {0, 4}
+    assert not {m["index"] for m in decisions(legal_moves(s)) if m["space"] == "board"} & {0, 4}
     s.species[0].extra["supply"] = 10
     p.exofossils = 4
-    assert {0, 4} <= {m["index"] for m in legal_moves(s) if m["space"] == "board"}
+    assert {0, 4} <= {m["index"] for m in decisions(legal_moves(s)) if m["space"] == "board"}
     mark(s, 0, "pink", 4)
     assert p.exofossils == 0 and s.species[0].extra["supply"] == 14 and p.score >= 25
 
@@ -544,7 +544,7 @@ def test_any_player_may_mark_a_blue_space_with_a_sample_and_gains_its_reward() -
     s = masc_game()
     token = s.species[0].extra["sample_spaces"][0]["token"]
     trace_decision(s, "blue")
-    moves = [m for m in legal_moves(s) if m["space"] == "sample"]
+    moves = [m for m in decisions(legal_moves(s)) if m["space"] == "sample"]
     assert moves == [{"type": "place_trace", "slot": 0, "space": "sample", "color": "blue", "index": 0}]
     p = s.players[s.current_player]
     reward = {r["t"]: r["n"] for r in species.sample_faces()[token]}
@@ -559,7 +559,7 @@ def test_any_player_may_mark_a_blue_space_with_a_sample_and_gains_its_reward() -
             assert after[idx] - before[idx] >= min(reward[key], 1) if key != "publicity" else after[idx] >= before[idx]
     assert p.trace_log[-1] == (0, "blue")
     trace_decision(s, "blue")
-    assert not [m for m in legal_moves(s) if m["space"] == "sample"]
+    assert not [m for m in decisions(legal_moves(s)) if m["space"] == "sample"]
 
 
 def test_mascamite_setup_is_logged_without_revealing_the_face_down_samples() -> None:

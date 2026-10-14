@@ -24,7 +24,10 @@ export default async function Lobby({ searchParams }: { searchParams: Promise<{ 
         <section className="card">
           <h2>New game</h2>
           <form action={createGameAction} className="stack">
-            <NewGameFields isGuest={user.isGuest} clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label }))} />
+            <NewGameFields
+              isGuest={user.isGuest}
+              clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label, mode: p.mode }))}
+            />
             <button type="submit">Create the game</button>
           </form>
         </section>

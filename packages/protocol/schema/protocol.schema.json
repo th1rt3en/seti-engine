@@ -253,6 +253,11 @@
           "title": "First Pass Done",
           "type": "boolean"
         },
+        "free_active": {
+          "default": false,
+          "title": "Free Active",
+          "type": "boolean"
+        },
         "gold_tiles": {
           "items": {
             "$ref": "#/$defs/GoldTile"
@@ -365,6 +370,18 @@
           ],
           "default": null,
           "title": "Playing"
+        },
+        "pluto_owner": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pluto Owner"
         },
         "probe_counter": {
           "default": 0,
@@ -487,6 +504,13 @@
           "title": "Start Player",
           "type": "integer"
         },
+        "stashed": {
+          "items": {
+            "$ref": "#/$defs/Decision"
+          },
+          "title": "Stashed",
+          "type": "array"
+        },
         "tech_stacks": {
           "items": {
             "$ref": "#/$defs/TechStack"
@@ -525,6 +549,14 @@
           "default": null,
           "title": "Undo"
         },
+        "undo_log": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Undo Log",
+          "type": "array"
+        },
         "winners": {
           "items": {
             "type": "integer"
@@ -546,6 +578,7 @@
         "end_of_round_stacks",
         "final_scores",
         "first_pass_done",
+        "free_active",
         "gold_tiles",
         "last_trace_kind",
         "log",
@@ -563,6 +596,7 @@
         "play_return",
         "players",
         "playing",
+        "pluto_owner",
         "probe_counter",
         "probes",
         "pushed",
@@ -578,11 +612,13 @@
         "species",
         "stage",
         "start_player",
+        "stashed",
         "tech_stacks",
         "turn",
         "turn_completed",
         "turn_fx",
         "undo",
+        "undo_log",
         "winners"
       ],
       "title": "GameState",
@@ -765,6 +801,25 @@
           "title": "Promo Cards",
           "type": "boolean"
         },
+        "sandbox": {
+          "default": false,
+          "title": "Sandbox",
+          "type": "boolean"
+        },
+        "sandbox_species": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Sandbox Species",
+          "type": "array"
+        },
         "seed": {
           "default": 0,
           "title": "Seed",
@@ -937,6 +992,13 @@
           "title": "Index",
           "type": "integer"
         },
+        "kept_cards": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Kept Cards",
+          "type": "array"
+        },
         "landers": {
           "additionalProperties": {
             "type": "integer"
@@ -1050,6 +1112,7 @@
         "gold_markers",
         "hand",
         "index",
+        "kept_cards",
         "landers",
         "message_cards",
         "messages",

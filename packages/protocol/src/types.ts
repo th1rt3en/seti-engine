@@ -14,6 +14,7 @@ export type FinalScores = {
   [k: string]: unknown;
 }[];
 export type FirstPassDone = boolean;
+export type FreeActive = boolean;
 export type Markers = number[];
 export type Side = string;
 export type Tile = string;
@@ -27,6 +28,8 @@ export type Stack = string[];
 export type Difficulty = number;
 export type Players = number;
 export type PromoCards = boolean;
+export type Sandbox = boolean;
+export type SandboxSpecies = (string | null)[];
 export type Seed = number;
 export type OumuamuaPlaced = boolean;
 export type PassCardAsked = boolean;
@@ -58,6 +61,7 @@ export type Exofossils = number;
 export type GoldMarkers = string[];
 export type Hand = string[];
 export type Index = number;
+export type KeptCards = string[];
 export type Card = string;
 export type Target = number;
 export type MessageCards = MessageCard[];
@@ -77,6 +81,7 @@ export type TraceLog = [number, string][];
 export type Tucked = string[];
 export type Players1 = PlayerState[];
 export type Playing = string | null;
+export type PlutoOwner = number | null;
 export type ProbeCounter = number;
 export type Capsule = boolean;
 export type Id = string;
@@ -124,6 +129,7 @@ export type Species1 = string;
 export type Species = SpeciesSlot[];
 export type Stage = string | null;
 export type StartPlayer = number;
+export type Stashed = Decision[];
 export type Category = string;
 export type Glyph = string;
 export type Tiles = string[];
@@ -137,6 +143,9 @@ export type TurnFx = {
 export type Undo = {
   [k: string]: unknown;
 } | null;
+export type UndoLog = {
+  [k: string]: unknown;
+}[];
 export type Winners1 = number[];
 export type Error = string;
 export type Legal = {
@@ -230,6 +239,7 @@ export interface GameState {
   end_of_round_stacks: EndOfRoundStacks;
   final_scores: FinalScores;
   first_pass_done: FirstPassDone;
+  free_active: FreeActive;
   gold_tiles: GoldTiles;
   last_trace_kind: LastTraceKind;
   log: Log;
@@ -247,6 +257,7 @@ export interface GameState {
   play_return: PlayReturn;
   players: Players1;
   playing: Playing;
+  pluto_owner: PlutoOwner;
   probe_counter: ProbeCounter;
   probes: Probes;
   pushed: Pushed;
@@ -262,11 +273,13 @@ export interface GameState {
   species: Species;
   stage: Stage;
   start_player: StartPlayer;
+  stashed: Stashed;
   tech_stacks: TechStacks;
   turn: Turn;
   turn_completed: TurnCompleted;
   turn_fx: TurnFx;
   undo: Undo;
+  undo_log: UndoLog;
   winners: Winners1;
 }
 export interface GoldTile {
@@ -293,6 +306,8 @@ export interface Options {
   difficulty?: Difficulty;
   players: Players;
   promo_cards?: PromoCards;
+  sandbox?: Sandbox;
+  sandbox_species?: SandboxSpecies;
   seed?: Seed;
 }
 /**
@@ -336,6 +351,7 @@ export interface PlayerState {
   gold_markers: GoldMarkers;
   hand: Hand;
   index: Index;
+  kept_cards: KeptCards;
   landers: Landers1;
   message_cards: MessageCards;
   messages: Messages;

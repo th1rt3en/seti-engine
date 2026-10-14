@@ -42,7 +42,7 @@ type Label = (m: Move) => string;
 export const LABELS: Record<string, Label> = {
   launch: () => "Launch a probe (2 credits)",
   pass: () => "Pass",
-  undo: () => "Undo the last trade",
+  undo: () => "Undo the last move",
   end_turn: () => "End the turn",
   move_energy: () => "Spend 1 energy for 1 movement",
   move_probe: (m) => `Move probe ${String(m.probe)} to ring ${(m.to as number[])[0]}, sector ${(m.to as number[])[1]}`,
@@ -58,8 +58,8 @@ export const LABELS: Record<string, Label> = {
   discard: (m) => `Discard ${cardName(m.card)}`,
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
   choose_gold: (m) => `Mark the ${String(m.tile)} gold scoring tile`,
-  orbit: (m) => `Orbit with probe ${String(m.probe)} (1 credit, 1 energy)`,
-  land: (m) => `Land with probe ${String(m.probe)}${m.moon ? ` on ${String(m.moon)}` : ""}`,
+  orbit: (m) => `Orbit ${m.at === "pluto" ? "Pluto " : ""}with probe ${String(m.probe)} (1 credit, 1 energy)`,
+  land: (m) => `Land ${m.at === "pluto" ? "on Pluto " : ""}with probe ${String(m.probe)}${m.moon ? ` on ${String(m.moon)}` : ""}`,
   land_free: (m) => `Land with probe ${String(m.probe)}${m.moon ? ` on ${String(m.moon)}` : ""} for free`,
   orbit_free: (m) => `Orbit with probe ${String(m.probe)} for free`,
   scan: () => "Scan (1 credit, 2 energy)",
@@ -109,16 +109,55 @@ export function describeMove(m: Move): string {
 }
 
 /** Group the moves for display: the free actions apart from the main actions and the answers to a decision. */
-export function groupMoves(moves: Move[], pending: boolean): { title: string; moves: Move[] }[] {
-  if (pending) return moves.length > 0 ? [{ title: "Your choice", moves }] : [];
+export const FREE_ACTION_TYPES = new Set([
+  "move_energy",
+  "move_probe",
+  "buy_card",
+  "exchange",
+  "discard_free",
+  "place_data",
+  "place_lower",
+  "complete_mission",
+  "deliver_sample",
+]);
+
+export function groupMoves(moves: Move[], pending: boolean, answeringFree = false): { title: string; moves: Move[] }[] {
+  if (pending) {
+    // a free action may interrupt the decisions of the main action (FREE-00): its moves come after the answers, in a group of their own
+    const isFree = (m: Move) => !answeringFree && FREE_ACTION_TYPES.has(m.type);
+    const groups = [
+      { title: "Your choice", moves: moves.filter((m) => !isFree(m) && m.type !== "undo") },
+      { title: "Free actions", moves: moves.filter(isFree) },
+      { title: "Undo", moves: moves.filter((m) => m.type === "undo") },
+    ];
+    return groups.filter((g) => g.moves.length > 0);
+  }
   const main = new Set(["launch", "pass", "orbit", "land", "scan", "research", "analyze", "play_card"]);
-  const end = new Set(["end_turn"]);
+  const end = new Set(["end_turn", "undo"]);
   const groups = [
     { title: "Main action", moves: moves.filter((m) => main.has(m.type)) },
     { title: "Free actions", moves: moves.filter((m) => !main.has(m.type) && !end.has(m.type)) },
     { title: "Turn", moves: moves.filter((m) => end.has(m.type)) },
   ];
   return groups.filter((g) => g.moves.length > 0);
+}
+
+/** Why a move cannot be taken back, in words for the confirmation (the engine marks such moves `irreversible`, UNDO-01). */
+export function irreversibleText(m: Move): string {
+  switch (m.type) {
+    case "pass":
+      return "Passing shows you the end-of-round cards, so it cannot be undone.";
+    case "end_turn":
+      return "Ending the turn may reveal an alien species, so it cannot be undone.";
+    case "buy_card":
+    case "exchange":
+    case "take_card":
+      return "Taking a card shows a card from the deck (a card of the display is replaced from the deck), so this cannot be undone.";
+    case "scan_done":
+      return "Finishing the scan refills the card row from the deck, so it cannot be undone.";
+    default:
+      return "This move shows something that is hidden (a card from the deck, a card, a tile or a species), so it cannot be undone.";
+  }
 }
 
 /** The moves that name a card of the player's hand: the player picks the card in the hand, then confirms. */
@@ -181,7 +220,7 @@ export function logText(m: Move): string {
     case "pol_pick":
       return "chose a card";
     case "undo":
-      return "took back the last trade";
+      return "took back the last move";
     case "exchange":
       return m.give === "card"
         ? `traded ${(m.cards as string[]).map(cardTitle).join(" and ")} for ${m.get === "card" ? `a card from ${source(m.source)}` : `1 ${String(m.get)}`}`

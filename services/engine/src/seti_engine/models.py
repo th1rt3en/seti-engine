@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 COLORS = ["green", "red", "purple", "white"]
 SECTOR_COLORS = ["red", "yellow", "blue", "black"]
@@ -20,7 +20,22 @@ class Options(BaseModel):
     players: int = Field(ge=1, le=4)  # 1 is the solo game against the rival (SOLO-01)
     difficulty: int = Field(default=3, ge=1, le=5)  # solo only: the number of gold stars (SOLO-04)
     promo_cards: bool = False  # PLAN.md D23: SE EN 01 and SE EN 02 are shuffled into the deck when on
+    # PLAN.md D33: a practice game for one player, without the rival, in which cards, resources and the discs can be added or changed freely
+    sandbox: bool = False
+    # sandbox only: the two face-down alien species, left to right; None leaves a slot to chance (SANDBOX-06)
+    sandbox_species: list[str | None] = Field(default_factory=lambda: list[str | None]([None, None]))
     seed: int = 0
+
+    @model_validator(mode="after")
+    def _sandbox_is_solo(self) -> Options:
+        if self.sandbox and self.players != 1:
+            raise ValueError("the sandbox is a game for one player")
+        chosen = [x for x in self.sandbox_species if x is not None]
+        if len(self.sandbox_species) != 2 or any(x not in SPECIES_BASE for x in chosen) or len(set(chosen)) != len(chosen):
+            raise ValueError("sandbox_species lists two different base species, or null for chance")
+        if chosen and not self.sandbox:
+            raise ValueError("the species can only be chosen in the sandbox")
+        return self
 
 
 class Probe(BaseModel):
@@ -74,6 +89,7 @@ class PlayerState(BaseModel):
     landers: dict[str, int] = Field(default_factory=dict)  # planet or moon -> count
     missions: list[MissionState] = Field(default_factory=list)  # CARD-10: face-up missions still to complete
     completed_missions: list[str] = Field(default_factory=list)  # CARD-16: face down
+    kept_cards: list[str] = Field(default_factory=list)  # cards kept in front of the player, no mission or end card (SE EN 01)
     end_cards: list[str] = Field(default_factory=list)  # CARD-20: end-of-game scoring cards in front of the player
     exertian_hand: list[str] = Field(default_factory=list)  # Exertian cards held (not in hand, ALIEN-EXE-02)
     exertian_played: list[str] = Field(default_factory=list)  # Exertian cards played face down (ALIEN-EXE-01)
@@ -163,6 +179,11 @@ class GameState(BaseModel):
     options: Options
     # the state before the last free exchange that can be taken back (UNDO-01); None once anything else is done. Never shown to a player.
     undo: dict[str, Any] | None = None
+    # the actions taken since `undo` was saved, oldest first: taking the last one back replays the others on the saved state (UNDO-01)
+    undo_log: list[dict[str, Any]] = Field(default_factory=list)
+    # decisions of the main action that a free action has interrupted, waiting while the free action's own decisions are answered (FREE-00)
+    stashed: list[Decision] = Field(default_factory=list)
+    free_active: bool = False  # the decisions now pending belong to a free action, which no other free action may interrupt (FREE-00)
     rng_state: int
     phase: Phase = "setup"
     round: int = 1
@@ -184,6 +205,7 @@ class GameState(BaseModel):
     rotations: int = 0  # solar system rotations so far (next disc = rotations % 3 + 1)
     first_pass_done: bool = False  # this round
     oumuamua_placed: bool = False
+    pluto_owner: int | None = None  # the player who played the promo card SE EN 01: only they can orbit or land at Pluto (PROMO-02)
     probes: list[Probe] = Field(default_factory=list)
     planets: dict[str, PlanetState] = Field(default_factory=dict)
     tech_stacks: list[TechStack] = Field(default_factory=list)
@@ -194,11 +216,13 @@ class GameState(BaseModel):
     pending: list[Decision] = Field(default_factory=list)  # first entry is what the engine waits for
     crossed: list[tuple[int, int]] = Field(default_factory=list)  # (player, milestone) crossed this turn, to resolve at turn end
     probe_counter: int = 0
-    stage: str | None = None  # None, 'pass' (passing steps running) or 'turn_end' (milestones, then the next player)
+    stage: str | None = (
+        None  # None, 'sectors' (resolving the sectors the main action completed), 'pass' (passing steps running) or 'turn_end'
+    )
     pass_discard_checked: bool = False
     pass_rotated: bool = False
     pass_card_asked: bool = False
-    completed: list[int] = Field(default_factory=list)  # sectors completed this turn, resolved at turn end (SECTOR-10)
+    completed: list[int] = Field(default_factory=list)  # sectors completed and not yet resolved: right after the main action (SECTOR-10)
     scan_steps: list[str] = Field(default_factory=list)  # steps of the running scan still to do (SCAN-01)
     aside: list[str] = Field(default_factory=list)  # cards drawn by #ET.15 and not yet placed
     queue: list[dict[str, Any]] = Field(default_factory=list)  # steps of the card being played, resolved in order (cards.py)

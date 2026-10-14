@@ -12,7 +12,7 @@ from collections import deque
 from typing import Any
 
 from . import alien_steps, card_defs, effects, objectives, rewards, solar, tables, techs
-from .models import Decision, GameState, MissionState, PlayerState
+from .models import Decision, GameState, MissionState, PlanetState, PlayerState
 
 Action = dict[str, Any]
 Events = list[dict[str, Any]]
@@ -63,6 +63,8 @@ def play(s: GameState, p: PlayerState, cid: str, events: Events) -> None:
         p.missions.append(MissionState(card=cid, kind=m["kind"], used=[False] * len(m.get("circles", []))))
     if cost > 0 and not pays_energy(cid):
         fire(s, p, [{"e": "play_cost", "cost": cost}], events)  # FAQ-C106
+    if cid in card_defs.MARS_FLAVOR:
+        fire(s, p, [{"e": "play_mars"}], events)  # PROMO-03: a card that names Mars in its flavor text
 
 
 def finish_play(s: GameState, p: PlayerState, events: Events) -> None:
@@ -76,6 +78,8 @@ def finish_play(s: GameState, p: PlayerState, events: Events) -> None:
         p.hand.append(cid)
     elif "mission" in d or any(m.card == cid for m in p.message_cards):
         pass  # already in front of the player (A-019, ALIEN-CEN-02)
+    elif d.get("keep"):
+        p.kept_cards.append(cid)  # SE EN 01 stays in front of its player (PROMO-02)
     elif "end" in d:
         p.end_cards.append(cid)
     elif cid not in p.tucked:  # #91 to #93 tuck themselves
@@ -121,6 +125,11 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
             _trace_step(s, p, st)
         else:
             rewards.grant(s, p, [st], events)
+    elif t == "pluto":
+        # PROMO-02: the card makes Pluto a planet that only its player can use: one orbiter space and one lander space
+        s.pluto_owner = p.index
+        s.planets["pluto"] = PlanetState(first_land_data_taken=[], first_land_owners=[])
+        events.append({"type": "pluto", "player": p.index})
     elif t == "move":
         p.movement += n
     elif t == "rotate":
@@ -443,10 +452,12 @@ def mission_moves(s: GameState, p: PlayerState) -> list[Action]:
     out: list[Action] = [
         {"type": "complete_mission", "card": m.card}
         for m in p.missions
-        if m.kind == "quick" and cond_ok(s, p, card_defs.CARDS[m.card]["mission"]["cond"])
+        if m.kind == "quick"
+        and m.card != s.playing
+        and cond_ok(s, p, card_defs.CARDS[m.card]["mission"]["cond"])  # not the card being played
     ]
     for m in p.missions:
-        if m.kind == "deliver":
+        if m.kind == "deliver" and m.card != s.playing:
             dest = solar.earth(s) if card_defs.CARDS[m.card]["mission"]["dest"] == "earth" else solar.find_cell(s, "PLANET:MARS")
             out += [
                 {"type": "deliver_sample", "card": m.card, "capsule": pr.id}
@@ -503,6 +514,8 @@ def fire(s: GameState, p: PlayerState, evs: list[dict[str, Any]], events: Events
 
 
 def _matches(spec: dict[str, Any], ev: dict[str, Any]) -> bool:
+    if "any" in spec:  # a circle with several ways to trigger it (SE EN 02)
+        return any(_matches(one, ev) for one in spec["any"])
     if spec["e"] != ev["e"]:
         return False
     for key in ("planet", "cat", "kind", "color", "cost", "corner"):

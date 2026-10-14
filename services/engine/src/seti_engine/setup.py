@@ -29,9 +29,16 @@ BONUS_ORDER = ["vp3", "card", "energy", "publicity"]
 GOLD_TILE_NAMES = ["Tech", "Mission", "Income", "Other"]
 
 
+def _sandbox_species(options: Options, drawn: list[str]) -> list[str]:
+    """SANDBOX-06: the species the player chose keep their slot; a slot left to chance takes the next species of the random order."""
+    wanted = options.sandbox_species
+    spare = [x for x in drawn if x not in wanted]
+    return [w if w is not None else spare.pop(0) for w in wanted]
+
+
 def new_game(options: Options) -> GameState:
     state = GameState(options=options, rng_state=rng.seed_state(options.seed), players=[])
-    solo = options.players == 1  # SOLO-01: set up as for two players
+    solo = options.players == 1 and not options.sandbox  # SOLO-01: set up as for two players (the sandbox has no rival, D33)
     n = 2 if solo else options.players
 
     # sector boards (stars come in pairs, BOARD-20): a random order of the four boards around the board
@@ -49,7 +56,8 @@ def new_game(options: Options) -> GameState:
     state.disc_angles = [rng.below(state, 8) for _ in range(3)]
 
     # two of the five alien species, hidden (SETUP-11)
-    picked = rng.shuffled(state, list(SPECIES_BASE))[:2]
+    drawn = rng.shuffled(state, list(SPECIES_BASE))
+    picked = _sandbox_species(options, drawn) if options.sandbox else drawn[:2]  # SANDBOX-06: the sandbox can choose them
     state.species = [SpeciesSlot(species=s, board=species.new_board(s)) for s in picked]
 
     # gold scoring tiles: random side up (SETUP-19)
@@ -61,7 +69,7 @@ def new_game(options: Options) -> GameState:
             state.tech_stacks.append(TechStack(category=cat, glyph=glyph, tiles=rng.shuffled(state, list(BONUS_ORDER))))
 
     # neutral milestones (SETUP-20): 2 markers at each of 20 and 30 for 2 players, 1 each for 3 players, none for 4
-    per = {2: 2, 3: 1, 4: 0}[n]
+    per = {1: 2, 2: 2, 3: 1, 4: 0}[n]
     state.neutral_markers = {"20": per, "30": per}
 
     # planets

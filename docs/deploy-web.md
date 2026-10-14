@@ -43,4 +43,4 @@ and end-of-game cards come from the engine's view (`view.trackers`), the turn co
 ## Open points
 
 - There is no password reset: a player who loses the password loses the account (D29).
-- The takedown contact in the footer and `LEGAL.md` must be filled in by the owner.
+- The takedown contact (seti.web.tobiko11@gmail.com) is in the footer (`apps/web/src/app/layout.tsx`) and in `LEGAL.md`; change both if it changes.

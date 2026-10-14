@@ -3,7 +3,7 @@
 from typing import Any
 
 import pytest
-from test_engine import begin, do, total_cards, with_state
+from test_engine import begin, decisions, do, total_cards, with_state
 
 from seti_engine import card_defs, cards, effects, rewards, solar, tables
 from seti_engine.engine import StepResult, apply, legal_moves
@@ -64,8 +64,8 @@ def me(r: StepResult) -> Any:
 
 
 def test_every_base_card_has_a_definition() -> None:
-    """CARD-01: all 138 base cards are defined; only the cards waiting for rulings are held back."""
-    base = {cid for cid, c in tables.cards().items() if c["deck"] == "base"}
+    """CARD-01: all 138 base cards and the 2 promo cards are defined; only the cards waiting for rulings are held back."""
+    base = {cid for cid, c in tables.cards().items() if c["deck"] in ("base", "promo")}  # the promo cards too (PROMO-01)
     assert {c for c in card_defs.CARDS if not c.startswith("ET.")} == base
     assert all(cards.playable(c) for c in ALL)
 
@@ -324,7 +324,7 @@ def test_colour_signal_cards_let_the_player_pick_one_of_the_two_sectors() -> Non
     """#56 Breakthrough Listen: 1 movement and a signal in a blue sector."""
     r = play(ready(), "56")
     assert me(r).movement == 1
-    assert {m["sector"] for m in r.legal} == set(rewards.sectors_of_color(r.state, "blue"))
+    assert {m["sector"] for m in decisions(r.legal)} == set(rewards.sectors_of_color(r.state, "blue"))
 
 
 def test_algonquin_marks_one_signal_of_each_colour_and_the_data_goes_to_the_supply() -> None:
@@ -332,7 +332,7 @@ def test_algonquin_marks_one_signal_of_each_colour_and_the_data_goes_to_the_supp
     r = play(ready(), "136")
     pool = me(r).data_pool
     for color in ("yellow", "red", "blue", "black"):
-        assert {m["sector"] for m in r.legal} == set(rewards.sectors_of_color(r.state, color))
+        assert {m["sector"] for m in decisions(r.legal)} == set(rewards.sectors_of_color(r.state, color))
         r = apply(r.state, r.legal[0])
     assert not r.state.pending and me(r).data_pool == pool
     assert sum(len(sec.markers) for sec in r.state.sectors) == 4
@@ -478,7 +478,7 @@ def test_hand_signals_discard_hand_cards_for_signals() -> None:
     first = next(m for m in r.legal if m["type"] == "hand_signal")
     color = tables.cards()[first["card"]]["sector"]
     r = apply(r.state, first)
-    assert {m["sector"] for m in r.legal} == set(rewards.sectors_of_color(r.state, color))
+    assert {m["sector"] for m in decisions(r.legal)} == set(rewards.sectors_of_color(r.state, color))
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -597,7 +597,7 @@ def test_same_kind_trace_needs_a_species_where_the_player_already_has_that_kind(
     pl = s.current_player
     s.players[pl].trace_log = [(1, "pink")]
     r = play(s, "98")
-    assert {m["slot"] for m in r.legal} == {1}
+    assert {m["slot"] for m in decisions(r.legal)} == {1}
 
 
 def test_extremophiles_scores_for_each_trace_of_the_chosen_colour() -> None:
@@ -1007,7 +1007,7 @@ def test_remove_orbiter_lets_the_player_choose_which_orbiter() -> None:
     st.first_orbiter = pl
     s.players[pl].orbiters["venus"] = 2
     r = play(s, "15")
-    firsts = {m["first"] for m in r.legal if m["planet"] == "venus"}
+    firsts = {m["first"] for m in decisions(r.legal) if m["planet"] == "venus"}
     assert firsts == {True, False}
     score, data = me(r).score, me(r).data_pool
     r2 = do(r, "remove_orbiter", planet="venus", first=True)
@@ -1040,7 +1040,7 @@ def test_remove_lander_frees_its_first_lander_space() -> None:
     st.first_land_owners = [pl, None]
     s.players[pl].landers["mars"] = 2
     r = play(s, "84")
-    slots = {m["slot"] for m in r.legal}
+    slots = {m["slot"] for m in decisions(r.legal)}
     assert slots == {0, None}
     r2 = do(r, "remove_lander", planet="mars", slot=0)
     assert r2.state.planets["mars"].first_land_data_taken == [False, False] and me(r2).landers["mars"] == 1

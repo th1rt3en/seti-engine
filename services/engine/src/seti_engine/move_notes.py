@@ -28,11 +28,11 @@ def space_label(state: GameState, ring: int, sector: int) -> str:
     return "empty space"
 
 
-def _probe_planet(state: GameState, probe_id: str) -> tuple[str | None, Any]:
+def _probe_planet(state: GameState, probe_id: str, at: str | None = None) -> tuple[str | None, Any]:
     probe = next((p for p in state.probes if p.id == probe_id), None)
     if probe is None:
         return None, None
-    return engine.planet_at(state, probe), probe
+    return at or engine.planet_at(state, probe), probe
 
 
 def _trace_rewards(state: GameState, move: dict[str, Any]) -> list[dict[str, Any]]:
@@ -54,7 +54,7 @@ def _trace_rewards(state: GameState, move: dict[str, Any]) -> list[dict[str, Any
 def note(state: GameState, move: dict[str, Any]) -> Note:
     kind = move["type"]
     if kind in ("orbit", "orbit_free", "land", "land_free"):
-        planet, probe = _probe_planet(state, move["probe"])
+        planet, probe = _probe_planet(state, move["probe"], move.get("at"))
         if planet is None:
             return None
         free = kind.endswith("_free")
@@ -101,4 +101,12 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
 
 
 def notes(state: GameState, legal: list[dict[str, Any]]) -> list[Note]:
-    return [note(state, m) for m in legal]
+    """One note per legal move. A move that would show something hidden (a card drawn from the deck, the round pile, a species, the next
+    tech tile) and so cannot be taken back is marked `irreversible`, so that the page warns before it (UNDO-01)."""
+    out: list[Note] = []
+    for m in legal:
+        n = note(state, m)
+        if engine.reveals(state, m):
+            n = {**(n or {}), "irreversible": True}
+        out.append(n)
+    return out

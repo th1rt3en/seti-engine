@@ -20,7 +20,7 @@ def total_cards(s: GameState) -> int:
     """Main-deck cards (alien cards are counted separately: they live in their own decks and hands)."""
     piles = [s.deck, s.discard, s.card_row, s.aside, *s.end_of_round_stacks]
     for p in s.players:
-        piles += [p.hand, p.tucked, p.missions and [m.card for m in p.missions] or [], p.completed_missions, p.end_cards]
+        piles += [p.hand, p.tucked, p.missions and [m.card for m in p.missions] or [], p.completed_missions, p.end_cards, p.kept_cards]
     n = sum(1 for pile in piles for c in pile if not c.startswith("ET."))
     if (
         s.playing
@@ -33,6 +33,13 @@ def total_cards(s: GameState) -> int:
 
 def do(r: StepResult, kind: str, **kw: object) -> StepResult:
     return apply(r.state, {"type": kind, **kw})
+
+
+def decisions(moves: list[dict[str, object]]) -> list[dict[str, object]]:
+    """The moves that answer the pending decision, without the free actions that may interrupt it (FREE-00) and the undo (UNDO-01)."""
+    from seti_engine.engine import FREE_TYPES
+
+    return [m for m in moves if m["type"] not in FREE_TYPES and m["type"] != "undo"]
 
 
 def with_state(s: GameState) -> StepResult:
@@ -158,7 +165,7 @@ def test_place_data_and_the_computer_spaces() -> None:
     assert r.state.players[pl].publicity == 5
     r = do(do(r, "place_data"), "place_data")
     assert r.state.pending and r.state.pending[0].kind == "income_tuck"  # FAQ-04: resolve it before any other free action
-    assert all(m["type"] in ("tuck", "skip_tuck") for m in r.legal)
+    assert all(m["type"] in ("tuck", "skip_tuck") for m in decisions(r.legal))
     hand = len(r.state.players[pl].hand)
     r = apply(r.state, {"type": "skip_tuck"})
     assert len(r.state.players[pl].hand) == hand
