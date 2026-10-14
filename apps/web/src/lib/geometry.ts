@@ -157,3 +157,7 @@ export const PLAYER_COLOR: Record<string, string> = {
   white: "#f3f3f3",
 };
 export const SECTOR_COLOR: Record<string, string> = { yellow: "#e0b000", red: "#d9503c", blue: "#3b82d6", black: "#3a3f47" };
+
+/** The four reward hexes across the top of the Centaurian board, on its picture (777 x 1415 px): the middle of each. A player who reaches their
+ * message milestone covers one with their message tile (ALIEN-CEN-04). The tile is drawn at this height on the picture. */
+export const CENTAURIAN_HEXES = { y: 130, xs: [230, 337, 445, 553], tileHeight: 170 };

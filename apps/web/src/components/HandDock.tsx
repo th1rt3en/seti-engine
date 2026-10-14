@@ -161,7 +161,17 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </span>
               </>
             ) : null}
-            {player.missions.length > 0 || player.kept_cards.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
+            {player.missions.length > 0 || player.kept_cards.length > 0 || player.message_cards.length > 0 ? (
+              <span className="handsep" aria-hidden="true" />
+            ) : null}
+            {player.message_cards.map((m) => (
+              <CardImage
+                key={`message-${m.card}`}
+                id={m.card}
+                size="mission"
+                title={`${cardName(m.card)}: its message marker is at ${m.target} points; the green part resolves when your score reaches it`}
+              />
+            ))}
             {player.kept_cards.map((c) => (
               <CardImage key={c} id={c} size="mission" title={`${cardName(c)}: kept in front of you`} />
             ))}

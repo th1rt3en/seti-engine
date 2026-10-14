@@ -9,6 +9,7 @@ import {
   ALIEN_COLUMN,
   ALIEN_TOP,
   BOARD,
+  CENTAURIAN_HEXES,
   CENTER,
   DIAL,
   DIAL_POCKET,
@@ -505,6 +506,32 @@ export function BoardView({
               })}
             </g>
           );
+        })}
+
+        {/* the message tiles that cover the reward hexes of the Centaurian board (ALIEN-CEN-04): the tile of the player who took the reward */}
+        {s.species.flatMap((sp, i) => {
+          if (!sp.discovered || sp.species !== "centaurians") return [];
+          const covered = (sp.extra?.covered ?? []) as (number | null)[];
+          return covered.map((player, k) => {
+            const x = CENTAURIAN_HEXES.xs[k];
+            if (player === null || player === undefined || x === undefined) return null;
+            const at = onAlienBoard(i, x, CENTAURIAN_HEXES.y);
+            const h = CENTAURIAN_HEXES.tileHeight * ALIEN.scale;
+            const colour = s.players[player]?.color === "red" ? "orange" : (s.players[player]?.color ?? "white");
+            return (
+              <image
+                // biome-ignore lint/suspicious/noArrayIndexKey: the four hexes are fixed
+                key={`cen-hex-${i}-${k}`}
+                href={TILES[colour] ?? TILES.white}
+                x={at.x - (h * 72) / 128 / 2}
+                y={at.y - h / 2}
+                width={(h * 72) / 128}
+                height={h}
+              >
+                <title>{`${who(player)}: message tile covers this reward`}</title>
+              </image>
+            );
+          });
         })}
 
         {/* the markers on the spaces of a species board that have been taken, and on its overflow spaces (under the discovery spaces) */}
