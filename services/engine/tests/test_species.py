@@ -193,6 +193,8 @@ def test_each_player_gets_a_message_milestone_fifteen_points_ahead() -> None:
     before = [p.score for p in s.players]
     r = discover(s, 0)
     assert [p.messages for p in r.state.players] == [[b + 15] for b in before]
+    placed = next(e for e in r.events if e["type"] == "messages_placed")
+    assert placed["targets"] == [{"player": i, "target": b + 15} for i, b in enumerate(before)]
 
 
 def test_reaching_a_message_lets_the_player_cover_a_reward() -> None:
@@ -206,7 +208,10 @@ def test_reaching_a_message_lets_the_player_cover_a_reward() -> None:
     r = do(with_state(s), "end_turn")
     assert r.state.pending[0].kind == "message_reward" and {m["hex"] for m in r.legal} == {0, 1, 2, 3}
     pub = r.state.players[pl].publicity
-    r2 = do(r, "choose_message", hex=2)
+    assert all(m["reward"] for m in r.legal)  # the prompt shows what each reward is
+    assert any(e["type"] == "message_reached" and e["player"] == pl for e in r.events)
+    r2 = apply(r.state, next(m for m in r.legal if m["hex"] == 2))
+    assert any(e["type"] == "message_reward" and e["hex"] == 2 and e["player"] == pl for e in r2.events)
     assert r2.state.players[pl].publicity == pub + 3 and r2.state.species[0].extra["covered"][2] == pl
     assert r2.state.players[pl].messages == []
     s3 = r2.state.model_copy(deep=True)

@@ -97,4 +97,3 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
 
 def notes(state: GameState, legal: list[dict[str, Any]]) -> list[Note]:
     return [note(state, m) for m in legal]
-

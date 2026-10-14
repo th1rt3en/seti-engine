@@ -149,7 +149,7 @@ def _discover(s: GameState, index: int, events: Events) -> None:
     elif slot.species == "anomalies":
         _setup_anomalies(s, slot, events)
     elif slot.species == "centaurians":
-        _setup_centaurians(s, slot)
+        _setup_centaurians(s, slot, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -463,10 +463,11 @@ def resolve_tile(s: GameState, events: Events) -> None:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
-def _setup_centaurians(s: GameState, slot: SpeciesSlot) -> None:
+def _setup_centaurians(s: GameState, slot: SpeciesSlot, events: Events) -> None:
     slot.extra["covered"] = [None, None, None, None]  # which player's message tile covers each reward hex
     for p in s.players:  # ALIEN-CEN-01: a message milestone 15 points ahead of the player's marker
         add_message(s, p)
+    events.append({"type": "messages_placed", "targets": [{"player": p.index, "target": p.messages[-1]} for p in s.players]})
     if s.rival is not None:
         s.rival.messages_in_reserve = rival.RIVAL_MESSAGE_RESERVE  # SOLO-ALIEN-02: the rival keeps the leftover tiles
 
@@ -483,7 +484,8 @@ def message_moves(s: GameState) -> list[dict[str, Any]]:
     i = message_slot(s)
     assert i is not None
     covered = s.species[i].extra["covered"]
-    return [{"type": "choose_message", "hex": k} for k, c in enumerate(covered) if c is None]
+    rewards_of = board_data("centaurians")["message_rewards"]
+    return [{"type": "choose_message", "hex": k, "reward": rewards_of[k]} for k, c in enumerate(covered) if c is None]
 
 
 def reach_message(s: GameState, p: PlayerState, hex_index: int, events: Events) -> None:
@@ -491,7 +493,9 @@ def reach_message(s: GameState, p: PlayerState, hex_index: int, events: Events) 
     i = message_slot(s)
     assert i is not None
     s.species[i].extra["covered"][hex_index] = p.index
-    rewards.grant(s, p, board_data("centaurians")["message_rewards"][hex_index], events, slot=i)
+    reward = board_data("centaurians")["message_rewards"][hex_index]
+    events.append({"type": "message_reward", "player": p.index, "hex": hex_index, "reward": reward})
+    rewards.grant(s, p, reward, events, slot=i)
 
 
 def check_messages(s: GameState, p: PlayerState, before: int) -> None:

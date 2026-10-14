@@ -47,10 +47,13 @@ def anomaly_at_earth(s: GameState) -> bool:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
-def place_message(s: GameState, p: PlayerState) -> None:
+def place_message(s: GameState, p: PlayerState, events: Events) -> None:
+    """ALIEN-CEN-02: a marker 15 points ahead of the player's score. The card stays in front of the player and is not a mission."""
     cid = s.playing
     assert cid is not None
-    p.message_cards.append(MessageCard(target=p.score + species.MESSAGE_LEAD, card=cid))
+    target = p.score + species.MESSAGE_LEAD
+    p.message_cards.append(MessageCard(target=target, card=cid))
+    events.append({"type": "message_card_placed", "player": p.index, "card": cid, "target": target})
 
 
 def resolve_message(s: GameState, p: PlayerState, target: int, events: Events) -> None:
@@ -67,7 +70,7 @@ def resolve_message(s: GameState, p: PlayerState, target: int, events: Events) -
             rewards.grant(s, p, [r], events)
     if not became_income:
         s.discard.append(mc.card)
-    events.append({"type": "message_resolved", "player": p.index, "card": mc.card})
+    events.append({"type": "message_resolved", "player": p.index, "card": mc.card, "target": mc.target})
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +81,7 @@ def resolve_message(s: GameState, p: PlayerState, target: int, events: Events) -
 def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -> bool:
     t = st["t"]
     if t == "message":
-        place_message(s, p)
+        place_message(s, p, events)
     elif t == "orbit_land_free":
         from . import cards  # noqa: PLC0415
 

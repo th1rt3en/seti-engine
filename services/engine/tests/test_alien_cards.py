@@ -432,6 +432,16 @@ def test_playing_a_centaurian_card_places_a_marker_fifteen_ahead() -> None:
     assert "ET.35" not in r.state.discard
 
 
+def test_placing_and_reaching_a_message_marker_are_logged() -> None:
+    """ALIEN-CEN-02: the log says which card put a marker where, and when its green part resolves."""
+    s = world("centaurians")
+    score = s.players[s.current_player].score
+    r = settle(play(s, "ET.35"))
+    assert {"type": "message_card_placed", "player": r.state.current_player, "card": "ET.35", "target": score + 15} in r.events
+    r2 = reach(r)
+    assert any(e["type"] == "message_resolved" and e["card"] == "ET.35" and e["target"] == score + 15 for e in r2.events)
+
+
 def reach(r: StepResult, extra: int = 0) -> StepResult:
     st = r.state.model_copy(deep=True)
     p = st.players[st.current_player]
@@ -480,6 +490,8 @@ def test_message_cards_are_not_missions() -> None:
     """ALIEN-CEN-02, FAQ-43."""
     r = settle(play(world("centaurians"), "ET.31"))
     assert not me(r).missions and not me(r).completed_missions
+    r2 = settle(reach(r))  # FAQ-43: resolving the green part does not complete a mission, so the grey gold tile does not count it
+    assert not me(r2).completed_missions
 
 
 def test_end_scoring_counts_the_traces_for_a_species() -> None:
