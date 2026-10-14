@@ -9,7 +9,7 @@ import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
 import { HandDock, type HandSelection } from "./HandDock";
-import { CreditIcon, EnergyIcon, ScoreIcon } from "./Icons";
+import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon } from "./Icons";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
@@ -100,6 +100,8 @@ export function GameView({
   topExtra?: ReactNode;
 }) {
   const s = view.state;
+  // exofossils exist once 'Oumuamua is face up: they show with the other resources (ALIEN-OUM-02)
+  const oumuamua = s.species.some((sp) => sp.discovered && sp.species === "oumuamua");
   const prompt = promptOf(view, names);
   const actor = view.to_act === null ? undefined : s.players[view.to_act];
   return (
@@ -144,6 +146,12 @@ export function GameView({
                       <EnergyIcon size={18} />
                       <b>{p.energy}</b>
                     </span>
+                    {oumuamua ? (
+                      <span className="res" title="Exofossils">
+                        <ExofossilIcon size={18} />
+                        <b>{p.exofossils}</b>
+                      </span>
+                    ) : null}
                   </>
                 )}
               </li>

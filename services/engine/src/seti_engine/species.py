@@ -169,11 +169,13 @@ def _setup_anomalies(s: GameState, slot: SpeciesSlot, events: Events) -> None:
     sectors = [earth_sector, (earth_sector + 3) % 8, (earth_sector - 3) % 8]
     cols = rng.shuffled(s, list(COLORS))  # which anomaly goes where is not ruled: seeded random order (A-004)
     slot.extra["tokens"] = [{"sector": sec, "color": col, "side": rng.below(s, 2)} for sec, col in zip(sectors, cols, strict=True)]
+    for t in slot.extra["tokens"]:  # the side that is up is public: the page shows what the token pays (ALIEN-ANO-01)
+        t["reward"] = _token_reward(t["color"], t["side"])
     events.append(
         {
             "type": "anomalies_placed",
             "earth_sector": earth_sector,
-            "tokens": [{**t, "reward": _token_reward(t["color"], t["side"])} for t in slot.extra["tokens"]],
+            "tokens": [dict(t) for t in slot.extra["tokens"]],
         }
     )
 

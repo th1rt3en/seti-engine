@@ -42,6 +42,7 @@ import { type ReactNode, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
 import slotData from "../generated/slots.json";
+import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
 import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ScorePawn, pieceColor } from "./Pieces";
 
 const DISCS = assets.discs as Record<string, string>;
@@ -50,6 +51,8 @@ const SAMPLES = assets.samples as Record<string, string> & { back: string };
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
 const STAR_BOARDS = assets.starBoards as Record<string, string>;
+/** How far (degrees) an Anomaly token lies from the middle of its sector: planets are about 20 degrees wide at the outermost ring. */
+const ANOMALY_SIDE_DEGREES = 15;
 const LANES = [1500, 1538, 1576, 1614];
 const EXERTIAN_LANE = 1440; // the Exertian milestone tiles lie just inside the players' lanes // radius of each player's lane on the score track
 
@@ -374,6 +377,20 @@ export function BoardView({
             </g>
           );
         })}
+
+        {/* the Anomaly tokens (ALIEN-ANO-01): on the outermost ring, a little to the side of the middle of their sector so that they never cover Uranus
+            or Neptune; they stay where they are while the discs turn, Earth moves to them */}
+        {s.species.flatMap((sp) =>
+          sp.discovered && sp.species === "anomalies"
+            ? ((sp.extra?.tokens ?? []) as AnomalyToken[]).map((tok) => (
+                <AnomalyTokenView
+                  key={`anomaly-${tok.sector}`}
+                  token={tok}
+                  at={polar(RING_RADIUS[4] ?? 870, sectorDegrees(tok.sector) - ANOMALY_SIDE_DEGREES)}
+                />
+              ))
+            : [],
+        )}
 
         {Array.from(spaces.entries()).flatMap(([key, group]) => {
           const [ring, sector] = key.split("-").map(Number) as [number, number];
