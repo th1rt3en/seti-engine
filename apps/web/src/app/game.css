@@ -1140,7 +1140,7 @@ button:disabled {
     position: fixed;
     bottom: 0;
     z-index: 70;
-    width: 25%;
+    width: calc((100% - 56px) / 4);
     height: 48px;
     padding: 0 4px;
     justify-content: center;
@@ -1163,13 +1163,13 @@ button:disabled {
     left: 0;
   }
   .rowdock > .handtab {
-    left: 25%;
+    left: calc((100% - 56px) / 4);
   }
   .trackerdock > .handtab {
-    left: 50%;
+    left: calc((100% - 56px) / 2);
   }
   .movelog > .handtab {
-    left: 75%;
+    left: calc((100% - 56px) * 3 / 4);
     border-right: 0;
   }
   .dock:not(.folded) > .handtab {
@@ -1433,19 +1433,37 @@ button:disabled {
   display: none;
 }
 @media (max-width: 760px) {
+  /* the button is the fifth part of the bar, at its right end, so that it covers nothing of the panels above the bar */
   .dockbarfold {
     display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: fixed;
-    right: 8px;
-    bottom: 56px;
+    right: 0;
+    bottom: 0;
     z-index: 75;
+    width: 56px;
+    height: 48px;
+    padding: 0 2px;
+    font-size: 0.7rem;
+    line-height: 1.1;
+    border-radius: 0;
+    background: var(--panel);
+    color: var(--text);
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+  html.dockbar-hidden .dockbarfold {
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    height: auto;
     padding: 4px 12px;
     font-size: 0.8rem;
     border-radius: 999px;
+    border: 1px solid var(--line);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-  }
-  html.dockbar-hidden .dockbarfold {
-    bottom: 8px;
   }
   html.dockbar-hidden .dock > .handtab,
   html.dockbar-hidden .handbody,
