@@ -115,6 +115,8 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
       return `${who} places a message marker at ${String(ev.target)} (${String(ev.card)})`;
     case "message_resolved":
       return `${who} reaches the message marker of ${String(ev.card)} (${String(ev.target)}) and resolves it`;
+    case "exertian_milestones":
+      return `Exertian milestones placed at ${(ev.milestones as { at: number; cost: number }[]).map((m) => `${m.at} (${m.cost > 0 ? `${m.cost} credit` : "free"})`).join(" and ")}, ahead of the leader (${String(ev.leader_score)})`;
     case "anomaly":
       return `Earth reaches the ${String(ev.color)} anomaly in ${sectorName(ctx, Number(ev.sector))}: ${
         typeof ev.player === "number"

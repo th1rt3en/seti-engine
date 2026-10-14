@@ -3,7 +3,7 @@
   "buy_card": ["source"],
   "choose_gold": ["tile"],
   "choose_land_slot": ["slot"],
-  "choose_message": ["hex"],
+  "choose_message": ["hex", "reward"],
   "complete_mission": ["card"],
   "cover": ["card", "circle"],
   "decline_cover": [],

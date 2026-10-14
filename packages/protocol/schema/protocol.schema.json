@@ -1071,8 +1071,30 @@
     "PlayerTracker": {
       "description": "What the tracker beside the board shows for one player. Everything here is public information.",
       "properties": {
+        "danger_board": {
+          "default": 0,
+          "title": "Danger Board",
+          "type": "integer"
+        },
+        "danger_cards": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Danger Cards"
+        },
         "end_cards": {
           "title": "End Cards",
+          "type": "integer"
+        },
+        "exertian_played": {
+          "default": 0,
+          "title": "Exertian Played",
           "type": "integer"
         },
         "income": {
@@ -1099,7 +1121,10 @@
         }
       },
       "required": [
+        "danger_board",
+        "danger_cards",
         "end_cards",
+        "exertian_played",
         "income",
         "missions_done",
         "score",

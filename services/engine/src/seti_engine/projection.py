@@ -13,7 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from . import engine, move_notes, tables
+from . import engine, move_notes, species, tables
 from .models import GameState, PlayerState
 
 HIDDEN = "?"  # a hidden card, tile or token
@@ -45,14 +45,28 @@ class PlayerTracker(BaseModel):
     missions_done: int  # completed missions (CARD-16)
     end_cards: int  # end-of-game scoring cards in front of the player (CARD-20)
     score: int
+    # Exertian danger (ALIEN-EXE-06). The board part and the number of cards played are public; the danger of the played cards
+    # is None unless the viewer is this player, because the cards lie face down until the end of the game.
+    danger_board: int = 0
+    exertian_played: int = 0
+    danger_cards: int | None = None
 
 
-def tracker(state: GameState, p: PlayerState) -> PlayerTracker:
+def tracker(state: GameState, p: PlayerState, viewer: int | None = None) -> PlayerTracker:
     """INCOME-01, INCOME-03, ROUND-02: the income a player gets at the end of each round, by kind. The solo rival has none (A-025)."""
     rival_player = state.rival is not None and p.index == state.rival.index
     tucked = {k: sum(1 for c in p.tucked if tables.cards()[c]["income"] == k) for k in INCOME_KINDS}
     income = {k: 0 if rival_player else INCOME_BASE[k] + tucked[k] for k in INCOME_KINDS}
-    return PlayerTracker(income=income, tucked=tucked, missions_done=len(p.completed_missions), end_cards=len(p.end_cards), score=p.score)
+    return PlayerTracker(
+        income=income,
+        tucked=tucked,
+        missions_done=len(p.completed_missions),
+        end_cards=len(p.end_cards),
+        score=p.score,
+        danger_board=species.board_danger(state, p),
+        exertian_played=len(p.exertian_played),
+        danger_cards=species.cards_danger(p) if viewer == p.index else None,
+    )
 
 
 class ReachCell(BaseModel):
@@ -141,7 +155,7 @@ def project(state: GameState, viewer: int | None) -> View:
     if actor != viewer:
         s.aside = []
     legal = engine.legal_moves(state) if viewer is not None and actor == viewer else []
-    trackers = [tracker(state, p) for p in state.players]
+    trackers = [tracker(state, p, viewer) for p in state.players]
     reach: list[ProbeReach] = []
     if legal and viewer is not None and not state.pending and state.phase == "play":
         reach = [

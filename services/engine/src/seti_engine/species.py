@@ -340,6 +340,13 @@ def _setup_exertians(s: GameState, slot: SpeciesSlot, owners: list[int], events:
     slot.face_up = None
     lead = max(p.score for p in s.players)
     slot.extra["milestones"] = [{"at": lead + d, "cost": 0 if i == 0 else 1, "done": []} for i, d in enumerate(EXERT_LEADS)]
+    events.append(
+        {
+            "type": "exertian_milestones",
+            "leader_score": lead,
+            "milestones": [{"at": m["at"], "cost": m["cost"]} for m in slot.extra["milestones"]],
+        }
+    )
     for pl in owners:  # an immediate chance to play one card per marker
         if not rival.is_rival(s, pl):
             s.pending.append(Decision(kind="exertian_play", player=pl, data={"cost": 0}))
@@ -358,15 +365,25 @@ def play_exertian(s: GameState, p: PlayerState, cid: str, cost: int) -> None:
     p.exertian_played.append(cid)  # face down: other players do not see which card it is
 
 
-def danger(s: GameState, p: PlayerState) -> int:
-    """ALIEN-EXE-06: the danger of the played cards plus 3, 2 or 1 per marker on the bottom, middle and top of the board."""
-    total = sum(EXERTIAN_CARDS[c][0] for c in p.exertian_played)
+def board_danger(s: GameState, p: PlayerState) -> int:
+    """ALIEN-EXE-06: 3, 2 or 1 danger per marker on the bottom, middle and top of the Exertian board. Public: the board is open."""
+    total = 0
     i = exertian_slot(s)
     if i is not None:
         for column in s.species[i].board.values():
             for k, markers in enumerate(column):
                 total += TIER_DANGER[k] * markers.count(p.index)
     return total
+
+
+def cards_danger(p: PlayerState) -> int:
+    """ALIEN-EXE-06: the danger of the played cards, which only their owner may know until the end of the game."""
+    return sum(EXERTIAN_CARDS[c][0] for c in p.exertian_played)
+
+
+def danger(s: GameState, p: PlayerState) -> int:
+    """ALIEN-EXE-06: the danger of the played cards plus the danger of the markers on the board."""
+    return cards_danger(p) + board_danger(s, p)
 
 
 def exertian_losses(s: GameState, totals: list[int]) -> list[int]:

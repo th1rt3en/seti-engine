@@ -4,7 +4,7 @@
 import { cardName } from "@/lib/moves";
 import { useBottomSpace, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
 import { CardImage } from "./CardImage";
 
@@ -17,6 +17,46 @@ export interface HandSelection {
   offered?: string[];
   offeredSelected?: string | null;
   onOffer?: (card: string) => void;
+}
+
+/** The tab with the player's Exertian cards (ALIEN-EXE-01 to ALIEN-EXE-07): those still held, those played face down, and the milestones. */
+function ExertianTab({ view }: { view: View }) {
+  const me = view.viewer;
+  const player = me === null ? undefined : view.state.players[me];
+  const slot = view.state.species.find((sp) => sp.discovered && sp.species === "exertians");
+  if (!player || !slot) return null;
+  const tracker = view.trackers?.[player.index];
+  const milestones = (slot.extra.milestones ?? []) as { at: number; cost: number; done: number[] }[];
+  return (
+    <div className="exertiantab">
+      <div className="cards">
+        <b className="offerlabel">Available ({player.exertian_hand.length})</b>
+        {player.exertian_hand.length === 0 ? <span className="muted">No Exertian cards left to play.</span> : null}
+        {player.exertian_hand.map((c, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: ids are unique, the index only guards a hidden card
+          <CardImage key={`${c}-${i}`} id={c} size="hand" />
+        ))}
+        <span className="handsep" aria-hidden="true" />
+        <b className="offerlabel">Played face down ({player.exertian_played.length})</b>
+        {player.exertian_played.length === 0 ? <span className="muted">None played yet.</span> : null}
+        {player.exertian_played.map((c, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: ids are unique, the index only guards a hidden card
+          <CardImage key={`${c}-${i}`} id={c} size="hand" />
+        ))}
+      </div>
+      <p className="muted">
+        Danger: {tracker?.danger_cards ?? 0} from played cards + {tracker?.danger_board ?? 0} from the species board ={" "}
+        <b>{(tracker?.danger_cards ?? 0) + (tracker?.danger_board ?? 0)}</b>. Milestones:{" "}
+        {milestones
+          .map(
+            (m, i) =>
+              `${i + 1}: ${m.at} points, ${m.cost > 0 ? `${m.cost} credit` : "free"}${m.done.includes(player.index) ? " (crossed)" : ""}`,
+          )
+          .join("; ")}
+        .
+      </p>
+    </div>
+  );
 }
 
 export function HandDock({ view, selection }: { view: View; selection?: HandSelection }) {
@@ -33,7 +73,10 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   useBottomSpace(dock, "hand");
   const me = view.viewer;
   const player = me === null ? undefined : view.state.players[me];
+  const [tab, setTab] = useState<"hand" | "exertian">("hand");
   if (!player) return null;
+  const exertians = view.state.species.some((sp) => sp.discovered && sp.species === "exertians");
+  const showExertian = exertians && tab === "exertian";
   return (
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
@@ -45,7 +88,18 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
       </button>
       {folded ? null : (
         <div className="handbody">
-          <div className="cards">
+          {exertians ? (
+            <div className="handtabs" role="tablist">
+              <button type="button" role="tab" aria-selected={!showExertian} onClick={() => setTab("hand")}>
+                Hand and missions
+              </button>
+              <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
+                Exertian cards ({player.exertian_hand.length} held · {player.exertian_played.length} played)
+              </button>
+            </div>
+          ) : null}
+          {showExertian ? <ExertianTab view={view} /> : null}
+          <div className="cards" hidden={showExertian}>
             {player.hand.length === 0 ? <span className="muted">No cards in hand.</span> : null}
             {player.hand.map((c, i) => {
               const picked = selection?.selected.includes(i) ?? false;

@@ -158,6 +158,31 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             labelled(<DeckCardIcon size={18} />, "Cards in hand"),
             s.players.map((p) => view.counts.hands[p.index] ?? 0),
           )}
+          {s.species.some((sp) => sp.discovered && sp.species === "exertians") ? (
+            <>
+              {group("Exertian danger (the most danger loses a tenth of its points)")}
+              {row(
+                labelled(<ScoreIcon size={18} />, "Species board"),
+                trackers.map((t) => t.danger_board),
+              )}
+              {row(
+                labelled(<DeckCardIcon size={18} />, "Played cards"),
+                // only the owner sees the danger of the cards; the others see how many lie face down
+                trackers.map((t) =>
+                  t.danger_cards === null || t.danger_cards === undefined ? `${t.exertian_played} face down` : t.danger_cards,
+                ),
+              )}
+              {row(
+                labelled(<ScoreIcon size={18} />, "Danger"),
+                trackers.map((t) =>
+                  t.danger_cards === null || t.danger_cards === undefined
+                    ? `${t.danger_board} + ${t.exertian_played} card${t.exertian_played === 1 ? "" : "s"}`
+                    : t.danger_board + t.danger_cards,
+                ),
+                "score",
+              )}
+            </>
+          ) : null}
           {s.species.some((sp) => sp.discovered && sp.species === "centaurians") ? (
             <>
               {group("Centaurian messages, resolved in the order sent")}

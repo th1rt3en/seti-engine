@@ -56,3 +56,19 @@ def test_the_turn_counter_counts_turns_in_the_round_and_starts_again() -> None:
             r = apply(r.state, r.legal[0])
         s = r.state
     assert s.round == 2 and s.turn == 1
+
+
+def test_exertian_danger_is_public_for_the_board_and_private_for_the_cards() -> None:
+    """ALIEN-EXE-06: the board danger and the number of cards played show to everyone; the danger of the played cards only to its owner."""
+    from seti_engine import species
+    from seti_engine.models import SpeciesSlot
+
+    s = begin(3).state.model_copy(deep=True)
+    s.species = [SpeciesSlot(species="exertians", board=species.new_board("exertians"), discovered=True), s.species[1]]
+    s.players[1].exertian_played = ["ET.41", "ET.43"]  # danger 6 and 3
+    s.species[0].board["pink"][4].append(1)  # a marker on the bottom tier: 3
+    mine = projection.project(s, viewer=1).trackers[1]
+    other = projection.project(s, viewer=0).trackers[1]
+    assert (mine.danger_board, mine.exertian_played, mine.danger_cards) == (3, 2, 9)
+    assert (other.danger_board, other.exertian_played, other.danger_cards) == (3, 2, None)
+    assert species.danger(s, s.players[1]) == 12

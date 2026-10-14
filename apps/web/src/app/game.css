@@ -525,6 +525,18 @@ main:has(.game) {
   align-items: flex-end;
   gap: 8px;
 }
+.handtabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.handtabs button[aria-selected="true"] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+.exertiantab p {
+  margin: 6px 0 0;
+}
 .handsep {
   align-self: stretch;
   width: 0;

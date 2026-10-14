@@ -384,6 +384,9 @@ def test_exertian_milestones_are_twenty_and_forty_ahead_of_the_leader() -> None:
     r = exert_game(("n", "n", "n"))
     lead = max(p.score for p in r.state.players)
     assert [m["at"] for m in r.state.species[0].extra["milestones"]] == [lead + 20, lead + 40]
+    assert [m["cost"] for m in r.state.species[0].extra["milestones"]] == [0, 1]
+    logged = next(e for e in r.events if e["type"] == "exertian_milestones")  # the log says where they are and what they cost
+    assert logged["milestones"] == [{"at": lead + 20, "cost": 0}, {"at": lead + 40, "cost": 1}]
 
 
 def test_crossing_an_exertian_milestone_lets_even_a_player_without_traces_play_a_card() -> None:
