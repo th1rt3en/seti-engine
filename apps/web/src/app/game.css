@@ -10,7 +10,8 @@
 
 main:has(.game) {
   max-width: none; /* the game uses the whole width of the window */
-  padding: 8px 12px 90px;
+  /* room below the page for the hand and the log that float over its bottom, so that the page scrolls until nothing is covered */
+  padding: 8px 12px calc(max(var(--hand-h, 0px), var(--log-h, 0px)) + 28px);
 }
 
 .game {
@@ -197,7 +198,7 @@ main:has(.game) {
 /* the columns: card row and species, the board, the publicity track and tech stacks */
 .gamegrid {
   display: grid;
-  grid-template-columns: var(--col-left) minmax(0, 1fr) var(--col-aux);
+  grid-template-columns: minmax(0, 1fr) var(--col-aux);
   gap: 14px;
   align-items: start;
 }
@@ -209,6 +210,10 @@ main:has(.game) {
 }
 .col-center {
   min-width: 0;
+  max-width: none; /* it is a main element: not the 1200 px of the other pages */
+  width: 100%;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
 }
@@ -221,10 +226,6 @@ main:has(.game) {
   height: auto;
 }
 .col-aux {
-  position: sticky;
-  top: calc(var(--bar-h) + 20px);
-  max-height: calc(100vh - var(--bar-h) - 32px);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -364,10 +365,10 @@ main:has(.game) {
 .trackerdock {
   position: fixed;
   right: 12px;
-  top: calc(var(--bar-h) + 20px);
+  top: calc(var(--bar-bottom, var(--bar-h)) + 12px);
   z-index: 35;
   width: clamp(300px, 17.5vw, 480px);
-  max-height: calc(100vh - var(--bar-h) - 32px);
+  max-height: calc(100vh - var(--bar-bottom, var(--bar-h)) - 24px);
   display: flex;
   flex-direction: column;
   background: color-mix(in srgb, var(--panel) 97%, transparent);
@@ -544,52 +545,9 @@ main:has(.game) {
 
 @media (max-width: 1100px) {
   :root {
-    --col-aux: clamp(300px, 34vw, 420px);
-  }
-  .gamegrid {
-    grid-template-columns: minmax(0, 1fr) var(--col-aux);
-  }
-  .col-left {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-  .col-left .cardrow {
-    flex: 1 1 340px;
-  }
-  .col-left .aliens {
-    flex: 3 1 560px;
-    flex-direction: row;
-  }
-  .col-left .alien {
-    flex: 1 1 260px;
-  }
-  .card-row {
-    width: calc(33% - 6px);
+    --col-aux: clamp(240px, 30vw, 360px);
   }
 }
-@media (max-width: 760px) {
-  .gamegrid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .col-aux {
-    position: static;
-    max-height: none;
-    overflow: visible;
-  }
-  .counter .big {
-    font-size: 28px;
-  }
-  .extra {
-    align-items: flex-start;
-  }
-  .trackerdock {
-    width: min(340px, calc(100vw - 24px));
-  }
-}
-
 /* a marker taking the place of a data token: the token lifts off towards its owner's data pile, the marker pops in */
 .pop {
   transform-box: fill-box;
@@ -1052,4 +1010,376 @@ button:disabled {
   transform: translate(-50%, -50%);
   font-size: 1.5rem;
   padding: 2px 14px;
+}
+
+/* the card row as a floating panel at the left edge */
+.rowdock {
+  position: fixed;
+  left: 12px;
+  top: calc(var(--bar-bottom, var(--bar-h)) + 12px);
+  z-index: 33;
+  width: clamp(300px, 17vw, 440px);
+  max-height: calc(100vh - var(--bar-bottom, var(--bar-h)) - 24px);
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--panel) 97%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+.rowdock.folded {
+  width: auto;
+}
+.rowbody {
+  overflow-y: auto;
+  padding: 0 10px 10px;
+}
+.rowbody .cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.rowbody .cards .card-row {
+  width: 100%;
+}
+.aliennotes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 10px;
+}
+.aliennotes .alien {
+  flex: 1 1 260px;
+}
+
+/* phones: the four panels (hand, card row, players, log) are the tabs of one bar at the bottom; a tab opens its panel above the bar */
+@media (max-width: 760px) {
+  main:has(.game) {
+    padding: 6px 8px 64px;
+  }
+  .game {
+    gap: 8px;
+  }
+  .topbar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .toprow {
+    gap: 6px 12px;
+  }
+  .counter .big {
+    font-size: 24px;
+  }
+  .now {
+    flex: 1 1 100%;
+    order: 3;
+  }
+  .scorechips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    order: 4;
+    padding-bottom: 2px;
+  }
+  .scorechips li {
+    flex: none;
+    padding: 2px 8px;
+    font-size: 0.9rem;
+  }
+  .toprow .extra {
+    order: 5;
+    flex: 1 1 100%;
+  }
+  .movebar {
+    max-height: 34vh;
+  }
+  .movebar .moves button,
+  .confirmbar button,
+  .trade button {
+    min-height: 40px;
+  }
+  .gamegrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .col-aux {
+    position: static;
+    max-height: none;
+  }
+  .publicity svg {
+    max-width: 260px;
+  }
+  .solopanel {
+    flex-direction: column;
+  }
+  .rivalboard,
+  .objectives {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .rivalfacts {
+    grid-template-columns: 1fr;
+  }
+  .rcard {
+    width: 84px;
+  }
+  .objective {
+    width: 96px;
+  }
+
+  .dock {
+    position: static;
+    width: auto;
+    max-height: none;
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+  .dock > .handtab {
+    position: fixed;
+    bottom: 0;
+    z-index: 70;
+    width: 25%;
+    height: 48px;
+    padding: 0 4px;
+    justify-content: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    line-height: 1.1;
+    text-align: center;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-radius: 0;
+  }
+  .dock > .handtab .muted {
+    display: none;
+  }
+  .dock > .handtab [aria-hidden="true"] {
+    display: none;
+  }
+  .hand > .handtab {
+    left: 0;
+  }
+  .rowdock > .handtab {
+    left: 25%;
+  }
+  .trackerdock > .handtab {
+    left: 50%;
+  }
+  .movelog > .handtab {
+    left: 75%;
+    border-right: 0;
+  }
+  .dock:not(.folded) > .handtab {
+    background: color-mix(in srgb, var(--accent) 28%, var(--panel));
+  }
+  .handbody,
+  .rowbody,
+  .trackerbody,
+  .logbody {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 48px;
+    z-index: 60;
+    max-height: 58vh;
+    overflow-y: auto;
+    padding: 10px;
+    background: var(--panel);
+    border-top: 2px solid var(--accent);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  }
+  .logbody {
+    max-height: 50vh;
+    font-size: 0.95rem;
+  }
+  .card-hand {
+    width: clamp(86px, 26vw, 130px);
+  }
+  .card-mission {
+    width: clamp(70px, 20vw, 100px);
+  }
+  .rowbody .cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .hand .cards {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .cardbtn.selected {
+    transform: translateY(-8px);
+  }
+  .trackerbody table {
+    font-size: 0.85rem;
+  }
+}
+
+/* phones: a bar on top that does not take half of the screen */
+@media (max-width: 760px) {
+  .topbar .toprow {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 4px 12px;
+  }
+  .counter {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .counter .label {
+    font-size: 10px;
+  }
+  .counter .big {
+    font-size: 20px;
+  }
+  .now {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    order: 0;
+    padding: 4px 10px;
+  }
+  .now .dot.big {
+    width: 18px;
+    height: 18px;
+  }
+  .now .who {
+    font-size: 0.95rem;
+  }
+  .now .prompt {
+    font-size: 0.85rem;
+  }
+  .scorechips {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .toprow .extra {
+    grid-column: 3;
+    grid-row: 1;
+    flex: none;
+    justify-self: end;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    font-size: 0.75rem;
+  }
+  .movebar {
+    max-height: 30vh;
+    padding-top: 4px;
+  }
+}
+
+/* amounts with icons (the log, the confirmations) */
+.amounts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  vertical-align: middle;
+}
+.amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.amount.gain b {
+  color: var(--good);
+}
+.amount.loss b {
+  color: #ff8a80;
+}
+
+/* the rival's turn in the log */
+.logrival {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 2px 2.8em;
+  padding: 3px 8px;
+  border-left: 3px solid #ff5a52;
+  background: color-mix(in srgb, #ff5a52 8%, transparent);
+  border-radius: 0 6px 6px 0;
+}
+.logrivalhead {
+  color: #ff8a80;
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.rivalplay {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.logcard {
+  height: auto;
+  border-radius: 4px;
+  transition: transform 0.15s;
+}
+.logcard:hover {
+  transform: scale(3);
+  transform-origin: left center;
+  position: relative;
+  z-index: 40;
+  transition-delay: 0.6s;
+}
+
+/* the gold scoring tiles beside the board, and one enlarged */
+.goldtile {
+  cursor: zoom-in;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+}
+.goldzoom {
+  position: fixed;
+  z-index: 110;
+  padding: 10px;
+  background: color-mix(in srgb, var(--panel) 98%, transparent);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+}
+.goldzoom svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.goldzoom p {
+  margin: 8px 2px 0;
+  font-size: 0.95rem;
+}
+
+/* places on the board that can be picked (land, orbit, signal, trace) */
+.spot {
+  cursor: pointer;
+}
+.spotshape {
+  fill: rgba(110, 240, 165, 0.16);
+  stroke: #6ef0a5;
+  stroke-width: 9;
+  stroke-dasharray: 26 14;
+  animation: spotpulse 1.6s ease-in-out infinite;
+}
+.spot:hover .spotshape,
+.spot:focus .spotshape {
+  fill: rgba(110, 240, 165, 0.42);
+}
+.spot.chosen .spotshape {
+  fill: rgba(110, 240, 165, 0.5);
+  stroke: #fff;
+  stroke-dasharray: none;
+  animation: none;
+}
+@keyframes spotpulse {
+  0%,
+  100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.35;
+  }
 }

@@ -74,3 +74,63 @@ export function DeckCardIcon({ size = SIZE }: { size?: number }) {
     </svg>
   );
 }
+
+/** Publicity: the red pennant with a microphone, as printed. */
+export function PublicityIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="publicity" className="resicon">
+      <title>Publicity</title>
+      <path d="M2 3h15l5 9-5 9H2z" fill="#e0452f" stroke="#8a2112" strokeWidth="1.4" strokeLinejoin="round" />
+      <rect x="9" y="6" width="5" height="9" rx="2.5" fill="#fff" />
+      <path d="M7.5 12a4.5 4.5 0 0 0 9 0M12 16.5V19" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** A data token: the blue glossy disc. */
+export function DataIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="data" className="resicon">
+      <title>Data</title>
+      <circle cx="12" cy="12" r="10.5" fill="#2f7be0" stroke="#173f7a" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="7.5" fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="1.2" />
+      <path d="M7 9.5h10M7 12.5h6M7 15.5h8" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** A card of an alien species: the alien head on a teal hexagon. */
+export function AlienCardIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="alien card" className="resicon">
+      <title>Alien card</title>
+      <path d="M12 1.5 21.5 7v10L12 22.5 2.5 17V7z" fill="#1f8f7a" stroke="#0d4a3f" strokeWidth="1.4" />
+      <path d="M12 6c3.4 0 5.4 2.4 5.4 5 0 2.6-2.3 5.6-5.4 6.6C8.9 16.600 6.600 13.600 6.600 11c0-2.600 2-5 5.400-5z" fill="#fff" />
+      <ellipse cx="9.600" cy="11" rx="1.400" ry="2.200" transform="rotate(-25 9.600 11)" fill="#0d4a3f" />
+      <ellipse cx="14.400" cy="11" rx="1.400" ry="2.200" transform="rotate(25 14.400 11)" fill="#0d4a3f" />
+    </svg>
+  );
+}
+
+/** An exofossil of 'Oumuamua. */
+export function ExofossilIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="exofossil" className="resicon">
+      <title>Exofossil</title>
+      <ellipse cx="12" cy="12" rx="10" ry="7" fill="#b89a6a" stroke="#6b5530" strokeWidth="1.4" transform="rotate(-20 12 12)" />
+      <path d="M5 13c3-6 9-8 14-4" fill="none" stroke="#6b5530" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+/** A trace of life: three dots in the colours of the three kinds. */
+export function TraceIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="trace" className="resicon">
+      <title>Trace</title>
+      <circle cx="7" cy="16" r="5" fill="#e0457b" />
+      <circle cx="17" cy="16" r="5" fill="#2f8fd8" />
+      <circle cx="12" cy="7.500" r="5" fill="#e0a800" />
+    </svg>
+  );
+}

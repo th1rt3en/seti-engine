@@ -267,7 +267,26 @@ def apply(state: GameState, action: Action) -> StepResult:
         _do_action(s, action, events)
     _advance(s, events)
     objectives.check_thresholds(s)  # SOLO-OBJ-04: reaching a level marks the task at once
+    events += _deltas(state, s)
     return StepResult(state=s, events=events, legal=legal_moves(s))
+
+
+def _deltas(before: GameState, after: GameState) -> list[dict[str, Any]]:
+    """What each player gained or lost in this step, net: a `delta` event for each player whose points or resources changed (the log)."""
+    out: list[dict[str, Any]] = []
+    for old, new in zip(before.players, after.players, strict=True):
+        changes = {
+            "vp": new.score - old.score,
+            "credit": new.credits - old.credits,
+            "energy": new.energy - old.energy,
+            "publicity": new.publicity - old.publicity,
+            "data": new.data_pool - old.data_pool,
+            "card": len(new.hand) - len(old.hand),
+        }
+        changes = {k: v for k, v in changes.items() if v != 0}
+        if changes:
+            out.append({"type": "delta", "player": new.index, "changes": changes})
+    return out
 
 
 def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:

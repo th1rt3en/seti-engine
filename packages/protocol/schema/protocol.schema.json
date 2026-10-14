@@ -1523,6 +1523,21 @@
           "title": "Legal",
           "type": "array"
         },
+        "notes": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Notes",
+          "type": "array"
+        },
         "reach": {
           "items": {
             "$ref": "#/$defs/ProbeReach"
@@ -1566,6 +1581,7 @@
       "required": [
         "counts",
         "legal",
+        "notes",
         "reach",
         "state",
         "to_act",

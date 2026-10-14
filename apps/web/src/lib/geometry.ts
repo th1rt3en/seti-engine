@@ -100,6 +100,37 @@ export const DISCOVERY: { x: number; y: number }[][] = [
   ],
 ];
 
+/**
+ * The species boards sit above the base board, their three bottom cut-outs around the three discovery spaces of the notch below (the board and
+ * its notches are printed so). The picture of a species board is 777 x 1415; its middle cut-out is at x = 388 and the cut-outs are 270 apart.
+ */
+export const ALIEN = { w: 777, h: 1415, centre: 388, scale: 1.09, bottom: 330, middleX: [680, 2820] };
+export const ALIEN_TOP = ALIEN.bottom - ALIEN.h * ALIEN.scale;
+
+/**
+ * The four gold scoring tiles lie against the circle of the board on its right side, one after the other, each with its flat lower edge
+ * tangent to the circle and its top turned away from the middle of the board. `radius` is the distance from the centre to the outer edge of the
+ * board's circle, the tiles are drawn at `scale` of their picture (550 x 488), and the group is centred on `centreDegrees`.
+ */
+export const GOLD = { w: 550, h: 488, scale: 0.7, radius: 1640, gap: 8, centreDegrees: 2, stepDegrees: 13.6 };
+
+export function goldPlace(i: number): { x: number; y: number; rotation: number } {
+  const degrees = GOLD.centreDegrees + (1.5 - i) * GOLD.stepDegrees; // the first tile is the one highest up
+  const at = polar(GOLD.radius + GOLD.gap + (GOLD.h * GOLD.scale) / 2, degrees);
+  return { x: at.x, y: at.y, rotation: 90 - degrees };
+}
+
+/** How far the tiles reach beyond the right edge of the board picture. */
+export const GOLD_EXTRA = 300;
+
+/** Where the markers of the choosers sit on a tile (picture of 550 x 488): the first and the second chooser, then the wide space for the others. */
+export const GOLD_SLOTS = [
+  { x: 105, y: 248 },
+  { x: 228, y: 248 },
+  { x: 350, y: 248 },
+  { x: 425, y: 248 },
+];
+
 export const PLAYER_COLOR: Record<string, string> = {
   green: "#2fbf71",
   red: "#ff5a52",

@@ -62,3 +62,5 @@ The earlier gap list is now mostly covered: main board, player boards, solar sys
   along it from the counter-clockwise end. A marker takes the leftmost token's place and the token lifts off towards its owner's data pile (shown in the tracker).
 
 - 2026-10-14: the symbols for credit, energy, a card of the display and a card of the deck (`apps/web/src/components/Icons.tsx`) are drawn placeholders, as are the tech names in `apps/web/src/lib/techs.ts` (the tiles show icons only, so the 12 short names are our own). If you have the printed symbols or official names, send them.
+
+- 2026-10-14: more drawn placeholders for the log and the confirmations: the icons of publicity, data, alien card, exofossil and trace (`apps/web/src/components/Icons.tsx`). The icons of the main actions (launch, orbit, land, scan) are cut from the player aid, and the score icon is the globe of the scoring track. The places of the trace spaces on the five species boards (`apps/web/src/lib/speciesSpaces.ts`) were measured by eye on the pictures (the sample spaces of the Mascamites have no place yet and stay buttons); the overflow spaces are placed 190 px under the discovery spaces.

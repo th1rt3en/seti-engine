@@ -13,7 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from . import engine, tables
+from . import engine, move_notes, tables
 from .models import GameState, PlayerState
 
 HIDDEN = "?"  # a hidden card, tile or token
@@ -79,6 +79,8 @@ class View(BaseModel):
     legal: list[dict[str, Any]] = Field(default_factory=list)
     # where the viewer's probes can go with their movement plus all their energy (FREE-01); empty unless the viewer may move now
     reach: list[ProbeReach] = Field(default_factory=list)
+    # what each legal move means (where, cost, rewards), in the order of `legal`, for the confirmation on the page (move_notes.py)
+    notes: list[dict[str, Any] | None] = Field(default_factory=list)
 
 
 def to_act(state: GameState) -> int | None:
@@ -138,7 +140,8 @@ def project(state: GameState, viewer: int | None) -> View:
             ProbeReach(probe=pid, cells=[ReachCell(to=to, cost=cost, path=path) for to, cost, path in cells])
             for pid, cells in engine.move_reach(state, state.players[viewer])
         ]
-    return View(viewer=viewer, state=s, counts=counts, trackers=trackers, to_act=actor, legal=legal, reach=reach)
+    notes = move_notes.notes(state, legal) if legal else []
+    return View(viewer=viewer, state=s, counts=counts, trackers=trackers, to_act=actor, legal=legal, reach=reach, notes=notes)
 
 
 def _hide_tokens(extra: dict[str, Any]) -> None:

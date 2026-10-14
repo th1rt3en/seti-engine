@@ -1,6 +1,8 @@
 {
   "actionIcons": {
+    "land": "/assets/icons/land.a6bea860fc.webp",
     "launch": "/assets/icons/launch.bb78e23086.webp",
+    "orbit": "/assets/icons/orbit.9f294a3c20.webp",
     "scan": "/assets/icons/scan.dc7737b60c.webp"
   },
   "background": "/assets/bg/milky-way.4e4312f4fa.webp",
@@ -206,6 +208,48 @@
     "disc-2": "/assets/discs/disc-2.053494e37c.webp",
     "disc-3": "/assets/discs/disc-3.15ea533bc2.webp",
     "disc-3-oumuamua": "/assets/discs/disc-3-oumuamua.702c2b2bc9.webp"
+  },
+  "gold": {
+    "Income-A": {
+      "per": "each set of three tucked income cards, one of each type (credit, energy, card)",
+      "src": "/assets/tiles/gold-Income-A.7588c2a545.webp",
+      "values": [11, 8, 5]
+    },
+    "Income-B": {
+      "per": "each tucked income card of the type you have most (credit or energy)",
+      "src": "/assets/tiles/gold-Income-B.a9fa6466df.webp",
+      "values": [5, 4, 3]
+    },
+    "Mission-A": {
+      "per": "each completed mission",
+      "src": "/assets/tiles/gold-Mission-A.c87b1c15c6.webp",
+      "values": [4, 3, 2]
+    },
+    "Mission-B": {
+      "per": "each pair of completed missions or end-of-game scoring cards",
+      "src": "/assets/tiles/gold-Mission-B.d77841c8cc.webp",
+      "values": [8, 6, 4]
+    },
+    "Other-A": {
+      "per": "each set of three life traces, one of each color (overflow markers count)",
+      "src": "/assets/tiles/gold-Other-A.535aefe8c3.webp",
+      "values": [8, 6, 4]
+    },
+    "Other-B": {
+      "per": "each sector win paired with an orbiter or lander",
+      "src": "/assets/tiles/gold-Other-B.28491a0bb2.webp",
+      "values": [8, 6, 4]
+    },
+    "Tech-A": {
+      "per": "each set of three techs, one of each type",
+      "src": "/assets/tiles/gold-Tech-A.50b85772c9.webp",
+      "values": [11, 8, 5]
+    },
+    "Tech-B": {
+      "per": "each pair of techs (any two)",
+      "src": "/assets/tiles/gold-Tech-B.d182d293a0.webp",
+      "values": [7, 5, 3]
+    }
   },
   "moon": "/assets/discs/moon.42ba127546.webp",
   "objectives": {

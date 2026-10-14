@@ -5,29 +5,21 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import assets from "../generated/assets.json";
-import { AlienBoards } from "./AlienBoards";
+import { AlienNotes } from "./AlienNotes";
 import { BarHeight } from "./BarHeight";
-import { type BoardInteraction, BoardView } from "./BoardView";
-import { CardImage } from "./CardImage";
+import { type BoardInteraction, type BoardSpots, BoardView } from "./BoardView";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ScoreIcon } from "./Icons";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
+import { RowDock, type RowSelection } from "./RowDock";
 import { SoloPanel } from "./SoloPanel";
 import { StateView } from "./StateView";
 import { type TechPick, TechStacks } from "./TechStacks";
 import { TrackerDock } from "./TrackerDock";
 
 const ROUNDS = 5;
-
-/** Picking a card of the card row (or the deck): which can be picked, which is, and what happens on a click. The sources are the engine's: "deck" and "row:<place>". */
-export interface RowSelection {
-  selectable: string[];
-  selected: string | null;
-  onSelect: (source: string) => void;
-}
 
 /** What the engine waits for, in words. */
 const DECISION: Record<string, string> = {
@@ -79,6 +71,7 @@ export function GameView({
   tech,
   log,
   interaction,
+  spots,
 }: {
   view: View;
   names: string[];
@@ -94,6 +87,8 @@ export function GameView({
   log?: ReactNode;
   /** Picking a probe and a space to move it to. */
   interaction?: BoardInteraction;
+  /** Places on the board that a move can be made at (landing, orbiting, signals, traces). */
+  spots?: BoardSpots;
   /** The moves of the player to act (and the buttons that go with them): shown in the bar on top. */
   moves?: ReactNode;
   /** Connection and clock information for the bar. */
@@ -154,56 +149,11 @@ export function GameView({
       </header>
 
       <div className="gamegrid">
-        <aside className="col-left">
-          <section className="cardrow" aria-label="Card row">
-            <h3>
-              Card row{" "}
-              <span className="muted small">
-                deck {view.counts.deck} · discard {s.discard.length}
-              </span>
-            </h3>
-            <div className="cards">
-              {s.card_row.length === 0 ? <span className="muted">empty</span> : null}
-              {s.card_row.map((c, i) => {
-                const source = `row:${i}`;
-                if (!row?.selectable.includes(source)) {
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the slot is the identity of a card of the row
-                  return <CardImage key={`${c}-${i}`} id={c} size="row" />;
-                }
-                return (
-                  <button
-                    // biome-ignore lint/suspicious/noArrayIndexKey: the slot is the identity of a card of the row
-                    key={`${c}-${i}`}
-                    type="button"
-                    className={row.selected === source ? "cardbtn selectable selected" : "cardbtn selectable"}
-                    aria-pressed={row.selected === source}
-                    onClick={() => row.onSelect(source)}
-                  >
-                    <CardImage id={c} size="row" />
-                  </button>
-                );
-              })}
-              {row?.selectable.includes("deck") ? (
-                <button
-                  type="button"
-                  className={row.selected === "deck" ? "cardbtn selectable selected deckbtn" : "cardbtn selectable deckbtn"}
-                  aria-pressed={row.selected === "deck"}
-                  onClick={() => row.onSelect("deck")}
-                  title="The top card of the deck"
-                >
-                  <img src={assets.cardBack} alt="Top of the deck" width={300} height={418} className="cardimg decktile" />
-                  <span className="decklabel">Deck {view.counts.deck}</span>
-                </button>
-              ) : null}
-            </div>
-          </section>
-          <AlienBoards view={view} names={names} />
-        </aside>
-
         <main className="col-center">
           <div className="boardwrap">
-            <BoardView view={view} names={names} previous={previous} interaction={interaction} />
+            <BoardView view={view} names={names} previous={previous} interaction={interaction} spots={spots} />
             <RoundPiles view={view} />
+            <AlienNotes view={view} names={names} />
           </div>
         </main>
 
@@ -224,6 +174,7 @@ export function GameView({
       <TrackerDock>
         <PlayerTracker view={view} names={names} previous={previous} />
       </TrackerDock>
+      <RowDock view={view} row={row} />
       <HandDock view={view} selection={hand} />
       {log}
     </div>

@@ -10,6 +10,7 @@ import {
   isHandMove,
   sameMove,
 } from "@/lib/moves";
+import { type Note, buildSpots } from "@/lib/targets";
 import { techName } from "@/lib/techs";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
@@ -18,6 +19,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { type LogEntry, MoveLog } from "./MoveLog";
+import { SpotPrompt } from "./SpotPrompt";
 import { TradeButtons } from "./Trade";
 
 type Server =
@@ -60,6 +62,8 @@ export function GameClient({
   const [rowMode, setRowMode] = useState<Move[] | null>(null);
   // a tech picked in the stacks (its place in the state)
   const [pickedTech, setPickedTech] = useState<number | null>(null);
+  // a place picked on the board (land, orbit, signal, trace)
+  const [pickedSpot, setPickedSpot] = useState<string | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
   const [extraEnergy, setExtraEnergy] = useState(0);
   // The moves still to send of a plan (a probe's whole way, with the energy it needs): each goes out when the view of the one before arrives.
@@ -107,6 +111,7 @@ export function GameClient({
           setPickedBuy(null);
           setRowMode(null);
           setPickedTech(null);
+          setPickedSpot(null);
           setExtraEnergy(0);
           const next = plan.current.shift();
           if (next !== undefined) {
@@ -174,8 +179,12 @@ export function GameClient({
   // exchanges and buying a card are made by picking cards (of the hand, of the display) and not with buttons of their own
   const exchanges = mine.filter((m) => m.type === "exchange");
   const buys = mine.filter((m) => m.type === "buy_card");
+  // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
+  const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
+  const placed = new Set([...handled].map((i) => mine[i]));
   const otherMoves = mine.filter(
     (m) =>
+      !placed.has(m) &&
       !handMoves.includes(m) &&
       m.type !== "exchange" &&
       m.type !== "buy_card" &&
@@ -207,6 +216,8 @@ export function GameClient({
   const techMoves = mine.filter((m) => m.type === "research" || m.type === "take_tech");
   const techOption = pickedTech === null ? undefined : techMoves.find((m) => m.stack === pickedTech);
   const techStack = pickedTech === null ? undefined : v.state.tech_stacks[pickedTech];
+  const spotOption = spots.find((sp) => sp.id === pickedSpot);
+  const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
   const buyOption = pickedBuy === null ? undefined : buys.find((m) => m.source === pickedBuy);
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
@@ -336,6 +347,12 @@ export function GameClient({
               </span>
             </div>
           ) : null}
+          {spots.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">Your choice</span>
+              <span className="handhint">Click a highlighted place on the board.</span>
+            </div>
+          ) : null}
           {techMoves.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">{techMoves[0]?.type === "research" ? "Main action" : "Your choice"}</span>
@@ -391,6 +408,19 @@ export function GameClient({
         <div className="confirmbar">
           <span className="confirm">Click the card of the display that you want.</span>
           <button type="button" className="secondary" onClick={() => setRowMode(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {spotMove ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} />
+            <button type="button" className="primary" onClick={() => play(spotMove)}>
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPickedSpot(null)}>
             Cancel
           </button>
         </div>
@@ -460,13 +490,26 @@ export function GameClient({
       names={names}
       moves={moves}
       previous={previous}
-      log={<MoveLog entries={log} who={(i) => (v.state.rival && i === v.state.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`))} />}
+      log={
+        <MoveLog
+          entries={log}
+          ctx={{
+            who: (i) => (v.state.rival && i === v.state.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`)),
+            stars: v.state.sectors.map((sec) => sec.star),
+            species: v.state.species.map((sp, i) =>
+              sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`,
+            ),
+            rival: v.state.rival ? v.state.rival.index : null,
+          }}
+        />
+      }
       hand={{ selectable: pickable, selected: picked, onSelect: selectCard }}
       tech={{
         selectable: techMoves.map((m) => Number(m.stack)),
         selected: pickedTech,
         onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
       }}
+      spots={{ items: spots, selected: pickedSpot, onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id) }}
       row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource }}
       interaction={
         reach.length > 0

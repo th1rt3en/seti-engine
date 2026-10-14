@@ -1,9 +1,14 @@
 "use client";
 // The log of the moves made in the game, as a panel floating at the bottom right. It can be folded to a tab; the newest move is at the bottom.
-// The server sends every client the same log with the identity of hidden cards left out (apps/worker/src/core/publicLog.ts).
-import { type GameEvent, describeEvent } from "@/lib/events";
+// The server sends every client the same log with the identity of hidden cards left out (apps/worker/src/core/publicLog.ts). A move is one line
+// with what it gave and took (the engine's `delta` events) as icons; in the solo game what the rival did after it is a block of its own.
+import type { GameEvent } from "@/lib/events";
 import { logText } from "@/lib/moves";
-import { useEffect, useRef, useState } from "react";
+import { techName } from "@/lib/techs";
+import { useBottomSpace, useDock } from "@/lib/useDock";
+import { type ReactNode, useEffect, useRef } from "react";
+import assets from "../generated/assets.json";
+import { Changes } from "./Reward";
 
 export interface LogEntry {
   seq: number;
@@ -12,29 +17,102 @@ export interface LogEntry {
   events: GameEvent[];
 }
 
-const KEY = "seti-log-folded";
-/** The events worth a line of their own besides the move: what the rival did and what the game did by itself. */
-const NOTABLE = new Set(["round", "rotate", "sector_won", "mission_completed", "game_over", "objectives_spent", "neutral_marker"]);
+/** What the log needs to know about the game to put names to the numbers of the events. */
+export interface LogContext {
+  who: (seat: number) => string;
+  /** The star of each sector, by the number of the sector. */
+  stars: string[];
+  /** The name of each alien species slot ("Species 1" until it is discovered). */
+  species: string[];
+  /** The seat of the solo rival, if there is one. */
+  rival: number | null;
+}
 
-export function MoveLog({ entries, who }: { entries: LogEntry[]; who: (seat: number) => string }) {
-  const [folded, setFolded] = useState(false);
-  useEffect(() => {
-    try {
-      setFolded(localStorage.getItem(KEY) === "1");
-    } catch {
-      // the browser does not keep it: the log starts open
-    }
-  }, []);
-  const toggle = () => {
-    const next = !folded;
-    setFolded(next);
-    try {
-      localStorage.setItem(KEY, next ? "1" : "0");
-    } catch {
-      // not remembered
-    }
-  };
+type Delta = GameEvent & { player: number; changes: Record<string, number> };
+
+const RIVAL_CARDS = assets.rivalCards as Record<string, string>;
+const cap = (s: unknown): string => {
+  const t = String(s);
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
+const techOf = (key: unknown): string => {
+  const [category = "", glyph = ""] = String(key).split("-");
+  return techName(category, glyph);
+};
+
+/** What the rival did, one event at a time. */
+function rivalLine(ev: GameEvent): ReactNode {
+  switch (ev.type) {
+    case "rival_card":
+      return (
+        <span className="rivalplay">
+          plays action card <b>{String(ev.card)}</b>
+          {RIVAL_CARDS[String(ev.card)] ? (
+            <img src={RIVAL_CARDS[String(ev.card)]} alt="" width={44} height={49} className="logcard" />
+          ) : null}
+        </span>
+      );
+    case "rival_launch":
+      return "launches a probe";
+    case "rival_telescope":
+      return "uses its telescope";
+    case "rival_tech":
+      return `takes the tech ${techOf(ev.tech)}`;
+    case "rival_orbit":
+      return `orbits ${cap(ev.planet)}`;
+    case "rival_land":
+      return ev.moon ? `lands on ${String(ev.moon)} (${cap(ev.planet)})` : `lands on ${cap(ev.planet)}`;
+    case "rival_analyze":
+      return "analyzes data";
+    case "rival_pass":
+      return "passes";
+    case "rival_gold":
+      return `marks the ${String(ev.tile)} gold scoring tile`;
+    case "rival_grows":
+      return "gets an advanced action card in its deck";
+    default:
+      return null;
+  }
+}
+
+/** The events of a move that say something the move itself does not (signals, traces, wins, rounds). */
+function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
+  const who = typeof ev.player === "number" ? ctx.who(ev.player) : "";
+  switch (ev.type) {
+    case "signal":
+      return `${who} marks a signal in ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
+    case "signal_tile":
+      return `${who} marks a signal on the 'Oumuamua tile`;
+    case "trace":
+      return `${who} marks a trace (${String(ev.space)} space of ${ctx.species[Number(ev.slot)] ?? "a species"})`;
+    case "sector_won":
+      return `${who} wins the sector of ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
+    case "discovered":
+      return `${cap(ev.species)} is discovered`;
+    case "tech":
+      return `${who} takes the tech ${techOf(ev.tech)}`;
+    case "mission_completed":
+      return `${who} completes a mission`;
+    case "neutral_marker":
+      return `a neutral marker blocks a discovery space (${String(ev.milestone)} points)`;
+    case "round":
+      return `Round ${String(ev.round)} begins`;
+    case "rotate":
+      return `the solar system rotates (disc ${String(ev.disc)})`;
+    case "objectives_spent":
+      return `objectives spent: ${String(ev.spent)}${Number(ev.short) > 0 ? `, ${String(ev.short)} short: the rival advances` : ""}`;
+    case "game_over":
+      return "the game is over";
+    default:
+      return null;
+  }
+}
+
+export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext }) {
+  const [folded, toggle] = useDock("log");
   const body = useRef<HTMLOListElement>(null);
+  const dock = useRef<HTMLElement>(null);
+  useBottomSpace(dock, "log");
   const last = entries.at(-1)?.seq;
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to the newest move when one is added
   useEffect(() => {
@@ -42,7 +120,7 @@ export function MoveLog({ entries, who }: { entries: LogEntry[]; who: (seat: num
     if (el) el.scrollTop = el.scrollHeight;
   }, [last, folded]);
   return (
-    <aside className={folded ? "movelog folded" : "movelog"} aria-label="Log of the moves">
+    <aside ref={dock} className={folded ? "movelog dock folded" : "movelog dock"} aria-label="Log of the moves">
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
         <span>Log ({entries.length})</span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
@@ -50,22 +128,52 @@ export function MoveLog({ entries, who }: { entries: LogEntry[]; who: (seat: num
       {folded ? null : (
         <ol ref={body} className="logbody">
           {entries.length === 0 ? <li className="muted">No move yet.</li> : null}
-          {entries.map((e) => (
-            <li key={e.seq}>
-              <span className="lognum">{e.seq + 1}</span>
-              <span className="logmove">
-                <b>{who(e.seat)}</b> {logText(e.action)}
-              </span>
-              {e.events
-                .filter((ev) => ev.type.startsWith("rival_") || NOTABLE.has(ev.type))
-                .map((ev, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the events of one move come in a fixed order
-                  <span key={i} className="logevent">
-                    {describeEvent(ev, who)}
+          {entries.map((e) => {
+            const deltas = e.events.filter((ev) => ev.type === "delta") as Delta[];
+            const mine = deltas.find((d) => d.player === e.seat);
+            const rival = ctx.rival;
+            const rivalEvents = e.events.filter((ev) => ev.type.startsWith("rival_"));
+            const rivalDelta = rival === null ? undefined : deltas.find((d) => d.player === rival);
+            const others = deltas.filter((d) => d.player !== e.seat && d.player !== rival);
+            const byRival = (ev: GameEvent): boolean => rival !== null && ev.player === rival;
+            const notes = e.events.filter((ev) => !ev.type.startsWith("rival_") && ev.type !== "delta" && !byRival(ev));
+            const rivalMore = e.events.filter((ev) => ev.type !== "delta" && !ev.type.startsWith("rival_") && byRival(ev));
+            return (
+              <li key={e.seq}>
+                <span className="lognum">{e.seq + 1}</span>
+                <span className="logmove">
+                  <b>{ctx.who(e.seat)}</b> {logText(e.action)} {mine ? <Changes changes={mine.changes} size={16} /> : null}
+                </span>
+                {notes.map((ev) => {
+                  const line = eventLine(ev, ctx);
+                  return line ? (
+                    <span key={JSON.stringify(ev)} className="logevent">
+                      {line}
+                    </span>
+                  ) : null;
+                })}
+                {others.map((d) => (
+                  <span key={`d${d.player}`} className="logevent">
+                    {ctx.who(d.player)} <Changes changes={d.changes} size={16} />
                   </span>
                 ))}
-            </li>
-          ))}
+                {rivalEvents.length > 0 || rivalMore.length > 0 || rivalDelta ? (
+                  <span className="logrival">
+                    <b className="logrivalhead">Rival's turn</b>
+                    {rivalEvents.map((ev) => {
+                      const line = rivalLine(ev);
+                      return line ? <span key={JSON.stringify(ev)}>{line}</span> : null;
+                    })}
+                    {rivalMore.map((ev) => {
+                      const line = eventLine(ev, ctx);
+                      return line ? <span key={`m${JSON.stringify(ev)}`}>{line}</span> : null;
+                    })}
+                    {rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+                  </span>
+                ) : null}
+              </li>
+            );
+          })}
         </ol>
       )}
     </aside>

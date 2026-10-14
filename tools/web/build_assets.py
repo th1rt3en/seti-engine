@@ -46,7 +46,12 @@ CARD_FILES = {"117": "card-lunar-gateway-en.png"}
 
 # The hexagon icons of the main actions, cut from the player aid (x0, y0, x1, y1); the light page around each hexagon is made transparent.
 ACTION_ICON_SOURCE = "player-aid-iconography-en.png"
-ACTION_ICONS = {"launch": (1166, 205, 1278, 328), "scan": (1166, 570, 1278, 693)}
+ACTION_ICONS = {
+    "launch": (1166, 205, 1278, 328),
+    "orbit": (1166, 332, 1278, 455),
+    "land": (1166, 453, 1278, 576),
+    "scan": (1166, 570, 1278, 693),
+}
 ACTION_ICON_SIZE = 112
 
 SCORE_ICON_BOX = (2987, 3941, 3107, 4061)  # the globe on the scoring track of the base board (next to the 100 and the 1), the icon of victory points
@@ -325,6 +330,16 @@ def main() -> None:
         rival_cards["back" if k == 19 else f"S.{k + 1}"] = save(card, "solo", f"rival-card-{'back' if k == 19 else k + 1}", quality=84, alpha_quality=92)
     provenance.append((RIVAL_CARDS_SOURCE, "apps/web/public/assets/solo/ (20 files)", "each action card of the rival and its back, cut from the sheet"))
 
+    gold: dict[str, dict[str, object]] = {}
+    for tile in json.loads((ROOT / "services/engine/src/seti_engine/data/gold-tiles.json").read_text(encoding="utf-8"))["tiles"]:
+        im = Image.open(SRC / f"{tile['image']}.png").convert("RGBA")  # 550 x 488: shown at about 380 px on the board and 480 px when hovered
+        gold[f"{tile['tile']}-{tile['side']}"] = {
+            "src": save(im, "tiles", f"gold-{tile['tile']}-{tile['side']}", quality=88, alpha_quality=95),
+            "per": tile["per"],
+            "values": tile["values"],
+        }
+    provenance.append(("gold-scoring-tile-*.png", "apps/web/public/assets/tiles/ (8 files)", "the gold scoring tiles, 550 px wide"))
+
     rival_boards: dict[str, str] = {}
     for name in RIVAL_BOARDS:
         im = Image.open(SRC / f"rival-board-{name}.png").convert("RGBA")
@@ -349,7 +364,7 @@ def main() -> None:
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
              "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
-             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards},
+             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold},
             indent=1,
             sort_keys=True,
         )
