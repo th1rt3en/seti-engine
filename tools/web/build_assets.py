@@ -19,7 +19,7 @@ import shutil
 from collections import deque
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SRC = ROOT / "assets"
@@ -43,6 +43,16 @@ SHEETS = {
 
 # cards whose cell on the sheet is empty and that the owner supplied as single pictures
 CARD_FILES = {"117": "card-lunar-gateway-en.png"}
+
+# The hexagon icons of the main actions, cut from the player aid (x0, y0, x1, y1); the light page around each hexagon is made transparent.
+ACTION_ICON_SOURCE = "player-aid-iconography-en.png"
+ACTION_ICONS = {"launch": (1166, 205, 1278, 328), "scan": (1166, 570, 1278, 693)}
+ACTION_ICON_SIZE = 112
+
+SCORE_ICON_BOX = (2987, 3941, 3107, 4061)  # the globe on the scoring track of the base board (next to the 100 and the 1), the icon of victory points
+SCORE_ICON_RADIUS = 50
+RIVAL_CARDS_SOURCE = "solo-rival-action-cards-sheet.png"  # 5 x 4 cells: S.1 to S.19, then the back
+RIVAL_CARD_WIDTH = 330
 
 BOARD_WIDTH = 1800  # the base board is 3507 x 5612 px; it is shown at most about 900 CSS px wide
 BOARD_SOURCE = "main-board-assembled.png"
@@ -105,6 +115,38 @@ def save(im: Image.Image, folder: str, name: str, **opts: object) -> str:
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(data)
     return f"/assets/{folder}/{name}.{digest}.webp"
+
+
+def clear_background(im: Image.Image, tolerance: int = 40) -> Image.Image:
+    """Make the part of the picture that is connected to its border and has the colour of the corner transparent (the page around an icon)."""
+    im = im.convert("RGBA")
+    px = im.load()
+    w, h = im.size
+    ref = px[0, 0]
+    close = lambda c: max(abs(c[0] - ref[0]), abs(c[1] - ref[1]), abs(c[2] - ref[2])) <= tolerance  # noqa: E731
+    seen = np.zeros((h, w), dtype=bool)
+    todo = deque([*((x, y) for x in range(w) for y in (0, h - 1)), *((x, y) for y in range(h) for x in (0, w - 1))])
+    while todo:
+        x, y = todo.popleft()
+        if not (0 <= x < w and 0 <= y < h) or seen[y, x] or not close(px[x, y]):
+            continue
+        seen[y, x] = True
+        px[x, y] = (0, 0, 0, 0)
+        todo.extend(((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+    return im
+
+
+def hexagon_mask(im: Image.Image, margin: float = 1.0) -> Image.Image:
+    """Keep only the pointy-top hexagon that fills the picture (the corners of the crop may hold parts of the page next to the icon)."""
+    w, h = im.size
+    radius, cx, cy = h / 2 + margin, w / 2, h / 2
+    px = im.load()
+    for y in range(h):
+        for x in range(w):
+            dx, dy = abs(x + 0.5 - cx), abs(y + 0.5 - cy)
+            if dx > radius * math.sqrt(3) / 2 or dy > radius - dx / math.sqrt(3):
+                px[x, y] = (0, 0, 0, 0)
+    return im
 
 
 def star_slots(ring: Image.Image) -> dict[str, dict[str, float]]:
@@ -216,6 +258,7 @@ def main() -> None:
         provenance.append((src, species[name], f"{im.width}x{im.height}"))
 
     base = Image.open(SRC / BOARD_SOURCE).convert("RGBA")
+    base_for_icons = base
 
     stacks: dict[str, dict[str, object]] = {}
     for category, slots in TECH_SLOTS.items():
@@ -256,6 +299,32 @@ def main() -> None:
     card_back = save(back_img, "cards", "back", quality=82)
     provenance.append((CARD_BACK_SOURCE, card_back, "back of the main deck (the draw piles of the rounds)"))
 
+    aid = Image.open(SRC / ACTION_ICON_SOURCE).convert("RGBA")
+    action_icons: dict[str, str] = {}
+    for name, box in ACTION_ICONS.items():
+        icon = hexagon_mask(clear_background(aid.crop(box)), margin=-3)
+        icon = icon.resize((ACTION_ICON_SIZE, round(ACTION_ICON_SIZE * icon.height / icon.width)), Image.LANCZOS)
+        action_icons[name] = save(icon, "icons", name, quality=90, alpha_quality=95)
+        provenance.append((ACTION_ICON_SOURCE, action_icons[name], f"the icon of the {name} action, cut from the player aid"))
+
+    globe = base_for_icons.crop(SCORE_ICON_BOX)
+    mask = Image.new("L", globe.size, 0)
+    ImageDraw.Draw(mask).ellipse((globe.width / 2 - SCORE_ICON_RADIUS, globe.height / 2 - SCORE_ICON_RADIUS, globe.width / 2 + SCORE_ICON_RADIUS, globe.height / 2 + SCORE_ICON_RADIUS), fill=255)
+    globe.putalpha(mask)
+    globe = globe.crop((int(globe.width / 2 - SCORE_ICON_RADIUS), int(globe.height / 2 - SCORE_ICON_RADIUS), int(globe.width / 2 + SCORE_ICON_RADIUS), int(globe.height / 2 + SCORE_ICON_RADIUS))).resize((96, 96), Image.LANCZOS)
+    score_icon = save(globe, "icons", "score", quality=92, alpha_quality=95)
+    provenance.append((BOARD_SOURCE, score_icon, "the globe of the scoring track, the icon of victory points"))
+
+    sheet = Image.open(SRC / RIVAL_CARDS_SOURCE).convert("RGBA")
+    cw, ch = sheet.width / 5, sheet.height / 4
+    rival_cards: dict[str, str] = {}
+    for k in range(20):
+        col, row = k % 5, k // 5
+        card = sheet.crop((round(col * cw), round(row * ch), round((col + 1) * cw), round((row + 1) * ch)))
+        card = card.resize((RIVAL_CARD_WIDTH, round(RIVAL_CARD_WIDTH * card.height / card.width)), Image.LANCZOS)
+        rival_cards["back" if k == 19 else f"S.{k + 1}"] = save(card, "solo", f"rival-card-{'back' if k == 19 else k + 1}", quality=84, alpha_quality=92)
+    provenance.append((RIVAL_CARDS_SOURCE, "apps/web/public/assets/solo/ (20 files)", "each action card of the rival and its back, cut from the sheet"))
+
     rival_boards: dict[str, str] = {}
     for name in RIVAL_BOARDS:
         im = Image.open(SRC / f"rival-board-{name}.png").convert("RGBA")
@@ -280,7 +349,7 @@ def main() -> None:
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
              "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
-             "rivalBoards": rival_boards, "objectives": objectives},
+             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards},
             indent=1,
             sort_keys=True,
         )

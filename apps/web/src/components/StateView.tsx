@@ -2,6 +2,7 @@
 // shown by GameView). It only shows what the engine's view
 // contains (hidden cards are "?"); it works out no rule. Used by the live game page and by the replay.
 import type { View } from "@seti/protocol";
+import { ScoreIcon } from "./Icons";
 
 const PLANETS = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "oumuamua"];
 
@@ -43,7 +44,7 @@ export function StateView({ view, names }: { view: View; names: string[] }) {
             <div className="kv">
               <span>
                 <b>Score</b>
-                {p.score}
+                <ScoreIcon size={16} /> {p.score}
               </span>
               <span>
                 <b>Publicity</b>

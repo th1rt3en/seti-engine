@@ -4,6 +4,7 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
+import { ScoreIcon } from "./Icons";
 
 const KINDS = [
   { key: "credit", label: "Credits", swatch: "#e5b83a" },
@@ -61,7 +62,9 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
         </thead>
         <tbody>
           {row(
-            "Score",
+            <>
+              <ScoreIcon size={18} /> Score
+            </>,
             trackers.map((t) => t.score),
             "score",
           )}

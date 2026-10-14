@@ -11,7 +11,7 @@ import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, BoardView } from "./BoardView";
 import { CardImage } from "./CardImage";
 import { HandDock, type HandSelection } from "./HandDock";
-import { CreditIcon, EnergyIcon } from "./Icons";
+import { CreditIcon, EnergyIcon, ScoreIcon } from "./Icons";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
@@ -128,7 +128,11 @@ export function GameView({
             {s.players.map((p) => (
               <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
-                {s.rival && p.index === s.rival.index ? "Rival" : (names[p.index] ?? `Player ${p.index + 1}`)} <b>{p.score}</b>
+                {s.rival && p.index === s.rival.index ? "Rival" : (names[p.index] ?? `Player ${p.index + 1}`)}
+                <span className="res" title="Victory points">
+                  <ScoreIcon size={20} />
+                  <b>{p.score}</b>
+                </span>
                 {s.rival && p.index === s.rival.index ? null : (
                   <>
                     <span className="res" title="Credits">

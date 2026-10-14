@@ -1,6 +1,30 @@
 // Small symbols for the resources: credit, energy and cards (a card of the display and a card of the deck have different symbols).
 // Drawn here until the owner supplies the printed symbols (docs/asset-gaps.md).
+import assets from "../generated/assets.json";
+
 const SIZE = 22;
+
+/** The globe of the scoring track: the icon of victory points, wherever a score is shown. */
+export function ScoreIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <img
+      src={assets.scoreIcon}
+      alt="points"
+      title="Victory points"
+      width={size}
+      height={size}
+      className="resicon scoreicon"
+      decoding="async"
+    />
+  );
+}
+
+/** The hexagon icon of a main action, as printed on the player aid. */
+export function ActionIcon({ name, size = 30 }: { name: string; size?: number }) {
+  const src = (assets.actionIcons as Record<string, string>)[name];
+  if (!src) return null;
+  return <img src={src} alt="" width={size} height={Math.round(size * 1.1)} className="resicon actionicon" decoding="async" />;
+}
 
 export function CreditIcon({ size = SIZE }: { size?: number }) {
   return (

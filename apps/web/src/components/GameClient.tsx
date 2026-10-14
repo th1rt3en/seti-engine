@@ -16,6 +16,7 @@ import { techName } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameView } from "./GameView";
+import { ActionIcon, ScoreIcon } from "./Icons";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { TradeButtons } from "./Trade";
 
@@ -235,7 +236,11 @@ export function GameClient({
           <h2>Game over ({ended.reason})</h2>
           <p>
             {ended.winners.length > 0 ? `Winner: ${ended.winners.map((w) => names[w] ?? w + 1).join(", ")}.` : "The rival won."}{" "}
-            {ended.ranking.map((r) => `${names[r.seat] ?? r.seat + 1}: ${r.score} points`).join(" · ")}
+            {ended.ranking.map((r) => (
+              <span key={r.seat} className="res">
+                {names[r.seat] ?? r.seat + 1}: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}
+              </span>
+            ))}
           </p>
         </section>
       ) : null}
@@ -256,6 +261,7 @@ export function GameClient({
                       title={idle ? "You have no probe on the map to move" : undefined}
                       onClick={() => play(m)}
                     >
+                      {m.type === "launch" || m.type === "scan" ? <ActionIcon name={m.type} /> : null}
                       {describeMove(m)}
                     </button>
                   );

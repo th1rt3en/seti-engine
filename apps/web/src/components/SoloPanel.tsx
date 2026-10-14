@@ -3,6 +3,7 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
+import { ScoreIcon } from "./Icons";
 import { DataToken, Marker, PieceDefs, pieceColor } from "./Pieces";
 
 const W = 1000;
@@ -95,6 +96,7 @@ const COMPUTER: [number, number][] = [0, 1, 2, 3, 4, 5].map((k) => [0.265 + 0.05
 const boardOf = (difficulty: number): string => (difficulty <= 2 ? "1-2-star" : `${difficulty}-star`);
 const BOARDS = assets.rivalBoards as Record<string, string>;
 const OBJECTIVES = assets.objectives as Record<string, string>;
+const RIVAL_CARDS = assets.rivalCards as Record<string, string>;
 
 function Rival({ view }: { view: View }) {
   const s = view.state;
@@ -127,14 +129,34 @@ function Rival({ view }: { view: View }) {
           ) : null}
         </svg>
       </div>
+      <div className="rivalcards">
+        <div className="rcgroup">
+          <h4>
+            Action cards played this round <span className="muted small">in the order played</span>
+          </h4>
+          <div className="rcrow">
+            {r.used.length === 0 ? <span className="muted">none yet</span> : null}
+            {r.used.map((id, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: the same card cannot be played twice in a round, but the order is the identity
+              <figure key={`${id}-${i}`} className="rcard" title={`Card ${id}`}>
+                <img src={RIVAL_CARDS[id]} alt={`Rival action card ${id}`} width={330} height={367} loading="lazy" decoding="async" />
+                <figcaption>{i + 1}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+        <div className="rcgroup">
+          <h4>Action deck</h4>
+          <figure className="rcard rcpile" title={`${view.counts.rival_deck} cards left in the rival's deck`}>
+            <img src={RIVAL_CARDS.back} alt="The rival's action deck" width={330} height={367} loading="lazy" decoding="async" />
+            <figcaption className="rccount">{view.counts.rival_deck}</figcaption>
+          </figure>
+        </div>
+      </div>
       <ul className="rivalfacts">
         <li>
-          <span className="dot" style={{ background: PLAYER_COLOR[me?.color ?? "white"] ?? "#fff" }} /> Score <b>{me?.score ?? 0}</b> ·
-          Publicity <b>{me?.publicity ?? 0}</b>
-        </li>
-        <li>
-          Action deck <b>{view.counts.rival_deck}</b> · played this round <b>{r.used.length}</b>
-          {r.used.length > 0 ? <span className="muted small"> ({r.used.join(", ")})</span> : null}
+          <span className="dot" style={{ background: PLAYER_COLOR[me?.color ?? "white"] ?? "#fff" }} /> <ScoreIcon size={18} />{" "}
+          <b>{me?.score ?? 0}</b> · Publicity <b>{me?.publicity ?? 0}</b>
         </li>
         <li>
           Advanced cards waiting <b>{r.advanced.length}</b> · Computer <b>{r.computer}</b>/6

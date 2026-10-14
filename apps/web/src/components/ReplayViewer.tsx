@@ -7,6 +7,7 @@ import type { ReplayData } from "@/lib/worker";
 import type { View } from "@seti/protocol";
 import { useEffect, useState } from "react";
 import { GameView } from "./GameView";
+import { ScoreIcon } from "./Icons";
 
 const REASONS: Record<string, string> = {
   completed: "The game was played to the end.",
@@ -118,7 +119,11 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
           <p>
             <b>{REASONS[end.reason] ?? end.reason}</b>{" "}
             {end.winners.length > 0 ? `Winner${end.winners.length > 1 ? "s" : ""}: ${end.winners.map(who).join(", ")}. ` : ""}
-            {end.ranking.map((r) => `${who(r.seat)}: ${r.score} points`).join(" · ")}
+            {end.ranking.map((r) => (
+              <span key={r.seat} className="res">
+                {who(r.seat)}: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}
+              </span>
+            ))}
           </p>
         ) : null}
       </section>
