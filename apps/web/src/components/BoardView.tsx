@@ -117,6 +117,8 @@ export function BoardView({
         aria-label="The game board"
       >
         <PieceDefs />
+        <image href={assets.board} x={0} y={0} width={BOARD.w} height={BOARD.h} />
+        {/* the species boards lie on the base board, over its edge at the top; their cut-outs show the discovery spaces */}
         {s.species.map((sp, i) => {
           const face = (assets.species as Record<string, string>)[sp.discovered ? sp.species : "back"] ?? assets.species.back;
           return (
@@ -133,7 +135,6 @@ export function BoardView({
             </image>
           );
         })}
-        <image href={assets.board} x={0} y={0} width={BOARD.w} height={BOARD.h} />
 
         {s.species.map((sp, i) => {
           // the deck of a discovered species lies to the right of its board: its back with the cards left over it, and the card that lies face up

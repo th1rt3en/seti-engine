@@ -112,7 +112,7 @@ export const ALIEN_TOP = ALIEN.bottom - ALIEN.h * ALIEN.scale;
  * tangent to the circle and its top turned away from the middle of the board. `radius` is the distance from the centre to the outer edge of the
  * board's circle, the tiles are drawn at `scale` of their picture (550 x 488), and the group is centred on `centreDegrees`.
  */
-export const GOLD = { w: 550, h: 488, scale: 0.7, radius: 1640, gap: 8, centreDegrees: 2, stepDegrees: 13.6 };
+export const GOLD = { w: 550, h: 488, scale: 0.84, radius: 1640, gap: 6, centreDegrees: 1, stepDegrees: 15.2 };
 
 export function goldPlace(i: number): { x: number; y: number; rotation: number } {
   const degrees = GOLD.centreDegrees + (1.5 - i) * GOLD.stepDegrees; // the first tile is the one highest up
@@ -121,7 +121,7 @@ export function goldPlace(i: number): { x: number; y: number; rotation: number }
 }
 
 /** How far the tiles reach beyond the right edge of the board picture. */
-export const GOLD_EXTRA = 300;
+export const GOLD_EXTRA = 350;
 
 /** Where the markers of the choosers sit on a tile (picture of 550 x 488): the first and the second chooser, then the wide space for the others. */
 export const GOLD_SLOTS = [
