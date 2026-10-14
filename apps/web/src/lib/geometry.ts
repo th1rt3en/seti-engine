@@ -131,6 +131,19 @@ export const GOLD_SLOTS = [
   { x: 425, y: 248 },
 ];
 
+/**
+ * The deck of a discovered species lies in a column to the right of its board: the back of the deck on top (with the number of cards left over it)
+ * and the card that lies face up below it. Sizes in board pixels; the column starts `gap` after the right edge of the board.
+ */
+export const ALIEN_COLUMN = { w: 300, h: 418, gap: 30, between: 36 };
+
+export function alienColumn(slot: number): { deck: { x: number; y: number }; faceUp: { x: number; y: number } } {
+  const left = (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale;
+  const x = left + ALIEN.w * ALIEN.scale + ALIEN_COLUMN.gap;
+  const y = ALIEN_TOP + 40;
+  return { deck: { x, y }, faceUp: { x, y: y + ALIEN_COLUMN.h + ALIEN_COLUMN.between } };
+}
+
 export const PLAYER_COLOR: Record<string, string> = {
   green: "#2fbf71",
   red: "#ff5a52",

@@ -68,3 +68,13 @@ def test_the_view_carries_the_reach_only_when_the_viewer_may_move() -> None:
     assert [r.probe for r in mine.reach] == ["t1"] and mine.reach[0].cells
     assert projection.project(s, 1 - pl).reach == []  # not the player to act
     assert projection.project(s, None).reach == []
+
+
+def test_the_reach_names_what_lies_on_each_space() -> None:
+    """The page asks 'confirm ... to move a probe from Mars to empty space?': the words come with the reach."""
+    s, pl = with_probe(energy=4, movement=1)
+    view = projection.project(s, pl)
+    reach = next(r for r in view.reach if r.probe == "t1")
+    known = {"Earth", "an asteroid field", "a comet", "empty space", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"}
+    assert reach.label in known
+    assert reach.cells and {c.label for c in reach.cells} <= known

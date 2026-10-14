@@ -86,6 +86,7 @@ Source: base rulebook pp. 7 to 19, 28. Costs are paid when the action is taken a
 - **FREE-04** (p.14) Computer spaces: covering the publicity space gives 1 publicity; covering the income space lets the player tuck a card (INCOME-01); spaces on computer techs give 2 points on the upper space and the depicted reward on the lower space (TECH-20).
 - **FREE-05** (p.18) Resource exchange (RES-06).
 - **FREE-06** (p.18) Buy a card: spend 3 publicity to take a card from the card row or from the top of the deck. Available whenever the player has at least 3 publicity (owner note, 2026-10-13: not only at publicity 3 to 5, where the board draws the box).
+- **UNDO-01** (owner request, 2026-10-14; D31) A free trade for 1 credit or 1 energy (2 credits, 2 energy or 2 cards given) can be taken back until the player's next action; the state is exactly as it was before the trade. A trade for a card cannot be taken back (A-026 open).
 - **FREE-07** (p.15) Complete a conditional mission (CARD-11).
 - **FREE-08** (p.15) Mark a triggerable mission circle when triggered (CARD-12); this may even be outside the player's own turn (CARD-13).
 - **FREE-10** (p.6) The "tuck a card for income" effect (INCOME-01).

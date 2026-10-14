@@ -61,11 +61,13 @@ class ReachCell(BaseModel):
     to: tuple[int, int]
     cost: int
     path: list[tuple[int, int]]
+    label: str = ""  # what lies on the space `to`, in words
 
 
 class ProbeReach(BaseModel):
     probe: str
     cells: list[ReachCell]
+    label: str = ""  # what lies on the space the probe is on now, in words
 
 
 class View(BaseModel):
@@ -81,6 +83,11 @@ class View(BaseModel):
     reach: list[ProbeReach] = Field(default_factory=list)
     # what each legal move means (where, cost, rewards), in the order of `legal`, for the confirmation on the page (move_notes.py)
     notes: list[dict[str, Any] | None] = Field(default_factory=list)
+
+
+def _label_of(state: GameState, probe_id: str) -> str:
+    probe = next(p for p in state.probes if p.id == probe_id)
+    return move_notes.space_label(state, probe.ring, probe.sector)
 
 
 def to_act(state: GameState) -> int | None:
@@ -119,6 +126,7 @@ def project(state: GameState, viewer: int | None) -> View:
             slot.extra = {}
         else:
             _hide_tokens(slot.extra)
+    s.undo = None  # UNDO-01: the state to go back to holds the hands and the decks; nobody is shown it
     for st in s.tech_stacks:
         st.tiles = st.tiles[:1] + [HIDDEN] * max(0, len(st.tiles) - 1)  # SETUP-16: only the top tile of a stack shows its bonus
     if s.rival is not None:
@@ -137,7 +145,11 @@ def project(state: GameState, viewer: int | None) -> View:
     reach: list[ProbeReach] = []
     if legal and viewer is not None and not state.pending and state.phase == "play":
         reach = [
-            ProbeReach(probe=pid, cells=[ReachCell(to=to, cost=cost, path=path) for to, cost, path in cells])
+            ProbeReach(
+                probe=pid,
+                label=_label_of(state, pid),
+                cells=[ReachCell(to=to, cost=cost, path=path, label=move_notes.space_label(state, *to)) for to, cost, path in cells],
+            )
             for pid, cells in engine.move_reach(state, state.players[viewer])
         ]
     notes = move_notes.notes(state, legal) if legal else []

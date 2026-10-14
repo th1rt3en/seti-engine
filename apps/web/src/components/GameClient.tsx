@@ -61,6 +61,8 @@ export function GameClient({
   const [pickedBuy, setPickedBuy] = useState<string | null>(null);
   // the end-of-round card picked to keep (after passing)
   const [pickedOffer, setPickedOffer] = useState<string | null>(null);
+  // the place picked for a probe to move to, until the player confirms
+  const [pendingMove, setPendingMove] = useState<{ to: [number, number]; cost: number; path: [number, number][] } | null>(null);
   const [rowMode, setRowMode] = useState<Move[] | null>(null);
   // a tech picked in the stacks (its place in the state)
   const [pickedTech, setPickedTech] = useState<number | null>(null);
@@ -112,6 +114,7 @@ export function GameClient({
           setPicked([]);
           setPickedBuy(null);
           setPickedOffer(null);
+          setPendingMove(null);
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
@@ -233,6 +236,14 @@ export function GameClient({
   const budget = movement + extra;
   const probe = reach.find((r) => r.probe === pickedProbe) ?? null;
   const targets = (probe?.cells ?? []).filter((c) => c.cost <= budget);
+  // the movement and the energy that a move to `t` uses: the movement the player has first, then energy
+  const moveText = (t: { to: [number, number]; cost: number }): string => {
+    const at = v.state.probes.find((x) => x.id === probe?.probe);
+    const from = probe === null ? "here" : `${probe.label} (ring ${at?.ring}, sector ${at?.sector})`;
+    const cell = probe?.cells.find((c) => c.to[0] === t.to[0] && c.to[1] === t.to[1]);
+    const used = Math.min(movement, t.cost);
+    return `Confirm using ${used} movement and ${t.cost - used} energy to move a probe from ${from} to ${cell?.label ?? "there"} (ring ${t.to[0]}, sector ${t.to[1]})?`;
+  };
   const moveTo = (t: { to: [number, number]; cost: number; path: [number, number][] }) => {
     if (probe === null) return;
     const steps: Move[] = [
@@ -425,6 +436,27 @@ export function GameClient({
           </button>
         </div>
       ) : null}
+      {pendingMove && probe ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <span>{moveText(pendingMove)}</span>
+            <button
+              type="button"
+              className="primary"
+              onClick={() => {
+                const t = pendingMove;
+                setPendingMove(null);
+                moveTo(t);
+              }}
+            >
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPendingMove(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
       {offerMove ? (
         <div className="confirmbar">
           <div className="confirm">
@@ -549,9 +581,13 @@ export function GameClient({
           ? {
               probes: reach.map((r) => r.probe),
               selected: probe?.probe ?? null,
-              onSelectProbe: (id) => setPickedProbe(id === pickedProbe ? null : id),
+              onSelectProbe: (id) => {
+                setPendingMove(null);
+                setPickedProbe(id === pickedProbe ? null : id);
+              },
               targets: targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
-              onTarget: moveTo,
+              onTarget: (t) => setPendingMove(t),
+              chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
             }
           : undefined
       }

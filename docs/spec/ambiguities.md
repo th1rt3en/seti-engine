@@ -212,3 +212,11 @@ Entry format:
 - Proposed ruling: the rival gets no starting hand, no starting resources and no income at the end of a round (nothing for credits, energy or the income card's card), and its 5 starting cards stay in the deck.
 - Questions for the owner: confirm.
 - Ruling (owner), 2026-10-13: Yes. The rival never has any resources; every resource it would gain becomes progress on the track at 1 to 1.
+
+## A-026: May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)?
+- Status: open
+- Rule IDs affected: RES-04, RES-06, FREE-05, UNDO-01
+- Rulebook page and text: p.19 "When you draw a card from the card row, you replace it immediately with a card from the top of the deck." p.18 a resource exchange may take its card "from the card row or from the top of the deck".
+- Readings: (1) as printed: the row is refilled at once, so a trade for a display card shows the top card of the deck and cannot be taken back without showing it to everyone and putting it back; (2) owner's message of 2026-10-14: the display does not refill until the end of the player's turn, so a trade for a display card (and a trade for credit or energy) can be taken back.
+- Consequences: reading 2 changes RES-04 for every card taken from the row (buying with publicity, trades, card effects), and a row with a gap in it would have to be shown during the turn. Until it is ruled, the engine follows the rulebook (reading 1), and only a trade for a credit or an energy can be taken back (UNDO-01 in `docs/PLAN.md`, D31); a trade for a display card or a deck card cannot.
+- Questions for the owner: is the row refilled at the end of the turn (for every way of taking a card from it, or only for a trade)? If it is, what does the row show during the turn, and may a card bought with publicity be taken back as well?

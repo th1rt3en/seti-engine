@@ -2,7 +2,7 @@
 // and says what each one means (`view.notes`, from move_notes.py); this file only says where on the picture each of them is, so that the board can
 // highlight the place and the player can click it. A move that has no place here stays a button of the bar.
 import type { View } from "@seti/protocol";
-import { ALIEN, ALIEN_TOP, DISCOVERY, MOON, PLANET, RING_BOUNDS, polar } from "./geometry";
+import { ALIEN, ALIEN_COLUMN, ALIEN_TOP, DISCOVERY, MOON, PLANET, RING_BOUNDS, alienColumn, polar } from "./geometry";
 import type { Move } from "./moves";
 import { SPECIES_SPACES } from "./speciesSpaces";
 
@@ -22,12 +22,17 @@ export type Note = {
   species?: string | null;
   space?: string;
   rewards?: { t: string; n: number }[];
+  alien?: "deck" | "face_up";
+  card?: string | null;
 } | null;
 
 export type Spot = {
   id: string;
   /** Where it is: a circle, or the outline of a wedge of the star ring. */
-  shape: { kind: "circle"; x: number; y: number; r: number } | { kind: "path"; d: string };
+  shape:
+    | { kind: "circle"; x: number; y: number; r: number }
+    | { kind: "path"; d: string }
+    | { kind: "rect"; x: number; y: number; w: number; h: number };
   /** The move of the engine that this place stands for, as its place in `view.legal`. */
   move: number;
   label: string;
@@ -63,7 +68,10 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
     const n = notes[i];
     if (!n) return;
     let spot: Omit<Spot, "move" | "label"> | null = null;
-    if (n.action && n.planet) {
+    if (n.alien && n.slot !== undefined) {
+      const at = alienColumn(n.slot)[n.alien === "deck" ? "deck" : "faceUp"];
+      spot = { id: `alien:${n.slot}:${n.alien}`, shape: { kind: "rect", x: at.x, y: at.y, w: ALIEN_COLUMN.w, h: ALIEN_COLUMN.h } };
+    } else if (n.action && n.planet) {
       const st = s.planets[n.planet];
       const pos = PLANET[n.planet];
       if (!st || !pos) return;

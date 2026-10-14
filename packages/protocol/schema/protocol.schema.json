@@ -512,6 +512,19 @@
           "title": "Turn Fx",
           "type": "array"
         },
+        "undo": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Undo"
+        },
         "winners": {
           "items": {
             "type": "integer"
@@ -569,6 +582,7 @@
         "turn",
         "turn_completed",
         "turn_fx",
+        "undo",
         "winners"
       ],
       "title": "GameState",
@@ -1150,6 +1164,11 @@
           "title": "Cells",
           "type": "array"
         },
+        "label": {
+          "default": "",
+          "title": "Label",
+          "type": "string"
+        },
         "probe": {
           "title": "Probe",
           "type": "string"
@@ -1157,6 +1176,7 @@
       },
       "required": [
         "cells",
+        "label",
         "probe"
       ],
       "title": "ProbeReach",
@@ -1195,6 +1215,11 @@
           "title": "Cost",
           "type": "integer"
         },
+        "label": {
+          "default": "",
+          "title": "Label",
+          "type": "string"
+        },
         "path": {
           "items": {
             "additionalItems": false,
@@ -1231,6 +1256,7 @@
       },
       "required": [
         "cost",
+        "label",
         "path",
         "to"
       ],

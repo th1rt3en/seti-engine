@@ -14,13 +14,13 @@
   "gop_done": [],
   "hand_signal": ["card"],
   "hand_signal_done": [],
-  "land": ["moon", "probe"],
+  "land": ["probe"],
+  "land_free": ["probe"],
   "launch": [],
   "mark_objective": ["objective", "task"],
   "mark_signal": ["sector"],
   "move_energy": [],
   "move_probe": ["probe", "to"],
-  "opt_no": [],
   "orbit": ["probe"],
   "pass": [],
   "pick_probe": ["probe"],
@@ -31,7 +31,6 @@
   "play_card": ["card"],
   "play_exertian": ["card"],
   "research": ["stack"],
-  "resolve_sector": ["sector"],
   "row_pick": ["source"],
   "scan": [],
   "scan_discard": ["source"],
@@ -48,5 +47,6 @@
   "take_card": ["source"],
   "take_round_card": ["card"],
   "take_tech": ["stack"],
-  "tuck": ["card"]
+  "tuck": ["card"],
+  "undo": []
 }

@@ -340,6 +340,13 @@ def main() -> None:
         }
     provenance.append(("gold-scoring-tile-*.png", "apps/web/public/assets/tiles/ (8 files)", "the gold scoring tiles, 550 px wide"))
 
+    alien_backs: dict[str, str] = {}
+    for species_name in ("anomalies", "centaurians", "exertians", "mascamites", "oumuamua"):
+        im = Image.open(SRC / f"card-back-alien-{species_name}.png").convert("RGBA")
+        im = im.resize((300, round(300 * im.height / im.width)), Image.LANCZOS)
+        alien_backs[species_name] = save(im, "cards", f"back-{species_name}", quality=84, alpha_quality=92)
+    provenance.append(("card-back-alien-<species>.png", "apps/web/public/assets/cards/ (5 files)", "the backs of the alien decks, 300 px wide"))
+
     rival_boards: dict[str, str] = {}
     for name in RIVAL_BOARDS:
         im = Image.open(SRC / f"rival-board-{name}.png").convert("RGBA")
@@ -364,7 +371,7 @@ def main() -> None:
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
              "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
-             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold},
+             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs},
             indent=1,
             sort_keys=True,
         )

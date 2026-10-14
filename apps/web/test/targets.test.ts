@@ -63,3 +63,24 @@ describe("the places on the board that moves can be made at", () => {
     expect(handled.has(4)).toBe(false); // a sample space of the Mascamites has no place: it stays a button
   });
 });
+
+describe("the deck of a species", () => {
+  it("makes the deck and the face-up card two places beside the board of that species", () => {
+    const v = view(
+      [
+        { type: "take_alien", source: "deck" },
+        { type: "take_alien", source: "face_up" },
+      ],
+      [
+        { slot: 1, alien: "deck", card: null },
+        { slot: 1, alien: "face_up", card: "ET.3" },
+      ],
+    );
+    const { spots, handled } = buildSpots(v);
+    expect(spots.map((s) => s.id)).toEqual(["alien:1:deck", "alien:1:face_up"]);
+    expect(spots.every((s) => s.shape.kind === "rect")).toBe(true);
+    expect(handled.size).toBe(2);
+    const [deck, faceUp] = spots.map((s) => (s.shape.kind === "rect" ? s.shape : null));
+    expect(deck && faceUp && faceUp.y > deck.y && faceUp.x === deck.x).toBe(true); // one under the other, in a column
+  });
+});

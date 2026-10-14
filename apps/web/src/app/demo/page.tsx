@@ -26,6 +26,18 @@ export default function Demo() {
     first.species = "centaurians";
     first.discovery_spaces = ["p0", "n", "p2"];
     first.board = { pink: [[0], [1]], yellow: [[2]], blue: [[]] };
+    // the deck of the species and the card that lies face up, and an 'Oumuamua exofossil, to show the column beside the board and the tracker row
+    first.deck = Array(7).fill("?");
+    first.face_up = "ET.12";
+    const second = view.state.species[1];
+    if (second) {
+      second.discovered = true;
+      second.species = "oumuamua";
+      second.deck = Array(9).fill("?");
+      second.face_up = "ET.31";
+      second.board = { pink: [[], [], [], [], []], yellow: [[], [], [], [], []], blue: [[], [], [], [], []] };
+    }
+    for (const p of view.state.players) p.exofossils = p.index + 1;
   }
   const names = ["Alice", "Bob", "Cy"];
   return (

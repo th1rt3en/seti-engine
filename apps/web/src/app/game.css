@@ -1541,3 +1541,20 @@ button:disabled {
 .offersep {
   border-left-color: var(--good);
 }
+
+/* a piece that gets a new place glides there quickly */
+.piece {
+  transition: transform 0.14s ease-out;
+}
+
+/* the deck of a discovered species beside its board: the number of cards over the back of the deck */
+.deckcount {
+  fill: rgba(8, 12, 26, 0.88);
+  stroke: #fff;
+  stroke-width: 8;
+}
+.deckcounttext {
+  fill: #fff;
+  font-size: 84px;
+  font-weight: 800;
+}

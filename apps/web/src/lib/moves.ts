@@ -38,6 +38,7 @@ type Label = (m: Move) => string;
 export const LABELS: Record<string, Label> = {
   launch: () => "Launch a probe (2 credits)",
   pass: () => "Pass",
+  undo: () => "Undo the last trade",
   end_turn: () => "End the turn",
   move_energy: () => "Spend 1 energy for 1 movement",
   move_probe: (m) => `Move probe ${String(m.probe)} to ring ${(m.to as number[])[0]}, sector ${(m.to as number[])[1]}`,
@@ -175,6 +176,8 @@ export function logText(m: Move): string {
       return "played an Exertian card face down";
     case "pol_pick":
       return "chose a card";
+    case "undo":
+      return "took back the last trade";
     case "exchange":
       return m.give === "card"
         ? `traded ${(m.cards as string[]).map(cardTitle).join(" and ")} for ${m.get === "card" ? `a card from ${source(m.source)}` : `1 ${String(m.get)}`}`

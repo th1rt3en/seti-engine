@@ -139,6 +139,9 @@ export type TurnCompleted = boolean;
 export type TurnFx = {
   [k: string]: unknown;
 }[];
+export type Undo = {
+  [k: string]: unknown;
+} | null;
 export type Winners1 = number[];
 export type Error = string;
 export type Legal = {
@@ -173,6 +176,7 @@ export type Notes = ({
   [k: string]: unknown;
 } | null)[];
 export type Cost = number;
+export type Label = string;
 export type Path = [number, number][];
 /**
  * @minItems 2
@@ -180,6 +184,7 @@ export type Path = [number, number][];
  */
 export type To = [number, number];
 export type Cells = ReachCell[];
+export type Label1 = string;
 export type Probe1 = string;
 export type Reach = ProbeReach[];
 export type ToAct = number | null;
@@ -264,6 +269,7 @@ export interface GameState {
   turn: Turn;
   turn_completed: TurnCompleted;
   turn_fx: TurnFx;
+  undo: Undo;
   winners: Winners1;
   [k: string]: unknown;
 }
@@ -504,6 +510,7 @@ export interface Counts {
 }
 export interface ProbeReach {
   cells: Cells;
+  label: Label1;
   probe: Probe1;
   [k: string]: unknown;
 }
@@ -512,6 +519,7 @@ export interface ProbeReach {
  */
 export interface ReachCell {
   cost: Cost;
+  label: Label;
   path: Path;
   to: To;
   [k: string]: unknown;

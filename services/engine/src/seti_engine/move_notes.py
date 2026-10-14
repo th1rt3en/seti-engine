@@ -7,10 +7,25 @@ a move that needs no note). Nothing here changes the state or the moves.
 
 from typing import Any
 
-from . import engine, rewards, species
+from . import engine, rewards, solar, species
 from .models import GameState
 
 Note = dict[str, Any] | None
+
+
+def space_label(state: GameState, ring: int, sector: int) -> str:
+    """What lies on a space of the solar system, in words, for the confirmation of a move: 'Mars', 'an asteroid field', 'empty space'."""
+    cell = solar.visible(state, ring, sector)[1]
+    planet = solar.planet_of(cell)
+    if planet is not None:
+        return planet.capitalize()
+    if cell == "EARTH":
+        return "Earth"
+    if cell == "ASTEROID":
+        return "an asteroid field"
+    if cell == "COMET":
+        return "a comet"
+    return "empty space"
 
 
 def _probe_planet(state: GameState, probe_id: str) -> tuple[str | None, Any]:
@@ -55,6 +70,10 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
     if kind in ("mark_signal", "scan_earth"):
         sector = state.sectors[move["sector"]]
         return {"sector": move["sector"], "star": sector.star, "color": sector.color}
+    if kind == "take_alien":  # the top of the deck of a species (hidden), or the card that lies face up
+        slot_index = state.pending[0].data["slot"]
+        face_up = state.species[slot_index].face_up
+        return {"slot": slot_index, "alien": move["source"], "card": face_up if move["source"] == "face_up" else None}
     if kind == "place_trace":
         slot = state.species[move["slot"]]
         return {

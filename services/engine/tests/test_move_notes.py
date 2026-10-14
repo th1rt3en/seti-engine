@@ -1,6 +1,6 @@
 """The facts the page needs for a confirmation (move_notes.py): where a move is, its cost and what it gives (LAND-01, ORBIT-01, LIFE-03)."""
 
-from test_engine import begin
+from test_engine import begin, with_state
 
 from seti_engine import projection, solar
 from seti_engine.engine import legal_moves
@@ -83,3 +83,53 @@ def test_a_step_reports_what_each_player_gained_or_lost_net() -> None:
     assert all(v != 0 for v in changes.values())
     # a step that changes nothing reports nothing for the other player
     assert not [e for e in r.events if e["type"] == "delta" and e["player"] != pl]
+
+
+def test_a_trade_for_credit_or_energy_can_be_taken_back_and_nothing_else_can() -> None:
+    """UNDO-01: back to exactly the state before the trade; any other action ends the chance; a trade for a card has no undo (A-026)."""
+    from seti_engine.engine import apply
+
+    s, pl = at_planet("mars")
+    s.players[pl].credits, s.players[pl].energy = 4, 0
+    base = with_state(s)
+    assert {"type": "undo"} not in base.legal  # nothing to take back yet
+    traded = apply(base.state, {"type": "exchange", "give": "credit", "get": "energy"})
+    assert traded.state.players[pl].credits == 2 and traded.state.players[pl].energy == 1
+    assert {"type": "undo"} in traded.legal
+    back = apply(traded.state, {"type": "undo"})
+    assert back.state.model_dump(exclude={"undo"}) == s.model_dump(exclude={"undo"})  # the state before, to the last field (the rng too)
+    assert back.state.undo is None and {"type": "undo"} not in back.legal
+    # a second trade, then another action: the chance is gone
+    again = apply(back.state, {"type": "exchange", "give": "credit", "get": "energy"})
+    other = apply(again.state, {"type": "orbit", "probe": "t1"})
+    assert {"type": "undo"} not in other.legal and other.state.undo is None
+    # a trade for a card (from the row or the deck) cannot be taken back
+    card = apply(back.state, {"type": "exchange", "give": "credit", "get": "card", "source": "deck"})
+    assert {"type": "undo"} not in card.legal
+
+
+def test_the_view_never_carries_the_state_to_go_back_to() -> None:
+    from seti_engine.engine import apply
+
+    s, pl = at_planet("mars")
+    s.players[pl].credits = 4
+    traded = apply(with_state(s).state, {"type": "exchange", "give": "credit", "get": "energy"})
+    assert traded.state.undo is not None
+    for viewer in (pl, 1 - pl, None):
+        assert projection.project(traded.state, viewer).state.undo is None
+
+
+def test_taking_an_alien_card_says_which_species_and_which_card_lies_face_up() -> None:
+    """The page asks 'confirm taking random card?' (the top of the deck) or 'confirm taking <card>?' (the card that lies face up)."""
+    from seti_engine.models import Decision
+
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    s.species[1].deck = ["ET.1", "ET.2"]
+    s.species[1].face_up = "ET.3"
+    s.pending = [Decision(kind="take_alien_card", player=pl, data={"slot": 1})]
+    legal = legal_moves(s)
+    notes = projection.move_notes.notes(s, legal)
+    by_source = {m["source"]: n for m, n in zip(legal, notes, strict=True)}
+    assert by_source["deck"] == {"slot": 1, "alien": "deck", "card": None}  # the card on the deck is not named
+    assert by_source["face_up"] == {"slot": 1, "alien": "face_up", "card": "ET.3"}

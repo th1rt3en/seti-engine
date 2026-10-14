@@ -4,7 +4,7 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, PublicityIcon, ScoreIcon } from "./Icons";
+import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon } from "./Icons";
 
 const KINDS = [
   { key: "credit", label: "Credits", icon: <CreditIcon size={18} /> },
@@ -135,6 +135,12 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
               );
             })}
           </tr>
+          {s.species.some((sp) => sp.discovered && sp.species === "oumuamua")
+            ? row(
+                labelled(<ExofossilIcon size={18} />, "Exofossils"),
+                s.players.map((p) => p.exofossils),
+              )
+            : null}
           {row(
             labelled(<DeckCardIcon size={18} />, "Cards in hand"),
             s.players.map((p) => view.counts.hands[p.index] ?? 0),

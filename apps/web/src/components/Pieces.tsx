@@ -71,7 +71,8 @@ const gradient = (color: PieceColor, kind: "body" | "top" | "dimple"): string =>
 
 function Piece({ x, y, size, title, children }: { x: number; y: number; size: number; title?: string; children: ReactNode }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${size / 100})`}>
+    // a CSS transform, so that a piece that is given a new place glides there (`.piece` in game.css) instead of jumping
+    <g className="piece" style={{ transform: `translate(${x}px, ${y}px) scale(${size / 100})` }}>
       {children}
       {title ? <title>{title}</title> : null}
     </g>

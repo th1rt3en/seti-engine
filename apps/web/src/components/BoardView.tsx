@@ -6,6 +6,7 @@
 // `lib/geometry.ts` tells where that is on the picture, and `Pieces.tsx` draws the pieces.
 import {
   ALIEN,
+  ALIEN_COLUMN,
   ALIEN_TOP,
   BOARD,
   CENTER,
@@ -23,11 +24,13 @@ import {
   RING_RADIUS,
   STAR,
   STAR_BOARD_HOME,
+  alienColumn,
   goldPlace,
   polar,
   scoreDegrees,
   sectorDegrees,
 } from "@/lib/geometry";
+import { cardName } from "@/lib/moves";
 import type { Spot } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
@@ -50,6 +53,8 @@ export interface BoardInteraction {
   onSelectProbe: (id: string) => void;
   targets: { to: [number, number]; cost: number; path: [number, number][] }[];
   onTarget: (target: { to: [number, number]; cost: number; path: [number, number][] }) => void;
+  /** The space picked, waiting to be confirmed ("ring-sector"): its route stays drawn. */
+  chosen?: string | null;
 }
 
 /** Places that a move can be made at (landing, orbiting, a signal, a trace): highlighted on the board, and clicked to pick the move. */
@@ -129,6 +134,46 @@ export function BoardView({
           );
         })}
         <image href={assets.board} x={0} y={0} width={BOARD.w} height={BOARD.h} />
+
+        {s.species.map((sp, i) => {
+          // the deck of a discovered species lies to the right of its board: its back with the cards left over it, and the card that lies face up
+          if (!sp.discovered) return null;
+          const back = (assets.alienBacks as Record<string, string>)[sp.species];
+          const at = alienColumn(i);
+          const faceUp = sp.face_up ? (assets.cards as Record<string, string>)[sp.face_up] : undefined;
+          return (
+            <g key={`alien-deck-${sp.species}`}>
+              {back ? (
+                <g>
+                  <image
+                    href={back}
+                    x={at.deck.x}
+                    y={at.deck.y}
+                    width={ALIEN_COLUMN.w}
+                    height={ALIEN_COLUMN.h}
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                  <circle cx={at.deck.x + ALIEN_COLUMN.w / 2} cy={at.deck.y + ALIEN_COLUMN.h / 2} r={62} className="deckcount" />
+                  <text
+                    x={at.deck.x + ALIEN_COLUMN.w / 2}
+                    y={at.deck.y + ALIEN_COLUMN.h / 2 + 24}
+                    textAnchor="middle"
+                    className="deckcounttext"
+                  >
+                    {sp.deck.length}
+                  </text>
+                  <title>{`${sp.deck.length} cards left in the deck of ${sp.species}`}</title>
+                </g>
+              ) : null}
+              {faceUp ? (
+                <g>
+                  <image href={faceUp} x={at.faceUp.x} y={at.faceUp.y} width={ALIEN_COLUMN.w} height={ALIEN_COLUMN.h} />
+                  <title>{`The card that lies face up: ${cardName(sp.face_up)}`}</title>
+                </g>
+              ) : null}
+            </g>
+          );
+        })}
 
         {s.gold_tiles.map((g, i) => {
           const info = GOLD_TILES[`${g.tile}-${g.side}`];
@@ -298,7 +343,7 @@ export function BoardView({
         {interaction?.targets.map((t) => {
           const key = `${t.to[0]}-${t.to[1]}`;
           const centre = polar(RING_RADIUS[t.to[0]] ?? 270, sectorDegrees(t.to[1]));
-          const route = hover === key ? t.path : [];
+          const route = hover === key || interaction.chosen === key ? t.path : [];
           return (
             <g
               key={key}
@@ -428,6 +473,8 @@ export function BoardView({
           >
             {sp.shape.kind === "circle" ? (
               <circle cx={sp.shape.x} cy={sp.shape.y} r={sp.shape.r} className="spotshape" />
+            ) : sp.shape.kind === "rect" ? (
+              <rect x={sp.shape.x} y={sp.shape.y} width={sp.shape.w} height={sp.shape.h} rx={26} className="spotshape" />
             ) : (
               <path d={sp.shape.d} className="spotshape" />
             )}

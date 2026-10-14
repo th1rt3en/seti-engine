@@ -113,6 +113,8 @@ def legal_moves(state: GameState) -> list[Action]:
         return []
     p = state.players[state.current_player]
     moves: list[Action] = _free_moves(state, p)
+    if state.undo is not None:
+        moves.append({"type": "undo"})  # UNDO-01
     if not state.main_done:
         moves += _main_moves(state, p)
     else:
@@ -259,6 +261,10 @@ def apply(state: GameState, action: Action) -> StepResult:
     legal = legal_moves(state)
     if action not in legal:
         raise IllegalAction(f"{action} is not legal; legal moves: {legal}")
+    if action == {"type": "undo"}:  # UNDO-01: back to the state before the last exchange that can be taken back
+        assert state.undo is not None
+        back = GameState.model_validate(state.undo)
+        return StepResult(state=back, events=[{"type": "undo", "player": state.current_player}], legal=legal_moves(back))
     s = state.model_copy(deep=True)
     events: list[dict[str, Any]] = []
     if s.pending:
@@ -268,7 +274,21 @@ def apply(state: GameState, action: Action) -> StepResult:
     _advance(s, events)
     objectives.check_thresholds(s)  # SOLO-OBJ-04: reaching a level marks the task at once
     events += _deltas(state, s)
+    s.undo = _snapshot(state) if _undoable(state, action) else None
     return StepResult(state=s, events=events, legal=legal_moves(s))
+
+
+def _undoable(state: GameState, action: Action) -> bool:
+    """UNDO-01 (owner request 2026-10-14): a trade for 1 credit or 1 energy shows nothing hidden and can be taken back.
+
+    A trade for a card is not on this list: a card taken from the card row is replaced at once from the deck (RES-04), which shows the top
+    card of the deck, and a card from the deck is hidden. Whether the row may wait until the end of the turn is open (A-026).
+    """
+    return not state.pending and action["type"] == "exchange" and action["get"] in ("credit", "energy")
+
+
+def _snapshot(state: GameState) -> dict[str, Any]:
+    return state.model_copy(update={"undo": None}).model_dump(mode="json")
 
 
 def _deltas(before: GameState, after: GameState) -> list[dict[str, Any]]:

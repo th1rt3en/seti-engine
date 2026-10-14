@@ -161,6 +161,8 @@ class ObjectiveState(BaseModel):
 
 class GameState(BaseModel):
     options: Options
+    # the state before the last free exchange that can be taken back (UNDO-01); None once anything else is done. Never shown to a player.
+    undo: dict[str, Any] | None = None
     rng_state: int
     phase: Phase = "setup"
     round: int = 1
