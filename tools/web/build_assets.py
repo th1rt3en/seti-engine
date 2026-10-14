@@ -363,6 +363,15 @@ def main() -> None:
         samples[key] = save(im, "tiles", f"sample-{file}", quality=90, alpha_quality=95)
     provenance.append(("mascamite-sample-*.png (8 files)", "apps/web/public/assets/tiles/ (8 files)", "the back and the 7 faces of the Mascamite samples, 120 px wide"))
 
+    # the milestone tiles that lie on the scoring track: the Centaurian message tiles (+15, one for each colour of the supply: white, green, purple and
+    # orange; the engine's red player has the orange one) and the two Exertian tiles (the second costs 1 credit)
+    milestone_tiles: dict[str, str] = {}
+    for key, file in [(c, f"marker-plus15-{c}") for c in ("green", "orange", "purple", "white")] + [("exertian", "tab-red-card-arrow"), ("exertian-credit", "tab-red-credit-card-arrow")]:
+        im = Image.open(SRC / f"{file}.png").convert("RGBA")
+        im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS)
+        milestone_tiles[key] = save(im, "tiles", file, quality=90, alpha_quality=95)
+    provenance.append(("marker-plus15-<colour>.png, tab-red-card-arrow.png, tab-red-credit-card-arrow.png", "apps/web/public/assets/tiles/ (6 files)", "message and Exertian milestone tiles, at twice their size"))
+
     rival_boards: dict[str, str] = {}
     for name in RIVAL_BOARDS:
         im = Image.open(SRC / f"rival-board-{name}.png").convert("RGBA")
@@ -387,7 +396,7 @@ def main() -> None:
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
              "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
-             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs, "techFronts": tech_fronts, "samples": samples},
+             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs, "techFronts": tech_fronts, "samples": samples, "milestoneTiles": milestone_tiles},
             indent=1,
             sort_keys=True,
         )

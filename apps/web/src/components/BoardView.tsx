@@ -44,6 +44,7 @@ import slotData from "../generated/slots.json";
 import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ScorePawn, pieceColor } from "./Pieces";
 
 const DISCS = assets.discs as Record<string, string>;
+const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
@@ -597,10 +598,15 @@ export function BoardView({
           return (
             <g key={`exm-${m.at}`} opacity={m.done.length >= s.players.length ? 0.4 : 1}>
               <title>{`Exertian milestone ${k + 1} at ${m.at} points: play an Exertian card face down${m.cost > 0 ? ` (costs ${m.cost} credit)` : ""}`}</title>
-              <rect x={at.x - 50} y={at.y - 50} width={100} height={100} rx={16} fill="#6b1f1f" stroke="#fff" strokeWidth={6} />
-              <text x={at.x} y={at.y + 21} textAnchor="middle" fontSize={62} fontWeight={700} fill="#fff">
-                {m.cost > 0 ? "E¢" : "E"}
-              </text>
+              {/* the tile lies along the track, its arrow pointing the way the markers go (clockwise) */}
+              <image
+                href={TILES[m.cost > 0 ? "exertian-credit" : "exertian"]}
+                x={-70}
+                y={-44}
+                width={140}
+                height={88}
+                transform={`translate(${at.x} ${at.y}) rotate(${-scoreDegrees(m.at)})`}
+              />
             </g>
           );
         })}
@@ -612,21 +618,14 @@ export function BoardView({
             return (
               <g key={`msg-${p.index}-${target}`}>
                 <title>{`${who(p.index)}: Centaurian message milestone at ${target} points`}</title>
-                <rect
-                  x={at.x - 30}
-                  y={at.y - 22}
-                  width={60}
-                  height={44}
-                  rx={6}
-                  fill={PLAYER_COLOR[p.color] ?? "#fff"}
-                  stroke="#fff"
-                  strokeWidth={5}
-                />
-                <path
-                  d={`M${at.x - 42} ${at.y - 30} L${at.x} ${at.y + 6} L${at.x + 42} ${at.y - 30}`}
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth={4}
+                {/* the +15 tile of the player's colour (the supply has white, green, purple and orange: the red player has the orange one) */}
+                <image
+                  href={TILES[p.color === "red" ? "orange" : p.color] ?? TILES.white}
+                  x={-36}
+                  y={-64}
+                  width={72}
+                  height={128}
+                  transform={`translate(${at.x} ${at.y}) rotate(${-scoreDegrees(target)})`}
                 />
               </g>
             );

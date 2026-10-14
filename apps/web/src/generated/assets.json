@@ -258,6 +258,14 @@
       "values": [7, 5, 3]
     }
   },
+  "milestoneTiles": {
+    "exertian": "/assets/tiles/tab-red-card-arrow.bd7c276b5f.webp",
+    "exertian-credit": "/assets/tiles/tab-red-credit-card-arrow.d8402966cd.webp",
+    "green": "/assets/tiles/marker-plus15-green.f900073101.webp",
+    "orange": "/assets/tiles/marker-plus15-orange.95d9ea1740.webp",
+    "purple": "/assets/tiles/marker-plus15-purple.d9009d5ad0.webp",
+    "white": "/assets/tiles/marker-plus15-white.2a91522f20.webp"
+  },
   "moon": "/assets/discs/moon.42ba127546.webp",
   "objectives": {
     "L1-16-vp": "/assets/solo/objective-L1-16-vp.e1cbd1fb62.webp",
