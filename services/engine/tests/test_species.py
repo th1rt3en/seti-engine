@@ -471,7 +471,9 @@ def test_mascamite_samples_are_dealt_to_jupiter_and_saturn() -> None:
     s = masc_game()
     ex = s.species[0].extra
     assert len(ex["samples"]["jupiter"]) == 3 and len(ex["samples"]["saturn"]) == 3
-    assert ex["sample_spaces"] == [{"token": ex["sample_spaces"][0]["token"], "marker": None}]
+    assert ex["sample_spaces"] == [
+        {"token": ex["sample_spaces"][0]["token"], "marker": None, "reward": species.sample_faces()[ex["sample_spaces"][0]["token"]]}
+    ]
     all_tokens = [*ex["samples"]["jupiter"], *ex["samples"]["saturn"], ex["sample_spaces"][0]["token"]]
     assert sorted(all_tokens) == list(range(7))
 
@@ -558,3 +560,11 @@ def test_any_player_may_mark_a_blue_space_with_a_sample_and_gains_its_reward() -
     assert p.trace_log[-1] == (0, "blue")
     trace_decision(s, "blue")
     assert not [m for m in legal_moves(s) if m["space"] == "sample"]
+
+
+def test_mascamite_setup_is_logged_without_revealing_the_face_down_samples() -> None:
+    """ALIEN-MASC-01."""
+    r = discover(game("mascamites", "anomalies"), 0)
+    placed = next(e for e in r.events if e["type"] == "samples_placed")
+    assert placed["planets"] == {"jupiter": 3, "saturn": 3}
+    assert placed["face_up"]["reward"] == species.sample_faces()[placed["face_up"]["token"]]

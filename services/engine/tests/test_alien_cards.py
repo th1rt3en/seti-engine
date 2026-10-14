@@ -506,3 +506,30 @@ def test_end_scoring_counts_the_traces_for_a_species() -> None:
     slot.board["pink"][0].append(p.index)
     slot.discovery_spaces[0] = f"p{p.index}"
     assert cards.end_points(s, p) == 4
+
+
+def test_a_collected_sample_is_hidden_from_everyone_but_its_owner() -> None:
+    """ALIEN-MASC-02, ALIEN-MASC-04: the token under a capsule stays face down until it is delivered."""
+    from seti_engine import projection
+    from seti_engine.models import Probe
+
+    s = world("mascamites")
+    pl = s.current_player
+    s.probes.append(Probe(id="capsule1", player=pl, ring=1, sector=1, capsule=True, sample=3))
+    other = (pl + 1) % len(s.players)
+    assert next(p for p in projection.project(s, pl).state.probes if p.id == "capsule1").sample == 3
+    assert next(p for p in projection.project(s, other).state.probes if p.id == "capsule1").sample == -1
+    assert next(p for p in projection.project(s, None).state.probes if p.id == "capsule1").sample == -1
+
+
+def test_sample_choices_come_with_the_reward_of_each_token() -> None:
+    """ALIEN-MASC-02: the player looks at the samples of the planet before choosing, so the page needs each token's face."""
+    from seti_engine import move_notes
+    from seti_engine.models import Decision
+
+    s = world("mascamites")
+    s.pending = [Decision(kind="mascamite_sample", player=s.current_player, data={"mode": "collect", "planets": ["jupiter"]})]
+    legal = legal_moves(s)
+    notes = move_notes.notes(s, legal)
+    assert len(legal) == 3
+    assert all(n is not None and n["rewards"] == species.sample_faces()[m["sample"]] for m, n in zip(legal, notes, strict=True))

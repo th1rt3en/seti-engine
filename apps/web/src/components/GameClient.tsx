@@ -20,6 +20,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
+import { SampleReward } from "./Mascamites";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SpotPrompt } from "./SpotPrompt";
@@ -335,6 +336,9 @@ export function GameClient({
                     >
                       {m.type === "launch" || m.type === "scan" ? <ActionIcon name={m.type} /> : null}
                       {describeMove(m)}
+                      {m.type === "pick_sample" || m.type === "deliver_sample" ? (
+                        <SampleReward note={v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))]} />
+                      ) : null}
                     </button>
                   );
                 })}

@@ -128,6 +128,9 @@ def project(state: GameState, viewer: int | None) -> View:
     s.rng_state = 0
     s.deck = [HIDDEN] * len(s.deck)
     s.end_of_round_stacks = [[HIDDEN] * len(x) for x in s.end_of_round_stacks]
+    for pr in s.probes:
+        if pr.capsule and (viewer is None or pr.player != viewer):
+            pr.sample = -1  # a collected sample stays face down until it is delivered (ALIEN-MASC-04)
     for p in s.players:
         if p.index != viewer:
             p.hand = [HIDDEN] * len(p.hand)

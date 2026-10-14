@@ -381,7 +381,14 @@ export function BoardView({
             const pick = interaction?.probes.includes(p.id) ?? false;
             const chosen = interaction?.selected === p.id;
             const piece = p.capsule ? (
-              <Marker key={p.id} x={at.x + dx} y={at.y + dy} size={78} color={color(p.player)} title={title} />
+              <g key={p.id}>
+                <Marker x={at.x + dx} y={at.y + dy} size={78} color={color(p.player)} title={title} />
+                {/* the sample token under the capsule (a drawn placeholder) */}
+                <circle cx={at.x + dx + 30} cy={at.y + dy - 30} r={22} fill="#3b2a52" stroke="#fff" strokeWidth={5} />
+                <text x={at.x + dx + 30} y={at.y + dy - 20} textAnchor="middle" fontSize={26} fill="#fff">
+                  S
+                </text>
+              </g>
             ) : (
               <Figure key={p.id} x={at.x + dx} y={at.y + dy} color={color(p.player)} title={title} />
             );
@@ -446,8 +453,21 @@ export function BoardView({
         {Object.entries(PLANET).map(([name, pos]) => {
           const st = s.planets[name];
           if (!st) return null;
+          const mascamites = s.species.find((sp) => sp.discovered && sp.species === "mascamites");
+          const samples = ((mascamites?.extra.samples ?? {}) as Record<string, number[]>)[name]?.length ?? 0;
           return (
             <g key={name}>
+              {/* the sample tokens lying face down on Jupiter and Saturn (a drawn placeholder: the token art is not in the asset repo) */}
+              {Array.from({ length: samples }, (_, k) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: identical face-down tokens, only their count matters
+                <g key={`sample-${name}-${k}`} transform={`translate(${pos.x + pos.r * 0.45 + k * 30} ${pos.y - pos.r * 0.75 - k * 14})`}>
+                  <title>{`${samples} sample${samples === 1 ? "" : "s"} face down on ${name}`}</title>
+                  <circle r={34} fill="#3b2a52" stroke="#fff" strokeWidth={6} />
+                  <text y={12} textAnchor="middle" fontSize={34} fill="#fff">
+                    S
+                  </text>
+                </g>
+              ))}
               {st.orbiters.map((player, k) => (
                 <g
                   // biome-ignore lint/suspicious/noArrayIndexKey: arrival order

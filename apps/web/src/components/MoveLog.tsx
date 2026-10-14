@@ -117,6 +117,16 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
       return `${who} reaches the message marker of ${String(ev.card)} (${String(ev.target)}) and resolves it`;
     case "exertian_milestones":
       return `Exertian milestones placed at ${(ev.milestones as { at: number; cost: number }[]).map((m) => `${m.at} (${m.cost > 0 ? `${m.cost} credit` : "free"})`).join(" and ")}, ahead of the leader (${String(ev.leader_score)})`;
+    case "samples_placed":
+      return `Mascamite samples placed: ${Object.entries(ev.planets as Record<string, number>)
+        .map(([planet, n]) => `${n} face down on ${cap(planet)}`)
+        .join(", ")}; one lies face up on the species board (${rewardText((ev.face_up as { reward: RewardItem[] }).reward)})`;
+    case "sample_collected":
+      return `${who} collects a sample on ${cap(ev.planet)} (it stays hidden under their capsule)`;
+    case "sample_delivered":
+      return `${who} delivers a sample: ${rewardText(ev.reward as RewardItem[])}${Number(ev.times) > 1 ? " (twice)" : ""}; the token lies on sample space ${Number(ev.space) + 1}`;
+    case "sample_space_marked":
+      return `${who} marks sample space ${Number(ev.space) + 1} and gains ${rewardText(ev.reward as RewardItem[])}`;
     case "anomaly":
       return `Earth reaches the ${String(ev.color)} anomaly in ${sectorName(ctx, Number(ev.sector))}: ${
         typeof ev.player === "number"

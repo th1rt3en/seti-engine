@@ -1598,3 +1598,14 @@ button:disabled {
 .tracker .messagequeue li:first-child {
   font-weight: 600;
 }
+
+.mascamitetab p,
+.mascamitetab ul {
+  margin: 4px 0;
+}
+.mascamitetab ul {
+  padding-left: 1.2em;
+}
+.samplespaces li.taken {
+  opacity: 0.7;
+}

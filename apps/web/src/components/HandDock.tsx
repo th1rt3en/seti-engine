@@ -7,6 +7,7 @@ import type { View } from "@seti/protocol";
 import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
 import { CardImage } from "./CardImage";
+import { MascamiteTab } from "./Mascamites";
 
 /** The cards of the hand that a move can be made with, the places (in the hand) of those that are picked, and what happens when one is clicked. */
 export interface HandSelection {
@@ -73,10 +74,14 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   useBottomSpace(dock, "hand");
   const me = view.viewer;
   const player = me === null ? undefined : view.state.players[me];
-  const [tab, setTab] = useState<"hand" | "exertian">("hand");
+  const [tab, setTab] = useState<"hand" | "exertian" | "mascamite">("hand");
   if (!player) return null;
   const exertians = view.state.species.some((sp) => sp.discovered && sp.species === "exertians");
+  const mascamites = view.state.species.some((sp) => sp.discovered && sp.species === "mascamites");
   const showExertian = exertians && tab === "exertian";
+  const showMascamite = mascamites && tab === "mascamite";
+  const who = (seat: number): string =>
+    view.state.rival && seat === view.state.rival.index ? "Rival" : seat === view.viewer ? "You" : `Player ${seat + 1}`;
   return (
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
@@ -88,18 +93,26 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
       </button>
       {folded ? null : (
         <div className="handbody">
-          {exertians ? (
+          {exertians || mascamites ? (
             <div className="handtabs" role="tablist">
-              <button type="button" role="tab" aria-selected={!showExertian} onClick={() => setTab("hand")}>
+              <button type="button" role="tab" aria-selected={!showExertian && !showMascamite} onClick={() => setTab("hand")}>
                 Hand and missions
               </button>
-              <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
-                Exertian cards ({player.exertian_hand.length} held · {player.exertian_played.length} played)
-              </button>
+              {exertians ? (
+                <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
+                  Exertian cards ({player.exertian_hand.length} held · {player.exertian_played.length} played)
+                </button>
+              ) : null}
+              {mascamites ? (
+                <button type="button" role="tab" aria-selected={showMascamite} onClick={() => setTab("mascamite")}>
+                  Mascamite samples
+                </button>
+              ) : null}
             </div>
           ) : null}
           {showExertian ? <ExertianTab view={view} /> : null}
-          <div className="cards" hidden={showExertian}>
+          {showMascamite ? <MascamiteTab view={view} who={who} /> : null}
+          <div className="cards" hidden={showExertian || showMascamite}>
             {player.hand.length === 0 ? <span className="muted">No cards in hand.</span> : null}
             {player.hand.map((c, i) => {
               const picked = selection?.selected.includes(i) ?? false;
