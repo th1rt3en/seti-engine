@@ -19,6 +19,7 @@ import {
   GOLD_SLOTS,
   MOON,
   NEUTRAL_POCKETS,
+  OUMUAMUA_TILE,
   PLANET,
   RING_BOUNDS,
   RING_RADIUS,
@@ -295,6 +296,33 @@ export function BoardView({
             />
           );
         })}
+
+        {(() => {
+          // the data slot of the 'Oumuamua tile: markers take its places from the counter-clockwise end, the data tokens that are left lie after them
+          const slot = s.species.find((sp) => sp.discovered && sp.species === "oumuamua");
+          const tile = slot?.extra?.tile as { data: number; markers: number[] } | undefined;
+          if (!s.oumuamua_placed || !tile) return null;
+          const turn = 45 * (s.disc_angles[2] ?? 0);
+          return OUMUAMUA_TILE.degrees.map((deg, k) => {
+            const at = polar(OUMUAMUA_TILE.radius, deg + turn);
+            const marker = tile.markers[k];
+            if (marker !== undefined) {
+              return (
+                <Marker
+                  key={`oum-${deg}`}
+                  x={at.x}
+                  y={at.y}
+                  size={OUMUAMUA_TILE.size}
+                  color={color(marker)}
+                  title={`${who(marker)}: marker on the 'Oumuamua tile`}
+                />
+              );
+            }
+            return k < tile.markers.length + tile.data ? (
+              <DataToken key={`oum-${deg}`} x={at.x} y={at.y} size={OUMUAMUA_TILE.size} title="Data on the 'Oumuamua tile" />
+            ) : null;
+          });
+        })()}
 
         {s.sectors.map((sec, i) => {
           // The data of a star lies in its curved slot, first token at the counter-clockwise end. When a player marks a signal there, the leftmost

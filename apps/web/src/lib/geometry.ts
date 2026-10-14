@@ -144,6 +144,12 @@ export function alienColumn(slot: number): { deck: { x: number; y: number }; fac
   return { deck: { x, y }, faceUp: { x, y: y + ALIEN_COLUMN.h + ALIEN_COLUMN.between } };
 }
 
+/**
+ * The data slot of the 'Oumuamua tile in disc 3 (ring 3, slot 3): three places along the oval, the first at the counter-clockwise end. Measured on the
+ * picture of the disc as it lies at rest; the disc turns, so the places turn with it (`disc_angles[2]` steps of 45 degrees counter-clockwise).
+ */
+export const OUMUAMUA_TILE = { radius: 682, degrees: [172.4, 164.9, 157.5], size: 84 };
+
 export const PLAYER_COLOR: Record<string, string> = {
   green: "#2fbf71",
   red: "#ff5a52",

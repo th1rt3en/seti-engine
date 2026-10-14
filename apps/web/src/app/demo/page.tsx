@@ -36,6 +36,8 @@ export default function Demo() {
       second.deck = Array(9).fill("?");
       second.face_up = "ET.31";
       second.board = { pink: [[1, 0], [2], [], [], []], yellow: [[], [], [], [], []], blue: [[0], [], [], [], []] };
+      view.state.oumuamua_placed = true;
+      second.extra = { tile: { data: 1, markers: [0, 1] }, supply: 15 };
       second.overflow = [0, 2];
       second.overflow_kinds = ["blue", "blue"];
     }
