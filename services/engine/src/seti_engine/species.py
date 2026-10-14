@@ -147,7 +147,7 @@ def _discover(s: GameState, index: int, events: Events) -> None:
     elif slot.species == "oumuamua":
         _setup_oumuamua(s, slot, events)
     elif slot.species == "anomalies":
-        _setup_anomalies(s, slot)
+        _setup_anomalies(s, slot, events)
     elif slot.species == "centaurians":
         _setup_centaurians(s, slot)
 
@@ -157,13 +157,26 @@ def _discover(s: GameState, index: int, events: Events) -> None:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
-def _setup_anomalies(s: GameState, slot: SpeciesSlot) -> None:
+def _token_reward(color: str, side: int) -> list[dict[str, Any]]:
+    faces: list[list[dict[str, Any]]] = next(t for t in board_data("anomalies")["tokens"] if t["column"] == color)["sides"]
+    return faces[side]
+
+
+def _setup_anomalies(s: GameState, slot: SpeciesSlot, events: Events) -> None:
+    """ALIEN-ANO-01: one token opposite Earth, the other two 2 sectors clockwise and counter-clockwise of Earth (owner, 2026-10-14)."""
     from . import solar  # noqa: PLC0415
 
     earth_sector = solar.earth(s)[1]
-    sectors = [earth_sector, (earth_sector + 3) % 8, (earth_sector - 3) % 8]  # ALIEN-ANO-01
+    sectors = [(earth_sector + 4) % 8, (earth_sector + 2) % 8, (earth_sector - 2) % 8]
     cols = rng.shuffled(s, list(COLORS))  # which anomaly goes where is not ruled: seeded random order (A-004)
     slot.extra["tokens"] = [{"sector": sec, "color": col, "side": rng.below(s, 2)} for sec, col in zip(sectors, cols, strict=True)]
+    events.append(
+        {
+            "type": "anomalies_placed",
+            "earth_sector": earth_sector,
+            "tokens": [{**t, "reward": _token_reward(t["color"], t["side"])} for t in slot.extra["tokens"]],
+        }
+    )
 
 
 def anomaly_reward(s: GameState, slot: SpeciesSlot, color: str) -> int | None:
@@ -187,10 +200,12 @@ def after_rotation(s: GameState, events: Events) -> None:
             if tok["sector"] != earth_sector:
                 continue
             winner = anomaly_reward(s, slot, tok["color"])
-            events.append({"type": "anomaly", "color": tok["color"], "player": winner})
+            reward = _token_reward(tok["color"], tok["side"])
+            events.append(
+                {"type": "anomaly", "sector": tok["sector"], "color": tok["color"], "side": tok["side"], "reward": reward, "player": winner}
+            )
             if winner is not None:
-                faces = next(t for t in board_data("anomalies")["tokens"] if t["column"] == tok["color"])["sides"]
-                rewards.grant(s, s.players[winner], faces[tok["side"]], events)
+                rewards.grant(s, s.players[winner], reward, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

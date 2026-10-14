@@ -41,6 +41,19 @@ const techOf = (key: unknown): string => {
   return techName(category, glyph);
 };
 
+interface RewardItem {
+  t: string;
+  n: number;
+}
+interface AnomalyToken {
+  sector: number;
+  color: string;
+  reward: RewardItem[];
+}
+const rewardText = (list: RewardItem[]): string =>
+  list.map((r) => `${r.n} ${r.t.replace("card_any", "card").replace("vp", "VP")}`).join(" + ");
+const sectorName = (ctx: LogContext, sector: number): string => ctx.stars[sector] ?? `sector ${sector}`;
+
 /** What the rival did, one event at a time. */
 function rivalLine(ev: GameEvent): ReactNode {
   switch (ev.type) {
@@ -90,6 +103,14 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
       return `${who} wins the sector of ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
     case "discovered":
       return `${cap(ev.species)} is discovered`;
+    case "anomalies_placed":
+      return `anomaly tokens placed: ${(ev.tokens as AnomalyToken[]).map((k) => `${cap(k.color)} in ${sectorName(ctx, k.sector)} (${rewardText(k.reward)})`).join("; ")}`;
+    case "anomaly":
+      return `Earth reaches the ${String(ev.color)} anomaly in ${sectorName(ctx, Number(ev.sector))}: ${
+        typeof ev.player === "number"
+          ? `${ctx.who(ev.player)} (highest ${String(ev.color)} trace) gains ${rewardText(ev.reward as RewardItem[])}`
+          : "nobody has a trace there, no reward"
+      }`;
     case "tech":
       return `${who} takes the tech ${techOf(ev.tech)}`;
     case "mission_completed":
