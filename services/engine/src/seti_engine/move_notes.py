@@ -101,4 +101,12 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
 
 
 def notes(state: GameState, legal: list[dict[str, Any]]) -> list[Note]:
-    return [note(state, m) for m in legal]
+    """One note per legal move. A move that would show something hidden (a card drawn from the deck, the round pile, a species, the next
+    tech tile) and so cannot be taken back is marked `irreversible`, so that the page warns before it (UNDO-01)."""
+    out: list[Note] = []
+    for m in legal:
+        n = note(state, m)
+        if engine.reveals(state, m):
+            n = {**(n or {}), "irreversible": True}
+        out.append(n)
+    return out

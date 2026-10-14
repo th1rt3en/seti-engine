@@ -443,10 +443,12 @@ def mission_moves(s: GameState, p: PlayerState) -> list[Action]:
     out: list[Action] = [
         {"type": "complete_mission", "card": m.card}
         for m in p.missions
-        if m.kind == "quick" and cond_ok(s, p, card_defs.CARDS[m.card]["mission"]["cond"])
+        if m.kind == "quick"
+        and m.card != s.playing
+        and cond_ok(s, p, card_defs.CARDS[m.card]["mission"]["cond"])  # not the card being played
     ]
     for m in p.missions:
-        if m.kind == "deliver":
+        if m.kind == "deliver" and m.card != s.playing:
             dest = solar.earth(s) if card_defs.CARDS[m.card]["mission"]["dest"] == "earth" else solar.find_cell(s, "PLANET:MARS")
             out += [
                 {"type": "deliver_sample", "card": m.card, "capsule": pr.id}

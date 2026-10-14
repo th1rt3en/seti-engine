@@ -163,6 +163,11 @@ class GameState(BaseModel):
     options: Options
     # the state before the last free exchange that can be taken back (UNDO-01); None once anything else is done. Never shown to a player.
     undo: dict[str, Any] | None = None
+    # the actions taken since `undo` was saved, oldest first: taking the last one back replays the others on the saved state (UNDO-01)
+    undo_log: list[dict[str, Any]] = Field(default_factory=list)
+    # decisions of the main action that a free action has interrupted, waiting while the free action's own decisions are answered (FREE-00)
+    stashed: list[Decision] = Field(default_factory=list)
+    free_active: bool = False  # the decisions now pending belong to a free action, which no other free action may interrupt (FREE-00)
     rng_state: int
     phase: Phase = "setup"
     round: int = 1
@@ -194,11 +199,13 @@ class GameState(BaseModel):
     pending: list[Decision] = Field(default_factory=list)  # first entry is what the engine waits for
     crossed: list[tuple[int, int]] = Field(default_factory=list)  # (player, milestone) crossed this turn, to resolve at turn end
     probe_counter: int = 0
-    stage: str | None = None  # None, 'pass' (passing steps running) or 'turn_end' (milestones, then the next player)
+    stage: str | None = (
+        None  # None, 'sectors' (resolving the sectors the main action completed), 'pass' (passing steps running) or 'turn_end'
+    )
     pass_discard_checked: bool = False
     pass_rotated: bool = False
     pass_card_asked: bool = False
-    completed: list[int] = Field(default_factory=list)  # sectors completed this turn, resolved at turn end (SECTOR-10)
+    completed: list[int] = Field(default_factory=list)  # sectors completed and not yet resolved: right after the main action (SECTOR-10)
     scan_steps: list[str] = Field(default_factory=list)  # steps of the running scan still to do (SCAN-01)
     aside: list[str] = Field(default_factory=list)  # cards drawn by #ET.15 and not yet placed
     queue: list[dict[str, Any]] = Field(default_factory=list)  # steps of the card being played, resolved in order (cards.py)

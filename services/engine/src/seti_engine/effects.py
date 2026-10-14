@@ -80,13 +80,16 @@ def refill_card_row(state: GameState) -> None:
 
 
 def take_from_row_or_deck(state: GameState, p: PlayerState, source: str) -> str | None:
-    """`source` is 'deck' or 'row:<index>'. A card taken from the row is replaced at once (RES-04)."""
+    """`source` is 'deck' or 'row:<index>'. A card taken from the row is replaced at once (RES-04, A-026): only that one, so a gap that a
+    running scan has left in the row stays until the scan is finished (SCAN-03)."""
     if source == "deck":
         return draw_random_card(state, p)
     idx = int(source.split(":")[1])
     cid = state.card_row.pop(idx)
     p.hand.append(cid)
-    refill_card_row(state)
+    replacement = draw_from_deck(state)
+    if replacement is not None:
+        state.card_row.append(replacement)
     return cid
 
 

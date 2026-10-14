@@ -2,7 +2,7 @@
 
 import pytest
 from test_cards import give, me, put_probe, settle
-from test_engine import do, total_cards, with_state
+from test_engine import decisions, do, total_cards, with_state
 from test_species import discover, game
 
 from seti_engine import card_defs, cards, effects, solar, species, tables
@@ -99,7 +99,7 @@ def test_land_and_collect_a_sample() -> None:
     assert me(r).energy == energy and first_pending(r) in ("land_data_slot", "mascamite_sample", "trace", "")
     r = settle_until(r, "mascamite_sample")
     tokens = species.samples_on(r.state, "jupiter")
-    assert len(tokens) == 3 and {m["sample"] for m in r.legal} == set(tokens)
+    assert len(tokens) == 3 and {m["sample"] for m in decisions(r.legal)} == set(tokens)
     r = do(r, "pick_sample", planet="jupiter", sample=tokens[0])
     caps = [pr for pr in r.state.probes if pr.capsule]
     assert len(caps) == 1 and caps[0].sample == tokens[0] and len(species.samples_on(r.state, "jupiter")) == 2
@@ -127,13 +127,13 @@ def test_orbit_or_land_card() -> None:
     s = world("mascamites")
     put_probe(s, "saturn", "s1")
     r = play(s, "ET.3")
-    kinds = {m["type"] for m in r.legal}
+    kinds = {m["type"] for m in decisions(r.legal)}
     assert kinds == {"orbit_free", "land_free"}
     credits = me(r).credits
     r = do(r, "orbit_free", probe="s1")
     assert me(r).credits == credits and r.state.planets["saturn"].orbiters == [r.state.current_player]
     r = settle_until(r, "mascamite_sample")
-    assert {m["planet"] for m in r.legal} == {"saturn"}
+    assert {m["planet"] for m in decisions(r.legal)} == {"saturn"}
 
 
 def test_peek_at_samples_gives_the_reward_and_puts_the_sample_back() -> None:
@@ -144,7 +144,7 @@ def test_peek_at_samples_gives_the_reward_and_puts_the_sample_back() -> None:
     put_probe(s, "saturn", "s1")
     r = play(s, "ET.5")
     tokens = species.samples_on(r.state, "saturn")
-    assert first_pending(r) == "mascamite_sample" and {m["sample"] for m in r.legal} == set(tokens)
+    assert first_pending(r) == "mascamite_sample" and {m["sample"] for m in decisions(r.legal)} == set(tokens)
     r2 = do(r, "pick_sample", planet="saturn", sample=tokens[0])
     assert species.samples_on(r2.state, "saturn") == tokens and not [pr for pr in r2.state.probes if pr.capsule]
 
@@ -529,7 +529,7 @@ def test_sample_choices_come_with_the_reward_of_each_token() -> None:
 
     s = world("mascamites")
     s.pending = [Decision(kind="mascamite_sample", player=s.current_player, data={"mode": "collect", "planets": ["jupiter"]})]
-    legal = legal_moves(s)
+    legal = decisions(legal_moves(s))
     notes = move_notes.notes(s, legal)
     assert len(legal) == 3
     assert all(n is not None and n["rewards"] == species.sample_faces()[m["sample"]] for m, n in zip(legal, notes, strict=True))

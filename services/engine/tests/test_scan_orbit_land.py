@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from test_engine import begin, do, with_state
+from test_engine import begin, decisions, do, with_state
 
 from seti_engine import effects, rewards, solar
 from seti_engine.engine import StepResult, apply, legal_moves
@@ -237,7 +237,7 @@ def test_any_trace_can_use_any_free_color() -> None:
 
     s.pending = [Decision(kind="trace", player=s.current_player, data={"color": "any"})]
     s.species[0].discovery_spaces[1] = "n"
-    colors = {m["color"] for m in legal_moves(s) if m["space"] == "discovery" and m["slot"] == 0}
+    colors = {m["color"] for m in decisions(legal_moves(s)) if m["space"] == "discovery" and m["slot"] == 0}
     assert colors == {"pink", "blue"}
 
 

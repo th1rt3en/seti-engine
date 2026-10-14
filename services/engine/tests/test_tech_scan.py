@@ -1,6 +1,6 @@
 """Scan steps, telescope techs, research, computer techs and analyze (SCAN, TECH, TECHACT, ANALYZE rules)."""
 
-from test_engine import begin, do, with_state
+from test_engine import begin, decisions, do, with_state
 
 from seti_engine import rewards, solar, tables
 from seti_engine.engine import StepResult, apply, legal_moves
@@ -17,7 +17,7 @@ def test_scan_marks_earth_sector_then_a_row_card_sector() -> None:
     r2 = do(with_state(s), "scan")
     p = r2.state.players[pl]
     assert p.credits == 2 and p.energy == 2
-    assert {m["type"] for m in r2.legal} == {"scan_earth", "scan_discard"}  # any order (SCAN-01)
+    assert {m["type"] for m in decisions(r2.legal)} == {"scan_earth", "scan_discard"}  # any order (SCAN-01)
     r3 = do(r2, "scan_earth", sector=earth_sector)
     assert r3.state.sectors[earth_sector].markers == [pl]
     assert not [m for m in r3.legal if m["type"] == "scan_done"]  # the row step is still to do
@@ -25,9 +25,9 @@ def test_scan_marks_earth_sector_then_a_row_card_sector() -> None:
     color = tables.cards()[cid]["sector"]
     r4 = do(r3, "scan_discard", source="row:0")
     assert cid in r4.state.discard and len(r4.state.card_row) == 2  # refilled only after the scan
-    assert {m["sector"] for m in r4.legal} == set(rewards.sectors_of_color(r4.state, color))
+    assert {m["sector"] for m in decisions(r4.legal)} == set(rewards.sectors_of_color(r4.state, color))
     r5 = apply(r4.state, r4.legal[0])
-    assert [m["type"] for m in r5.legal] == ["scan_done"]
+    assert [m["type"] for m in decisions(r5.legal)] == ["scan_done"]
     r6 = do(r5, "scan_done")
     assert len(r6.state.card_row) == 3 and r6.state.scan_steps == []
     assert sum(len(sec.markers) for sec in r6.state.sectors) == 2

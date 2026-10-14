@@ -1,6 +1,6 @@
 """The facts the page needs for a confirmation (move_notes.py): where a move is, its cost and what it gives (LAND-01, ORBIT-01, LIFE-03)."""
 
-from test_engine import begin, with_state
+from test_engine import begin, decisions, with_state
 
 from seti_engine import projection, solar
 from seti_engine.engine import legal_moves
@@ -17,7 +17,7 @@ def at_planet(planet: str) -> tuple[GameState, int]:
 
 
 def note_of(s: GameState, kind: str, **kw: object) -> dict | None:
-    legal = legal_moves(s)
+    legal = decisions(legal_moves(s))
     notes = projection.move_notes.notes(s, legal)
     i = next(i for i, m in enumerate(legal) if m["type"] == kind and all(m.get(k) == v for k, v in kw.items()))
     return notes[i]
@@ -52,7 +52,7 @@ def test_trace_and_signal_notes() -> None:
 
     pl = s.current_player
     s.pending.append(Decision(kind="trace", player=pl, data={"color": "any"}))
-    legal = legal_moves(s)
+    legal = decisions(legal_moves(s))
     notes = projection.move_notes.notes(s, legal)
     discovery = [(m, n) for m, n in zip(legal, notes, strict=True) if m["space"] == "discovery"]
     assert discovery and all(n["species"] is None for _, n in discovery)  # nobody has seen the species yet
@@ -85,8 +85,8 @@ def test_a_step_reports_what_each_player_gained_or_lost_net() -> None:
     assert not [e for e in r.events if e["type"] == "delta" and e["player"] != pl]
 
 
-def test_a_trade_for_credit_or_energy_can_be_taken_back_and_nothing_else_can() -> None:
-    """UNDO-01: back to exactly the state before the trade; any other action ends the chance; a trade for a card has no undo (A-026)."""
+def test_a_trade_for_credit_or_energy_can_be_taken_back() -> None:
+    """UNDO-01: back to exactly the state before the trade; a trade for a card from the deck shows a card and has no undo."""
     from seti_engine.engine import apply
 
     s, pl = at_planet("mars")
@@ -97,15 +97,12 @@ def test_a_trade_for_credit_or_energy_can_be_taken_back_and_nothing_else_can() -
     assert traded.state.players[pl].credits == 2 and traded.state.players[pl].energy == 1
     assert {"type": "undo"} in traded.legal
     back = apply(traded.state, {"type": "undo"})
-    assert back.state.model_dump(exclude={"undo"}) == s.model_dump(exclude={"undo"})  # the state before, to the last field (the rng too)
+    assert back.state.model_dump(exclude={"undo", "undo_log"}) == s.model_dump(
+        exclude={"undo", "undo_log"}
+    )  # the state before, to the last field
     assert back.state.undo is None and {"type": "undo"} not in back.legal
-    # a second trade, then another action: the chance is gone
-    again = apply(back.state, {"type": "exchange", "give": "credit", "get": "energy"})
-    other = apply(again.state, {"type": "orbit", "probe": "t1"})
-    assert {"type": "undo"} not in other.legal and other.state.undo is None
-    # a trade for a card (from the row or the deck) cannot be taken back
     card = apply(back.state, {"type": "exchange", "give": "credit", "get": "card", "source": "deck"})
-    assert {"type": "undo"} not in card.legal
+    assert {"type": "undo"} not in card.legal and card.state.undo is None
 
 
 def test_the_view_never_carries_the_state_to_go_back_to() -> None:
@@ -128,11 +125,16 @@ def test_taking_an_alien_card_says_which_species_and_which_card_lies_face_up() -
     s.species[1].deck = ["ET.1", "ET.2"]
     s.species[1].face_up = "ET.3"
     s.pending = [Decision(kind="take_alien_card", player=pl, data={"slot": 1})]
-    legal = legal_moves(s)
+    legal = decisions(legal_moves(s))
     notes = projection.move_notes.notes(s, legal)
     by_source = {m["source"]: n for m, n in zip(legal, notes, strict=True)}
-    assert by_source["deck"] == {"slot": 1, "alien": "deck", "card": None}  # the card on the deck is not named
-    assert by_source["face_up"] == {"slot": 1, "alien": "face_up", "card": "ET.3"}
+    assert by_source["deck"] == {
+        "slot": 1,
+        "alien": "deck",
+        "card": None,
+        "irreversible": True,
+    }  # the top of the deck is a reveal  # the card on the deck is not named
+    assert by_source["face_up"] == {"slot": 1, "alien": "face_up", "card": "ET.3", "irreversible": True}  # its replacement is a reveal
 
 
 def test_a_signal_in_the_sector_of_oumuamua_names_the_sector_and_tells_the_tile_from_the_sector() -> None:
@@ -145,7 +147,7 @@ def test_a_signal_in_the_sector_of_oumuamua_names_the_sector_and_tells_the_tile_
     s.species[0].species = "oumuamua"
     species._discover(s, 0, [])
     s.pending = [Decision(kind="oumuamua_signal", player=pl, data={})]
-    legal = legal_moves(s)
+    legal = decisions(legal_moves(s))
     notes = projection.move_notes.notes(s, legal)
     by_where = {m["where"]: n for m, n in zip(legal, notes, strict=True)}
     sector = species.oumuamua_sector(s)

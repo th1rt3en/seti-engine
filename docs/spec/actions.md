@@ -79,14 +79,14 @@ Source: base rulebook pp. 7 to 19, 28. Costs are paid when the action is taken a
 
 ## Free actions
 
-- **FREE-00** (FAQ Q4) A free action may interrupt a main action but may not interrupt another free action: it is resolved completely first (FAQ-04).
+- **FREE-00** (FAQ Q4) A free action may interrupt a main action but may not interrupt another free action: it is resolved completely first (FAQ-04). In the engine the decisions of the main action wait (`stashed`) while the decisions of the free action are answered; resolving sectors, milestones and passing cannot be interrupted.
 - **FREE-01** (p.9) Spend 1 energy to gain 1 movement.
 - **FREE-02** (p.9, p.7) Discard a card for the free action in its top-left corner (movement, publicity, data and so on, as depicted).
 - **FREE-03** (p.14) Place data: take 1 data from the data pool and place it in the leftmost available space of the computer; the space's effect resolves immediately. Possible only on the player's own turn.
 - **FREE-04** (p.14) Computer spaces: covering the publicity space gives 1 publicity; covering the income space lets the player tuck a card (INCOME-01); spaces on computer techs give 2 points on the upper space and the depicted reward on the lower space (TECH-20).
 - **FREE-05** (p.18) Resource exchange (RES-06).
 - **FREE-06** (p.18) Buy a card: spend 3 publicity to take a card from the card row or from the top of the deck. Available whenever the player has at least 3 publicity (owner note, 2026-10-13: not only at publicity 3 to 5, where the board draws the box).
-- **UNDO-01** (owner request, 2026-10-14; D31) A free trade for 1 credit or 1 energy (2 credits, 2 energy or 2 cards given) can be taken back until the player's next action; the state is exactly as it was before the trade. A trade for a card cannot be taken back (A-026 open).
+- **UNDO-01** (owner request, 2026-10-14; D31, D32) A move can be taken back, one after the other back to the first of the turn (the state is exactly as it was before it), unless it shows something hidden: a card from the deck (including the card that replaces one taken from the card row), a card of the round pile after passing, a species being revealed, the next tech tile, an alien card or a Mascamite sample being looked at. After such a move nothing before it can be taken back, and before it the page warns that it cannot be undone and asks for a confirmation (the engine marks these moves `irreversible` in the move notes). Nothing is taken back across turns, and the decisions of passing or of the end of the turn cannot be taken back.
 - **FREE-07** (p.15) Complete a conditional mission (CARD-11).
 - **FREE-08** (p.15) Mark a triggerable mission circle when triggered (CARD-12); this may even be outside the player's own turn (CARD-13).
 - **FREE-10** (p.6) The "tuck a card for income" effect (INCOME-01).

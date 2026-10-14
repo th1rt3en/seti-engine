@@ -14,6 +14,7 @@ export type FinalScores = {
   [k: string]: unknown;
 }[];
 export type FirstPassDone = boolean;
+export type FreeActive = boolean;
 export type Markers = number[];
 export type Side = string;
 export type Tile = string;
@@ -124,6 +125,7 @@ export type Species1 = string;
 export type Species = SpeciesSlot[];
 export type Stage = string | null;
 export type StartPlayer = number;
+export type Stashed = Decision[];
 export type Category = string;
 export type Glyph = string;
 export type Tiles = string[];
@@ -137,6 +139,9 @@ export type TurnFx = {
 export type Undo = {
   [k: string]: unknown;
 } | null;
+export type UndoLog = {
+  [k: string]: unknown;
+}[];
 export type Winners1 = number[];
 export type Error = string;
 export type Legal = {
@@ -230,6 +235,7 @@ export interface GameState {
   end_of_round_stacks: EndOfRoundStacks;
   final_scores: FinalScores;
   first_pass_done: FirstPassDone;
+  free_active: FreeActive;
   gold_tiles: GoldTiles;
   last_trace_kind: LastTraceKind;
   log: Log;
@@ -262,11 +268,13 @@ export interface GameState {
   species: Species;
   stage: Stage;
   start_player: StartPlayer;
+  stashed: Stashed;
   tech_stacks: TechStacks;
   turn: Turn;
   turn_completed: TurnCompleted;
   turn_fx: TurnFx;
   undo: Undo;
+  undo_log: UndoLog;
   winners: Winners1;
 }
 export interface GoldTile {

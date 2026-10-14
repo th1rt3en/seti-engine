@@ -143,7 +143,10 @@ def project(state: GameState, viewer: int | None) -> View:
             slot.extra = {}
         else:
             _hide_tokens(slot.extra)
-    s.undo = None  # UNDO-01: the state to go back to holds the hands and the decks; nobody is shown it
+    s.undo, s.undo_log = None, []  # UNDO-01: the state to go back to holds the hands and the decks; nobody is shown it
+    for d in s.stashed:
+        if d.player != viewer:
+            d.data = {}
     for st in s.tech_stacks:
         st.tiles = st.tiles[:1] + [HIDDEN] * max(0, len(st.tiles) - 1)  # SETUP-16: only the top tile of a stack shows its bonus
     if s.rival is not None:

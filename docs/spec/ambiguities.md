@@ -62,6 +62,7 @@ Entry format:
 - Consequence of each reading: free actions after the main action (placing data, discarding cards for signals, tucking income, completing missions) can change who wins a sector or what triggers.
 - Questions for the owner: which reading is right? (Reading 1 follows p.13 literally; reading 2 follows p.7 and p.18.)
 - Ruling (owner), 2026-10-12: Reading 1: completed sectors are resolved right after the main action, before the player's remaining free actions. No free action can change the outcome of a sector.
+- Implementation note (2026-10-14): the engine had resolved sectors only when the player ended the turn, against this ruling. It now resolves them right after the main action (and any decisions of it); the player still takes free actions afterwards and then ends the turn.
 
 ## A-006: Income after passing
 - Status: ruled
@@ -214,9 +215,10 @@ Entry format:
 - Ruling (owner), 2026-10-13: Yes. The rival never has any resources; every resource it would gain becomes progress on the track at 1 to 1.
 
 ## A-026: May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)?
-- Status: open
+- Status: ruled
 - Rule IDs affected: RES-04, RES-06, FREE-05, UNDO-01
 - Rulebook page and text: p.19 "When you draw a card from the card row, you replace it immediately with a card from the top of the deck." p.18 a resource exchange may take its card "from the card row or from the top of the deck".
 - Readings: (1) as printed: the row is refilled at once, so a trade for a display card shows the top card of the deck and cannot be taken back without showing it to everyone and putting it back; (2) owner's message of 2026-10-14: the display does not refill until the end of the player's turn, so a trade for a display card (and a trade for credit or energy) can be taken back.
 - Consequences: reading 2 changes RES-04 for every card taken from the row (buying with publicity, trades, card effects), and a row with a gap in it would have to be shown during the turn. Until it is ruled, the engine follows the rulebook (reading 1), and only a trade for a credit or an energy can be taken back (UNDO-01 in `docs/PLAN.md`, D31); a trade for a display card or a deck card cannot.
 - Questions for the owner: is the row refilled at the end of the turn (for every way of taking a card from it, or only for a trade)? If it is, what does the row show during the turn, and may a card bought with publicity be taken back as well?
+- Ruling (owner), 2026-10-14: neither reading. The row is refilled after the whole scan action (SCAN-03, FAQ-15), but at once whenever a free action (3 publicity, or a trade) takes a card from the display. A free action may interrupt the main action but not another free action (FREE-00). In general every move can be taken back unless it reveals hidden information (drawing or revealing a card from the deck, passing to see and draw from the round pile, revealing a species); the page then warns that the move cannot be undone and asks for a confirmation (UNDO-01, D32). So a trade or purchase of a display card cannot be taken back, because its replacement comes from the deck.
