@@ -253,12 +253,33 @@ def _main_moves(state: GameState, p: PlayerState) -> list[Action]:
                 for moon in tables.planet_info(planet)["moons"]:
                     if moon not in state.planets[planet].moon_landers:
                         out.append({"type": "land", "probe": pr.id, "moon": moon})
+    out += _pluto_moves(state, p)  # PROMO-02
     if p.credits >= 1 and p.energy >= 2:
         out.append({"type": "scan"})  # SCAN-01
     if p.publicity >= techs.RESEARCH_COST:
         out += techs.research_moves(state, p)  # TECHACT-01
     if techs.can_analyze(p):
         out.append({"type": "analyze"})  # ANALYZE-01
+    return out
+
+
+OUTERMOST_RING = 4  # the ring of Uranus and Neptune
+
+
+def _pluto_moves(state: GameState, p: PlayerState) -> list[Action]:
+    """PROMO-02, FAQ-C300: the owner of SE EN 01 may orbit or land at Pluto with a probe on any space of the outermost ring: one orbiter
+    and one lander at most, at the normal costs."""
+    if state.pluto_owner != p.index or "pluto" not in state.planets:
+        return []
+    st = state.planets["pluto"]
+    out: list[Action] = []
+    for pr in probes_in_space(state, p):
+        if pr.capsule or pr.ring != OUTERMOST_RING:
+            continue
+        if not st.orbiters and p.credits >= 1 and p.energy >= 1:
+            out.append({"type": "orbit", "probe": pr.id, "at": "pluto"})
+        if not st.landers and p.energy >= land_cost(state, p, "pluto"):
+            out.append({"type": "land", "probe": pr.id, "at": "pluto"})
     return out
 
 
@@ -498,7 +519,7 @@ def _orbit_land_free_moves(s: GameState, p: PlayerState, d: Decision) -> list[Ac
 def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = False, opts: dict[str, Any] | None = None) -> None:
     """ORBIT-01 to ORBIT-05."""
     probe = next(pr for pr in s.probes if pr.id == a["probe"])
-    planet = planet_at(s, probe)
+    planet = "pluto" if a.get("at") == "pluto" else planet_at(s, probe)
     assert planet is not None
     data = tables.planet_info(planet)
     if not free:
@@ -524,7 +545,7 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
     """LAND-01 to LAND-06. A moon landing gives the moon's rewards only (ambiguity A-016). `free` is a landing from a card effect."""
     opts = opts or {}
     probe = next(pr for pr in s.probes if pr.id == a["probe"])
-    planet = planet_at(s, probe)
+    planet = "pluto" if a.get("at") == "pluto" else planet_at(s, probe)
     assert planet is not None
     data = tables.planet_info(planet)
     if not free:

@@ -158,6 +158,16 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             labelled(<DeckCardIcon size={18} />, "Cards in hand"),
             s.players.map((p) => view.counts.hands[p.index] ?? 0),
           )}
+          {s.pluto_owner !== null && s.pluto_owner !== undefined && s.planets.pluto ? (
+            <tr>
+              <th scope="row">{labelled(<ScoreIcon size={18} />, "Pluto (promo card)")}</th>
+              <td colSpan={s.players.length}>
+                {who(s.pluto_owner)} only. Orbiter:{" "}
+                {s.planets.pluto.orbiters.length > 0 ? who(s.planets.pluto.orbiters[0] as number) : "free"}
+                {" · "}Lander: {s.planets.pluto.landers.length > 0 ? who(s.planets.pluto.landers[0] as number) : "free"}
+              </td>
+            </tr>
+          ) : null}
           {s.species.some((sp) => sp.discovered && sp.species === "exertians") ? (
             <>
               {group("Exertian danger (the most danger loses a tenth of its points)")}

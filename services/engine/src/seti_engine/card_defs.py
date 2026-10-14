@@ -126,6 +126,12 @@ def circle(on: dict[str, Any], *r: Step) -> dict[str, Any]:
     return {"on": on, "r": list(r)}
 
 
+# the cards whose flavor text names Mars, read from the card art (owner to confirm, A-027): #13, #14, #22, #34, #76, #84, #85, #119, ET.4
+MARS_FLAVOR = frozenset({"13", "14", "22", "34", "76", "84", "85", "119", "ET.4"})
+# SE EN 02: an orbit or a landing at Mars (or its moons), or playing a card that names Mars in its flavor text
+MARS_TRIGGER = {"any": [{"e": "orbit", "planet": "mars"}, {"e": "land", "planet": "mars"}, {"e": "play_mars"}]}
+
+
 def trig(*circles: dict[str, Any]) -> dict[str, Any]:
     return {"kind": "trigger", "circles": list(circles)}
 
@@ -421,6 +427,9 @@ ALIEN_CARDS: dict[str, dict[str, Any]] = {
         "fx": [R("land_free", bonus_vp=3, bonus_planets=["oumuamua"])],
         "mission": quick(species_all("oumuamua"), exo(1)),
     },
+    # Promo cards (PLAN.md D23, PROMO-01 to PROMO-03)
+    "SE_EN_01": {"fx": [R("pluto")], "keep": True},
+    "SE_EN_02": {"mission": trig(circle(MARS_TRIGGER, pub(2)), circle(MARS_TRIGGER, vp(5)))},
     # Centaurians (they cost energy; the green part resolves when the message marker is reached)
     "ET.31": {"fx": [*message(), LAUNCH], "green": [R("tuck_self")]},
     "ET.32": {"fx": [*message(), data(2)], "green": [R("tuck_self")]},

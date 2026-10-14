@@ -161,7 +161,10 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </span>
               </>
             ) : null}
-            {player.missions.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
+            {player.missions.length > 0 || player.kept_cards.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
+            {player.kept_cards.map((c) => (
+              <CardImage key={c} id={c} size="mission" title={`${cardName(c)}: kept in front of you`} />
+            ))}
             {player.missions.map((m) => (
               <CardImage
                 key={m.card}

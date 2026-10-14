@@ -74,6 +74,7 @@ class PlayerState(BaseModel):
     landers: dict[str, int] = Field(default_factory=dict)  # planet or moon -> count
     missions: list[MissionState] = Field(default_factory=list)  # CARD-10: face-up missions still to complete
     completed_missions: list[str] = Field(default_factory=list)  # CARD-16: face down
+    kept_cards: list[str] = Field(default_factory=list)  # cards kept in front of the player, no mission or end card (SE EN 01)
     end_cards: list[str] = Field(default_factory=list)  # CARD-20: end-of-game scoring cards in front of the player
     exertian_hand: list[str] = Field(default_factory=list)  # Exertian cards held (not in hand, ALIEN-EXE-02)
     exertian_played: list[str] = Field(default_factory=list)  # Exertian cards played face down (ALIEN-EXE-01)
@@ -189,6 +190,7 @@ class GameState(BaseModel):
     rotations: int = 0  # solar system rotations so far (next disc = rotations % 3 + 1)
     first_pass_done: bool = False  # this round
     oumuamua_placed: bool = False
+    pluto_owner: int | None = None  # the player who played the promo card SE EN 01: only they can orbit or land at Pluto (PROMO-02)
     probes: list[Probe] = Field(default_factory=list)
     planets: dict[str, PlanetState] = Field(default_factory=dict)
     tech_stacks: list[TechStack] = Field(default_factory=list)

@@ -20,7 +20,7 @@ def total_cards(s: GameState) -> int:
     """Main-deck cards (alien cards are counted separately: they live in their own decks and hands)."""
     piles = [s.deck, s.discard, s.card_row, s.aside, *s.end_of_round_stacks]
     for p in s.players:
-        piles += [p.hand, p.tucked, p.missions and [m.card for m in p.missions] or [], p.completed_missions, p.end_cards]
+        piles += [p.hand, p.tucked, p.missions and [m.card for m in p.missions] or [], p.completed_missions, p.end_cards, p.kept_cards]
     n = sum(1 for pile in piles for c in pile if not c.startswith("ET."))
     if (
         s.playing

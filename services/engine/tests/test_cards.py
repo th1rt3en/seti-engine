@@ -64,8 +64,8 @@ def me(r: StepResult) -> Any:
 
 
 def test_every_base_card_has_a_definition() -> None:
-    """CARD-01: all 138 base cards are defined; only the cards waiting for rulings are held back."""
-    base = {cid for cid, c in tables.cards().items() if c["deck"] == "base"}
+    """CARD-01: all 138 base cards and the 2 promo cards are defined; only the cards waiting for rulings are held back."""
+    base = {cid for cid, c in tables.cards().items() if c["deck"] in ("base", "promo")}  # the promo cards too (PROMO-01)
     assert {c for c in card_defs.CARDS if not c.startswith("ET.")} == base
     assert all(cards.playable(c) for c in ALL)
 

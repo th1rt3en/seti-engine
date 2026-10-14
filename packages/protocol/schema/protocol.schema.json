@@ -371,6 +371,18 @@
           "default": null,
           "title": "Playing"
         },
+        "pluto_owner": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pluto Owner"
+        },
         "probe_counter": {
           "default": 0,
           "title": "Probe Counter",
@@ -584,6 +596,7 @@
         "play_return",
         "players",
         "playing",
+        "pluto_owner",
         "probe_counter",
         "probes",
         "pushed",
@@ -960,6 +973,13 @@
           "title": "Index",
           "type": "integer"
         },
+        "kept_cards": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Kept Cards",
+          "type": "array"
+        },
         "landers": {
           "additionalProperties": {
             "type": "integer"
@@ -1073,6 +1093,7 @@
         "gold_markers",
         "hand",
         "index",
+        "kept_cards",
         "landers",
         "message_cards",
         "messages",

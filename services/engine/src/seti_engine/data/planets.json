@@ -259,6 +259,44 @@
    ],
    "order": 7
   },
+  "PLUTO": {
+   "first_land_data": [],
+   "first_orbit": [],
+   "img": "p_pluto",
+   "land": [
+    {
+     "n": 11,
+     "t": "vp"
+    },
+    {
+     "n": 4,
+     "t": "data"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {},
+   "orbit": [
+    {
+     "n": 11,
+     "t": "vp"
+    },
+    {
+     "n": 3,
+     "t": "publicity"
+    },
+    {
+     "kind": "any",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "order": 8,
+   "promo": "SE_EN_01"
+  },
   "SATURN": {
    "first_land_data": [
     2

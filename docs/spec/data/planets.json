@@ -371,6 +371,44 @@
      }
     ]
    }
+  },
+  "PLUTO": {
+   "order": 8,
+   "img": "p_pluto",
+   "promo": "SE_EN_01",
+   "orbit": [
+    {
+     "t": "vp",
+     "n": 11
+    },
+    {
+     "t": "publicity",
+     "n": 3
+    },
+    {
+     "t": "trace",
+     "kind": "any",
+     "n": 1
+    }
+   ],
+   "first_orbit": [],
+   "land": [
+    {
+     "t": "vp",
+     "n": 11
+    },
+    {
+     "t": "data",
+     "n": 4
+    },
+    {
+     "t": "trace",
+     "kind": "yellow",
+     "n": 1
+    }
+   ],
+   "first_land_data": [],
+   "moons": {}
   }
  },
  "discovery_spaces": {

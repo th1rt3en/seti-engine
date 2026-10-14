@@ -27,6 +27,7 @@ Status: **draft for owner review** (Phase 1, written 2026-10-12). Derived from `
 | `cards-and-missions.md` | card anatomy, missions, end-of-game scoring cards, terminology |
 | `milestones-and-scoring.md` | gold and neutral milestones, end of game, gold scoring tiles |
 | `aliens.md` | discovery and the five base species |
+| `promo.md` | the promo cards SE EN 01 (Pluto) and SE EN 02 (Gateway to Mars) |
 | `solo.md` | solo setup, objectives, the rival's progress, end of the game |
 | `solo-rival-cards.md` | rival action procedures and all 19 rival cards (owner-confirmed) |
 | `data/rival-action-cards.json` | rival cards as data |
