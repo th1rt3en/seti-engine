@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 COLORS = ["green", "red", "purple", "white"]
 SECTOR_COLORS = ["red", "yellow", "blue", "black"]
@@ -20,7 +20,15 @@ class Options(BaseModel):
     players: int = Field(ge=1, le=4)  # 1 is the solo game against the rival (SOLO-01)
     difficulty: int = Field(default=3, ge=1, le=5)  # solo only: the number of gold stars (SOLO-04)
     promo_cards: bool = False  # PLAN.md D23: SE EN 01 and SE EN 02 are shuffled into the deck when on
+    # PLAN.md D33: a practice game for one player, without the rival, in which cards, resources and the discs can be added or changed freely
+    sandbox: bool = False
     seed: int = 0
+
+    @model_validator(mode="after")
+    def _sandbox_is_solo(self) -> Options:
+        if self.sandbox and self.players != 1:
+            raise ValueError("the sandbox is a game for one player")
+        return self
 
 
 class Probe(BaseModel):

@@ -801,6 +801,11 @@
           "title": "Promo Cards",
           "type": "boolean"
         },
+        "sandbox": {
+          "default": false,
+          "title": "Sandbox",
+          "type": "boolean"
+        },
         "seed": {
           "default": 0,
           "title": "Seed",

@@ -45,6 +45,11 @@ export function NewGameFields({
           ))}
         </select>
       </label>
+      {solo ? (
+        <label className="row">
+          <input type="checkbox" name="sandbox" /> Sandbox (practice: no rival, add any card, resources and turn the discs)
+        </label>
+      ) : null}
       {solo ? null : (
         <label className="row">
           <input type="checkbox" name="rated" disabled={isGuest} /> Rated (2 to 4 players, accounts only)

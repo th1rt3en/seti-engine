@@ -15,7 +15,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from . import alien_steps, cards, effects, objectives, rewards, rival, scoring, solar, species, tables, techs
+from . import alien_steps, cards, effects, objectives, rewards, rival, sandbox, scoring, solar, species, tables, techs
 from .models import Decision, GameState, Options, PlayerState, Probe
 from .setup import new_game
 
@@ -125,6 +125,8 @@ def legal_moves(state: GameState) -> list[Action]:
         moves += _main_moves(state, p)
     else:
         moves.append({"type": "end_turn"})
+    if state.options.sandbox:
+        moves.append(sandbox.marker(state))  # D33
     return moves
 
 
@@ -304,12 +306,16 @@ FREE_TYPES = frozenset(
     {"move_energy", "move_probe", "buy_card", "exchange", "discard_free", "place_data", "place_lower", "complete_mission", "deliver_sample"}
 )  # the free actions (FREE-01 to FREE-07, TECH-21)
 # moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
-NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lower", "launch", "undo"})
+NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lower", "launch", "undo", "sandbox"})
 
 
 def apply(state: GameState, action: Action) -> StepResult:
     legal = legal_moves(state)
-    if action not in legal:
+    if sandbox.is_sandbox_action(action):  # D33: too many to list, so they are checked on their own
+        why = sandbox.check(state, action)
+        if why is not None:
+            raise IllegalAction(f"{action} is not allowed: {why}")
+    elif action not in legal:
         raise IllegalAction(f"{action} is not legal; legal moves: {legal}")
     if action == {"type": "undo"}:  # UNDO-01: back to the state before the last move; the moves before it are played again
         back = _undo(state)
@@ -344,6 +350,8 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
         _do_action(s, action, events)
     elif s.pending:
         _resolve_decision(s, action, events)
+    elif sandbox.is_sandbox_action(action):
+        sandbox.apply_action(s, action, events)
     else:
         _do_action(s, action, events)
         if action["type"] in FREE_TYPES:

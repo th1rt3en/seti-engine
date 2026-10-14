@@ -25,6 +25,7 @@ import { SampleReward } from "./Mascamites";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
+import { SandboxPanel } from "./Sandbox";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradeButtons } from "./Trade";
 
@@ -238,9 +239,11 @@ export function GameClient({
   // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
   const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
   const placed = new Set([...handled].map((i) => mine[i]));
+  const sandboxMarker = mine.find((m) => m.type === "sandbox");
   const otherMoves = mine.filter(
     (m) =>
       !placed.has(m) &&
+      m.type !== "sandbox" &&
       m.type !== "take_round_card" &&
       m.type !== "place_computer_tech" &&
       m.type !== "choose_gold" &&
@@ -336,6 +339,9 @@ export function GameClient({
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
+      {sandboxMarker && !ended ? (
+        <SandboxPanel marker={sandboxMarker as never} send={(a) => send({ t: "action", seq: seq.current, action: a })} handCards={hand} />
+      ) : null}
       {unsure ? (
         <div className="confirmbar">
           <div className="confirm warn">

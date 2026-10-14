@@ -1658,3 +1658,38 @@ button:disabled {
   border-left: 4px solid #e0a030;
   padding-left: 10px;
 }
+
+/* the sandbox of a practice game */
+.sandbox {
+  margin: 6px 0;
+  padding: 6px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+.sandbox summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.sandboxbody {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+.sandboxbody h4 {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+}
+.sandboxcards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 6px 0;
+  max-height: 160px;
+  overflow: auto;
+}
+.sandboxres {
+  display: inline-flex;
+  gap: 2px;
+}

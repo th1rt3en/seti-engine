@@ -31,7 +31,7 @@ GOLD_TILE_NAMES = ["Tech", "Mission", "Income", "Other"]
 
 def new_game(options: Options) -> GameState:
     state = GameState(options=options, rng_state=rng.seed_state(options.seed), players=[])
-    solo = options.players == 1  # SOLO-01: set up as for two players
+    solo = options.players == 1 and not options.sandbox  # SOLO-01: set up as for two players (the sandbox has no rival, D33)
     n = 2 if solo else options.players
 
     # sector boards (stars come in pairs, BOARD-20): a random order of the four boards around the board
@@ -61,7 +61,7 @@ def new_game(options: Options) -> GameState:
             state.tech_stacks.append(TechStack(category=cat, glyph=glyph, tiles=rng.shuffled(state, list(BONUS_ORDER))))
 
     # neutral milestones (SETUP-20): 2 markers at each of 20 and 30 for 2 players, 1 each for 3 players, none for 4
-    per = {2: 2, 3: 1, 4: 0}[n]
+    per = {1: 2, 2: 2, 3: 1, 4: 0}[n]
     state.neutral_markers = {"20": per, "30": per}
 
     # planets
