@@ -7,10 +7,12 @@ export function NewGameFields({
   clocks,
   isGuest,
 }: {
-  clocks: { key: string; label: string }[];
+  clocks: { key: string; label: string; mode: "realtime" | "turnbased" | "both" }[];
   isGuest: boolean;
 }) {
   const [players, setPlayers] = useState(2);
+  // real-time or turn-based play (D34): each has three speeds and the choice of no time control
+  const [mode, setMode] = useState<"realtime" | "turnbased">("realtime");
   const solo = players === 1;
   return (
     <>
@@ -35,14 +37,26 @@ export function NewGameFields({
           </select>
         </label>
       ) : null}
+      <fieldset className="modeswitch">
+        <legend>Table</legend>
+        <label className="row">
+          <input type="radio" name="mode" value="realtime" checked={mode === "realtime"} onChange={() => setMode("realtime")} /> Real time
+        </label>
+        <label className="row">
+          <input type="radio" name="mode" value="turnbased" checked={mode === "turnbased"} onChange={() => setMode("turnbased")} /> Turn
+          based (days per game)
+        </label>
+      </fieldset>
       <label>
-        Clock
-        <select name="clock" defaultValue="none">
-          {clocks.map((c) => (
-            <option key={c.key} value={c.key}>
-              {c.label}
-            </option>
-          ))}
+        Time control
+        <select name="clock" key={mode} defaultValue="none">
+          {clocks
+            .filter((c) => c.mode === "both" || c.mode === mode)
+            .map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.label}
+              </option>
+            ))}
         </select>
       </label>
       {solo ? (

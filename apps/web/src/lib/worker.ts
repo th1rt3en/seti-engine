@@ -49,13 +49,38 @@ export async function gameLog(
   return res.ok ? ((await res.json()) as { action: Record<string, unknown> }[]) : [];
 }
 
-/** The clock presets of the lobby (decision D13). */
-export const CLOCK_PRESETS: Record<string, { label: string; clock: Clock }> = {
-  none: { label: "No clock", clock: { kind: "none" } },
-  // Decision D26: three speeds. The starting time is also the maximum; every turn adds the increment. Values set by the owner.
-  fast: { label: "Fast: 5 min, +1 min 30 s per turn", clock: { kind: "bank", initialMs: 5 * 60_000, incrementMs: 90_000 } },
-  normal: { label: "Normal: 7 min 30 s, +2 min 30 s per turn", clock: { kind: "bank", initialMs: 450_000, incrementMs: 150_000 } },
-  slow: { label: "Slow: 10 min, +3 min 30 s per turn", clock: { kind: "bank", initialMs: 10 * 60_000, incrementMs: 210_000 } },
+const MIN = 60_000;
+const HOUR = 60 * MIN;
+const DAY = 24 * HOUR;
+
+/** The clock presets of the lobby (decisions D13, D26, D34). `none` is offered in both modes. */
+export type ClockMode = "realtime" | "turnbased";
+export const CLOCK_PRESETS: Record<string, { label: string; mode: ClockMode | "both"; clock: Clock }> = {
+  none: { label: "No time control", mode: "both", clock: { kind: "none" } },
+  // Decision D26: three real-time speeds. The starting time is also the maximum; every turn adds the increment. Values set by the owner.
+  fast: { label: "Fast: 5 min, +1 min 30 s per turn", mode: "realtime", clock: { kind: "bank", initialMs: 5 * MIN, incrementMs: 90_000 } },
+  normal: {
+    label: "Normal: 7 min 30 s, +2 min 30 s per turn",
+    mode: "realtime",
+    clock: { kind: "bank", initialMs: 450_000, incrementMs: 150_000 },
+  },
+  slow: {
+    label: "Slow: 10 min, +3 min 30 s per turn",
+    mode: "realtime",
+    clock: { kind: "bank", initialMs: 10 * MIN, incrementMs: 210_000 },
+  },
+  // Decision D34: three turn-based speeds, in days. The same bank clock: the starting time is the most a bank holds and each turn adds the increment.
+  tb_fast: { label: "Fast: 2 days, +6 h per turn", mode: "turnbased", clock: { kind: "bank", initialMs: 2 * DAY, incrementMs: 6 * HOUR } },
+  tb_normal: {
+    label: "Normal: 3 days, +9 h per turn",
+    mode: "turnbased",
+    clock: { kind: "bank", initialMs: 3 * DAY, incrementMs: 9 * HOUR },
+  },
+  tb_slow: {
+    label: "Slow: 4 days, +12 h per turn",
+    mode: "turnbased",
+    clock: { kind: "bank", initialMs: 4 * DAY, incrementMs: 12 * HOUR },
+  },
 };
 
 export interface ReplayData {

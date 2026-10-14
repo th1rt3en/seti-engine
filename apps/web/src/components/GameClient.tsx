@@ -14,6 +14,7 @@ import {
 } from "@/lib/moves";
 import { type Note, buildSpots } from "@/lib/targets";
 import { TECH_INFO, techName } from "@/lib/techs";
+import { useTurnSound } from "@/lib/turnSound";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
@@ -42,6 +43,12 @@ const GOLD_INFO = assets.gold as Record<string, { per: string; values: number[] 
 const minutes = (ms: number | null | undefined): string => {
   if (ms == null) return "";
   const total = Math.floor(Math.abs(ms) / 1000);
+  if (total >= 86400) {
+    // turn-based clocks run for days: "3d 9h" (D34)
+    const d = Math.floor(total / 86400);
+    const hh = Math.floor((total % 86400) / 3600);
+    return `${ms < 0 ? "-" : ""}${d}d ${hh}h`;
+  }
   const h = Math.floor(total / 3600);
   const mm = String(Math.floor((total % 3600) / 60)).padStart(h > 0 ? 2 : 1, "0");
   const ss = String(total % 60).padStart(2, "0");
@@ -206,6 +213,10 @@ export function GameClient({
     setUnsure(null);
     send({ t: "action", seq: seq.current, action: move });
   };
+
+  // D34: a ting when it becomes the player's turn to act
+  const myTurn = view !== null && view.view.viewer !== null && view.view.to_act === view.view.viewer && !ended;
+  const [soundOn, toggleSound] = useTurnSound(myTurn);
 
   if (view === null) {
     return (
@@ -661,6 +672,17 @@ export function GameClient({
         : null}
     </>
   );
+  const soundButton = (
+    <button
+      type="button"
+      className="secondary small soundtoggle"
+      aria-pressed={soundOn}
+      title={soundOn ? "A ting plays when it is your turn: click to switch it off" : "Click to hear a ting when it is your turn"}
+      onClick={toggleSound}
+    >
+      {soundOn ? "🔔 Sound on" : "🔕 Sound off"}
+    </button>
+  );
   const clocks = view.remaining ? (
     <span className="clocks">
       {left.map((r, i) => (
@@ -740,6 +762,7 @@ export function GameClient({
       topExtra={
         <>
           {clocks}
+          {v.viewer !== null ? soundButton : null}
           {v.state.players.length > 0 ? (
             <button type="button" className="secondary small" onClick={() => setBoardOpen(!boardOpen)}>
               Player boards

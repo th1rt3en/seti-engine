@@ -287,3 +287,34 @@ describe("signed requests to the engine service", () => {
     expect(await engineAuth("", "POST", "/x", "")).toEqual({});
   });
 });
+
+describe("clock presets (D26, D34)", () => {
+  it("turn-based play has three speeds in days, each also available without a clock", async () => {
+    const { CLOCK_PRESETS } = await import("@/lib/worker");
+    const DAY = 86_400_000;
+    const HOUR = 3_600_000;
+    expect(CLOCK_PRESETS.tb_slow?.clock).toEqual({ kind: "bank", initialMs: 4 * DAY, incrementMs: 12 * HOUR });
+    expect(CLOCK_PRESETS.tb_normal?.clock).toEqual({ kind: "bank", initialMs: 3 * DAY, incrementMs: 9 * HOUR });
+    expect(CLOCK_PRESETS.tb_fast?.clock).toEqual({ kind: "bank", initialMs: 2 * DAY, incrementMs: 6 * HOUR });
+    expect(CLOCK_PRESETS.none).toMatchObject({ mode: "both", clock: { kind: "none" } });
+    const modes = (m: string) =>
+      Object.entries(CLOCK_PRESETS)
+        .filter(([, p]) => p.mode === m || p.mode === "both")
+        .map(([k]) => k);
+    expect(modes("realtime")).toEqual(["none", "fast", "normal", "slow"]);
+    expect(modes("turnbased")).toEqual(["none", "tb_fast", "tb_normal", "tb_slow"]);
+  });
+
+  it("describes a clock in words, in minutes or in days", async () => {
+    const { describeClock, spanText } = await import("@/lib/queries");
+    expect(spanText(90_000)).toBe("1 min 30 s");
+    expect(spanText(3 * 86_400_000)).toBe("3 days");
+    expect(describeClock(JSON.stringify({ kind: "bank", initialMs: 450_000, incrementMs: 150_000 }))).toBe(
+      "7 min 30 s + 2 min 30 s per turn",
+    );
+    expect(describeClock(JSON.stringify({ kind: "bank", initialMs: 4 * 86_400_000, incrementMs: 12 * 3_600_000 }))).toBe(
+      "4 days + 12 h per turn",
+    );
+    expect(describeClock(JSON.stringify({ kind: "none" }))).toBe("no clock");
+  });
+});
