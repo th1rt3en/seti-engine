@@ -232,3 +232,71 @@ Entry format:
 - Proposed ruling: reading 1. I read the flavor text of all 138 base cards and the 40 alien cards from the card images and found the word "Mars" in #13 Perseverance Rover, #14 Mars Science Laboratory, #22 Mars Flyby, #34 Mars Exploration Program, #76 (NASA research center "may take us to Mars"), #84 Perseverance samples ("on the surface of Mars"), #85 reusable rocket ("settlement of Mars"), #119 PIXL spectrometer ("life on Mars") and ET.4 Martian Quarantine Lab ("quarantine on Mars"). The Exertian cards are played face down and are not included.
 - Questions for the owner: is this list right (a missed card means a missed trigger)?
 
+## A-028: Effects of the 42 expansion main-deck cards
+- Status: open (missing data)
+- Rule IDs affected: EXP-03
+- Rulebook page and text: R16 "Using this expansion": shuffle the 42 new cards into the main deck. The rulebook does not list the cards.
+- Readings: the effects are printed on the cards (pictures). The repository's extraction has the effects of 16 of the 42 (`effectsRaw`) and fragments of the text for 33; most main actions (launch, land, rotate, tech icons) and many rewards exist only in the pictures. The card pictures are not in the repository (`docs/asset-gaps.md` item 2).
+- Consequence: a card whose effect is guessed would break the rule "never implement from memory". A card that is in the deck but cannot be played would break games.
+- Proposed ruling: the 42 cards are implemented when the owner supplies their pictures (or a checked transcription); until then `expansion` does not put them in the deck (the deck stays 138 cards plus the promo cards), and the organizations, quick start cards and signal tokens work without them.
+- Questions for the owner: please supply the 42 card pictures (the repo's `assets/` source folder had the English sheets for the base game; the expansion sheets are missing), or confirm another source.
+
+## A-029: Alien cards that give signal tokens and the other new icons
+- Status: open (missing data)
+- Rule IDs affected: EXP-SIG-01, EXP-03
+- Rulebook page and text: R16 p.8: "It can be found on some of the new cards and alien species."
+- Readings: n/a (data).
+- Consequence: none until the cards are implemented (A-028, A-032).
+- Proposed ruling: implement the signal token as a resource (done) and let each card use it when its effect is implemented.
+
+## A-030: Which organizations are numbered 1 to 4
+- Status: open (missing data, low priority)
+- Rule IDs affected: EXP-ORG-05
+- Rulebook page and text: R16 p.4 "When playing with organizations for the first time, consider starting with those numbered 1-4 (see the bottom left corner). Those four are generally less complex."
+- Readings: the extraction has a complexity label (passive, once-per-round, complex) but not the numbers.
+- Consequence: only the first-game recommendation.
+- Proposed ruling: not implemented; players choose freely.
+- Questions for the owner: which four organizations carry the numbers 1 to 4? (Then a "first game" option can be added.)
+
+## A-031: Organization income at the start of rounds 3, 4 and 5 versus the base income rules
+- Status: proposed
+- Rule IDs affected: EXP-ORG-08, ROUND-02, INCOME-01 to INCOME-04
+- Rulebook page and text: R16 p.5: "Do not resolve income at game start. You will resolve your income at the start of rounds 3, 4 and 5." Base rulebook p.19: income is resolved at the end of each round (also by tucked cards, INCOME-01).
+- Readings: (1) the organization income replaces the printed income card (3 credits, 2 energy, 1 card in the base game), and the tucked cards add their resource as in INCOME-03; it is resolved once per round at the points of the base game's income, which are the starts of rounds 3, 4 and 5 (no income after round 5 and none before round 2). (2) the income of the organization is given in addition to the base income card.
+- Consequence: the amounts of income of every game with organizations.
+- Proposed ruling: reading 1 ("the organizations replace the starting income cards", R16 p.4). Income = the organization's income plus 1 resource of the kind of each tucked card (INCOME-01), given when the round before ends.
+- Questions for the owner: confirm.
+
+## A-032: Boards, tokens and cards of Arkhos, Glyphids and Amoeba
+- Status: open (missing data)
+- Rule IDs affected: EXP-ARK-*, EXP-GLY-*, EXP-AMO-*
+- Rulebook page and text: A14 describes the rules of the three species; the boards (the rewards of every space, the overflow spaces, the translation board and its strips, the organelle spaces and their directions), the 10 + 10 species cards, the 9 exploration cards, the 12 security cards and the 35 glyph tokens are pictures that the repository does not hold (the alien-aid pictures show the boards at a size that is too small to read every reward with certainty).
+- Readings: n/a.
+- Consequence: the species cannot be played without their data; a species with guessed rewards would be wrong.
+- Proposed ruling: implement the species when the board pictures and the card pictures are supplied; the rules are in `expansion.md` and the engine keeps the species list open (`SPECIES_BASE` plus the three).
+- Questions for the owner: please supply the pictures of the three boards (and the translation strips), the species cards, the exploration and security cards and the glyph tokens.
+
+## A-033: The extra rival starting card and the four rival action cards of the expansion
+- Status: open (missing data)
+- Rule IDs affected: EXP-SOLO-02
+- Rulebook page and text: R16 p.6 shows the new starting card (the picture reads "Then [1 advance] for each [gold star] of your difficulty level" next to a species-board icon). The rest of the card (its main action) is not legible, and the other three rival action cards are not shown.
+- Consequence: solo with the expansion.
+- Proposed ruling: implement when the card pictures are supplied.
+
+## A-034: The three long-term objective tiles and the advance symbol
+- Status: open (missing data)
+- Rule IDs affected: EXP-SOLO-04, EXP-SOLO-06, EXP-SOLO-07
+- Rulebook page and text: R16 p.6-7 show the three tiles (each with three tasks) and the text "the rival gets [advance symbol] for each uncompleted task": the number printed with the symbol is not readable in the extracted text.
+- Consequence: the penalty at the end of rounds 2, 3 and 4 and the fallback of EXP-SOLO-07 (how many advances).
+- Proposed ruling: read the tiles and the symbol from the original pictures when supplied.
+- Questions for the owner: how many spaces does the rival advance for each uncompleted long-term task, and what are the tasks of the three tiles?
+
+## A-035: The promo card "Space Agencies" that remembers a previous game
+- Status: open
+- Rule IDs affected: EXP-PROMO-01
+- Rulebook page and text: P3: the effect transfers to the next game with organizations: one extra quick start card is dealt, the player still chooses 2.
+- Readings: (1) not implemented (the engine and the website keep nothing between games); (2) a lobby option "dealt one extra quick start card" chosen per player at the start; (3) a flag on the account.
+- Consequence: a small advantage that cannot be checked by the engine.
+- Proposed ruling: reading 1 for now: the promo card is not in the deck and its after-game bonus is not offered. The card itself (launch a probe, gain a signal token) is easy once the owner wants it.
+- Questions for the owner: which reading?
+

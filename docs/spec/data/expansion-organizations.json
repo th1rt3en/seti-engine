@@ -1,0 +1,302 @@
+{
+ "source": "tools/card-tracker/cards-extracted.json (a community extraction of the cards); NOT yet checked against the physical cards by the owner",
+ "organizations": [
+  {
+   "id": "cosmos_strategy_group",
+   "name": "Cosmos Strategy Group",
+   "number": null,
+   "starting_resources": {
+    "credit": 4,
+    "energy": 2,
+    "card": 1,
+    "publicity": 1,
+    "data": 0
+   },
+   "tuck_income_cards": 2,
+   "probes": 0,
+   "income": {
+    "credit": 2,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "passive": "When you play a card as a main action, you may mark one matching reward space if the card's sector color matches an unmarked space on this organization. Yellow or black cards can mark the credit space, red or black cards can mark the publicity space, and blue or black cards can mark the data space.",
+    "freeAction": "Once per round, gain 1 card from either the card row or the top of the deck, then clear all reward spaces marked on this organization."
+   },
+   "reference_note": "Setup grants resources and income. Main-action card colors mark and immediately grant matching reward spaces. The once-per-round free action gains a card and clears marked reward spaces; round reset only restores the use token."
+  },
+  {
+   "id": "deep_sky_survey",
+   "name": "Deep Sky Survey",
+   "number": null,
+   "starting_resources": {
+    "credit": 3,
+    "energy": 2,
+    "card": 0,
+    "publicity": 3,
+    "data": 1
+   },
+   "tuck_income_cards": 2,
+   "probes": 0,
+   "income": {
+    "credit": 2,
+    "energy": 2,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 1
+   },
+   "abilities": {
+    "passive": "You don't need energy to perform Analyze Data.",
+    "freeAction": "Once per round, switch a card from your hand with a card on the card row."
+   },
+   "reference_note": "Setup grants no starting card. Analyze Data costs no energy. The once-per-round free action swaps exactly one hand card with one card-row card, and round reset restores the use token."
+  },
+  {
+   "id": "fenwick_research_center",
+   "name": "Fenwick Research Center",
+   "number": null,
+   "starting_resources": {
+    "credit": 3,
+    "energy": 1,
+    "card": 0,
+    "publicity": 4,
+    "data": 0
+   },
+   "tuck_income_cards": 3,
+   "probes": 0,
+   "income": {
+    "credit": 3,
+    "energy": 1,
+    "card": 0,
+    "publicity": 1,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "passive": "You only need 5 publicity to research tech.",
+    "freeAction": "Once per round, spend 1 publicity to gain any card from the card row or a random card from the main deck, then gain that card's free-action corner bonus."
+   },
+   "reference_note": "Tech research uses a 5-publicity threshold. The once-per-round free action spends 1 publicity, gains a row or deck card, resolves its free-action corner, and resets next round."
+  },
+  {
+   "id": "futurespan_institute",
+   "name": "Futurespan Institute",
+   "number": null,
+   "starting_resources": {
+    "credit": 3,
+    "energy": 3,
+    "card": 1,
+    "publicity": 3,
+    "data": 0
+   },
+   "tuck_income_cards": 2,
+   "probes": 0,
+   "income": {
+    "credit": 2,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "freeAction": "Prepare one card from your hand by placing it on this organization and setting the countdown to that card's credit cost x 10 + 5. Once per round while the token is on the scoring track, move it 3 spaces farther ahead and gain 1 card.",
+    "mainAction": "Once your score marker reaches or passes the Futurespan token, play the prepared card as a main action without paying its credit cost, then return the token."
+   },
+   "reference_note": "Sponsor selection stores a hand card and creates a cost-based countdown. Score gains reduce the countdown, the unlocked card can be played for free, and the delay power increases the countdown by 3 while gaining a card."
+  },
+  {
+   "id": "helion_assembly",
+   "name": "Helion Assembly",
+   "number": null,
+   "starting_resources": {
+    "credit": 3,
+    "energy": 2,
+    "card": 0,
+    "publicity": 7,
+    "data": 0
+   },
+   "tuck_income_cards": 0,
+   "probes": 0,
+   "income": {
+    "credit": 3,
+    "energy": 1,
+    "card": 1,
+    "publicity": 1,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "passive": "When you develop a tech, you may mark the matching reward space on this organization and gain its reward. Probe/orange tech grants 1 energy, scan/purple tech grants 1 signal token, and computer/blue tech grants 1 data.",
+    "freeAction": "Once per round, destroy one of your probe/orange or scan/purple techs, then tuck one card from your hand for income and clear all reward spaces marked on this organization."
+   },
+   "reference_note": "Developed tech categories can mark and immediately grant one matching reward. The free action clears marks, disables one non-computer tech, tucks one hand card for income, and resets next round."
+  },
+  {
+   "id": "mission_relay",
+   "name": "Mission Relay",
+   "number": null,
+   "starting_resources": {
+    "credit": 3,
+    "energy": 2,
+    "card": 2,
+    "publicity": 2,
+    "data": 0
+   },
+   "tuck_income_cards": 3,
+   "probes": 0,
+   "income": {
+    "credit": 1,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "setup": "At the start of the game, mark the lowest-scoring space on the mission gold scoring tile.",
+    "passive": "When you play a card with a mission, gain 1 publicity.",
+    "freeAction": "Once per round, spend 2 publicity to gain any card from the card row or a random card from the main deck, then immediately gain the resource matching that card's income corner."
+   },
+   "reference_note": "Setup marks the mission gold scoring tile. Mission cards grant publicity when played. The once-per-round power spends 2 publicity, gains a row or deck card, resolves its income corner, and resets next round."
+  },
+  {
+   "id": "orbital_dynamics",
+   "name": "Orbital Dynamics",
+   "number": null,
+   "starting_resources": {
+    "credit": 2,
+    "energy": 2,
+    "card": 0,
+    "publicity": 3,
+    "data": 0
+   },
+   "tuck_income_cards": 2,
+   "probes": 2,
+   "income": {
+    "credit": 3,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "passive": "Your probe capacity is 1 higher.",
+    "freeAction": "Once per round, move at most 2 different probes of yours with 1 step each."
+   },
+   "reference_note": "Setup launches 2 probes and increases probe capacity by 1. The once-per-round free action moves up to 2 different probes one step each, then resets next round."
+  },
+  {
+   "id": "sentinel_probe_network",
+   "name": "Sentinel Probe Network",
+   "number": null,
+   "starting_resources": {
+    "credit": 4,
+    "energy": 2,
+    "card": 0,
+    "publicity": 3,
+    "data": 0
+   },
+   "tuck_income_cards": 1,
+   "probes": 0,
+   "income": {
+    "credit": 3,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 1
+   },
+   "abilities": {
+    "passive": "When you launch a probe, mark a signal in that probe's sector.",
+    "freeAction": "Once per round, after you play and fully resolve a non-alien card as a main action this turn, gain that card's free-action corner effect."
+   },
+   "reference_note": "Probe launches mark a signal in the launched sector. The last fully resolved own non-alien main-action card corner is stored, replayed by the once-per-round power, and cleared by turn or round management."
+  },
+  {
+   "id": "stratus_core",
+   "name": "Stratus Core",
+   "number": null,
+   "starting_resources": {
+    "credit": 3,
+    "energy": 2,
+    "card": 1,
+    "publicity": 3,
+    "data": 0
+   },
+   "tuck_income_cards": 3,
+   "probes": 0,
+   "income": {
+    "credit": 2,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "freeAction": "Once per round, gain the free-action corner effects of all 3 cards in the card row without discarding those cards."
+   },
+   "reference_note": "The once-per-round free action resolves all current card-row free-action corners in row order while keeping the offered cards in place, then resets next round."
+  },
+  {
+   "id": "turing_systems",
+   "name": "Turing Systems",
+   "number": null,
+   "starting_resources": {
+    "credit": 4,
+    "energy": 2,
+    "card": 1,
+    "publicity": 2,
+    "data": 0
+   },
+   "tuck_income_cards": 2,
+   "probes": 0,
+   "income": {
+    "credit": 2,
+    "energy": 2,
+    "card": 1,
+    "publicity": 0,
+    "data": 1,
+    "signalToken": 0
+   },
+   "abilities": {
+    "passive": "When you research a computer/blue tech, gain 1 publicity.",
+    "freeAction": "Once per round, choose any probe or scan tech. Until the end of this turn, you may use that tech's ability as if you had researched it. This does not count as researching the tech and does not grant its immediate bonuses."
+   },
+   "reference_note": "Computer tech research grants publicity. The once-per-round free action temporarily adds a selected probe or scan tech to effective techs, grants no immediate bonuses, and expires at turn end."
+  },
+  {
+   "id": "xenolab",
+   "name": "Xenolab",
+   "number": null,
+   "starting_resources": {
+    "credit": 2,
+    "energy": 2,
+    "card": 1,
+    "publicity": 1,
+    "data": 0
+   },
+   "tuck_income_cards": 3,
+   "probes": 0,
+   "income": {
+    "credit": 2,
+    "energy": 1,
+    "card": 1,
+    "publicity": 0,
+    "data": 0,
+    "signalToken": 0
+   },
+   "abilities": {
+    "mainAction": "Xenolab starts with three active action tiles. You may use an active tile as a discounted main action, then flip that tile inactive: spend 1 credit to launch a probe, spend 2 energy to scan, or spend 4 publicity to research any tech.",
+    "passive": "When you gain the trace shown on an inactive tile, flip that tile back active. The trace is still gained normally and is not spent."
+   },
+   "reference_note": "Setup creates three active action tiles. Direct organization use is prevented; active tiles provide discounted launch, scan, or research main actions, flip inactive on use, and reactivate when the matching trace is gained."
+  }
+ ]
+}

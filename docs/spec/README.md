@@ -28,6 +28,7 @@ Status: **draft for owner review** (Phase 1, written 2026-10-12). Derived from `
 | `milestones-and-scoring.md` | gold and neutral milestones, end of game, gold scoring tiles |
 | `aliens.md` | discovery and the five base species |
 | `sandbox.md` | the solo sandbox (D33) |
+| `expansion.md`, `expansion-data.md`, `data/expansion-*.json` | the Space Agencies expansion (D35): rules from the rulebook EN 16, the alien aid EN 14 and the promo sheet 3, and the data of the organizations and quick start cards (owner check pending) |
 | `promo.md` | the promo cards SE EN 01 (Pluto) and SE EN 02 (Gateway to Mars) |
 | `solo.md` | solo setup, objectives, the rival's progress, end of the game |
 | `solo-rival-cards.md` | rival action procedures and all 19 rival cards (owner-confirmed) |
