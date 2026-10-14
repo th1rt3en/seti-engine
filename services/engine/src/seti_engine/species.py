@@ -143,13 +143,13 @@ def _discover(s: GameState, index: int, events: Events) -> None:
             _deal(s, s.players[pl], slot)
     slot.face_up = slot.deck.pop() if slot.deck else None
     if slot.species == "mascamites":
-        _setup_mascamites(s, slot)
+        _setup_mascamites(s, slot, events)
     elif slot.species == "oumuamua":
         _setup_oumuamua(s, slot, events)
     elif slot.species == "anomalies":
-        _setup_anomalies(s, slot)
+        _setup_anomalies(s, slot, events)
     elif slot.species == "centaurians":
-        _setup_centaurians(s, slot)
+        _setup_centaurians(s, slot, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -157,13 +157,26 @@ def _discover(s: GameState, index: int, events: Events) -> None:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
-def _setup_anomalies(s: GameState, slot: SpeciesSlot) -> None:
+def _token_reward(color: str, side: int) -> list[dict[str, Any]]:
+    faces: list[list[dict[str, Any]]] = next(t for t in board_data("anomalies")["tokens"] if t["column"] == color)["sides"]
+    return faces[side]
+
+
+def _setup_anomalies(s: GameState, slot: SpeciesSlot, events: Events) -> None:
+    """ALIEN-ANO-01: one token in Earth's sector, the other two 3 sectors clockwise and counter-clockwise of Earth."""
     from . import solar  # noqa: PLC0415
 
     earth_sector = solar.earth(s)[1]
-    sectors = [earth_sector, (earth_sector + 3) % 8, (earth_sector - 3) % 8]  # ALIEN-ANO-01
+    sectors = [earth_sector, (earth_sector + 3) % 8, (earth_sector - 3) % 8]
     cols = rng.shuffled(s, list(COLORS))  # which anomaly goes where is not ruled: seeded random order (A-004)
     slot.extra["tokens"] = [{"sector": sec, "color": col, "side": rng.below(s, 2)} for sec, col in zip(sectors, cols, strict=True)]
+    events.append(
+        {
+            "type": "anomalies_placed",
+            "earth_sector": earth_sector,
+            "tokens": [{**t, "reward": _token_reward(t["color"], t["side"])} for t in slot.extra["tokens"]],
+        }
+    )
 
 
 def anomaly_reward(s: GameState, slot: SpeciesSlot, color: str) -> int | None:
@@ -187,10 +200,12 @@ def after_rotation(s: GameState, events: Events) -> None:
             if tok["sector"] != earth_sector:
                 continue
             winner = anomaly_reward(s, slot, tok["color"])
-            events.append({"type": "anomaly", "color": tok["color"], "player": winner})
+            reward = _token_reward(tok["color"], tok["side"])
+            events.append(
+                {"type": "anomaly", "sector": tok["sector"], "color": tok["color"], "side": tok["side"], "reward": reward, "player": winner}
+            )
             if winner is not None:
-                faces = next(t for t in board_data("anomalies")["tokens"] if t["column"] == tok["color"])["sides"]
-                rewards.grant(s, s.players[winner], faces[tok["side"]], events)
+                rewards.grant(s, s.players[winner], reward, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -209,11 +224,24 @@ def sample_faces() -> list[list[dict[str, Any]]]:
     return faces
 
 
-def _setup_mascamites(s: GameState, slot: SpeciesSlot) -> None:
+def new_sample_space(token: int) -> dict[str, Any]:
+    """A blue space holding a face-up sample token (ALIEN-MASC-05). The token and its reward are public; `marker` is who marked it."""
+    return {"token": token, "marker": None, "reward": sample_faces()[token]}
+
+
+def _setup_mascamites(s: GameState, slot: SpeciesSlot, events: Events) -> None:
     """ALIEN-MASC-01: 7 face-down samples, 3 to Jupiter, 3 to Saturn, the last one face up on its designated blue space."""
     order = rng.shuffled(s, list(range(len(sample_faces()))))
     slot.extra["samples"] = {"jupiter": order[0:3], "saturn": order[3:6]}
-    slot.extra["sample_spaces"] = [{"token": order[6], "marker": None}]
+    slot.extra["sample_spaces"] = [new_sample_space(order[6])]
+    # the face-up token is public; of the others only how many lie on each planet is (they are face down)
+    events.append(
+        {
+            "type": "samples_placed",
+            "planets": {planet: len(tokens) for planet, tokens in slot.extra["samples"].items()},
+            "face_up": {"token": order[6], "reward": sample_faces()[order[6]]},
+        }
+    )
 
 
 def samples_on(s: GameState, planet: str) -> list[int]:
@@ -265,16 +293,26 @@ def deliver_sample(s: GameState, p: PlayerState, capsule_id: str, events: Events
     cap = next(pr for pr in s.probes if pr.id == capsule_id and pr.capsule)
     assert cap.sample is not None
     s.probes.remove(cap)
-    s.species[i].extra["sample_spaces"].append({"token": cap.sample, "marker": None})
+    s.species[i].extra["sample_spaces"].append(new_sample_space(cap.sample))
     for _ in range(times):  # #ET.7 resolves the delivered sample twice
         rewards.grant(s, p, sample_faces()[cap.sample], events, slot=i)
-    events.append({"type": "sample_delivered", "player": p.index})
+    events.append(
+        {
+            "type": "sample_delivered",
+            "player": p.index,
+            "token": cap.sample,  # revealed on delivery (ALIEN-MASC-04)
+            "reward": sample_faces()[cap.sample],
+            "space": len(s.species[i].extra["sample_spaces"]) - 1,
+            "times": times,
+        }
+    )
 
 
 def mark_sample_space(s: GameState, p: PlayerState, slot_index: int, j: int, events: Events) -> None:
     """ALIEN-MASC-05: any player may mark a blue space holding a sample token and gains that token's reward."""
     sp = s.species[slot_index].extra["sample_spaces"][j]
     sp["marker"] = p.index
+    events.append({"type": "sample_space_marked", "player": p.index, "space": j, "reward": sample_faces()[sp["token"]]})
     rewards.grant(s, p, sample_faces()[sp["token"]], events, slot=slot_index)
 
 
@@ -325,6 +363,13 @@ def _setup_exertians(s: GameState, slot: SpeciesSlot, owners: list[int], events:
     slot.face_up = None
     lead = max(p.score for p in s.players)
     slot.extra["milestones"] = [{"at": lead + d, "cost": 0 if i == 0 else 1, "done": []} for i, d in enumerate(EXERT_LEADS)]
+    events.append(
+        {
+            "type": "exertian_milestones",
+            "leader_score": lead,
+            "milestones": [{"at": m["at"], "cost": m["cost"]} for m in slot.extra["milestones"]],
+        }
+    )
     for pl in owners:  # an immediate chance to play one card per marker
         if not rival.is_rival(s, pl):
             s.pending.append(Decision(kind="exertian_play", player=pl, data={"cost": 0}))
@@ -343,15 +388,25 @@ def play_exertian(s: GameState, p: PlayerState, cid: str, cost: int) -> None:
     p.exertian_played.append(cid)  # face down: other players do not see which card it is
 
 
-def danger(s: GameState, p: PlayerState) -> int:
-    """ALIEN-EXE-06: the danger of the played cards plus 3, 2 or 1 per marker on the bottom, middle and top of the board."""
-    total = sum(EXERTIAN_CARDS[c][0] for c in p.exertian_played)
+def board_danger(s: GameState, p: PlayerState) -> int:
+    """ALIEN-EXE-06: 3, 2 or 1 danger per marker on the bottom, middle and top of the Exertian board. Public: the board is open."""
+    total = 0
     i = exertian_slot(s)
     if i is not None:
         for column in s.species[i].board.values():
             for k, markers in enumerate(column):
                 total += TIER_DANGER[k] * markers.count(p.index)
     return total
+
+
+def cards_danger(p: PlayerState) -> int:
+    """ALIEN-EXE-06: the danger of the played cards, which only their owner may know until the end of the game."""
+    return sum(EXERTIAN_CARDS[c][0] for c in p.exertian_played)
+
+
+def danger(s: GameState, p: PlayerState) -> int:
+    """ALIEN-EXE-06: the danger of the played cards plus the danger of the markers on the board."""
+    return cards_danger(p) + board_danger(s, p)
 
 
 def exertian_losses(s: GameState, totals: list[int]) -> list[int]:
@@ -448,10 +503,11 @@ def resolve_tile(s: GameState, events: Events) -> None:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
-def _setup_centaurians(s: GameState, slot: SpeciesSlot) -> None:
+def _setup_centaurians(s: GameState, slot: SpeciesSlot, events: Events) -> None:
     slot.extra["covered"] = [None, None, None, None]  # which player's message tile covers each reward hex
     for p in s.players:  # ALIEN-CEN-01: a message milestone 15 points ahead of the player's marker
         add_message(s, p)
+    events.append({"type": "messages_placed", "targets": [{"player": p.index, "target": p.messages[-1]} for p in s.players]})
     if s.rival is not None:
         s.rival.messages_in_reserve = rival.RIVAL_MESSAGE_RESERVE  # SOLO-ALIEN-02: the rival keeps the leftover tiles
 
@@ -468,7 +524,8 @@ def message_moves(s: GameState) -> list[dict[str, Any]]:
     i = message_slot(s)
     assert i is not None
     covered = s.species[i].extra["covered"]
-    return [{"type": "choose_message", "hex": k} for k, c in enumerate(covered) if c is None]
+    rewards_of = board_data("centaurians")["message_rewards"]
+    return [{"type": "choose_message", "hex": k, "reward": rewards_of[k]} for k, c in enumerate(covered) if c is None]
 
 
 def reach_message(s: GameState, p: PlayerState, hex_index: int, events: Events) -> None:
@@ -476,7 +533,9 @@ def reach_message(s: GameState, p: PlayerState, hex_index: int, events: Events) 
     i = message_slot(s)
     assert i is not None
     s.species[i].extra["covered"][hex_index] = p.index
-    rewards.grant(s, p, board_data("centaurians")["message_rewards"][hex_index], events, slot=i)
+    reward = board_data("centaurians")["message_rewards"][hex_index]
+    events.append({"type": "message_reward", "player": p.index, "hex": hex_index, "reward": reward})
+    rewards.grant(s, p, reward, events, slot=i)
 
 
 def check_messages(s: GameState, p: PlayerState, before: int) -> None:

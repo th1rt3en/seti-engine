@@ -525,6 +525,18 @@ main:has(.game) {
   align-items: flex-end;
   gap: 8px;
 }
+.handtabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.handtabs button[aria-selected="true"] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+.exertiantab p {
+  margin: 6px 0 0;
+}
 .handsep {
   align-self: stretch;
   width: 0;
@@ -1575,4 +1587,25 @@ button:disabled {
 }
 .spot.chosen .spotshape.goldspot {
   fill: rgba(110, 240, 165, 0.55);
+}
+
+.tracker .messagequeue {
+  margin: 0;
+  padding-left: 1.2em;
+  text-align: left;
+  font-size: 0.85em;
+}
+.tracker .messagequeue li:first-child {
+  font-weight: 600;
+}
+
+.mascamitetab p,
+.mascamitetab ul {
+  margin: 4px 0;
+}
+.mascamitetab ul {
+  padding-left: 1.2em;
+}
+.samplespaces li.taken {
+  opacity: 0.7;
 }

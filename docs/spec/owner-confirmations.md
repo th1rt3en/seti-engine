@@ -28,3 +28,7 @@ The owner confirmed every row of the alien species, solo and scoring, and card d
 - Objective tiles: the strip with a check does not mean "mark a signal" but "**win a sector**" (the grey one: a sector of any color; a colored one: a sector of that color). Applies to L1 "land / win a sector", the L2 pairs of colors, L3 black, and L3 "telescope tech, win a sector of any color". The data was corrected (`tools/board/solo_scoring_data.py`, `data/objectives.json`).
 - The green "2 VP" tab is the 2-point tile on top of each tech stack (first taker scores 2). The gray boxes are expansion components.
 - The 81 re-checked cards (53 base, 13 alien, 15 Exertian) are confirmed against the card images, with the Exertian danger and end-of-game notes as the rule for those cards.
+
+## Anomaly token placement, 2026-10-14
+
+The owner re-checked ALIEN-ANO-01 against the rulebook: one token in Earth's sector, the others 3 sectors either side. The spec text was right and is unchanged. Placement (`anomalies_placed`) and each resolution (`anomaly`) are now written to the log.

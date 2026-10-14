@@ -42,6 +42,11 @@ export default function Demo() {
       second.overflow_kinds = ["blue", "blue"];
     }
     for (const p of view.state.players) p.exofossils = p.index + 1;
+    // Centaurian message milestones and a message card marker, to show them on the score track
+    view.state.players.forEach((p, i) => {
+      p.messages = [p.score + 15];
+      if (i === 0) p.message_cards = [{ target: p.score + 22, card: "ET.35" }];
+    });
   }
   const names = ["Alice", "Bob", "Cy"];
   return (

@@ -83,6 +83,11 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
         slot_index = state.pending[0].data["slot"]
         face_up = state.species[slot_index].face_up
         return {"slot": slot_index, "alien": move["source"], "card": face_up if move["source"] == "face_up" else None}
+    if kind == "pick_sample":  # ALIEN-MASC-02: the player looks at the samples on the planet; only the actor is sent these notes
+        return {"planet": move["planet"], "rewards": list(species.sample_faces()[move["sample"]])}
+    if kind == "deliver_sample":  # ALIEN-MASC-04: the token under the capsule and the card's own reward
+        capsule = next(pr for pr in state.probes if pr.id == move["capsule"])
+        return {"capsule": capsule.id, "rewards": list(species.sample_faces()[capsule.sample or 0])}
     if kind == "place_trace":
         slot = state.species[move["slot"]]
         return {
@@ -97,4 +102,3 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
 
 def notes(state: GameState, legal: list[dict[str, Any]]) -> list[Note]:
     return [note(state, m) for m in legal]
-

@@ -432,6 +432,16 @@ def test_playing_a_centaurian_card_places_a_marker_fifteen_ahead() -> None:
     assert "ET.35" not in r.state.discard
 
 
+def test_placing_and_reaching_a_message_marker_are_logged() -> None:
+    """ALIEN-CEN-02: the log says which card put a marker where, and when its green part resolves."""
+    s = world("centaurians")
+    score = s.players[s.current_player].score
+    r = settle(play(s, "ET.35"))
+    assert {"type": "message_card_placed", "player": r.state.current_player, "card": "ET.35", "target": score + 15} in r.events
+    r2 = reach(r)
+    assert any(e["type"] == "message_resolved" and e["card"] == "ET.35" and e["target"] == score + 15 for e in r2.events)
+
+
 def reach(r: StepResult, extra: int = 0) -> StepResult:
     st = r.state.model_copy(deep=True)
     p = st.players[st.current_player]
@@ -480,6 +490,8 @@ def test_message_cards_are_not_missions() -> None:
     """ALIEN-CEN-02, FAQ-43."""
     r = settle(play(world("centaurians"), "ET.31"))
     assert not me(r).missions and not me(r).completed_missions
+    r2 = settle(reach(r))  # FAQ-43: resolving the green part does not complete a mission, so the grey gold tile does not count it
+    assert not me(r2).completed_missions
 
 
 def test_end_scoring_counts_the_traces_for_a_species() -> None:
@@ -494,3 +506,30 @@ def test_end_scoring_counts_the_traces_for_a_species() -> None:
     slot.board["pink"][0].append(p.index)
     slot.discovery_spaces[0] = f"p{p.index}"
     assert cards.end_points(s, p) == 4
+
+
+def test_a_collected_sample_is_hidden_from_everyone_but_its_owner() -> None:
+    """ALIEN-MASC-02, ALIEN-MASC-04: the token under a capsule stays face down until it is delivered."""
+    from seti_engine import projection
+    from seti_engine.models import Probe
+
+    s = world("mascamites")
+    pl = s.current_player
+    s.probes.append(Probe(id="capsule1", player=pl, ring=1, sector=1, capsule=True, sample=3))
+    other = (pl + 1) % len(s.players)
+    assert next(p for p in projection.project(s, pl).state.probes if p.id == "capsule1").sample == 3
+    assert next(p for p in projection.project(s, other).state.probes if p.id == "capsule1").sample == -1
+    assert next(p for p in projection.project(s, None).state.probes if p.id == "capsule1").sample == -1
+
+
+def test_sample_choices_come_with_the_reward_of_each_token() -> None:
+    """ALIEN-MASC-02: the player looks at the samples of the planet before choosing, so the page needs each token's face."""
+    from seti_engine import move_notes
+    from seti_engine.models import Decision
+
+    s = world("mascamites")
+    s.pending = [Decision(kind="mascamite_sample", player=s.current_player, data={"mode": "collect", "planets": ["jupiter"]})]
+    legal = legal_moves(s)
+    notes = move_notes.notes(s, legal)
+    assert len(legal) == 3
+    assert all(n is not None and n["rewards"] == species.sample_faces()[m["sample"]] for m, n in zip(legal, notes, strict=True))

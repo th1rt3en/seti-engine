@@ -135,12 +135,17 @@ def test_trace_on_a_board_counts_for_missions() -> None:
 
 
 def test_anomalies_are_placed_in_earths_sector_and_three_sectors_either_side() -> None:
-    """ALIEN-ANO-01."""
-    s = discover(game(), 0).state
+    """ALIEN-ANO-01: the placement is logged with each token's sector, color, face and reward."""
+    r = discover(game(), 0)
+    s = r.state
     e = solar.earth(s)[1]
     toks = s.species[0].extra["tokens"]
     assert sorted(t["sector"] for t in toks) == sorted([e, (e + 3) % 8, (e - 3) % 8])
     assert sorted(t["color"] for t in toks) == ["blue", "pink", "yellow"]
+    placed = [x for x in r.events if x["type"] == "anomalies_placed"]
+    assert len(placed) == 1 and placed[0]["earth_sector"] == e
+    assert [(t["sector"], t["color"], t["side"]) for t in placed[0]["tokens"]] == [(t["sector"], t["color"], t["side"]) for t in toks]
+    assert all(t["reward"] for t in placed[0]["tokens"])
 
 
 def test_rotation_into_an_anomaly_pays_the_highest_marker_of_its_column() -> None:
@@ -155,6 +160,8 @@ def test_rotation_into_an_anomaly_pays_the_highest_marker_of_its_column() -> Non
     pub = s.players[0].publicity
     species.after_rotation(s, ev)
     assert [x["player"] for x in ev if x["type"] == "anomaly"] == [0]
+    logged = next(x for x in ev if x["type"] == "anomaly")  # the log says which token, where, and what it paid
+    assert (logged["sector"], logged["color"], logged["side"], logged["reward"]) == (e, "yellow", 1, [{"n": 2, "t": "publicity"}])
     assert s.players[0].publicity == pub + 2  # the yellow token's other face: 2 publicity
 
 
@@ -186,6 +193,8 @@ def test_each_player_gets_a_message_milestone_fifteen_points_ahead() -> None:
     before = [p.score for p in s.players]
     r = discover(s, 0)
     assert [p.messages for p in r.state.players] == [[b + 15] for b in before]
+    placed = next(e for e in r.events if e["type"] == "messages_placed")
+    assert placed["targets"] == [{"player": i, "target": b + 15} for i, b in enumerate(before)]
 
 
 def test_reaching_a_message_lets_the_player_cover_a_reward() -> None:
@@ -199,7 +208,10 @@ def test_reaching_a_message_lets_the_player_cover_a_reward() -> None:
     r = do(with_state(s), "end_turn")
     assert r.state.pending[0].kind == "message_reward" and {m["hex"] for m in r.legal} == {0, 1, 2, 3}
     pub = r.state.players[pl].publicity
-    r2 = do(r, "choose_message", hex=2)
+    assert all(m["reward"] for m in r.legal)  # the prompt shows what each reward is
+    assert any(e["type"] == "message_reached" and e["player"] == pl for e in r.events)
+    r2 = apply(r.state, next(m for m in r.legal if m["hex"] == 2))
+    assert any(e["type"] == "message_reward" and e["hex"] == 2 and e["player"] == pl for e in r2.events)
     assert r2.state.players[pl].publicity == pub + 3 and r2.state.species[0].extra["covered"][2] == pl
     assert r2.state.players[pl].messages == []
     s3 = r2.state.model_copy(deep=True)
@@ -372,6 +384,9 @@ def test_exertian_milestones_are_twenty_and_forty_ahead_of_the_leader() -> None:
     r = exert_game(("n", "n", "n"))
     lead = max(p.score for p in r.state.players)
     assert [m["at"] for m in r.state.species[0].extra["milestones"]] == [lead + 20, lead + 40]
+    assert [m["cost"] for m in r.state.species[0].extra["milestones"]] == [0, 1]
+    logged = next(e for e in r.events if e["type"] == "exertian_milestones")  # the log says where they are and what they cost
+    assert logged["milestones"] == [{"at": lead + 20, "cost": 0}, {"at": lead + 40, "cost": 1}]
 
 
 def test_crossing_an_exertian_milestone_lets_even_a_player_without_traces_play_a_card() -> None:
@@ -456,7 +471,9 @@ def test_mascamite_samples_are_dealt_to_jupiter_and_saturn() -> None:
     s = masc_game()
     ex = s.species[0].extra
     assert len(ex["samples"]["jupiter"]) == 3 and len(ex["samples"]["saturn"]) == 3
-    assert ex["sample_spaces"] == [{"token": ex["sample_spaces"][0]["token"], "marker": None}]
+    assert ex["sample_spaces"] == [
+        {"token": ex["sample_spaces"][0]["token"], "marker": None, "reward": species.sample_faces()[ex["sample_spaces"][0]["token"]]}
+    ]
     all_tokens = [*ex["samples"]["jupiter"], *ex["samples"]["saturn"], ex["sample_spaces"][0]["token"]]
     assert sorted(all_tokens) == list(range(7))
 
@@ -543,3 +560,11 @@ def test_any_player_may_mark_a_blue_space_with_a_sample_and_gains_its_reward() -
     assert p.trace_log[-1] == (0, "blue")
     trace_decision(s, "blue")
     assert not [m for m in legal_moves(s) if m["space"] == "sample"]
+
+
+def test_mascamite_setup_is_logged_without_revealing_the_face_down_samples() -> None:
+    """ALIEN-MASC-01."""
+    r = discover(game("mascamites", "anomalies"), 0)
+    placed = next(e for e in r.events if e["type"] == "samples_placed")
+    assert placed["planets"] == {"jupiter": 3, "saturn": 3}
+    assert placed["face_up"]["reward"] == species.sample_faces()[placed["face_up"]["token"]]

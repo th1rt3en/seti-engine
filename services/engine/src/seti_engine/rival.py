@@ -501,7 +501,7 @@ def _take_sample(s: GameState, planet: str) -> None:
         return
     token = tokens[rng.below(s, len(tokens))]
     s.species[i].extra["samples"][planet].remove(token)
-    s.species[i].extra["sample_spaces"].append({"token": token, "marker": None})
+    s.species[i].extra["sample_spaces"].append(species.new_sample_space(token))
 
 
 def _telescope(s: GameState, a: dict[str, Any], events: Events) -> None:

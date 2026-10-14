@@ -15,6 +15,10 @@ const cap = (s: unknown): string => {
   const t = String(s);
   return t.charAt(0).toUpperCase() + t.slice(1);
 };
+const rewardList = (list: unknown): string =>
+  (Array.isArray(list) ? (list as { t: string; n: number }[]) : [])
+    .map((r) => `${r.n} ${r.t.replace("alien_card", "alien card").replace("vp", "VP").replace("trace", "trace of any color")}`)
+    .join(" + ");
 const planet = (s: unknown): string => cap(s);
 const source = (s: unknown): string => {
   const t = String(s);
@@ -87,7 +91,7 @@ export const LABELS: Record<string, Label> = {
   slingshot_pick: (m) => (m.choice === "move" ? "Gain 1 movement instead of publicity" : "Gain the publicity"),
   choose_land_slot: (m) => `Take first-lander space ${Number(m.slot) + 1}`,
   take_alien: (m) => `Take the ${m.source === "face_up" ? "face-up" : "top"} alien card`,
-  choose_message: (m) => `Cover reward ${Number(m.hex) + 1} with your message tile`,
+  choose_message: (m) => `Cover reward ${Number(m.hex) + 1} (${rewardList(m.reward)}) with your message tile`,
   play_exertian: () => "Play an Exertian card face down",
   skip_exertian: () => "Do not play an Exertian card",
   pol_pick: (m) => `Choose ${cardName(m.card)}`,

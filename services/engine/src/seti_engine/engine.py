@@ -670,6 +670,7 @@ def _resolve_milestones(s: GameState, events: list[dict[str, Any]]) -> bool:
             continue
         if m >= species.MESSAGE_BASE:  # ALIEN-CEN-04: a Centaurian message milestone
             s.players[player].messages.remove(m - species.MESSAGE_BASE)
+            events.append({"type": "message_reached", "player": player, "target": m - species.MESSAGE_BASE})
             s.pending.append(Decision(kind="message_reward", player=player))
             return False
         if m in GOLD_MILESTONES:

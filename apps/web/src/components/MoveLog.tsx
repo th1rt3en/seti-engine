@@ -41,6 +41,19 @@ const techOf = (key: unknown): string => {
   return techName(category, glyph);
 };
 
+interface RewardItem {
+  t: string;
+  n: number;
+}
+interface AnomalyToken {
+  sector: number;
+  color: string;
+  reward: RewardItem[];
+}
+const rewardText = (list: RewardItem[]): string =>
+  list.map((r) => `${r.n} ${r.t.replace("card_any", "card").replace("vp", "VP")}`).join(" + ");
+const sectorName = (ctx: LogContext, sector: number): string => ctx.stars[sector] ?? `sector ${sector}`;
+
 /** What the rival did, one event at a time. */
 function rivalLine(ev: GameEvent): ReactNode {
   switch (ev.type) {
@@ -90,6 +103,36 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
       return `${who} wins the sector of ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
     case "discovered":
       return `${cap(ev.species)} is discovered`;
+    case "anomalies_placed":
+      return `anomaly tokens placed: ${(ev.tokens as AnomalyToken[]).map((k) => `${cap(k.color)} in ${sectorName(ctx, k.sector)} (${rewardText(k.reward)})`).join("; ")}`;
+    case "messages_placed":
+      return `message milestones placed: ${(ev.targets as { player: number; target: number }[]).map((k) => `${ctx.who(k.player)} at ${k.target}`).join(", ")}`;
+    case "message_reached":
+      return `${who} reaches their message milestone (${String(ev.target)})`;
+    case "message_reward":
+      return `${who} covers a message reward and gains ${rewardText(ev.reward as RewardItem[])}`;
+    case "message_card_placed":
+      return `${who} places a message marker at ${String(ev.target)} (${String(ev.card)})`;
+    case "message_resolved":
+      return `${who} reaches the message marker of ${String(ev.card)} (${String(ev.target)}) and resolves it`;
+    case "exertian_milestones":
+      return `Exertian milestones placed at ${(ev.milestones as { at: number; cost: number }[]).map((m) => `${m.at} (${m.cost > 0 ? `${m.cost} credit` : "free"})`).join(" and ")}, ahead of the leader (${String(ev.leader_score)})`;
+    case "samples_placed":
+      return `Mascamite samples placed: ${Object.entries(ev.planets as Record<string, number>)
+        .map(([planet, n]) => `${n} face down on ${cap(planet)}`)
+        .join(", ")}; one lies face up on the species board (${rewardText((ev.face_up as { reward: RewardItem[] }).reward)})`;
+    case "sample_collected":
+      return `${who} collects a sample on ${cap(ev.planet)} (it stays hidden under their capsule)`;
+    case "sample_delivered":
+      return `${who} delivers a sample: ${rewardText(ev.reward as RewardItem[])}${Number(ev.times) > 1 ? " (twice)" : ""}; the token lies on sample space ${Number(ev.space) + 1}`;
+    case "sample_space_marked":
+      return `${who} marks sample space ${Number(ev.space) + 1} and gains ${rewardText(ev.reward as RewardItem[])}`;
+    case "anomaly":
+      return `Earth reaches the ${String(ev.color)} anomaly in ${sectorName(ctx, Number(ev.sector))}: ${
+        typeof ev.player === "number"
+          ? `${ctx.who(ev.player)} (highest ${String(ev.color)} trace) gains ${rewardText(ev.reward as RewardItem[])}`
+          : "nobody has a trace there, no reward"
+      }`;
     case "tech":
       return `${who} takes the tech ${techOf(ev.tech)}`;
     case "mission_completed":

@@ -1,52 +1,132 @@
 {
-  "analyze": [],
-  "buy_card": ["source"],
-  "choose_gold": ["tile"],
-  "choose_land_slot": ["slot"],
-  "choose_message": ["hex"],
-  "complete_mission": ["card"],
-  "cover": ["card", "circle"],
-  "decline_cover": [],
-  "discard_free": ["card"],
-  "end_turn": [],
-  "exchange": ["cards", "get", "give", "source"],
-  "gop": ["probe"],
-  "gop_done": [],
-  "hand_signal": ["card"],
-  "hand_signal_done": [],
-  "land": ["probe"],
-  "land_free": ["probe"],
-  "launch": [],
-  "mark_objective": ["objective", "task"],
-  "mark_signal": ["sector"],
-  "move_energy": [],
-  "move_probe": ["probe", "to"],
-  "orbit": ["probe"],
-  "pass": [],
-  "pick_probe": ["probe"],
-  "place_computer_tech": ["slot"],
-  "place_data": [],
-  "place_lower": ["slot"],
-  "place_trace": ["color", "index", "slot", "space"],
-  "play_card": ["card"],
-  "play_exertian": ["card"],
-  "research": ["stack"],
-  "row_pick": ["source"],
-  "scan": [],
-  "scan_discard": ["source"],
-  "scan_done": [],
-  "scan_earth": ["sector"],
-  "scan_hand_discard": ["card"],
-  "scan_mercury": [],
-  "scan_probe": ["mode"],
-  "signal_where": ["where"],
-  "skip_exertian": [],
-  "skip_tuck": [],
-  "slingshot_pick": ["choice"],
-  "take_alien": ["source"],
-  "take_card": ["source"],
-  "take_round_card": ["card"],
-  "take_tech": ["stack"],
-  "tuck": ["card"],
-  "undo": []
+ "analyze": [],
+ "buy_card": [
+  "source"
+ ],
+ "choose_gold": [
+  "tile"
+ ],
+ "choose_land_slot": [
+  "slot"
+ ],
+ "choose_message": [
+  "hex",
+  "reward"
+ ],
+ "complete_mission": [
+  "card"
+ ],
+ "cover": [
+  "card",
+  "circle"
+ ],
+ "decline_cover": [],
+ "discard_free": [
+  "card"
+ ],
+ "end_turn": [],
+ "exchange": [
+  "cards",
+  "get",
+  "give",
+  "source"
+ ],
+ "gop": [
+  "probe"
+ ],
+ "gop_done": [],
+ "hand_signal": [
+  "card"
+ ],
+ "hand_signal_done": [],
+ "land": [
+  "probe"
+ ],
+ "land_free": [
+  "probe"
+ ],
+ "launch": [],
+ "mark_objective": [
+  "objective",
+  "task"
+ ],
+ "mark_signal": [
+  "sector"
+ ],
+ "move_energy": [],
+ "move_probe": [
+  "probe",
+  "to"
+ ],
+ "orbit": [
+  "probe"
+ ],
+ "pass": [],
+ "pick_probe": [
+  "probe"
+ ],
+ "place_computer_tech": [
+  "slot"
+ ],
+ "place_data": [],
+ "place_lower": [
+  "slot"
+ ],
+ "place_trace": [
+  "color",
+  "index",
+  "slot",
+  "space"
+ ],
+ "play_card": [
+  "card"
+ ],
+ "play_exertian": [
+  "card"
+ ],
+ "research": [
+  "stack"
+ ],
+ "row_pick": [
+  "source"
+ ],
+ "scan": [],
+ "scan_discard": [
+  "source"
+ ],
+ "scan_done": [],
+ "scan_earth": [
+  "sector"
+ ],
+ "scan_hand_discard": [
+  "card"
+ ],
+ "scan_mercury": [],
+ "scan_probe": [
+  "mode"
+ ],
+ "signal_where": [
+  "where"
+ ],
+ "skip_exertian": [],
+ "skip_tuck": [],
+ "slingshot_pick": [
+  "choice"
+ ],
+ "take_alien": [
+  "source"
+ ],
+ "take_card": [
+  "source"
+ ],
+ "take_round_card": [
+  "card"
+ ],
+ "take_tech": [
+  "stack"
+ ],
+ "tuck": [
+  "card"
+ ],
+ "undo": []
 }
