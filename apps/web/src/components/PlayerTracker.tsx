@@ -5,6 +5,7 @@ import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon } from "./Icons";
+import { OPEN_BOARD_EVENT } from "./PlayerBoard";
 
 const KINDS = [
   { key: "credit", label: "Credits", icon: <CreditIcon size={18} /> },
@@ -67,6 +68,16 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
                 <span className="pname">{who(p.index)}</span>
                 {view.viewer === p.index ? <span className="pill">you</span> : null}
                 {p.passed ? <span className="pill">passed</span> : null}
+                {s.rival && p.index === s.rival.index ? null : (
+                  <button
+                    type="button"
+                    className="boardlink"
+                    title={`Look at the board of ${who(p.index)}: its computer and techs`}
+                    onClick={() => window.dispatchEvent(new CustomEvent(OPEN_BOARD_EVENT, { detail: p.index }))}
+                  >
+                    board
+                  </button>
+                )}
               </th>
             ))}
           </tr>

@@ -70,6 +70,7 @@ export function GameView({
   row,
   tech,
   log,
+  overlay,
   interaction,
   spots,
 }: {
@@ -85,6 +86,8 @@ export function GameView({
   tech?: TechPick;
   /** The log of the moves (the live game shows it). */
   log?: ReactNode;
+  /** A panel over the page (the player boards). */
+  overlay?: ReactNode;
   /** Picking a probe and a space to move it to. */
   interaction?: BoardInteraction;
   /** Places on the board that a move can be made at (landing, orbiting, signals, traces). */
@@ -173,6 +176,7 @@ export function GameView({
       <RowDock view={view} row={row} />
       <HandDock view={view} selection={hand} />
       {log}
+      {overlay}
     </div>
   );
 }

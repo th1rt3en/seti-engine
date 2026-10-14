@@ -11,7 +11,7 @@ import {
   sameMove,
 } from "@/lib/moves";
 import { type Note, buildSpots } from "@/lib/targets";
-import { techName } from "@/lib/techs";
+import { TECH_INFO, techName } from "@/lib/techs";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
@@ -19,6 +19,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { type LogEntry, MoveLog } from "./MoveLog";
+import { OPEN_BOARD_EVENT, PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradeButtons } from "./Trade";
 
@@ -66,6 +67,10 @@ export function GameClient({
   const [rowMode, setRowMode] = useState<Move[] | null>(null);
   // a tech picked in the stacks (its place in the state)
   const [pickedTech, setPickedTech] = useState<number | null>(null);
+  // the player boards: shown or not, and whose; the slot of the computer picked for a tech that was just researched
+  const [boardOpen, setBoardOpen] = useState(false);
+  const [boardPlayer, setBoardPlayer] = useState(0);
+  const [pickedSlot, setPickedSlot] = useState<number | null>(null);
   // a place picked on the board (land, orbit, signal, trace)
   const [pickedSpot, setPickedSpot] = useState<string | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
@@ -118,6 +123,7 @@ export function GameClient({
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
+          setPickedSlot(null);
           setExtraEnergy(0);
           const next = plan.current.shift();
           if (next !== undefined) {
@@ -152,6 +158,24 @@ export function GameClient({
       socket.current?.close();
     };
   }, [gameId, wsBase, signedIn]);
+
+  // the boards open at the request of the tracker, and by themselves when a computer tech has to be put in a slot
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      setBoardPlayer((e as CustomEvent<number>).detail);
+      setBoardOpen(true);
+    };
+    window.addEventListener(OPEN_BOARD_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_BOARD_EVENT, onOpen);
+  }, []);
+  const choosing = view?.view.legal.some((m) => m.type === "place_computer_tech") ?? false;
+  const viewer = view?.view.viewer ?? null;
+  useEffect(() => {
+    if (choosing && viewer !== null) {
+      setBoardPlayer(viewer);
+      setBoardOpen(true);
+    }
+  }, [choosing, viewer]);
 
   const send = useCallback((msg: unknown) => socket.current?.send(JSON.stringify(msg)), []);
   const play = (move: Move) => send({ t: "action", seq: seq.current, action: move });
@@ -192,6 +216,7 @@ export function GameClient({
     (m) =>
       !placed.has(m) &&
       m.type !== "take_round_card" &&
+      m.type !== "place_computer_tech" &&
       !handMoves.includes(m) &&
       m.type !== "exchange" &&
       m.type !== "buy_card" &&
@@ -228,6 +253,12 @@ export function GameClient({
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   const offers = [...new Set(mine.filter((m) => m.type === "take_round_card").map((m) => String(m.card)))];
   const offerMove = pickedOffer === null ? undefined : mine.find((m) => m.type === "take_round_card" && m.card === pickedOffer);
+  // a tech for the computer goes in a slot picked on the player board
+  const slotMoves = mine.filter((m) => m.type === "place_computer_tech");
+  const slotMove = pickedSlot === null ? undefined : slotMoves.find((m) => m.slot === pickedSlot);
+  const slotTech = String(v.state.pending[0]?.data?.tech ?? "");
+  const slotChoice: SlotChoice | undefined =
+    slotMoves.length > 0 ? { slots: slotMoves.map((m) => Number(m.slot)), selected: pickedSlot, onPick: setPickedSlot } : undefined;
   const buyOption = pickedBuy === null ? undefined : buys.find((m) => m.source === pickedBuy);
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
@@ -365,6 +396,12 @@ export function GameClient({
               </span>
             </div>
           ) : null}
+          {slotMoves.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">Your choice</span>
+              <span className="handhint">Click the slot of the computer on your player board where the new tech goes.</span>
+            </div>
+          ) : null}
           {offers.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
@@ -453,6 +490,22 @@ export function GameClient({
             </button>
           </div>
           <button type="button" className="secondary" onClick={() => setPendingMove(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {slotMove && slotTech ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <span>
+              Confirm placing {techName(slotTech.split("-")[0] ?? "", slotTech.split("-")[1] ?? "")} on computer space{" "}
+              {Number(slotMove.slot) + 1}? <span className="muted small">{TECH_INFO[slotTech]?.effect}</span>
+            </span>
+            <button type="button" className="primary" onClick={() => play(slotMove)}>
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPickedSlot(null)}>
             Cancel
           </button>
         </div>
@@ -561,6 +614,18 @@ export function GameClient({
           }}
         />
       }
+      overlay={
+        boardOpen ? (
+          <PlayerBoardPanel
+            view={v}
+            names={names}
+            shown={boardPlayer}
+            onShow={setBoardPlayer}
+            onClose={() => setBoardOpen(false)}
+            choice={slotChoice}
+          />
+        ) : null
+      }
       hand={{
         selectable: pickable,
         selected: picked,
@@ -594,6 +659,11 @@ export function GameClient({
       topExtra={
         <>
           {clocks}
+          {v.state.players.length > 0 ? (
+            <button type="button" className="secondary small" onClick={() => setBoardOpen(!boardOpen)}>
+              Player boards
+            </button>
+          ) : null}
           <span className="small muted">
             {online ? "Connected" : "Reconnecting..."} · action {view.seq}
           </span>

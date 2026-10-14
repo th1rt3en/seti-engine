@@ -347,6 +347,13 @@ def main() -> None:
         alien_backs[species_name] = save(im, "cards", f"back-{species_name}", quality=84, alpha_quality=92)
     provenance.append(("card-back-alien-<species>.png", "apps/web/public/assets/cards/ (5 files)", "the backs of the alien decks, 300 px wide"))
 
+    tech_fronts: dict[str, str] = {}
+    for category, techs in json.loads((ROOT / "services/engine/src/seti_engine/data/tech-board.json").read_text(encoding="utf-8"))["stacks"].items():
+        for tech in techs:
+            im = Image.open(SRC / f"tech-tile-{tech['front']}.png").convert("RGBA")  # 175 x 246: the front of a tech tile, shown on the player board
+            tech_fronts[f"{category}-{tech['glyph']}"] = save(im, "tiles", f"front-{category}-{tech['glyph']}", quality=90, alpha_quality=95)
+    provenance.append(("tech-tile-front-*.png (12 files)", "apps/web/public/assets/tiles/ (12 files)", "the fronts of the tech tiles"))
+
     rival_boards: dict[str, str] = {}
     for name in RIVAL_BOARDS:
         im = Image.open(SRC / f"rival-board-{name}.png").convert("RGBA")
@@ -371,7 +378,7 @@ def main() -> None:
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
              "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
-             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs},
+             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs, "techFronts": tech_fronts},
             indent=1,
             sort_keys=True,
         )

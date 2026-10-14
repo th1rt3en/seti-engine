@@ -467,6 +467,20 @@
     "3": "/assets/stars/star-board-3.b607bd3948.webp",
     "4": "/assets/stars/star-board-4.ae0f526e28.webp"
   },
+  "techFronts": {
+    "computer-branch": "/assets/tiles/front-computer-branch.ed4dae929f.webp",
+    "computer-cross": "/assets/tiles/front-computer-cross.06c7f7de5c.webp",
+    "computer-dot": "/assets/tiles/front-computer-dot.a8fcac8a27.webp",
+    "computer-link": "/assets/tiles/front-computer-link.aa457b0112.webp",
+    "probe-branch": "/assets/tiles/front-probe-branch.7b877bfa10.webp",
+    "probe-cross": "/assets/tiles/front-probe-cross.e83b571e22.webp",
+    "probe-dot": "/assets/tiles/front-probe-dot.9f7f46935f.webp",
+    "probe-link": "/assets/tiles/front-probe-link.359335ec2d.webp",
+    "telescope-branch": "/assets/tiles/front-telescope-branch.a1a7c880d0.webp",
+    "telescope-cross": "/assets/tiles/front-telescope-cross.44ce8a8680.webp",
+    "telescope-dot": "/assets/tiles/front-telescope-dot.f60d6c964f.webp",
+    "telescope-link": "/assets/tiles/front-telescope-link.87b0effd62.webp"
+  },
   "tiles": {
     "computer-branch-card": "/assets/tiles/computer-branch-card.67682bf8ca.webp",
     "computer-branch-energy": "/assets/tiles/computer-branch-energy.5a1809c8d3.webp",
