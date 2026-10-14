@@ -38,7 +38,7 @@ def resources_available(s: GameState) -> list[str]:
 
 
 def addable_cards(s: GameState) -> list[str]:
-    """SANDBOX-02: every card of the base deck (and the promo cards when the game has them) and the alien cards of the species that are face up."""
+    """SANDBOX-02: every base card (and the promo cards when the game has them) and the alien cards of the species that are face up."""
     shown = discovered_species(s)
     out = []
     for cid, c in tables.cards().items():
