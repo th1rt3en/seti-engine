@@ -1616,3 +1616,12 @@ button:disabled {
     max-height: none;
   }
 }
+
+/* the free place of a gold scoring tile that can be marked: dark inside and a bright ring, to be seen on the gold */
+.spotshape.goldspot {
+  fill: rgba(8, 40, 26, 0.55);
+  stroke-width: 13;
+}
+.spot.chosen .spotshape.goldspot {
+  fill: rgba(110, 240, 165, 0.55);
+}

@@ -17,6 +17,7 @@ import { TECH_INFO, techName } from "@/lib/techs";
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
 import { useCallback, useEffect, useRef, useState } from "react";
+import assets from "../generated/assets.json";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { type LogEntry, MoveLog } from "./MoveLog";
@@ -30,6 +31,8 @@ type Server =
   | { t: "error"; code: string; message: string; legal?: Move[] }
   | { t: "log"; from: number; entries: LogEntry[] }
   | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } };
+
+const GOLD_INFO = assets.gold as Record<string, { per: string; values: number[] }>;
 
 /** h:mm:ss or m:ss; a clock in the negative shows a minus sign. */
 const minutes = (ms: number | null | undefined): string => {
@@ -72,6 +75,8 @@ export function GameClient({
   const [boardOpen, setBoardOpen] = useState(false);
   const [boardPlayer, setBoardPlayer] = useState(0);
   const [pickedSlot, setPickedSlot] = useState<number | null>(null);
+  // the gold scoring tile picked to mark (by name)
+  const [pickedGold, setPickedGold] = useState<string | null>(null);
   // a place picked on the board (land, orbit, signal, trace)
   const [pickedSpot, setPickedSpot] = useState<string | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
@@ -125,6 +130,7 @@ export function GameClient({
           setPickedTech(null);
           setPickedSpot(null);
           setPickedSlot(null);
+          setPickedGold(null);
           setExtraEnergy(0);
           const next = plan.current.shift();
           if (next !== undefined) {
@@ -218,6 +224,7 @@ export function GameClient({
       !placed.has(m) &&
       m.type !== "take_round_card" &&
       m.type !== "place_computer_tech" &&
+      m.type !== "choose_gold" &&
       !handMoves.includes(m) &&
       m.type !== "exchange" &&
       m.type !== "buy_card" &&
@@ -260,6 +267,10 @@ export function GameClient({
   const slotTech = String(v.state.pending[0]?.data?.tech ?? "");
   const slotChoice: SlotChoice | undefined =
     slotMoves.length > 0 ? { slots: slotMoves.map((m) => Number(m.slot)), selected: pickedSlot, onPick: setPickedSlot } : undefined;
+  // a gold scoring tile is marked by clicking its free place on the board
+  const goldMoves = mine.filter((m) => m.type === "choose_gold");
+  const goldTile = pickedGold === null ? undefined : v.state.gold_tiles.find((g) => g.tile === pickedGold);
+  const goldMove = goldTile === undefined ? undefined : goldMoves.find((m) => m.tile === goldTile.tile);
   const buyOption = pickedBuy === null ? undefined : buys.find((m) => m.source === pickedBuy);
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
@@ -397,6 +408,12 @@ export function GameClient({
               </span>
             </div>
           ) : null}
+          {goldMoves.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">Your choice</span>
+              <span className="handhint">Click the highlighted place of a gold scoring tile beside the board to mark it.</span>
+            </div>
+          ) : null}
           {slotMoves.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
@@ -511,6 +528,23 @@ export function GameClient({
           </button>
         </div>
       ) : null}
+      {goldMove && goldTile ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <span>
+              Confirm marking the <b>{goldTile.tile}</b> gold scoring tile ({GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.per})? You
+              would be the {["first", "second", "third or later"][Math.min(goldTile.markers.length, 2)]} to mark it:{" "}
+              <b>{GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.values[Math.min(goldTile.markers.length, 2)]} points</b> for each.
+            </span>
+            <button type="button" className="primary" onClick={() => play(goldMove)}>
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPickedGold(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
       {offerMove ? (
         <div className="confirmbar">
           <div className="confirm">
@@ -614,6 +648,11 @@ export function GameClient({
             rival: v.state.rival ? v.state.rival.index : null,
           }}
         />
+      }
+      goldChoice={
+        goldMoves.length > 0
+          ? { tiles: goldMoves.map((m) => String(m.tile)), selected: pickedGold, onPick: (t) => setPickedGold(pickedGold === t ? null : t) }
+          : undefined
       }
       overlay={
         boardOpen ? (

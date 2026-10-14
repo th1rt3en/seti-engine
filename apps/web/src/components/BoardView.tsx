@@ -59,6 +59,13 @@ export interface BoardInteraction {
 }
 
 /** Places that a move can be made at (landing, orbiting, a signal, a trace): highlighted on the board, and clicked to pick the move. */
+/** Choosing a gold scoring tile to mark: the tiles that can be marked (by name), the one picked, and the click. The place taken is the leftmost free one of the tile. */
+export interface GoldChoice {
+  tiles: string[];
+  selected: string | null;
+  onPick: (tile: string) => void;
+}
+
 export interface BoardSpots {
   items: Spot[];
   selected: string | null;
@@ -84,7 +91,15 @@ export function BoardView({
   previous,
   interaction,
   spots,
-}: { view: View; names: string[]; previous?: View | null; interaction?: BoardInteraction; spots?: BoardSpots }) {
+  goldChoice,
+}: {
+  view: View;
+  names: string[];
+  previous?: View | null;
+  interaction?: BoardInteraction;
+  spots?: BoardSpots;
+  goldChoice?: GoldChoice;
+}) {
   const s = view.state;
   const [hover, setHover] = useState<string | null>(null);
   // a gold scoring tile is shown larger, upright and with its markers when the pointer rests on it for a second (or when it is tapped)
@@ -223,6 +238,27 @@ export function BoardView({
                   />
                 );
               })}
+              {goldChoice?.tiles.includes(g.tile)
+                ? (() => {
+                    const at = GOLD_SLOTS[Math.min(g.markers.length, GOLD_SLOTS.length - 1)] ?? { x: 0, y: 0 };
+                    return (
+                      <g
+                        // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Mark the ${g.tile} gold scoring tile`}
+                        className={goldChoice.selected === g.tile ? "spot chosen" : "spot"}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goldChoice.onPick(g.tile);
+                        }}
+                        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && goldChoice.onPick(g.tile)}
+                      >
+                        <circle cx={at.x} cy={at.y} r={70} className="spotshape goldspot" />
+                      </g>
+                    );
+                  })()
+                : null}
               <title>{`${g.tile} (side ${g.side}): ${info.per}`}</title>
             </g>
           );

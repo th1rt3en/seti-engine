@@ -7,7 +7,7 @@ import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
-import { type BoardInteraction, type BoardSpots, BoardView } from "./BoardView";
+import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
 import { BottomBarFold } from "./BottomBarFold";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ScoreIcon } from "./Icons";
@@ -73,6 +73,7 @@ export function GameView({
   overlay,
   interaction,
   spots,
+  goldChoice,
 }: {
   view: View;
   names: string[];
@@ -92,6 +93,8 @@ export function GameView({
   interaction?: BoardInteraction;
   /** Places on the board that a move can be made at (landing, orbiting, signals, traces). */
   spots?: BoardSpots;
+  /** Marking a gold scoring tile. */
+  goldChoice?: GoldChoice;
   /** The moves of the player to act (and the buttons that go with them): shown in the bar on top. */
   moves?: ReactNode;
   /** Connection and clock information for the bar. */
@@ -155,7 +158,7 @@ export function GameView({
       <div className="gamegrid">
         <main className="col-center">
           <div className="boardwrap">
-            <BoardView view={view} names={names} previous={previous} interaction={interaction} spots={spots} />
+            <BoardView view={view} names={names} previous={previous} interaction={interaction} spots={spots} goldChoice={goldChoice} />
             <RoundPiles view={view} />
           </div>
         </main>
