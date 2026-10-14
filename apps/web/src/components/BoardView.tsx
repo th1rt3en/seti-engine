@@ -21,6 +21,7 @@ import {
   NEUTRAL_POCKETS,
   OUMUAMUA_TILE,
   PLANET,
+  PLAYER_COLOR,
   RING_BOUNDS,
   RING_RADIUS,
   STAR,
@@ -46,7 +47,8 @@ const DISCS = assets.discs as Record<string, string>;
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
 const STAR_BOARDS = assets.starBoards as Record<string, string>;
-const LANES = [1500, 1538, 1576, 1614]; // radius of each player's lane on the score track
+const LANES = [1500, 1538, 1576, 1614];
+const EXERTIAN_LANE = 1440; // the Exertian milestone tiles lie just inside the players' lanes // radius of each player's lane on the score track
 
 /** Moving a probe: the probes that can be picked, the one that is, the spaces it can go to now (with what each takes and the way there). */
 export interface BoardInteraction {
@@ -579,6 +581,67 @@ export function BoardView({
             />
           )),
         )}
+
+        {/* the Exertian milestone tiles: shared, 20 and 40 points ahead of the leader at discovery; the second costs 1 credit to play a card */}
+        {(
+          (s.species.find((sp) => sp.discovered && sp.species === "exertians")?.extra.milestones ?? []) as {
+            at: number;
+            cost: number;
+            done: number[];
+          }[]
+        ).map((m, k) => {
+          const at = polar(EXERTIAN_LANE, scoreDegrees(m.at));
+          return (
+            <g key={`exm-${m.at}`} opacity={m.done.length >= s.players.length ? 0.4 : 1}>
+              <title>{`Exertian milestone ${k + 1} at ${m.at} points: play an Exertian card face down${m.cost > 0 ? ` (costs ${m.cost} credit)` : ""}`}</title>
+              <rect x={at.x - 50} y={at.y - 50} width={100} height={100} rx={16} fill="#6b1f1f" stroke="#fff" strokeWidth={6} />
+              <text x={at.x} y={at.y + 21} textAnchor="middle" fontSize={62} fontWeight={700} fill="#fff">
+                {m.cost > 0 ? "E¢" : "E"}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* the Centaurian message tiles (one per player, 15 points ahead at discovery) and the message markers of the cards in front of the players */}
+        {s.players.flatMap((p) => [
+          ...p.messages.map((target) => {
+            const at = polar(LANES[p.index] ?? 1500, scoreDegrees(target));
+            return (
+              <g key={`msg-${p.index}-${target}`}>
+                <title>{`${who(p.index)}: Centaurian message milestone at ${target} points`}</title>
+                <rect
+                  x={at.x - 30}
+                  y={at.y - 22}
+                  width={60}
+                  height={44}
+                  rx={6}
+                  fill={PLAYER_COLOR[p.color] ?? "#fff"}
+                  stroke="#fff"
+                  strokeWidth={5}
+                />
+                <path
+                  d={`M${at.x - 42} ${at.y - 30} L${at.x} ${at.y + 6} L${at.x + 42} ${at.y - 30}`}
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth={4}
+                />
+              </g>
+            );
+          }),
+          ...p.message_cards.map((m, n) => {
+            const at = polar(LANES[p.index] ?? 1500, scoreDegrees(m.target));
+            return (
+              <Marker
+                key={`mc-${p.index}-${m.card}-${n}`}
+                x={at.x}
+                y={at.y}
+                size={68}
+                color={color(p.index)}
+                title={`${who(p.index)}: message marker of ${m.card} at ${m.target} points (resolved in the order sent)`}
+              />
+            );
+          }),
+        ])}
 
         {s.players.map((p) => {
           const at = polar(LANES[p.index] ?? 1500, scoreDegrees(p.score));
