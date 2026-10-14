@@ -77,6 +77,7 @@ export function GameView({
   hand,
   row,
   tech,
+  log,
   interaction,
 }: {
   view: View;
@@ -89,6 +90,8 @@ export function GameView({
   row?: RowSelection;
   /** Picking a tech from the stacks. */
   tech?: TechPick;
+  /** The log of the moves (the live game shows it). */
+  log?: ReactNode;
   /** Picking a probe and a space to move it to. */
   interaction?: BoardInteraction;
   /** The moves of the player to act (and the buttons that go with them): shown in the bar on top. */
@@ -218,6 +221,7 @@ export function GameView({
         <PlayerTracker view={view} names={names} previous={previous} />
       </TrackerDock>
       <HandDock view={view} selection={hand} />
+      {log}
     </div>
   );
 }

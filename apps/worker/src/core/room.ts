@@ -7,6 +7,7 @@ import type { Identity } from "./auth.js";
 import * as clocks from "./clock.js";
 import type { Action, Engine } from "./engine.js";
 import { IllegalAction } from "./engine.js";
+import { type PublicEntry, publicEntry } from "./publicLog.js";
 import { shuffledSeats } from "./seating.js";
 
 export type Status = "lobby" | "playing" | "finished" | "cancelled";
@@ -104,6 +105,8 @@ export type ServerMessage =
   | { t: "lobby"; status: Status; seats: ({ name: string } | null)[]; host: string | null; rated: boolean; clock: clocks.ClockSettings }
   | { t: "view"; seq: number; status: Status; view: View; names: string[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Action[] }
+  /** The moves made so far, for the log beside the board: all of them on connecting (`from` is 0), then each new one. */
+  | { t: "log"; from: number; entries: PublicEntry[] }
   | { t: "ended"; result: Result };
 
 export interface Connection {
@@ -303,6 +306,7 @@ export class GameRoom {
     await this.d.store.put(logKey(count), entry);
     await this.d.store.put("logcount", count + 1);
     await this.d.store.put("state", res.state);
+    for (const c of this.d.connections()) c.send({ t: "log", from: count, entries: [publicEntry(entry)] });
     const clock = (await this.d.store.get<clocks.ClockState>("clock")) ?? clocks.initialClock(meta.clock, meta.seats.length);
     await this.d.store.put("clock", clocks.stop(meta.clock, clock, now));
     if (res.state.phase === "finished") {
@@ -472,7 +476,11 @@ export class GameRoom {
       return;
     }
     if (meta.status === "lobby") conn.send(lobbyMessage(meta));
-    else await this.sendView(conn, meta);
+    else {
+      await this.sendView(conn, meta);
+      const log = await this.d.store.list<LogEntry>("log:");
+      conn.send({ t: "log", from: 0, entries: log.map(publicEntry) });
+    }
   }
 
   /** What the clients are told: the view of each seat, or the spectator view. */

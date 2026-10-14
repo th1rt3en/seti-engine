@@ -41,6 +41,9 @@ SHEETS = {
     "oumuamua.webp": ("cards-alien-oumuamua-en-sheet.png", 5, 2),
 }
 
+# cards whose cell on the sheet is empty and that the owner supplied as single pictures
+CARD_FILES = {"117": "card-lunar-gateway-en.png"}
+
 BOARD_WIDTH = 1800  # the base board is 3507 x 5612 px; it is shown at most about 900 CSS px wide
 BOARD_SOURCE = "main-board-assembled.png"
 
@@ -166,6 +169,12 @@ def main() -> None:
     counts: dict[str, int] = {}
     for c in defs:
         if c["group"] not in ("base", "alien-base"):
+            continue
+        if c["id"] in CARD_FILES:
+            card = Image.open(SRC / CARD_FILES[c["id"]]).convert("RGBA")
+            card = card.resize((CARD_WIDTH, round(CARD_WIDTH * card.height / card.width)), Image.LANCZOS)
+            cards[c["id"]] = save(card, "cards", c["id"], quality=CARD_QUALITY)
+            provenance.append((CARD_FILES[c["id"]], cards[c["id"]], "single picture (its cell on the sheet is empty)"))
             continue
         sheet = pathlib.PurePosixPath(c["pos"][0]).name
         _, cols, rows = SHEETS[sheet]

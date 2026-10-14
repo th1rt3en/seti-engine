@@ -16,12 +16,14 @@ import { techName } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameView } from "./GameView";
+import { type LogEntry, MoveLog } from "./MoveLog";
 import { TradeButtons } from "./Trade";
 
 type Server =
   | { t: "lobby"; status: string; seats: ({ name: string } | null)[]; rated: boolean }
   | { t: "view"; seq: number; status: string; view: View; names: string[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Move[] }
+  | { t: "log"; from: number; entries: LogEntry[] }
   | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } };
 
 /** h:mm:ss or m:ss; a clock in the negative shows a minus sign. */
@@ -44,6 +46,8 @@ export function GameClient({
   const [view, setView] = useState<Extract<Server, { t: "view" }> | null>(null);
   const [ended, setEnded] = useState<Extract<Server, { t: "ended" }>["result"] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // the moves made so far (the server sends all of them when the page connects, then each new one)
+  const [log, setLog] = useState<LogEntry[]>([]);
   const [online, setOnline] = useState(false);
   const socket = useRef<WebSocket | null>(null);
   const seq = useRef(0);
@@ -111,6 +115,8 @@ export function GameClient({
               ws.send(JSON.stringify({ t: "action", seq: m.seq, action: next }));
             } else plan.current = [];
           }
+        } else if (m.t === "log") {
+          setLog((old) => (m.from === 0 ? m.entries : m.from === old.length ? [...old, ...m.entries] : old));
         } else if (m.t === "error") {
           plan.current = [];
           setError(m.message);
@@ -448,6 +454,7 @@ export function GameClient({
       names={names}
       moves={moves}
       previous={previous}
+      log={<MoveLog entries={log} who={(i) => (v.state.rival && i === v.state.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`))} />}
       hand={{ selectable: pickable, selected: picked, onSelect: selectCard }}
       tech={{
         selectable: techMoves.map((m) => Number(m.stack)),

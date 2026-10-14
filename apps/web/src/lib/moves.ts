@@ -162,6 +162,26 @@ export function handMoveText(m: Move): string {
   }
 }
 
+/** A move as a line of the log. The identity of a card that stays hidden is not in the move (the server leaves it out). */
+export function logText(m: Move): string {
+  switch (m.type) {
+    case "tuck":
+      return "tucked a card for income";
+    case "take_round_card":
+      return "took an end-of-round card";
+    case "play_exertian":
+      return "played an Exertian card face down";
+    case "pol_pick":
+      return "chose a card";
+    case "exchange":
+      return m.give === "card"
+        ? `traded ${(m.cards as string[]).map(cardTitle).join(" and ")} for ${m.get === "card" ? `a card from ${source(m.source)}` : `1 ${String(m.get)}`}`
+        : `traded 2 ${String(m.give)} for ${m.get === "card" ? `a card from ${source(m.source)}` : `1 ${String(m.get)}`}`;
+    default:
+      return describeMove(m);
+  }
+}
+
 /** The card's free action is movement only: it does nothing for a player without a probe on the map. */
 export const freeIsOnlyMovement = (id: unknown): boolean => {
   const free = CARDS[String(id)]?.free ?? [];
