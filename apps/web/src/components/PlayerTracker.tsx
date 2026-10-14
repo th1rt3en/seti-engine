@@ -4,6 +4,7 @@ import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 // tucked for each kind of income, the completed missions and the end-of-game scoring cards. The numbers come from the engine's view
 // (`view.trackers`); nothing is worked out here.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { cardName } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon } from "./Icons";
@@ -157,6 +158,37 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             labelled(<DeckCardIcon size={18} />, "Cards in hand"),
             s.players.map((p) => view.counts.hands[p.index] ?? 0),
           )}
+          {s.species.some((sp) => sp.discovered && sp.species === "centaurians") ? (
+            <>
+              {group("Centaurian messages, resolved in the order sent")}
+              <tr>
+                <th scope="row">{labelled(<ScoreIcon size={18} />, "Messages waiting (first on top)")}</th>
+                {s.players.map((p) => {
+                  // ALIEN-CEN-03: the message milestone comes first (placed at discovery), then the message cards in the order played
+                  const queue = [
+                    ...p.messages.map((target) => ({ target, label: "Milestone tile" })),
+                    ...p.message_cards.map((m) => ({ target: m.target, label: cardName(m.card) })),
+                  ];
+                  return (
+                    <td key={p.index}>
+                      {queue.length === 0 ? (
+                        "none"
+                      ) : (
+                        <ol className="messagequeue">
+                          {queue.map((m, n) => (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: the position in the queue is the identity
+                            <li key={n} title={`Reached at ${m.target} points`}>
+                              {m.label} at {m.target}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            </>
+          ) : null}
         </tbody>
       </table>
     </section>

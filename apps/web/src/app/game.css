@@ -1576,3 +1576,13 @@ button:disabled {
 .spot.chosen .spotshape.goldspot {
   fill: rgba(110, 240, 165, 0.55);
 }
+
+.tracker .messagequeue {
+  margin: 0;
+  padding-left: 1.2em;
+  text-align: left;
+  font-size: 0.85em;
+}
+.tracker .messagequeue li:first-child {
+  font-weight: 600;
+}
