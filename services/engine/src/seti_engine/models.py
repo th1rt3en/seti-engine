@@ -22,12 +22,19 @@ class Options(BaseModel):
     promo_cards: bool = False  # PLAN.md D23: SE EN 01 and SE EN 02 are shuffled into the deck when on
     # PLAN.md D33: a practice game for one player, without the rival, in which cards, resources and the discs can be added or changed freely
     sandbox: bool = False
+    # sandbox only: the two face-down alien species, left to right; None leaves a slot to chance (SANDBOX-06)
+    sandbox_species: list[str | None] = Field(default_factory=lambda: list[str | None]([None, None]))
     seed: int = 0
 
     @model_validator(mode="after")
     def _sandbox_is_solo(self) -> Options:
         if self.sandbox and self.players != 1:
             raise ValueError("the sandbox is a game for one player")
+        chosen = [x for x in self.sandbox_species if x is not None]
+        if len(self.sandbox_species) != 2 or any(x not in SPECIES_BASE for x in chosen) or len(set(chosen)) != len(chosen):
+            raise ValueError("sandbox_species lists two different base species, or null for chance")
+        if chosen and not self.sandbox:
+            raise ValueError("the species can only be chosen in the sandbox")
         return self
 
 

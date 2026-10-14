@@ -97,10 +97,12 @@ function Slot({ p, pos, choice }: { p: View["state"]["players"][number]; pos: nu
   );
 }
 
-function Board({ view, player, choice }: { view: View; player: number; choice?: SlotChoice }) {
+function Board({ view, player, choice, onPlaceData }: { view: View; player: number; choice?: SlotChoice; onPlaceData?: () => void }) {
   const p = view.state.players[player];
   if (!p) return null;
   const techs = new Set(p.techs);
+  // the free action "place data" (FREE-03) puts one data of the pool in the leftmost empty space: that space is the one to click
+  const next = onPlaceData ? p.computer.indexOf(false) : -1;
   return (
     <svg viewBox="0 0 1000 650" className="playerboard" role="img" aria-label={`The board of player ${player + 1}`}>
       <PieceDefs />
@@ -117,9 +119,31 @@ function Board({ view, player, choice }: { view: View; player: number; choice?: 
       </text>
       {Array.from({ length: 6 }, (_, i) => {
         const x = SPACE_X(i);
+        const clickable = i === next;
         return (
-          <g key={`space-${x}`}>
-            <circle cx={x} cy={140} r={54} fill="#0a1226" stroke="#6aa6ff" strokeWidth="5" />
+          <g
+            key={`space-${x}`}
+            className={clickable ? "pbspace pickable" : undefined}
+            {...(clickable
+              ? {
+                  role: "button",
+                  tabIndex: 0,
+                  "aria-label": `Place 1 data from your pool on computer space ${i + 1} (free action)`,
+                  onClick: onPlaceData,
+                  onKeyDown: (e: React.KeyboardEvent) => (e.key === "Enter" || e.key === " ") && onPlaceData?.(),
+                }
+              : {})}
+          >
+            {clickable ? <title>Place 1 data from your pool here (free action)</title> : null}
+            <circle
+              cx={x}
+              cy={140}
+              r={54}
+              fill="#0a1226"
+              stroke={clickable ? "#ffd166" : "#6aa6ff"}
+              strokeWidth={clickable ? 8 : 5}
+              strokeDasharray={clickable ? "10 6" : undefined}
+            />
             <text x={x} y={86} textAnchor="middle" className="pbnum">
               {i + 1}
             </text>
@@ -182,12 +206,12 @@ function Board({ view, player, choice }: { view: View; player: number; choice?: 
       ))}
 
       <text x="40" y="623" className="pbtitle">
-        Data pool
+        Data pool: {p.data_pool}
       </text>
       {Array.from({ length: 6 }, (_, i) => (
         <g key={`pool-${SPACE_X(i)}`}>
-          <circle cx={230 + i * 70} cy={615} r={26} fill="#0a1226" stroke="#6aa6ff" strokeWidth="3" opacity="0.8" />
-          {i < p.data_pool ? <DataToken x={230 + i * 70} y={615} size={44} title="Data in the pool" /> : null}
+          <circle cx={320 + i * 70} cy={615} r={26} fill="#0a1226" stroke="#6aa6ff" strokeWidth="3" opacity="0.8" />
+          {i < p.data_pool ? <DataToken x={320 + i * 70} y={615} size={44} title="Data in the pool" /> : null}
         </g>
       ))}
     </svg>
@@ -201,7 +225,17 @@ export function PlayerBoardPanel({
   onShow,
   onClose,
   choice,
-}: { view: View; names: string[]; shown: number; onShow: (player: number) => void; onClose: () => void; choice?: SlotChoice }) {
+  onPlaceData,
+}: {
+  view: View;
+  names: string[];
+  shown: number;
+  onShow: (player: number) => void;
+  onClose: () => void;
+  choice?: SlotChoice;
+  /** The free action "place data": given when the viewer may do it; the first empty space of their computer is then clickable. */
+  onPlaceData?: () => void;
+}) {
   const s = view.state;
   const players = s.players.filter((p) => !(s.rival && p.index === s.rival.index));
   return (
@@ -220,7 +254,15 @@ export function PlayerBoardPanel({
         </button>
       </header>
       {choice ? <p className="handhint">Click the slot of the computer where the new tech goes.</p> : null}
-      <Board view={view} player={shown} choice={shown === view.viewer ? choice : undefined} />
+      {onPlaceData && shown === view.viewer ? (
+        <p className="handhint">Click the highlighted computer space to place a data from your pool (free action).</p>
+      ) : null}
+      <Board
+        view={view}
+        player={shown}
+        choice={shown === view.viewer ? choice : undefined}
+        onPlaceData={shown === view.viewer ? onPlaceData : undefined}
+      />
     </section>
   );
 }

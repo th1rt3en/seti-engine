@@ -29,6 +29,7 @@ export type Difficulty = number;
 export type Players = number;
 export type PromoCards = boolean;
 export type Sandbox = boolean;
+export type SandboxSpecies = (string | null)[];
 export type Seed = number;
 export type OumuamuaPlaced = boolean;
 export type PassCardAsked = boolean;
@@ -306,6 +307,7 @@ export interface Options {
   players: Players;
   promo_cards?: PromoCards;
   sandbox?: Sandbox;
+  sandbox_species?: SandboxSpecies;
   seed?: Seed;
 }
 /**

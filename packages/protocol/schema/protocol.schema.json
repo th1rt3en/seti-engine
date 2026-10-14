@@ -806,6 +806,20 @@
           "title": "Sandbox",
           "type": "boolean"
         },
+        "sandbox_species": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Sandbox Species",
+          "type": "array"
+        },
         "seed": {
           "default": 0,
           "title": "Seed",

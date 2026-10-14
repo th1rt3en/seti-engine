@@ -86,6 +86,9 @@ export async function createGameAction(form: FormData): Promise<void> {
     options: {
       players,
       ...(players === 1 ? { difficulty, sandbox: form.get("sandbox") === "on" } : {}),
+      ...(players === 1 && form.get("sandbox") === "on"
+        ? { sandbox_species: [field(form, "species1") || null, field(form, "species2") || null] }
+        : {}),
       promo_cards: form.get("promo") === "on",
     },
     clock: (preset as NonNullable<typeof preset>).clock,

@@ -1693,3 +1693,12 @@ button:disabled {
   display: inline-flex;
   gap: 2px;
 }
+
+/* the computer space that takes the next data (free action) */
+.playerboard .pbspace.pickable {
+  cursor: pointer;
+}
+.playerboard .pbspace.pickable:hover circle,
+.playerboard .pbspace.pickable:focus circle {
+  fill: #1a2a55;
+}

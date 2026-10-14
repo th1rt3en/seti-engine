@@ -181,3 +181,28 @@ def test_the_sandbox_keeps_working_through_a_whole_game_of_random_moves() -> Non
         steps += 1
         assert len(legal_moves(r.state)) == len(r.legal)
     assert r.state.phase == "finished"
+
+
+def test_the_sandbox_can_choose_the_face_down_species() -> None:
+    """SANDBOX-06: a chosen species keeps its slot; a slot left to chance takes another species."""
+    both = start(Options(players=1, sandbox=True, seed=3, sandbox_species=["exertians", "mascamites"])).state
+    assert [sl.species for sl in both.species] == ["exertians", "mascamites"]
+    one = start(Options(players=1, sandbox=True, seed=3, sandbox_species=[None, "oumuamua"])).state
+    assert one.species[1].species == "oumuamua" and one.species[0].species != "oumuamua"
+    again = start(Options(players=1, sandbox=True, seed=3, sandbox_species=[None, "oumuamua"])).state
+    assert [sl.species for sl in again.species] == [sl.species for sl in one.species]  # the same seed gives the same game
+    assert not any(sl.discovered for sl in both.species)  # they are still face down: discovering them is part of play
+    plain = start(Options(players=1, sandbox=True, seed=3)).state
+    assert [sl.species for sl in plain.species] == [sl.species for sl in start(Options(players=1, sandbox=True, seed=3)).state.species]
+
+
+def test_the_species_choice_is_refused_outside_the_sandbox_and_when_it_makes_no_sense() -> None:
+    """SANDBOX-06."""
+    with pytest.raises(ValueError):
+        Options(players=1, sandbox_species=["exertians", None])
+    with pytest.raises(ValueError):
+        Options(players=1, sandbox=True, sandbox_species=["exertians", "exertians"])
+    with pytest.raises(ValueError):
+        Options(players=1, sandbox=True, sandbox_species=["glyphids", None])
+    with pytest.raises(ValueError):
+        Options(players=1, sandbox=True, sandbox_species=["exertians"])

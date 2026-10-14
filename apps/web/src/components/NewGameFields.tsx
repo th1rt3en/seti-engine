@@ -14,6 +14,24 @@ export function NewGameFields({
   // real-time or turn-based play (D34): each has three speeds and the choice of no time control
   const [mode, setMode] = useState<"realtime" | "turnbased">("realtime");
   const solo = players === 1;
+  // the sandbox can choose its two face-down alien species (SANDBOX-06)
+  const [sandbox, setSandbox] = useState(false);
+  const [first, setFirst] = useState("");
+  const [second, setSecond] = useState("");
+  const SPECIES = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"];
+  const speciesSelect = (name: string, label: string, value: string, onChange: (v: string) => void, taken: string) => (
+    <label>
+      {label}
+      <select name={name} value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">Random</option>
+        {SPECIES.filter((sp) => sp !== taken).map((sp) => (
+          <option key={sp} value={sp}>
+            {sp.charAt(0).toUpperCase() + sp.slice(1)}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
   return (
     <>
       <label>
@@ -61,8 +79,15 @@ export function NewGameFields({
       </label>
       {solo ? (
         <label className="row">
-          <input type="checkbox" name="sandbox" /> Sandbox (practice: no rival, add any card, resources and turn the discs)
+          <input type="checkbox" name="sandbox" checked={sandbox} onChange={(e) => setSandbox(e.target.checked)} /> Sandbox (practice: no
+          rival, add any card, resources and turn the discs)
         </label>
+      ) : null}
+      {solo && sandbox ? (
+        <>
+          {speciesSelect("species1", "Face-down alien species, left", first, setFirst, second)}
+          {speciesSelect("species2", "Face-down alien species, right", second, setSecond, first)}
+        </>
       ) : null}
       {solo ? null : (
         <label className="row">

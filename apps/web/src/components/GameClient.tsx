@@ -726,6 +726,7 @@ export function GameClient({
             onShow={setBoardPlayer}
             onClose={() => setBoardOpen(false)}
             choice={slotChoice}
+            onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
           />
         ) : null
       }
