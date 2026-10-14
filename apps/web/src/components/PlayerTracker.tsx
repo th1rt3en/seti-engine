@@ -4,13 +4,29 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import { ScoreIcon } from "./Icons";
+import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, PublicityIcon, ScoreIcon } from "./Icons";
 
 const KINDS = [
-  { key: "credit", label: "Credits", swatch: "#e5b83a" },
-  { key: "energy", label: "Energy", swatch: "#4fb06d" },
-  { key: "card", label: "Cards", swatch: "#4c8fd6" },
+  { key: "credit", label: "Credits", icon: <CreditIcon size={18} /> },
+  { key: "energy", label: "Energy", icon: <EnergyIcon size={18} /> },
+  { key: "card", label: "Cards", icon: <DeckCardIcon size={18} /> },
 ] as const;
+
+/** A label with its icon in front of it. */
+const labelled = (icon: ReactNode, text: string): ReactNode => (
+  <span className="rowlabel">
+    {icon}
+    {text}
+  </span>
+);
+
+/** The square that stands for completed missions (silver) and end-of-game scoring cards (gold). */
+const metal = (kind: "silver" | "gold", text: string): ReactNode => (
+  <span className="rowlabel">
+    <span className={`metal ${kind}`} aria-hidden="true" />
+    {text}
+  </span>
+);
 
 export function PlayerTracker({ view, names, previous }: { view: View; names: string[]; previous?: View | null }) {
   const s = view.state;
@@ -35,12 +51,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
       ))}
     </tr>
   );
-  const kindLabel = (k: (typeof KINDS)[number]): ReactNode => (
-    <>
-      <span className="swatch" style={{ background: k.swatch }} />
-      {k.label}
-    </>
-  );
+  const kindLabel = (k: (typeof KINDS)[number]): ReactNode => labelled(k.icon, k.label);
 
   return (
     <section className="tracker" aria-label="Player tracker">
@@ -88,38 +99,36 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
           )}
           {group("Missions and end of game")}
           {row(
-            "Missions done",
+            metal("silver", "Missions done"),
             trackers.map((t) => t.missions_done),
+            "metalrow silverrow",
           )}
           {row(
-            "End-game cards",
+            metal("gold", "End-game cards"),
             trackers.map((t) => t.end_cards),
+            "metalrow goldrow",
           )}
           {group("Now")}
           {row(
-            "Credits",
+            labelled(<CreditIcon size={18} />, "Credits"),
             s.players.map((p) => p.credits),
           )}
           {row(
-            "Energy",
+            labelled(<EnergyIcon size={18} />, "Energy"),
             s.players.map((p) => p.energy),
           )}
           {row(
-            "Publicity",
+            labelled(<PublicityIcon size={18} />, "Publicity"),
             s.players.map((p) => p.publicity),
           )}
           <tr>
-            <th scope="row">Data pile</th>
+            <th scope="row">{labelled(<DataIcon size={18} />, "Data pile")}</th>
             {s.players.map((p) => {
               const grew =
                 previous !== null && previous !== undefined && p.data_pool > (previous.state.players[p.index]?.data_pool ?? p.data_pool);
               return (
                 <td key={p.index} className={grew ? "flash" : undefined}>
                   <span className="datapile" title={`${p.data_pool} data in the pool`}>
-                    <svg width={18} height={18} viewBox="-50 -50 100 100" aria-hidden="true">
-                      <circle r={44} fill="url(#pc-data-top)" stroke="#0a2a66" strokeWidth={5} />
-                      <circle r={30} fill="url(#pc-data-dimple)" />
-                    </svg>
                     {p.data_pool}
                   </span>
                 </td>
@@ -127,7 +136,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             })}
           </tr>
           {row(
-            "Cards in hand",
+            labelled(<DeckCardIcon size={18} />, "Cards in hand"),
             s.players.map((p) => view.counts.hands[p.index] ?? 0),
           )}
         </tbody>

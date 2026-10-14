@@ -1458,3 +1458,50 @@ button:disabled {
     padding-bottom: 48px;
   }
 }
+
+/* the tracker: labels with their icons, and the silver and gold squares of the missions */
+.rowlabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.metal {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.85), inset 0 -2px 3px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.metal.silver {
+  background: linear-gradient(135deg, #fbfcfd 0%, #c3cad3 38%, #8d96a3 62%, #e4e8ed 100%);
+  border: 1px solid #6f7885;
+}
+.metal.gold {
+  background: linear-gradient(135deg, #fff1b8 0%, #e8b923 38%, #a8760a 62%, #f7d96a 100%);
+  border: 1px solid #7a5406;
+}
+.metal::after {
+  content: "";
+  position: absolute;
+  inset: 2px 7px 7px 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+.metalrow td {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.silverrow {
+  background: linear-gradient(90deg, rgba(200, 208, 218, 0.14), transparent 85%);
+}
+.silverrow td {
+  color: #dfe5ec;
+}
+.goldrow {
+  background: linear-gradient(90deg, rgba(240, 190, 50, 0.18), transparent 85%);
+}
+.goldrow td {
+  color: #ffd75e;
+}
