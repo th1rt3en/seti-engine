@@ -126,13 +126,21 @@ def pay(p: PlayerState, credits: int = 0, energy: int = 0, publicity: int = 0) -
     return True
 
 
+def tech_active(p: PlayerState, name: str) -> bool:
+    """Can the player use the ability of the tech? A tech that Helion Assembly has set beside its board still counts as owned for
+    everything else,
+    and one that Turing Systems borrows for the turn can be used without being owned (EXP-ORG-13)."""
+    return (name in p.techs and name not in p.org_data.get("disabled", [])) or name in p.org_data.get("borrowed", [])
+
+
 def probe_limit(p: PlayerState) -> int:
-    return 2 if "probe-dot" in p.techs else 1  # LAUNCH-02, LAUNCH-03
+    extra = 1 if p.organization == "orbital_dynamics" else 0  # Orbital Dynamics: the limit of probes in space is 1 higher (EXP-ORG-13)
+    return (2 if tech_active(p, "probe-dot") else 1) + extra  # LAUNCH-02, LAUNCH-03
 
 
 def launch_probe(state: GameState, p: PlayerState, events: list[dict[str, object]], nolimit: bool = False) -> bool:
     """Put a probe on Earth if the player is under the probe limit (LAUNCH-01); card #9 ignores the limit (FAQ-C009)."""
-    from . import cards  # noqa: PLC0415 - cards imports this module
+    from . import cards, orgs  # noqa: PLC0415 - these import this module
 
     if not nolimit and sum(1 for pr in state.probes if pr.player == p.index and not pr.capsule) >= probe_limit(p):
         return False
@@ -142,4 +150,5 @@ def launch_probe(state: GameState, p: PlayerState, events: list[dict[str, object
     state.probes.append(probe)
     events.append({"type": "launch", "player": p.index, "probe": probe.id})
     cards.fire(state, p, [{"e": "launch"}], events)  # FAQ-C117
+    orgs.on_launch(state, p, events)  # Sentinel Probe Network (EXP-ORG-13)
     return True

@@ -250,13 +250,10 @@ Entry format:
 - Proposed ruling: implement the signal token as a resource (done) and let each card use it when its effect is implemented.
 
 ## A-030: Which organizations are numbered 1 to 4
-- Status: open (missing data, low priority)
+- Status: resolved (read from the rulebook picture, no owner ruling needed)
 - Rule IDs affected: EXP-ORG-05
 - Rulebook page and text: R16 p.4 "When playing with organizations for the first time, consider starting with those numbered 1-4 (see the bottom left corner). Those four are generally less complex."
-- Readings: the extraction has a complexity label (passive, once-per-round, complex) but not the numbers.
-- Consequence: only the first-game recommendation.
-- Proposed ruling: not implemented; players choose freely.
-- Questions for the owner: which four organizations carry the numbers 1 to 4? (Then a "first game" option can be added.)
+- Resolution: the numbers are printed in the bottom left corner of the cards (R16 p.2): 1 Orbital Dynamics, 2 Fenwick Research Center, 3 Stratus Core, 4 Deep Sky Survey, 5 Turing Systems, 6 Cosmos Strategy Group, 7 Sentinel Probe Network, 8 Mission Relay, 9 Xenolab, 10 Futurespan Institute, 11 Helion Assembly. The first-game option (EXP-ORG-05) uses 1 to 4.
 
 ## A-031: Organization income at the start of rounds 3, 4 and 5 versus the base income rules
 - Status: proposed
@@ -299,4 +296,21 @@ Entry format:
 - Consequence: a small advantage that cannot be checked by the engine.
 - Proposed ruling: reading 1 for now: the promo card is not in the deck and its after-game bonus is not offered. The card itself (launch a probe, gain a signal token) is easy once the owner wants it.
 - Questions for the owner: which reading?
+
+## A-036: Details of the neutral quick start marks and of preparing a card at Futurespan
+- Status: proposed (the engine uses these readings; the owner is asked to confirm)
+- Rule IDs affected: EXP-QS-01, EXP-QS-03, EXP-ORG-12
+- Rulebook page and text: R16 p.5: the top half of a quick start card is marked "without gaining any bonuses" (a trace in the discovery space of the right species, 2 signals in a star's sector, an orbiter at a planet); neutral pieces are used for the 4 revealed cards. Futurespan (R16 p.2 picture): the token is placed 15, 25, 35 or 45 points ahead of the score counter for a prepared card that costs 1, 2, 3 or 4 credits.
+- Readings: (a) an orbiter placed by a quick start card takes the first orbiter space like any orbiter (so a later player does not get the first-orbiter bonus), or it sits beside the planet and leaves the bonus; (b) a trace for a discovery space that is already marked goes to the overflow space of its color, or is lost; (c) a prepared card of cost 0 gets +5 (the formula 10 x cost + 5), or cannot be prepared; a card that costs energy (an alien card of Centaurians) counts its energy as its cost.
+- Consequence: the first-orbiter bonus, the number of traces, the Futurespan token distance.
+- Proposed ruling: (a) it takes the first orbiter space (the bonus is lost, but the orbiter counts for landing costs and the planet); (b) it goes to the overflow space of that color; (c) +5 for cost 0, energy cost counts as the cost; (d) the income-only quick start cards SR.15 and SR.16 gain their resource at once when tucked (INCOME-01).
+- Questions for the owner: confirm or rule otherwise.
+
+## A-037: Xenolab tiles and traces
+- Status: proposed
+- Rule IDs affected: EXP-ORG-13 (Xenolab)
+- Rulebook page and text: R16 p.2 (picture): the three tiles show launch (1 credit), scan (2 energy) and research (4 publicity), with a blue, a yellow and a pink corner; "When you gain a life trace, flip the matching tile to its active side".
+- Readings: the corner color is the trace color that reactivates the tile: launch is reactivated by a blue trace, scan by a yellow trace, research by a pink trace (the order of the tiles in the picture).
+- Proposed ruling: that mapping; a trace gained in any way (also from a quick start card at setup? no: setup marks give no benefits) reactivates the matching inactive tile.
+- Questions for the owner: confirm the colors of the three tiles.
 

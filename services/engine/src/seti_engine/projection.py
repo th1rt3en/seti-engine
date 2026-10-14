@@ -136,6 +136,8 @@ def project(state: GameState, viewer: int | None) -> View:
             p.hand = [HIDDEN] * len(p.hand)
             p.exertian_hand = [HIDDEN] * len(p.exertian_hand)
             p.exertian_played = [HIDDEN] * len(p.exertian_played)
+            p.offered_orgs = [HIDDEN] * len(p.offered_orgs)  # EXP-ORG-04: the cards offered at setup are the player's secret
+            p.offered_quick = [HIDDEN] * len(p.offered_quick)
     for slot in s.species:
         slot.deck = [HIDDEN] * len(slot.deck)
         if not slot.discovered:

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, rewards, solar, tables
+from . import effects, orgs, rewards, solar, tables
 from .models import ComputerTech, Decision, GameState, PlayerState
 
 Action = dict[str, Any]
@@ -63,6 +63,7 @@ def take_tech(s: GameState, p: PlayerState, stack: int, events: Events, tile_bon
     name = tech_name(st.category, st.glyph)
     p.techs.append(name)
     events.append({"type": "tech", "player": p.index, "tech": name})
+    orgs.on_tech(s, p, st.category)  # Turing Systems (EXP-ORG-13)
     extra = _stack_extra(st.category, st.glyph)
     rewards.grant(s, p, [*([TILE_BONUS[tile]] if tile_bonus else []), *extra], events)  # TECHACT-04
     if st.category == "computer":
@@ -105,11 +106,12 @@ def place_lower(s: GameState, p: PlayerState, slot: int, events: Events) -> None
 
 
 def can_analyze(p: PlayerState) -> bool:
-    return p.energy >= 1 and all(p.computer)  # ANALYZE-01
+    return (p.energy >= 1 or orgs.analyze_free(p)) and all(p.computer)  # ANALYZE-01; Deep Sky Survey needs no energy (EXP-ORG-13)
 
 
 def analyze(s: GameState, p: PlayerState, events: Events) -> None:
-    effects.pay(p, energy=1)
+    if not orgs.analyze_free(p):
+        effects.pay(p, energy=1)
     p.computer = [False] * 6  # ANALYZE-02: every data token in the computer, bottom row too
     for t in p.computer_techs.values():
         t.lower_filled = False
@@ -122,11 +124,19 @@ def analyze(s: GameState, p: PlayerState, events: Events) -> None:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
+def _active_techs(p: PlayerState) -> list[str]:
+    """The techs whose ability the player can use (see effects.tech_active)."""
+    names = list(dict.fromkeys([*p.techs, *p.org_data.get("borrowed", [])]))
+    return [t for t in names if effects.tech_active(p, t)]
+
+
 def start_scan(s: GameState, p: PlayerState, free: bool = False, ctx: dict[str, Any] | None = None) -> None:
     """SCAN-01 to SCAN-05: the steps can be done in any order; telescope techs add optional steps (SCAN-04, TECH-10).
     `ctx` carries the extra points of cards such as #53 (FAQ-C051: only the base cost is skipped)."""
     s.scan_ctx = ctx or {}
-    s.scan_steps = ["earth", "row"] + [f"tt:{t.split('-')[1]}" for t in p.techs if t.startswith("telescope-") and t != "telescope-dot"]
+    s.scan_steps = ["earth", "row"] + [
+        f"tt:{t.split('-')[1]}" for t in _active_techs(p) if t.startswith("telescope-") and t != "telescope-dot"
+    ]
     s.pending.append(Decision(kind="scan_step", player=p.index))
 
 
@@ -136,11 +146,13 @@ def scan_moves(s: GameState, p: PlayerState) -> list[Action]:
     if "earth" in steps:
         earth = solar.earth(s)[1]
         sectors = [earth]
-        if "telescope-dot" in p.techs:  # TECH-TT01
+        if effects.tech_active(p, "telescope-dot"):  # TECH-TT01
             sectors += [(earth - 1) % 8, (earth + 1) % 8]
         out += [{"type": "scan_earth", "sector": i} for i in sectors]
     if "row" in steps:
         out += [{"type": "scan_discard", "source": f"row:{i}"} for i in range(len(s.card_row))]
+    if p.signal_tokens > 0 and s.card_row:  # EXP-SIG-02: a signal token pays for one more row card and its signal, in any order
+        out += [{"type": "scan_token", "source": f"row:{i}"} for i in range(len(s.card_row))]
     if "tt:branch" in steps:  # TECH-TT02
         out += [{"type": "scan_hand_discard", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
     if "tt:link" in steps and p.publicity >= 1 and solar.find_cell(s, "PLANET:MERCURY"):  # TECH-TT03
@@ -163,6 +175,11 @@ def resolve_scan(s: GameState, p: PlayerState, a: Action, events: Events) -> Non
         s.scan_steps.remove("row")
         cid = s.card_row.pop(int(a["source"].split(":")[1]))
         s.discard.append(cid)  # the row is refilled when the scan is finished (SCAN-03)
+        s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[cid]["sector"]}))
+    elif t == "scan_token":
+        p.signal_tokens -= 1  # EXP-SIG-02
+        cid = s.card_row.pop(int(a["source"].split(":")[1]))
+        s.discard.append(cid)  # the row is refilled when the scan is finished, so two tokens at most fit the three cards of the row
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[cid]["sector"]}))
     elif t == "scan_hand_discard":
         s.scan_steps.remove("tt:branch")

@@ -19,8 +19,22 @@ def solar() -> dict[str, Any]:
     return out
 
 
+@cache
 def cards() -> dict[str, dict[str, Any]]:
-    out: dict[str, dict[str, Any]] = load("cards.json")
+    """The static facts of the cards. The quick start cards that are tucked for income (SR.15, SR.16; EXP-QS-02) are in it too, with deck
+    "quick" so that no deck is built from them, because a tucked card is looked up like any other for its income."""
+    out: dict[str, dict[str, Any]] = dict(load("cards.json"))
+    for qid, q in quick_start_cards().items():
+        if q["income_increase"]:
+            out[qid] = {
+                "name": f"Quick start {qid}",
+                "deck": "quick",
+                "cost": 0,
+                "income": q["income_increase"],
+                "sector": None,
+                "species": None,
+                "free": [],
+            }
     return out
 
 
@@ -31,6 +45,18 @@ def stars() -> dict[str, Any]:
 
 def planets() -> dict[str, Any]:
     out: dict[str, Any] = load("planets.json")
+    return out
+
+
+def organizations() -> dict[str, dict[str, Any]]:
+    """The 11 organizations of the expansion by id (docs/spec/expansion-data.md, owner check pending)."""
+    out: dict[str, dict[str, Any]] = {o["id"]: o for o in load("expansion-organizations.json")["organizations"]}
+    return out
+
+
+def quick_start_cards() -> dict[str, dict[str, Any]]:
+    """The 21 quick start cards by id, SR.1 to SR.21 (docs/spec/expansion-data.md, owner check pending)."""
+    out: dict[str, dict[str, Any]] = {q["id"]: q for q in load("expansion-quick-start.json")["quick_start_cards"]}
     return out
 
 

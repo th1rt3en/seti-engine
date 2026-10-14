@@ -11,7 +11,7 @@ import copy
 from collections import deque
 from typing import Any
 
-from . import alien_steps, card_defs, effects, objectives, rewards, solar, tables, techs
+from . import alien_steps, card_defs, effects, objectives, orgs, rewards, solar, tables, techs
 from .models import Decision, GameState, MissionState, PlanetState, PlayerState
 
 Action = dict[str, Any]
@@ -59,8 +59,10 @@ def play(s: GameState, p: PlayerState, cid: str, events: Events) -> None:
     s.queue = copy.deepcopy(card_defs.CARDS[cid].get("fx", []))
     events.append({"type": "play_card", "player": p.index, "card": cid})
     m = card_defs.CARDS[cid].get("mission")
+    orgs.on_card_played(s, p, cid, tables.cards()[cid]["deck"] == "alien")
     if m:  # A-019: a mission is in play from the moment its card is played, so its own effect can trigger it
         p.missions.append(MissionState(card=cid, kind=m["kind"], used=[False] * len(m.get("circles", []))))
+        orgs.on_mission_played(s, p)  # Mission Relay (EXP-ORG-13)
     if cost > 0 and not pays_energy(cid):
         fire(s, p, [{"e": "play_cost", "cost": cost}], events)  # FAQ-C106
     if cid in card_defs.MARS_FLAVOR:
@@ -291,7 +293,7 @@ def land_free_moves(s: GameState, p: PlayerState, opts: dict[str, Any]) -> list[
         if planet not in s.planets:
             continue
         out.append({"type": "land_free", "probe": pr.id})
-        if opts.get("any_moon") or "probe-cross" in p.techs:
+        if opts.get("any_moon") or effects.tech_active(p, "probe-cross"):
             for moon in planet_moons(planet):
                 if opts.get("occupied") or moon not in s.planets[planet].moon_landers:
                     out.append({"type": "land_free", "probe": pr.id, "moon": moon})

@@ -1,22 +1,22 @@
 # Space Agencies expansion: organization and quick start data
 
-Data, not rules (see `expansion.md`). Source: the repository's card extraction `tools/card-tracker/cards-extracted.json` (a community transcription of the cards, with the ability texts and a reference summary); machine-readable copies are `data/expansion-organizations.json` and `data/expansion-quick-start.json`. **Not yet checked against the physical cards by the owner**: the owner should check each row (the engine uses these values). Resources are the starting resources at the top of the organization card; "tuck" is how many cards the organization lets the player tuck for income at the start (EXP-ORG-07); "income" is what the organization gives at the start of rounds 3, 4 and 5 (EXP-ORG-08); a signal token income is the new resource of EXP-SIG-01.
+Data, not rules (see `expansion.md`). Source: the repository's card extraction `tools/card-tracker/cards-extracted.json` (a community transcription of the cards, with the ability texts and a reference summary); machine-readable copies are `data/expansion-organizations.json` and `data/expansion-quick-start.json`. The starting resources, tuck icons, incomes and ability texts of the organizations were compared on 2026-10-15 with the pictures of the cards in the rulebook (R16 p.2 and p.5) and agree; the owner has not checked them yet. The quick start cards are not shown in the rulebook pictures in a readable size: owner check pending. Resources are the starting resources at the top of the organization card; "tuck" is how many cards the organization lets the player tuck for income at the start (EXP-ORG-07); "income" is what the organization gives at the start of rounds 3, 4 and 5 (EXP-ORG-08); a signal token income is the new resource of EXP-SIG-01.
 
 ## Organizations (11)
 
-| Organization | Credits | Energy | Cards | Publicity | Data | Probes | Tuck | Income: credit / energy / card / publicity / data / signal |
-|---|---|---|---|---|---|---|---|---|
-| Cosmos Strategy Group | 4 | 2 | 1 | 1 | 0 | 0 | 2 | 2 / 1 / 1 / 0 / 0 / 0 |
-| Deep Sky Survey | 3 | 2 | 0 | 3 | 1 | 0 | 2 | 2 / 2 / 1 / 0 / 0 / 1 |
-| Fenwick Research Center | 3 | 1 | 0 | 4 | 0 | 0 | 3 | 3 / 1 / 0 / 1 / 0 / 0 |
-| Futurespan Institute | 3 | 3 | 1 | 3 | 0 | 0 | 2 | 2 / 1 / 1 / 0 / 0 / 0 |
-| Helion Assembly | 3 | 2 | 0 | 7 | 0 | 0 | 0 | 3 / 1 / 1 / 1 / 0 / 0 |
-| Mission Relay | 3 | 2 | 2 | 2 | 0 | 0 | 3 | 1 / 1 / 1 / 0 / 0 / 0 |
-| Orbital Dynamics | 2 | 2 | 0 | 3 | 0 | 2 | 2 | 3 / 1 / 1 / 0 / 0 / 0 |
-| Sentinel Probe Network | 4 | 2 | 0 | 3 | 0 | 0 | 1 | 3 / 1 / 1 / 0 / 0 / 1 |
-| Stratus Core | 3 | 2 | 1 | 3 | 0 | 0 | 3 | 2 / 1 / 1 / 0 / 0 / 0 |
-| Turing Systems | 4 | 2 | 1 | 2 | 0 | 0 | 2 | 2 / 2 / 1 / 0 / 1 / 0 |
-| Xenolab | 2 | 2 | 1 | 1 | 0 | 0 | 3 | 2 / 1 / 1 / 0 / 0 / 0 |
+| No. | Organization | Credits | Energy | Cards | Publicity | Data | Probes | Tuck | Income: credit / energy / card / publicity / data / signal |
+|---|---|---|---|---|---|---|---|---|---|
+| 6 | Cosmos Strategy Group | 4 | 2 | 1 | 1 | 0 | 0 | 2 | 2 / 1 / 1 / 0 / 0 / 0 |
+| 4 | Deep Sky Survey | 3 | 2 | 0 | 3 | 1 | 0 | 2 | 2 / 2 / 1 / 0 / 0 / 1 |
+| 2 | Fenwick Research Center | 3 | 1 | 0 | 4 | 0 | 0 | 3 | 3 / 1 / 0 / 1 / 0 / 0 |
+| 10 | Futurespan Institute | 3 | 3 | 1 | 3 | 0 | 0 | 2 | 2 / 1 / 1 / 0 / 0 / 0 |
+| 11 | Helion Assembly | 3 | 2 | 0 | 7 | 0 | 0 | 0 | 3 / 1 / 1 / 1 / 0 / 0 |
+| 8 | Mission Relay | 3 | 2 | 2 | 2 | 0 | 0 | 3 | 1 / 1 / 1 / 0 / 0 / 0 |
+| 1 | Orbital Dynamics | 2 | 2 | 0 | 3 | 0 | 2 | 2 | 3 / 1 / 1 / 0 / 0 / 0 |
+| 7 | Sentinel Probe Network | 4 | 2 | 0 | 3 | 0 | 0 | 1 | 3 / 1 / 1 / 0 / 0 / 1 |
+| 3 | Stratus Core | 3 | 2 | 1 | 3 | 0 | 0 | 3 | 2 / 1 / 1 / 0 / 0 / 0 |
+| 5 | Turing Systems | 4 | 2 | 1 | 2 | 0 | 0 | 2 | 2 / 2 / 1 / 0 / 1 / 0 |
+| 9 | Xenolab | 2 | 2 | 1 | 1 | 0 | 0 | 3 | 2 / 1 / 1 / 0 / 0 / 0 |
 
 ### Abilities
 
@@ -86,4 +86,3 @@ Data, not rules (see `expansion.md`). Source: the repository's card extraction `
 - The 20 alien cards of the three species and the Arkhos exploration (9) and security (12) cards (A-032).
 - The boards of the three species, the translation strips, the organelle layout (A-032).
 - The 4 solo rival cards and the 3 long-term objective tiles (A-033, A-034).
-- Which four organizations are numbered 1 to 4 (A-030).

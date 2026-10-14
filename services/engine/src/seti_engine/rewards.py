@@ -16,6 +16,7 @@ Events = list[dict[str, Any]]
 TRACE_COLORS = ("pink", "yellow", "blue")  # LIFE-01; column order of the three discovery spaces
 DISCOVERY_VP = (5, 3)  # BOARD-40: left slot 5 VP, right slot 3 VP, each with 1 publicity
 OVERFLOW_VP = 3  # LIFE-01
+NEUTRAL = -1  # EXP-QS-03: the marker color of the neutral quick start pieces
 
 
 def grant(
@@ -50,6 +51,8 @@ def grant(
             s.pending += [Decision(kind="income_tuck", player=p.index) for _ in range(n)]  # INCOME-01; FAQ-01: may be declined
         elif t == "move":
             p.movement += n
+        elif t == "signal_token":
+            p.signal_tokens += n  # EXP-SIG-01
         elif t == "exofossil":
             species.gain_exofossil(s, p, n)
         elif t == "exofossil_pay":
@@ -144,7 +147,7 @@ def resolve_sector(s: GameState, index: int, events: Events) -> None:
         return
     sec = s.sectors[index]
     star = _star(sec.star)
-    ranking = _ranking(sec.markers)
+    ranking = _ranking(sec.markers, exclude=NEUTRAL)  # EXP-QS-04: the neutral color never wins
     winner = ranking[0]
     first = not sec.winners
     sec.winners.append(winner)  # SECTOR-14: the winner's marker beside the star stays; it never counts for the next win
@@ -152,10 +155,10 @@ def resolve_sector(s: GameState, index: int, events: Events) -> None:
     w = s.players[winner]
     w.sector_wins += 1
     events.append({"type": "sector_won", "player": winner, "sector": index})
-    for q in sorted(set(sec.markers)):
+    for q in sorted(set(sec.markers) - {NEUTRAL}):
         effects.gain_publicity(s, s.players[q])  # SECTOR-12
     grant(s, w, star["first_win" if first else "later_win"], events)  # SECTOR-15, SECTOR-16
-    second = _ranking(sec.markers, exclude=winner)  # SECTOR-13
+    second = _ranking(sec.markers, exclude=winner)  # SECTOR-13, EXP-QS-04: a neutral marker may stay as second
     sec.markers = [second[0]] if second else []
     sec.data_remaining = sec.capacity - len(sec.markers)
 

@@ -1,0 +1,429 @@
+{
+ "quick_start_cards": [
+  {
+   "id": "SR.1",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "alienIndex": 1,
+     "trace": "yellow"
+    }
+   ],
+   "place_text": "in the discovery space of the right species"
+  },
+  {
+   "id": "SR.2",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "alienIndex": 1,
+     "trace": "pink"
+    }
+   ],
+   "place_text": "in the discovery space of the right species"
+  },
+  {
+   "id": "SR.3",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "barnards_star"
+    }
+   ],
+   "place_text": "in Barnard's Star"
+  },
+  {
+   "id": "SR.4",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "proxima_centauri"
+    }
+   ],
+   "place_text": "in Proxima Centauri"
+  },
+  {
+   "id": "SR.5",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "sirius_a"
+    }
+   ],
+   "place_text": "in Sirius A"
+  },
+  {
+   "id": "SR.6",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "procyon"
+    }
+   ],
+   "place_text": "in Procyon"
+  },
+  {
+   "id": "SR.7",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "kepler_22"
+    }
+   ],
+   "place_text": "in Kepler 22"
+  },
+  {
+   "id": "SR.8",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "sixty_one_virginis"
+    }
+   ],
+   "place_text": "in 61 Virginis"
+  },
+  {
+   "id": "SR.9",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "count": 2,
+     "starName": "beta_pictoris"
+    }
+   ],
+   "place_text": "in Beta Pictoris"
+  },
+  {
+   "id": "SR.10",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "signal_token",
+     "n": 1
+    },
+    {
+     "effect": "data",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "count": 1,
+     "starName": "vega"
+    }
+   ],
+   "place_text": "in Vega"
+  },
+  {
+   "id": "SR.11",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 4
+    },
+    {
+     "effect": "publicity",
+     "n": 2
+    }
+   ],
+   "marks": [
+    {
+     "planet": "saturn"
+    }
+   ],
+   "place_text": "at Saturn"
+  },
+  {
+   "id": "SR.12",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "energy",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "planet": "venus"
+    }
+   ],
+   "place_text": "at Venus"
+  },
+  {
+   "id": "SR.13",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "data",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "planet": "jupiter"
+    }
+   ],
+   "place_text": "at Jupiter"
+  },
+  {
+   "id": "SR.14",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "credit",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "planet": "mercury"
+    }
+   ],
+   "place_text": "at Mercury"
+  },
+  {
+   "id": "SR.15",
+   "income_increase": "card",
+   "lower": [],
+   "marks": [
+    {
+     "planet": "uranus"
+    }
+   ],
+   "place_text": "at Uranus"
+  },
+  {
+   "id": "SR.16",
+   "income_increase": "data",
+   "lower": [],
+   "marks": [
+    {
+     "planet": "neptune"
+    }
+   ],
+   "place_text": "at Neptune"
+  },
+  {
+   "id": "SR.17",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "card",
+     "n": 1
+    }
+   ],
+   "marks": [
+    {
+     "planet": "mars"
+    }
+   ],
+   "place_text": "at Mars"
+  },
+  {
+   "id": "SR.18",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "credit",
+     "n": 1
+    },
+    {
+     "effect": "card",
+     "n": 1
+    }
+   ],
+   "marks": [],
+   "place_text": null
+  },
+  {
+   "id": "SR.19",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "energy",
+     "n": 1
+    },
+    {
+     "effect": "card",
+     "n": 1
+    }
+   ],
+   "marks": [],
+   "place_text": null
+  },
+  {
+   "id": "SR.20",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 4
+    },
+    {
+     "effect": "signal_token",
+     "n": 1
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    }
+   ],
+   "marks": [],
+   "place_text": null
+  },
+  {
+   "id": "SR.21",
+   "income_increase": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 3
+    }
+   ],
+   "marks": [],
+   "place_text": null
+  }
+ ],
+ "source": "tools/card-tracker/cards-extracted.json (community extraction); owner check pending"
+}

@@ -55,12 +55,14 @@ def gold_points(s: GameState, p: PlayerState) -> int:
     for g in s.gold_tiles:
         if p.index in g.markers:
             total += tile_values(g)[min(g.markers.index(p.index), 2)] * sets_for(s, p, g)
+        elif p.index in g.low_markers:
+            total += tile_values(g)[2] * sets_for(s, p, g)
     return total
 
 
 def solvay_points(s: GameState, p: PlayerState) -> int:
     """#113 Solvay Conference, FAQ-C113: the best tile the player did not mark, scored as if on its lowest (rightmost) value."""
-    options = [tile_values(g)[2] * sets_for(s, p, g) for g in s.gold_tiles if p.index not in g.markers]
+    options = [tile_values(g)[2] * sets_for(s, p, g) for g in s.gold_tiles if p.index not in g.markers and p.index not in g.low_markers]
     return max(options, default=0)
 
 

@@ -7,7 +7,7 @@ Order of random draws (all from the seeded generator, so a game is reproducible 
 
 from __future__ import annotations
 
-from . import rival, rng, species, tables
+from . import orgs, rival, rng, species, tables
 from .models import (
     COLORS,
     GLYPHS,
@@ -84,14 +84,15 @@ def new_game(options: Options) -> GameState:
     state.deck = rng.shuffled(state, deck_ids)
     state.card_row = [state.deck.pop() for _ in range(3)]
     # end-of-round stacks: dealt face down from the main deck at setup (A-003), 1 more card than players each, rounds 1 to 4
-    for _ in range(4):
-        state.end_of_round_stacks.append([state.deck.pop() for _ in range(n + 1)])
+    for r in range(4):  # EXP-ORG-03: with organizations only the stacks of rounds 2 to 4 are prepared
+        skip = options.organizations and r == 0
+        state.end_of_round_stacks.append([] if skip else [state.deck.pop() for _ in range(n + 1)])
 
     # players (SETUP-30 to SETUP-38)
     for i in range(n):
         is_rival = solo and i == 1
         p = PlayerState(index=i, color=COLORS[i], credits=0 if is_rival else 4, energy=0 if is_rival else 3, publicity=4)
-        if not is_rival:  # the rival has no hand and no resources (SOLO-10)
+        if not is_rival and not options.organizations:  # the rival has no hand and no resources (SOLO-10); organizations deal 4 cards below
             p.hand = [state.deck.pop() for _ in range(5)]
         state.players.append(p)
 
@@ -100,6 +101,9 @@ def new_game(options: Options) -> GameState:
     for rank in range(n):  # starting scores 1, 2, 3, 4 by turn order (SETUP-32)
         state.players[(state.start_player + rank) % n].score = rank + 1
 
+    if options.organizations:  # EXP-ORG-03, EXP-ORG-04: organizations and quick start cards instead of the income card
+        orgs.deal(state, [(state.start_player + rank) % n for rank in range(n)])
+        return state
     # each player tucks one card for income, in turn order: the engine waits for each choice (SETUP-36, FAQ-01)
     for rank in range(n):
         pl = (state.start_player + rank) % n

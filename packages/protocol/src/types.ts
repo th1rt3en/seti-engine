@@ -15,6 +15,7 @@ export type FinalScores = {
 }[];
 export type FirstPassDone = boolean;
 export type FreeActive = boolean;
+export type LowMarkers = number[];
 export type Markers = number[];
 export type Side = string;
 export type Tile = string;
@@ -22,10 +23,15 @@ export type GoldTiles = GoldTile[];
 export type LastTraceKind = string;
 export type Log = string[];
 export type MainDone = boolean;
+export type NeutralQuick = string[];
 export type Pile = string[];
 export type Row = string[];
 export type Stack = string[];
+export type BeginnerOrganizations = boolean;
 export type Difficulty = number;
+export type Expansion = boolean;
+export type NeutralQuickStart = boolean;
+export type Organizations = boolean;
 export type Players = number;
 export type PromoCards = boolean;
 export type Sandbox = boolean;
@@ -71,11 +77,18 @@ export type Kind1 = string;
 export type Used = boolean[];
 export type Missions = MissionState[];
 export type Movement = number;
+export type OfferedOrgs = string[];
+export type OfferedQuick = string[];
+export type OrgMarks = string[];
+export type OrgUsed = boolean;
+export type Organization = string | null;
 export type Passed = boolean;
 export type ProbesLaunched = number;
 export type Publicity = number;
+export type QuickStart = string[];
 export type Score = number;
 export type SectorWins = number;
+export type SignalTokens = number;
 export type Techs = string[];
 export type TraceLog = [number, string][];
 export type Tucked = string[];
@@ -245,6 +258,7 @@ export interface GameState {
   log: Log;
   main_done: MainDone;
   neutral_markers: NeutralMarkers;
+  neutral_quick: NeutralQuick;
   objectives: ObjectiveState | null;
   options: Options;
   oumuamua_placed: OumuamuaPlaced;
@@ -283,6 +297,7 @@ export interface GameState {
   winners: Winners1;
 }
 export interface GoldTile {
+  low_markers: LowMarkers;
   markers: Markers;
   side: Side;
   tile: Tile;
@@ -303,7 +318,11 @@ export interface Marks {
   [k: string]: boolean[];
 }
 export interface Options {
+  beginner_organizations?: BeginnerOrganizations;
   difficulty?: Difficulty;
+  expansion?: Expansion;
+  neutral_quick_start?: NeutralQuickStart;
+  organizations?: Organizations;
   players: Players;
   promo_cards?: PromoCards;
   sandbox?: Sandbox;
@@ -357,12 +376,20 @@ export interface PlayerState {
   messages: Messages;
   missions: Missions;
   movement: Movement;
+  offered_orgs: OfferedOrgs;
+  offered_quick: OfferedQuick;
   orbiters: Orbiters1;
+  org_data: OrgData;
+  org_marks: OrgMarks;
+  org_used: OrgUsed;
+  organization: Organization;
   passed: Passed;
   probes_launched: ProbesLaunched;
   publicity: Publicity;
+  quick_start: QuickStart;
   score: Score;
   sector_wins: SectorWins;
+  signal_tokens: SignalTokens;
   techs: Techs;
   trace_log: TraceLog;
   tucked: Tucked;
@@ -394,6 +421,9 @@ export interface MissionState {
 }
 export interface Orbiters1 {
   [k: string]: number;
+}
+export interface OrgData {
+  [k: string]: unknown;
 }
 export interface Probe {
   capsule: Capsule;

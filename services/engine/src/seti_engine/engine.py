@@ -15,7 +15,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from . import alien_steps, cards, effects, objectives, rewards, rival, sandbox, scoring, solar, species, tables, techs
+from . import alien_steps, cards, effects, objectives, orgs, rewards, rival, sandbox, scoring, solar, species, tables, techs
 from .models import Decision, GameState, Options, PlayerState, Probe
 from .setup import new_game
 
@@ -59,7 +59,7 @@ def leave_cost(state: GameState, p: PlayerState, ring: int, sector: int) -> int:
     """Cost to leave a space: 1, plus 1 on asteroids unless the player has the asteroid tech (MOVE-02, TECH-PT03)."""
     cell = solar.visible(state, ring, sector)[1]
     ignore = cards.fx_active(state, "ignore_asteroid")  # FAQ-C026
-    extra = 1 if cell == "ASTEROID" and "probe-link" not in p.techs and not ignore else 0
+    extra = 1 if cell == "ASTEROID" and not effects.tech_active(p, "probe-link") and not ignore else 0
     return 1 + extra
 
 
@@ -153,6 +153,8 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
         return [*place, *techs.lower_moves(p), {"type": "data_done"}]
     if d.kind == "sector_order":  # TURN-05 (owner ruling 2026-10-14): the player chooses which completed sector is resolved next
         return [{"type": "resolve_sector", "sector": i} for i in d.data["sectors"] if i in state.completed]
+    if d.kind in ("choose_org", "choose_quick"):
+        return orgs.choose_moves(state, d)  # EXP-ORG-04
     if d.kind == "setup_tuck":
         return [{"type": "tuck", "card": c} for c in dict.fromkeys(p.hand)]
     if d.kind == "income_tuck":
@@ -195,7 +197,9 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
     if d.kind == "land_data_slot":
         return [{"type": "choose_land_slot", "slot": k} for k in d.data["slots"]]
     if d.kind == "gold_choice":
-        return [{"type": "choose_gold", "tile": g.tile} for g in state.gold_tiles if d.player not in g.markers]
+        return [
+            {"type": "choose_gold", "tile": g.tile} for g in state.gold_tiles if d.player not in g.markers and d.player not in g.low_markers
+        ]
     raise ValueError(d.kind)
 
 
@@ -236,6 +240,7 @@ def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
         out.append({"type": "place_data"})  # FREE-03
     out += techs.lower_moves(p)  # TECH-21
     out += cards.mission_moves(state, p)  # FREE-07
+    out += orgs.free_moves(state, p)  # EXP-ORG-10
     return out
 
 
@@ -251,14 +256,14 @@ def _main_moves(state: GameState, p: PlayerState) -> list[Action]:
             out.append({"type": "orbit", "probe": pr.id})  # ORBIT-01
         if p.energy >= land_cost(state, p, planet):
             out.append({"type": "land", "probe": pr.id})  # LAND-01
-            if "probe-cross" in p.techs:  # LAND-05, TECH-PT04
+            if effects.tech_active(p, "probe-cross"):  # LAND-05, TECH-PT04
                 for moon in tables.planet_info(planet)["moons"]:
                     if moon not in state.planets[planet].moon_landers:
                         out.append({"type": "land", "probe": pr.id, "moon": moon})
     out += _pluto_moves(state, p)  # PROMO-02
     if p.credits >= 1 and p.energy >= 2:
         out.append({"type": "scan"})  # SCAN-01
-    if p.publicity >= techs.RESEARCH_COST:
+    if p.publicity >= orgs.research_cost(p, techs.RESEARCH_COST):
         out += techs.research_moves(state, p)  # TECHACT-01
     if techs.can_analyze(p):
         out.append({"type": "analyze"})  # ANALYZE-01
@@ -294,7 +299,7 @@ def planet_at(state: GameState, probe: Probe) -> str | None:
 def land_cost(state: GameState, p: PlayerState, planet: str) -> int:
     """LAND-01, LAND-02: 3 energy, 2 if the planet has an orbiter, 1 less with probe tech PT#02 (glyph branch)."""
     cost = 2 if state.planets[planet].orbiters else 3
-    return cost - (1 if "probe-branch" in p.techs else 0)
+    return cost - (1 if effects.tech_active(p, "probe-branch") else 0)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -303,7 +308,18 @@ def land_cost(state: GameState, p: PlayerState, planet: str) -> int:
 
 
 FREE_TYPES = frozenset(
-    {"move_energy", "move_probe", "buy_card", "exchange", "discard_free", "place_data", "place_lower", "complete_mission", "deliver_sample"}
+    {
+        "move_energy",
+        "move_probe",
+        "buy_card",
+        "exchange",
+        "discard_free",
+        "place_data",
+        "place_lower",
+        "complete_mission",
+        "deliver_sample",
+        "org_free",
+    }
 )  # the free actions (FREE-01 to FREE-07, TECH-21)
 # moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
 NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lower", "launch", "undo", "sandbox"})
@@ -449,7 +465,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         events.append({"type": "scan", "player": p.index})
         cards.fire(s, p, [{"e": "scan"}], events)  # FAQ-C101
     elif t == "research":  # TECHACT-01, TECHACT-02: pay 6 publicity, rotate, then take the tech
-        effects.pay(p, publicity=techs.RESEARCH_COST)
+        effects.pay(p, publicity=orgs.research_cost(p, techs.RESEARCH_COST))  # EXP-ORG-13: Fenwick needs 5
         s.main_done = True
         _rotate(s, events)
         techs.take_tech(s, p, a["stack"], events)
@@ -482,7 +498,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
             s.pending.append(Decision(kind="slingshot", player=p.index))
         elif cards.fx_active(s, "no_pub_move"):  # #ET.12: no publicity for moving probes this turn
             pass
-        elif solar.has_publicity_icon(cell) or (cell == "ASTEROID" and "probe-link" in p.techs):  # MOVE-05, TECH-PT03
+        elif solar.has_publicity_icon(cell) or (cell == "ASTEROID" and effects.tech_active(p, "probe-link")):  # MOVE-05, TECH-PT03
             effects.gain_publicity(s, p)
             events.append({"type": "publicity", "player": p.index, "reason": "visit"})
         events.append({"type": "move", "player": p.index, "probe": probe.id, "to": a["to"]})
@@ -513,6 +529,8 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         cards.fire(s, p, [{"e": "discard_free", "corner": k} for k in corners], events)  # FAQ-C138
     elif t == "place_data":
         _place_data(s, p, events)
+    elif t == "org_free":
+        orgs.free_action(s, p, a, events)  # EXP-ORG-10
 
 
 def _orbit_land_free_moves(s: GameState, p: PlayerState, d: Decision) -> list[Action]:
@@ -635,7 +653,10 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
         s.completed.remove(a["sector"])
         rewards.resolve_sector(s, a["sector"], events)
         return
-    if t == "tuck":
+    if d.kind in ("choose_org", "choose_quick"):
+        orgs.resolve_choice(s, p, d, a, events)
+        pass
+    elif t == "tuck":
         effects.tuck_card(s, p, a["card"])
         events.append({"type": "tuck", "player": p.index, "card": a["card"]})
     elif t == "skip_tuck":
@@ -692,7 +713,7 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif t == "choose_gold":
         next(g for g in s.gold_tiles if g.tile == a["tile"]).markers.append(p.index)
         p.gold_markers.append(a["tile"])
-    if d.kind == "setup_tuck" and not any(x.kind == "setup_tuck" for x in s.pending):
+    if d.kind in orgs.SETUP_KINDS and not any(x.kind in orgs.SETUP_KINDS for x in s.pending):
         s.phase = "play"
 
 
@@ -842,6 +863,7 @@ def _next_turn(s: GameState, events: list[dict[str, Any]]) -> None:
     s.turn_completed = False
     p = s.players[s.current_player]
     p.movement = 0  # unused movement is lost at the end of the turn (A-015)
+    orgs.end_turn(s, p)
     n = len(s.players)
     for k in range(1, n + 1):
         q = (s.current_player + k) % n
@@ -861,6 +883,9 @@ def _end_round(s: GameState, events: list[dict[str, Any]]) -> None:
             p = s.players[(s.start_player + k) % n]
             if rival.is_rival(s, p.index):
                 continue  # the rival has no income (A-025)
+            if p.organization is not None:
+                orgs.gain_income(s, p)  # EXP-ORG-08, A-031: the organization's income replaces the income card
+                continue
             p.credits += 3
             p.energy += 2
             effects.draw_random_card(s, p)  # the income card's random card (INCOME-03)
