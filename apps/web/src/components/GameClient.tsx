@@ -1,4 +1,5 @@
 "use client";
+import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 import {
   type Move,
   buyText,
@@ -19,7 +20,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { type LogEntry, MoveLog } from "./MoveLog";
-import { OPEN_BOARD_EVENT, PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
+import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradeButtons } from "./Trade";
 

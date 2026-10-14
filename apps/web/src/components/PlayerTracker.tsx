@@ -1,3 +1,5 @@
+"use client";
+import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 // The tracker beside the board: for every player the score, the income of each kind (the income card plus the tucked cards), the cards
 // tucked for each kind of income, the completed missions and the end-of-game scoring cards. The numbers come from the engine's view
 // (`view.trackers`); nothing is worked out here.
@@ -5,7 +7,6 @@ import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon } from "./Icons";
-import { OPEN_BOARD_EVENT } from "./PlayerBoard";
 
 const KINDS = [
   { key: "credit", label: "Credits", icon: <CreditIcon size={18} /> },
