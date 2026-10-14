@@ -3,6 +3,7 @@
 // opens by itself when a card of the row can be clicked (to buy it, or to take it in a trade).
 import { useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
+import { useEffect, useRef } from "react";
 import assets from "../generated/assets.json";
 import { CardImage } from "./CardImage";
 
@@ -17,10 +18,17 @@ export function RowDock({ view, row }: { view: View; row?: RowSelection }) {
   const [folded, toggle, set] = useDock("row", () => window.innerWidth < 1700);
   const s = view.state;
   const wanted = (row?.selectable.length ?? 0) > 0;
-  const shut = folded && !wanted;
+  const shut = folded;
+  // the panel opens by itself when a card of it can be picked (to buy it, or to take it in a trade), and can be folded again at any time
+  const wasWanted = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only when a card of the row becomes pickable
+  useEffect(() => {
+    if (wanted && !wasWanted.current) set(true);
+    wasWanted.current = wanted;
+  }, [wanted]);
   return (
     <aside className={shut ? "rowdock dock folded" : "rowdock dock"} aria-label="Card row">
-      <button type="button" className="handtab" onClick={() => (wanted && folded ? set(true) : toggle())} aria-expanded={!shut}>
+      <button type="button" className="handtab" onClick={toggle} aria-expanded={!shut}>
         <span>
           Card row{" "}
           <span className="muted small">

@@ -9,6 +9,7 @@ import { AlienNotes } from "./AlienNotes";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView } from "./BoardView";
+import { BottomBarFold } from "./BottomBarFold";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ScoreIcon } from "./Icons";
 import { PlayerTracker } from "./PlayerTracker";
@@ -176,6 +177,7 @@ export function GameView({
       <TrackerDock>
         <PlayerTracker view={view} names={names} previous={previous} />
       </TrackerDock>
+      <BottomBarFold />
       <RowDock view={view} row={row} />
       <HandDock view={view} selection={hand} />
       {log}

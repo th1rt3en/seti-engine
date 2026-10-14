@@ -1427,3 +1427,34 @@ button:disabled {
     display: none;
   }
 }
+
+/* the button that hides the bar of panels at the bottom: only on phones */
+.dockbarfold {
+  display: none;
+}
+@media (max-width: 760px) {
+  .dockbarfold {
+    display: inline-flex;
+    position: fixed;
+    right: 8px;
+    bottom: 56px;
+    z-index: 75;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+  html.dockbar-hidden .dockbarfold {
+    bottom: 8px;
+  }
+  html.dockbar-hidden .dock > .handtab,
+  html.dockbar-hidden .handbody,
+  html.dockbar-hidden .rowbody,
+  html.dockbar-hidden .trackerbody,
+  html.dockbar-hidden .logbody {
+    display: none;
+  }
+  html.dockbar-hidden main:has(.game) {
+    padding-bottom: 48px;
+  }
+}
