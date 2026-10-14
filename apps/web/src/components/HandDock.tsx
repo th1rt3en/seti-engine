@@ -5,6 +5,7 @@ import { cardName } from "@/lib/moves";
 import { useBottomSpace, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useRef } from "react";
+import { useEffect, useRef as useRefHook } from "react";
 import { CardImage } from "./CardImage";
 
 /** The cards of the hand that a move can be made with, the places (in the hand) of those that are picked, and what happens when one is clicked. */
@@ -12,10 +13,22 @@ export interface HandSelection {
   selectable: string[];
   selected: number[];
   onSelect: (index: number) => void;
+  /** Cards that are offered to the player to keep one of (the end-of-round cards after passing): they lie with the hand for the moment. */
+  offered?: string[];
+  offeredSelected?: string | null;
+  onOffer?: (card: string) => void;
 }
 
 export function HandDock({ view, selection }: { view: View; selection?: HandSelection }) {
-  const [folded, toggle] = useDock("hand");
+  const [folded, toggle, set] = useDock("hand");
+  const wanted = (selection?.offered?.length ?? 0) > 0;
+  const wasWanted = useRefHook(false);
+  // the hand opens by itself when cards are offered, so that the player sees them
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only when cards become offered
+  useEffect(() => {
+    if (wanted && !wasWanted.current) set(true);
+    wasWanted.current = wanted;
+  }, [wanted]);
   const dock = useRef<HTMLElement>(null);
   useBottomSpace(dock, "hand");
   const me = view.viewer;
@@ -25,7 +38,8 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
         <span>
-          Hand ({player.hand.length}){player.missions.length > 0 ? ` · ${player.missions.length} missions` : ""}
+          Hand ({player.hand.length + (selection?.offered?.length ?? 0)})
+          {player.missions.length > 0 ? ` · ${player.missions.length} missions` : ""}
         </span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
@@ -37,8 +51,11 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
               const picked = selection?.selected.includes(i) ?? false;
               if (!selection?.selectable.includes(c)) {
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the same card can be in hand twice
-                  <span key={`${c}-${i}`} className={selection && selection.selectable.length > 0 ? "cardslot dim" : "cardslot"}>
+                  <span
+                    // biome-ignore lint/suspicious/noArrayIndexKey: the same card can be in hand twice
+                    key={`${c}-${i}`}
+                    className={wanted || (selection && selection.selectable.length > 0) ? "cardslot dim" : "cardslot"}
+                  >
                     <CardImage id={c} size="hand" />
                   </span>
                 );
@@ -56,6 +73,27 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </button>
               );
             })}
+            {wanted ? (
+              <>
+                <span className="handsep offersep" aria-hidden="true" />
+                <span className="offerbox">
+                  <b className="offerlabel">Keep one of these</b>
+                  <span className="offercards">
+                    {selection?.offered?.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        className={selection.offeredSelected === c ? "cardbtn selectable selected" : "cardbtn selectable"}
+                        aria-pressed={selection.offeredSelected === c}
+                        onClick={() => selection.onOffer?.(c)}
+                      >
+                        <CardImage id={c} size="hand" />
+                      </button>
+                    ))}
+                  </span>
+                </span>
+              </>
+            ) : null}
             {player.missions.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
             {player.missions.map((m) => (
               <CardImage

@@ -59,6 +59,8 @@ export function GameClient({
   // to buy, and the trade moves that wait for the player to click a card of the display
   const [picked, setPicked] = useState<number[]>([]);
   const [pickedBuy, setPickedBuy] = useState<string | null>(null);
+  // the end-of-round card picked to keep (after passing)
+  const [pickedOffer, setPickedOffer] = useState<string | null>(null);
   const [rowMode, setRowMode] = useState<Move[] | null>(null);
   // a tech picked in the stacks (its place in the state)
   const [pickedTech, setPickedTech] = useState<number | null>(null);
@@ -109,6 +111,7 @@ export function GameClient({
           setError(null);
           setPicked([]);
           setPickedBuy(null);
+          setPickedOffer(null);
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
@@ -185,6 +188,7 @@ export function GameClient({
   const otherMoves = mine.filter(
     (m) =>
       !placed.has(m) &&
+      m.type !== "take_round_card" &&
       !handMoves.includes(m) &&
       m.type !== "exchange" &&
       m.type !== "buy_card" &&
@@ -218,6 +222,9 @@ export function GameClient({
   const techStack = pickedTech === null ? undefined : v.state.tech_stacks[pickedTech];
   const spotOption = spots.find((sp) => sp.id === pickedSpot);
   const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
+  // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
+  const offers = [...new Set(mine.filter((m) => m.type === "take_round_card").map((m) => String(m.card)))];
+  const offerMove = pickedOffer === null ? undefined : mine.find((m) => m.type === "take_round_card" && m.card === pickedOffer);
   const buyOption = pickedBuy === null ? undefined : buys.find((m) => m.source === pickedBuy);
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
@@ -347,6 +354,12 @@ export function GameClient({
               </span>
             </div>
           ) : null}
+          {offers.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">Your choice</span>
+              <span className="handhint">Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.</span>
+            </div>
+          ) : null}
           {spots.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
@@ -408,6 +421,19 @@ export function GameClient({
         <div className="confirmbar">
           <span className="confirm">Click the card of the display that you want.</span>
           <button type="button" className="secondary" onClick={() => setRowMode(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {offerMove ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <span>{handMoveText(offerMove)}</span>
+            <button type="button" className="primary" onClick={() => play(offerMove)}>
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPickedOffer(null)}>
             Cancel
           </button>
         </div>
@@ -503,7 +529,14 @@ export function GameClient({
           }}
         />
       }
-      hand={{ selectable: pickable, selected: picked, onSelect: selectCard }}
+      hand={{
+        selectable: pickable,
+        selected: picked,
+        onSelect: selectCard,
+        offered: offers,
+        offeredSelected: pickedOffer,
+        onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
+      }}
       tech={{
         selectable: techMoves.map((m) => Number(m.stack)),
         selected: pickedTech,

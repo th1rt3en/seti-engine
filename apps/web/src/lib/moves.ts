@@ -105,7 +105,7 @@ export function describeMove(m: Move): string {
 
 /** Group the moves for display: the free actions apart from the main actions and the answers to a decision. */
 export function groupMoves(moves: Move[], pending: boolean): { title: string; moves: Move[] }[] {
-  if (pending) return [{ title: "Your choice", moves }];
+  if (pending) return moves.length > 0 ? [{ title: "Your choice", moves }] : [];
   const main = new Set(["launch", "pass", "orbit", "land", "scan", "research", "analyze", "play_card"]);
   const end = new Set(["end_turn"]);
   const groups = [
@@ -157,6 +157,8 @@ export function handMoveText(m: Move): string {
       return `Discard ${name} from your hand to mark a signal in a ${sector} sector?`;
     case "hand_signal":
       return `Discard ${name} to mark a signal in a ${sector} sector?`;
+    case "take_round_card":
+      return `Confirm keeping ${name} from the end-of-round cards? The others go back.`;
     default:
       return describeMove(m);
   }

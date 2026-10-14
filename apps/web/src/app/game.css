@@ -486,17 +486,6 @@ main:has(.game) {
   font-weight: 700;
 }
 
-.more {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 8px 12px;
-}
-.more summary {
-  cursor: pointer;
-  font-weight: 600;
-}
-
 /* the hand: floating in the bottom left corner, as wide as its cards need, and it can be folded down */
 .hand {
   position: fixed;
@@ -1522,4 +1511,33 @@ button:disabled {
 }
 .goldrow td {
   color: #ffd75e;
+}
+
+/* the cards offered after passing lie with the hand; the cards of the hand are greyed out */
+.cardslot.dim .cardimg {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+.offerbox {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 2px solid var(--good);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--good) 10%, transparent);
+}
+.offerlabel {
+  color: var(--good);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.offercards {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.offersep {
+  border-left-color: var(--good);
 }

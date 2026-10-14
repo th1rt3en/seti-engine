@@ -17,7 +17,6 @@ import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
 import { RowDock, type RowSelection } from "./RowDock";
 import { SoloPanel } from "./SoloPanel";
-import { StateView } from "./StateView";
 import { type TechPick, TechStacks } from "./TechStacks";
 import { TrackerDock } from "./TrackerDock";
 
@@ -167,11 +166,6 @@ export function GameView({
       </div>
 
       <SoloPanel view={view} />
-
-      <details className="more">
-        <summary>All details (techs, planets, gold tiles, sectors)</summary>
-        <StateView view={view} names={names} />
-      </details>
 
       <BarHeight />
       <TrackerDock>
