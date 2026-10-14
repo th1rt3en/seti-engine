@@ -35,7 +35,9 @@ export default function Demo() {
       second.species = "oumuamua";
       second.deck = Array(9).fill("?");
       second.face_up = "ET.31";
-      second.board = { pink: [[], [], [], [], []], yellow: [[], [], [], [], []], blue: [[], [], [], [], []] };
+      second.board = { pink: [[1, 0], [2], [], [], []], yellow: [[], [], [], [], []], blue: [[0], [], [], [], []] };
+      second.overflow = [0, 2];
+      second.overflow_kinds = ["blue", "blue"];
     }
     for (const p of view.state.players) p.exofossils = p.index + 1;
   }

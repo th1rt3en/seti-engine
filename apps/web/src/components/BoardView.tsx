@@ -31,10 +31,11 @@ import {
   sectorDegrees,
 } from "@/lib/geometry";
 import { cardName } from "@/lib/moves";
-import type { Spot } from "@/lib/targets";
+import { SPECIES_SPACES } from "@/lib/speciesSpaces";
+import { type Spot, onAlienBoard } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
 import slotData from "../generated/slots.json";
@@ -154,10 +155,10 @@ export function BoardView({
                     height={ALIEN_COLUMN.h}
                     preserveAspectRatio="xMidYMid slice"
                   />
-                  <circle cx={at.deck.x + ALIEN_COLUMN.w / 2} cy={at.deck.y + ALIEN_COLUMN.h / 2} r={62} className="deckcount" />
+                  <circle cx={at.deck.x + ALIEN_COLUMN.w / 2} cy={at.deck.y + ALIEN_COLUMN.h / 2} r={92} className="deckcount" />
                   <text
                     x={at.deck.x + ALIEN_COLUMN.w / 2}
-                    y={at.deck.y + ALIEN_COLUMN.h / 2 + 24}
+                    y={at.deck.y + ALIEN_COLUMN.h / 2 + 42}
                     textAnchor="middle"
                     className="deckcounttext"
                   >
@@ -414,6 +415,51 @@ export function BoardView({
               })}
             </g>
           );
+        })}
+
+        {/* the markers on the spaces of a species board that have been taken, and on its overflow spaces (under the discovery spaces) */}
+        {s.species.map((sp, i) => {
+          const marks: ReactNode[] = [];
+          if (sp.discovered) {
+            for (const [colour, spaces] of Object.entries(sp.board)) {
+              spaces.forEach((players, k) => {
+                const at = SPECIES_SPACES[sp.species]?.[colour]?.[k];
+                if (!at) return;
+                const base = onAlienBoard(i, at[0], at[1]);
+                players.forEach((player, n) => {
+                  // a top capsule takes any number of markers: each later one lies a little higher
+                  marks.push(
+                    <Marker
+                      // biome-ignore lint/suspicious/noArrayIndexKey: markers are placed in order and never reorder
+                      key={`sb-${i}-${colour}-${k}-${n}`}
+                      x={base.x}
+                      y={base.y - n * 22}
+                      size={86}
+                      color={color(player)}
+                      title={`${who(player)}: marker on the ${colour} space of ${sp.species}`}
+                    />,
+                  );
+                });
+              });
+            }
+          }
+          sp.overflow.forEach((player, n) => {
+            const colour = sp.overflow_kinds[n] ?? "pink";
+            const at = DISCOVERY[i]?.[["pink", "yellow", "blue"].indexOf(colour)];
+            if (!at) return;
+            marks.push(
+              <Marker
+                // biome-ignore lint/suspicious/noArrayIndexKey: markers are placed in order and never reorder
+                key={`of-${i}-${n}`}
+                x={at.x}
+                y={at.y + 190 - sp.overflow_kinds.slice(0, n).filter((c) => c === colour).length * 20}
+                size={80}
+                color={color(player)}
+                title={`${who(player)}: marker on the ${colour} overflow space`}
+              />,
+            );
+          });
+          return marks;
         })}
 
         {s.species.slice(0, 2).map((sp, i) =>

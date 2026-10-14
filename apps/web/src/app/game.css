@@ -1033,15 +1033,6 @@ button:disabled {
 .rowbody .cards .card-row {
   width: 100%;
 }
-.aliennotes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  margin-top: 10px;
-}
-.aliennotes .alien {
-  flex: 1 1 260px;
-}
 
 /* phones: the four panels (hand, card row, players, log) are the tabs of one bar at the bottom; a tab opens its panel above the bar */
 @media (max-width: 760px) {
@@ -1555,6 +1546,6 @@ button:disabled {
 }
 .deckcounttext {
   fill: #fff;
-  font-size: 84px;
+  font-size: 124px;
   font-weight: 800;
 }

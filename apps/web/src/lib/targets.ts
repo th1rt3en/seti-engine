@@ -53,7 +53,7 @@ function sectorPath(i: number): string {
 export const moonKey = (moon: string): string => moon.toLowerCase().split(/[ _]/)[0] ?? "";
 
 /** A place on the picture of a species board, as a place on the base board (the boards sit above it, ALIEN in geometry.ts). */
-const onAlienBoard = (slot: number, x: number, y: number): { x: number; y: number } => ({
+export const onAlienBoard = (slot: number, x: number, y: number): { x: number; y: number } => ({
   x: (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale + x * ALIEN.scale,
   y: ALIEN_TOP + y * ALIEN.scale,
 });

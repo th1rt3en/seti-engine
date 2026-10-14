@@ -5,7 +5,6 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import { AlienNotes } from "./AlienNotes";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView } from "./BoardView";
@@ -155,7 +154,6 @@ export function GameView({
           <div className="boardwrap">
             <BoardView view={view} names={names} previous={previous} interaction={interaction} spots={spots} />
             <RoundPiles view={view} />
-            <AlienNotes view={view} names={names} />
           </div>
         </main>
 
