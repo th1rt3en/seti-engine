@@ -1,0 +1,122 @@
+{
+ "snapshot_of": "tech board and player board check page, collection tech-player-check",
+ "taken": "2026-10-13",
+ "all_confirmed": true,
+ "items": [
+  {
+   "key": "rule-tiles",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-first",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-rotation",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-neutral",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-probe-dot",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-probe-link",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-probe-branch",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-probe-cross",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-telescope-dot",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-telescope-link",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-telescope-branch",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-telescope-cross",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-computer-dot",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-computer-link",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-computer-branch",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "stack-computer-cross",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "track-pub",
+   "status": "confirmed",
+   "note": "3 publicity for 1 card: this can be done at any publicity not just 3-5"
+  },
+  {
+   "key": "track-score",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "pb-pool",
+   "status": "confirmed",
+   "note": "note that when a player acquire data that would put them over the 6 data threshold, they might place the data in their data pool into the computer first"
+  },
+  {
+   "key": "pb-comp",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "pb-slots",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "pb-analyze",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "pb-others",
+   "status": "confirmed",
+   "note": ""
+  }
+ ]
+}

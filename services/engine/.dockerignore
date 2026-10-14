@@ -1,0 +1,32 @@
+# What `gcloud run deploy --source services/engine` does not upload (the Dockerfile builds the image from pyproject.toml and src).
+.gcloudignore
+.gitignore
+.dockerignore
+
+# Environments, caches and build output
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+*.egg-info/
+dist/
+build/
+
+# Not needed in the image
+tests/
+PROGRESS.md
+uv.lock
+
+# Secrets and local settings must never be uploaded
+.env
+.env.*
+*.pem
+*.key
+service-account*.json
+*-credentials.json
+.data/
+*.sqlite
+*.log

@@ -1,0 +1,1484 @@
+{
+  "$defs": {
+    "ApplyRequest": {
+      "properties": {
+        "action": {
+          "additionalProperties": true,
+          "description": "One of the `legal` moves returned with the state; an object with a `type`.",
+          "title": "Action",
+          "type": "object"
+        },
+        "state": {
+          "$ref": "#/$defs/GameState"
+        }
+      },
+      "required": [
+        "action",
+        "state"
+      ],
+      "title": "ApplyRequest",
+      "type": "object"
+    },
+    "ComputerTech": {
+      "properties": {
+        "lower_filled": {
+          "default": false,
+          "title": "Lower Filled",
+          "type": "boolean"
+        },
+        "tech": {
+          "title": "Tech",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lower_filled",
+        "tech"
+      ],
+      "title": "ComputerTech",
+      "type": "object"
+    },
+    "Counts": {
+      "description": "How many of the hidden things there are.",
+      "properties": {
+        "deck": {
+          "title": "Deck",
+          "type": "integer"
+        },
+        "end_of_round_stacks": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "End Of Round Stacks",
+          "type": "array"
+        },
+        "exertian_hands": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Exertian Hands",
+          "type": "array"
+        },
+        "exertian_played": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Exertian Played",
+          "type": "array"
+        },
+        "hands": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Hands",
+          "type": "array"
+        },
+        "objective_stack": {
+          "default": 0,
+          "title": "Objective Stack",
+          "type": "integer"
+        },
+        "rival_deck": {
+          "default": 0,
+          "title": "Rival Deck",
+          "type": "integer"
+        },
+        "species_decks": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Species Decks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "deck",
+        "end_of_round_stacks",
+        "exertian_hands",
+        "exertian_played",
+        "hands",
+        "objective_stack",
+        "rival_deck",
+        "species_decks"
+      ],
+      "title": "Counts",
+      "type": "object"
+    },
+    "Decision": {
+      "description": "Something the engine waits for a player to choose before play continues.",
+      "properties": {
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "player": {
+          "title": "Player",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "data",
+        "kind",
+        "player"
+      ],
+      "title": "Decision",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "properties": {
+        "error": {
+          "title": "Error",
+          "type": "string"
+        },
+        "legal": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Legal",
+          "type": "array"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error",
+        "legal",
+        "message"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "GameState": {
+      "properties": {
+        "action_sectors": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Action Sectors",
+          "type": "array"
+        },
+        "aside": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aside",
+          "type": "array"
+        },
+        "card_row": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Card Row",
+          "type": "array"
+        },
+        "completed": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Completed",
+          "type": "array"
+        },
+        "crossed": {
+          "items": {
+            "additionalItems": false,
+            "items": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "title": "Crossed",
+          "type": "array"
+        },
+        "current_player": {
+          "default": 0,
+          "title": "Current Player",
+          "type": "integer"
+        },
+        "deck": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Deck",
+          "type": "array"
+        },
+        "disc_angles": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Disc Angles",
+          "type": "array"
+        },
+        "discard": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Discard",
+          "type": "array"
+        },
+        "end_of_round_stacks": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "End Of Round Stacks",
+          "type": "array"
+        },
+        "final_scores": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Final Scores",
+          "type": "array"
+        },
+        "first_pass_done": {
+          "default": false,
+          "title": "First Pass Done",
+          "type": "boolean"
+        },
+        "gold_tiles": {
+          "items": {
+            "$ref": "#/$defs/GoldTile"
+          },
+          "title": "Gold Tiles",
+          "type": "array"
+        },
+        "last_trace_kind": {
+          "default": "any",
+          "title": "Last Trace Kind",
+          "type": "string"
+        },
+        "log": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Log",
+          "type": "array"
+        },
+        "main_done": {
+          "default": false,
+          "title": "Main Done",
+          "type": "boolean"
+        },
+        "neutral_markers": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Neutral Markers",
+          "type": "object"
+        },
+        "objectives": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ObjectiveState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "options": {
+          "$ref": "#/$defs/Options"
+        },
+        "oumuamua_placed": {
+          "default": false,
+          "title": "Oumuamua Placed",
+          "type": "boolean"
+        },
+        "pass_card_asked": {
+          "default": false,
+          "title": "Pass Card Asked",
+          "type": "boolean"
+        },
+        "pass_discard_checked": {
+          "default": false,
+          "title": "Pass Discard Checked",
+          "type": "boolean"
+        },
+        "pass_rotated": {
+          "default": false,
+          "title": "Pass Rotated",
+          "type": "boolean"
+        },
+        "pending": {
+          "items": {
+            "$ref": "#/$defs/Decision"
+          },
+          "title": "Pending",
+          "type": "array"
+        },
+        "phase": {
+          "default": "setup",
+          "enum": [
+            "setup",
+            "play",
+            "finished"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "planets": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PlanetState"
+          },
+          "title": "Planets",
+          "type": "object"
+        },
+        "play_return": {
+          "default": false,
+          "title": "Play Return",
+          "type": "boolean"
+        },
+        "players": {
+          "items": {
+            "$ref": "#/$defs/PlayerState"
+          },
+          "title": "Players",
+          "type": "array"
+        },
+        "playing": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Playing"
+        },
+        "probe_counter": {
+          "default": 0,
+          "title": "Probe Counter",
+          "type": "integer"
+        },
+        "probes": {
+          "items": {
+            "$ref": "#/$defs/Probe"
+          },
+          "title": "Probes",
+          "type": "array"
+        },
+        "pushed": {
+          "items": {
+            "additionalItems": false,
+            "items": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "title": "Pushed",
+          "type": "array"
+        },
+        "queue": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Queue",
+          "type": "array"
+        },
+        "rival": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RivalState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rng_state": {
+          "title": "Rng State",
+          "type": "integer"
+        },
+        "rotations": {
+          "default": 0,
+          "title": "Rotations",
+          "type": "integer"
+        },
+        "round": {
+          "default": 1,
+          "title": "Round",
+          "type": "integer"
+        },
+        "scan_ctx": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scan Ctx"
+        },
+        "scan_steps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Scan Steps",
+          "type": "array"
+        },
+        "sector_order": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Sector Order",
+          "type": "array"
+        },
+        "sectors": {
+          "items": {
+            "$ref": "#/$defs/SectorState"
+          },
+          "title": "Sectors",
+          "type": "array"
+        },
+        "species": {
+          "items": {
+            "$ref": "#/$defs/SpeciesSlot"
+          },
+          "title": "Species",
+          "type": "array"
+        },
+        "stage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stage"
+        },
+        "start_player": {
+          "default": 0,
+          "title": "Start Player",
+          "type": "integer"
+        },
+        "tech_stacks": {
+          "items": {
+            "$ref": "#/$defs/TechStack"
+          },
+          "title": "Tech Stacks",
+          "type": "array"
+        },
+        "turn_completed": {
+          "default": false,
+          "title": "Turn Completed",
+          "type": "boolean"
+        },
+        "turn_fx": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Turn Fx",
+          "type": "array"
+        },
+        "winners": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Winners",
+          "type": "array"
+        }
+      },
+      "required": [
+        "action_sectors",
+        "aside",
+        "card_row",
+        "completed",
+        "crossed",
+        "current_player",
+        "deck",
+        "disc_angles",
+        "discard",
+        "end_of_round_stacks",
+        "final_scores",
+        "first_pass_done",
+        "gold_tiles",
+        "last_trace_kind",
+        "log",
+        "main_done",
+        "neutral_markers",
+        "objectives",
+        "options",
+        "oumuamua_placed",
+        "pass_card_asked",
+        "pass_discard_checked",
+        "pass_rotated",
+        "pending",
+        "phase",
+        "planets",
+        "play_return",
+        "players",
+        "playing",
+        "probe_counter",
+        "probes",
+        "pushed",
+        "queue",
+        "rival",
+        "rng_state",
+        "rotations",
+        "round",
+        "scan_ctx",
+        "scan_steps",
+        "sector_order",
+        "sectors",
+        "species",
+        "stage",
+        "start_player",
+        "tech_stacks",
+        "turn_completed",
+        "turn_fx",
+        "winners"
+      ],
+      "title": "GameState",
+      "type": "object"
+    },
+    "GoldTile": {
+      "properties": {
+        "markers": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Markers",
+          "type": "array"
+        },
+        "side": {
+          "title": "Side",
+          "type": "string"
+        },
+        "tile": {
+          "title": "Tile",
+          "type": "string"
+        }
+      },
+      "required": [
+        "markers",
+        "side",
+        "tile"
+      ],
+      "title": "GoldTile",
+      "type": "object"
+    },
+    "LegalRequest": {
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/GameState"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "LegalRequest",
+      "type": "object"
+    },
+    "LegalResponse": {
+      "properties": {
+        "legal": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Legal",
+          "type": "array"
+        }
+      },
+      "required": [
+        "legal"
+      ],
+      "title": "LegalResponse",
+      "type": "object"
+    },
+    "MessageCard": {
+      "description": "A Centaurian card in front of a player waiting for its message marker to be reached (ALIEN-CEN-02).",
+      "properties": {
+        "card": {
+          "title": "Card",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "card",
+        "target"
+      ],
+      "title": "MessageCard",
+      "type": "object"
+    },
+    "MissionState": {
+      "description": "A mission card in front of a player (CARD-10 to CARD-16). `used` marks the covered circles of a triggerable mission.",
+      "properties": {
+        "card": {
+          "title": "Card",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "used": {
+          "items": {
+            "type": "boolean"
+          },
+          "title": "Used",
+          "type": "array"
+        }
+      },
+      "required": [
+        "card",
+        "kind",
+        "used"
+      ],
+      "title": "MissionState",
+      "type": "object"
+    },
+    "NewGameRequest": {
+      "properties": {
+        "options": {
+          "$ref": "#/$defs/Options"
+        }
+      },
+      "required": [
+        "options"
+      ],
+      "title": "NewGameRequest",
+      "type": "object"
+    },
+    "ObjectiveState": {
+      "description": "The player's objectives in the solo game (SOLO-OBJ-*).",
+      "properties": {
+        "marks": {
+          "additionalProperties": {
+            "items": {
+              "type": "boolean"
+            },
+            "type": "array"
+          },
+          "title": "Marks",
+          "type": "object"
+        },
+        "pile": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Pile",
+          "type": "array"
+        },
+        "row": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Row",
+          "type": "array"
+        },
+        "stack": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Stack",
+          "type": "array"
+        }
+      },
+      "required": [
+        "marks",
+        "pile",
+        "row",
+        "stack"
+      ],
+      "title": "ObjectiveState",
+      "type": "object"
+    },
+    "Options": {
+      "properties": {
+        "difficulty": {
+          "default": 3,
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Difficulty",
+          "type": "integer"
+        },
+        "players": {
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Players",
+          "type": "integer"
+        },
+        "promo_cards": {
+          "default": false,
+          "title": "Promo Cards",
+          "type": "boolean"
+        },
+        "seed": {
+          "default": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "players"
+      ],
+      "title": "Options",
+      "type": "object"
+    },
+    "PlanetState": {
+      "properties": {
+        "first_land_data_taken": {
+          "items": {
+            "type": "boolean"
+          },
+          "title": "First Land Data Taken",
+          "type": "array"
+        },
+        "first_land_owners": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "First Land Owners",
+          "type": "array"
+        },
+        "first_orbit_taken": {
+          "default": false,
+          "title": "First Orbit Taken",
+          "type": "boolean"
+        },
+        "first_orbiter": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Orbiter"
+        },
+        "landers": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Landers",
+          "type": "array"
+        },
+        "moon_landers": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Moon Landers",
+          "type": "object"
+        },
+        "orbiters": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Orbiters",
+          "type": "array"
+        }
+      },
+      "required": [
+        "first_land_data_taken",
+        "first_land_owners",
+        "first_orbit_taken",
+        "first_orbiter",
+        "landers",
+        "moon_landers",
+        "orbiters"
+      ],
+      "title": "PlanetState",
+      "type": "object"
+    },
+    "PlayerState": {
+      "properties": {
+        "color": {
+          "title": "Color",
+          "type": "string"
+        },
+        "completed_missions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Completed Missions",
+          "type": "array"
+        },
+        "computer": {
+          "items": {
+            "type": "boolean"
+          },
+          "title": "Computer",
+          "type": "array"
+        },
+        "computer_techs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ComputerTech"
+          },
+          "title": "Computer Techs",
+          "type": "object"
+        },
+        "credits": {
+          "default": 0,
+          "title": "Credits",
+          "type": "integer"
+        },
+        "data_pool": {
+          "default": 0,
+          "title": "Data Pool",
+          "type": "integer"
+        },
+        "end_cards": {
+          "items": {
+            "type": "string"
+          },
+          "title": "End Cards",
+          "type": "array"
+        },
+        "energy": {
+          "default": 0,
+          "title": "Energy",
+          "type": "integer"
+        },
+        "exertian_hand": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exertian Hand",
+          "type": "array"
+        },
+        "exertian_played": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exertian Played",
+          "type": "array"
+        },
+        "exofossils": {
+          "default": 0,
+          "title": "Exofossils",
+          "type": "integer"
+        },
+        "gold_markers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Gold Markers",
+          "type": "array"
+        },
+        "hand": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Hand",
+          "type": "array"
+        },
+        "index": {
+          "title": "Index",
+          "type": "integer"
+        },
+        "landers": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Landers",
+          "type": "object"
+        },
+        "message_cards": {
+          "items": {
+            "$ref": "#/$defs/MessageCard"
+          },
+          "title": "Message Cards",
+          "type": "array"
+        },
+        "messages": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Messages",
+          "type": "array"
+        },
+        "missions": {
+          "items": {
+            "$ref": "#/$defs/MissionState"
+          },
+          "title": "Missions",
+          "type": "array"
+        },
+        "movement": {
+          "default": 0,
+          "title": "Movement",
+          "type": "integer"
+        },
+        "orbiters": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Orbiters",
+          "type": "object"
+        },
+        "passed": {
+          "default": false,
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "probes_launched": {
+          "default": 0,
+          "title": "Probes Launched",
+          "type": "integer"
+        },
+        "publicity": {
+          "default": 4,
+          "title": "Publicity",
+          "type": "integer"
+        },
+        "score": {
+          "default": 0,
+          "title": "Score",
+          "type": "integer"
+        },
+        "sector_wins": {
+          "default": 0,
+          "title": "Sector Wins",
+          "type": "integer"
+        },
+        "techs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Techs",
+          "type": "array"
+        },
+        "trace_log": {
+          "items": {
+            "additionalItems": false,
+            "items": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "title": "Trace Log",
+          "type": "array"
+        },
+        "tucked": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tucked",
+          "type": "array"
+        }
+      },
+      "required": [
+        "color",
+        "completed_missions",
+        "computer",
+        "computer_techs",
+        "credits",
+        "data_pool",
+        "end_cards",
+        "energy",
+        "exertian_hand",
+        "exertian_played",
+        "exofossils",
+        "gold_markers",
+        "hand",
+        "index",
+        "landers",
+        "message_cards",
+        "messages",
+        "missions",
+        "movement",
+        "orbiters",
+        "passed",
+        "probes_launched",
+        "publicity",
+        "score",
+        "sector_wins",
+        "techs",
+        "trace_log",
+        "tucked"
+      ],
+      "title": "PlayerState",
+      "type": "object"
+    },
+    "Probe": {
+      "properties": {
+        "capsule": {
+          "default": false,
+          "title": "Capsule",
+          "type": "boolean"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "player": {
+          "title": "Player",
+          "type": "integer"
+        },
+        "ring": {
+          "title": "Ring",
+          "type": "integer"
+        },
+        "sample": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sample"
+        },
+        "sector": {
+          "title": "Sector",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "capsule",
+        "id",
+        "player",
+        "ring",
+        "sample",
+        "sector"
+      ],
+      "title": "Probe",
+      "type": "object"
+    },
+    "ProjectRequest": {
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/GameState"
+        },
+        "viewer": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The player index, or null for a spectator.",
+          "title": "Viewer"
+        }
+      },
+      "required": [
+        "state",
+        "viewer"
+      ],
+      "title": "ProjectRequest",
+      "type": "object"
+    },
+    "RivalState": {
+      "description": "The solo rival (SOLO-*): it is the second entry of `GameState.players`, with its own bookkeeping here.",
+      "properties": {
+        "advanced": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Advanced",
+          "type": "array"
+        },
+        "arrow": {
+          "default": "left",
+          "title": "Arrow",
+          "type": "string"
+        },
+        "computer": {
+          "default": 0,
+          "title": "Computer",
+          "type": "integer"
+        },
+        "deck": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Deck",
+          "type": "array"
+        },
+        "index": {
+          "title": "Index",
+          "type": "integer"
+        },
+        "messages_in_reserve": {
+          "default": 0,
+          "title": "Messages In Reserve",
+          "type": "integer"
+        },
+        "progress": {
+          "title": "Progress",
+          "type": "integer"
+        },
+        "techs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Techs",
+          "type": "array"
+        },
+        "used": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Used",
+          "type": "array"
+        }
+      },
+      "required": [
+        "advanced",
+        "arrow",
+        "computer",
+        "deck",
+        "index",
+        "messages_in_reserve",
+        "progress",
+        "techs",
+        "used"
+      ],
+      "title": "RivalState",
+      "type": "object"
+    },
+    "SectorState": {
+      "properties": {
+        "capacity": {
+          "title": "Capacity",
+          "type": "integer"
+        },
+        "color": {
+          "title": "Color",
+          "type": "string"
+        },
+        "data_remaining": {
+          "title": "Data Remaining",
+          "type": "integer"
+        },
+        "markers": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Markers",
+          "type": "array"
+        },
+        "star": {
+          "title": "Star",
+          "type": "string"
+        },
+        "winners": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Winners",
+          "type": "array"
+        }
+      },
+      "required": [
+        "capacity",
+        "color",
+        "data_remaining",
+        "markers",
+        "star",
+        "winners"
+      ],
+      "title": "SectorState",
+      "type": "object"
+    },
+    "SpeciesSlot": {
+      "properties": {
+        "board": {
+          "additionalProperties": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "title": "Board",
+          "type": "object"
+        },
+        "complete": {
+          "default": false,
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "deck": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Deck",
+          "type": "array"
+        },
+        "discovered": {
+          "default": false,
+          "title": "Discovered",
+          "type": "boolean"
+        },
+        "discovery_spaces": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Discovery Spaces",
+          "type": "array"
+        },
+        "extra": {
+          "additionalProperties": true,
+          "title": "Extra",
+          "type": "object"
+        },
+        "face_up": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Face Up"
+        },
+        "overflow": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Overflow",
+          "type": "array"
+        },
+        "overflow_kinds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Overflow Kinds",
+          "type": "array"
+        },
+        "species": {
+          "title": "Species",
+          "type": "string"
+        }
+      },
+      "required": [
+        "board",
+        "complete",
+        "deck",
+        "discovered",
+        "discovery_spaces",
+        "extra",
+        "face_up",
+        "overflow",
+        "overflow_kinds",
+        "species"
+      ],
+      "title": "SpeciesSlot",
+      "type": "object"
+    },
+    "StepResult": {
+      "properties": {
+        "events": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "legal": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Legal",
+          "type": "array"
+        },
+        "state": {
+          "$ref": "#/$defs/GameState"
+        }
+      },
+      "required": [
+        "events",
+        "legal",
+        "state"
+      ],
+      "title": "StepResult",
+      "type": "object"
+    },
+    "TechStack": {
+      "properties": {
+        "category": {
+          "title": "Category",
+          "type": "string"
+        },
+        "glyph": {
+          "title": "Glyph",
+          "type": "string"
+        },
+        "tiles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tiles",
+          "type": "array"
+        },
+        "two_point_tile": {
+          "default": true,
+          "title": "Two Point Tile",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "category",
+        "glyph",
+        "tiles",
+        "two_point_tile"
+      ],
+      "title": "TechStack",
+      "type": "object"
+    },
+    "View": {
+      "description": "The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act.",
+      "properties": {
+        "counts": {
+          "$ref": "#/$defs/Counts"
+        },
+        "legal": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Legal",
+          "type": "array"
+        },
+        "state": {
+          "$ref": "#/$defs/GameState"
+        },
+        "to_act": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "To Act"
+        },
+        "viewer": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Viewer"
+        }
+      },
+      "required": [
+        "counts",
+        "legal",
+        "state",
+        "to_act",
+        "viewer"
+      ],
+      "title": "View",
+      "type": "object"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "description": "Protocol version 0.1.0. Generated by tools/engine/gen_protocol.py; do not edit.",
+  "properties": {
+    "ApplyRequest": {
+      "$ref": "#/$defs/ApplyRequest"
+    },
+    "ErrorResponse": {
+      "$ref": "#/$defs/ErrorResponse"
+    },
+    "GameState": {
+      "$ref": "#/$defs/GameState"
+    },
+    "LegalRequest": {
+      "$ref": "#/$defs/LegalRequest"
+    },
+    "LegalResponse": {
+      "$ref": "#/$defs/LegalResponse"
+    },
+    "NewGameRequest": {
+      "$ref": "#/$defs/NewGameRequest"
+    },
+    "Options": {
+      "$ref": "#/$defs/Options"
+    },
+    "ProjectRequest": {
+      "$ref": "#/$defs/ProjectRequest"
+    },
+    "StepResult": {
+      "$ref": "#/$defs/StepResult"
+    },
+    "View": {
+      "$ref": "#/$defs/View"
+    }
+  },
+  "title": "SetiProtocol",
+  "type": "object"
+}

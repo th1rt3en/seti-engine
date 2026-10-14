@@ -1,0 +1,197 @@
+<title>SETI Card Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: a sticky review bar over one row per card, with the printed card on the left and what the engine was given on the right. */
+  :root {
+    --bg: #f4f5f7;
+    --panel: #ffffff;
+    --ink: #151a22;
+    --muted: #5b6573;
+    --line: #d9dde4;
+    --accent: #1d6a8c;
+    --accent-ink: #ffffff;
+    --ok: #1f7a4d;
+    --ok-bg: #e2f3ea;
+    --flag: #b4440c;
+    --flag-bg: #fbe7da;
+    --code-bg: #eceff3;
+    --font: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1217; --panel: #161c24; --ink: #e8ecf1; --muted: #93a0b0; --line: #2a3340; --accent: #5bb4d6; --accent-ink: #08141b;
+      --ok: #62d49b; --ok-bg: #12301f; --flag: #ff9a62; --flag-bg: #3a2013; --code-bg: #0f151c; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1217; --panel: #161c24; --ink: #e8ecf1; --muted: #93a0b0; --line: #2a3340; --accent: #5bb4d6; --accent-ink: #08141b;
+    --ok: #62d49b; --ok-bg: #12301f; --flag: #ff9a62; --flag-bg: #3a2013; --code-bg: #0f151c; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header.top { padding-block: 24px 12px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--muted); max-width: 70ch; }
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+  .progress { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .progress small { color: var(--muted); font-weight: 400; }
+  .bar input[type="search"], .bar select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); min-width: 0; }
+  .bar input[type="search"] { flex: 1 1 180px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .copy { font: inherit; background: var(--accent); color: var(--accent-ink); border: 0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .list { display: flex; flex-direction: column; gap: 14px; padding-top: 16px; }
+  article.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; padding: 14px; }
+  article.card[data-state="ok"] { border-color: var(--ok); }
+  article.card[data-state="flag"] { border-color: var(--flag); }
+  .img { width: 100%; max-width: 300px; height: auto; border-radius: 8px; display: block; background: var(--code-bg); aspect-ratio: 747 / 1040; }
+  .body { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+  .head h2 { font-size: 1.15rem; margin: 0; }
+  .id { font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+  .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
+  dl.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 14px; margin: 0; }
+  dl.fields div { min-width: 0; }
+  dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--line); }
+  h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 4px 0 2px; }
+  ul.text { margin: 0; padding-left: 1.1em; }
+  pre.code { font-family: var(--mono); font-size: 0.78rem; line-height: 1.45; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 0; overflow-x: auto; white-space: pre; max-width: 100%; }
+  .note { color: var(--flag); font-size: 0.85rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; margin-top: auto; }
+  .actions button { font: inherit; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; font-weight: 600; }
+  .actions button.ok[aria-pressed="true"] { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+  .actions button.flag[aria-pressed="true"] { background: var(--flag-bg); border-color: var(--flag); color: var(--flag); }
+  .actions textarea { flex: 1 1 260px; min-width: 0; font: inherit; padding: 7px 10px; border: 1px solid var(--flag); border-radius: 6px; background: var(--panel); color: var(--ink); min-height: 40px; resize: vertical; }
+  .empty { color: var(--muted); padding: 32px 0; text-align: center; }
+  #out { display: none; width: 100%; font-family: var(--mono); font-size: 0.8rem; min-height: 8rem; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); margin-top: 10px; }
+  @media (max-width: 720px) {
+    article.card { grid-template-columns: minmax(0, 1fr); }
+    .img { max-width: 240px; margin: 0 auto; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>SETI Card Review</h1>
+    <p>Each row shows the printed card next to what was transcribed from it and the code the engine runs. Mark a card <b>Matches</b> when the three agree, or <b>Wrong</b> with a note on what the card really says. Your marks stay in this browser; <b>Copy corrections</b> gives the list to send back.</p>
+  </header>
+  <div class="bar" role="region" aria-label="Review controls">
+    <div class="progress" id="progress" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <select id="group" aria-label="Card group"></select>
+    <input id="q" type="search" placeholder="Search id, name or text" aria-label="Search cards">
+    <button class="copy" id="copy" type="button">Copy corrections</button>
+  </div>
+  <textarea id="out" readonly aria-label="Corrections to copy"></textarea>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+  const CARDS = /*CARDS*/[];
+  const KEY = "seti-card-review-v1";
+  const SECTOR = { yellow: "#e0b000", red: "#d9503c", blue: "#3b82d6", black: "#3a3f47" };
+  let marks = {};
+  try { marks = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { marks = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(marks)); } catch (e) {} };
+  let filter = "all";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const state = (id) => (marks[id] ? marks[id].s : "todo");
+
+  const groups = ["All groups", ...Array.from(new Set(CARDS.map((c) => c.group)))];
+  $("group").innerHTML = groups.map((g, i) => `<option value="${i === 0 ? "" : esc(g)}">${esc(g)}</option>`).join("");
+  const CHIPS = [["all", "All"], ["todo", "To check"], ["ok", "Matches"], ["flag", "Wrong"]];
+  $("chips").innerHTML = CHIPS.map(([k, l]) => `<button class="chip" type="button" data-k="${k}" aria-pressed="${k === filter}">${l}</button>`).join("");
+
+  function field(label, value, extra = "") {
+    if (value === null || value === undefined || value === "") return "";
+    return `<div><dt>${label}</dt><dd>${extra}${esc(value)}</dd></div>`;
+  }
+
+  function cardHtml(c) {
+    const s = state(c.id);
+    const m = marks[c.id] || {};
+    const sector = c.sector ? `<span class="sw" style="background:${SECTOR[c.sector] || "transparent"}"></span>` : "";
+    const cost = c.cost ? `${c.cost}${c.costType ? " " + c.costType : ""}` : "";
+    const text = c.text.length ? `<ul class="text">${c.text.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : `<span class="id">no text transcribed</span>`;
+    const extra = [...(c.additions || []).map((a) => `Added by the owner: ${a}`), c.note ? `Owner note: ${c.note}` : "", ...(c.unparsed || []).map((u) => `Not parsed: ${u}`)].filter(Boolean);
+    return `<article class="card" data-id="${esc(c.id)}" data-state="${s}">
+      <img class="img" src="${c.img}" alt="Card ${esc(c.id)} ${esc(c.name)}" decoding="async" loading="lazy">
+      <div class="body">
+        <div class="head"><h2>${esc(c.name || "(no name)")}</h2><span class="id">${esc(c.id)}</span><span class="tag">${esc(c.group)}</span>${c.ownerStatus ? `<span class="tag">tracker: ${esc(c.ownerStatus)}</span>` : ""}</div>
+        <dl class="fields">${field("Cost", cost)}${field("Income", c.income)}${field("Sector", c.sector, sector)}${field("Free action", c.free)}</dl>
+        <div><h3>Transcribed text</h3>${text}${extra.map((e) => `<div class="note">${esc(e)}</div>`).join("")}</div>
+        <div><h3>Engine code</h3><pre class="code">${esc(c.code)}</pre></div>
+        <div class="actions">
+          <button type="button" class="ok" data-act="ok" aria-pressed="${s === "ok"}">Matches</button>
+          <button type="button" class="flag" data-act="flag" aria-pressed="${s === "flag"}">Wrong</button>
+          ${s === "flag" ? `<textarea id="note-${esc(c.id)}" data-note="${esc(c.id)}" placeholder="What does the printed card say?">${esc(m.n || "")}</textarea>` : ""}
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function visible() {
+    const q = $("q").value.trim().toLowerCase();
+    const g = $("group").value;
+    return CARDS.filter((c) => (g === "" || c.group === g) && (filter === "all" || state(c.id) === filter) &&
+      (q === "" || `${c.id} ${c.name} ${c.text.join(" ")} ${c.code}`.toLowerCase().includes(q)));
+  }
+
+  function renderProgress() {
+    const ok = CARDS.filter((c) => state(c.id) === "ok").length;
+    const flag = CARDS.filter((c) => state(c.id) === "flag").length;
+    $("progress").innerHTML = `${ok + flag} of ${CARDS.length} reviewed <small>· ${ok} match · ${flag} wrong</small>`;
+  }
+
+  function render() {
+    const list = visible();
+    $("list").innerHTML = list.length ? list.map(cardHtml).join("") : `<div class="empty">No cards match this filter.</div>`;
+    renderProgress();
+  }
+
+  $("list").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-act]");
+    if (!b) return;
+    const id = b.closest("article").dataset.id;
+    const act = b.dataset.act;
+    marks[id] = state(id) === act ? undefined : { s: act, n: (marks[id] || {}).n || "" };
+    if (!marks[id]) delete marks[id];
+    save();
+    const art = b.closest("article");
+    const card = CARDS.find((c) => c.id === id);
+    if (filter === "all") { art.outerHTML = cardHtml(card); renderProgress(); } else render();
+  });
+  $("list").addEventListener("input", (e) => {
+    const id = e.target.dataset.note;
+    if (!id) return;
+    marks[id] = { s: "flag", n: e.target.value };
+    save();
+  });
+  $("chips").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-k]");
+    if (!b) return;
+    filter = b.dataset.k;
+    document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.k === filter)));
+    render();
+  });
+  $("q").addEventListener("input", render);
+  $("group").addEventListener("change", render);
+  $("copy").addEventListener("click", async () => {
+    const wrong = CARDS.filter((c) => state(c.id) === "flag");
+    const text = wrong.length
+      ? wrong.map((c) => `${c.id} ${c.name}: ${(marks[c.id].n || "").trim() || "(no note)"}`).join("\n")
+      : "No corrections marked.";
+    const out = $("out");
+    out.value = text;
+    try { await navigator.clipboard.writeText(text); $("copy").textContent = "Copied"; setTimeout(() => ($("copy").textContent = "Copy corrections"), 1500); out.style.display = "none"; }
+    catch (err) { out.style.display = "block"; out.focus(); out.select(); }
+  });
+  render();
+</script>

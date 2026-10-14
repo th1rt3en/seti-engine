@@ -1,0 +1,492 @@
+{
+ "cards": [
+  {
+   "actions": [
+    {
+     "cardBenefitVp": 0,
+     "kind": "analyze"
+    },
+    {
+     "kind": "launch",
+     "progress": 0,
+     "publicity": 1
+    },
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 0
+    },
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 3,
+     "planets": [
+      "saturn",
+      "mars",
+      "jupiter",
+      "venus"
+     ],
+     "preference": "orbiter"
+    }
+   ],
+   "dir": "left",
+   "id": "S.1",
+   "tier": "basic"
+  },
+  {
+   "actions": [
+    {
+     "cardBenefitVp": 0,
+     "kind": "analyze"
+    },
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 0
+    },
+    {
+     "cardRowSignals": 2,
+     "earthSignals": 1,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.2",
+   "tier": "basic"
+  },
+  {
+   "actions": [
+    {
+     "discoveredSpecies": 1,
+     "kind": "species_check"
+    },
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 0
+    },
+    {
+     "cardRowSignals": 2,
+     "earthSignals": 1,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "left",
+   "id": "S.3",
+   "tier": "basic"
+  },
+  {
+   "actions": [
+    {
+     "discoveredSpecies": 2,
+     "kind": "species_check"
+    },
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 3,
+     "planets": [
+      "jupiter",
+      "mars",
+      "saturn",
+      "venus"
+     ],
+     "preference": "orbiter"
+    },
+    {
+     "costPublicity": 0,
+     "kind": "tech",
+     "progress": 1
+    }
+   ],
+   "dir": "right",
+   "id": "S.4",
+   "tier": "basic"
+  },
+  {
+   "actions": [
+    {
+     "cardBenefitVp": 3,
+     "kind": "analyze"
+    },
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 1
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "left",
+   "id": "S.5",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 1
+    },
+    {
+     "kind": "launch",
+     "progress": 1,
+     "publicity": 1
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "left",
+   "id": "S.6",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 1
+    },
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "neptune",
+      "saturn",
+      "mercury",
+      "venus"
+     ],
+     "preference": "lander"
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.7",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "cardBenefitVp": 3,
+     "kind": "analyze"
+    },
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "uranus",
+      "jupiter",
+      "mercury",
+      "venus"
+     ],
+     "preference": "lander"
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "left",
+   "id": "S.8",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "cardBenefitVp": 3,
+     "kind": "analyze"
+    },
+    {
+     "kind": "launch",
+     "progress": 1,
+     "publicity": 1
+    },
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "neptune",
+      "uranus",
+      "mercury",
+      "venus"
+     ],
+     "preference": "orbiter"
+    }
+   ],
+   "dir": "right",
+   "id": "S.9",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "cardBenefitVp": 3,
+     "kind": "analyze"
+    },
+    {
+     "kind": "launch",
+     "progress": 1,
+     "publicity": 1
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.10",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 1
+    },
+    {
+     "cardBenefitVp": 3,
+     "kind": "analyze"
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.11",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 1
+    },
+    {
+     "kind": "launch",
+     "progress": 1,
+     "publicity": 1
+    },
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "mercury",
+      "saturn",
+      "jupiter",
+      "venus"
+     ],
+     "preference": "lander"
+    }
+   ],
+   "dir": "left",
+   "id": "S.12",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "neptune",
+      "uranus",
+      "mars",
+      "venus"
+     ],
+     "preference": "lander"
+    },
+    {
+     "cardBenefitVp": 3,
+     "kind": "analyze"
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "left",
+   "id": "S.13",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "kind": "launch",
+     "progress": 1,
+     "publicity": 1
+    },
+    {
+     "costPublicity": 6,
+     "kind": "tech",
+     "progress": 1
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.14",
+   "tier": "advanced"
+  },
+  {
+   "actions": [
+    {
+     "kind": "launch",
+     "progress": 0,
+     "publicity": 1
+    },
+    {
+     "kind": "probe",
+     "landerOnly": true,
+     "moonLanding": true,
+     "movementByPlanet": [
+      {
+       "movement": 4,
+       "planet": "saturn"
+      },
+      {
+       "movement": 5,
+       "planet": "jupiter"
+      }
+     ],
+     "preference": "lander",
+     "takeSample": true
+    },
+    {
+     "effect": "mascamites_sample",
+     "kind": "text",
+     "text": "Take a random Mascamite sample from the planet and place it face up on this species board (ignore its reward)."
+    }
+   ],
+   "dir": "right",
+   "id": "S.15",
+   "species": "mascamites",
+   "tier": "species"
+  },
+  {
+   "actions": [
+    {
+     "effect": "anomalies_trace",
+     "kind": "text",
+     "text": "If the rival is not winning the next anomaly, they mark a trace of that color for this species and gain 3 VP."
+    },
+    {
+     "costPublicity": 0,
+     "kind": "tech",
+     "progress": 1
+    }
+   ],
+   "dir": "left",
+   "id": "S.16",
+   "species": "anomalies",
+   "tier": "species"
+  },
+  {
+   "actions": [
+    {
+     "kind": "probe",
+     "moonLanding": false,
+     "movement": 4,
+     "preference": "lander",
+     "target": "oumuamua"
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 1,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 1
+    }
+   ],
+   "dir": "left",
+   "id": "S.17",
+   "species": "oumuamua",
+   "tier": "species"
+  },
+  {
+   "actions": [
+    {
+     "effect": "centaurians_countdown",
+     "kind": "text",
+     "text": "If the rival still has a Centaurian marker in their reserve and none on the scoring track, place one \"+15\" marker ahead of their current score. Then advance 1 on the progress track."
+    },
+    {
+     "cardRowSignals": 2,
+     "earthSignals": 1,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.18",
+   "species": "centaurians",
+   "tier": "species"
+  },
+  {
+   "actions": [
+    {
+     "effect": "exertians_danger_card",
+     "kind": "text",
+     "text": "Count the number of the rival's played Exertian cards and the rival's traces on this species board. If the total is less than 5, the rival secretly plays an Exertian card."
+    },
+    {
+     "cardRowSignals": 2,
+     "earthSignals": 1,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "right",
+   "id": "S.19",
+   "species": "exertians",
+   "tier": "species"
+  }
+ ],
+ "source": "assets/solo-rival-action-cards-sheet.png (cards S.1 to S.19) and base rulebook pages 23 to 26"
+}

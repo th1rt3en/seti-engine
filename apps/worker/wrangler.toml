@@ -1,0 +1,24 @@
+# The Worker and its Durable Object. The owner deploys (CLAUDE.md rule 7): see docs/deploy-worker.md. No secrets belong in this file.
+name = "seti-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-01-01"
+
+[[durable_objects.bindings]]
+name = "GAME_ROOM"
+class_name = "GameRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "seti"
+database_id = "466fc48e-8908-4f65-bbe7-6677706eeec8"
+migrations_dir = "migrations"
+
+[vars]
+ENGINE_URL = "https://seti-engine-725889947830.us-central1.run.app"
+AUTH_ISSUER = "seti-web"
+AUTH_AUDIENCE = "seti-worker"
+# Secrets (set with `wrangler secret put`): AUTH_PUBLIC_KEY, and ENGINE_SIGNING_KEY (the key that signs requests to the engine service).

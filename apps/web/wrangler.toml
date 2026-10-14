@@ -1,0 +1,25 @@
+# The website as a Cloudflare Worker (decision D30), built by OpenNext: `pnpm --filter @seti/web deploy`. No secrets belong in this file:
+# set them with `wrangler secret put` (see docs/deploy-web.md): AUTH_PRIVATE_KEY, ENGINE_SIGNING_KEY, TURNSTILE_SECRET_KEY.
+name = "seti-web"
+main = ".open-next/worker.js"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "seti"
+database_id = "466fc48e-8908-4f65-bbe7-6677706eeec8"
+migrations_dir = "../worker/migrations"
+
+[vars]
+DB_MODE = "d1"
+WORKER_URL = "https://seti-worker.tobiko11.workers.dev"
+WORKER_WS_URL = "wss://seti-worker.tobiko11.workers.dev"
+ENGINE_URL = "https://seti-engine-725889947830.us-central1.run.app"
+AUTH_ISSUER = "seti-web"
+AUTH_AUDIENCE = "seti-worker"
+TURNSTILE_SITE_KEY = "0x4AAAAAAFWL9EVQzbSXxk75"

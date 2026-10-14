@@ -1,0 +1,4977 @@
+[
+ {
+  "id": "39",
+  "group": "base",
+  "name": "61 Virginis Observation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 2 signals in a yellow sector",
+   "at 61 Virginis.",
+   "QUICK MISSION: when win a yellow sector (x2), gain 4 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "128",
+  "group": "base",
+  "name": "Advanced Navigation System",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you visit a planet (except Earth): circles: 1 energy; 1 data; 1 movement"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "136",
+  "group": "base",
+  "name": "Algonquin Radio Observatory",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "mark 1 signal in a yellow sector",
+   "mark 1 signal in a red sector",
+   "mark 1 signal in a blue sector",
+   "mark 1 signal in a black sector",
+   "Don't gain any 0 data from them."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "64",
+  "group": "base",
+  "name": "ALICE",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a computer tech",
+   "QUICK MISSION: when mark 1 blue life trace; oneach, gain 2 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "45",
+  "group": "base",
+  "name": "Allen Telescope Array",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "discard 2 cards from the row and mark a signal in each matching sector",
+   "If you complete at least one sector this turn, gain 1 energy."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "discard 2 cards from the row and mark a signal in each matching sector"
+   }
+  ],
+  "owner_note": "Missing instant effect: scan 2 from display cards",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "46",
+  "group": "base",
+  "name": "ALMA Observatory",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "discard 2 cards from the row and mark a signal in each matching sector",
+   "If you complete at least one sector this turn, gain 1 card from the deck."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "discard 2 cards from the row and mark a signal in each matching sector"
+   }
+  ],
+  "owner_note": "Missing instant effect: scan 2 from display cards",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   5
+  ]
+ },
+ {
+  "id": "122",
+  "group": "base",
+  "name": "Amateur Astronomers",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "DESC_WITH_TYPE(any, Do this 3 times: Discard the top card of the deck for its signal.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   6
+  ]
+ },
+ {
+  "id": "97",
+  "group": "base",
+  "name": "Apollo 11 Mission",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a probe tech",
+   "QUICK MISSION: when mark 1 yellow life trace; oneach, gain 2 VP; 1 random card from the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   7
+  ]
+ },
+ {
+  "id": "55",
+  "group": "base",
+  "name": "Arecibo Observatory",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "In addition, mark a signal in any sector in any sector."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "take a scan action without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: scan action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   8
+  ]
+ },
+ {
+  "id": "129",
+  "group": "base",
+  "name": "Asteroids Research",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you visit asteroids on your turn: circles: 1 data; 1 data; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   9
+  ]
+ },
+ {
+  "id": "123",
+  "group": "base",
+  "name": "Asteroids Flyby",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "DESC_WITH_TYPE(move, If you visit asteroids this turn, gain 1 data .)"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 1",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "70",
+  "group": "base",
+  "name": "ATLAS",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a computer tech",
+   "QUICK MISSION: when mark 3 blue life trace, gain 3 VP; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "15",
+  "group": "base",
+  "name": "Atmospheric Entry",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "DESC_WITH_TYPE(orbit_count, Remove one of your orbiter from any planet to gain:)",
+   "3 VP",
+   "1 data",
+   "1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "38",
+  "group": "base",
+  "name": "Barnard's Star Observation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 2 signals in a red sector",
+   "at Barnard's Star.",
+   "END OF GAME: 3 VP for each win in a red sector"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "43",
+  "group": "base",
+  "name": "Beta Pictoris Observation",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 1 signal in a black sector",
+   "at Beta Pictoris.",
+   "QUICK MISSION: when win a black sector, gain 2 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "56",
+  "group": "base",
+  "name": "Breakthrough Listen",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "mark 1 signal in a blue sector"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   },
+   {
+    "kind": "raw",
+    "text": "scan blue"
+   }
+  ],
+  "owner_note": "missing instant effect: move 1, scan blue",
+  "status": "needs-owner-reading",
+  "unparsed": [
+   "scan blue"
+  ],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   5
+  ]
+ },
+ {
+  "id": "48",
+  "group": "base",
+  "name": "Breakthrough Starshot",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "mark 1 signal in a red sector"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   },
+   {
+    "kind": "raw",
+    "text": "scan red"
+   }
+  ],
+  "owner_note": "Missing instant effect: move 1, scan red",
+  "status": "needs-owner-reading",
+  "unparsed": [
+   "scan red"
+  ],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   6
+  ]
+ },
+ {
+  "id": "49",
+  "group": "base",
+  "name": "Breakthrough Watch",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "mark 1 signal in a yellow sector"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   },
+   {
+    "kind": "raw",
+    "text": "scan yellow"
+   }
+  ],
+  "owner_note": "Missing instant effect: move 1, scan yellow",
+  "status": "needs-owner-reading",
+  "unparsed": [
+   "scan yellow"
+  ],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   7
+  ]
+ },
+ {
+  "id": "115",
+  "group": "base",
+  "name": "Canadian Hydrogen Telescope",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 1 signal in any sector",
+   "QUICK MISSION: when research a telescope tech, gain 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   8
+  ]
+ },
+ {
+  "id": "80",
+  "group": "base",
+  "name": "Cape Canaveral SFS",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "black",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "TRIGGERABLE MISSION:  circles: 1 movement; 1 movement; 1 movement"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   9
+  ]
+ },
+ {
+  "id": "8",
+  "group": "base",
+  "name": "Cassini Probe",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "1 card from the row or the deck",
+   "QUICK MISSION: when orbiter or lander, gain 6 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   0
+  ]
+ },
+ {
+  "id": "88",
+  "group": "base",
+  "name": "Chandra Space Observatory",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 2 signals in any sector",
+   "QUICK MISSION: when Have a signal in 4 different sectors, gain 2 publicity",
+   "in a sector with one of your probes."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   1
+  ]
+ },
+ {
+  "id": "73",
+  "group": "base",
+  "name": "Clean Space Initiative",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "Discard all 3 cards from the card row for their free-action corner effect."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   2
+  ]
+ },
+ {
+  "id": "124",
+  "group": "base",
+  "name": "Cometary Encounter",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "2 movement",
+   "DESC_WITH_TYPE(move, If you visit a comet this turn, gain 4 VP .)"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   3
+  ]
+ },
+ {
+  "id": "116",
+  "group": "base",
+  "name": "Control Center",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "black",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When vou mark a signal in a sector of the indicated color: circles: 1 movement; 1 movement; 1 movement"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   4
+  ]
+ },
+ {
+  "id": "138",
+  "group": "base",
+  "name": "Cornell University",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you discard a card from your hand for this free action: circles: 1 publicity; 1 data; 1 movement"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   5
+  ]
+ },
+ {
+  "id": "98",
+  "group": "base",
+  "name": "Coronal Spectrograph",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "DESC_WITH_TYPE(pink, Mark a pink trace for a species for which you have already marked a pink trace.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   6
+  ]
+ },
+ {
+  "id": "53",
+  "group": "base",
+  "name": "Deep Synoptic Array",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "2 VP for each signal in a yellow sector you mark with this action."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "take a scan action without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: scan action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   7
+  ]
+ },
+ {
+  "id": "16",
+  "group": "base",
+  "name": "Dragonfly",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "You may land on a space that is already occupied and still get the covered reward."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   8
+  ]
+ },
+ {
+  "id": "68",
+  "group": "base",
+  "name": "DUNE",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a computer tech",
+   "END OF GAME: 2 VP for each blue trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   9
+  ]
+ },
+ {
+  "id": "57",
+  "group": "base",
+  "name": "Effelsberg Telescope Construction",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 card from the row or the deck",
+   "rotate the solar system",
+   "research a telescope tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 card from the row or the deck"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a telescope tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 card any, 1 rotate, 1 pink technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   0
+  ]
+ },
+ {
+  "id": "99",
+  "group": "base",
+  "name": "Electron Microscope",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "DESC_WITH_TYPE(yellow, Mark a yellow trace for a species for which you have already marked a yellow trace.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   1
+  ]
+ },
+ {
+  "id": "126",
+  "group": "base",
+  "name": "Euclid Telescope Construction",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a probe tech",
+   "OR",
+   "rotate the solar system",
+   "research a telescope tech",
+   "END OF GAME: 2 VP for each computer tech"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   2
+  ]
+ },
+ {
+  "id": "12",
+  "group": "base",
+  "name": "Europa Clipper",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "black",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "on a planet or a moon, even without the required tech.",
+   "END OF GAME: 3 VP for each orbiter or lander at Jupiter (incl. moons)."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   3
+  ]
+ },
+ {
+  "id": "100",
+  "group": "base",
+  "name": "Exascale Supercomputer",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "DESC_WITH_TYPE(blue, Mark a blue trace for a species for which you have already marked a blue trace.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   4
+  ]
+ },
+ {
+  "id": "75",
+  "group": "base",
+  "name": "Extremophiles Study",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "black",
+  "free_action": "1 data",
+  "repo_effects": [
+   "mark 1 any life trace",
+   "DESC_WITH_TYPE(score, Then for each trace of any color you have in that color, gain 1 VP.)"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "mark 1 any life trace"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 any trace",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   5
+  ]
+ },
+ {
+  "id": "9",
+  "group": "base",
+  "name": "Falcon Heavy",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "1 publicity",
+   "Ignore the limit of probes in space for those launches."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   6
+  ]
+ },
+ {
+  "id": "65",
+  "group": "base",
+  "name": "FAST Telescope Construction",
+  "cost": "4",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "black",
+  "free_action": "1 move",
+  "repo_effects": [
+   "discard 2 cards from the row and mark a signal in each matching sector",
+   "rotate the solar system",
+   "research a telescope tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "discard 2 cards from the row and mark a signal in each matching sector"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a telescope tech"
+   }
+  ],
+  "owner_note": "missing instant effect: scan 2 from display cards, 1 rotate, 1 pink technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   7
+  ]
+ },
+ {
+  "id": "107",
+  "group": "base",
+  "name": "First Black Hole Photo",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "2 data",
+   "TRIGGERABLE MISSION:  circles: 2 publicity; 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   8
+  ]
+ },
+ {
+  "id": "71",
+  "group": "base",
+  "name": "Focused Research",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a any tech",
+   "Then gain 2 VP for each tech of that type you have."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a any tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 rotate, 1 any color technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   9
+  ]
+ },
+ {
+  "id": "90",
+  "group": "base",
+  "name": "Fuel Tanks Construction",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "Gain 1 energy for each card with energy income card income you show from your hand."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   0
+  ]
+ },
+ {
+  "id": "91",
+  "group": "base",
+  "name": "Fusion Reactor",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "Gain 1 energy for each card with energy income card tucked income. Then increase your income with this card."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   1
+  ]
+ },
+ {
+  "id": "121",
+  "group": "base",
+  "name": "Future Circular Collider",
+  "cost": "4",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "3 data",
+   "rotate the solar system",
+   "research a computer tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "3 data"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a computer tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 3 data, 1 rotate, 1 blue technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   2
+  ]
+ },
+ {
+  "id": "4",
+  "group": "base",
+  "name": "Galileo Mission",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you visit: circles: 1 publicity; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   3
+  ]
+ },
+ {
+  "id": "86",
+  "group": "base",
+  "name": "Giant Magellan Telescope",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "discard 1 card from the row and mark a signal in each matching sector",
+   "END OF GAME: 1 VP for each sector where you have a signal."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "discard 1 card from the row and mark a signal in each matching sector"
+   }
+  ],
+  "owner_note": "missing instant effect: scan 1 from display cards",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   4
+  ]
+ },
+ {
+  "id": "66",
+  "group": "base",
+  "name": "GMRT Telescope Construction",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a telescope tech",
+   "QUICK MISSION: when mark 1 pink life trace; oneach, gain 2 VP; 1 energy"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   5
+  ]
+ },
+ {
+  "id": "93",
+  "group": "base",
+  "name": "Government Funding",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "Gain 3 VP for each card with credit income card tucked income. Then increase your income with this card."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   6
+  ]
+ },
+ {
+  "id": "11",
+  "group": "base",
+  "name": "Grant",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 card from the row or the deck",
+   "Reveal the card you drew, and gain its free-action corner effect."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   7
+  ]
+ },
+ {
+  "id": "19",
+  "group": "base",
+  "name": "Gravitational Slingshot",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "2 movement",
+   "Each time you visit a planet this turn, you may gain 1 movement instead of 1 publicity."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   8
+  ]
+ },
+ {
+  "id": "30",
+  "group": "base",
+  "name": "Great Observatories Project",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "DESC_WITH_TYPE(any, Choose up to 3 probes (yours or other players'). For each probe, mark a signal in any sector in its sector.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   9
+  ]
+ },
+ {
+  "id": "105",
+  "group": "base",
+  "name": "Green Bank Telescope",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "black",
+  "free_action": "1 move",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "QUICK MISSION: when mark 3 pink life trace, gain mark 1 pink life trace"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "take a scan action without paying its cost"
+   },
+   {
+    "kind": "dup",
+    "text": "missing quick mission: mark 3 pink traces -> mark 1 pink trace"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 scan action\nmissing quick mission: mark 3 pink traces -> mark 1 pink trace",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   0
+  ]
+ },
+ {
+  "id": "18",
+  "group": "base",
+  "name": "Hayabusa",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "black",
+  "free_action": "1 move",
+  "repo_effects": [
+   "DESC_WITH_TYPE(yellow, If you have a probe on asteroids, mark a yellow trace.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   1
+  ]
+ },
+ {
+  "id": "134",
+  "group": "base",
+  "name": "Herschel Space Observatory",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 1 signal in any sector",
+   "in a sector with one or your probes",
+   "QUICK MISSION: when Have a signal in 4 different sectors, gain 2 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   2
+  ]
+ },
+ {
+  "id": "27",
+  "group": "base",
+  "name": "Hubble Space Telescope",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "signal in any sector in a sector with one of your probes."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 1",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   3
+  ]
+ },
+ {
+  "id": "81",
+  "group": "base",
+  "name": "International Collaboration",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "research a any tech",
+   "Do not advance the solar system. Do not gain the 3 VP / 1 publicity / 1 energy / 1 card from the row or the deck bonus printed on the tile.",
+   "that someone else has already researched."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "research a any tech"
+   }
+  ],
+  "owner_note": "missing instant effect:  1 any color technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   4
+  ]
+ },
+ {
+  "id": "59",
+  "group": "base",
+  "name": "Ion Propulsion System",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 energy",
+   "rotate the solar system",
+   "research a probe tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 energy"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a probe tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 energy, 1 rotate, 1 orange technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   5
+  ]
+ },
+ {
+  "id": "79",
+  "group": "base",
+  "name": "ISS",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "1 publicity",
+   "TRIGGERABLE MISSION:  circles: 1 credit; 1 card from the row or the deck; 5 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   6
+  ]
+ },
+ {
+  "id": "29",
+  "group": "base",
+  "name": "James Webb Space Telescope",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "signal in any sector in a sector with one of your probes and in both neighboring sectors."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 1",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   7
+  ]
+ },
+ {
+  "id": "82",
+  "group": "base",
+  "name": "Johnson Space Center",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "TRIGGERABLE MISSION:  circles: 2 publicity; 2 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   8
+  ]
+ },
+ {
+  "id": "6",
+  "group": "base",
+  "name": "Juno Probe",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "1 data",
+   "QUICK MISSION: when orbiter or lander, gain 7 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   9
+  ]
+ },
+ {
+  "id": "35",
+  "group": "base",
+  "name": "Jupiter Exploration Program",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 2 signals in any sector",
+   "QUICK MISSION: when orbiter or lander, gain 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   0
+  ]
+ },
+ {
+  "id": "23",
+  "group": "base",
+  "name": "Jupiter Flyby",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "2 movement",
+   "If you visit Jupiter this turn, gain 4 VP."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   1
+  ]
+ },
+ {
+  "id": "40",
+  "group": "base",
+  "name": "Kepler 22 Observation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 2 signals in a yellow sector",
+   "at Kepler 22.",
+   "END OF GAME: 3 VP for each win in a yellow sector"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   2
+  ]
+ },
+ {
+  "id": "28",
+  "group": "base",
+  "name": "Kepler Space Telescope",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 movement",
+   "signal in any sector signal in any sector in a sector with one of your probes."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 1",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   3
+  ]
+ },
+ {
+  "id": "69",
+  "group": "base",
+  "name": "Large Hadron Collider",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 data",
+   "rotate the solar system",
+   "research a computer tech"
+  ],
+  "owner_additions": [],
+  "owner_note": "missing instant effect: 1 data, 1 rotate, 1 blue technology",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   4
+  ]
+ },
+ {
+  "id": "25",
+  "group": "base",
+  "name": "Lightsail",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "4 movement",
+   "Gain 1 VP for each unique planet you visit this turn (incl. Earth)."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "4 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 4",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   5
+  ]
+ },
+ {
+  "id": "102",
+  "group": "base",
+  "name": "Linguistic Analysis",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "3 publicity",
+   "QUICK MISSION: when mark 1 pink life trace; mark 1 yellow life trace; mark 1 blue life trace; for a single species, gain mark 1 any life trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   6
+  ]
+ },
+ {
+  "id": "51",
+  "group": "base",
+  "name": "Lovell Telescope",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 data",
+   "take a scan action without paying its cost",
+   "QUICK MISSION: when Have at least; DESC_WITH_TYPE(publicity, 8 publicity), gain 3 VP; 1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   7
+  ]
+ },
+ {
+  "id": "130",
+  "group": "base",
+  "name": "Low-Cost Space Launch",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "launch a probe without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 launch action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   8
+  ]
+ },
+ {
+  "id": "109",
+  "group": "base",
+  "name": "Low-Power Microprocessors",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "1 energy",
+   "rotate the solar system",
+   "research a computer tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 energy"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a computer tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 energy, 1 rotate, 1 blue technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   9
+  ]
+ },
+ {
+  "id": "2",
+  "group": "base",
+  "name": "Mariner 10 Mission",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you visit: circles: 1 random card from the deck; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "34",
+  "group": "base",
+  "name": "Mars Exploration Program",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 2 signals in any sector",
+   "QUICK MISSION: when orbiter or lander, gain 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "22",
+  "group": "base",
+  "name": "Mars Flyby",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "2 movement",
+   "If you visit Mars this turn, gain 4 VP."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "14",
+  "group": "base",
+  "name": "Mars Science Laboratory",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 publicity",
+   "2 data",
+   "END OF GAME: 4 VP for each orbiter or lander at Mars (incl. moons)."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "gain 1 publicity and 2 data"
+   }
+  ],
+  "owner_note": "missing instant effect: gain 1 publicity and 2 data",
+  "status": "needs-owner-reading",
+  "unparsed": [
+   "gain 1 publicity and 2 data"
+  ],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "32",
+  "group": "base",
+  "name": "Mercury Exploration Program",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 2 signals in any sector",
+   "QUICK MISSION: when orbiter or lander, gain 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "20",
+  "group": "base",
+  "name": "Mercury Flyby",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "2 movement",
+   "If you visit Mercury this turn, gain 4 VP."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   5
+  ]
+ },
+ {
+  "id": "7",
+  "group": "base",
+  "name": "MESSENGER Probe",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "1 movement",
+   "QUICK MISSION: when orbiter or lander, gain 7 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   6
+  ]
+ },
+ {
+  "id": "77",
+  "group": "base",
+  "name": "NASA Astrobiology Institute",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 publicity",
+   "TRIGGERABLE MISSION:  circles: 1 data; 1 data; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   7
+  ]
+ },
+ {
+  "id": "92",
+  "group": "base",
+  "name": "NASA Image of the Day",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "2 publicity",
+   "Gain 1 publicity for each card with card income card tucked income. Then increase your income with this card."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 publicity"
+   }
+  ],
+  "owner_note": "missing instant effect: 2 publicity",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   8
+  ]
+ },
+ {
+  "id": "76",
+  "group": "base",
+  "name": "NASA Research Center",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION:  circles: 1 energy; 1 publicity; 1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   9
+  ]
+ },
+ {
+  "id": "95",
+  "group": "base",
+  "name": "Near-Earth Asteroids Survey",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "2 publicity",
+   "QUICK MISSION: when Have a probe on asteroids adjacent to Earth, gain 5 VP; 1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "127",
+  "group": "base",
+  "name": "NEAR Shoemaker",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "2 publicity",
+   "END OF GAME: If you have a probe on asteroids, gain 13 VP ."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 publicity"
+   }
+  ],
+  "owner_note": "missing instant effect: 2 publicity",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "89",
+  "group": "base",
+  "name": "NIAC Program",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "3 random card from the deck",
+   "QUICK MISSION: when Have no cards in your hand, gain 1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "135",
+  "group": "base",
+  "name": "Noto Radio Observatory",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 publicity",
+   "take a scan action without paying its cost"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 publicity"
+   },
+   {
+    "kind": "dup",
+    "text": "take a scan action without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 publicity, 1 scan action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "10",
+  "group": "base",
+  "name": "ODINUS Mission",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a probe tech",
+   "QUICK MISSION: when orbiter or lander at Neptune and orbiter or lander at Uranus (incl. their moons), gain 5 VP; 1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "62",
+  "group": "base",
+  "name": "Onsala Telescope Construction",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a telescope tech",
+   "END OF GAME: 2 VP for each pink trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   5
+  ]
+ },
+ {
+  "id": "133",
+  "group": "base",
+  "name": "Optimal Launch Window",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "DESC_WITH_TYPE(move, Then 1 movement for each other planet or a comet in the same sector as Earth.)"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "launch a probe without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 launch action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   6
+  ]
+ },
+ {
+  "id": "120",
+  "group": "base",
+  "name": "Orbiting Lagrange Point",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "black",
+  "free_action": "1 move",
+  "repo_effects": [
+   "DESC_WITH_TYPE(any, signal in any sector in a sector with one of your probes. If you have exactly 1 signal in that sector, return this card to your hand.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   7
+  ]
+ },
+ {
+  "id": "17",
+  "group": "base",
+  "name": "OSIRIS-REx",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "DESC_WITH_TYPE(data, Choose 1 of your probes. Gain 2 data if it is on asteroids. Gain 1 data for each adjacent asteroid)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   8
+  ]
+ },
+ {
+  "id": "52",
+  "group": "base",
+  "name": "Parkes Observatory",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "2 VP for each signal in a red sector you mark with this action."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "take a scan action without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: scan action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   9
+  ]
+ },
+ {
+  "id": "13",
+  "group": "base",
+  "name": "Perseverance Rover",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "If you land on Mars, Mercury, or any moon with this action, gain 4 VP."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   0
+  ]
+ },
+ {
+  "id": "1",
+  "group": "base",
+  "name": "Pioneer 11 Mission",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you visit: circles: 1 data; 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   1
+  ]
+ },
+ {
+  "id": "119",
+  "group": "base",
+  "name": "PIXL",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a computer tech",
+   "Then gain 1 VP for each 1 publicity you have."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a computer tech"
+   }
+  ],
+  "owner_note": "missing instant effect:  1 rotate, 1 blue technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   2
+  ]
+ },
+ {
+  "id": "114",
+  "group": "base",
+  "name": "Planet Hunters",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "1 card from the row or the deck",
+   "Then you can discard up to 3 cards for signals from your hand."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 card from the row or the deck"
+   }
+  ],
+  "owner_note": "missing instant effect: draw 1 any",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   3
+  ]
+ },
+ {
+  "id": "112",
+  "group": "base",
+  "name": "Planetary Geologic Mapping",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a probe tech",
+   "QUICK MISSION: when orbiter and lander at a single planet., gain 3 VP; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   4
+  ]
+ },
+ {
+  "id": "118",
+  "group": "base",
+  "name": "PLATO",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "mark 3 signals in any sector",
+   "in a sector with one of your probes. Don't gain any 0 data from them."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "mark 3 signals"
+   }
+  ],
+  "owner_note": "missing instant effect: mark 3 signals",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   5
+  ]
+ },
+ {
+  "id": "94",
+  "group": "base",
+  "name": "Popularization of Science",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "1 publicity",
+   "TRIGGERABLE MISSION:  circles: 2 publicity; 2 publicity; 2 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   6
+  ]
+ },
+ {
+  "id": "74",
+  "group": "base",
+  "name": "Pre-launch Testing",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "DESC_WITH_TYPE(move, 1 movement for each card with a 0 movement free-action corner effect you show from your hand.)"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "launch a probe without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 launch action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   7
+  ]
+ },
+ {
+  "id": "110",
+  "group": "base",
+  "name": "Press Statement",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "3 publicity"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "3 publicity"
+   }
+  ],
+  "owner_note": "missing instant effect: 3 publicity",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   8
+  ]
+ },
+ {
+  "id": "42",
+  "group": "base",
+  "name": "Procyon Observation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 2 signals in a blue sector",
+   "at Procyon.",
+   "END OF GAME: 3 VP for each win in a blue sector"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   9
+  ]
+ },
+ {
+  "id": "87",
+  "group": "base",
+  "name": "Project Longshot",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a probe tech",
+   "QUICK MISSION: when have a probe at least 5 spaces from Earth, gain 3 VP; 1 energy"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   0
+  ]
+ },
+ {
+  "id": "37",
+  "group": "base",
+  "name": "Proxima Centauri Observation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 2 signals in a red sector",
+   "at Proxima Centauri.",
+   "QUICK MISSION: when win a red sector (x2), gain 4 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   1
+  ]
+ },
+ {
+  "id": "61",
+  "group": "base",
+  "name": "Quantum Computer",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "black",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a computer tech",
+   "QUICK MISSION: when Have at least; 50 VP, gain tuck a card for income"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   2
+  ]
+ },
+ {
+  "id": "111",
+  "group": "base",
+  "name": "Roman Space Telescope",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a telescope tech",
+   "QUICK MISSION: when orbiter, gain 2 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   3
+  ]
+ },
+ {
+  "id": "104",
+  "group": "base",
+  "name": "Rosetta Probe",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "QUICK MISSION: when Have a probe on a comet, gain 3 VP; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   4
+  ]
+ },
+ {
+  "id": "84",
+  "group": "base",
+  "name": "Sample Return",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "DESC_WITH_TYPE(yellow, Remove one of your lander from any planet or moon to mark a yellow trace.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   5
+  ]
+ },
+ {
+  "id": "36",
+  "group": "base",
+  "name": "Saturn Exploration Program",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 2 signals in any sector",
+   "QUICK MISSION: when orbiter or lander, gain 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   6
+  ]
+ },
+ {
+  "id": "24",
+  "group": "base",
+  "name": "Saturn Flyby",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "3 movement",
+   "If you visit Saturn this turn, gain 6 VP."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "3 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 3",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   7
+  ]
+ },
+ {
+  "id": "72",
+  "group": "base",
+  "name": "Scientific Cooperation",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a any tech",
+   "If you take the tech that someone else has researched, gain 2 publicity."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a any tech"
+   }
+  ],
+  "owner_note": "missing instant effect:, 1 rotate, 1 any color technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   8
+  ]
+ },
+ {
+  "id": "137",
+  "group": "base",
+  "name": "SETI Data Archive",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "2 data"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 data"
+   }
+  ],
+  "owner_note": "missing instant effect: 2 data",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   9
+  ]
+ },
+ {
+  "id": "78",
+  "group": "base",
+  "name": "SETI Institute",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "1 publicity",
+   "TRIGGERABLE MISSION:  circles: 2 data; 1 card from the row or the deck; 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   0
+  ]
+ },
+ {
+  "id": "108",
+  "group": "base",
+  "name": "SETI@Home",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "black",
+  "free_action": "1 data",
+  "repo_effects": [
+   "DESC_WITH_TYPE(pink, If you have at least 8 publicity, mark a pink trace .)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   1
+  ]
+ },
+ {
+  "id": "63",
+  "group": "base",
+  "name": "SHERLOC",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a probe tech",
+   "END OF GAME: 2 VP for each yellow trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   2
+  ]
+ },
+ {
+  "id": "41",
+  "group": "base",
+  "name": "Sirius A Observation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 2 signals in a blue sector",
+   "at Sirius A.",
+   "QUICK MISSION: when win a blue sector (x2), gain 4 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   3
+  ]
+ },
+ {
+  "id": "113",
+  "group": "base",
+  "name": "Solvay Conference",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "2 publicity",
+   "END OF GAME: Resolve the rightmost space on a gold scoring tile you did not mark."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 publicity"
+   }
+  ],
+  "owner_note": "missing instant effect: 2 publicity",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   4
+  ]
+ },
+ {
+  "id": "31",
+  "group": "base",
+  "name": "Space Launch System",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "1 movement",
+   "QUICK MISSION: when lander, gain 1 credit"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   5
+  ]
+ },
+ {
+  "id": "132",
+  "group": "base",
+  "name": "Space Shuttle",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "black",
+  "free_action": "1 move",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "2 publicity",
+   "QUICK MISSION: when Have 5; orbiter or lander, gain 3 VP; 1 credit"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   6
+  ]
+ },
+ {
+  "id": "50",
+  "group": "base",
+  "name": "Square Kilometre Array",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "discard 3 cards from the row and mark a signal in each matching sector",
+   "2 VP for each unique sector in which you mark a signal."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "discard 3 cards from the row and mark a signal in each matching sector"
+   }
+  ],
+  "owner_note": "Missing instant effect: scan 3 from display cards",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   7
+  ]
+ },
+ {
+  "id": "85",
+  "group": "base",
+  "name": "Starship",
+  "cost": "4",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "rotate the solar system",
+   "research a probe tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "launch a probe without paying its cost"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a probe tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 launch action, 1 rotate, 1 orange technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   8
+  ]
+ },
+ {
+  "id": "106",
+  "group": "base",
+  "name": "Strategic Planning",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you pay the indicated cost to play a card as your main action: circles: 2 VP; 1 card from the row or the deck; 2 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   9
+  ]
+ },
+ {
+  "id": "96",
+  "group": "base",
+  "name": "Tardigrades Study",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 publicity",
+   "1 data",
+   "1 random card from the deck",
+   "QUICK MISSION: when mark 3 yellow life trace, gain mark 1 yellow life trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   0
+  ]
+ },
+ {
+  "id": "131",
+  "group": "base",
+  "name": "Telescope Modernization",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 data",
+  "repo_effects": [
+   "1 card from the row or the deck",
+   "TRIGGERABLE MISSION:  circles: 1 publicity; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   1
+  ]
+ },
+ {
+  "id": "101",
+  "group": "base",
+  "name": "Telescope Time Allocation",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "TRIGGERABLE MISSION:  circles: mark 1 signal in a yellow sector; mark 1 signal in a red sector; mark 1 signal in a blue sector"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   2
+  ]
+ },
+ {
+  "id": "26",
+  "group": "base",
+  "name": "Through the Asteroid Belt",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "2 movement",
+   "Ignore move restrictions from asteroids this turn."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   3
+  ]
+ },
+ {
+  "id": "125",
+  "group": "base",
+  "name": "Trajectory Correction",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 data",
+  "repo_effects": [
+   "1 movement",
+   "DESC_WITH_TYPE(move, If you move within the same ring at least once this turn, gain 3 VP 1 publicity .)"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 1",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   4
+  ]
+ },
+ {
+  "id": "60",
+  "group": "base",
+  "name": "Trident Probe",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "QUICK MISSION: when orbiter or lander, gain 4 VP; 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   5
+  ]
+ },
+ {
+  "id": "58",
+  "group": "base",
+  "name": "Uranus Orbiter and Probe",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "QUICK MISSION: when orbiter or lander, gain 3 VP; 1 random card from the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   6
+  ]
+ },
+ {
+  "id": "44",
+  "group": "base",
+  "name": "Vega Observation",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "mark 1 signal in a black sector",
+   "at Vega.",
+   "END OF GAME: 3 VP for each win in a black sector"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   7
+  ]
+ },
+ {
+  "id": "5",
+  "group": "base",
+  "name": "Venera Probe",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "1 publicity",
+   "QUICK MISSION: when orbiter or lander, gain 7 VP; 1 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   8
+  ]
+ },
+ {
+  "id": "33",
+  "group": "base",
+  "name": "Venus Exploration Program",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "mark 2 signals in any sector",
+   "QUICK MISSION: when orbiter or lander, gain 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   9
+  ]
+ },
+ {
+  "id": "21",
+  "group": "base",
+  "name": "Venus Flyby",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "2 movement",
+   "If you visit Venus this turn, gain 3 VP."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "2 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 2",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   0
+  ]
+ },
+ {
+  "id": "54",
+  "group": "base",
+  "name": "VERITAS Telescopes",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 move",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "2 VP for each signal in a blue sector you mark with this action."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "take a scan action without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: scan action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   1
+  ]
+ },
+ {
+  "id": "47",
+  "group": "base",
+  "name": "Very Large Array",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "discard 2 cards from the row and mark a signal in each matching sector",
+   "If you complete at least one sector this turn, gain 1 data."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "discard 2 cards from the row and mark a signal in each matching sector"
+   }
+  ],
+  "owner_note": "Missing instant effect: scan 2 from display cards",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   2
+  ]
+ },
+ {
+  "id": "3",
+  "group": "base",
+  "name": "Voyager 2 Mission",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 move",
+  "repo_effects": [
+   "TRIGGERABLE MISSION: When you visit: circles: 1 energy; 1 credit"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   3
+  ]
+ },
+ {
+  "id": "103",
+  "group": "base",
+  "name": "Westerbork Synthesis Radio Telescope",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a telescope tech",
+   "QUICK MISSION: when win a  sector (x2), gain 9 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   4
+  ]
+ },
+ {
+  "id": "83",
+  "group": "base",
+  "name": "Wow! Signal",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 publicity",
+   "mark 2 signals in any sector",
+   "in the sector with Earth."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 publicity"
+   },
+   {
+    "kind": "dup",
+    "text": "mark 2 signals"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 publicity, mark 2 signals",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   5
+  ]
+ },
+ {
+  "id": "67",
+  "group": "base",
+  "name": "Yevpatoria Telescope Construction",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 move",
+  "repo_effects": [
+   "1 publicity",
+   "rotate the solar system",
+   "research a telescope tech",
+   "Then you can discard a card for a signal from your hand."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "1 publicity"
+   },
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a telescope tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 publicity, 1 rotate, 1 pink technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   6
+  ]
+ },
+ {
+  "id": "117",
+  "group": "base",
+  "name": "Lunar Gateway",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "TRIGGERABLE MISSION:  circles: launch a probe without paying its cost; 1 energy"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   7
+  ]
+ },
+ {
+  "id": "ET.20",
+  "group": "alien-base",
+  "name": "Amazing Uncertainty",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "mark 1 signal in any sector",
+   "in any sector.",
+   "Then gain 1 VP for each signal you have in sectors with anomalies."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "mark 1 signal"
+   }
+  ],
+  "owner_note": "missing instant effect: mark 1 signal",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "ET.17",
+  "group": "alien-base",
+  "name": "Are we Being Observed?",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "Gain the reward from the anomaly which is going to be triggered next.",
+   "QUICK MISSION: when mark 1 pink life trace; mark 1 yellow life trace; mark 1 blue life trace; for this species, gain 3 VP; 2 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "ET.12",
+  "group": "alien-base",
+  "name": "Close-up View",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "5 movement",
+   "Don't gain any 0 publicity for moving probes this turn."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "5 movement"
+   }
+  ],
+  "owner_note": "missing instant effect: move 5",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "ET.13",
+  "group": "alien-base",
+  "name": "Concerned People",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "1 publicity",
+   "TRIGGERABLE MISSION:  circles: 1 energy; 1 card from the row or the deck; 3 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "ET.16",
+  "group": "alien-base",
+  "name": "Flooding the Media Space",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "DESC_WITH_TYPE(card_any, Draw all three cards from the card row.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "ET.14",
+  "group": "alien-base",
+  "name": "Listening Carefully",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "DESC_WITH_TYPE(any, In addition mark a signal in any sector in a sector with the anomaly which is going to be triggered next.)"
+  ],
+  "owner_additions": [],
+  "owner_note": "missing instant effect: 1 scan action",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "ET.18",
+  "group": "alien-base",
+  "name": "Message Capsule",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a any tech"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a any tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 rotate, 1 any technology",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "ET.19",
+  "group": "alien-base",
+  "name": "New Physics",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "mark 1 any life trace"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "mark 1 any life trace"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 any trace",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "ET.15",
+  "group": "alien-base",
+  "name": "Part of Everyday Life",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "3 random card from the deck",
+   "Discard one of them for its free-action corner effect and then discard another one to gain a resource corresponding to its income."
+  ],
+  "owner_additions": [
+   {
+    "kind": "ok",
+    "text": "3 card from the row or the deck"
+   }
+  ],
+  "owner_note": "missing instant effect: draw 3",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "ET.11",
+  "group": "alien-base",
+  "name": "Signs of Life",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "If it was in a sector with an anomaly, gain 1 movement ."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "launch a probe without paying its cost"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 launch action",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "ET.34",
+  "group": "alien-base",
+  "name": "A Message from Afar",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "1 random card from the deck",
+   "when you reach the marker",
+   "mark 1 pink life trace"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "missing effect: e.ADVANCED_15(), draw 1, e.FULFILL_ADVANCED(), mark 1 pink trace"
+   }
+  ],
+  "owner_note": "missing effect: e.ADVANCED_15(), draw 1, e.FULFILL_ADVANCED(), mark 1 pink trace",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "ET.36",
+  "group": "alien-base",
+  "name": "Alien Schematics",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "2 publicity",
+   "when you reach the marker",
+   "mark 1 blue life trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "ET.32",
+  "group": "alien-base",
+  "name": "Exocomputers",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "data",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "2 data",
+   "when you reach the marker",
+   "tuck a card for income"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "missing effect: e.ADVANCED_15(), 2 data, e.FULFILL_ADVANCED(), e.INCOME()"
+   }
+  ],
+  "owner_note": "missing effect: e.ADVANCED_15(), 2 data, e.FULFILL_ADVANCED(), e.INCOME()",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "ET.38",
+  "group": "alien-base",
+  "name": "Hivemind Concept",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "data",
+  "sector": "blue",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "rotate the solar system",
+   "research a computer tech",
+   "when you reach the marker",
+   "tuck a card for income"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "ET.33",
+  "group": "alien-base",
+  "name": "Infocluster",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "publicity",
+  "sector": "yellow",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "1 publicity",
+   "1 credit",
+   "when you reach the marker",
+   "tuck a card for income"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "ET.37",
+  "group": "alien-base",
+  "name": "Music of the Spheres",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "1 card from the row or the deck",
+   "when you reach the marker",
+   "1 credit",
+   "mark 1 any life trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "ET.35",
+  "group": "alien-base",
+  "name": "Synthesis Instructions",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "1 data",
+   "when you reach the marker",
+   "mark 1 yellow life trace"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "ET.39",
+  "group": "alien-base",
+  "name": "Telescope Blueprints",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "publicity",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "rotate the solar system",
+   "research a telescope tech",
+   "when you reach the marker",
+   "tuck a card for income"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "ET.40",
+  "group": "alien-base",
+  "name": "Torrent-chain Signal",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "data",
+  "sector": "yellow",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "mark 2 signals in any sector",
+   "when you reach the marker",
+   "tuck a card for income"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "ET.31",
+  "group": "alien-base",
+  "name": "Vessel Designs",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "publicity",
+  "sector": "blue",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "place your message marker 15 points ahead",
+   "launch a probe without paying its cost",
+   "when you reach the marker",
+   "tuck a card for income"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "missing effect: e.ADVANCED_15(), 1 launch action, e.FULFILL_ADVANCED(), e.INCOME()"
+   }
+  ],
+  "owner_note": "missing effect: e.ADVANCED_15(), 1 launch action, e.FULFILL_ADVANCED(), e.INCOME()",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "ET.7",
+  "group": "alien-base",
+  "name": "Breeding Sample",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "Then look at all sample on the planet and pick one up.",
+   "QUICK MISSION: when deliver a sample to earth, gain Resolve delivered sample twice."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "ET.10",
+  "group": "alien-base",
+  "name": "Computer Simulations",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "yellow",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "1 publicity",
+   "rotate the solar system",
+   "research a computer tech",
+   "QUICK MISSION: when 2 blue traces for this species., gain Choose Jupiter or Saturn. Look at all its sample, pick one, gain its reward, and put it back."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "ET.5",
+  "group": "alien-base",
+  "name": "Ecosystem Study",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "Look at all sample on a planet with your probe. Choose one, gain its reward, and put it back.",
+   "END OF GAME: 1 VP for each trace of any color you have marked for this species."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "ET.1",
+  "group": "alien-base",
+  "name": "First Contact",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "1 movement",
+   "take a land action without paying its cost",
+   "Then look at all sample on the planet and pick one up.",
+   "QUICK MISSION: when deliver a sample to earth, gain deliver a sample; 2 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "ET.8",
+  "group": "alien-base",
+  "name": "Hive Sample",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "blue",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "1 publicity",
+   "rotate the solar system",
+   "research a probe tech",
+   "QUICK MISSION: when 2 yellow traces for this species., gain Choose Jupiter or Saturn. Look at all its sample, pick one, gain its reward, and put it back."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "ET.4",
+  "group": "alien-base",
+  "name": "Martian Quarantine Lab",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "Then look at all sample on the planet and pick one up.",
+   "QUICK MISSION: when deliver a sample to mars, gain deliver a sample; 2 VP; 1 card from the row or the deck"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "ET.3",
+  "group": "alien-base",
+  "name": "Mass Sample Collection",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "take a orbit or land action without paying its cost",
+   "Then look at all sample on the planet and pick one up.",
+   "QUICK MISSION: when deliver a sample to earth, gain deliver a sample; 3 VP; 1 credit"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "ET.9",
+  "group": "alien-base",
+  "name": "Orbital Monitoring",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "1 publicity",
+   "rotate the solar system",
+   "research a telescope tech",
+   "QUICK MISSION: when 2 pink traces for this species., gain Choose Jupiter or Saturn. Look at all its sample, pick one, gain its reward, and put it back."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "ET.2",
+  "group": "alien-base",
+  "name": "Rover Exploration",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "black",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "on a planet or a moon, even without the required tech. Then look at all sample on the planet and pick one up.",
+   "QUICK MISSION: when deliver a sample to earth, gain deliver a sample; 3 VP; 3 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "ET.6",
+  "group": "alien-base",
+  "name": "The Queen",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "on a planet or a moon, even without the required tech. Then look at all sample on the planet and pick one up.",
+   "QUICK MISSION: when deliver a sample to earth, gain deliver a sample; 6 VP; 2 publicity"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "ET.22",
+  "group": "alien-base",
+  "name": "Altered Trajectory",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "If you mark at least 1 signal on Oumuamua, gain exofossil.",
+   "QUICK MISSION: when lander on Oumuamua, gain 4 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "ET.29",
+  "group": "alien-base",
+  "name": "Comparative Analysis",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "gain 1 exofossil",
+   "TRIGGERABLE MISSION:  circles: 1 data; 1 publicity; 3 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "ET.23",
+  "group": "alien-base",
+  "name": "Exofossil Discovery",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "yellow",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "mark 1 signal in any sector",
+   "in the sector with Oumuamua.",
+   "QUICK MISSION: when Have at least 3 exofossils, gain spend 2 exofossil; 11 VP"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "ET.30",
+  "group": "alien-base",
+  "name": "Excavation Rover",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "black",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "take a land action without paying its cost",
+   "If you land on Oumuamua with this action, gain 3 VP.",
+   "QUICK MISSION: when mark 1 pink life trace; mark 1 yellow life trace; mark 1 blue life trace; for this species, gain gain 1 exofossil"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "ET.28",
+  "group": "alien-base",
+  "name": "Exofossil Samples",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "rotate the solar system",
+   "research a computer tech",
+   "Then you may spend an exofossil to gain 1 data."
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "rotate the solar system"
+   },
+   {
+    "kind": "dup",
+    "text": "research a computer tech"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 rotate, 1 blue tech",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "ET.27",
+  "group": "alien-base",
+  "name": "Perfect Timing",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "4 movement",
+   "If you visit Oumuamua this turn, gain exofossil.",
+   "QUICK MISSION: when Have at least 1 signal on Oumuamua., gain gain 1 exofossil"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "ET.25",
+  "group": "alien-base",
+  "name": "Probe Customisation",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "blue",
+  "free_action": "1 score, 1 data",
+  "repo_effects": [
+   "You may spend an exofossil any number of times to gain 2 movement for each.",
+   "Then",
+   "take a land action without paying its cost"
+  ],
+  "owner_additions": [
+   {
+    "kind": "ok",
+    "text": "then land (after movement)"
+   }
+  ],
+  "owner_note": "missing effect: then land (after movement).",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "ET.26",
+  "group": "alien-base",
+  "name": "Race Against Time",
+  "cost": "1",
+  "cost_type": "credit",
+  "income": "energy",
+  "sector": "red",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "launch a probe without paying its cost",
+   "gain 1 exofossil"
+  ],
+  "owner_additions": [
+   {
+    "kind": "dup",
+    "text": "launch a probe without paying its cost"
+   },
+   {
+    "kind": "dup",
+    "text": "gain 1 exofossil"
+   }
+  ],
+  "owner_note": "missing instant effect: 1 launch action, 1 exofossil",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "ET.24",
+  "group": "alien-base",
+  "name": "Terrain Mapping",
+  "cost": "3",
+  "cost_type": "credit",
+  "income": "credit",
+  "sector": "yellow",
+  "free_action": "1 score, 1 move",
+  "repo_effects": [
+   "mark 1 signal in a yellow sector",
+   "mark 1 signal in a red sector",
+   "mark 1 signal in a blue sector",
+   "Then you may spend an exofossil to mark a signal in any sector in any sector.",
+   "END OF GAME: 1 VP for each trace of any color you have marked for this species."
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "ET.21",
+  "group": "alien-base",
+  "name": "Visitor in the Sky",
+  "cost": "2",
+  "cost_type": "credit",
+  "income": "card",
+  "sector": "blue",
+  "free_action": "2 publicity",
+  "repo_effects": [
+   "take a scan action without paying its cost",
+   "2 VP for each signal you mark on Oumuamua.",
+   "QUICK MISSION: when Have a trace of any color marked for this species that requires a exofossil payment., gain 1 data"
+  ],
+  "owner_additions": [],
+  "owner_note": "",
+  "status": "complete",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "ET.52",
+  "group": "alien-base",
+  "name": "Automated Lab",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 0, endgame scoring: marked 6 traces of exertians -> 7 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 0, endgame scoring: marked 6 traces of exertians -> 7 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   0
+  ]
+ },
+ {
+  "id": "ET.50",
+  "group": "alien-base",
+  "name": "Casette Deployment",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 2, endgame scoring: 3 orbiters or landers at a single planet (including moons) -> 10 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 2, endgame scoring: 3 orbiters or landers at a single planet (including moons) -> 10 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   1
+  ]
+ },
+ {
+  "id": "ET.45",
+  "group": "alien-base",
+  "name": "Core-breach Exoplanet",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 4, endgame scoring: 2 blue sector victories -> 12 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 4, endgame scoring: 2 blue sector victories -> 12 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   2
+  ]
+ },
+ {
+  "id": "ET.42",
+  "group": "alien-base",
+  "name": "Deflector",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 7, endgame scoring: 3 pink tech -> 15 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 7, endgame scoring: 3 pink tech -> 15 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   3
+  ]
+ },
+ {
+  "id": "ET.43",
+  "group": "alien-base",
+  "name": "Expender Core",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 3, endgame scoring: 3 blue tech -> 9 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 3, endgame scoring: 3 blue tech -> 9 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   4
+  ]
+ },
+ {
+  "id": "ET.51",
+  "group": "alien-base",
+  "name": "Extractor",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 8, endgame scoring: 8 cards tucked for income -> 18 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 8, endgame scoring: 8 cards tucked for income -> 18 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   0
+  ]
+ },
+ {
+  "id": "ET.47",
+  "group": "alien-base",
+  "name": "Fission-sun Exoplanet",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 5, endgame scoring: 2 black sector victories -> 14 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 5, endgame scoring: 2 black sector victories -> 14 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   1
+  ]
+ },
+ {
+  "id": "ET.49",
+  "group": "alien-base",
+  "name": "Generative Infrastructure",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 7, endgame scoring: 4 landers (including moons) -> 16 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 7, endgame scoring: 4 landers (including moons) -> 16 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   2
+  ]
+ },
+ {
+  "id": "ET.54",
+  "group": "alien-base",
+  "name": "Nanowielder Node",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 1, endgame scoring: marked 5 or more traces of the same color -> 8 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 1, endgame scoring: marked 5 or more traces of the same color -> 8 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   3
+  ]
+ },
+ {
+  "id": "ET.53",
+  "group": "alien-base",
+  "name": "Neuralab",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 9, endgame scoring: marked 6 traces of the other species -> 20 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 9, endgame scoring: marked 6 traces of the other species -> 20 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   4
+  ]
+ },
+ {
+  "id": "ET.48",
+  "group": "alien-base",
+  "name": "Oscillating Probes",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 3, endgame scoring: 3 probes in orbit -> 11 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 3, endgame scoring: 3 probes in orbit -> 11 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   0
+  ]
+ },
+ {
+  "id": "ET.44",
+  "group": "alien-base",
+  "name": "pierced Exoplanet",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 4, endgame scoring: 2 red sector victories -> 12 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 4, endgame scoring: 2 red sector victories -> 12 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   1
+  ]
+ },
+ {
+  "id": "ET.41",
+  "group": "alien-base",
+  "name": "Razor-edge Shuttle",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 6, endgame scoring: 3 orange tech -> 14 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 6, endgame scoring: 3 orange tech -> 14 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   2
+  ]
+ },
+ {
+  "id": "ET.55",
+  "group": "alien-base",
+  "name": "Stratoelevator",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 4, endgame scoring: finished 5 or more quick missions -> 12 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 4, endgame scoring: finished 5 or more quick missions -> 12 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   3
+  ]
+ },
+ {
+  "id": "ET.46",
+  "group": "alien-base",
+  "name": "Vortex Exoplanet",
+  "cost": "0",
+  "cost_type": "credit",
+  "income": null,
+  "sector": null,
+  "free_action": null,
+  "repo_effects": [],
+  "owner_additions": [
+   {
+    "kind": "raw",
+    "text": "missing effect: danger 4, endgame scoring: 2 yellow sector victories -> 12 score"
+   }
+  ],
+  "owner_note": "missing effect: danger 4, endgame scoring: 2 yellow sector victories -> 12 score",
+  "status": "owner-corrected",
+  "unparsed": [],
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   4
+  ]
+ }
+]

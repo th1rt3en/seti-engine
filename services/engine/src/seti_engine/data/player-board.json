@@ -1,0 +1,36 @@
+{
+ "analyze_slot": {
+  "cost": [
+   {
+    "n": 1,
+    "t": "energy"
+   }
+  ],
+  "gives": "blue life trace",
+  "requires": "top row full"
+ },
+ "computer": {
+  "fill_order": "left to right",
+  "space_effects": {
+   "2": [
+    {
+     "n": 1,
+     "t": "publicity"
+    }
+   ],
+   "4": "tuck a card for income (income icon)"
+  },
+  "tech_slot_note": "Four computer tech slots sit behind spaces 1, 3, 5 and 6 (read from the picture on rulebook p.14). A tech slot adds a lower space under its top space.",
+  "tech_slots_under_spaces": [
+   1,
+   3,
+   5,
+   6
+  ],
+  "top_row_spaces": 6
+ },
+ "data_pool_capacity": 6,
+ "probe_tech_slots": 4,
+ "slot_note": "Probe and telescope techs go on their own slot, one per technology. The slot positions print the same four pictures as the stacks on the tech board.",
+ "telescope_tech_slots": 4
+}

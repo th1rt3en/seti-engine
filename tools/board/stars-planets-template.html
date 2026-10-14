@@ -1,0 +1,284 @@
+<title>SETI Stars and Planets Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one wide column. Each star board and planet shows the source image large, with a reading of it beside it. */
+:root {
+  --bg: #f2f4f8; --surface: #ffffff; --ink: #172033; --muted: #566176; --line: #d8dde8;
+  --accent: #2f4ccf; --ok: #17724a; --ok-bg: #e2f3ea; --diff: #a9331d; --diff-bg: #fbe8e3;
+  --todo: #7d879b; --todo-bg: #eceff5;
+  --vp: #1c7a4d; --vp-bg: #dcf1e5; --data: #2f5fb8; --data-bg: #dfe9fa; --pub: #b8321f; --pub-bg: #fbe3df; --nrg: #3c8a1f; --nrg-bg: #e4f3da;
+  --card: #4b5565; --card-bg: #e6e9ef; --inc: #8a6a14; --inc-bg: #f5ecd0; --sig: #5a5f6b; --sig-bg: #e3e5ea;
+  --t-pink: #c22a7d; --t-pink-bg: #fadcec; --t-yellow: #946a00; --t-yellow-bg: #faedc4; --t-blue: #1d73b8; --t-blue-bg: #d9ecf9; --t-any: #5b3fa0; --t-any-bg: #e8e0f7;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131e; --surface: #161d2c; --ink: #e5e9f2; --muted: #97a2b9; --line: #29334a; --accent: #8da2ff;
+    --ok: #5fcb92; --ok-bg: #12301f; --diff: #ff9a84; --diff-bg: #3a1b14; --todo: #8e98ae; --todo-bg: #1f283b;
+    --vp: #6fd6a0; --vp-bg: #12301f; --data: #8fb2f2; --data-bg: #1b2a4a; --pub: #ff9a84; --pub-bg: #3a1b14; --nrg: #8fdc6a; --nrg-bg: #1d3412;
+    --card: #b6bfce; --card-bg: #232c3f; --inc: #e6c565; --inc-bg: #3a2f10; --sig: #b6bdca; --sig-bg: #2a3142;
+    --t-pink: #ff8cc6; --t-pink-bg: #4a1735; --t-yellow: #f0cc66; --t-yellow-bg: #40320a; --t-blue: #7cc0ef; --t-blue-bg: #12324a; --t-any: #c0a8f5; --t-any-bg: #2e2250;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131e; --surface: #161d2c; --ink: #e5e9f2; --muted: #97a2b9; --line: #29334a; --accent: #8da2ff;
+  --ok: #5fcb92; --ok-bg: #12301f; --diff: #ff9a84; --diff-bg: #3a1b14; --todo: #8e98ae; --todo-bg: #1f283b;
+  --vp: #6fd6a0; --vp-bg: #12301f; --data: #8fb2f2; --data-bg: #1b2a4a; --pub: #ff9a84; --pub-bg: #3a1b14; --nrg: #8fdc6a; --nrg-bg: #1d3412;
+  --card: #b6bfce; --card-bg: #232c3f; --inc: #e6c565; --inc-bg: #3a2f10; --sig: #b6bdca; --sig-bg: #2a3142;
+  --t-pink: #ff8cc6; --t-pink-bg: #4a1735; --t-yellow: #f0cc66; --t-yellow-bg: #40320a; --t-blue: #7cc0ef; --t-blue-bg: #12324a; --t-any: #c0a8f5; --t-any-bg: #2e2250;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 18px; line-height: 1.5; padding-inline: 16px; padding-block: 0 56px; }
+.wrap { max-width: 1500px; margin-inline: auto; }
+button, textarea { font: inherit; color: inherit; } button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1 { font-size: 34px; font-weight: 600; margin: 0; }
+h2 { font-size: 26px; margin: 44px 0 12px; font-weight: 600; text-wrap: balance; }
+h3 { font-size: 16px; margin: 0 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+header { padding-block: 20px 8px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; align-items: end; }
+.sub { color: var(--muted); max-width: 72ch; margin: 4px 0 0; }
+.sync { font-family: var(--mono); font-size: 15px; color: var(--muted); } .sync.err { color: var(--diff); }
+.meter { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-block: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.meter b { font-family: var(--mono); font-size: 28px; }
+.bar { flex: 1 1 200px; height: 12px; border-radius: 6px; background: var(--todo-bg); display: flex; overflow: hidden; }
+.bar i { display: block; height: 100%; } .b-ok { background: var(--ok); } .b-diff { background: var(--diff); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-block: 12px; min-width: 0; }
+.row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+.row > * { min-width: 0; }
+.imgbox { flex: 1 1 520px; max-width: 900px; }
+.imgbox img { width: 100%; max-width: 900px; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.cap { color: var(--muted); font-size: 15px; margin: 4px 0 0; }
+.read { flex: 1 1 420px; display: grid; gap: 14px; align-content: start; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0; padding: 0; list-style: none; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 12px; font-size: 16px; font-weight: 500; border: 1px solid transparent; }
+.p-vp { background: var(--vp-bg); color: var(--vp); } .p-data { background: var(--data-bg); color: var(--data); } .p-publicity { background: var(--pub-bg); color: var(--pub); }
+.p-energy { background: var(--nrg-bg); color: var(--nrg); } .p-card_any, .p-card_random { background: var(--card-bg); color: var(--card); } .p-tuck { background: var(--inc-bg); color: var(--inc); }
+.p-signal_planet, .p-signal_color { background: var(--sig-bg); color: var(--sig); }
+.p-trace-pink { background: var(--t-pink-bg); color: var(--t-pink); } .p-trace-yellow { background: var(--t-yellow-bg); color: var(--t-yellow); } .p-trace-blue { background: var(--t-blue-bg); color: var(--t-blue); } .p-trace-any { background: var(--t-any-bg); color: var(--t-any); }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; align-items: baseline; margin: 0; }
+.kv dt { color: var(--muted); font-size: 15px; } .kv dd { margin: 0; }
+.slot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tok { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--data); background: var(--data-bg); display: grid; place-items: center; font-size: 13px; font-family: var(--mono); color: var(--data); }
+.tok.two { border-color: var(--vp); background: var(--vp-bg); color: var(--vp); font-weight: 600; }
+.swatch { display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--line); }
+.items { display: grid; gap: 6px; margin-top: 14px; }
+.item { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); border-left-width: 4px; }
+.item.s-confirmed { border-left-color: var(--ok); } .item.s-difference { border-left-color: var(--diff); }
+.item > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.item > summary::-webkit-details-marker { display: none; }
+.item .t { font-weight: 500; flex: 1 1 300px; font-size: 19px; }
+.badge { font-size: 15px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--todo-bg); color: var(--todo); white-space: nowrap; }
+.s-confirmed .badge { background: var(--ok-bg); color: var(--ok); } .s-difference .badge { background: var(--diff-bg); color: var(--diff); }
+.body { padding: 6px 16px 18px; display: grid; gap: 12px; }
+textarea.note { width: 100%; min-height: 90px; font-size: 17px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding: 8px 10px; resize: vertical; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 12px 20px; font-weight: 500; font-size: 17px; }
+.btn:hover { border-color: var(--accent); } .btn.ok { background: var(--ok); border-color: var(--ok); color: #fff; } .btn.diff { background: var(--diff); border-color: var(--diff); color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.ok, :root:not([data-theme="light"]) .btn.diff { color: #0e131e; } }
+:root[data-theme="dark"] .btn.ok, :root[data-theme="dark"] .btn.diff { color: #0e131e; }
+.hint { color: var(--diff); font-size: 15px; } .banner { background: var(--diff-bg); color: var(--diff); border-radius: 8px; padding: 12px 16px; margin-block: 8px; }
+.ringwrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+.ringwrap svg { width: min(100%, 560px); height: auto; } svg text { font-family: var(--mono); fill: var(--ink); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>SETI stars and planets check</h1>
+      <p class="sub">The four sector boards with the eight nearby stars, and the planetary board with the seven planets, their moons and the species discovery spaces. Each source image is shown large with my reading beside it. Open a row, compare it with the image and your board, and mark it.</p>
+    </div>
+    <div class="sync" id="sync" role="status">Connecting...</div>
+  </header>
+  <div id="banner"></div>
+  <div class="meter" id="meter"></div>
+
+  <h2>What the reward colors mean</h2>
+  <div class="panel">
+    <ul class="pills" id="legend"></ul>
+    <p class="cap">Victory points are green, data is blue, publicity is red, energy is light green, cards are grey, income tucks are gold, signals are slate. Life traces keep their board colors: pink for scanning, yellow for landing, blue for analyzing, purple for any kind.</p>
+  </div>
+
+  <h2>Sector boards and the nearby stars</h2>
+  <div class="panel">
+    <p style="margin:0 0 8px">Each sector board covers two neighbouring sectors. The four boards go around the board in a random order. The picture shows each board as a quarter ring; the star nearer the right-hand edge is listed first.</p>
+    <div class="ringwrap"><div id="ringDraw"></div>
+      <div class="read"><h3>Random arrangement</h3><p class="cap" id="ringInfo"></p><div class="actions"><button class="btn" type="button" id="shuffle">Shuffle the four boards</button></div></div></div>
+    <div class="items" id="items-sector-rules"></div>
+  </div>
+  <div id="boards"></div>
+
+  <h2>Planetary board</h2>
+  <div id="planets"></div>
+
+  <h2>Species discovery spaces</h2>
+  <div class="panel" id="disc"></div>
+</div>
+
+<script>
+const D = /*DATA*/;
+const URLS = /*URLS*/;
+const state = {};
+let db = null, uid = null, canWrite = true, local = false;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+function rewardText(r) {
+  const n = r.n ?? 1, s = n > 1 ? 's' : '';
+  switch (r.t) {
+    case 'vp': return `${n} VP`; case 'data': return `${n} data`; case 'publicity': return `${n} publicity`; case 'energy': return `${n} energy`;
+    case 'card_any': return `${n} card${s} from the row or the deck`; case 'card_random': return `${n} random card${s} from the deck`;
+    case 'tuck': return `tuck ${n} card${s} for income`; case 'signal_planet': return `${n} signal${s} in a sector with this planet`;
+    case 'signal_color': return `1 signal in a ${r.color} sector`; case 'trace': return `${n} ${r.kind} life trace${s}`;
+  }
+  return r.t;
+}
+const pill = (r) => `<li class="pill p-${r.t === 'trace' ? 'trace-' + r.kind : r.t}">${esc(rewardText(r))}</li>`;
+const pills = (rs) => `<ul class="pills">${rs.map(pill).join('')}</ul>`;
+const COLORS = { red: '#d4452f', yellow: '#e2b21f', blue: '#2f78d0', black: '#4a4f5c' };
+const swatch = (c) => `<span class="swatch" style="background:${COLORS[c]}"></span>`;
+
+/* ---------- items ---------- */
+const ITEMS = [];
+const RULES = [
+  ['rule-boards', 'sector', 'Sector board layout', 'The four sector boards each cover two neighbouring sectors, giving the 8 sectors. They are placed in a random order around the board; every board keeps its own two stars in the order shown. The discs and the boards are randomized independently.'],
+  ['rule-slot', 'sector', 'Data slots and the second position', 'Every star has a data slot that holds 4 to 6 tokens (listed below). A marker placed in the second position of a slot scores 2 points (the green 2 beside each slot). Each player who contributed at least 1 marker when a sector completes gains 1 publicity (the red 1 and person icon printed beside every star).'],
+  ['rule-win', 'sector', 'Winner rewards', 'Where a board prints a circle beside the star, the circle is the reward for the first win of that sector and the capsule beside it is the reward for later wins. Where the board prints one capsule only (Sirius A, Proxima Centauri, 61 Virginis), the same reward applies to every win. Check this against each board picture.'],
+];
+for (const [k, g, t, d] of RULES) ITEMS.push({ key: k, group: g, title: t, desc: d });
+for (const b of D.boards) {
+  ITEMS.push({ key: 'board' + b.id, group: 'boards', title: `Sector board ${b.id}: ${b.stars.map((s) => s.name).join(' and ')}`, desc: `Carries ${b.stars.map((s) => s.name).join(' and ')}.` });
+  for (const s of b.stars) ITEMS.push({ key: 'star-' + s.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), group: 'boards', title: `${s.name} (${s.color}): slot ${s.capacity}`, star: s });
+}
+for (const [name, p] of Object.entries(D.planets)) ITEMS.push({ key: 'planet-' + name.toLowerCase(), group: 'planets', title: cap(name.toLowerCase()), planet: [name, p] });
+ITEMS.push({ key: 'disc-left', group: 'disc', title: 'Left species slot', desc: 'Discovery spaces: 5 VP and 1 publicity each (pink, yellow, blue). Overflow spaces below: 3 VP each.' });
+ITEMS.push({ key: 'disc-right', group: 'disc', title: 'Right species slot', desc: 'Discovery spaces: 3 VP and 1 publicity each (pink, yellow, blue). Overflow spaces below: 3 VP each.' });
+
+function slotDraw(n) { let s = '<div class="slot">'; for (let i = 1; i <= n; i++) s += `<span class="tok${i === 2 ? ' two' : ''}">${i === 2 ? '2' : i}</span>`; return s + '</div>'; }
+function bodyFor(it) {
+  if (it.desc) return `<p style="margin:0">${esc(it.desc)}</p>`;
+  if (it.star) {
+    const s = it.star;
+    return `<dl class="kv"><dt>Color</dt><dd>${swatch(s.color)}${esc(s.color)} sector</dd>
+      <dt>Data slot</dt><dd>${s.capacity} tokens ${slotDraw(s.capacity)}<span class="cap">position 2 scores 2 VP</span></dd>
+      <dt>Every contributor</dt><dd>${pills(D.star_common.each_contributor)}</dd>
+      <dt>First win</dt><dd>${pills(s.first_win)}</dd><dt>Later wins</dt><dd>${pills(s.later_win)}</dd></dl>`;
+  }
+  if (it.planet) {
+    const [name, p] = it.planet;
+    const moons = Object.entries(p.moons).map(([m, r]) => `<dt>${esc(m)}</dt><dd>${pills(r)}</dd>`).join('');
+    return `<dl class="kv"><dt>Orbit</dt><dd>${pills(p.orbit)}</dd><dt>First orbiter</dt><dd>${pills(p.first_orbit)} <span class="cap">covers the space</span></dd>
+      <dt>Lander</dt><dd>${pills(p.land)}</dd><dt>First lander data</dt><dd>${p.first_land_data.map((x) => `<span class="pill p-data">${x} data</span>`).join(' ')} <span class="cap">${p.first_land_data.length > 1 ? 'two first-lander spaces; the first two landers each choose one' : 'covers the space'}</span></dd>${moons ? `<dt>Moons</dt><dd><dl class="kv" style="margin:0">${moons}</dl></dd>` : '<dt>Moons</dt><dd>none</dd>'}</dl>`;
+  }
+  return '';
+}
+function itemHtml(it) {
+  const st = state[it.key]?.status || 'unchecked', label = { unchecked: 'Unchecked', confirmed: 'Confirmed', difference: 'Difference' }[st];
+  return `<details class="item s-${st}" data-key="${esc(it.key)}"><summary><span class="t">${esc(it.title)}</span><span class="badge">${label}</span></summary><div class="body">${bodyFor(it)}
+    <textarea class="note" placeholder="Required for a difference: what is wrong or missing?" ${canWrite ? '' : 'disabled'}>${esc(state[it.key]?.note || '')}</textarea>
+    <div class="actions"><button class="btn ok" data-act="confirmed" type="button" ${canWrite ? '' : 'disabled'}>Matches the board</button>
+    <button class="btn diff" data-act="difference" type="button" ${canWrite ? '' : 'disabled'}>Mark a difference</button>
+    <button class="btn" data-act="unchecked" type="button" ${canWrite ? '' : 'disabled'}>Clear</button><span class="hint" hidden></span></div></div></details>`;
+}
+const itemsOf = (g, pred) => ITEMS.filter((i) => i.group === g && (!pred || pred(i))).map(itemHtml).join('');
+function render() {
+  const open = new Set([...document.querySelectorAll('details.item[open]')].map((d) => d.dataset.key));
+  $('items-sector-rules').innerHTML = itemsOf('sector');
+  $('boards').innerHTML = D.boards.map((b) => {
+    const keys = new Set(['board' + b.id, ...b.stars.map((s) => 'star-' + s.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'))]);
+    return `<div class="panel"><div class="row"><div class="imgbox"><img src="${URLS[b.image]}" alt="Sector board ${b.id}" loading="lazy"><p class="cap">Sector board ${b.id}, as supplied. The slot cutout is the data slot.</p></div>
+      <div class="read"><h3>Reading</h3>${b.stars.map((s) => `<div><b>${esc(s.name)}</b> ${swatch(s.color)}${esc(s.color)}<br><span class="cap">Slot ${s.capacity}. First win: ${esc(s.first_win.map(rewardText).join(', '))}. Later: ${esc(s.later_win.map(rewardText).join(', '))}.</span></div>`).join('')}</div></div>
+      <div class="items">${ITEMS.filter((i) => keys.has(i.key)).map(itemHtml).join('')}</div></div>`;
+  }).join('');
+  $('planets').innerHTML = Object.entries(D.planets).sort((a, b) => a[1].order - b[1].order).map(([name, p]) => {
+    const it = ITEMS.find((i) => i.key === 'planet-' + name.toLowerCase());
+    return `<div class="panel"><div class="row"><div class="imgbox"><img src="${URLS[p.img]}" alt="${esc(name)} on the planetary board" loading="lazy"><p class="cap">${esc(cap(name.toLowerCase()))} on the planetary board. Above the planet: the orbit rewards. Inside: the lander spaces. Beside it: the moons.</p></div>
+      <div class="read"><h3>Reading</h3>${bodyFor(it)}</div></div><div class="items">${itemHtml(it)}</div></div>`;
+  }).join('');
+  $('disc').innerHTML = `<div class="row"><div class="imgbox"><img src="${URLS.p_slotsL}" alt="Left species slot" loading="lazy"><p class="cap">Left slot.</p></div><div class="imgbox"><img src="${URLS.p_slotsR}" alt="Right species slot" loading="lazy"><p class="cap">Right slot.</p></div></div>
+    <p class="cap">Top row of each slot: the three discovery spaces (pink, yellow, blue life trace). Lower row: the three overflow spaces, 3 VP each.</p><div class="items">${itemsOf('disc')}</div>`;
+  document.querySelectorAll('details.item').forEach((d) => { if (open.has(d.dataset.key)) d.open = true; });
+}
+function summary() {
+  const total = ITEMS.length; let ok = 0, diff = 0;
+  for (const it of ITEMS) { const s = state[it.key]?.status; if (s === 'confirmed') ok++; else if (s === 'difference') diff++; }
+  $('meter').innerHTML = `<span><b>${ok}</b> of ${total} confirmed</span><span class="cap">${diff} with differences, ${total - ok - diff} unchecked</span><div class="bar" role="img" aria-label="${ok} confirmed, ${diff} differences"><i class="b-ok" style="width:${ok / total * 100}%"></i><i class="b-diff" style="width:${diff / total * 100}%"></i></div>`;
+}
+function sync(t, e) { $('sync').textContent = t; $('sync').classList.toggle('err', !!e); }
+
+/* ---------- storage ---------- */
+const LS = 'seti-stars-planets-v1', safe = (k) => k.replace(/[^A-Za-z0-9_\-.~:@+]/g, '_');
+const lsRead = () => { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch { return {}; } };
+const queues = new Map();
+function persist(key, rec) {
+  const prev = queues.get(key) || Promise.resolve();
+  queues.set(key, prev.then(async () => {
+    if (local) { const o = lsRead(); if (rec) o[key] = rec; else delete o[key]; try { localStorage.setItem(LS, JSON.stringify(o)); } catch {} return; }
+    const ref = db.collection('stars-planets-check').doc(safe(key)); if (rec) await ref.set(rec); else await ref.delete();
+  }).then(() => sync(local ? 'Saved in this browser only' : 'All changes saved'), (e) => sync('Could not save: ' + (e && e.message || 'error'), true)));
+}
+function commit(key, patch) {
+  if (!canWrite) return;
+  const cur = state[key] || { status: 'unchecked', note: '' }, rec = { status: cur.status, note: cur.note || '', ...patch, at: Date.now(), by: uid || 'local' };
+  if (rec.status === 'unchecked' && !rec.note) { delete state[key]; persist(key, null); } else { state[key] = rec; persist(key, rec); }
+  sync('Saving...'); render(); summary();
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const d = b.closest('details.item'), key = d.dataset.key, ta = d.querySelector('textarea'), note = ta.value.trim(), hint = d.querySelector('.hint');
+  if (b.dataset.act === 'difference' && !note) { hint.textContent = 'Write what is different first.'; hint.hidden = false; ta.focus(); return; }
+  if (b.dataset.act === 'unchecked') commit(key, { status: 'unchecked', note: '' }); else commit(key, { status: b.dataset.act, note });
+  document.querySelector(`details.item[data-key="${CSS.escape(key)}"]`)?.setAttribute('open', '');
+});
+document.addEventListener('change', (e) => {
+  if (!e.target.matches('textarea.note')) return;
+  const key = e.target.closest('details.item').dataset.key, cur = state[key] || { status: 'unchecked' };
+  commit(key, { status: cur.status, note: e.target.value.trim() });
+});
+
+/* ---------- ring of sector boards ---------- */
+let order = [0, 1, 2, 3];
+function ringSvg() {
+  const R1 = 60, R2 = 150; let s = `<svg viewBox="-170 -170 340 340" role="img" aria-label="The eight sectors with the nearby stars">`;
+  const p = (r, a) => [r * Math.cos(a * Math.PI / 180), -r * Math.sin(a * Math.PI / 180)].map((v) => v.toFixed(1)).join(' ');
+  for (let k = 0; k < 8; k++) {
+    const b = D.boards[order[Math.floor(k / 2)]], star = b.stars[k % 2], a0 = k * 45 + 1, a1 = (k + 1) * 45 - 1;
+    s += `<path d="M ${p(R2, a0)} A ${R2} ${R2} 0 0 0 ${p(R2, a1)} L ${p(R1, a1)} A ${R1} ${R1} 0 0 1 ${p(R1, a0)} Z" fill="${COLORS[star.color]}" opacity=".85" stroke="var(--line)"/>`;
+    const [x, y] = p((R1 + R2) / 2, k * 45 + 22.5).split(' ');
+    s += `<text x="${x}" y="${(+y + 3).toFixed(1)}" font-size="8" text-anchor="middle" fill="#fff" style="fill:#fff;paint-order:stroke;stroke:#0008;stroke-width:2">${k}</text>`;
+    const [lx, ly] = p(R2 + 14, k * 45 + 22.5).split(' ');
+    s += `<text x="${lx}" y="${(+ly + 3).toFixed(1)}" font-size="7.5" text-anchor="middle">${esc(star.name.split(' ')[0])}</text>`;
+  }
+  return s + '</svg>';
+}
+function drawRing() {
+  $('ringDraw').innerHTML = ringSvg();
+  $('ringInfo').textContent = `Sectors 0 to 7 counter-clockwise from the 3 o'clock direction. Boards in order: ${order.map((i) => i + 1).join(', ')}. Each board keeps its two stars together, the first listed star in the lower-numbered sector.`;
+}
+$('shuffle').addEventListener('click', () => { for (let i = 3; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; } drawRing(); });
+
+/* ---------- boot ---------- */
+$('legend').innerHTML = [{ t: 'vp', n: 5 }, { t: 'data', n: 2 }, { t: 'publicity', n: 1 }, { t: 'energy', n: 4 }, { t: 'card_any', n: 1 }, { t: 'tuck', n: 1 }, { t: 'signal_planet', n: 1 }, { t: 'trace', kind: 'pink' }, { t: 'trace', kind: 'yellow' }, { t: 'trace', kind: 'blue' }, { t: 'trace', kind: 'any' }].map(pill).join('');
+render(); summary(); drawRing();
+(async () => {
+  let d = null, u = null;
+  try { [d, u] = await Promise.all([claude.use('db'), claude.use('user')]); } catch {}
+  db = d;
+  if (u) { try { uid = await u.id(); } catch {} try { if ((await u.can('data.write')) === false) canWrite = false; } catch {} }
+  if (!db) { local = true; const o = lsRead(); for (const k of Object.keys(o)) state[k] = o[k]; $('banner').innerHTML = '<div class="banner">Shared storage is unavailable here, so checks are kept in this browser only.</div>'; sync('Saved in this browser only'); render(); summary(); return; }
+  if (!canWrite) $('banner').innerHTML = '<div class="banner">You have view-only access, so checks cannot be saved.</div>';
+  const idMap = new Map(ITEMS.map((i) => [safe(i.key), i.key]));
+  db.collection('stars-planets-check').onSnapshot((snap) => {
+    for (const k of Object.keys(state)) delete state[k];
+    for (const doc of snap.docs) { const k = idMap.get(doc.id); if (k) state[k] = doc.data(); }
+    sync(snap.metadata.hasPendingWrites ? 'Saving...' : 'All changes saved');
+    if (!document.activeElement || !document.activeElement.matches('textarea.note')) render();
+    summary();
+  }, (err) => sync('Lost connection to storage: ' + (err && err.message || err.code), true));
+})();
+</script>

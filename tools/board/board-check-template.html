@@ -1,0 +1,343 @@
+<title>SETI Board Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column of sections; each wheel shows the source image beside a drawing built from the transcribed data. */
+:root {
+  --bg: #f2f4f8; --surface: #ffffff; --ink: #172033; --muted: #566176; --line: #d8dde8;
+  --accent: #2f4ccf; --accent-ink: #ffffff; --ok: #17724a; --ok-bg: #e2f3ea; --diff: #a9331d; --diff-bg: #fbe8e3;
+  --todo: #7d879b; --todo-bg: #eceff5; --code-bg: #eef1f7;
+  --c-null: #c9cfdb; --c-empty: #fbfcff; --c-ast: #9a8f86; --c-comet: #8fc5e8; --c-planet: #f0b341; --c-earth: #6cc0a0; --c-ink: #172033;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131e; --surface: #161d2c; --ink: #e5e9f2; --muted: #97a2b9; --line: #29334a;
+    --accent: #8da2ff; --accent-ink: #0e131e; --ok: #5fcb92; --ok-bg: #12301f; --diff: #ff9a84; --diff-bg: #3a1b14;
+    --todo: #8e98ae; --todo-bg: #1f283b; --code-bg: #101725;
+    --c-null: #2a3347; --c-empty: #1c2538; --c-ast: #7d746c; --c-comet: #4a86b0; --c-planet: #c8902a; --c-earth: #3f9a7c; --c-ink: #f2f5fb;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131e; --surface: #161d2c; --ink: #e5e9f2; --muted: #97a2b9; --line: #29334a;
+  --accent: #8da2ff; --accent-ink: #0e131e; --ok: #5fcb92; --ok-bg: #12301f; --diff: #ff9a84; --diff-bg: #3a1b14;
+  --todo: #8e98ae; --todo-bg: #1f283b; --code-bg: #101725;
+  --c-null: #2a3347; --c-empty: #1c2538; --c-ast: #7d746c; --c-comet: #4a86b0; --c-planet: #c8902a; --c-earth: #3f9a7c; --c-ink: #f2f5fb;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 18px; line-height: 1.5; padding-inline: 16px; padding-block: 0 56px; }
+.wrap { max-width: 1500px; margin-inline: auto; }
+button, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1 { font-size: 34px; font-weight: 600; margin: 0; }
+h2 { font-size: 26px; margin: 40px 0 12px; font-weight: 600; text-wrap: balance; }
+h3 { font-size: 16px; margin: 0 0 6px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+header { padding-block: 20px 8px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; align-items: end; }
+.sub { color: var(--muted); max-width: 70ch; margin: 4px 0 0; }
+.sync { font-family: var(--mono); font-size: 15px; color: var(--muted); }
+.sync.err { color: var(--diff); }
+.meter { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-block: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.meter b { font-family: var(--mono); font-size: 28px; }
+.bar { flex: 1 1 200px; height: 12px; border-radius: 4px; background: var(--todo-bg); display: flex; overflow: hidden; }
+.bar i { display: block; height: 100%; } .b-ok { background: var(--ok); } .b-diff { background: var(--diff); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-block: 8px; min-width: 0; }
+.row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.row > * { min-width: 0; }
+.imgbox { flex: 1 1 520px; max-width: 900px; }
+.imgbox img { width: 100%; max-width: 900px; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.cap { color: var(--muted); font-size: 15px; margin: 4px 0 0; }
+.draw { flex: 1 1 520px; max-width: 900px; }
+.draw svg { width: 100%; height: auto; display: block; }
+svg text { font-family: var(--mono); fill: var(--c-ink); }
+.legend { display: flex; gap: 12px 20px; flex-wrap: wrap; font-size: 16px; color: var(--muted); margin-block: 6px 0; }
+.legend span::before { content: ""; display: inline-block; width: 18px; height: 18px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--k); border: 1px solid var(--line); }
+.items { display: grid; gap: 6px; margin-top: 10px; }
+.item { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); border-left-width: 4px; }
+.item.s-confirmed { border-left-color: var(--ok); } .item.s-difference { border-left-color: var(--diff); }
+.item > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.item > summary::-webkit-details-marker { display: none; }
+.item .t { font-weight: 500; flex: 1 1 300px; font-size: 19px; }
+.badge { font-size: 15px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--todo-bg); color: var(--todo); white-space: nowrap; }
+.s-confirmed .badge { background: var(--ok-bg); color: var(--ok); } .s-difference .badge { background: var(--diff-bg); color: var(--diff); }
+.body { padding: 6px 16px 18px; display: grid; gap: 10px; }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px 16px; font-family: var(--mono); font-size: 16px; margin: 0; padding: 0; list-style: none; }
+.slots b { color: var(--muted); font-weight: 500; margin-right: 6px; }
+textarea.note { width: 100%; min-height: 90px; font-size: 17px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding: 8px 10px; resize: vertical; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 12px 20px; font-weight: 500; font-size: 17px; }
+.btn:hover { border-color: var(--accent); }
+.btn.ok { background: var(--ok); border-color: var(--ok); color: #fff; } .btn.diff { background: var(--diff); border-color: var(--diff); color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.ok, :root:not([data-theme="light"]) .btn.diff { color: #0e131e; } }
+:root[data-theme="dark"] .btn.ok, :root[data-theme="dark"] .btn.diff { color: #0e131e; }
+.hint { color: var(--diff); font-size: 15px; } .meta { color: var(--muted); font-size: 15px; }
+.sim { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.sim .draw { max-width: 900px; flex: 1 1 520px; }
+.real { position: relative; width: 100%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: #0b1020; }
+.real img { position: absolute; left: 50%; top: 50%; transform-origin: center; display: block; max-width: none; transition: transform .5s ease; }
+@media (prefers-reduced-motion: reduce) { .real img { transition: none; } }
+.ctrl { display: flex; flex-direction: column; gap: 12px; flex: 1 1 320px; }
+.ctrl .counter { font-family: var(--mono); font-size: 16px; color: var(--muted); }
+.banner { background: var(--diff-bg); color: var(--diff); border-radius: 8px; padding: 12px 16px; margin-block: 8px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>SETI board check</h1>
+      <p class="sub">The solar system, transcribed from the board images. Each drawing is built from the data the engine will use. Compare it with the picture beside it and with your physical board, then mark each row.</p>
+    </div>
+    <div class="sync" id="sync" role="status">Connecting...</div>
+  </header>
+  <div id="banner"></div>
+  <div class="meter" id="meter"></div>
+
+  <h2>How to read the drawings</h2>
+  <div class="panel">
+    <p style="margin:0 0 6px">Each wheel is drawn as 8 slots around a circle, numbered 0 to 7. Slot 0 starts at the 3 o'clock direction of the picture and the numbers go <b>counter-clockwise</b>, the same way the discs turn. Rings are numbered from the Sun outward: ring 1 is the innermost.</p>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <h2>Try the stacking and rotation</h2>
+  <div class="panel">
+    <div class="sim">
+      <div class="draw real-wrap">
+        <div class="real" id="realBoard" role="img" aria-label="The real discs stacked on the real base board"></div>
+        <p class="cap">The real discs on the real base board, zoomed to the outer ring (ring 4, with Uranus and Neptune). Disc 3 is at the bottom, disc 1 on top.</p>
+      </div>
+      <div class="draw"><div id="simDraw"></div><p class="cap">The same state as a drawing, so each space can be read.</p></div>
+      <div class="ctrl">
+        <h3>Visible board</h3>
+        <div class="counter" id="simInfo"></div>
+        <div class="actions">
+          <button class="btn" type="button" data-rot="1">Rotate disc 1</button>
+          <button class="btn" type="button" data-rot="2">Rotate disc 2</button>
+          <button class="btn" type="button" data-rot="3">Rotate disc 3</button>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" id="rotNext">Rotate (next in order)</button>
+          <button class="btn" type="button" id="rotRand">Random layout</button>
+          <button class="btn" type="button" id="rotReset">Reset</button>
+        </div>
+        <label class="meta"><input type="checkbox" id="showOum"> Show 'Oumuamua (species discovered)</label>
+        <p class="cap">The small digit in a cell tells which disc it comes from (4 means the fixed base). Rotating disc 2 also turns disc 1, and rotating disc 3 turns all three, as you described.</p>
+      </div>
+    </div>
+    <div class="items" id="items-rules"></div>
+  </div>
+
+  <div id="sections"></div>
+</div>
+
+<script>
+const DATA = /*DATA*/;
+const URLS = /*URLS*/;
+const KINDS = { NULL: 'cutout', EMPTY: 'plain space', ASTEROID: 'asteroids', COMET: 'comet', PLANET: 'planet', EARTH: 'Earth' };
+const state = {};            // key -> {status, note, at}
+let db = null, uid = null, canWrite = true, local = false;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cap = (s) => s.charAt(0) + s.slice(1).toLowerCase();
+
+/* ---------- geometry ---------- */
+const R0 = 36, BAND = 34, VB = 190;
+function polar(r, deg) { const t = deg * Math.PI / 180; return [r * Math.cos(t), -r * Math.sin(t)]; }
+function cellPath(ring, slot) {
+  const r1 = R0 + (ring - 1) * BAND + 1, r2 = R0 + ring * BAND - 1, a0 = slot * 45 + 1, a1 = (slot + 1) * 45 - 1;
+  const p = (r, a) => polar(r, a).map((v) => v.toFixed(1)).join(' ');
+  return `M ${p(r2, a0)} A ${r2} ${r2} 0 0 0 ${p(r2, a1)} L ${p(r1, a1)} A ${r1} ${r1} 0 0 1 ${p(r1, a0)} Z`;
+}
+function cellInfo(c) {
+  if (c === 'NULL') return { k: 'null', label: '' };
+  if (c === 'EMPTY') return { k: 'empty', label: '' };
+  if (c === 'ASTEROID') return { k: 'ast', label: 'A' };
+  if (c === 'COMET') return { k: 'comet', label: 'C' };
+  if (c === 'EARTH') return { k: 'earth', label: 'EARTH' };
+  if (c.startsWith('PLANET:')) return { k: 'planet', label: cap(c.slice(7)).slice(0, 7) };
+  return { k: 'null', label: '?' };
+}
+function ringsSvg(rows, opts = {}) {
+  // rows: {ring: [8 cells]}; opts.src: {ring: [8 disc numbers]}
+  let s = `<svg viewBox="${-VB} ${-VB} ${VB * 2} ${VB * 2}" role="img" aria-label="${esc(opts.label || 'wheel')}">`;
+  for (const ring of Object.keys(rows).map(Number)) {
+    rows[ring].forEach((c, slot) => {
+      const i = cellInfo(c);
+      s += `<path d="${cellPath(ring, slot)}" fill="var(--c-${i.k})" stroke="var(--line)" stroke-width="0.8"/>`;
+      if (i.label || opts.src) {
+        const mid = R0 + (ring - 0.5) * BAND, [x, y] = polar(mid, slot * 45 + 22.5);
+        if (i.label) s += `<text x="${x.toFixed(1)}" y="${(y + 2.5).toFixed(1)}" font-size="${i.label.length > 2 ? 6.5 : 9}" text-anchor="middle">${esc(i.label)}</text>`;
+        if (opts.src && c !== 'NULL') s += `<text x="${(x + 10).toFixed(1)}" y="${(y - 8).toFixed(1)}" font-size="6.5" text-anchor="middle" opacity=".75">${opts.src[ring][slot]}</text>`;
+      }
+    });
+  }
+  const outer = R0 + 4 * BAND + 12;
+  for (let k = 0; k < 8; k++) {
+    const [x, y] = polar(outer, k * 45 + 22.5);
+    s += `<text x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" font-size="9" text-anchor="middle" opacity=".7">${k}</text>`;
+    const [x1, y1] = polar(R0 - 2, k * 45), [x2, y2] = polar(outer - 12, k * 45);
+    s += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--line)" stroke-width="0.5" stroke-dasharray="2 3"/>`;
+  }
+  s += `<circle r="${R0 - 3}" fill="var(--bg)" stroke="var(--line)"/><text y="3" font-size="8" text-anchor="middle" opacity=".7">SUN</text>`;
+  const [ax, ay] = polar(VB - 6, 0);
+  s += `<text x="${ax}" y="${ay + 3}" font-size="8" text-anchor="end" opacity=".6">0&#176;</text></svg>`;
+  return s;
+}
+
+/* ---------- data helpers ---------- */
+const W = DATA.wheels;
+const wheelRows = (w) => Object.fromEntries(Object.entries(W[w]).map(([r, row]) => [Number(r), row]));
+function visible(angles, oum) {
+  const rows = { 1: [], 2: [], 3: [], 4: [] }, src = { 1: [], 2: [], 3: [], 4: [] };
+  for (let ring = 1; ring <= 4; ring++) for (let s = 0; s < 8; s++) {
+    let cell = 'EMPTY', from = 4;
+    for (let d = ring; d <= 4; d++) {
+      const step = d <= 3 ? angles[d - 1] : 0, local = ((s - step) % 8 + 8) % 8;
+      let c = W[d][ring][local];
+      if (oum && d === DATA.oumuamua_slot.wheel && ring === DATA.oumuamua_slot.ring && local === DATA.oumuamua_slot.slot) c = 'PLANET:OUMUAMUA';
+      if (c !== 'NULL') { cell = c; from = d; break; }
+    }
+    rows[ring][s] = cell; src[ring][s] = from;
+  }
+  return { rows, src };
+}
+const slotsList = (row) => '<ul class="slots">' + row.map((c, i) => `<li><b>${i}</b>${esc(c === 'NULL' ? 'cutout' : c.startsWith('PLANET:') ? cap(c.slice(7)) : c === 'EARTH' ? 'Earth' : cap(c))}</li>`).join('') + '</ul>';
+
+/* ---------- items ---------- */
+const WHEELS = [
+  { id: 'd1', w: 1, title: 'Disc 1 (top, smallest)', img: 'disc1', note: 'Covers ring 1 only. Mercury, Venus and Earth.', rings: [1] },
+  { id: 'd2', w: 2, title: 'Disc 2 (middle)', img: 'disc2', note: 'Covers rings 1 and 2. Mars and two asteroid fields.', rings: [1, 2] },
+  { id: 'd3', w: 3, title: 'Disc 3 (bottom disc)', img: 'disc3', note: 'Covers rings 1 to 3. Jupiter, Saturn, comets and asteroids.', rings: [1, 2, 3], extra: 'disc3o' },
+  { id: 'b', w: 4, title: 'Base board (fixed, does not rotate)', img: 'base', note: 'Four rings. Uranus and Neptune are on ring 4. Crop of the assembled main board.', rings: [1, 2, 3, 4] },
+];
+const ITEMS = [];
+const RULES = [
+  ['rule-stack', 'Stacking', 'Disc 1 covers ring 1 only, disc 2 covers rings 1 and 2, disc 3 covers rings 1 to 3, and the base covers all four rings and never rotates. At each ring and sector, the space you see is the top-most disc whose cell there is not a cutout. Cells under a cutout show the next disc down.'],
+  ['rule-rotate', 'Rotation', 'One rotation turns a disc 1/8 of a turn counter-clockwise. The first rotation turns disc 1 alone, the second turns disc 2 (taking disc 1 with it), the third turns disc 3 (taking both), then it repeats. The base does not move.'],
+  ['rule-adjacent', 'Adjacency (my proposal, please correct it)', 'Two visible spaces are adjacent when they are in the same ring and in neighbouring sectors, or in the same sector and in neighbouring rings. Not diagonally. A cutout is not a space. The Sun is not a space and nothing exists outside ring 4. Within a ring I let sector 7 touch sector 0 (the ring is a circle). You said the outermost ring has no wrap-around: if that means ring 4 should NOT connect sector 7 to sector 0, write it in the note.'],
+  ['rule-icons', 'Publicity icons', 'Planets (not Earth) and comets carry a publicity icon: 1 publicity when a probe moves onto them, including when pushed there. Asteroids carry none. Plain spaces carry none.'],
+  ['rule-oum', "'Oumuamua tile position", "When 'Oumuamua is discovered, its tile goes on disc 3, ring 3, slot 3. That is the slot two sectors clockwise of Jupiter, and it is a cutout until then (compare the second picture of disc 3 below). Try the checkbox above."],
+];
+for (const [k, t, d] of RULES) ITEMS.push({ key: k, title: t, desc: d, group: 'rules' });
+for (const wh of WHEELS) for (const r of wh.rings) {
+  const row = W[wh.w][r];
+  ITEMS.push({ key: `${wh.id}r${r}`, title: `${wh.title}, ring ${r}`, row, group: wh.id });
+}
+
+function itemHtml(it) {
+  const st = state[it.key]?.status || 'unchecked';
+  const label = { unchecked: 'Unchecked', confirmed: 'Confirmed', difference: 'Difference' }[st];
+  return `<details class="item s-${st}" data-key="${esc(it.key)}"><summary><span class="t">${esc(it.title)}</span><span class="badge">${label}</span></summary>
+  <div class="body">${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : slotsList(it.row)}
+    <textarea class="note" placeholder="Required for a difference: what is wrong or missing?" ${canWrite ? '' : 'disabled'}>${esc(state[it.key]?.note || '')}</textarea>
+    <div class="actions"><button class="btn ok" data-act="confirmed" type="button" ${canWrite ? '' : 'disabled'}>Matches the board</button>
+      <button class="btn diff" data-act="difference" type="button" ${canWrite ? '' : 'disabled'}>Mark a difference</button>
+      <button class="btn" data-act="unchecked" type="button" ${canWrite ? '' : 'disabled'}>Clear</button><span class="hint" hidden></span></div></div></details>`;
+}
+function renderSections() {
+  const open = new Set([...document.querySelectorAll('details.item[open]')].map((d) => d.dataset.key));
+  $('items-rules').innerHTML = ITEMS.filter((i) => i.group === 'rules').map(itemHtml).join('');
+  let html = '';
+  for (const wh of WHEELS) {
+    html += `<h2>${esc(wh.title)}</h2><div class="panel"><p style="margin:0 0 8px;color:var(--muted)">${esc(wh.note)}</p><div class="row">
+      <div class="imgbox"><img src="${URLS[wh.img]}" alt="${esc(wh.title)} source image" loading="lazy"><p class="cap">Source image. Slot 0 is the 0 to 45 degree wedge counter-clockwise from the 3 o'clock direction.</p>${wh.extra ? `<img style="margin-top:8px" src="${URLS[wh.extra]}" alt="Disc 3 with the 'Oumuamua tile" loading="lazy"><p class="cap">The same disc with the 'Oumuamua tile in place.</p>` : ''}</div>
+      <div class="draw">${ringsSvg(wheelRows(wh.w), { label: wh.title })}<p class="cap">Drawn from the transcribed data.</p></div></div>
+      <div class="items">${ITEMS.filter((i) => i.group === wh.id).map(itemHtml).join('')}</div></div>`;
+  }
+  $('sections').innerHTML = html;
+  document.querySelectorAll('details.item').forEach((d) => { if (open.has(d.dataset.key)) d.open = true; });
+}
+function summary() {
+  const total = ITEMS.length; let ok = 0, diff = 0;
+  for (const it of ITEMS) { const s = state[it.key]?.status; if (s === 'confirmed') ok++; else if (s === 'difference') diff++; }
+  $('meter').innerHTML = `<span><b>${ok}</b> of ${total} confirmed</span><span class="meta">${diff} with differences, ${total - ok - diff} unchecked</span><div class="bar" role="img" aria-label="${ok} confirmed, ${diff} differences"><i class="b-ok" style="width:${ok / total * 100}%"></i><i class="b-diff" style="width:${diff / total * 100}%"></i></div>`;
+}
+function sync(t, e) { $('sync').textContent = t; $('sync').classList.toggle('err', !!e); }
+
+/* ---------- storage ---------- */
+const LS = 'seti-board-check-v1';
+const lsRead = () => { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch { return {}; } };
+const queues = new Map();
+function persist(key, rec) {
+  const prev = queues.get(key) || Promise.resolve();
+  const next = prev.then(async () => {
+    if (local) { const o = lsRead(); if (rec) o[key] = rec; else delete o[key]; try { localStorage.setItem(LS, JSON.stringify(o)); } catch {} return; }
+    const ref = db.collection('board-check').doc(key.replace(/[^A-Za-z0-9_\-.~:@+]/g, '_'));
+    if (rec) await ref.set(rec); else await ref.delete();
+  }).then(() => sync(local ? 'Saved in this browser only' : 'All changes saved'), (e) => sync('Could not save: ' + (e && e.message || 'error'), true));
+  queues.set(key, next);
+}
+function commit(key, patch) {
+  if (!canWrite) return;
+  const cur = state[key] || { status: 'unchecked', note: '' };
+  const rec = { status: cur.status, note: cur.note || '', ...patch, at: Date.now(), by: uid || 'local' };
+  if (rec.status === 'unchecked' && !rec.note) { delete state[key]; persist(key, null); } else { state[key] = rec; persist(key, rec); }
+  sync('Saving...'); renderSections(); summary();
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const d = b.closest('details.item'); const key = d.dataset.key; const ta = d.querySelector('textarea'); const note = ta.value.trim(); const hint = d.querySelector('.hint');
+  if (b.dataset.act === 'difference' && !note) { hint.textContent = 'Write what is different first.'; hint.hidden = false; ta.focus(); return; }
+  if (b.dataset.act === 'unchecked') commit(key, { status: 'unchecked', note: '' }); else commit(key, { status: b.dataset.act, note });
+  document.querySelector(`details.item[data-key="${CSS.escape(key)}"]`)?.setAttribute('open', '');
+});
+document.addEventListener('change', (e) => {
+  if (!e.target.matches('textarea.note')) return;
+  const key = e.target.closest('details.item').dataset.key; const cur = state[key] || { status: 'unchecked' };
+  commit(key, { status: cur.status, note: e.target.value.trim() });
+});
+
+/* ---------- simulator ---------- */
+const sim = { angles: [0, 0, 0], count: 0, turns: [0, 0, 0] };
+const DISC_W = { d1: 396 * 1.92 / 2120, d2: 608 * 1.89 / 2120, d3: 1008 * 1.54 / 2120 };   // width as a fraction of the base crop
+function buildReal() {
+  const el = $('realBoard');
+  const mk = (id, src, w) => `<img id="${id}" src="${src}" alt="" style="width:${(w * 100).toFixed(2)}%;transform:translate(-50%,-50%)">`;
+  el.innerHTML = `<img src="${URLS.basez}" alt="Base board" style="width:100%;left:0;top:0;transform:none">` + mk('rd3', URLS.disc3a, DISC_W.d3) + mk('rd2', URLS.disc2a, DISC_W.d2) + mk('rd1', URLS.disc1a, DISC_W.d1);
+}
+function updateReal() {
+  if (!$('rd1')) return;
+  $('rd3').src = $('showOum').checked ? URLS.disc3oa : URLS.disc3a;
+  [['rd1', 0], ['rd2', 1], ['rd3', 2]].forEach(([id, i]) => { $(id).style.transform = `translate(-50%,-50%) rotate(${-45 * sim.turns[i]}deg)`; });
+}
+function drawSim() {
+  updateReal();
+  const v = visible(sim.angles, $('showOum').checked);
+  $('simDraw').innerHTML = ringsSvg(v.rows, { src: v.src, label: 'Visible board' });
+  $('simInfo').textContent = `Rotations so far: ${sim.count}. Disc angles (1/8 turns): disc 1 = ${sim.angles[0]}, disc 2 = ${sim.angles[1]}, disc 3 = ${sim.angles[2]}. Next in order turns disc ${sim.count % 3 + 1}.`;
+}
+function rotate(d) { for (let i = 0; i < d; i++) { sim.angles[i] = (sim.angles[i] + 1) % 8; sim.turns[i]++; } sim.count++; drawSim(); }
+document.querySelectorAll('[data-rot]').forEach((b) => b.addEventListener('click', () => rotate(Number(b.dataset.rot))));
+$('rotNext').addEventListener('click', () => rotate(sim.count % 3 + 1));
+$('rotRand').addEventListener('click', () => { sim.angles = [0, 0, 0].map(() => Math.floor(Math.random() * 8)); sim.turns = sim.angles.slice(); sim.count = 0; drawSim(); });
+$('rotReset').addEventListener('click', () => { sim.angles = [0, 0, 0]; sim.turns = [0, 0, 0]; sim.count = 0; drawSim(); });
+$('showOum').addEventListener('change', drawSim);
+
+/* ---------- boot ---------- */
+$('legend').innerHTML = [['planet', 'planet'], ['earth', 'Earth'], ['comet', 'comet (C)'], ['ast', 'asteroids (A)'], ['empty', 'plain space'], ['null', 'cutout, no space']]
+  .map(([k, t]) => `<span style="--k:var(--c-${k})">${t}</span>`).join('');
+buildReal(); renderSections(); summary(); drawSim();
+(async () => {
+  let d = null, u = null;
+  try { [d, u] = await Promise.all([claude.use('db'), claude.use('user')]); } catch {}
+  db = d;
+  if (u) { try { uid = await u.id(); } catch {} try { if ((await u.can('data.write')) === false) canWrite = false; } catch {} }
+  if (!db) {
+    local = true; const o = lsRead(); for (const k of Object.keys(o)) state[k] = o[k];
+    $('banner').innerHTML = '<div class="banner">Shared storage is unavailable here, so checks are kept in this browser only.</div>';
+    sync('Saved in this browser only'); renderSections(); summary(); return;
+  }
+  if (!canWrite) $('banner').innerHTML = '<div class="banner">You have view-only access, so checks cannot be saved.</div>';
+  const idMap = new Map(ITEMS.map((i) => [i.key.replace(/[^A-Za-z0-9_\-.~:@+]/g, '_'), i.key]));
+  db.collection('board-check').onSnapshot((snap) => {
+    for (const k of Object.keys(state)) delete state[k];
+    for (const doc of snap.docs) { const k = idMap.get(doc.id); if (k) state[k] = doc.data(); }
+    sync(snap.metadata.hasPendingWrites ? 'Saving...' : 'All changes saved');
+    if (!document.activeElement || !document.activeElement.matches('textarea.note')) renderSections();
+    summary();
+  }, (err) => sync('Lost connection to storage: ' + (err && err.message || err.code), true));
+})();
+</script>

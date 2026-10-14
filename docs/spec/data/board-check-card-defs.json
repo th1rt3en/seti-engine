@@ -1,0 +1,498 @@
+{
+ "snapshot_of": "card definitions re-check page",
+ "taken": "2026-10-13",
+ "rows": [
+  {
+   "key": "a-ET.11",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877499224
+  },
+  {
+   "key": "a-ET.12",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877472889
+  },
+  {
+   "key": "a-ET.14",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877474666
+  },
+  {
+   "key": "a-ET.15",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877494104
+  },
+  {
+   "key": "a-ET.18",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877477130
+  },
+  {
+   "key": "a-ET.19",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877480957
+  },
+  {
+   "key": "a-ET.20",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877470487
+  },
+  {
+   "key": "a-ET.25",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877518210
+  },
+  {
+   "key": "a-ET.26",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877523295
+  },
+  {
+   "key": "a-ET.28",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877515315
+  },
+  {
+   "key": "a-ET.31",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877512968
+  },
+  {
+   "key": "a-ET.32",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877511584
+  },
+  {
+   "key": "a-ET.34",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877507012
+  },
+  {
+   "key": "a-ET.41",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877554015
+  },
+  {
+   "key": "a-ET.42",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877536636
+  },
+  {
+   "key": "a-ET.43",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877539461
+  },
+  {
+   "key": "a-ET.44",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877550725
+  },
+  {
+   "key": "a-ET.45",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877532624
+  },
+  {
+   "key": "a-ET.46",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877558373
+  },
+  {
+   "key": "a-ET.47",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877542477
+  },
+  {
+   "key": "a-ET.48",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877549442
+  },
+  {
+   "key": "a-ET.49",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877544107
+  },
+  {
+   "key": "a-ET.50",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877527567
+  },
+  {
+   "key": "a-ET.51",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877541043
+  },
+  {
+   "key": "a-ET.52",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877525680
+  },
+  {
+   "key": "a-ET.53",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877547778
+  },
+  {
+   "key": "a-ET.54",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877545713
+  },
+  {
+   "key": "a-ET.55",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877556735
+  },
+  {
+   "key": "b-105",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791876321151
+  },
+  {
+   "key": "b-109",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877214905
+  },
+  {
+   "key": "b-110",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877371173
+  },
+  {
+   "key": "b-113",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877406597
+  },
+  {
+   "key": "b-114",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877252354
+  },
+  {
+   "key": "b-118",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877258577
+  },
+  {
+   "key": "b-119",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877248971
+  },
+  {
+   "key": "b-121",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875745162
+  },
+  {
+   "key": "b-123",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875536616
+  },
+  {
+   "key": "b-124",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875550416
+  },
+  {
+   "key": "b-125",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877445424
+  },
+  {
+   "key": "b-127",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877232181
+  },
+  {
+   "key": "b-130",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877211813
+  },
+  {
+   "key": "b-133",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877238893
+  },
+  {
+   "key": "b-135",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877236814
+  },
+  {
+   "key": "b-137",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877400929
+  },
+  {
+   "key": "b-14",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877221721
+  },
+  {
+   "key": "b-19",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791876311206
+  },
+  {
+   "key": "b-20",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877225387
+  },
+  {
+   "key": "b-21",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877450367
+  },
+  {
+   "key": "b-22",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877218079
+  },
+  {
+   "key": "b-23",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877195536
+  },
+  {
+   "key": "b-24",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877382977
+  },
+  {
+   "key": "b-25",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877209645
+  },
+  {
+   "key": "b-26",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877425641
+  },
+  {
+   "key": "b-27",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791876324805
+  },
+  {
+   "key": "b-28",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877197729
+  },
+  {
+   "key": "b-29",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877185430
+  },
+  {
+   "key": "b-45",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875493912
+  },
+  {
+   "key": "b-46",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875497275
+  },
+  {
+   "key": "b-47",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877455230
+  },
+  {
+   "key": "b-48",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875544623
+  },
+  {
+   "key": "b-49",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875547201
+  },
+  {
+   "key": "b-50",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877410241
+  },
+  {
+   "key": "b-52",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877243719
+  },
+  {
+   "key": "b-53",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875714463
+  },
+  {
+   "key": "b-54",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877453134
+  },
+  {
+   "key": "b-55",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875502944
+  },
+  {
+   "key": "b-56",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875539077
+  },
+  {
+   "key": "b-57",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875723560
+  },
+  {
+   "key": "b-59",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877181648
+  },
+  {
+   "key": "b-65",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875734649
+  },
+  {
+   "key": "b-67",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877466750
+  },
+  {
+   "key": "b-69",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877203683
+  },
+  {
+   "key": "b-71",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875739252
+  },
+  {
+   "key": "b-72",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877385556
+  },
+  {
+   "key": "b-74",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877306973
+  },
+  {
+   "key": "b-75",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875727588
+  },
+  {
+   "key": "b-81",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877178353
+  },
+  {
+   "key": "b-83",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877462329
+  },
+  {
+   "key": "b-85",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877420138
+  },
+  {
+   "key": "b-86",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791875751659
+  },
+  {
+   "key": "b-92",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791877227547
+  },
+  {
+   "key": "summary",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874925728
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "tiles": [
+  {
+   "image": "gold-scoring-tile-three-techs-11-8-5",
+   "per": "each set of three techs, one of each type",
+   "side": "A",
+   "tile": "Tech",
+   "values": [
+    11,
+    8,
+    5
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-two-wild-techs-7-5-3",
+   "per": "each pair of techs (any two)",
+   "side": "B",
+   "tile": "Tech",
+   "values": [
+    7,
+    5,
+    3
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-card-4-3-2",
+   "per": "each completed mission",
+   "side": "A",
+   "tile": "Mission",
+   "values": [
+    4,
+    3,
+    2
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-two-cards-8-6-4",
+   "per": "each pair of completed missions or end-of-game scoring cards",
+   "side": "B",
+   "tile": "Mission",
+   "values": [
+    8,
+    6,
+    4
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-credit-energy-question-11-8-5",
+   "per": "each set of three tucked income cards, one of each type (credit, energy, card)",
+   "side": "A",
+   "tile": "Income",
+   "values": [
+    11,
+    8,
+    5
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-credit-or-energy-5-4-3",
+   "per": "each tucked income card of the type you have most (credit or energy)",
+   "side": "B",
+   "tile": "Income",
+   "values": [
+    5,
+    4,
+    3
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-three-traces-8-6-4",
+   "per": "each set of three life traces, one of each color (overflow markers count)",
+   "side": "A",
+   "tile": "Other",
+   "values": [
+    8,
+    6,
+    4
+   ]
+  },
+  {
+   "image": "gold-scoring-tile-signal-and-planet-8-6-4",
+   "per": "each sector win paired with an orbiter or lander",
+   "side": "B",
+   "tile": "Other",
+   "values": [
+    8,
+    6,
+    4
+   ]
+  }
+ ],
+ "values_order": "first chooser, second chooser, third and later choosers (wide slot)"
+}

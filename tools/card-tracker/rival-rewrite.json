@@ -1,0 +1,241 @@
+{
+ "S.1": {
+  "code": "{\n  id: 'S.1',\n  deckTier: BASIC,\n  decisionDirection: LEFT,\n  candidates: [\n    analyze(),\n    launch([PUBLICITY_1]),\n    tech({ paid: true }),\n    probe({ movement: 3, planets: [SATURN, MARS, JUPITER, VENUS], moonLanding: true, preference: ORBITER }),\n  ],\n}",
+  "words": [
+   "1. Analyze (no card benefit), then discard a computer tech for 3 VP and 1 progress",
+   "2. Launch a probe, gain 1 publicity",
+   "3. Pay 6 publicity, rotate the solar system and research a tech",
+   "4. Move the probe from Earth with 3 moves, planets in order: Saturn, Mars, Jupiter, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: orbiter first, then lander"
+  ],
+  "dir": "left",
+  "diff": [
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it."
+  ]
+ },
+ "S.2": {
+  "code": "{\n  id: 'S.2',\n  deckTier: BASIC,\n  decisionDirection: RIGHT,\n  candidates: [\n    analyze(),\n    tech({ paid: true }),\n    telescope({ earthSignals: 1, cardRowSignals: 2, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Analyze (no card benefit), then discard a computer tech for 3 VP and 1 progress",
+   "2. Pay 6 publicity, rotate the solar system and research a tech",
+   "3. Telescope: 1 signal in the sector of Earth, 2 card-row signals; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.3": {
+  "code": "{\n  id: 'S.3',\n  deckTier: BASIC,\n  decisionDirection: LEFT,\n  candidates: [\n    speciesCheck(1),\n    tech({ paid: true }),\n    telescope({ earthSignals: 1, cardRowSignals: 2, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. If the 1st alien species is discovered, replace this card with that species' card and resolve it",
+   "2. Pay 6 publicity, rotate the solar system and research a tech",
+   "3. Telescope: 1 signal in the sector of Earth, 2 card-row signals; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "left",
+  "diff": [
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.4": {
+  "code": "{\n  id: 'S.4',\n  deckTier: BASIC,\n  decisionDirection: RIGHT,\n  candidates: [\n    speciesCheck(2),\n    probe({ movement: 3, planets: [JUPITER, MARS, SATURN, VENUS], moonLanding: true, preference: ORBITER }),\n    tech({ effects: [PROGRESS_1] }),\n  ],\n}",
+  "words": [
+   "1. If the 2nd alien species is discovered, replace this card with that species' card and resolve it",
+   "2. Move the probe from Earth with 3 moves, planets in order: Jupiter, Mars, Saturn, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: orbiter first, then lander",
+   "3. No publicity cost, rotate the solar system and research a tech, advance 1 on the progress track"
+  ],
+  "dir": "right",
+  "diff": [
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it."
+  ]
+ },
+ "S.5": {
+  "code": "{\n  id: 'S.5',\n  deckTier: ADVANCED,\n  decisionDirection: LEFT,\n  candidates: [\n    analyze([VP_3]),\n    tech({ paid: true, effects: [PROGRESS_1] }),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Analyze (card benefit: +3 VP), then discard a computer tech for 3 VP and 1 progress",
+   "2. Pay 6 publicity, rotate the solar system and research a tech, advance 1 on the progress track",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "left",
+  "diff": [
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.6": {
+  "code": "{\n  id: 'S.6',\n  deckTier: ADVANCED,\n  decisionDirection: LEFT,\n  candidates: [\n    tech({ paid: true, effects: [PROGRESS_1] }),\n    launch([PUBLICITY_1, PROGRESS_1]),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Pay 6 publicity, rotate the solar system and research a tech, advance 1 on the progress track",
+   "2. Launch a probe, gain 1 publicity, advance 1 on the progress track",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "left",
+  "diff": [
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.7": {
+  "code": "{\n  id: 'S.7',\n  deckTier: ADVANCED,\n  decisionDirection: RIGHT,\n  candidates: [\n    tech({ paid: true, effects: [PROGRESS_1] }),\n    probe({ movement: 4, planets: [NEPTUNE, SATURN, MERCURY, VENUS], moonLanding: true, preference: LANDER }),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Pay 6 publicity, rotate the solar system and research a tech, advance 1 on the progress track",
+   "2. Move the probe from Earth with 4 moves, planets in order: Neptune, Saturn, Mercury, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: lander first, then orbiter",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Planets: the card shows Neptune, Saturn, Mercury, Venus. The repo lists Uranus, Saturn, Mercury, Venus.",
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.8": {
+  "code": "{\n  id: 'S.8',\n  deckTier: ADVANCED,\n  decisionDirection: LEFT,\n  candidates: [\n    analyze([VP_3]),\n    probe({ movement: 4, planets: [URANUS, JUPITER, MERCURY, VENUS], moonLanding: true, preference: LANDER }),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Analyze (card benefit: +3 VP), then discard a computer tech for 3 VP and 1 progress",
+   "2. Move the probe from Earth with 4 moves, planets in order: Uranus, Jupiter, Mercury, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: lander first, then orbiter",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "left",
+  "diff": [
+   "Planets: the card shows Uranus, Jupiter, Mercury, Venus. The repo lists Neptune, Jupiter, Mercury, Venus.",
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.9": {
+  "code": "{\n  id: 'S.9',\n  deckTier: ADVANCED,\n  decisionDirection: RIGHT,\n  candidates: [\n    analyze([VP_3]),\n    launch([PUBLICITY_1, PROGRESS_1]),\n    probe({ movement: 4, planets: [NEPTUNE, URANUS, MERCURY, VENUS], moonLanding: true, preference: ORBITER }),\n  ],\n}",
+  "words": [
+   "1. Analyze (card benefit: +3 VP), then discard a computer tech for 3 VP and 1 progress",
+   "2. Launch a probe, gain 1 publicity, advance 1 on the progress track",
+   "3. Move the probe from Earth with 4 moves, planets in order: Neptune, Uranus, Mercury, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: orbiter first, then lander"
+  ],
+  "dir": "right",
+  "diff": [
+   "Planet order: the card shows Neptune, Uranus, Mercury, Venus. The repo lists Uranus, Neptune, Mercury, Venus.",
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it."
+  ]
+ },
+ "S.10": {
+  "code": "{\n  id: 'S.10',\n  deckTier: ADVANCED,\n  decisionDirection: RIGHT,\n  candidates: [\n    analyze([VP_3]),\n    launch([PUBLICITY_1, PROGRESS_1]),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Analyze (card benefit: +3 VP), then discard a computer tech for 3 VP and 1 progress",
+   "2. Launch a probe, gain 1 publicity, advance 1 on the progress track",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.11": {
+  "code": "{\n  id: 'S.11',\n  deckTier: ADVANCED,\n  decisionDirection: RIGHT,\n  candidates: [\n    tech({ paid: true, effects: [PROGRESS_1] }),\n    analyze([VP_3]),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Pay 6 publicity, rotate the solar system and research a tech, advance 1 on the progress track",
+   "2. Analyze (card benefit: +3 VP), then discard a computer tech for 3 VP and 1 progress",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.12": {
+  "code": "{\n  id: 'S.12',\n  deckTier: ADVANCED,\n  decisionDirection: LEFT,\n  candidates: [\n    tech({ paid: true, effects: [PROGRESS_1] }),\n    launch([PUBLICITY_1, PROGRESS_1]),\n    probe({ movement: 4, planets: [MERCURY, SATURN, JUPITER, VENUS], moonLanding: true, preference: LANDER }),\n  ],\n}",
+  "words": [
+   "1. Pay 6 publicity, rotate the solar system and research a tech, advance 1 on the progress track",
+   "2. Launch a probe, gain 1 publicity, advance 1 on the progress track",
+   "3. Move the probe from Earth with 4 moves, planets in order: Mercury, Saturn, Jupiter, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: lander first, then orbiter"
+  ],
+  "dir": "left",
+  "diff": [
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it."
+  ]
+ },
+ "S.13": {
+  "code": "{\n  id: 'S.13',\n  deckTier: ADVANCED,\n  decisionDirection: LEFT,\n  candidates: [\n    probe({ movement: 4, planets: [NEPTUNE, URANUS, MARS, VENUS], moonLanding: true, preference: LANDER }),\n    analyze([VP_3]),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Move the probe from Earth with 4 moves, planets in order: Neptune, Uranus, Mars, Venus; first try to land on a moon by discarding a probe tech; otherwise tie preference: lander first, then orbiter",
+   "2. Analyze (card benefit: +3 VP), then discard a computer tech for 3 VP and 1 progress",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "left",
+  "diff": [
+   "Analyze: the repo data has no computer-tech discard (discard 1 computer tech for 3 VP and 1 progress), which the rulebook and the card show.",
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.14": {
+  "code": "{\n  id: 'S.14',\n  deckTier: ADVANCED,\n  decisionDirection: RIGHT,\n  candidates: [\n    launch([PUBLICITY_1, PROGRESS_1]),\n    tech({ paid: true, effects: [PROGRESS_1] }),\n    telescope({ earthSignals: 2, cardRowSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Launch a probe, gain 1 publicity, advance 1 on the progress track",
+   "2. Pay 6 publicity, rotate the solar system and research a tech, advance 1 on the progress track",
+   "3. Telescope: 2 signals in the sector of Earth, 1 card-row signal; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.15": {
+  "code": "{\n  id: 'S.15',\n  deckTier: SPECIES_SPECIAL,\n  decisionDirection: RIGHT,\n  candidates: [\n    launch([PUBLICITY_1]),\n    probe({ movementByPlanet: [{ planet: SATURN, movement: 4 }, { planet: JUPITER, movement: 5 }], moonLanding: true, landerOnly: true, preference: LANDER }),\n    customAction('mascamites_sample'),\n  ],\n}",
+  "words": [
+   "1. Launch a probe, gain 1 publicity",
+   "2. Move the probe from Earth: Saturn with 4 moves, then Jupiter with 5 moves; first try to land on a moon by discarding a probe tech; otherwise tie preference: lander only",
+   "3. Take a random Mascamite sample from the planet and place it face up on this species board (ignore its reward)."
+  ],
+  "dir": "right",
+  "diff": [
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it."
+  ]
+ },
+ "S.16": {
+  "code": "{\n  id: 'S.16',\n  deckTier: SPECIES_SPECIAL,\n  decisionDirection: LEFT,\n  candidates: [\n    customAction('anomalies_trace'),\n    tech({ effects: [PROGRESS_1] }),\n  ],\n}",
+  "words": [
+   "1. If the rival is not winning the next anomaly, they mark a trace of that color for this species and gain 3 VP.",
+   "2. No publicity cost, rotate the solar system and research a tech, advance 1 on the progress track"
+  ],
+  "dir": "left",
+  "diff": []
+ },
+ "S.17": {
+  "code": "{\n  id: 'S.17',\n  deckTier: SPECIES_SPECIAL,\n  decisionDirection: LEFT,\n  candidates: [\n    probe({ movement: 4, target: OUMUAMUA, preference: LANDER }),\n    telescope({ earthSignals: 1, cardRowSignals: 1, oumuamuaSignals: 1, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Move the probe from Earth to Oumuamua with 4 moves; place it as: lander first, then orbiter",
+   "2. Telescope: 1 signal in the sector of Earth, 1 card-row signal, 1 signal in the sector of Oumuamua; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "left",
+  "diff": [
+   "Probe: the repo data has only the placement preference. The moon landing by discarding a probe tech and the first-space check are not in it.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.18": {
+  "code": "{\n  id: 'S.18',\n  deckTier: SPECIES_SPECIAL,\n  decisionDirection: RIGHT,\n  candidates: [\n    customAction('centaurians_countdown'),\n    telescope({ earthSignals: 1, cardRowSignals: 2, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. If the rival still has a Centaurian marker in their reserve and none on the scoring track, place one \"+15\" marker ahead of their current score. Then advance 1 on the progress track.",
+   "2. Telescope: 1 signal in the sector of Earth, 2 card-row signals; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ },
+ "S.19": {
+  "code": "{\n  id: 'S.19',\n  deckTier: SPECIES_SPECIAL,\n  decisionDirection: RIGHT,\n  candidates: [\n    customAction('exertians_danger_card'),\n    telescope({ earthSignals: 1, cardRowSignals: 2, extraCardRowSignalWithTelescopeTech: 1 }),\n  ],\n}",
+  "words": [
+   "1. Count the number of the rival's played Exertian cards and the rival's traces on this species board. If the total is less than 5, the rival secretly plays an Exertian card.",
+   "2. Telescope: 1 signal in the sector of Earth, 2 card-row signals; plus 1 extra card-row signal by discarding a telescope tech"
+  ],
+  "dir": "right",
+  "diff": [
+   "Telescope: the card shows 1 Earth signal and 2 card-row signals. The repo uses mode EARTH, which is 2 Earth and 1 card-row signal on the other cards.",
+   "Telescope: the repo data has no extra card-row signal for discarding a telescope tech, which every telescope row shows."
+  ]
+ }
+}

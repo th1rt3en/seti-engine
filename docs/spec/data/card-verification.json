@@ -1,0 +1,1718 @@
+{
+ "snapshot_of": "card tracker database, collection verification",
+ "taken": "2026-10-12",
+ "rows": [
+  {
+   "group": "alien-base",
+   "id": "ET.1",
+   "name": "First Contact",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:06:43.666000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.2",
+   "name": "Rover Exploration",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:06:47.020000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.3",
+   "name": "Mass Sample Collection",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:06:54.307000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.4",
+   "name": "Martian Quarantine Lab",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:07:07.955000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.5",
+   "name": "Ecosystem Study",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:07:17.223000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.6",
+   "name": "The Queen",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:11:54.056000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.7",
+   "name": "Breeding Sample",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:12:01.447000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.8",
+   "name": "Hive Sample",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:12:09.107000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.9",
+   "name": "Orbital Monitoring",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:12:13.224000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.10",
+   "name": "Computer Simulations",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:12:17.563000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.11",
+   "name": "Signs of Life",
+   "status": "difference",
+   "note": "missing instant effect: 1 launch action",
+   "checked_at": "2026-10-12T08:12:29.218000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.12",
+   "name": "Close-up View",
+   "status": "difference",
+   "note": "missing instant effect: move 5",
+   "checked_at": "2026-10-12T08:12:43.461000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.13",
+   "name": "Concerned People",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:12:45.940000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.14",
+   "name": "Listening Carefully",
+   "status": "confirmed",
+   "note": "missing instant effect: 1 scan action",
+   "checked_at": "2026-10-12T08:12:55.470000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.15",
+   "name": "Part of Everyday Life",
+   "status": "difference",
+   "note": "missing instant effect: draw 3",
+   "checked_at": "2026-10-12T08:13:45.595000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.16",
+   "name": "Flooding the Media Space",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:14:00.547000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.17",
+   "name": "Are we Being Observed?",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:14:04.664000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.18",
+   "name": "Message Capsule",
+   "status": "difference",
+   "note": "missing instant effect: 1 rotate, 1 any technology",
+   "checked_at": "2026-10-12T08:14:14.320000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.19",
+   "name": "New Physics",
+   "status": "difference",
+   "note": "missing instant effect: 1 any trace",
+   "checked_at": "2026-10-12T08:14:25.153000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.20",
+   "name": "Amazing Uncertainty",
+   "status": "difference",
+   "note": "missing instant effect: mark 1 signal",
+   "checked_at": "2026-10-12T08:14:35.740000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.21",
+   "name": "Visitor in the Sky",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:14:58.464000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.22",
+   "name": "Altered Trajectory",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:15:08.838000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.23",
+   "name": "Exofossil Discovery",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:17:09.960000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.24",
+   "name": "Terrain Mapping",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:17:13.074000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.25",
+   "name": "Probe Customisation",
+   "status": "difference",
+   "note": "missing effect: then land (after movement).",
+   "checked_at": "2026-10-12T08:18:10.838000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.26",
+   "name": "Race Against Time",
+   "status": "difference",
+   "note": "missing instant effect: 1 launch action, 1 exofossil",
+   "checked_at": "2026-10-12T08:18:29.126000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.27",
+   "name": "Perfect Timing",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:18:32.064000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.28",
+   "name": "Exofossil Samples",
+   "status": "difference",
+   "note": "missing instant effect: 1 rotate, 1 blue tech",
+   "checked_at": "2026-10-12T08:18:45.484000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.29",
+   "name": "Comparative Analysis",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:18:48.811000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.30",
+   "name": "Excavation Rover",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:18:51.860000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.31",
+   "name": "Vessel Designs",
+   "status": "difference",
+   "note": "missing effect: e.ADVANCED_15(), 1 launch action, e.FULFILL_ADVANCED(), e.INCOME()",
+   "checked_at": "2026-10-12T08:19:39.353000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.32",
+   "name": "Exocomputers",
+   "status": "difference",
+   "note": "missing effect: e.ADVANCED_15(), 2 data, e.FULFILL_ADVANCED(), e.INCOME()",
+   "checked_at": "2026-10-12T08:19:53.495000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.33",
+   "name": "Infocluster",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:19:55.342000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.34",
+   "name": "A Message from Afar",
+   "status": "difference",
+   "note": "missing effect: e.ADVANCED_15(), draw 1, e.FULFILL_ADVANCED(), mark 1 pink trace",
+   "checked_at": "2026-10-12T08:20:19.691000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.35",
+   "name": "Synthesis Instructions",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:20:28.072000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.36",
+   "name": "Alien Schematics",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:20:30.517000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.37",
+   "name": "Music of the Spheres",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:20:37.679000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.38",
+   "name": "Hivemind Concept",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:20:39.937000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.39",
+   "name": "Telescope Blueprints",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:20:42.134000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.40",
+   "name": "Torrent-chain Signal",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:20:45.172000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.41",
+   "name": "Razor-edge Shuttle",
+   "status": "difference",
+   "note": "missing effect: danger 6, endgame scoring: 3 orange tech -> 14 score",
+   "checked_at": "2026-10-12T08:24:07.358000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.42",
+   "name": "Deflector",
+   "status": "difference",
+   "note": "missing effect: danger 7, endgame scoring: 3 pink tech -> 15 score",
+   "checked_at": "2026-10-12T08:24:17.688000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.43",
+   "name": "Expender Core",
+   "status": "difference",
+   "note": "missing effect: danger 3, endgame scoring: 3 blue tech -> 9 score",
+   "checked_at": "2026-10-12T08:24:30.004000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.44",
+   "name": "pierced Exoplanet",
+   "status": "difference",
+   "note": "missing effect: danger 4, endgame scoring: 2 red sector victories -> 12 score",
+   "checked_at": "2026-10-12T08:24:44.996000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.45",
+   "name": "Core-breach Exoplanet",
+   "status": "difference",
+   "note": "missing effect: danger 4, endgame scoring: 2 blue sector victories -> 12 score",
+   "checked_at": "2026-10-12T08:24:59.821000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.46",
+   "name": "Vortex Exoplanet",
+   "status": "difference",
+   "note": "missing effect: danger 4, endgame scoring: 2 yellow sector victories -> 12 score",
+   "checked_at": "2026-10-12T08:25:12.541000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.47",
+   "name": "Fission-sun Exoplanet",
+   "status": "difference",
+   "note": "missing effect: danger 5, endgame scoring: 2 black sector victories -> 14 score",
+   "checked_at": "2026-10-12T08:25:23.248000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.48",
+   "name": "Oscillating Probes",
+   "status": "difference",
+   "note": "missing effect: danger 3, endgame scoring: 3 probes in orbit -> 11 score",
+   "checked_at": "2026-10-12T08:25:42.017000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.49",
+   "name": "Generative Infrastructure",
+   "status": "difference",
+   "note": "missing effect: danger 7, endgame scoring: 4 landers (including moons) -> 16 score",
+   "checked_at": "2026-10-12T08:25:58.542000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.50",
+   "name": "Casette Deployment",
+   "status": "difference",
+   "note": "missing effect: danger 2, endgame scoring: 3 orbiters or landers at a single planet (including moons) -> 10 score",
+   "checked_at": "2026-10-12T08:26:28.527000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.51",
+   "name": "Extractor",
+   "status": "difference",
+   "note": "missing effect: danger 8, endgame scoring: 8 cards tucked for income -> 18 score",
+   "checked_at": "2026-10-12T08:26:45.374000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.52",
+   "name": "Automated Lab",
+   "status": "difference",
+   "note": "missing effect: danger 0, endgame scoring: marked 6 traces of exertians -> 7 score",
+   "checked_at": "2026-10-12T08:27:07.163000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.53",
+   "name": "Neuralab",
+   "status": "difference",
+   "note": "missing effect: danger 9, endgame scoring: marked 6 traces of the other species -> 20 score",
+   "checked_at": "2026-10-12T08:27:25.253000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.54",
+   "name": "Nanowielder Node",
+   "status": "difference",
+   "note": "missing effect: danger 1, endgame scoring: marked 5 or more traces of the same color -> 8 score",
+   "checked_at": "2026-10-12T08:28:09.877000+00:00"
+  },
+  {
+   "group": "alien-base",
+   "id": "ET.55",
+   "name": "Stratoelevator",
+   "status": "difference",
+   "note": "missing effect: danger 4, endgame scoring: finished 5 or more quick missions -> 12 score",
+   "checked_at": "2026-10-12T08:28:11.504000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "1",
+   "name": "Pioneer 11 Mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T03:49:38.602000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "2",
+   "name": "Mariner 10 Mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:46:16.419000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "3",
+   "name": "Voyager 2 Mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:44:59.535000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "4",
+   "name": "Galileo Mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:45:11.958000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "5",
+   "name": "Venera Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:46:12.332000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "6",
+   "name": "Juno Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:47:30.487000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "7",
+   "name": "MESSENGER Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:47:51.870000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "8",
+   "name": "Cassini Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:48:15.236000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "9",
+   "name": "Falcon Heavy",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:48:27.197000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "10",
+   "name": "ODINUS Mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:49:42.673000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "11",
+   "name": "Grant",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:49:53.526000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "12",
+   "name": "Europa Clipper",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:52:10.394000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "13",
+   "name": "Perseverance Rover",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:52:22.772000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "14",
+   "name": "Mars Science Laboratory",
+   "status": "difference",
+   "note": "missing instant effect: gain 1 publicity and 2 data",
+   "checked_at": "2026-10-12T04:53:06.010000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "15",
+   "name": "Atmospheric Entry",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:53:34.792000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "16",
+   "name": "Dragonfly",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:53:47.808000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "17",
+   "name": "OSIRIS-REx",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:54:09.185000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "18",
+   "name": "Hayabusa",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T04:54:14.892000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "19",
+   "name": "Gravitational Slingshot",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T06:42:39.853000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "20",
+   "name": "Mercury Flyby",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T06:43:09.120000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "21",
+   "name": "Venus Flyby",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T06:43:17.083000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "22",
+   "name": "Mars Flyby",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T06:43:24.172000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "23",
+   "name": "Jupiter Flyby",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T06:43:51.910000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "24",
+   "name": "Saturn Flyby",
+   "status": "difference",
+   "note": "missing instant effect: move 3",
+   "checked_at": "2026-10-12T06:44:06.643000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "25",
+   "name": "Lightsail",
+   "status": "difference",
+   "note": "missing instant effect: move 4",
+   "checked_at": "2026-10-12T06:50:11.927000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "26",
+   "name": "Through the Asteroid Belt",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T06:50:19.554000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "27",
+   "name": "Hubble Space Telescope",
+   "status": "difference",
+   "note": "missing instant effect: move 1",
+   "checked_at": "2026-10-12T06:50:32.780000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "28",
+   "name": "Kepler Space Telescope",
+   "status": "difference",
+   "note": "missing instant effect: move 1",
+   "checked_at": "2026-10-12T06:50:41.966000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "29",
+   "name": "James Webb Space Telescope",
+   "status": "difference",
+   "note": "missing instant effect: move 1",
+   "checked_at": "2026-10-12T06:51:02.272000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "30",
+   "name": "Great Observatories Project",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T06:51:07.368000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "31",
+   "name": "Space Launch System",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T06:51:38.038000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "32",
+   "name": "Mercury Exploration Program",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T06:52:14.084000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "33",
+   "name": "Venus Exploration Program",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:03:24.417000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "34",
+   "name": "Mars Exploration Program",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:03:30.987000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "35",
+   "name": "Jupiter Exploration Program",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:03:38.595000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "36",
+   "name": "Saturn Exploration Program",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:03:49.096000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "37",
+   "name": "Proxima Centauri Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:03:56.761000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "38",
+   "name": "Barnard's Star Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:05:55.795000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "39",
+   "name": "61 Virginis Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:06:02.218000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "40",
+   "name": "Kepler 22 Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:06:11.142000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "41",
+   "name": "Sirius A Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:11:16.955000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "42",
+   "name": "Procyon Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:11:26.741000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "43",
+   "name": "Beta Pictoris Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:11:38.385000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "44",
+   "name": "Vega Observation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:13:56.082000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "45",
+   "name": "Allen Telescope Array",
+   "status": "difference",
+   "note": "Missing instant effect: scan 2 from display cards",
+   "checked_at": "2026-10-12T07:14:43.290000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "46",
+   "name": "ALMA Observatory",
+   "status": "difference",
+   "note": "Missing instant effect: scan 2 from display cards",
+   "checked_at": "2026-10-12T07:21:18.635000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "47",
+   "name": "Very Large Array",
+   "status": "difference",
+   "note": "Missing instant effect: scan 2 from display cards",
+   "checked_at": "2026-10-12T07:21:25.520000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "48",
+   "name": "Breakthrough Starshot",
+   "status": "difference",
+   "note": "Missing instant effect: move 1, scan red",
+   "checked_at": "2026-10-12T07:21:50.520000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "49",
+   "name": "Breakthrough Watch",
+   "status": "difference",
+   "note": "Missing instant effect: move 1, scan yellow",
+   "checked_at": "2026-10-12T07:22:18.124000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "50",
+   "name": "Square Kilometre Array",
+   "status": "difference",
+   "note": "Missing instant effect: scan 3 from display cards",
+   "checked_at": "2026-10-12T07:23:56.298000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "51",
+   "name": "Lovell Telescope",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:32:47.291000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "52",
+   "name": "Parkes Observatory",
+   "status": "difference",
+   "note": "missing instant effect: scan action",
+   "checked_at": "2026-10-12T07:33:18.734000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "53",
+   "name": "Deep Synoptic Array",
+   "status": "difference",
+   "note": "missing instant effect: scan action",
+   "checked_at": "2026-10-12T07:33:34.838000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "54",
+   "name": "VERITAS Telescopes",
+   "status": "difference",
+   "note": "missing instant effect: scan action",
+   "checked_at": "2026-10-12T07:33:43.894000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "55",
+   "name": "Arecibo Observatory",
+   "status": "difference",
+   "note": "missing instant effect: scan action",
+   "checked_at": "2026-10-12T07:33:47.750000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "56",
+   "name": "Breakthrough Listen",
+   "status": "difference",
+   "note": "missing instant effect: move 1, scan blue",
+   "checked_at": "2026-10-12T07:34:00.629000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "57",
+   "name": "Effelsberg Telescope Construction",
+   "status": "difference",
+   "note": "missing instant effect: 1 card any, 1 rotate, 1 pink technology",
+   "checked_at": "2026-10-12T07:38:08.187000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "58",
+   "name": "Uranus Orbiter and Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:38:15.169000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "59",
+   "name": "Ion Propulsion System",
+   "status": "difference",
+   "note": "missing instant effect: 1 energy, 1 rotate, 1 orange technology",
+   "checked_at": "2026-10-12T07:38:32.771000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "60",
+   "name": "Trident Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:38:36.521000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "61",
+   "name": "Quantum Computer",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:39:12.233000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "62",
+   "name": "Onsala Telescope Construction",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:40:50.115000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "63",
+   "name": "SHERLOC",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:40:52.862000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "64",
+   "name": "ALICE",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:43:11.673000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "65",
+   "name": "FAST Telescope Construction",
+   "status": "difference",
+   "note": "missing instant effect: scan 2 from display cards, 1 rotate, 1 pink technology",
+   "checked_at": "2026-10-12T07:45:17.618000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "66",
+   "name": "GMRT Telescope Construction",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:45:27.848000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "67",
+   "name": "Yevpatoria Telescope Construction",
+   "status": "difference",
+   "note": "missing instant effect: 1 publicity, 1 rotate, 1 pink technology",
+   "checked_at": "2026-10-12T07:45:47.608000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "68",
+   "name": "DUNE",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:46:13.555000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "69",
+   "name": "Large Hadron Collider",
+   "status": "confirmed",
+   "note": "missing instant effect: 1 data, 1 rotate, 1 blue technology",
+   "checked_at": "2026-10-12T07:46:40.025000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "70",
+   "name": "ATLAS",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:46:51.533000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "71",
+   "name": "Focused Research",
+   "status": "difference",
+   "note": "missing instant effect: 1 rotate, 1 any color technology",
+   "checked_at": "2026-10-12T07:47:18.050000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "72",
+   "name": "Scientific Cooperation",
+   "status": "difference",
+   "note": "missing instant effect:, 1 rotate, 1 any color technology",
+   "checked_at": "2026-10-12T07:47:35.103000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "73",
+   "name": "Clean Space Initiative",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:48:30.779000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "74",
+   "name": "Pre-launch Testing",
+   "status": "difference",
+   "note": "missing instant effect: 1 launch action",
+   "checked_at": "2026-10-12T07:48:48.274000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "75",
+   "name": "Extremophiles Study",
+   "status": "difference",
+   "note": "missing instant effect: 1 any trace",
+   "checked_at": "2026-10-12T07:48:59.204000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "76",
+   "name": "NASA Research Center",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:49:04.475000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "77",
+   "name": "NASA Astrobiology Institute",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:49:12.357000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "78",
+   "name": "SETI Institute",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:49:20.004000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "79",
+   "name": "ISS",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:50:28.078000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "80",
+   "name": "Cape Canaveral SFS",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:50:32.627000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "81",
+   "name": "International Collaboration",
+   "status": "difference",
+   "note": "missing instant effect:  1 any color technology",
+   "checked_at": "2026-10-12T07:50:49.403000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "82",
+   "name": "Johnson Space Center",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:50:59.181000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "83",
+   "name": "Wow! Signal",
+   "status": "difference",
+   "note": "missing instant effect: 1 publicity, mark 2 signals",
+   "checked_at": "2026-10-12T07:51:16.261000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "84",
+   "name": "Sample Return",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:53:01.900000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "85",
+   "name": "Starship",
+   "status": "difference",
+   "note": "missing instant effect: 1 launch action, 1 rotate, 1 orange technology",
+   "checked_at": "2026-10-12T07:53:56.834000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "86",
+   "name": "Giant Magellan Telescope",
+   "status": "difference",
+   "note": "missing instant effect: scan 1 from display cards",
+   "checked_at": "2026-10-12T07:54:11.184000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "87",
+   "name": "Project Longshot",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:54:16.325000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "88",
+   "name": "Chandra Space Observatory",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:54:32.502000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "89",
+   "name": "NIAC Program",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:55:04.814000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "90",
+   "name": "Fuel Tanks Construction",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:55:08.174000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "91",
+   "name": "Fusion Reactor",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:55:13.664000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "92",
+   "name": "NASA Image of the Day",
+   "status": "difference",
+   "note": "missing instant effect: 2 publicity",
+   "checked_at": "2026-10-12T07:55:27.850000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "93",
+   "name": "Government Funding",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:00.667000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "94",
+   "name": "Popularization of Science",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:17.679000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "95",
+   "name": "Near-Earth Asteroids Survey",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:23.142000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "96",
+   "name": "Tardigrades Study",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:29.182000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "97",
+   "name": "Apollo 11 Mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:32.384000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "98",
+   "name": "Coronal Spectrograph",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:35.660000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "99",
+   "name": "Electron Microscope",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:40.394000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "100",
+   "name": "Exascale Supercomputer",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:43.027000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "101",
+   "name": "Telescope Time Allocation",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:57:49.457000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "102",
+   "name": "Linguistic Analysis",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:59:15.397000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "103",
+   "name": "Westerbork Synthesis Radio Telescope",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:59:18.399000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "104",
+   "name": "Rosetta Probe",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:59:22.039000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "105",
+   "name": "Green Bank Telescope",
+   "status": "difference",
+   "note": "missing instant effect: 1 scan action\nmissing quick mission: mark 3 pink traces -> mark 1 pink trace",
+   "checked_at": "2026-10-12T07:59:55.124000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "106",
+   "name": "Strategic Planning",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T07:59:58.795000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "107",
+   "name": "First Black Hole Photo",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:00:07.796000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "108",
+   "name": "SETI@Home",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:00:12.415000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "109",
+   "name": "Low-Power Microprocessors",
+   "status": "difference",
+   "note": "missing instant effect: 1 energy, 1 rotate, 1 blue technology",
+   "checked_at": "2026-10-12T08:02:10.832000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "110",
+   "name": "Press Statement",
+   "status": "difference",
+   "note": "missing instant effect: 3 publicity",
+   "checked_at": "2026-10-12T08:02:19.049000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "111",
+   "name": "Roman Space Telescope",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:02:23.720000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "112",
+   "name": "Planetary Geologic Mapping",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:02:29.651000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "113",
+   "name": "Solvay Conference",
+   "status": "difference",
+   "note": "missing instant effect: 2 publicity",
+   "checked_at": "2026-10-12T08:02:44.549000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "114",
+   "name": "Planet Hunters",
+   "status": "difference",
+   "note": "missing instant effect: draw 1 any",
+   "checked_at": "2026-10-12T08:02:57.039000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "115",
+   "name": "Canadian Hydrogen Telescope",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:03:10.174000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "116",
+   "name": "Control Center",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:03:18.752000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "117",
+   "name": "Lunar Gateway",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:03:37.921000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "118",
+   "name": "PLATO",
+   "status": "difference",
+   "note": "missing instant effect: mark 3 signals",
+   "checked_at": "2026-10-12T08:03:51.574000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "119",
+   "name": "PIXL",
+   "status": "difference",
+   "note": "missing instant effect:  1 rotate, 1 blue technology",
+   "checked_at": "2026-10-12T08:04:01.915000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "120",
+   "name": "Orbiting Lagrange Point",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:04:15.677000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "121",
+   "name": "Future Circular Collider",
+   "status": "difference",
+   "note": "missing instant effect: 3 data, 1 rotate, 1 blue technology",
+   "checked_at": "2026-10-12T08:04:35.635000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "122",
+   "name": "Amateur Astronomers",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:04:39.947000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "123",
+   "name": "Asteroids Flyby",
+   "status": "difference",
+   "note": "missing instant effect: move 1",
+   "checked_at": "2026-10-12T08:04:53.118000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "124",
+   "name": "Cometary Encounter",
+   "status": "difference",
+   "note": "missing instant effect: move 2",
+   "checked_at": "2026-10-12T08:05:00.498000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "125",
+   "name": "Trajectory Correction",
+   "status": "difference",
+   "note": "missing instant effect: move 1",
+   "checked_at": "2026-10-12T08:05:07.546000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "126",
+   "name": "Euclid Telescope Construction",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:05:10.952000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "127",
+   "name": "NEAR Shoemaker",
+   "status": "difference",
+   "note": "missing instant effect: 2 publicity",
+   "checked_at": "2026-10-12T08:05:20.634000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "128",
+   "name": "Advanced Navigation System",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:05:23.960000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "129",
+   "name": "Asteroids Research",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:05:27.003000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "130",
+   "name": "Low-Cost Space Launch",
+   "status": "difference",
+   "note": "missing instant effect: 1 launch action",
+   "checked_at": "2026-10-12T08:05:40.897000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "131",
+   "name": "Telescope Modernization",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:05:44.852000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "132",
+   "name": "Space Shuttle",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:05:47.440000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "133",
+   "name": "Optimal Launch Window",
+   "status": "difference",
+   "note": "missing instant effect: 1 launch action",
+   "checked_at": "2026-10-12T08:05:56.773000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "134",
+   "name": "Herschel Space Observatory",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:06:03.429000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "135",
+   "name": "Noto Radio Observatory",
+   "status": "difference",
+   "note": "missing instant effect: 1 publicity, 1 scan action",
+   "checked_at": "2026-10-12T08:06:17.590000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "136",
+   "name": "Algonquin Radio Observatory",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:06:21.126000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "137",
+   "name": "SETI Data Archive",
+   "status": "difference",
+   "note": "missing instant effect: 2 data",
+   "checked_at": "2026-10-12T08:06:30.551000+00:00"
+  },
+  {
+   "group": "base",
+   "id": "138",
+   "name": "Cornell University",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:06:35.305000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.1",
+   "name": "Rival action S.1",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:57:26.711000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.2",
+   "name": "Rival action S.2",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:03:09.263000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.3",
+   "name": "Rival action S.3",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:03:44.305000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.4",
+   "name": "Rival action S.4",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:04:17.607000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.5",
+   "name": "Rival action S.5",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:04:47.162000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.6",
+   "name": "Rival action S.6",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:05:12.491000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.7",
+   "name": "Rival action S.7",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:05:35.601000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.8",
+   "name": "Rival action S.8",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:05:51.037000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.9",
+   "name": "Rival action S.9",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:05:57.137000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.10",
+   "name": "Rival action S.10",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:06:05.047000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.11",
+   "name": "Rival action S.11",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:06:12.166000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.12",
+   "name": "Rival action S.12",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:06:18.269000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.13",
+   "name": "Rival action S.13",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:06:25.171000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.14",
+   "name": "Rival action S.14",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:06:29.271000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.15",
+   "name": "Rival action S.15",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:06:45.374000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.16",
+   "name": "Rival action S.16",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:07:03.091000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.17",
+   "name": "Rival action S.17",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:07:12.392000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.18",
+   "name": "Rival action S.18",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:07:19.813000+00:00"
+  },
+  {
+   "group": "base-solo-rival-action",
+   "id": "S.19",
+   "name": "Rival action S.19",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T09:07:24.813000+00:00"
+  },
+  {
+   "group": "expansion-promo-se-en",
+   "id": "SE EN 01",
+   "name": "Not a planet since 2006",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:32:00.937000+00:00"
+  },
+  {
+   "group": "expansion-promo-se-en",
+   "id": "SE EN 02",
+   "name": "Gateway to Mars",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": "2026-10-12T08:32:02.903000+00:00"
+  }
+ ]
+}

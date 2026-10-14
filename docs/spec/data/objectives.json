@@ -1,0 +1,444 @@
+{
+ "icon_vocabulary": "see tools/board/solo_scoring_data.py",
+ "objectives": [
+  {
+   "id": "L1-16-vp",
+   "level": "I",
+   "image": "solo-objective-L1-16-vp",
+   "tasks": [
+    [
+     {
+      "kind": "reach_vp",
+      "n": 16
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L1-5-data",
+   "level": "I",
+   "image": "solo-objective-L1-5-data",
+   "tasks": [
+    [
+     {
+      "kind": "data_in_pool",
+      "n": 5
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L1-8-publicity",
+   "level": "I",
+   "image": "solo-objective-L1-8-publicity",
+   "tasks": [
+    [
+     {
+      "kind": "reach_publicity",
+      "n": 8
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L1-land-or-win-sector",
+   "level": "I",
+   "image": "solo-objective-L1-probe-or-signal-check",
+   "tasks": [
+    [
+     {
+      "kind": "action",
+      "action": "land"
+     },
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "any"
+      ]
+     }
+    ]
+   ],
+   "note": "one task, either part marks it"
+  },
+  {
+   "id": "L2-asteroid-trace",
+   "level": "II",
+   "image": "solo-objective-L2-asteroid-satellite-trace",
+   "tasks": [
+    [
+     {
+      "kind": "visit",
+      "what": "asteroids"
+     }
+    ],
+    [
+     {
+      "kind": "life_trace",
+      "color": "blue"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-blue-or-red-signal",
+   "level": "II",
+   "image": "solo-objective-L2-blue-red-signal-checks",
+   "tasks": [
+    [
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "blue"
+      ]
+     },
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "red"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-computer-tech-trace",
+   "level": "II",
+   "image": "solo-objective-L2-computer-tech-trace",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "computer"
+     }
+    ],
+    [
+     {
+      "kind": "life_trace",
+      "color": "blue"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-jupiter-saturn",
+   "level": "II",
+   "image": "solo-objective-L2-jupiter-saturn",
+   "tasks": [
+    [
+     {
+      "kind": "orbit_or_land",
+      "planet": "jupiter"
+     },
+     {
+      "kind": "orbit_or_land",
+      "planet": "saturn"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-mars-uranus-neptune",
+   "level": "II",
+   "image": "solo-objective-L2-mars-uranus-neptune",
+   "tasks": [
+    [
+     {
+      "kind": "orbit_or_land",
+      "planet": "mars"
+     },
+     {
+      "kind": "orbit_or_land",
+      "planet": "uranus"
+     },
+     {
+      "kind": "orbit_or_land",
+      "planet": "neptune"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-probe-tech-mission",
+   "level": "II",
+   "image": "solo-objective-L2-probe-tech-card",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "probe"
+     }
+    ],
+    [
+     {
+      "kind": "complete_mission"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-red-or-yellow-signal",
+   "level": "II",
+   "image": "solo-objective-L2-red-yellow-signal-checks",
+   "tasks": [
+    [
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "red"
+      ]
+     },
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "yellow"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-comet-3-credit-card",
+   "level": "II",
+   "image": "solo-objective-L2-satellite-3-credit-tech",
+   "tasks": [
+    [
+     {
+      "kind": "visit",
+      "what": "comet"
+     }
+    ],
+    [
+     {
+      "kind": "play_card_costing",
+      "credits": 3
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-telescope-tech-mission",
+   "level": "II",
+   "image": "solo-objective-L2-telescope-tech-card",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "telescope"
+     }
+    ],
+    [
+     {
+      "kind": "complete_mission"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-venus-mercury",
+   "level": "II",
+   "image": "solo-objective-L2-venus-mercury",
+   "tasks": [
+    [
+     {
+      "kind": "orbit_or_land",
+      "planet": "venus"
+     },
+     {
+      "kind": "orbit_or_land",
+      "planet": "mercury"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L2-yellow-or-blue-signal",
+   "level": "II",
+   "image": "solo-objective-L2-yellow-blue-signal-checks",
+   "tasks": [
+    [
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "yellow"
+      ]
+     },
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "blue"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-black-signal",
+   "level": "III",
+   "image": "solo-objective-L3-black-signal-check",
+   "tasks": [
+    [
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "black"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-computer-and-any-tech",
+   "level": "III",
+   "image": "solo-objective-L3-computer-mixed-tech",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "computer"
+     }
+    ],
+    [
+     {
+      "kind": "tech",
+      "type": "any"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-probe-tech-land",
+   "level": "III",
+   "image": "solo-objective-L3-probe-tech-rover",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "probe"
+     }
+    ],
+    [
+     {
+      "kind": "action",
+      "action": "land"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-orbit",
+   "level": "III",
+   "image": "solo-objective-L3-satellite",
+   "tasks": [
+    [
+     {
+      "kind": "action",
+      "action": "orbit"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-launch-9-publicity",
+   "level": "III",
+   "image": "solo-objective-L3-shuttle-9-publicity",
+   "tasks": [
+    [
+     {
+      "kind": "action",
+      "action": "launch"
+     }
+    ],
+    [
+     {
+      "kind": "reach_publicity",
+      "n": 9
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-telescope-tech-win-sector",
+   "level": "III",
+   "image": "solo-objective-L3-telescope-tech-signal",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "telescope"
+     }
+    ],
+    [
+     {
+      "kind": "win_sector",
+      "sectors": [
+       "any"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-trace-launch-scan",
+   "level": "III",
+   "image": "solo-objective-L3-trace-probe-telescope",
+   "tasks": [
+    [
+     {
+      "kind": "life_trace",
+      "color": "blue"
+     }
+    ],
+    [
+     {
+      "kind": "action",
+      "action": "launch"
+     }
+    ],
+    [
+     {
+      "kind": "action",
+      "action": "scan"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-two-scans",
+   "level": "III",
+   "image": "solo-objective-L3-two-telescope-hex",
+   "tasks": [
+    [
+     {
+      "kind": "action",
+      "action": "scan"
+     }
+    ],
+    [
+     {
+      "kind": "action",
+      "action": "scan"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "L3-two-blue-traces",
+   "level": "III",
+   "image": "solo-objective-L3-two-traces",
+   "tasks": [
+    [
+     {
+      "kind": "life_trace",
+      "color": "blue"
+     }
+    ],
+    [
+     {
+      "kind": "life_trace",
+      "color": "blue"
+     }
+    ]
+   ]
+  }
+ ]
+}

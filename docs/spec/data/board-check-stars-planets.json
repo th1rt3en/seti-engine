@@ -1,0 +1,133 @@
+{
+ "snapshot_of": "stars and planets check page, collection stars-planets-check",
+ "taken": "2026-10-12",
+ "all_confirmed": true,
+ "items": [
+  {
+   "key": "rule-boards",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-slot",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-win",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "board1",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "board2",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "board3",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "board4",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-proxima-centauri",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-kepler-22",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-barnard-s-star",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-sirius-a",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-vega",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-procyon",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-beta-pictoris",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "star-61-virginis",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-mercury",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-venus",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-mars",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-jupiter",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-saturn",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-uranus",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "planet-neptune",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "disc-left",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "disc-right",
+   "status": "confirmed",
+   "note": ""
+  }
+ ],
+ "owner_answers": {
+  "first_vs_later_win_reading": "correct",
+  "phobos_deimos": "share 1 moon slot",
+  "species_slots_left_right": "correct",
+  "sector_positions": "the position of the sectors is randomized each game"
+ }
+}

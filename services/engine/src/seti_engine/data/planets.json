@@ -1,0 +1,417 @@
+{
+ "discovery_spaces": {
+  "left_board_slot": {
+   "discovery_space_each_color": [
+    {
+     "n": 5,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "publicity"
+    }
+   ],
+   "image": "p_slotsL",
+   "overflow_space_each": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ]
+  },
+  "note": "Each of the two alien species slots has three discovery spaces (pink, yellow, blue trace) and three overflow spaces below them.",
+  "right_board_slot": {
+   "discovery_space_each_color": [
+    {
+     "n": 3,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "publicity"
+    }
+   ],
+   "image": "p_slotsR",
+   "overflow_space_each": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ]
+  }
+ },
+ "planets": {
+  "JUPITER": {
+   "first_land_data": [
+    2
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_jupiter",
+   "land": [
+    {
+     "n": 7,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {
+    "Callisto": [
+     {
+      "n": 13,
+      "t": "vp"
+     },
+     {
+      "n": 4,
+      "t": "data"
+     }
+    ],
+    "Europa": [
+     {
+      "n": 7,
+      "t": "vp"
+     },
+     {
+      "kind": "yellow",
+      "n": 2,
+      "t": "trace"
+     }
+    ],
+    "Ganymede": [
+     {
+      "n": 12,
+      "t": "vp"
+     },
+     {
+      "n": 5,
+      "t": "publicity"
+     }
+    ],
+    "Io": [
+     {
+      "n": 10,
+      "t": "vp"
+     },
+     {
+      "n": 4,
+      "t": "energy"
+     }
+    ]
+   },
+   "orbit": [
+    {
+     "n": 1,
+     "t": "data"
+    },
+    {
+     "n": 1,
+     "t": "signal_planet"
+    },
+    {
+     "n": 1,
+     "t": "tuck"
+    }
+   ],
+   "order": 4
+  },
+  "MARS": {
+   "first_land_data": [
+    2,
+    1
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_mars",
+   "land": [
+    {
+     "n": 6,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {
+    "Phobos and Deimos (one space)": [
+     {
+      "n": 8,
+      "t": "vp"
+     },
+     {
+      "n": 2,
+      "t": "tuck"
+     }
+    ]
+   },
+   "orbit": [
+    {
+     "n": 1,
+     "t": "card_any"
+    },
+    {
+     "n": 1,
+     "t": "signal_planet"
+    },
+    {
+     "n": 1,
+     "t": "tuck"
+    }
+   ],
+   "order": 3
+  },
+  "MERCURY": {
+   "first_land_data": [
+    3
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_mercury",
+   "land": [
+    {
+     "n": 12,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {},
+   "orbit": [
+    {
+     "n": 1,
+     "t": "card_random"
+    },
+    {
+     "n": 2,
+     "t": "signal_planet"
+    },
+    {
+     "n": 1,
+     "t": "tuck"
+    }
+   ],
+   "order": 1
+  },
+  "NEPTUNE": {
+   "first_land_data": [
+    3
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_neptune",
+   "land": [
+    {
+     "n": 10,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {
+    "Triton": [
+     {
+      "n": 26,
+      "t": "vp"
+     }
+    ]
+   },
+   "orbit": [
+    {
+     "n": 4,
+     "t": "data"
+    },
+    {
+     "color": "black",
+     "n": 1,
+     "t": "signal_color"
+    },
+    {
+     "n": 7,
+     "t": "vp"
+    }
+   ],
+   "order": 7
+  },
+  "SATURN": {
+   "first_land_data": [
+    2
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_saturn",
+   "land": [
+    {
+     "n": 8,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {
+    "Enceladus": [
+     {
+      "n": 12,
+      "t": "vp"
+     },
+     {
+      "color": "red",
+      "n": 1,
+      "t": "signal_color"
+     },
+     {
+      "color": "yellow",
+      "n": 1,
+      "t": "signal_color"
+     },
+     {
+      "color": "blue",
+      "n": 1,
+      "t": "signal_color"
+     }
+    ],
+    "Titan": [
+     {
+      "n": 7,
+      "t": "vp"
+     },
+     {
+      "kind": "any",
+      "n": 2,
+      "t": "trace"
+     }
+    ]
+   },
+   "orbit": [
+    {
+     "n": 2,
+     "t": "publicity"
+    },
+    {
+     "n": 1,
+     "t": "signal_planet"
+    },
+    {
+     "n": 1,
+     "t": "tuck"
+    }
+   ],
+   "order": 5
+  },
+  "URANUS": {
+   "first_land_data": [
+    3
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_uranus",
+   "land": [
+    {
+     "n": 9,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {
+    "Titania": [
+     {
+      "n": 25,
+      "t": "vp"
+     }
+    ]
+   },
+   "orbit": [
+    {
+     "n": 3,
+     "t": "card_random"
+    },
+    {
+     "color": "black",
+     "n": 1,
+     "t": "signal_color"
+    },
+    {
+     "n": 8,
+     "t": "vp"
+    }
+   ],
+   "order": 6
+  },
+  "VENUS": {
+   "first_land_data": [
+    2
+   ],
+   "first_orbit": [
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ],
+   "img": "p_venus",
+   "land": [
+    {
+     "n": 5,
+     "t": "vp"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "moons": {},
+   "orbit": [
+    {
+     "n": 6,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "tuck"
+    }
+   ],
+   "order": 2
+  }
+ }
+}

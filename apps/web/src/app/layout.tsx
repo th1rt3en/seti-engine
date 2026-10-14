@@ -1,0 +1,55 @@
+import { currentUser } from "@/lib/session";
+import type { Metadata } from "next";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { logoutAction } from "./actions";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "SETI online",
+  description: "A fan-made, non-commercial online version of the board game SETI. Not affiliated with Czech Games Edition.",
+};
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const user = await currentUser();
+  return (
+    <html lang="en">
+      <body>
+        <header className="bar">
+          <Link href="/" className="brand">
+            SETI online
+          </Link>
+          <nav>
+            <Link href="/lobby">Lobby</Link>
+            <Link href="/leaderboard">Leaderboard</Link>
+            {user ? (
+              <>
+                <Link href={`/players/${user.id}`}>{user.name}</Link>
+                {user.isGuest ? <Link href="/account">Create an account</Link> : null}
+                <form action={logoutAction}>
+                  <button type="submit" className="link">
+                    Log out
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <Link href="/login">Log in</Link>
+                <Link href="/signup">Sign up</Link>
+              </>
+            )}
+          </nav>
+        </header>
+        <main>{children}</main>
+        <footer className="foot">
+          <p>
+            This is an unofficial, fan-made, non-commercial project. It is not affiliated with, endorsed by or sponsored by Czech Games
+            Edition (CGE). SETI: Search for Extraterrestrial Intelligence and its artwork, names and rules belong to their respective
+            owners. If CGE asks us to take the project down or remove content, we will do so promptly. Takedown contact:{" "}
+            <strong>to be added by the owner before any public launch</strong>.
+          </p>
+        </footer>
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,206 @@
+{
+ "boards": [
+  {
+   "id": 1,
+   "image": "sb1",
+   "stars": [
+    {
+     "name": "Proxima Centauri",
+     "color": "red",
+     "capacity": 6,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "later_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "slot": "low"
+    },
+    {
+     "name": "Kepler 22",
+     "color": "yellow",
+     "capacity": 5,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "later_win": [
+      {
+       "t": "vp",
+       "n": 3
+      }
+     ],
+     "slot": "high"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "image": "sb2",
+   "stars": [
+    {
+     "name": "Barnard's Star",
+     "color": "red",
+     "capacity": 5,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "later_win": [
+      {
+       "t": "vp",
+       "n": 3
+      }
+     ],
+     "slot": "low"
+    },
+    {
+     "name": "Sirius A",
+     "color": "blue",
+     "capacity": 6,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "later_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "slot": "high"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "image": "sb3",
+   "stars": [
+    {
+     "name": "Vega",
+     "color": "black",
+     "capacity": 4,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      },
+      {
+       "t": "vp",
+       "n": 2
+      }
+     ],
+     "later_win": [
+      {
+       "t": "vp",
+       "n": 5
+      }
+     ],
+     "slot": "low"
+    },
+    {
+     "name": "Procyon",
+     "color": "blue",
+     "capacity": 5,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "later_win": [
+      {
+       "t": "vp",
+       "n": 3
+      }
+     ],
+     "slot": "high"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "image": "sb4",
+   "stars": [
+    {
+     "name": "Beta Pictoris",
+     "color": "black",
+     "capacity": 5,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      },
+      {
+       "t": "vp",
+       "n": 3
+      }
+     ],
+     "later_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "slot": "low"
+    },
+    {
+     "name": "61 Virginis",
+     "color": "yellow",
+     "capacity": 6,
+     "first_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "later_win": [
+      {
+       "t": "trace",
+       "kind": "pink",
+       "n": 1
+      }
+     ],
+     "slot": "high"
+    }
+   ]
+  }
+ ],
+ "star_common": {
+  "each_contributor": [
+   {
+    "t": "publicity",
+    "n": 1
+   }
+  ],
+  "second_position": [
+   {
+    "t": "vp",
+    "n": 2
+   }
+  ]
+ }
+}

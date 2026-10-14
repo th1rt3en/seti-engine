@@ -1,0 +1,552 @@
+<title>SETI Card Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky summary and filters over a list of expandable card rows; status is shown by color and text. */
+:root {
+  --bg: #f2f4f8;
+  --surface: #ffffff;
+  --ink: #172033;
+  --muted: #566176;
+  --line: #d8dde8;
+  --accent: #2f4ccf;
+  --accent-ink: #ffffff;
+  --ok: #17724a;
+  --ok-bg: #e2f3ea;
+  --diff: #a9331d;
+  --diff-bg: #fbe8e3;
+  --todo: #7d879b;
+  --todo-bg: #eceff5;
+  --code-bg: #eef1f7;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131e;
+    --surface: #161d2c;
+    --ink: #e5e9f2;
+    --muted: #97a2b9;
+    --line: #29334a;
+    --accent: #8da2ff;
+    --accent-ink: #0e131e;
+    --ok: #5fcb92;
+    --ok-bg: #12301f;
+    --diff: #ff9a84;
+    --diff-bg: #3a1b14;
+    --todo: #8e98ae;
+    --todo-bg: #1f283b;
+    --code-bg: #101725;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131e;
+  --surface: #161d2c;
+  --ink: #e5e9f2;
+  --muted: #97a2b9;
+  --line: #29334a;
+  --accent: #8da2ff;
+  --accent-ink: #0e131e;
+  --ok: #5fcb92;
+  --ok-bg: #12301f;
+  --diff: #ff9a84;
+  --diff-bg: #3a1b14;
+  --todo: #8e98ae;
+  --todo-bg: #1f283b;
+  --code-bg: #101725;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; padding-inline: 16px; padding-block: 0 48px; }
+.wrap { max-width: 980px; margin-inline: auto; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { padding-block: 20px 12px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
+h1 { font-size: 22px; font-weight: 600; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 62ch; }
+.sync { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.sync.err { color: var(--diff); }
+
+.meters { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-block: 8px 16px; }
+.meter { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+.meter h2 { margin: 0 0 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.meter .big { font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+.meter .big small { font-size: 12px; color: var(--muted); }
+.bar { height: 8px; border-radius: 4px; background: var(--todo-bg); display: flex; overflow: hidden; margin-top: 8px; }
+.bar i { display: block; height: 100%; }
+.bar .b-ok { background: var(--ok); }
+.bar .b-diff { background: var(--diff); }
+.meter .legend { margin-top: 6px; font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+.ftoggle { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.fcount { background: var(--accent); color: var(--accent-ink); border-radius: 9px; padding: 0 6px; font-size: 12px; font-family: var(--mono); line-height: 18px; }
+.fcaret { transition: transform .12s; display: inline-block; }
+.ftoggle[aria-expanded="false"] .fcaret { transform: rotate(-90deg); }
+.panel { display: flex; flex-direction: column; gap: 8px; padding-block: 10px 4px; }
+.groups { display: flex; flex-wrap: wrap; gap: 6px; }
+.gbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 5px 9px; font-size: 13px; display: inline-flex; gap: 8px; align-items: baseline; }
+.gbtn .cnt { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.gbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.gbtn[aria-pressed="true"] .cnt { color: inherit; opacity: 0.85; }
+.gbtn.scope { font-weight: 600; }
+.row2 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 5px 10px; font-size: 13px; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.search { flex: 1 1 180px; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 10px; }
+.sortlbl { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.sel { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 5px 8px; font-size: 13px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; font-weight: 500; }
+.btn:hover { border-color: var(--accent); }
+.btn.ok { background: var(--ok); border-color: var(--ok); color: #fff; }
+.btn.diff { background: var(--diff); border-color: var(--diff); color: #fff; }
+:root[data-theme="dark"] .btn.ok, :root[data-theme="dark"] .btn.diff { color: #0e131e; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.ok, :root:not([data-theme="light"]) .btn.diff { color: #0e131e; } }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+.help { color: var(--muted); font-size: 13px; margin-block: 12px; max-width: 80ch; }
+.list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.gnote { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 14px 0 2px; display: flex; gap: 8px; flex-wrap: wrap; }
+.gnote span.n { text-transform: none; letter-spacing: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.card.s-confirmed { border-left: 4px solid var(--ok); }
+.card.s-difference { border-left: 4px solid var(--diff); }
+.head { width: 100%; text-align: left; background: transparent; border: 0; padding: 9px 12px; display: grid; grid-template-columns: auto minmax(52px, auto) minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; }
+.head .id { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 3.2em; }
+.head .name { font-weight: 500; overflow-wrap: anywhere; }
+.head .chips { grid-column: 3 / 4; color: var(--muted); font-size: 12px; font-family: var(--mono); display: flex; gap: 4px 10px; flex-wrap: wrap; }
+.head .caret { grid-row: 1; grid-column: 1; width: 10px; color: var(--muted); transition: transform .12s; }
+.card.open .caret { transform: rotate(90deg); }
+.badge { grid-row: 1; grid-column: 4; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--todo-bg); color: var(--todo); white-space: nowrap; }
+.s-confirmed .badge { background: var(--ok-bg); color: var(--ok); }
+.s-difference .badge { background: var(--diff-bg); color: var(--diff); }
+@media (max-width: 520px) {
+  .head { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .head .id { grid-column: 2; grid-row: 1; }
+  .head .name { grid-column: 2 / 4; grid-row: 2; }
+  .head .chips { grid-column: 2 / 4; grid-row: 3; }
+  .badge { grid-column: 3; }
+}
+.detail { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 14px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+.blk h3 { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+pre.code { margin: 0; padding: 8px 10px; background: var(--code-bg); border-radius: 6px; font-family: var(--mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 220px; overflow: auto; }
+.strs { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.strs li { background: var(--code-bg); border-radius: 6px; padding: 6px 10px; overflow-wrap: anywhere; }
+.strs code { font-family: var(--mono); font-size: 11px; color: var(--muted); display: block; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+textarea.note { width: 100%; min-height: 64px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding: 8px 10px; resize: vertical; }
+.meta { font-size: 12px; color: var(--muted); }
+.hint { color: var(--diff); font-size: 12px; }
+.empty { padding: 28px 12px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; }
+.banner { background: var(--diff-bg); color: var(--diff); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+.thumb { grid-column: 1; grid-row: 1 / span 2; width: 38px; border-radius: 3px; background-color: var(--code-bg); background-repeat: no-repeat; object-fit: cover; display: block; align-self: center; }
+.head { grid-template-columns: 38px auto minmax(0, 1fr) auto; }
+.head .caret { display: none; }
+.head .id { grid-column: 2; }
+.head .name { grid-column: 3; }
+.head .chips { grid-column: 3; grid-row: 2; }
+.head .badge { grid-column: 4; }
+.thumb.none { visibility: hidden; }
+.artbox { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.cardimg { flex: 0 0 auto; width: min(100%, 380px); border-radius: 8px; background-color: var(--code-bg); background-repeat: no-repeat; cursor: zoom-in; border: 1px solid var(--line); display: block; }
+.cardimg.big { width: min(100%, 760px); cursor: zoom-out; }
+.artbox .info { flex: 1 1 260px; min-width: 0; display: grid; gap: 14px; }
+.noart { flex: 0 0 auto; width: min(100%, 380px); aspect-ratio: 5 / 7; border: 1px dashed var(--line); border-radius: 8px; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 16px; }
+.rules { margin-top: 6px; color: var(--muted); font-size: 13px; max-width: 80ch; }
+.rules ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.rwlist { margin: 0 0 8px; padding-left: 20px; display: grid; gap: 3px; }
+.rwdiff { margin: 0; padding-left: 18px; display: grid; gap: 3px; color: var(--diff); }
+.blk.rewrite { border: 1px solid var(--accent); border-radius: 6px; padding: 8px 10px; }
+.artcap { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+details.ref { margin: 6px 0 2px; }
+details.ref summary { cursor: pointer; color: var(--accent); }
+details.ref img { max-width: 100%; margin-top: 8px; border-radius: 8px; border: 1px solid var(--line); }
+@media (max-width: 520px) {
+  .head { grid-template-columns: 38px minmax(0, 1fr) auto; }
+  .head .id { grid-column: 2; grid-row: 1; }
+  .head .name { grid-column: 2 / 4; grid-row: 2; }
+  .head .chips { grid-column: 2 / 4; grid-row: 3; }
+  .head .badge { grid-column: 3; grid-row: 1; }
+  .thumb { grid-row: 1 / span 3; }
+}
+@media (max-width: 640px) {
+  .meters { grid-template-columns: 1fr 1fr; gap: 8px; margin-block: 4px 10px; }
+  .meter { padding: 8px 10px; }
+  .meter .legend { display: none; }
+  .meter .big { font-size: 16px; }
+  .meter .big small { display: block; }
+  header.top { padding-block: 14px 6px; }
+  .help { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .caret, .fcaret { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>SETI card tracker</h1>
+      <p class="sub">Compare each card with a physical copy, then mark its data confirmed or flag the difference. Card data is what the project's engine will start from, taken from the Ender-Wiggin2019/seti repository.</p>
+    </div>
+    <div class="sync" id="sync" role="status">Connecting...</div>
+  </header>
+
+  <div id="banner"></div>
+
+  <section class="meters" id="meters" aria-label="Progress"></section>
+
+  <div class="bar">
+    <button class="btn ftoggle" id="fToggle" type="button" aria-expanded="true" aria-controls="panel">Filters <span class="fcount" id="fCount" hidden></span><span class="fcaret" aria-hidden="true">&#9662;</span></button>
+    <input class="search" id="q" type="search" placeholder="Search name, id or text" aria-label="Search cards">
+  </div>
+  <div class="panel" id="panel">
+    <div class="groups" id="groups" role="group" aria-label="Filter by group"></div>
+    <div class="row2">
+      <div class="seg" id="statusSeg" role="group" aria-label="Filter by status"></div>
+      <label class="sortlbl">Order
+        <select class="sel" id="sort">
+          <option value="default">Deck order</option>
+          <option value="id">Id, numeric</option>
+          <option value="name">Name, A to Z</option>
+          <option value="diff">Differences first</option>
+          <option value="todo">Unchecked first</option>
+          <option value="recent">Recently checked</option>
+        </select>
+      </label>
+      <button class="btn" id="resetBtn" type="button">Reset filters</button>
+      <button class="btn" id="exportBtn" type="button" hidden>Export CSV</button>
+    </div>
+  </div>
+
+  <p class="help">Open a card to see what the repository holds for it. Confirm only when name, cost, income, sector, free action and effect text all match the physical card. If anything differs, mark a difference and write what the physical card shows.</p>
+
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+const DATA = /*DATA*/;
+
+const STATUS = { unchecked: 'Unchecked', confirmed: 'Confirmed', difference: 'Difference' };
+const state = { scope: 'all', group: 'all', status: 'all', q: '', sort: 'default' };
+try { const s = localStorage.getItem('seti-tracker-sort'); if (s) state.sort = s; } catch {}
+const FLAT_SORTS = new Set(['diff', 'todo', 'recent']);   // these ignore the group order
+const saved = new Map();      // key -> {status, note, at, by}
+const open = new Set();
+const built = new Set();
+let db = null, uid = null, canWrite = true, usingLocal = false, downloads = null;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const keyOf = (it) => (it.g + ':' + it.id).replace(/[^A-Za-z0-9_\-.~:@+]/g, '_');
+const groupOf = Object.fromEntries(DATA.groups.map((g) => [g.key, g]));
+const groupIdx = Object.fromEntries(DATA.groups.map((g, i) => [g.key, i]));
+const items = DATA.items.map((it, idx) => ({ ...it, idx, key: keyOf(it), scope: groupOf[it.g].scope }));
+const byKey = new Map(items.map((it) => [it.key, it]));
+const statusOf = (it) => saved.get(it.key)?.status || 'unchecked';
+
+function setSync(text, isErr) { const el = $('sync'); el.textContent = text; el.classList.toggle('err', !!isErr); }
+
+/* ---------- storage ---------- */
+const LS = 'seti-card-verification-v1';
+function lsRead() { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch { return {}; } }
+function lsWrite(o) { try { localStorage.setItem(LS, JSON.stringify(o)); } catch {} }
+
+const queues = new Map();
+function persist(key, rec) {
+  const prev = queues.get(key) || Promise.resolve();
+  const next = prev.then(async () => {
+    if (usingLocal) { const o = lsRead(); if (rec) o[key] = rec; else delete o[key]; lsWrite(o); return; }
+    const ref = db.collection('verification').doc(key);
+    if (rec) await ref.set(rec); else await ref.delete();
+  }).then(() => setSync(usingLocal ? 'Saved in this browser only' : 'All changes saved'),
+          (e) => setSync('Could not save: ' + (e && e.message || 'unknown error'), true));
+  queues.set(key, next);
+  return next;
+}
+
+function commit(key, patch) {
+  if (!canWrite) return;
+  const cur = saved.get(key) || { status: 'unchecked', note: '' };
+  const rec = { status: cur.status, note: cur.note || '', ...patch, at: Date.now(), by: uid || 'local' };
+  if (rec.status === 'unchecked' && !rec.note) { saved.delete(key); persist(key, null); }
+  else { saved.set(key, rec); persist(key, rec); }
+  setSync('Saving...');
+  refreshRow(key); refreshSummary();
+}
+
+/* ---------- filtering ---------- */
+function visible(it) {
+  if (state.scope !== 'all' && it.scope.toLowerCase() !== state.scope) return false;
+  if (state.group !== 'all' && it.g !== state.group) return false;
+  if (state.status !== 'all' && statusOf(it) !== state.status) return false;
+  if (state.q) {
+    const hay = (it.id + ' ' + it.n + ' ' + (it.e || '') + ' ' + (it.r || '') + ' ' + (it.t || []).map((t) => t[1]).join(' ') + ' ' + (saved.get(it.key)?.note || '')).toLowerCase();
+    if (!hay.includes(state.q)) return false;
+  }
+  return true;
+}
+
+/* ---------- summary ---------- */
+function counts(pred) {
+  let total = 0, ok = 0, diff = 0;
+  for (const it of items) if (pred(it)) { total++; const s = statusOf(it); if (s === 'confirmed') ok++; else if (s === 'difference') diff++; }
+  return { total, ok, diff };
+}
+function meterHtml(title, c) {
+  const pct = (n) => c.total ? (n / c.total * 100).toFixed(2) : 0;
+  return `<div class="meter"><h2>${esc(title)}</h2><div class="big">${c.ok}<small> of ${c.total} confirmed</small></div>
+    <div class="bar" role="img" aria-label="${c.ok} confirmed, ${c.diff} with differences, ${c.total - c.ok - c.diff} unchecked"><i class="b-ok" style="width:${pct(c.ok)}%"></i><i class="b-diff" style="width:${pct(c.diff)}%"></i></div>
+    <div class="legend"><span>${c.diff} with differences</span><span>${c.total - c.ok - c.diff} unchecked</span></div></div>`;
+}
+function activeFilters() {
+  return (state.scope !== 'all') + (state.group !== 'all') + (state.status !== 'all') + (state.sort !== 'default');
+}
+function updateFilterCount() {
+  const n = activeFilters(); const el = $('fCount');
+  el.hidden = !n; el.textContent = n;
+}
+function setFiltersOpen(open) {
+  $('panel').hidden = !open;
+  $('fToggle').setAttribute('aria-expanded', String(open));
+  try { localStorage.setItem('seti-tracker-filters-open', open ? '1' : '0'); } catch {}
+}
+function refreshSummary() {
+  updateFilterCount();
+  $('meters').innerHTML = meterHtml('Base game', counts((i) => i.scope === 'Base game')) + meterHtml('Expansion', counts((i) => i.scope === 'Expansion')) + meterHtml('Promo cards', counts((i) => i.scope === 'Promo'));
+  const g = ['<button class="gbtn scope" type="button" data-scope="all" aria-pressed="' + (state.scope === 'all' && state.group === 'all') + '">All <span class="cnt">' + counts(() => true).total + '</span></button>'];
+  for (const sc of ['Base game', 'Expansion', 'Promo']) {
+    const c = counts((i) => i.scope === sc);
+    g.push(`<button class="gbtn scope" type="button" data-scope="${sc.toLowerCase()}" aria-pressed="${state.scope === sc.toLowerCase() && state.group === 'all'}">${esc(sc)} <span class="cnt">${c.ok}/${c.total}</span></button>`);
+  }
+  for (const gr of DATA.groups) {
+    const c = counts((i) => i.g === gr.key);
+    g.push(`<button class="gbtn" type="button" data-group="${gr.key}" title="${esc(gr.note)}" aria-pressed="${state.group === gr.key}">${esc(gr.label)} <span class="cnt">${c.ok}/${c.total}</span></button>`);
+  }
+  $('groups').innerHTML = g.join('');
+  $('statusSeg').innerHTML = ['all', 'unchecked', 'confirmed', 'difference'].map((s) => `<button type="button" data-status="${s}" aria-pressed="${state.status === s}">${s === 'all' ? 'All statuses' : STATUS[s]}</button>`).join('');
+}
+
+/* ---------- list ---------- */
+function comparator() {
+  const rank = { diff: { difference: 0, unchecked: 1, confirmed: 2 }, todo: { unchecked: 0, difference: 1, confirmed: 2 } };
+  const byIdx = (a, b) => a.idx - b.idx;
+  const field = {
+    default: byIdx,
+    id: (a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true }) || byIdx(a, b),
+    name: (a, b) => a.n.localeCompare(b.n, undefined, { sensitivity: 'base' }) || byIdx(a, b),
+    diff: (a, b) => rank.diff[statusOf(a)] - rank.diff[statusOf(b)] || groupIdx[a.g] - groupIdx[b.g] || byIdx(a, b),
+    todo: (a, b) => rank.todo[statusOf(a)] - rank.todo[statusOf(b)] || groupIdx[a.g] - groupIdx[b.g] || byIdx(a, b),
+    recent: (a, b) => (saved.get(b.key)?.at || 0) - (saved.get(a.key)?.at || 0) || byIdx(a, b),
+  }[state.sort] || byIdx;
+  return FLAT_SORTS.has(state.sort) ? field : (a, b) => groupIdx[a.g] - groupIdx[b.g] || field(a, b);
+}
+function chips(it) {
+  const c = [];
+  if (FLAT_SORTS.has(state.sort)) c.push(groupOf[it.g].label);
+  if (it.sp) c.push(it.sp);
+  if (it.p != null) c.push('cost ' + it.p);
+  if (it.i) c.push('income ' + it.i);
+  if (it.s) c.push(it.s);
+  if (it.f) c.push('free: ' + it.f);
+  return c.map((x) => `<span>${esc(x)}</span>`).join('');
+}
+function artEl(it, cls) {
+  const a = it.a; if (!a) return '';
+  const U = DATA.art.urls;
+  const label = esc(it.n) + ' card image';
+  if (a.length === 1) return `<img class="${cls}" src="${U[a[0]]}" alt="${label}" loading="lazy" decoding="async">`;
+  const sh = DATA.art.sheets[a[0]];
+  const cw = sh.w / sh.cols, ch = sh.h / sh.rows;
+  const x = sh.cols > 1 ? a[2] / (sh.cols - 1) * 100 : 0;
+  const y = sh.rows > 1 ? a[1] / (sh.rows - 1) * 100 : 0;
+  return `<div class="${cls}" role="img" aria-label="${label}" style="aspect-ratio:${cw} / ${ch};background-image:url(${U[a[0]]});background-size:${sh.cols * 100}% ${sh.rows * 100}%;background-position:${x}% ${y}%"></div>`;
+}
+function rowHtml(it) {
+  const s = statusOf(it);
+  return `<article class="card s-${s}${open.has(it.key) ? ' open' : ''}" data-key="${esc(it.key)}">
+    <button class="head" type="button" aria-expanded="${open.has(it.key)}">
+      ${artEl(it, 'thumb') || '<span class="thumb none"></span>'}
+      <span class="id">${esc(it.id)}</span>
+      <span class="name">${esc(it.n)}</span>
+      <span class="chips">${chips(it)}</span>
+      <span class="badge">${STATUS[s]}</span>
+    </button>
+    <div class="detail" hidden></div>
+  </article>`;
+}
+function renderList() {
+  const rows = items.filter(visible).sort(comparator());
+  if (!rows.length) { $('list').innerHTML = '<div class="empty">No cards match these filters.</div>'; return; }
+  const flat = FLAT_SORTS.has(state.sort);
+  let html = '', last = '';
+  for (const it of rows) {
+    if (!flat && it.g !== last) {
+      last = it.g; const g = groupOf[it.g];
+      html += `<div class="gnote"><strong>${esc(g.scope)} &middot; ${esc(g.label)}</strong><span class="n">${esc(g.note)}</span></div>`;
+      if (g.help) html += `<details class="ref"><summary>Action rules used by these cards (from the rulebook)</summary><div class="rules">${g.help}</div></details>`;
+      const ref = DATA.art.refs[it.g];
+      if (ref) html += `<details class="ref"><summary>Show the reference sheet for this group</summary><img src="${DATA.art.urls[ref]}" alt="Reference sheet for ${esc(g.label)}" loading="lazy"></details>`;
+    }
+    html += rowHtml(it);
+  }
+  $('list').innerHTML = html;
+  built.clear();
+  for (const k of open) { const el = cardEl(k); if (el) fillDetail(el, byKey.get(k)); }
+}
+const cardEl = (key) => $('list').querySelector('[data-key="' + CSS.escape(key) + '"]');
+
+function fillDetail(el, it) {
+  const d = el.querySelector('.detail');
+  d.hidden = false;
+  if (built.has(it.key)) return;
+  built.add(it.key);
+  const rec = saved.get(it.key) || {};
+  const facts = [['Id', it.id], ['Name', it.n], ['Cost', it.p], ['Income', it.i], ['Sector', it.s], ['Free action', it.f], ['Alien species', it.sp]]
+    .filter((f) => f[1] != null && f[1] !== '')
+    .map((f) => `<div><dt>${f[0]}</dt><dd>${esc(f[1])}</dd></div>`).join('');
+  const strs = (it.t || []).length ? `<div class="blk"><h3>Text strings in the repo (symbols appear as {name})</h3><ul class="strs">${it.t.map((t) => `<li><code>${esc(t[0])}</code>${esc(t[1])}</li>`).join('')}</ul></div>` : '';
+  const rs = it.rs ? `<div class="blk"><h3>Full effect as the repo stores it, in words</h3><ul class="rwdiff" style="color:var(--ink)">${it.rs.map((w) => '<li>' + esc(w) + '</li>').join('') || '<li>no effect data</li>'}</ul></div>` : '';
+  const eff = it.e ? `<div class="blk"><h3>Effects as stored in the repo (code form)</h3><pre class="code">${esc(it.e)}</pre></div>` : '';
+  const raw = it.r ? `<div class="blk"><h3>${it.rw ? 'Repo data, for comparison (incomplete)' : 'Repo data'}</h3><pre class="code">${esc(it.r)}</pre></div>` : '';
+  const rw = it.rw ? `<div class="blk rewrite"><h3>Rewritten from the card art (check each line against the card). Decision arrow: ${esc(it.rwdir)}</h3><ol class="rwlist">${it.rwp.map((w) => '<li>' + esc(w.replace(/^\d+\.\s*/, '')) + '</li>').join('')}</ol><pre class="code">${esc(it.rw)}</pre></div>` +
+    `<div class="blk"><h3>Differences from the repo data</h3><ul class="rwdiff">${it.rwd.map((w) => '<li>' + esc(w) + '</li>').join('')}</ul></div>` : '';
+  const fl = it.fl ? `<div class="blk"><h3>Flavor text in the repo</h3><div class="strs"><li>${esc(it.fl)}</li></div></div>` : '';
+  const big = artEl(it, 'cardimg');
+  const noart = `<div class="noart">No card image is available for this card. Compare the data below with the physical card.</div>`;
+  d.innerHTML = `<div class="artbox">${big || noart}<div class="info"><dl class="facts">${facts}</dl>${rw}${rs}${strs}${eff}${raw}${fl}</div></div>
+    <div class="blk"><h3>Your check against the physical card</h3>
+      <textarea class="note" id="note-${esc(it.key)}" placeholder="Required for a difference: what does the physical card show?" ${canWrite ? '' : 'disabled'}>${esc(rec.note || '')}</textarea></div>
+    <div class="actions">
+      <button class="btn ok" type="button" data-act="confirmed" ${canWrite ? '' : 'disabled'}>Matches the physical card</button>
+      <button class="btn diff" type="button" data-act="difference" ${canWrite ? '' : 'disabled'}>Mark a difference</button>
+      <button class="btn" type="button" data-act="unchecked" ${canWrite ? '' : 'disabled'}>Clear</button>
+      <span class="hint" hidden></span>
+      <span class="meta"></span>
+    </div>`;
+  updateMeta(el, it);
+}
+function updateMeta(el, it) {
+  const rec = saved.get(it.key); const m = el.querySelector('.meta'); if (!m) return;
+  m.textContent = rec ? STATUS[rec.status] + ' on ' + new Date(rec.at).toLocaleString() + (rec.by === uid || rec.by === 'local' ? ' by you' : '') : '';
+}
+function refreshRow(key) {
+  const it = byKey.get(key); const el = cardEl(key); if (!it) return;
+  if (!el) return;
+  if (!visible(it)) { renderList(); return; }
+  const s = statusOf(it);
+  el.className = 'card s-' + s + (open.has(key) ? ' open' : '');
+  el.querySelector('.badge').textContent = STATUS[s];
+  updateMeta(el, it);
+  const ta = el.querySelector('textarea.note');
+  if (ta && document.activeElement !== ta) ta.value = saved.get(key)?.note || '';
+}
+
+/* ---------- events ---------- */
+$('list').addEventListener('click', (e) => {
+  const card = e.target.closest('.card'); if (!card) return;
+  const key = card.dataset.key; const it = byKey.get(key);
+  const img = e.target.closest('.cardimg');
+  if (img) { img.classList.toggle('big'); return; }
+  if (e.target.closest('.head')) {
+    const willOpen = !open.has(key);
+    if (willOpen) { open.add(key); fillDetail(card, it); } else { open.delete(key); card.querySelector('.detail').hidden = true; }
+    card.classList.toggle('open', willOpen);
+    card.querySelector('.head').setAttribute('aria-expanded', willOpen);
+    return;
+  }
+  const btn = e.target.closest('[data-act]'); if (!btn) return;
+  const ta = card.querySelector('textarea.note'); const note = ta.value.trim();
+  const hint = card.querySelector('.hint');
+  if (btn.dataset.act === 'difference' && !note) { hint.textContent = 'Write what the physical card shows first.'; hint.hidden = false; ta.focus(); return; }
+  hint.hidden = true;
+  if (btn.dataset.act === 'unchecked') { ta.value = ''; commit(key, { status: 'unchecked', note: '' }); }
+  else commit(key, { status: btn.dataset.act, note });
+});
+$('list').addEventListener('change', (e) => {
+  if (!e.target.classList.contains('note')) return;
+  const card = e.target.closest('.card'); const key = card.dataset.key;
+  const cur = saved.get(key) || { status: 'unchecked' };
+  commit(key, { status: cur.status, note: e.target.value.trim() });
+});
+$('groups').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.scope) { state.scope = b.dataset.scope; state.group = 'all'; }
+  else if (b.dataset.group) { state.group = state.group === b.dataset.group ? 'all' : b.dataset.group; state.scope = 'all'; }
+  refreshSummary(); renderList();
+});
+$('statusSeg').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.status = b.dataset.status; refreshSummary(); renderList();
+});
+$('sort').value = state.sort;
+if ($('sort').value !== state.sort) { state.sort = 'default'; $('sort').value = 'default'; }
+$('sort').addEventListener('change', (e) => {
+  state.sort = e.target.value;
+  try { localStorage.setItem('seti-tracker-sort', state.sort); } catch {}
+  updateFilterCount(); renderList();
+});
+$('fToggle').addEventListener('click', () => setFiltersOpen($('panel').hidden));
+$('resetBtn').addEventListener('click', () => {
+  state.scope = 'all'; state.group = 'all'; state.status = 'all'; state.sort = 'default'; state.q = ''; $('q').value = '';
+  $('sort').value = 'default';
+  try { localStorage.setItem('seti-tracker-sort', 'default'); } catch {}
+  refreshSummary(); renderList();
+});
+{
+  let stored = null;
+  try { stored = localStorage.getItem('seti-tracker-filters-open'); } catch {}
+  const small = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
+  setFiltersOpen(stored === null ? !small : stored === '1');
+}
+let qt = 0;
+$('q').addEventListener('input', (e) => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); renderList(); }, 150); });
+
+$('exportBtn').addEventListener('click', async () => {
+  const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const lines = [['scope', 'group', 'id', 'name', 'status', 'note', 'checked_at'].join(',')];
+  for (const it of items) {
+    const r = saved.get(it.key) || {};
+    lines.push([it.scope, groupOf[it.g].label, it.id, it.n, r.status || 'unchecked', r.note || '', r.at ? new Date(r.at).toISOString() : ''].map(q).join(','));
+  }
+  try { await downloads.save({ filename: 'seti-card-verification.csv', data: lines.join('\n') }); }
+  catch (err) { if (err && err.code !== 'declined') setSync('Export failed: ' + (err.message || err.code), true); }
+});
+
+/* ---------- boot ---------- */
+refreshSummary(); renderList();
+
+(async () => {
+  try {
+    const [d, u, dl] = await Promise.all([claude.use('db'), claude.use('user'), claude.use('downloads')]);
+    db = d; downloads = dl;
+    if (u) { try { uid = await u.id(); } catch {} try { const w = await u.can('data.write'); if (w === false) canWrite = false; } catch {} }
+  } catch {}
+  if (downloads) $('exportBtn').hidden = false;
+  if (!db) {
+    usingLocal = true;
+    const o = lsRead(); for (const k of Object.keys(o)) if (byKey.has(k)) saved.set(k, o[k]);
+    $('banner').innerHTML = '<div class="banner">Shared storage is unavailable here, so your checks are kept in this browser only. Open the page signed in to claude.ai to save them where Claude can read them.</div>';
+    setSync('Saved in this browser only'); refreshSummary(); renderList(); return;
+  }
+  if (!canWrite) $('banner').innerHTML = '<div class="banner">You have view-only access, so checks cannot be saved.</div>';
+  db.collection('verification').onSnapshot((snap) => {
+    saved.clear();
+    for (const doc of snap.docs) if (byKey.has(doc.id)) saved.set(doc.id, doc.data());
+    built.clear();
+    setSync(snap.metadata.hasPendingWrites ? 'Saving...' : 'All changes saved');
+    refreshSummary();
+    const focused = document.activeElement && document.activeElement.classList.contains('note');
+    if (!focused) renderList();
+    else for (const k of open) refreshRow(k);
+  }, (err) => setSync('Lost connection to storage: ' + (err && err.message || err.code), true));
+})();
+</script>

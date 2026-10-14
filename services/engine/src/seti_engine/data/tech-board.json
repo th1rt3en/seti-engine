@@ -1,0 +1,227 @@
+{
+ "bonuses_per_stack": [
+  [
+   {
+    "n": 3,
+    "t": "vp"
+   }
+  ],
+  [
+   {
+    "n": 1,
+    "t": "card_any"
+   }
+  ],
+  [
+   {
+    "n": 1,
+    "t": "energy"
+   }
+  ],
+  [
+   {
+    "n": 1,
+    "t": "publicity"
+   }
+  ]
+ ],
+ "publicity_track": {
+  "cap": 10,
+  "range": [
+   0,
+   10
+  ],
+  "start": 4,
+  "zones": [
+   {
+    "from": 3,
+    "printed": "Buy a card: pay 3 publicity, take 1 card (free action). The box is drawn beside spaces 3 to 5 but the action is available at any publicity of 3 or more (owner note).",
+    "to": 5
+   },
+   {
+    "from": 6,
+    "printed": "Research a tech: pay 6 publicity, rotate the solar system, take a tech (main action).",
+    "to": 10
+   }
+  ]
+ },
+ "score_track": {
+  "milestones": [
+   {
+    "at": 20,
+    "icon": "alien",
+    "kind": "neutral"
+   },
+   {
+    "at": 25,
+    "kind": "gold"
+   },
+   {
+    "at": 30,
+    "icon": "alien",
+    "kind": "neutral"
+   },
+   {
+    "at": 50,
+    "kind": "gold"
+   },
+   {
+    "at": 70,
+    "kind": "gold"
+   }
+  ],
+  "spaces": "1 to 100, then around again (100/200 token)"
+ },
+ "stacks": {
+  "computer": [
+   {
+    "effect": "A new computer space: 2 VP on the upper space when data is placed there; the lower space gives 1 credit.",
+    "extra_bonus": [],
+    "front": "front-computer-1-credit",
+    "glyph": "dot",
+    "lower": [
+     {
+      "n": 1,
+      "t": "credit"
+     }
+    ],
+    "tech": "CT#01"
+   },
+   {
+    "effect": "A new computer space: 2 VP upper; the lower space gives 1 energy.",
+    "extra_bonus": [],
+    "front": "front-computer-1-energy",
+    "glyph": "link",
+    "lower": [
+     {
+      "n": 1,
+      "t": "energy"
+     }
+    ],
+    "tech": "CT#02"
+   },
+   {
+    "effect": "A new computer space: 2 VP upper; the lower space gives 1 card.",
+    "extra_bonus": [],
+    "front": "front-computer-1-card",
+    "glyph": "branch",
+    "lower": [
+     {
+      "n": 1,
+      "t": "card_any"
+     }
+    ],
+    "tech": "CT#03"
+   },
+   {
+    "effect": "A new computer space: 2 VP upper; the lower space gives 2 publicity.",
+    "extra_bonus": [],
+    "front": "front-computer-2-publicity",
+    "glyph": "cross",
+    "lower": [
+     {
+      "n": 2,
+      "t": "publicity"
+     }
+    ],
+    "tech": "CT#04"
+   }
+  ],
+  "probe": [
+   {
+    "effect": "You can have up to 2 probes in space at the same time.",
+    "extra_bonus": [
+     {
+      "n": 1,
+      "t": "launch"
+     }
+    ],
+    "front": "front-probe-2-satellites",
+    "glyph": "dot",
+    "tech": "PT#01"
+   },
+   {
+    "effect": "Moving onto asteroids gives 1 publicity; leaving asteroids no longer costs 1 extra movement.",
+    "extra_bonus": [],
+    "front": "front-probe-asteroid-trade",
+    "glyph": "link",
+    "tech": "PT#03"
+   },
+   {
+    "effect": "Landing costs 1 less energy.",
+    "extra_bonus": [],
+    "front": "front-probe-rover-2-energy",
+    "glyph": "branch",
+    "tech": "PT#02"
+   },
+   {
+    "effect": "You can land on a planet's moon instead of the planet; same cost.",
+    "extra_bonus": [],
+    "front": "front-probe-moon-rover",
+    "glyph": "cross",
+    "tech": "PT#04"
+   }
+  ],
+  "telescope": [
+   {
+    "effect": "During a Scan, you can mark a signal in a sector adjacent to Earth instead of marking Earth's sector.",
+    "extra_bonus": [
+     {
+      "n": 2,
+      "t": "data"
+     }
+    ],
+    "front": "front-telescope-earth-signal",
+    "glyph": "dot",
+    "tech": "TT#01"
+   },
+   {
+    "effect": "During a Scan, pay 1 publicity to mark an extra signal in a sector with Mercury.",
+    "extra_bonus": [],
+    "front": "front-telescope-mercury-signal",
+    "glyph": "link",
+    "tech": "TT#03"
+   },
+   {
+    "effect": "During a Scan, discard one card from hand to mark an extra signal in a matching sector.",
+    "extra_bonus": [],
+    "front": "front-telescope-discard-signal",
+    "glyph": "branch",
+    "tech": "TT#02"
+   },
+   {
+    "effect": "During a Scan, pay 1 energy to launch a probe, or gain 1 movement.",
+    "extra_bonus": [],
+    "front": "front-telescope-energy-to-probe",
+    "glyph": "cross",
+    "tech": "TT#04"
+   }
+  ]
+ },
+ "tech_board": {
+  "first_taker_bonus": [
+   {
+    "n": 2,
+    "t": "vp"
+   }
+  ],
+  "first_taker_note": "A 2-point tile sits on top of each stack; the first player to take from a stack discards it and scores 2 points.",
+  "neutral_milestone_box": {
+   "note": "Printed next to the 20-point milestone: number of nonplayer markers by player count (4: none, 3: one, 1-2: two per milestone).",
+   "players_1_2": 2,
+   "players_3": 1,
+   "players_4": 0
+  },
+  "rotation_counter": {
+   "note": "Three labelled spaces: yellow ring 1, orange rings 1+2, teal rings 1+2+3. The counter advances one position each time the solar system rotates and then cycles. The starting space is the one the rulebook calls \"the marked space\" (read as ring 1).",
+   "positions": [
+    "ring 1",
+    "rings 1+2",
+    "rings 1+2+3"
+   ],
+   "start": "ring 1"
+  },
+  "stacks_per_category": 4,
+  "tiles_per_stack": 4
+ }
+}

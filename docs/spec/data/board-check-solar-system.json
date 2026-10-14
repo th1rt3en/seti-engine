@@ -1,0 +1,97 @@
+{
+ "snapshot_of": "board check page, collection board-check",
+ "taken": "2026-10-12",
+ "all_confirmed": true,
+ "items": [
+  {
+   "key": "rule-stack",
+   "title": "Stacking",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-rotate",
+   "title": "Rotation",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-adjacent",
+   "title": "Adjacency",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-icons",
+   "title": "Publicity icons",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "rule-oum",
+   "title": "Oumuamua tile position",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "d1r1",
+   "title": "Disc 1 ring 1",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "d2r1",
+   "title": "Disc 2 ring 1",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "d2r2",
+   "title": "Disc 2 ring 2",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "d3r1",
+   "title": "Disc 3 ring 1",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "d3r2",
+   "title": "Disc 3 ring 2",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "d3r3",
+   "title": "Disc 3 ring 3",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "br1",
+   "title": "Base ring 1",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "br2",
+   "title": "Base ring 2",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "br3",
+   "title": "Base ring 3",
+   "status": "confirmed",
+   "note": ""
+  },
+  {
+   "key": "br4",
+   "title": "Base ring 4",
+   "status": "confirmed",
+   "note": ""
+  }
+ ]
+}

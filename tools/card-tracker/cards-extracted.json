@@ -1,0 +1,6355 @@
+[
+ {
+  "group": "base",
+  "id": "39",
+  "name": "61 Virginis Observation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_YELLOW(2), DESC('at 61 Virginis.'), m.QUICK_MISSION( [e.FULFILL_SECTOR_YELLOW(2)], [e.SCORE(4), e.PUBLICITY()], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "128",
+  "name": "Advanced Navigation System",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { reward: e.ENERGY(1) } as any, { reward: e.DATA(1) } as any, { reward: e.MOVE(1) } as any, ], 'desc.card-128-req', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-128-req": "When you visit a planet (except Earth):"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "136",
+  "name": "Algonquin Radio Observatory",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_YELLOW(), e.SIGNAL_RED(), e.SIGNAL_BLUE(), e.SIGNAL_BLACK(), DESC('desc.card-136'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-136": "Don't gain any {data-0} from them."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "64",
+  "name": "ALICE",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_COMPUTER(), m.QUICK_MISSION([e.TRACE_BLUE(1), d.onEach], e.DATA(2)),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "45",
+  "name": "Allen Telescope Array",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-45": "If you complete at least one sector this turn, gain {energy-1}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "46",
+  "name": "ALMA Observatory",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-46": "If you complete at least one sector this turn, gain {draw-card-1}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "122",
+  "name": "Amateur Astronomers",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   6
+  ],
+  "img": null,
+  "text": {
+   "desc.card-122": "Do this 3 times: <br><br> Discard the top card of the deck for its signal."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "97",
+  "name": "Apollo 11 Mission",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(), m.QUICK_MISSION([e.TRACE_YELLOW(1), d.onEach], [e.SCORE(2), e.CARD()]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "55",
+  "name": "Arecibo Observatory",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   8
+  ],
+  "img": null,
+  "text": {
+   "desc.card-55": "In addition, mark a {any-signal} in any sector."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "129",
+  "name": "Asteroids Research",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { reward: e.DATA(1) } as any, { reward: e.DATA(1) } as any, { reward: e.DATA(1) } as any, ], 'desc.card-129-req', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   0,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-129-req": "When you visit asteroids on your turn:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "123",
+  "name": "Asteroids Flyby",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.card-123": "If you visit asteroids this turn, gain {data-1} ."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "70",
+  "name": "ATLAS",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_COMPUTER(), m.QUICK_MISSION(e.TRACE_BLUE(3), [e.SCORE(3), e.DATA(1)]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "15",
+  "name": "Atmospheric Entry",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "DESC_WITH_TYPE(EMiscIcon.ORBIT_COUNT, 'desc.card-15'), e.SCORE(3), e.DATA(), e.CARD_ANY(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-15": "Remove one of your {orbit-count} from any planet to gain:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "38",
+  "name": "Barnard's Star Observation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_RED(2), DESC(\"at Barnard's Star.\"), m.END_GAME( '{score-3} for each {fulfill-sector-red}', 3, e.FULFILL_SECTOR_RED(), 'sm', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "43",
+  "name": "Beta Pictoris Observation",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_BLACK(), DESC('at Beta Pictoris.'), m.QUICK_MISSION([e.FULFILL_SECTOR_BLACK()], [e.SCORE(2), e.PUBLICITY()]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "56",
+  "name": "Breakthrough Listen",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   5
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "48",
+  "name": "Breakthrough Starshot",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "49",
+  "name": "Breakthrough Watch",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "115",
+  "name": "Canadian Hydrogen Telescope",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(1, 'in any sector.'), m.QUICK_MISSION(e.TECH_SCAN(3), e.DATA()),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "80",
+  "name": "Cape Canaveral SFS",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.LAUNCH(), reward: e.MOVE(), }, { req: e.LAUNCH(), reward: e.MOVE(), }, { req: e.LAUNCH(), reward: e.MOVE(), }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   1,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "8",
+  "name": "Cassini Probe",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.CARD_ANY(), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Saturn (incl. moons)'), [ e.SCORE(6), e.PUBLICITY(), ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "88",
+  "name": "Chandra Space Observatory",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(2, 'desc.card-88'), m.QUICK_MISSION(DESC('desc.card-88-req'), e.PUBLICITY(2)),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-88": "in a sector with one of your probes.",
+   "desc.card-88-req": "Have a signal in 4 different sectors"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "73",
+  "name": "Clean Space Initiative",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-73": "Discard all 3 cards from the card row for their free-action corner effect."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "124",
+  "name": "Cometary Encounter",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-124": "If you visit a comet this turn, gain {score-4} ."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "116",
+  "name": "Control Center",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: e.SIGNAL_YELLOW(1), reward: e.MOVE(1) }, { req: e.SIGNAL_RED(1), reward: e.MOVE(1) }, { req: e.SIGNAL_BLUE(1), reward: e.MOVE(1) }, ], 'desc.card-116', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-116": "When vou mark a signal in a sector of the indicated color:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "138",
+  "name": "Cornell University",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: e.PUBLICITY(), reward: e.PUBLICITY() }, { req: e.DATA(), reward: e.DATA() }, { req: e.MOVE(), reward: e.MOVE() }, ], 'desc.card-138', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-138": "When you discard a card from your hand for this free action:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "98",
+  "name": "Coronal Spectrograph",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   6
+  ],
+  "img": null,
+  "text": {
+   "desc.card-98": "Mark a {red-trace} for a species<br> for which you have already marked a {red-trace}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "53",
+  "name": "Deep Synoptic Array",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   7
+  ],
+  "img": null,
+  "text": {
+   "desc.card-53": "{score-2} for each {yellow-signal} you mark with this action."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "16",
+  "name": "Dragonfly",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.LAND(), DESC( 'You may land on a space that is already occupied and still get the covered reward.', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "68",
+  "name": "DUNE",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_COMPUTER(), m.END_GAME('desc.card-68-endgame', 2, e.TRACE_BLUE()),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   2,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-68-endgame": "{score-2} for each {blue-trace}"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "57",
+  "name": "Effelsberg Telescope Construction",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "99",
+  "name": "Electron Microscope",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-99": "Mark a {yellow-trace} for a species<br> for which you have already marked a {yellow-trace}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "126",
+  "name": "Euclid Telescope Construction",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(1, '', 'xs'), DESC('OR'), e.ROTATE(), e.TECH_SCAN(1, '', 'xs'), // OR(e.TECH_PROBE(), e.TECH_SCAN()), m.END_GAME('{score-2} for each {computer-tech}', 2, e.TECH_COMPUTER()),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "12",
+  "name": "Europa Clipper",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAND(), DESC('desc.card-12', 'half'), m.END_GAME('desc.card-12-endgame'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-12": "on a planet or a moon, <br>even without the required tech.",
+   "desc.card-12-endgame": "{score-3} for each {orbit-or-land-count} at Jupiter (incl. moons)."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "100",
+  "name": "Exascale Supercomputer",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-100": "Mark a {blue-trace} for a species<br> for which you have already marked a {blue-trace}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "75",
+  "name": "Extremophiles Study",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-75": "Then for each {any-trace} you have in that color, gain {score-1}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "9",
+  "name": "Falcon Heavy",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(2), e.PUBLICITY(1), DESC('Ignore the limit of probes in space for those launches.'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "65",
+  "name": "FAST Telescope Construction",
+  "nameKey": null,
+  "price": "4",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "107",
+  "name": "First Black Hole Photo",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.DATA(2, '', 'xxs'), m.FULL_MISSION([ { req: e.TRACE_BLUE(), reward: e.PUBLICITY(2) }, { req: e.TRACE_BLUE(), reward: e.SCORE(4) }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "71",
+  "name": "Focused Research",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   3,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-71": "Then gain {score-2} for each tech of that type you have."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "90",
+  "name": "Fuel Tanks Construction",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.card-90": "Gain {energy-1} for each card with {energy-income} <br> income you show from your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "91",
+  "name": "Fusion Reactor",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-91": "Gain {energy-1} for each card with {energy-income} <br>tucked income.<br> Then increase your {income} with this card."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "121",
+  "name": "Future Circular Collider",
+  "nameKey": null,
+  "price": "4",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "4",
+  "name": "Galileo Mission",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: DESC('Venus'), reward: e.PUBLICITY(1) }, { req: DESC('Jupiter'), reward: e.DATA(1) }, ], 'When you visit:', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "86",
+  "name": "Giant Magellan Telescope",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-86-endgame": "{score-1} for each sector <br>where you have a signal."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "66",
+  "name": "GMRT Telescope Construction",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_SCAN(), m.QUICK_MISSION([e.TRACE_RED(1), d.onEach], [e.SCORE(2), e.ENERGY()]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   5
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "93",
+  "name": "Government Funding",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   6
+  ],
+  "img": null,
+  "text": {
+   "desc.card-93": "Gain {score-3} for each card with {credit-income} <br>tucked income.<br> Then increase your {income} with this card."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "11",
+  "name": "Grant",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.CARD_ANY(), DESC('Reveal the card you drew, and gain its free-action corner effect.'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "19",
+  "name": "Gravitational Slingshot",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   8
+  ],
+  "img": null,
+  "text": {
+   "desc.card-19": "Each time you visit a planet this turn,<br>you may gain {move-1} instead of {publicity-1}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "30",
+  "name": "Great Observatories Project",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   4,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-30": "Choose up to 3 probes (yours or other players'). For each probe, mark a {any-signal} in its sector."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "105",
+  "name": "Green Bank Telescope",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "18",
+  "name": "Hayabusa",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-18": "If you have a probe on asteroids, mark a {yellow-trace}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "134",
+  "name": "Herschel Space Observatory",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(), DESC('desc.card-134'), m.QUICK_MISSION(DESC('desc.card-134-req'), e.PUBLICITY(2)),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-134": "in a sector with one or your probes",
+   "desc.card-134-req": "Have a signal in 4 different sectors"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "27",
+  "name": "Hubble Space Telescope",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-27": "{any-signal} in a sector with one of your probes."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "81",
+  "name": "International Collaboration",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-81": "that someone else has <br> already researched.",
+   "desc.card-81-2": "Do not advance the solar system. <br>Do not gain the {score-3} / {publicity-1} / {energy-1} / {any-card-1} <br> bonus printed on the tile."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "59",
+  "name": "Ion Propulsion System",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   5
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "79",
+  "name": "ISS",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'desc'), m.FULL_MISSION([ { req: e.LAUNCH(), reward: e.CREDIT(), }, { req: e.LAUNCH(), reward: e.CARD_ANY(), }, { req: e.LAUNCH(), reward: e.SCORE(5), }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "29",
+  "name": "James Webb Space Telescope",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   7
+  ],
+  "img": null,
+  "text": {
+   "desc.card-29": "{any-signal} in a sector with one of your probes and in both neighboring sectors."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "82",
+  "name": "Johnson Space Center",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.ORBIT(), reward: e.PUBLICITY(2), }, { req: e.LAND(), reward: e.PUBLICITY(2), }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "6",
+  "name": "Juno Probe",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.DATA(), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Jupiter (incl. moons)'), [ e.SCORE(7), e.PUBLICITY(), ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   5,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "35",
+  "name": "Jupiter Exploration Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(2, 'in the sector with Jupiter.'), m.QUICK_MISSION( e.ORBIT_OR_LAND_COUNT(1, 'at Jupiter (incl. moons)'), e.SCORE(4), ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "23",
+  "name": "Jupiter Flyby",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-23": "If you visit Jupiter this turn, gain {score-4}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "40",
+  "name": "Kepler 22 Observation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_YELLOW(2), DESC('at Kepler 22.'), m.END_GAME( '{score-3} for each {fulfill-sector-yellow}', 3, e.FULFILL_SECTOR_YELLOW(), 'sm', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "28",
+  "name": "Kepler Space Telescope",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-28": "{any-signal} {any-signal} in a sector with one of your probes."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "69",
+  "name": "Large Hadron Collider",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "25",
+  "name": "Lightsail",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-25": "Gain {score-1} for each unique planet you visit this turn (incl. Earth)."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "102",
+  "name": "Linguistic Analysis",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(3), m.QUICK_MISSION( [ e.TRACE_RED(1, '', 'desc-mini'), e.TRACE_YELLOW(1, '', 'desc-mini'), e.TRACE_BLUE(1, '', 'desc-mini'), DESC('for a single species'), ], e.TRACE_ANY(1, 'for that species'), ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "51",
+  "name": "Lovell Telescope",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.DATA(), e.SCAN(), m.QUICK_MISSION( [ DESC('Have at least'), DESC_WITH_TYPE(EResource.PUBLICITY, '{publicity-8}'), ], [e.SCORE(3), e.CARD_ANY()], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "130",
+  "name": "Low-Cost Space Launch",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "109",
+  "name": "Low-Power Microprocessors",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-1.webp",
+   6,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "2",
+  "name": "Mariner 10 Mission",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: DESC('Mercury'), reward: e.CARD() }, { req: DESC('Venus'), reward: e.PUBLICITY() }, ], 'When you visit:', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "34",
+  "name": "Mars Exploration Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(2, 'in the sector with Mars.'), m.QUICK_MISSION( e.ORBIT_OR_LAND_COUNT(1, 'at Mars (incl. moons)'), e.SCORE(4), ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "22",
+  "name": "Mars Flyby",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-22": "If you visit Mars this turn, gain {score-4}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "14",
+  "name": "Mars Science Laboratory",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-14-endgame": "{score-4} for each {orbit-or-land-count} at Mars (incl. moons)."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "32",
+  "name": "Mercury Exploration Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(2, 'in the sector with Mercury.'), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Mercury'), e.SCORE(4)),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "20",
+  "name": "Mercury Flyby",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-20": "If you visit Mercury this turn, gain {score-4}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "7",
+  "name": "MESSENGER Probe",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.MOVE(), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Mercury'), [ e.SCORE(7), e.PUBLICITY(), ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "77",
+  "name": "NASA Astrobiology Institute",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'desc'), m.FULL_MISSION([ { req: e.TRACE_RED(), reward: e.DATA(), }, { req: e.TRACE_YELLOW(), reward: e.DATA(), }, { req: e.TRACE_BLUE(), reward: e.DATA(), }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "92",
+  "name": "NASA Image of the Day",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   8
+  ],
+  "img": null,
+  "text": {
+   "desc.card-92": "Gain {publicity-1} for each card with {card-income} <br>tucked income.<br> Then increase your {income} with this card."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "76",
+  "name": "NASA Research Center",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.TECH_PROBE(), reward: e.ENERGY(), }, { req: e.TECH_SCAN(), reward: e.PUBLICITY(), }, { req: e.TECH_COMPUTER(), reward: e.CARD_ANY(), }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   0,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "95",
+  "name": "Near-Earth Asteroids Survey",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(2), m.QUICK_MISSION(DESC('desc.card-95-req'), [e.SCORE(5), e.CARD_ANY()]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.card-95-req": "Have a probe on asteroids adjacent to Earth"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "127",
+  "name": "NEAR Shoemaker",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-127-endgame": "If you have a probe on asteroids, <br>gain {score-13} ."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "89",
+  "name": "NIAC Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.CARD(3), m.QUICK_MISSION(DESC('desc.card-89-req'), e.CARD_ANY()),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-89-req": "Have no cards in your hand"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "135",
+  "name": "Noto Radio Observatory",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "10",
+  "name": "ODINUS Mission",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(), m.QUICK_MISSION(DESC('desc.card-10'), [e.SCORE(5), e.CARD_ANY()]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-10": "{orbit-or-land-count} at Neptune <br> and {orbit-or-land-count} at Uranus <br> (incl. their moons)"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "62",
+  "name": "Onsala Telescope Construction",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_SCAN(), m.END_GAME('desc.card-62-endgame', 2, e.TRACE_RED()),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-62-endgame": "{score-2} for each {red-trace}"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "133",
+  "name": "Optimal Launch Window",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   6
+  ],
+  "img": null,
+  "text": {
+   "desc.card-133": "Then {move-1} for each other planet or a comet in the same sector as Earth."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "120",
+  "name": "Orbiting Lagrange Point",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   7
+  ],
+  "img": null,
+  "text": {
+   "desc.card-120": "{any-signal} in a sector with one of your probes. If you have exactly 1 signal in that sector, return this card to your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "17",
+  "name": "OSIRIS-REx",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   8
+  ],
+  "img": null,
+  "text": {
+   "desc.card-17": "Choose 1 of your probes.<br>Gain {data-2} if it is on asteroids.<br>Gain {data-1} for each adjacent asteroid"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "52",
+  "name": "Parkes Observatory",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   1,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-52": "{score-2} for each {red-signal} you mark with this action."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "13",
+  "name": "Perseverance Rover",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.card-13": "If you land on Mars, Mercury, or any moon with this action, <br>gain {score-4}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "1",
+  "name": "Pioneer 11 Mission",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: DESC('Jupiter'), reward: e.DATA(1) }, { req: DESC('Saturn'), reward: e.SCORE(4) }, ], 'When you visit:', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "119",
+  "name": "PIXL",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-119": "Then gain {score-1} for each {publicity-1} you have."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "114",
+  "name": "Planet Hunters",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-114": "Then you can discard up to 3 cards for signals from your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "112",
+  "name": "Planetary Geologic Mapping",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(), m.QUICK_MISSION(DESC('desc.card-112-req'), [e.SCORE(3), e.DATA(1)]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-112-req": "{orbit-count} and {land-count} at a single planet."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "118",
+  "name": "PLATO",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-118": "in a sector with one of your probes. Don't gain any {data-0} from them."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "94",
+  "name": "Popularization of Science",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'desc'), m.FULL_MISSION([ { req: e.TECH_PROBE(), reward: e.PUBLICITY(2), }, { req: e.TECH_SCAN(), reward: e.PUBLICITY(2), }, { req: e.TECH_COMPUTER(), reward: e.PUBLICITY(2), }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "74",
+  "name": "Pre-launch Testing",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   7
+  ],
+  "img": null,
+  "text": {
+   "desc.card-74": "{move-1} for each card with a {move-0} free-action corner effect you show from your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "110",
+  "name": "Press Statement",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "42",
+  "name": "Procyon Observation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_BLUE(2), DESC('at Procyon.'), m.END_GAME( '{score-3} for each {fulfill-sector-blue}', 3, e.FULFILL_SECTOR_BLUE(), 'sm', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   2,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "87",
+  "name": "Project Longshot",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(), m.QUICK_MISSION(DESC('desc.card-87'), [e.SCORE(3), e.ENERGY(1)]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.card-87": "have a probe at least 5 spaces from Earth"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "37",
+  "name": "Proxima Centauri Observation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_RED(2), DESC('at Proxima Centauri.'), m.QUICK_MISSION([e.FULFILL_SECTOR_RED(2)], [e.SCORE(4), e.PUBLICITY()]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "61",
+  "name": "Quantum Computer",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_COMPUTER(), m.QUICK_MISSION([DESC('desc.card-61-req'), e.SCORE(50)], e.INCOME()),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-61-req": "Have at least"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "111",
+  "name": "Roman Space Telescope",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_SCAN(), m.QUICK_MISSION(e.ORBIT_COUNT(2), e.DATA(2)),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "104",
+  "name": "Rosetta Probe",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), m.QUICK_MISSION(DESC('desc.card-104-req'), [e.SCORE(3), e.DATA(1)]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-104-req": "Have a probe on a comet"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "84",
+  "name": "Sample Return",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-84": "Remove one of your {land-count} from any planet or moon to mark a {yellow-trace}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "36",
+  "name": "Saturn Exploration Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(2, 'in the sector with Saturn.'), m.QUICK_MISSION( e.ORBIT_OR_LAND_COUNT(1, 'at Saturn (incl. moons)'), e.SCORE(4), ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "24",
+  "name": "Saturn Flyby",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   7
+  ],
+  "img": null,
+  "text": {
+   "desc.card-24": "If you visit Saturn this turn, gain {score-6}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "72",
+  "name": "Scientific Cooperation",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   8
+  ],
+  "img": null,
+  "text": {
+   "desc.card-72": "If you take the tech that someone else has researched, <br>gain {publicity-2}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "137",
+  "name": "SETI Data Archive",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   3,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "78",
+  "name": "SETI Institute",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'desc'), m.FULL_MISSION([ { req: e.SCAN(), reward: e.DATA(2), }, { req: e.SCAN(), reward: e.CARD_ANY(), }, { req: e.SCAN(), reward: e.SCORE(4), }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "108",
+  "name": "SETI@Home",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-108": "If you have at least {publicity-8}, mark a {red-trace} ."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "63",
+  "name": "SHERLOC",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(), m.END_GAME('desc.card-63-endgame', 2, e.TRACE_YELLOW()),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-63-endgame": "{score-2} for each {yellow-trace}"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "41",
+  "name": "Sirius A Observation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_BLUE(2), DESC('at Sirius A.'), m.QUICK_MISSION([e.FULFILL_SECTOR_BLUE(2)], [e.SCORE(4), e.PUBLICITY()]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "113",
+  "name": "Solvay Conference",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-113-endgame": "Resolve the rightmost space on a gold scoring tile you did not mark."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "31",
+  "name": "Space Launch System",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.MOVE(), m.QUICK_MISSION( [e.LAND_COUNT(3, 'Do not count moons', 'desc-mini')], e.CREDIT(), ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   5
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "132",
+  "name": "Space Shuttle",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.PUBLICITY(2), m.QUICK_MISSION( [DESC('Have 5'), e.ORBIT_OR_LAND_COUNT(1)], [e.SCORE(3), e.CREDIT()], ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "50",
+  "name": "Square Kilometre Array",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   7
+  ],
+  "img": null,
+  "text": {
+   "desc.card-50": "{score-2} for each unique sector<br> in which you mark a signal."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "85",
+  "name": "Starship",
+  "nameKey": null,
+  "price": "4",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "106",
+  "name": "Strategic Planning",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: e.CREDIT(1), reward: e.SCORE(2) }, { req: e.CREDIT(2), reward: e.CARD_ANY() }, { req: e.CREDIT(3), reward: e.PUBLICITY(2) }, ], 'desc.card-106', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   4,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-106": "When you pay the indicated cost to play a card as your main action:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "96",
+  "name": "Tardigrades Study",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(), e.DATA(), e.CARD(), m.QUICK_MISSION(e.TRACE_YELLOW(3), e.TRACE_YELLOW()),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "131",
+  "name": "Telescope Modernization",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.CARD_ANY(1, '', 'xs'), m.FULL_MISSION([ { req: e.TECH_SCAN(), reward: e.PUBLICITY(1) }, { req: e.SCAN(), reward: e.DATA(1) }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "101",
+  "name": "Telescope Time Allocation",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.SCAN(), reward: e.SIGNAL_YELLOW(), }, { req: e.SCAN(), reward: e.SIGNAL_RED(), }, { req: e.SCAN(), reward: e.SIGNAL_BLUE(), }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "26",
+  "name": "Through the Asteroid Belt",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.card-26": "Ignore move restrictions from asteroids this turn."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "125",
+  "name": "Trajectory Correction",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.card-125": "If you move within the same ring at least once this turn, gain {score-3} {publicity-1} ."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "60",
+  "name": "Trident Probe",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Neptune (incl. moons)'), [ e.SCORE(4), e.DATA(), ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   5
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "58",
+  "name": "Uranus Orbiter and Probe",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Uranus (incl. moons)'), [ e.SCORE(3), e.CARD(), ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   6
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "44",
+  "name": "Vega Observation",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_BLACK(), DESC('at Vega.'), m.END_GAME( '{score-3} for each {fulfill-sector-black}', 3, e.FULFILL_SECTOR_BLACK(), 'sm', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "5",
+  "name": "Venera Probe",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.PUBLICITY(), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Venus'), [ e.SCORE(7), e.PUBLICITY(), ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   8
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "33",
+  "name": "Venus Exploration Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_ANY(2, 'in the sector with Venus.'), m.QUICK_MISSION(e.ORBIT_OR_LAND_COUNT(1, 'at Venus'), e.SCORE(4)),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   5,
+   9
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "21",
+  "name": "Venus Flyby",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.card-21": "If you visit Venus this turn, gain {score-3}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "54",
+  "name": "VERITAS Telescopes",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.card-54": "{score-2} for each {blue-signal} you mark with this action."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "47",
+  "name": "Very Large Array",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.card-47": "If you complete at least one sector this turn, gain {data-1}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "3",
+  "name": "Voyager 2 Mission",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { req: DESC('Uranus'), reward: e.ENERGY(1) }, { req: DESC('Neptune'), reward: e.CREDIT(1) }, ], 'When you visit:', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "103",
+  "name": "Westerbork Synthesis Radio Telescope",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_SCAN(), m.QUICK_MISSION( [e.FULFILL_SECTOR_ANY(2, 'in the same sector')], e.SCORE(9), ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "83",
+  "name": "Wow! Signal",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   5
+  ],
+  "img": null,
+  "text": {
+   "desc.card-83": "in the sector with Earth."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "67",
+  "name": "Yevpatoria Telescope Construction",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   6
+  ],
+  "img": null,
+  "text": {
+   "desc.card-67": "Then you can discard a card for a signal from your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "base",
+  "id": "117",
+  "name": "Lunar Gateway",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(1, '', 'xxs'), m.FULL_MISSION([ { req: e.ORBIT_OR_LAND(), reward: e.LAUNCH(), }, { req: e.ORBIT_OR_LAND(), reward: e.ENERGY(), }, ]),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   7
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-promo-se-en",
+  "id": "SE EN 01",
+  "name": "Not a planet since 2006",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   8
+  ],
+  "img": null,
+  "text": {
+   "desc.card-se-en-01": "Keep this card in front of you.<br>If vou have a probe in the outermost ring, <br>you may use an {orbit-action} or {land-action} action to place that probe on Pluto."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-promo-se-en",
+  "id": "SE EN 02",
+  "name": "Gateway to Mars",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { reward: e.PUBLICITY(2), } as any, { reward: e.SCORE(5), } as any, ], 'desc.card-se-en-02', ),",
+  "description": "",
+  "pos": [
+   "/seti-assets/cards/cards-2.webp",
+   6,
+   9
+  ],
+  "img": null,
+  "text": {
+   "desc.card-se-en-02": "When you {orbit-or-land-action} at Mars (or its moons) <br>or when you play a card mentioning \"Mars\" in its flavor text:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.20",
+  "name": "Amazing Uncertainty",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.et-20": "Then gain {score-1} for each signal <br>you have in sectors with anomalies."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.17",
+  "name": "Are we Being Observed?",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "DESC('desc.et-17'), m.QUICK_MISSION( [ e.TRACE_RED(1, '', 'desc'), e.TRACE_YELLOW(1, '', 'desc'), e.TRACE_BLUE(1, '', 'desc'), DESC('for this species'), ], [e.SCORE(3), e.PUBLICITY(2)], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.et-17": "Gain the reward from the anomaly which is going to be triggered next."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.12",
+  "name": "Close-up View",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.et-12": "Don't gain any {publicity-0} for moving probes this turn."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.13",
+  "name": "Concerned People",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.PUBLICITY(1), m.FULL_MISSION([ { req: e.TECH_ANY(), reward: e.ENERGY(), }, { req: e.TECH_ANY(), reward: e.CARD_ANY(), }, { req: e.TECH_ANY(), reward: e.SCORE(3), }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.16",
+  "name": "Flooding the Media Space",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.et-16": "Draw all three cards from the card row."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.14",
+  "name": "Listening Carefully",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.et-14": "In addition mark a {any-signal} in a sector <br>with the anomaly which is going to be triggered next."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.18",
+  "name": "Message Capsule",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.19",
+  "name": "New Physics",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.15",
+  "name": "Part of Everyday Life",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.et-15": "Discard one of them for its free-action corner effect and then discard another one to gain a resource corresponding to its income."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.11",
+  "name": "Signs of Life",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.ANOMALIES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/anomalies.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.et-11": "If it was in a sector with an anomaly, <br>gain {move-1} ."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.34",
+  "name": "A Message from Afar",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.36",
+  "name": "Alien Schematics",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.ADVANCED_15(), e.PUBLICITY(2), e.FULFILL_ADVANCED(), e.TRACE_BLUE(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.32",
+  "name": "Exocomputers",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.DATA",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.38",
+  "name": "Hivemind Concept",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.DATA",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.ADVANCED_15(), e.ROTATE(), e.TECH_COMPUTER(), e.FULFILL_ADVANCED(), e.INCOME(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.33",
+  "name": "Infocluster",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.PUBLICITY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.ADVANCED_15(), e.PUBLICITY(), e.CREDIT(), e.FULFILL_ADVANCED(), e.INCOME(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.37",
+  "name": "Music of the Spheres",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.ADVANCED_15(), e.CARD_ANY(), e.FULFILL_ADVANCED(), e.CREDIT(), e.TRACE_ANY(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.35",
+  "name": "Synthesis Instructions",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.ADVANCED_15(), e.DATA(), e.FULFILL_ADVANCED(), e.TRACE_YELLOW(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.39",
+  "name": "Telescope Blueprints",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.PUBLICITY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.ADVANCED_15(), e.ROTATE(), e.TECH_SCAN(), e.FULFILL_ADVANCED(), e.INCOME(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.40",
+  "name": "Torrent-chain Signal",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.DATA",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.ADVANCED_15(), e.SIGNAL_ANY(2), e.FULFILL_ADVANCED(), e.INCOME(),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.31",
+  "name": "Vessel Designs",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.PUBLICITY",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.CENTAURIANS",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/centaurians.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.7",
+  "name": "Breeding Sample",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.LAND(), DESC('desc.et-pickup'), m.QUICK_MISSION( m.MASCAMITES_SAMPLE_DELIVERY(EPlanet.EARTH), DESC('desc.et-7'), ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.et-7": "Resolve {fulfill-sample} twice.",
+   "desc.et-pickup": "Then look at all {sample}<br> on the planet and <br>pick one up."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.10",
+  "name": "Computer Simulations",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.PUBLICITY(), e.ROTATE(), e.TECH_COMPUTER(), m.QUICK_MISSION( [DESC('desc.et-10-req')], [DESC('desc.et-pickup-back-reward')], 'large', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.et-10-req": "{blue-trace-2} for this species.",
+   "desc.et-pickup-back-reward": "Choose Jupiter or Saturn. <br>Look at all its {sample}, pick one, gain its reward, and put it back."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.5",
+  "name": "Ecosystem Study",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.et-5-endgame": "{score-1} for each {any-trace} you have marked for this species.",
+   "desc.et-pickup-back": "Look at all {sample} on a planet with your probe. Choose one, gain its reward, and put it back."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.1",
+  "name": "First Contact",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.MOVE(1, '', 'xs'), e.LAND(1, '', 'xs'), DESC('desc.et-pickup', 'half'), m.QUICK_MISSION( [m.MASCAMITES_SAMPLE_DELIVERY(EPlanet.EARTH)], [e.FULFILL_SAMPLE(), e.DATA(2)], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.et-pickup": "Then look at all {sample}<br> on the planet and <br>pick one up."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.8",
+  "name": "Hive Sample",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.PUBLICITY(), e.ROTATE(), e.TECH_PROBE(), m.QUICK_MISSION( [DESC('desc.et-8-req')], [DESC('desc.et-pickup-back-reward')], 'large', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.et-8-req": "{yellow-trace-2} for this species.",
+   "desc.et-pickup-back-reward": "Choose Jupiter or Saturn. <br>Look at all its {sample}, pick one, gain its reward, and put it back."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.4",
+  "name": "Martian Quarantine Lab",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.LAND(), DESC('desc.et-pickup', 'half'), m.QUICK_MISSION( [m.MASCAMITES_SAMPLE_DELIVERY(EPlanet.MARS)], [e.FULFILL_SAMPLE(), e.SCORE(2), e.CARD_ANY()], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.et-pickup": "Then look at all {sample}<br> on the planet and <br>pick one up."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.3",
+  "name": "Mass Sample Collection",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.ORBIT_OR_LAND(), DESC('desc.et-pickup', 'half'), m.QUICK_MISSION( [m.MASCAMITES_SAMPLE_DELIVERY(EPlanet.EARTH)], [e.FULFILL_SAMPLE(), e.SCORE(3), e.CREDIT()], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.et-pickup": "Then look at all {sample}<br> on the planet and <br>pick one up."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.9",
+  "name": "Orbital Monitoring",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.PUBLICITY(), e.ROTATE(), e.TECH_SCAN(), m.QUICK_MISSION( [DESC('desc.et-9-req')], [DESC('desc.et-pickup-back-reward')], 'large', ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.et-9-req": "{red-trace-2} for this species.",
+   "desc.et-pickup-back-reward": "Choose Jupiter or Saturn. <br>Look at all its {sample}, pick one, gain its reward, and put it back."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.2",
+  "name": "Rover Exploration",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.LAND(), DESC('desc.et-pickup-moon', 'half'), m.QUICK_MISSION( [m.MASCAMITES_SAMPLE_DELIVERY(EPlanet.EARTH)], [e.FULFILL_SAMPLE(), e.SCORE(3), e.DATA(3)], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.et-pickup-moon": "on a planet or a moon, even without the required tech. <br>Then look at all {sample} <br>on the planet and pick one up."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.6",
+  "name": "The Queen",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.MASCAMITES",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.LAND(), DESC('desc.et-pickup-moon', 'half'), m.QUICK_MISSION( [m.MASCAMITES_SAMPLE_DELIVERY(EPlanet.EARTH)], [e.FULFILL_SAMPLE(), e.SCORE(6), e.PUBLICITY(2)], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/mascamites.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.et-pickup-moon": "on a planet or a moon, even without the required tech. <br>Then look at all {sample} <br>on the planet and pick one up."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.22",
+  "name": "Altered Trajectory",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.SCAN(), DESC('desc.et-22', 'half'), m.QUICK_MISSION(DESC('desc.et-22-req'), e.SCORE(4)),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.et-22": "If you mark at least 1 signal on Oumuamua, gain {exofossil}.",
+   "desc.et-22-req": "{land-count} on Oumuamua"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.29",
+  "name": "Comparative Analysis",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.EXOFOSSIL(1, '', 'xs'), m.FULL_MISSION([ { req: e.TRACE_ANY(), reward: e.DATA(1) }, { req: e.TRACE_ANY(), reward: e.PUBLICITY(1) }, { req: e.TRACE_ANY(), reward: e.SCORE(3) }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.23",
+  "name": "Exofossil Discovery",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.SIGNAL_ANY(), DESC('desc.et-23'), m.QUICK_MISSION(DESC('desc.et-23-req'), [ e.USE_EXOFOSSIL(2), e.SCORE(11), ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "desc.et-23": "in the sector with Oumuamua.",
+   "desc.et-23-req": "Have at least {exofossil-3}"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.30",
+  "name": "Excavation Rover",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.LAND(), DESC('desc.et-30', 'half'), m.QUICK_MISSION( [ e.TRACE_RED(1, '', 'desc'), e.TRACE_YELLOW(1, '', 'desc'), e.TRACE_BLUE(1, '', 'desc'), DESC('for this species'), ], [e.EXOFOSSIL()], ),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.et-30": "If you land on Oumuamua with this action, <br>gain {score-3}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.28",
+  "name": "Exofossil Samples",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.et-28": "Then you may {use-exofossil} to gain {data-1}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.27",
+  "name": "Perfect Timing",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.MOVE(4), DESC('desc.et-27', 'half'), m.QUICK_MISSION(DESC('desc.et-27-req'), [e.EXOFOSSIL(1)]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {
+   "desc.et-27": "If you visit Oumuamua <br>this turn, gain {exofossil}.",
+   "desc.et-27-req": "Have at least 1 signal on Oumuamua."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.25",
+  "name": "Probe Customisation",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {
+   "desc.et-25": "You may {use-exofossil} any number of times to gain {move-2} for each."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.26",
+  "name": "Race Against Time",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.24",
+  "name": "Terrain Mapping",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.SIGNAL_YELLOW(), e.SIGNAL_RED(), e.SIGNAL_BLUE(), DESC('desc.et-24'), m.END_GAME('desc.et-24-endgame'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {
+   "desc.et-24": "Then you may {use-exofossil} to mark a {any-signal} in any sector.",
+   "desc.et-24-endgame": "{score-1} for each {any-trace} you have marked for this species."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.21",
+  "name": "Visitor in the Sky",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.OUMUAMUA",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.SCAN(), DESC('desc.et-21', 'half'), m.QUICK_MISSION(DESC('desc.et-21-req'), e.DATA()),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/oumuamua.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {
+   "desc.et-21": "{score-2} for each signal you <br>mark on Oumuamua.",
+   "desc.et-21-req": "Have a {any-trace} marked for this species that requires<br> a {exofossil} payment."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.52",
+  "name": "Automated Lab",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.50",
+  "name": "Casette Deployment",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.45",
+  "name": "Core-breach Exoplanet",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.42",
+  "name": "Deflector",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.43",
+  "name": "Expender Core",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.51",
+  "name": "Extractor",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.47",
+  "name": "Fission-sun Exoplanet",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.49",
+  "name": "Generative Infrastructure",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.54",
+  "name": "Nanowielder Node",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.53",
+  "name": "Neuralab",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.48",
+  "name": "Oscillating Probes",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.44",
+  "name": "pierced Exoplanet",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.41",
+  "name": "Razor-edge Shuttle",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.55",
+  "name": "Stratoelevator",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   3
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "alien-base",
+  "id": "ET.46",
+  "name": "Vortex Exoplanet",
+  "nameKey": null,
+  "price": "0",
+  "income": null,
+  "sector": null,
+  "alien": "EAlienType.EXERTIANS",
+  "freeAction": null,
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/exertians.webp",
+   2,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "1",
+  "name": "Reusable Lander",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/1.webp",
+  "text": {
+   "sa.desc.card_1": "If you land on a planet (not a moon) <br>which had a {land-count} already, <br>return this card to your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "2",
+  "name": "Tracking and Data Relay Satellite",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/2.webp",
+  "text": {
+   "sa.desc.card_2": "Choose {publicity-0} , {data-0} , or {move-0} <br>Gain it once for each card you show <br>from your hand that has the icon <br>in its free-action corner effect."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "3",
+  "name": "NASA Deep Space Network",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/3.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "4",
+  "name": "Breakthrough Message",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/4.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "5",
+  "name": "Servicing Mission",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/5.webp",
+  "text": {
+   "sa.desc.card_5": "Then, if you have a probe on a space adjacent to Earth, return this card to your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "6",
+  "name": "Live Landing Broadcast",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/6.webp",
+  "text": {
+   "sa.desc.card_6": "Then mark a {any-signal} in the sector where you landed."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "7",
+  "name": "Twin Probes",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_PROBE(), m.QUICK_MISSION(DESC('sa.desc.card_7'), [e.CREDIT(2)]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/7.webp",
+  "text": {
+   "sa.desc.card_7": "Have 2 probes in space<br>at two different planets<br>(except Earth)"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "8",
+  "name": "Quantum Data Storage",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_COMPUTER(), m.END_GAME('sa.desc.card_8_endgame'),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/8.webp",
+  "text": {
+   "sa.desc.card_8_endgame": "{score-3} for each remaining {data-0} in your data pool."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "9",
+  "name": "Lunar Crater Radio Telescope",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.ROTATE(), e.TECH_SCAN(), m.QUICK_MISSION(e.FULFILL_SECTOR_ANY(3), [e.PUBLICITY(3)]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/9.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "10",
+  "name": "First Human in Space",
+  "nameKey": null,
+  "price": "4",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/10.webp",
+  "text": {
+   "sa.desc.card_10_endgame": "{score-1} for each remaining {publicity-0}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "11",
+  "name": "Psyche Probe",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "e.LAUNCH(), e.PUBLICITY(1), m.QUICK_MISSION(DESC('sa.desc.card_11'), [e.SCORE(3), e.ENERGY(2)]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/11.webp",
+  "text": {
+   "sa.desc.card_11": "Have a probe on asteroids"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "12",
+  "name": "Two-planet Flyby Maneuver",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/12.webp",
+  "text": {
+   "sa.desc.card_12": "If you visit at least 2 different<br>planets this turn, gain {score-3}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "13",
+  "name": "James Clerk Maxwell Telescope",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/13.webp",
+  "text": {
+   "sa.desc.card_13": "Then gain {signal-token}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "14",
+  "name": "Reusable Rocket",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/14.webp",
+  "text": {
+   "sa.desc.card_14": "If another player has a probe on Earth, return this card to your hand."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "15",
+  "name": "Iterative Engineering",
+  "nameKey": null,
+  "price": "3",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/15.webp",
+  "text": {
+   "sa.desc.card_15": "Gain the {score-3} / {publicity-1} / {energy-1} / {any-card-1} bonus printed on the tech tile again."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "16",
+  "name": "Astronaut Training Experience",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(4), m.QUICK_MISSION(DESC('sa.desc.card_16'), [e.SCORE(2), e.PUBLICITY()]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/16.webp",
+  "text": {
+   "sa.desc.card_16": "Have no publicity"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "17",
+  "name": "Paid Media Coverage",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/17.webp",
+  "text": {
+   "sa.desc.card_17": "You can spend any amount of {credit-0} to gain {score-2} {publicity-2} for each credit spent."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "18",
+  "name": "Contracted Research",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "DESC('sa.desc.card_18'), e.ROTATE(), e.TECH_ANY(), DESC('sa.desc.card_18_2'),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/18.webp",
+  "text": {
+   "sa.desc.card_18": "Set your {publicity-0} to 0.",
+   "sa.desc.card_18_2": "that someone else has already researched."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "19",
+  "name": "New Assignment",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/19.webp",
+  "text": {
+   "sa.desc.card_19": "Remove one of your {orbit-count} from any<br>planet to place a probe on the space<br>with that planet on the solar system<br>board (ignoring your probe limit)."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "20",
+  "name": "Well Executed Project",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/20.webp",
+  "text": {
+   "sa.desc.card_20": "Discard a non-alien card from your hand.<br>Gain its free-action corner effect 3 times."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "21",
+  "name": "Orbital Refueling",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION( [ { reward: e.ENERGY(), } as any, { reward: e.ENERGY(), } as any, ], 'sa.desc.card_21', ),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/21.webp",
+  "text": {
+   "sa.desc.card_21": "Visit a planet <br>where you have an {orbit-count}:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "22",
+  "name": "TESS Satellite",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/22.webp",
+  "text": {
+   "sa.desc.card_22": "in a sector where you have<br>3 or more signals.<br> Don't gain any {data-0} from them."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "23",
+  "name": "Neutral Buoyancy Training",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'xs'), m.FULL_MISSION([ { req: e.LAUNCH(), reward: e.CARD(), }, { req: e.ORBIT_OR_LAND_COUNT(), reward: e.SCORE(3), }, ]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/23.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "24",
+  "name": "Space Elevator",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.TECH_PROBE(), reward: e.LAUNCH(), }, { req: e.TECH_PROBE(), reward: e.LAUNCH(), }, ]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/24.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "25",
+  "name": "LIGO",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.TECH_SCAN(), reward: e.SIGNAL_TOKEN(), }, { req: e.TECH_SCAN(), reward: e.SIGNAL_TOKEN(), }, ]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/25.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "26",
+  "name": "New AI Models",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.TECH_COMPUTER(), reward: e.DATA(), }, { req: e.TECH_COMPUTER(), reward: e.DATA(), }, ]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/26.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "27",
+  "name": "Better Solar Panels",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/27.webp",
+  "text": {
+   "sa.desc.card_27": "If you have 0 energy, gain {energy-1} for <br>each of your probes in space."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "28",
+  "name": "Restructuring",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": "DESC('sa.desc.card_28'), m.QUICK_MISSION(DESC('sa.desc.card_28_2'), [ e.PUBLICITY(2), e.CARD_ANY(), ]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/28.webp",
+  "text": {
+   "sa.desc.card_28": "Discard any number of cards from<br>your hand. Then gain resources<br>according to their income corner.",
+   "sa.desc.card_28_2": "Have 0 credits, 0 energy and no cards in hand"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "29",
+  "name": "Abandoned Mission",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/29.webp",
+  "text": {
+   "sa.desc.card_29": "Return a mission you have not completed yet to your hand to gain {data-2}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "30",
+  "name": "Akatsuku Orbiter",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/30.webp",
+  "text": {
+   "sa.desc.card_30": "Then gain {data-1} for each {computer-tech} you have."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "31",
+  "name": "Ingenuity Helicopter",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/31.webp",
+  "text": {
+   "sa.desc.card_31": "{score-6} for each planet where you have<br> {land-count-2} (moons do not count)."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "32",
+  "name": "MUREP Idea Competition",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/32.webp",
+  "text": {
+   "sa.desc.card_32": "Discard all cards from your hand (if any). <br>Then gain"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "33",
+  "name": "Delayed Launch",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'xs'), m.FULL_MISSION( [ { reward: e.LAUNCH(), } as any, ], 'sa.desc.card_33', ),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/33.webp",
+  "text": {
+   "sa.desc.card_33": "When you pass:"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "34",
+  "name": "Private Sector Investment",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/34.webp",
+  "text": {
+   "sa.desc.card_34": "Then gain {draw-card-1} for each tech of<br> the type you have the most of."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "35",
+  "name": "NASA Exoplanet Archive",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_TOKEN(), m.QUICK_MISSION(DESC('sa.desc.card_35'), [e.ENERGY()]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/35.webp",
+  "text": {
+   "sa.desc.card_35": "Have a total of at least {data-12} in<br>your computer and data pool"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "36",
+  "name": "Big Ear Radio Telescope",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/36.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "37",
+  "name": "Pandora Satellite",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/37.webp",
+  "text": {
+   "sa.desc.card_37": "in each sector where you already have a signal.<br>Don't gain any {data-0} from them."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "38",
+  "name": "Space Rendezvous",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/38.webp",
+  "text": {
+   "sa.desc.card_38": "Then gain {score-3} if you have a probe<br>on a space with another probe."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "39",
+  "name": "Grand Tour Program",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": "e.MOVE(2), m.END_GAME('sa.desc.card_39_endgame', 2, undefined, 'xxs'),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/39.webp",
+  "text": {
+   "sa.desc.card_39_endgame": "{score-2} for each planet (not a moon)<br>where you have {orbit-count} or {land-count}."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "40",
+  "name": "Hall-effect Thruster",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.DATA, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/40.webp",
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "41",
+  "name": "Exoplanet Survey",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": null,
+  "freeAction": "[{ type: EResource.MOVE, value: 1 }]",
+  "effectsRaw": "e.SIGNAL_TOKEN(), e.PUBLICITY(), e.CARD_ANY(), m.QUICK_MISSION(DESC('sa.desc.card_41'), [e.SCORE(4)]),",
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/41.webp",
+  "text": {
+   "sa.desc.card_41": "Have a signal in a yellow, red, blue, and black sector"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-main-deck",
+  "id": "42",
+  "name": "LOFAR Array",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": null,
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 1 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": null,
+  "img": "/seti-assets/cards/space-agency/42.webp",
+  "text": {
+   "sa.desc.card_42": "Have a signal or {fulfill-sector-any} in each sector"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.1",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLACK",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_ORANGE, value: 1 } as any]",
+  "effectsRaw": "e.GLYPH_YELLOW(1, '', 'xs'), e.GLYPH_GREEN(1, '', 'xs'), DESC('OR'), e.GLYPH_BLUE(1, '', 'xs'), e.GLYPH_PURPLE(1, '', 'xs'), m.END_GAME('sa.desc.card_et_1'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_1": "{score-3} for each {glyph-count} of which type you have the most.",
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.2",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_ORANGE, value: 1 } as any]",
+  "effectsRaw": "DESC('{glyph-purple[sm]} {glyph-purple[sm]} {glyph-red[sm]}'), DESC('———————— OR ————————'), DESC('{glyph-blue[sm]} {glyph-blue[sm]} {glyph-green[sm]}'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.3",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "0",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_GREEN, value: 1 } as any]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.ORBIT_OR_LAND_COUNT(), reward: e.GLYPH_YELLOW() }, { req: e.ORBIT_OR_LAND_COUNT(), reward: e.GLYPH_GRAY() }, { req: e.ORBIT_OR_LAND_COUNT(), reward: e.GLYPH_BLUE() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.4",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "0",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_GRAY, value: 1 } as any]",
+  "effectsRaw": "m.FULL_MISSION([ { req: e.TECH_PROBE(), reward: e.GLYPH_YELLOW() }, { req: e.TECH_SCAN(), reward: e.GLYPH_ORANGE() }, { req: e.TECH_COMPUTER(), reward: e.GLYPH_RED() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.5",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_GRAY, value: 1 } as any]",
+  "effectsRaw": "e.SIGNAL_TOKEN(), m.FULL_MISSION([ { req: e.SCAN(), reward: e.GLYPH_YELLOW() }, { req: e.SCAN(), reward: e.GLYPH_PURPLE() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.6",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_PURPLE, value: 1 } as any]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'xxs'), e.DATA(1, '', 'xxs'), m.FULL_MISSION([ { req: e.LAUNCH(), reward: e.GLYPH_ORANGE() }, { req: e.LAUNCH(), reward: e.GLYPH_GREEN() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.7",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_BLUE, value: 1 } as any]",
+  "effectsRaw": "e.CARD_ANY(), m.FULL_MISSION([ { req: e.TRACE_ANY(), reward: e.GLYPH_RED() }, { req: e.TRACE_ANY(), reward: e.GLYPH_GRAY() }, { req: e.TRACE_ANY(), reward: e.GLYPH_PURPLE() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.8",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_YELLOW, value: 1 } as any]",
+  "effectsRaw": "DESC('{glyph-green[sm]} {glyph-green[sm]} {glyph-red[sm]}'), DESC('———————— OR ————————'), DESC('{glyph-gray[sm]} {glyph-gray[sm]} {glyph-orange[sm]}'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.9",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_GREEN, value: 1 } as any]",
+  "effectsRaw": "e.GLYPH_YELLOW(1, '', 'xs'), e.GLYPH_PURPLE(1, '', 'xs'), DESC('OR'), e.GLYPH_BLUE(1, '', 'xs'), e.GLYPH_ORANGE(1, '', 'xs'), m.END_GAME('sa.desc.card_et_9'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_9": "{score-1} for each {glyph-count} in your largest set.",
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.10",
+  "name": "@.~$\\/\\'$/.!%;|?",
+  "nameKey": "sa.glyphids-title",
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.GLYPHIDS",
+  "freeAction": "[{ type: EAlienIcon.GLYPH_RED, value: 1 } as any]",
+  "effectsRaw": "e.LAUNCH(), e.GLYPH_GREEN(), m.QUICK_MISSION(DESC('sa.desc.card_et_10'), [ e.GLYPH_RED(), e.GLYPH_BLUE(), ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/glyphids.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_10": "{red-trace} {yellow-trace} {blue-trace} <br> for this species",
+   "sa.glyphids-title": "@.~$\\/\\'$/.!%;|?"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.11",
+  "name": "Biosignature Screening",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.CARD_ANY(), e.ORGANELLE_RED(), m.END_GAME('sa.desc.card_et_11'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   0,
+   0
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_11": "{score-2} for each {red-trace} you have <br>marked for this species."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.12",
+  "name": "Physical Characterization",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.CARD_ANY(), e.ORGANELLE_YELLOW(), m.END_GAME('sa.desc.card_et_12'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   0,
+   1
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_12": "{score-2} for each {yellow-trace} you have <br>marked for this species."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.13",
+  "name": "Genome Characterization",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.CARD_ANY(), e.ORGANELLE_BLUE(), m.END_GAME('sa.desc.card_et_13'),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   0,
+   2
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_13": "{score-2} for each {blue-trace} you have <br>marked for this species."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.14",
+  "name": "Breakthrough Theory",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CARD",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.PUBLICITY(3), m.QUICK_MISSION(DESC('sa.desc.card_et_14_req'), [ DESC('sa.desc.card_et_14_reward'), ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   0,
+   3
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_14_req": "{red-trace} {yellow-trace} {blue-trace} for this species except discovery spaces.",
+   "sa.desc.card_et_14_reward": "{score-1} for each empty space on this species board"
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.15",
+  "name": "Low-gravity Research",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.LAUNCH(), e.ORGANELLE_YELLOW(), m.FULL_MISSION([ { req: e.TRACE_BLUE(), reward: e.DATA() }, { req: e.TRACE_BLUE(), reward: e.DATA() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   0,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.16",
+  "name": "Automated Analysis",
+  "nameKey": null,
+  "price": "2",
+  "income": "EResource.CARD",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": "e.DATA(3), e.ORGANELLE_BLUE(), m.FULL_MISSION([ { req: e.TRACE_RED(), reward: e.DATA() }, { req: e.TRACE_YELLOW(), reward: e.DATA() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   1,
+   0
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.17",
+  "name": "Safety Protocols",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.RED",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": "e.PUBLICITY(1, '', 'xxs'), m.FULL_MISSION([ { req: e.TECH_PROBE(), reward: e.ORGANELLE_YELLOW() }, { req: e.TECH_SCAN(), reward: e.ORGANELLE_RED() }, { req: e.TECH_COMPUTER(), reward: e.ORGANELLE_BLUE() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   1,
+   1
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.18",
+  "name": "Scientific Papers",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.CREDIT",
+  "sector": "ESector.BLUE",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.DATA, value: 1 },     ]",
+  "effectsRaw": "e.CARD(2), m.FULL_MISSION([ { req: e.TRACE_ANY(1, 'for this species'), reward: e.PUBLICITY() }, { req: e.TRACE_ANY(1, 'for this species'), reward: e.PUBLICITY() }, ]),",
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   1,
+   2
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.19",
+  "name": "Extreme Conditions Testing",
+  "nameKey": null,
+  "price": "0",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.BLACK",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[{ type: EResource.PUBLICITY, value: 2 }]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   1,
+   3
+  ],
+  "img": null,
+  "text": {
+   "sa.desc.card_et_18": "Remove one of your markers from a space on this species to gain {organelle-red-3} or {organelle-yellow-3} or {organelle-blue-3} based on the color of the space."
+  },
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-alien",
+  "id": "ET.20",
+  "name": "Place of Origin",
+  "nameKey": null,
+  "price": "1",
+  "income": "EResource.ENERGY",
+  "sector": "ESector.YELLOW",
+  "alien": "EAlienType.AMOEBA",
+  "freeAction": "[       { type: EResource.SCORE, value: 1 },       { type: EResource.MOVE, value: 1 },     ]",
+  "effectsRaw": null,
+  "description": null,
+  "pos": [
+   "/seti-assets/aliens/amoeba.webp",
+   1,
+   4
+  ],
+  "img": null,
+  "text": {},
+  "flavor": null,
+  "raw": null
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.COSMOS_STRATEGY_GROUP",
+  "name": "Cosmos Strategy Group",
+  "raw": "{ id: EOrganizationId.COSMOS_STRATEGY_GROUP, name: 'Cosmos Strategy Group', localizedName: '宇宙战略集团', frontendReference: { type: 'cards', displayName: 'Cosmos Strategy Group', image: 'corporations/Cosmos Strategy Group.jpg', }, abilityText: { passive: \"When you play a card as a main action, you may mark one matching reward space if the card's sector color matches an unmarked space on this organization. Yellow or black cards can mark the credit space, red or black cards can mark the publicity space, and blue or black cards can mark the data space.\", freeAction: 'Once per round, gain 1 card from either the card row or the top of the deck, then clear all reward spaces marked on this organization.', }, referenceLogicSummary: 'Setup grants resources and income. Main-action card colors mark and immediately grant matching reward spaces. The once-per-round free action gains a card and clears marked reward spaces; round reset only restores the use token.', complexity: 'complex', resources: { credit: 4, energy: 2, card: 1, publicity: 1, data: 0 }, tuckIncome: 2, probes: 0, income: { credit: 2, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Cosmos Strategy Group.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.DEEP_SKY_SURVEY",
+  "name": "Deep Sky Survey",
+  "raw": "{ id: EOrganizationId.DEEP_SKY_SURVEY, name: 'Deep Sky Survey', localizedName: '深空探测', frontendReference: { type: 'look', displayName: 'Deep Sky Survey', image: 'corporations/Deep Sky Survey.jpg', }, abilityText: { passive: \"You don't need energy to perform Analyze Data.\", freeAction: 'Once per round, switch a card from your hand with a card on the card row.', }, referenceLogicSummary: 'Setup grants no starting card. Analyze Data costs no energy. The once-per-round free action swaps exactly one hand card with one card-row card, and round reset restores the use token.', complexity: 'passive', resources: { credit: 3, energy: 2, card: 0, publicity: 3, data: 1 }, tuckIncome: 2, probes: 0, income: { credit: 2, energy: 2, card: 1, publicity: 0, data: 0, signalToken: 1, }, }",
+  "img": "corporations/Deep Sky Survey.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.FENWICK_RESEARCH_CENTER",
+  "name": "Fenwick Research Center",
+  "raw": "{ id: EOrganizationId.FENWICK_RESEARCH_CENTER, name: 'Fenwick Research Center', localizedName: '芬威克研究中心', frontendReference: { type: 'publ', displayName: 'NovaTek Industries', image: 'corporations/Fenwick Research Center.jpg', }, abilityText: { passive: 'You only need 5 publicity to research tech.', freeAction: \"Once per round, spend 1 publicity to gain any card from the card row or a random card from the main deck, then gain that card's free-action corner bonus.\", }, referenceLogicSummary: 'Tech research uses a 5-publicity threshold. The once-per-round free action spends 1 publicity, gains a row or deck card, resolves its free-action corner, and resets next round.', complexity: 'once-per-round', resources: { credit: 3, energy: 1, card: 0, publicity: 4, data: 0 }, tuckIncome: 3, probes: 0, income: { credit: 3, energy: 1, card: 0, publicity: 1, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Fenwick Research Center.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.FUTURESPAN_INSTITUTE",
+  "name": "Futurespan Institute",
+  "raw": "{ id: EOrganizationId.FUTURESPAN_INSTITUTE, name: 'Futurespan Institute', localizedName: '未来跨度研究所', frontendReference: { type: 'sponsoring', displayName: 'FutureSpan Institute', image: 'corporations/Futurespan Institute.jpg', }, abilityText: { freeAction: \"Prepare one card from your hand by placing it on this organization and setting the countdown to that card's credit cost x 10 + 5. Once per round while the token is on the scoring track, move it 3 spaces farther ahead and gain 1 card.\", mainAction: 'Once your score marker reaches or passes the Futurespan token, play the prepared card as a main action without paying its credit cost, then return the token.', }, referenceLogicSummary: 'Sponsor selection stores a hand card and creates a cost-based countdown. Score gains reduce the countdown, the unlocked card can be played for free, and the delay power increases the countdown by 3 while gaining a card.', complexity: 'complex', resources: { credit: 3, energy: 3, card: 1, publicity: 3, data: 0 }, tuckIncome: 2, probes: 0, income: { credit: 2, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Futurespan Institute.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.HELION_ASSEMBLY",
+  "name": "Helion Assembly",
+  "raw": "{ id: EOrganizationId.HELION_ASSEMBLY, name: 'Helion Assembly', localizedName: '赫利昂联合体', frontendReference: { type: 'techSeller', displayName: 'Virelon Technologies', image: 'corporations/Helion Assembly.jpg', }, abilityText: { passive: 'When you develop a tech, you may mark the matching reward space on this organization and gain its reward. Probe/orange tech grants 1 energy, scan/purple tech grants 1 signal token, and computer/blue tech grants 1 data.', freeAction: 'Once per round, destroy one of your probe/orange or scan/purple techs, then tuck one card from your hand for income and clear all reward spaces marked on this organization.', }, referenceLogicSummary: 'Developed tech categories can mark and immediately grant one matching reward. The free action clears marks, disables one non-computer tech, tucks one hand card for income, and resets next round.', complexity: 'complex', resources: { credit: 3, energy: 2, card: 0, publicity: 7, data: 0 }, tuckIncome: 0, probes: 0, income: { credit: 3, energy: 1, card: 1, publicity: 1, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Helion Assembly.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.MISSION_RELAY",
+  "name": "Mission Relay",
+  "raw": "{ id: EOrganizationId.MISSION_RELAY, name: 'Mission Relay', localizedName: '任务中继站', frontendReference: { type: 'missions', displayName: 'Mission Broadcast', image: 'corporations/Mission Relay.jpg', }, abilityText: { setup: 'At the start of the game, mark the lowest-scoring space on the mission gold scoring tile.', passive: 'When you play a card with a mission, gain 1 publicity.', freeAction: \"Once per round, spend 2 publicity to gain any card from the card row or a random card from the main deck, then immediately gain the resource matching that card's income corner.\", }, referenceLogicSummary: 'Setup marks the mission gold scoring tile. Mission cards grant publicity when played. The once-per-round power spends 2 publicity, gains a row or deck card, resolves its income corner, and resets next round.', complexity: 'complex', resources: { credit: 3, energy: 2, card: 2, publicity: 2, data: 0 }, tuckIncome: 3, probes: 0, income: { credit: 1, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Mission Relay.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.ORBITAL_DYNAMICS",
+  "name": "Orbital Dynamics",
+  "raw": "{ id: EOrganizationId.ORBITAL_DYNAMICS, name: 'Orbital Dynamics', localizedName: '寰宇动力', frontendReference: { type: 'probes', displayName: 'Orbital Dynamics', image: 'corporations/Orbital Dynamics.jpg', }, abilityText: { passive: 'Your probe capacity is 1 higher.', freeAction: 'Once per round, move at most 2 different probes of yours with 1 step each.', }, referenceLogicSummary: 'Setup launches 2 probes and increases probe capacity by 1. The once-per-round free action moves up to 2 different probes one step each, then resets next round.', complexity: 'once-per-round', resources: { credit: 2, energy: 2, card: 0, publicity: 3, data: 0 }, tuckIncome: 2, probes: 2, income: { credit: 3, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Orbital Dynamics.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.SENTINEL_PROBE_NETWORK",
+  "name": "Sentinel Probe Network",
+  "raw": "{ id: EOrganizationId.SENTINEL_PROBE_NETWORK, name: 'Sentinel Probe Network', localizedName: '哨兵探测网络', frontendReference: { type: 'probeSignal', displayName: 'Sentinel Probe Network', image: 'corporations/Sentinel Probe Network.jpg', }, abilityText: { passive: \"When you launch a probe, mark a signal in that probe's sector.\", freeAction: \"Once per round, after you play and fully resolve a non-alien card as a main action this turn, gain that card's free-action corner effect.\", }, referenceLogicSummary: 'Probe launches mark a signal in the launched sector. The last fully resolved own non-alien main-action card corner is stored, replayed by the once-per-round power, and cleared by turn or round management.', complexity: 'once-per-round', resources: { credit: 4, energy: 2, card: 0, publicity: 3, data: 0 }, tuckIncome: 1, probes: 0, income: { credit: 3, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 1, }, }",
+  "img": "corporations/Sentinel Probe Network.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.STRATUS_CORE",
+  "name": "Stratus Core",
+  "raw": "{ id: EOrganizationId.STRATUS_CORE, name: 'Stratus Core', localizedName: '层云核心', frontendReference: { type: 'offerEffects', displayName: 'Stratus Core', image: 'corporations/Stratus Core.jpg', }, abilityText: { freeAction: 'Once per round, gain the free-action corner effects of all 3 cards in the card row without discarding those cards.', }, referenceLogicSummary: 'The once-per-round free action resolves all current card-row free-action corners in row order while keeping the offered cards in place, then resets next round.', complexity: 'once-per-round', resources: { credit: 3, energy: 2, card: 1, publicity: 3, data: 0 }, tuckIncome: 3, probes: 0, income: { credit: 2, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Stratus Core.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.TURING_SYSTEMS",
+  "name": "Turing Systems",
+  "raw": "{ id: EOrganizationId.TURING_SYSTEMS, name: 'Turing Systems', localizedName: '图灵系统', frontendReference: { type: 'testTech', displayName: 'Axion Intelligence', image: 'corporations/Turing Systems.jpg', }, abilityText: { passive: 'When you research a computer/blue tech, gain 1 publicity.', freeAction: \"Once per round, choose any probe or scan tech. Until the end of this turn, you may use that tech's ability as if you had researched it. This does not count as researching the tech and does not grant its immediate bonuses.\", }, referenceLogicSummary: 'Computer tech research grants publicity. The once-per-round free action temporarily adds a selected probe or scan tech to effective techs, grants no immediate bonuses, and expires at turn end.', complexity: 'complex', resources: { credit: 4, energy: 2, card: 1, publicity: 2, data: 0 }, tuckIncome: 2, probes: 0, income: { credit: 2, energy: 2, card: 1, publicity: 0, data: 1, signalToken: 0, }, }",
+  "img": "corporations/Turing Systems.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-organization",
+  "id": "EOrganizationId.XENOLAB",
+  "name": "Xenolab",
+  "raw": "{ id: EOrganizationId.XENOLAB, name: 'Xenolab', localizedName: '异星实验室', frontendReference: { type: 'traces', displayName: 'XenoLab', image: 'corporations/Xenolab.jpg', }, abilityText: { mainAction: 'Xenolab starts with three active action tiles. You may use an active tile as a discounted main action, then flip that tile inactive: spend 1 credit to launch a probe, spend 2 energy to scan, or spend 4 publicity to research any tech.', passive: 'When you gain the trace shown on an inactive tile, flip that tile back active. The trace is still gained normally and is not spent.', }, referenceLogicSummary: 'Setup creates three active action tiles. Direct organization use is prevented; active tiles provide discounted launch, scan, or research main actions, flip inactive on use, and reactivate when the matching trace is gained.', complexity: 'complex', resources: { credit: 2, energy: 2, card: 1, publicity: 1, data: 0 }, tuckIncome: 3, probes: 0, income: { credit: 2, energy: 1, card: 1, publicity: 0, data: 0, signalToken: 0, }, }",
+  "img": "corporations/Xenolab.jpg",
+  "text": {}
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.1",
+  "name": "Quick start SR.1",
+  "raw": "{ id: 'SR.1', upperEffects: [e.TRACE_YELLOW()], upperText: 'prelude.mark', middleText: 'in the discovery space of the right species', lowerEffects: [e.SCORE(3), e.PUBLICITY()], setupMarks: [{ kind: 'trace', trace: ETrace.YELLOW, alienIndex: 1 }], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.2",
+  "name": "Quick start SR.2",
+  "raw": "{ id: 'SR.2', upperEffects: [e.TRACE_RED()], upperText: 'prelude.mark', middleText: 'in the discovery space of the right species', lowerEffects: [e.SCORE(3), e.PUBLICITY()], setupMarks: [{ kind: 'trace', trace: ETrace.PINK, alienIndex: 1 }], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.3",
+  "name": "Quick start SR.3",
+  "raw": "{ id: 'SR.3', upperEffects: [e.SIGNAL_RED(2)], upperText: 'prelude.mark', middleText: \"in Barnard's Star\", lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [ { kind: 'signal', starName: EStarName.BARNARDS_STAR, count: 2 }, ], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.4",
+  "name": "Quick start SR.4",
+  "raw": "{ id: 'SR.4', upperEffects: [e.SIGNAL_RED(2)], upperText: 'prelude.mark', middleText: 'in Proxima Centauri', lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [ { kind: 'signal', starName: EStarName.PROXIMA_CENTAURI, count: 2 }, ], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.5",
+  "name": "Quick start SR.5",
+  "raw": "{ id: 'SR.5', upperEffects: [e.SIGNAL_BLUE(2)], upperText: 'prelude.mark', middleText: 'in Sirius A', lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [{ kind: 'signal', starName: EStarName.SIRIUS_A, count: 2 }], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.6",
+  "name": "Quick start SR.6",
+  "raw": "{ id: 'SR.6', upperEffects: [e.SIGNAL_BLUE(2)], upperText: 'prelude.mark', middleText: 'in Procyon', lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [{ kind: 'signal', starName: EStarName.PROCYON, count: 2 }], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.7",
+  "name": "Quick start SR.7",
+  "raw": "{ id: 'SR.7', upperEffects: [e.SIGNAL_YELLOW(2)], upperText: 'prelude.mark', middleText: 'in Kepler 22', lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [{ kind: 'signal', starName: EStarName.KEPLER_22, count: 2 }], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.8",
+  "name": "Quick start SR.8",
+  "raw": "{ id: 'SR.8', upperEffects: [e.SIGNAL_YELLOW(2)], upperText: 'prelude.mark', middleText: 'in 61 Virginis', lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [ { kind: 'signal', starName: EStarName.SIXTY_ONE_VIRGINIS, count: 2 }, ], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.9",
+  "name": "Quick start SR.9",
+  "raw": "{ id: 'SR.9', upperEffects: [e.SIGNAL_BLACK(2)], upperText: 'prelude.mark', middleText: 'in Beta Pictoris', lowerEffects: [e.SCORE(2), e.DATA(2)], setupMarks: [ { kind: 'signal', starName: EStarName.BETA_PICTORIS, count: 2 }, ], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.10",
+  "name": "Quick start SR.10",
+  "raw": "{ id: 'SR.10', upperEffects: [e.SIGNAL_BLACK()], upperText: 'prelude.mark', middleText: 'in Vega', lowerEffects: [e.SIGNAL_TOKEN(), e.DATA(1)], setupMarks: [{ kind: 'signal', starName: EStarName.VEGA, count: 1 }], watermark: true, }",
+  "text": {
+   "prelude.mark": "Mark(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.11",
+  "name": "Quick start SR.11",
+  "raw": "{ id: 'SR.11', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Saturn', lowerEffects: [e.SCORE(4), e.PUBLICITY(2)], setupMarks: [{ kind: 'orbiter', planet: EPlanet.SATURN }], watermark: true, }",
+  "text": {
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.12",
+  "name": "Quick start SR.12",
+  "raw": "{ id: 'SR.12', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Venus', lowerEffects: [e.SCORE(3), e.PUBLICITY(), e.ENERGY()], setupMarks: [{ kind: 'orbiter', planet: EPlanet.VENUS }], watermark: true, }",
+  "text": {
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.13",
+  "name": "Quick start SR.13",
+  "raw": "{ id: 'SR.13', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Jupiter', lowerEffects: [e.SCORE(3), e.PUBLICITY(), e.DATA()], setupMarks: [{ kind: 'orbiter', planet: EPlanet.JUPITER }], watermark: true, }",
+  "text": {
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.14",
+  "name": "Quick start SR.14",
+  "raw": "{ id: 'SR.14', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Mercury', lowerEffects: [e.SCORE(2), e.PUBLICITY(), e.CREDIT()], setupMarks: [{ kind: 'orbiter', planet: EPlanet.MERCURY }], watermark: true, }",
+  "text": {
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.15",
+  "name": "Quick start SR.15",
+  "raw": "{ id: 'SR.15', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Uranus', lowerEffects: [DESC('prelude.card_income')], income: EResource.CARD, setupMarks: [{ kind: 'orbiter', planet: EPlanet.URANUS }], watermark: true, }",
+  "text": {
+   "prelude.card_income": "Increase your {income} with this card (and gain the {draw-card} immediately).",
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.16",
+  "name": "Quick start SR.16",
+  "raw": "{ id: 'SR.16', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Neptune', lowerEffects: [DESC('prelude.data_income')], income: EResource.DATA, setupMarks: [{ kind: 'orbiter', planet: EPlanet.NEPTUNE }], watermark: true, }",
+  "text": {
+   "prelude.data_income": "Increase your {income} with this card (and gain the {data} immediately).",
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.17",
+  "name": "Quick start SR.17",
+  "raw": "{ id: 'SR.17', upperEffects: [e.ORBIT_COUNT()], upperText: 'prelude.place', middleText: 'at Mars', lowerEffects: [e.SCORE(3), e.PUBLICITY(), e.CARD()], setupMarks: [{ kind: 'orbiter', planet: EPlanet.MARS }], watermark: true, }",
+  "text": {
+   "prelude.place": "Place(without gaining any bonuses for doing so):"
+  }
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.18",
+  "name": "Quick start SR.18",
+  "raw": "{ id: 'SR.18', upperEffects: [], upperText: '', middleText: '', lowerEffects: [e.SCORE(3), e.CREDIT(), e.CARD()], setupMarks: [], watermark: true, }",
+  "text": {}
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.19",
+  "name": "Quick start SR.19",
+  "raw": "{ id: 'SR.19', upperEffects: [], upperText: '', middleText: '', lowerEffects: [e.SCORE(3), e.ENERGY(), e.CARD()], setupMarks: [], watermark: true, }",
+  "text": {}
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.20",
+  "name": "Quick start SR.20",
+  "raw": "{ id: 'SR.20', upperEffects: [], upperText: '', middleText: '', lowerEffects: [e.SCORE(4), e.SIGNAL_TOKEN(), e.PUBLICITY()], setupMarks: [], watermark: true, }",
+  "text": {}
+ },
+ {
+  "group": "expansion-quick-start",
+  "id": "SR.21",
+  "name": "Quick start SR.21",
+  "raw": "{ id: 'SR.21', upperEffects: [], upperText: '', middleText: '', lowerEffects: [e.SCORE(3), e.PUBLICITY(3)], setupMarks: [], watermark: true, }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.1",
+  "name": "Rival action S.1",
+  "raw": "{ id: 'S.1', deckTier: ERivalActionCardTier.BASIC, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ analyze(), launch([PUBLICITY_1]), tech({ paid: true }), probe({ movement: 3, planets: [EPlanet.SATURN, EPlanet.MARS, EPlanet.JUPITER, EPlanet.VENUS], probePlacement: ERivalProbePlacement.ORBITER, }), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.2",
+  "name": "Rival action S.2",
+  "raw": "{ id: 'S.2', deckTier: ERivalActionCardTier.BASIC, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ analyze(), tech({ paid: true }), telescope(ERivalTelescopeMode.DEFAULT), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.3",
+  "name": "Rival action S.3",
+  "raw": "{ id: 'S.3', deckTier: ERivalActionCardTier.BASIC, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ { kind: ERivalActionKind.SPECIES_REPLACEMENT_CHECK, alienIndex: 1 }, tech({ paid: true }), telescope(ERivalTelescopeMode.DEFAULT), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.4",
+  "name": "Rival action S.4",
+  "raw": "{ id: 'S.4', deckTier: ERivalActionCardTier.BASIC, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ { kind: ERivalActionKind.SPECIES_REPLACEMENT_CHECK, alienIndex: 2 }, probe({ movement: 3, planets: [EPlanet.JUPITER, EPlanet.MARS, EPlanet.SATURN, EPlanet.VENUS], probePlacement: ERivalProbePlacement.ORBITER, }), tech({ effects: [PROGRESS_1] }), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.5",
+  "name": "Rival action S.5",
+  "raw": "{ id: 'S.5', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ analyze([VP_3]), tech({ paid: true, effects: [PROGRESS_1] }), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.6",
+  "name": "Rival action S.6",
+  "raw": "{ id: 'S.6', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ tech({ paid: true, effects: [PROGRESS_1] }), launch([PUBLICITY_1, PROGRESS_1]), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.7",
+  "name": "Rival action S.7",
+  "raw": "{ id: 'S.7', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ tech({ paid: true, effects: [PROGRESS_1] }), probe({ movement: 4, planets: [ EPlanet.URANUS, EPlanet.SATURN, EPlanet.MERCURY, EPlanet.VENUS, ], probePlacement: ERivalProbePlacement.LANDER, }), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.8",
+  "name": "Rival action S.8",
+  "raw": "{ id: 'S.8', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ analyze([VP_3]), probe({ movement: 4, planets: [ EPlanet.NEPTUNE, EPlanet.JUPITER, EPlanet.MERCURY, EPlanet.VENUS, ], probePlacement: ERivalProbePlacement.LANDER, }), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.9",
+  "name": "Rival action S.9",
+  "raw": "{ id: 'S.9', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ analyze([VP_3]), launch([PUBLICITY_1, PROGRESS_1]), probe({ movement: 4, planets: [ EPlanet.URANUS, EPlanet.NEPTUNE, EPlanet.MERCURY, EPlanet.VENUS, ], probePlacement: ERivalProbePlacement.ORBITER, }), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.10",
+  "name": "Rival action S.10",
+  "raw": "{ id: 'S.10', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ analyze([VP_3]), launch([PUBLICITY_1, PROGRESS_1]), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.11",
+  "name": "Rival action S.11",
+  "raw": "{ id: 'S.11', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ tech({ paid: true, effects: [PROGRESS_1] }), analyze([VP_3]), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.12",
+  "name": "Rival action S.12",
+  "raw": "{ id: 'S.12', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ tech({ paid: true, effects: [PROGRESS_1] }), launch([PUBLICITY_1, PROGRESS_1]), probe({ movement: 4, planets: [ EPlanet.MERCURY, EPlanet.SATURN, EPlanet.JUPITER, EPlanet.VENUS, ], probePlacement: ERivalProbePlacement.LANDER, }), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.13",
+  "name": "Rival action S.13",
+  "raw": "{ id: 'S.13', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ probe({ movement: 4, planets: [EPlanet.NEPTUNE, EPlanet.URANUS, EPlanet.MARS, EPlanet.VENUS], probePlacement: ERivalProbePlacement.LANDER, }), analyze([VP_3]), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.14",
+  "name": "Rival action S.14",
+  "raw": "{ id: 'S.14', deckTier: ERivalActionCardTier.ADVANCED, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ launch([PUBLICITY_1, PROGRESS_1]), tech({ paid: true, effects: [PROGRESS_1] }), telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.15",
+  "name": "Rival action S.15",
+  "raw": "{ id: 'S.15', deckTier: ERivalActionCardTier.SPECIES_SPECIAL, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ launch([PUBLICITY_1]), probe({ movement: 4, planets: [EPlanet.SATURN], probePlacement: ERivalProbePlacement.LANDER, collectMascamitesSample: true, }), probe({ movement: 5, planets: [EPlanet.JUPITER], probePlacement: ERivalProbePlacement.LANDER, collectMascamitesSample: true, }), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.16",
+  "name": "Rival action S.16",
+  "raw": "{ id: 'S.16', deckTier: ERivalActionCardTier.SPECIES_SPECIAL, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ { kind: ERivalActionKind.MARK_TRACE }, tech({ effects: [PROGRESS_1] }), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.17",
+  "name": "Rival action S.17",
+  "raw": "{ id: 'S.17', deckTier: ERivalActionCardTier.SPECIES_SPECIAL, decisionDirection: ERivalDecisionDirection.LEFT, candidates: [ probe({ movement: 4, probeTarget: ERivalProbeTarget.OUMUAMUA, probePlacement: ERivalProbePlacement.LANDER, }), telescope(ERivalTelescopeMode.OUMUAMUA), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.18",
+  "name": "Rival action S.18",
+  "raw": "{ id: 'S.18', deckTier: ERivalActionCardTier.SPECIES_SPECIAL, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ { kind: ERivalActionKind.START_COUNTDOWN }, telescope(ERivalTelescopeMode.DEFAULT), ], }",
+  "text": {}
+ },
+ {
+  "group": "base-solo-rival-action",
+  "id": "S.19",
+  "name": "Rival action S.19",
+  "raw": "{ id: 'S.19', deckTier: ERivalActionCardTier.SPECIES_SPECIAL, decisionDirection: ERivalDecisionDirection.RIGHT, candidates: [ { kind: ERivalActionKind.PLAY_DANGER_CARD }, telescope(ERivalTelescopeMode.EARTH), ], }",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.1",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.1",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.2",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.2",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.3",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.3",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.4",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.4",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.5",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.5",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.6",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.6",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.7",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.7",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.8",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.8",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-exploration",
+  "id": "ARKHOS.EXPLORATION.9",
+  "name": "Arkhos exploration ARKHOS.EXPLORATION.9",
+  "raw": "Repo has only a stub for this card: effect ids are \"UNMAPPED\"; no rules text.",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard01",
+  "name": "Arkhos security AIcard01",
+  "raw": "trace color group pink; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard02",
+  "name": "Arkhos security AIcard02",
+  "raw": "trace color group pink; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard03",
+  "name": "Arkhos security AIcard03",
+  "raw": "trace color group pink; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard04",
+  "name": "Arkhos security AIcard04",
+  "raw": "trace color group pink; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard05",
+  "name": "Arkhos security AIcard05",
+  "raw": "trace color group yellow; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard06",
+  "name": "Arkhos security AIcard06",
+  "raw": "trace color group yellow; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard07",
+  "name": "Arkhos security AIcard07",
+  "raw": "trace color group yellow; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard08",
+  "name": "Arkhos security AIcard08",
+  "raw": "trace color group yellow; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard09",
+  "name": "Arkhos security AIcard09",
+  "raw": "trace color group blue; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard10",
+  "name": "Arkhos security AIcard10",
+  "raw": "trace color group blue; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard11",
+  "name": "Arkhos security AIcard11",
+  "raw": "trace color group blue; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ },
+ {
+  "group": "expansion-arkhos-security",
+  "id": "AIcard12",
+  "name": "Arkhos security AIcard12",
+  "raw": "trace color group blue; cost 2 credits; effect text is a generic per-color description, not the printed card text",
+  "text": {}
+ }
+]

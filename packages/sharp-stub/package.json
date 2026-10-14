@@ -1,0 +1,7 @@
+{
+  "name": "sharp",
+  "version": "0.0.0-stub",
+  "private": true,
+  "description": "Stands in for sharp (Next's optional image optimizer): the website serves its images as they are, and a Cloudflare Worker cannot load the native module.",
+  "main": "index.js"
+}

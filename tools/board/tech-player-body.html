@@ -1,0 +1,142 @@
+<div class="wrap">
+  <header>
+    <div>
+      <h1>SETI tech board and player board check</h1>
+      <p class="sub">The 12 tech stacks with their tile bonuses, the publicity and score tracks, and the player board. Each source image is shown large, with my reading beside it. The human player board is not in your asset folder, so I read it from the rulebook pictures: please compare it with your physical board.</p>
+    </div>
+    <div class="sync" id="sync" role="status">Connecting...</div>
+  </header>
+  <div id="banner"></div>
+  <div class="meter" id="meter"></div>
+
+  <h2>The tech board</h2>
+  <div class="panel">
+    <div class="imgbox" style="max-width:1500px;flex-basis:100%"><img id="imgTechboard" alt="Tech board and rotation counter" style="max-width:1500px"><p class="cap">Tech board, turned upright. Top right: pink telescope stacks. Middle: orange probe stacks. Bottom right: blue computer stacks. Left: the rotation counter. The corner glyph of each stack (dot, link, branch, cross) is printed on every tile of that stack.</p></div>
+    <div class="items" id="items-board"></div>
+  </div>
+
+  <div id="stacks"></div>
+
+  <h2>Publicity and score tracks</h2>
+  <div class="panel">
+    <div class="row"><div class="imgbox"><img id="imgPub" alt="Publicity track"><p class="cap">Publicity track, turned upright. Spaces 6 to 10 sit under the research-tech box (6 publicity); spaces 3 to 5 under the buy-a-card box (3 publicity).</p></div>
+      <div class="read"><h3>Reading</h3><dl class="kv"><dt>Range</dt><dd>0 to 10, start on 4, cap 10</dd><dt>Buy a card</dt><dd>3 publicity for 1 card, at any publicity of 3 or more</dd><dt>Research a tech</dt><dd>6 publicity or more</dd><dt>Score track</dt><dd>1 to 100, then around with the 100/200 token</dd><dt>Milestones</dt><dd>20 and 30 neutral (alien head); 25, 50, 70 gold</dd></dl></div></div>
+    <div class="items" id="items-tracks"></div>
+  </div>
+
+  <h2>Player board</h2>
+  <div class="panel">
+    <div class="row"><div class="imgbox"><img id="imgSetup" alt="Player board from the rulebook"><p class="cap">The player board with its slots named (rulebook p.6).</p></div>
+      <div class="imgbox"><img id="imgComp" alt="Computer and data pool"><p class="cap">Data pool, computer and analyze slot (rulebook p.14).</p></div></div>
+    <div class="row" style="margin-top:16px"><div class="imgbox"><img id="imgTechs" alt="Computer with techs"><p class="cap">Computer with computer techs in place: techs sit behind spaces 1 and 5 here (rulebook p.14).</p></div>
+      <div class="read"><h3>Reading</h3><dl class="kv"><dt>Data pool</dt><dd>up to 6 data</dd><dt>Computer</dt><dd>6 spaces in the top row, filled left to right</dd><dt>Space 2</dt><dd><ul class="pills"><li class="pill p-publicity">1 publicity</li></ul></dd><dt>Space 4</dt><dd><ul class="pills"><li class="pill p-tuck">tuck a card for income</li></ul></dd><dt>Tech slots</dt><dd>4 computer slots, behind spaces 1, 3, 5, 6 (not 2 or 4)</dd><dt>Analyze</dt><dd>1 energy, top row full, then a blue life trace</dd><dt>Other slots</dt><dd>4 probe slots, 4 telescope slots</dd></dl></div></div>
+    <div class="items" id="items-player"></div>
+  </div>
+</div>
+<script>
+const D = /*DATA*/;
+const URLS = /*URLS*/;
+const state = {};
+let db = null, uid = null, canWrite = true, local = false;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const GL = { dot: 'dot', link: 'link (infinity)', branch: 'branch', cross: 'cross' };
+function rewardText(r) {
+  const n = r.n ?? 1, s = n > 1 ? 's' : '';
+  return ({ vp: `${n} VP`, data: `${n} data`, publicity: `${n} publicity`, energy: `${n} energy`, credit: `${n} credit`, card_any: `${n} card${s} from the row or the deck`, launch: 'launch a probe, no cost' })[r.t] || r.t;
+}
+const pills = (rs) => rs.length ? `<ul class="pills">${rs.map((r) => `<li class="pill p-${r.t === 'credit' ? 'tuck' : r.t === 'launch' ? 'sig' : r.t}">${esc(rewardText(r))}</li>`).join('')}</ul>` : '<span class="cap">none</span>';
+
+const ITEMS = [];
+const add = (key, group, title, extra) => ITEMS.push({ key, group, title, ...extra });
+add('rule-tiles', 'board', 'Tile bonuses: 4 tiles per stack', { desc: 'Each stack holds four tiles of the same technology. Their placed sides differ only in the bonus: 3 VP, 1 card, 1 energy, 1 publicity. Two stacks add an extra immediate bonus on every tile (the "two satellites" probe stack launches a probe for free; the "Earth signal" telescope stack gives 2 data). Look at the tile sheets below.' });
+add('rule-first', 'board', 'First taker bonus', { desc: 'Each stack starts with a 2-point tile on top. The first player to take a tile from the stack discards it and scores 2 points (TECHACT-03).' });
+add('rule-rotation', 'board', 'Rotation counter', { desc: 'The counter has three positions: ring 1 (yellow), rings 1+2 (orange), rings 1+2+3 (teal). It advances one position each time the solar system rotates, then cycles. It starts on ring 1, which I read as the "marked space" in the rulebook. Please confirm the starting position.' });
+add('rule-neutral', 'board', 'Nonplayer marker box', { desc: 'Printed beside the 20-point milestone: 4 players none, 3 players one, 1 to 2 players two markers per neutral milestone.' });
+for (const cat of ['probe', 'telescope', 'computer']) D.stacks[cat].forEach((s, i) => add(`stack-${cat}-${s.glyph}`, 'stacks', `${cap(cat)} stack ${i + 1}: ${s.tech}, glyph ${GL[s.glyph]}`, { stack: s, cat }));
+add('track-pub', 'tracks', 'Publicity track', { desc: 'Spaces 0 to 10, markers start on 4, cap 10. The buy-a-card box (3 publicity for 1 card) is drawn beside spaces 3 to 5 and the research-tech box (6 publicity) beside 6 to 10, but both actions are available at any publicity of at least their cost.' });
+add('track-score', 'tracks', 'Score track milestones', { desc: 'Spaces 1 to 100, then around again with the 100/200 token. Neutral milestones at 20 and 30 (alien head), gold milestones at 25, 50 and 70.' });
+add('pb-pool', 'player', 'Data pool', { desc: 'Holds up to 6 data; extra data is discarded. Before a gain that would overflow it, a player may place pool data into the computer to make room.' });
+add('pb-comp', 'player', 'Computer top row', { desc: '6 spaces filled left to right. Space 2 gives 1 publicity; space 4 lets you tuck a card for income; spaces 1, 3, 5 and 6 have no effect.' });
+add('pb-slots', 'player', 'Computer tech slots', { desc: 'Four slots, behind spaces 1, 3, 5 and 6. A computer tech adds a lower space under its top space (the upper gives 2 VP when data is placed, the lower gives the tech reward; the lower can only be filled once the upper is filled).' });
+add('pb-analyze', 'player', 'Analyze slot', { desc: 'Pay 1 energy. Needs the whole top row filled. Clears all computer spaces, then mark a blue life trace.' });
+add('pb-others', 'player', 'Probe and telescope slots', { desc: 'Four probe tech slots and four telescope tech slots, one per technology. The printed slot pictures match the stacks on the tech board.' });
+
+function bodyFor(it) {
+  if (it.desc) return `<p style="margin:0">${esc(it.desc)}</p>`;
+  const s = it.stack, bon = D.bonuses_per_stack;
+  const extra = s.extra_bonus.length ? `<dt>Extra on every tile</dt><dd>${pills(s.extra_bonus)}</dd>` : '';
+  const lower = s.lower ? `<dt>Lower space</dt><dd>${pills(s.lower)}</dd>` : '';
+  return `<div class="row"><div class="imgbox" style="max-width:260px;flex-basis:200px"><img src="${URLS[s.front]}" alt="${esc(s.tech)} tile, technology side"><p class="cap">Technology side of ${esc(s.tech)}.</p></div>
+    <div class="read"><dl class="kv"><dt>Technology</dt><dd>${esc(s.tech)}: ${esc(s.effect)}</dd>${lower}${extra}<dt>The four tiles</dt><dd>${bon.map((b) => pills(b)).join('')}</dd></dl></div></div>`;
+}
+function itemHtml(it) {
+  const st = state[it.key]?.status || 'unchecked', label = { unchecked: 'Unchecked', confirmed: 'Confirmed', difference: 'Difference' }[st];
+  return `<details class="item s-${st}" data-key="${esc(it.key)}"><summary><span class="t">${esc(it.title)}</span><span class="badge">${label}</span></summary><div class="body">${bodyFor(it)}
+    <textarea class="note" placeholder="Required for a difference: what is wrong or missing?" ${canWrite ? '' : 'disabled'}>${esc(state[it.key]?.note || '')}</textarea>
+    <div class="actions"><button class="btn ok" data-act="confirmed" type="button" ${canWrite ? '' : 'disabled'}>Matches the board</button>
+    <button class="btn diff" data-act="difference" type="button" ${canWrite ? '' : 'disabled'}>Mark a difference</button>
+    <button class="btn" data-act="unchecked" type="button" ${canWrite ? '' : 'disabled'}>Clear</button><span class="hint" hidden></span></div></div></details>`;
+}
+const grp = (g) => ITEMS.filter((i) => i.group === g).map(itemHtml).join('');
+function render() {
+  const open = new Set([...document.querySelectorAll('details.item[open]')].map((d) => d.dataset.key));
+  $('items-board').innerHTML = grp('board'); $('items-tracks').innerHTML = grp('tracks'); $('items-player').innerHTML = grp('player');
+  const names = { probe: 'Probe stacks (orange)', telescope: 'Telescope stacks (pink)', computer: 'Computer stacks (blue)' };
+  $('stacks').innerHTML = ['probe', 'telescope', 'computer'].map((c) => `<h2>${names[c]}</h2><div class="panel"><div class="imgbox" style="max-width:1100px;flex-basis:100%"><img src="${URLS['tiles_' + c]}" alt="${names[c]} tile sheet" loading="lazy" style="max-width:1100px"><p class="cap">All 20 images for this row: 16 placed sides in groups of four by stack glyph (the label above each tile names the glyph and bonus), and the 4 technology sides in the last line.</p></div><div class="items">${ITEMS.filter((i) => i.cat === c).map(itemHtml).join('')}</div></div>`).join('');
+  document.querySelectorAll('details.item').forEach((d) => { if (open.has(d.dataset.key)) d.open = true; });
+}
+function summary() {
+  const total = ITEMS.length; let ok = 0, diff = 0;
+  for (const it of ITEMS) { const s = state[it.key]?.status; if (s === 'confirmed') ok++; else if (s === 'difference') diff++; }
+  $('meter').innerHTML = `<span><b>${ok}</b> of ${total} confirmed</span><span class="cap">${diff} with differences, ${total - ok - diff} unchecked</span><div class="bar" role="img" aria-label="${ok} confirmed, ${diff} differences"><i class="b-ok" style="width:${ok / total * 100}%"></i><i class="b-diff" style="width:${diff / total * 100}%"></i></div>`;
+}
+function sync(t, e) { $('sync').textContent = t; $('sync').classList.toggle('err', !!e); }
+const LS = 'seti-tech-player-v1', safe = (k) => k.replace(/[^A-Za-z0-9_\-.~:@+]/g, '_');
+const lsRead = () => { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch { return {}; } };
+const queues = new Map();
+function persist(key, rec) {
+  const prev = queues.get(key) || Promise.resolve();
+  queues.set(key, prev.then(async () => {
+    if (local) { const o = lsRead(); if (rec) o[key] = rec; else delete o[key]; try { localStorage.setItem(LS, JSON.stringify(o)); } catch {} return; }
+    const ref = db.collection('tech-player-check').doc(safe(key)); if (rec) await ref.set(rec); else await ref.delete();
+  }).then(() => sync(local ? 'Saved in this browser only' : 'All changes saved'), (e) => sync('Could not save: ' + (e && e.message || 'error'), true)));
+}
+function commit(key, patch) {
+  if (!canWrite) return;
+  const cur = state[key] || { status: 'unchecked', note: '' }, rec = { status: cur.status, note: cur.note || '', ...patch, at: Date.now(), by: uid || 'local' };
+  if (rec.status === 'unchecked' && !rec.note) { delete state[key]; persist(key, null); } else { state[key] = rec; persist(key, rec); }
+  sync('Saving...'); render(); summary();
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const d = b.closest('details.item'), key = d.dataset.key, ta = d.querySelector('textarea'), note = ta.value.trim(), hint = d.querySelector('.hint');
+  if (b.dataset.act === 'difference' && !note) { hint.textContent = 'Write what is different first.'; hint.hidden = false; ta.focus(); return; }
+  if (b.dataset.act === 'unchecked') commit(key, { status: 'unchecked', note: '' }); else commit(key, { status: b.dataset.act, note });
+  document.querySelector(`details.item[data-key="${CSS.escape(key)}"]`)?.setAttribute('open', '');
+});
+document.addEventListener('change', (e) => {
+  if (!e.target.matches('textarea.note')) return;
+  const key = e.target.closest('details.item').dataset.key, cur = state[key] || { status: 'unchecked' };
+  commit(key, { status: cur.status, note: e.target.value.trim() });
+});
+$('imgTechboard').src = URLS.techboard; $('imgPub').src = URLS.pubtrack; $('imgSetup').src = URLS.pb_setup; $('imgComp').src = URLS.pb_comp; $('imgTechs').src = URLS.pb_techs;
+render(); summary();
+(async () => {
+  let d = null, u = null;
+  try { [d, u] = await Promise.all([claude.use('db'), claude.use('user')]); } catch {}
+  db = d;
+  if (u) { try { uid = await u.id(); } catch {} try { if ((await u.can('data.write')) === false) canWrite = false; } catch {} }
+  if (!db) { local = true; const o = lsRead(); for (const k of Object.keys(o)) state[k] = o[k]; $('banner').innerHTML = '<div class="banner">Shared storage is unavailable here, so checks are kept in this browser only.</div>'; sync('Saved in this browser only'); render(); summary(); return; }
+  if (!canWrite) $('banner').innerHTML = '<div class="banner">You have view-only access, so checks cannot be saved.</div>';
+  const idMap = new Map(ITEMS.map((i) => [safe(i.key), i.key]));
+  db.collection('tech-player-check').onSnapshot((snap) => {
+    for (const k of Object.keys(state)) delete state[k];
+    for (const doc of snap.docs) { const k = idMap.get(doc.id); if (k) state[k] = doc.data(); }
+    sync(snap.metadata.hasPendingWrites ? 'Saving...' : 'All changes saved');
+    if (!document.activeElement || !document.activeElement.matches('textarea.note')) render();
+    summary();
+  }, (err) => sync('Lost connection to storage: ' + (err && err.message || err.code), true));
+})();
+</script>

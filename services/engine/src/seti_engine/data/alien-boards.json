@@ -1,0 +1,1232 @@
+{
+ "anomalies": {
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "note": "top capsule: always available; a later marker sits above earlier ones",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "note": "top capsule: always available; a later marker sits above earlier ones",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "note": "top capsule: always available; a later marker sits above earlier ones",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "image": "ab_anomalies",
+  "title": "Anomalies",
+  "tokens": [
+   {
+    "column": "pink",
+    "name": "Anomaly token, pink column",
+    "sides": [
+     [
+      {
+       "n": 1,
+       "t": "credit"
+      }
+     ],
+     [
+      {
+       "n": 4,
+       "t": "vp"
+      }
+     ]
+    ]
+   },
+   {
+    "column": "yellow",
+    "name": "Anomaly token, yellow column",
+    "sides": [
+     [
+      {
+       "n": 1,
+       "t": "card_any"
+      }
+     ],
+     [
+      {
+       "n": 2,
+       "t": "publicity"
+      }
+     ]
+    ]
+   },
+   {
+    "column": "blue",
+    "name": "Anomaly token, blue column",
+    "sides": [
+     [
+      {
+       "n": 1,
+       "t": "data"
+      }
+     ],
+     [
+      {
+       "n": 1,
+       "t": "energy"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "centaurians": {
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "cost": [
+       {
+        "n": 1,
+        "t": "data"
+       }
+      ],
+      "note": "top capsule: pay 1 data each time",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "cost": [
+       {
+        "n": 3,
+        "t": "data"
+       }
+      ],
+      "rewards": [
+       {
+        "n": 15,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "cost": [
+       {
+        "n": 1,
+        "t": "data"
+       }
+      ],
+      "note": "top capsule: pay 1 data each time",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "cost": [
+       {
+        "n": 3,
+        "t": "data"
+       }
+      ],
+      "rewards": [
+       {
+        "n": 15,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "cost": [
+       {
+        "n": 1,
+        "t": "data"
+       }
+      ],
+      "note": "top capsule: pay 1 data each time",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "cost": [
+       {
+        "n": 3,
+        "t": "data"
+       }
+      ],
+      "rewards": [
+       {
+        "n": 15,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "image": "ab_centaurians",
+  "message_note": "Four reward hexes across the top. When a player reaches their message milestone they choose one available hex and cover it with their message tile.",
+  "message_rewards": [
+   [
+    {
+     "kind": "any",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   [
+    {
+     "n": 1,
+     "t": "alien_card"
+    },
+    {
+     "n": 1,
+     "t": "energy"
+    }
+   ],
+   [
+    {
+     "n": 3,
+     "t": "publicity"
+    }
+   ],
+   [
+    {
+     "n": 8,
+     "t": "vp"
+    }
+   ]
+  ],
+  "title": "Centaurians",
+  "tokens": [
+   {
+    "colors": [
+     "white",
+     "green",
+     "purple",
+     "orange"
+    ],
+    "name": "Message tile (+15), one per player color",
+    "note": "Four player colors are shown in the supplied tiles; the physical game has 4 message tiles."
+   }
+  ]
+ },
+ "exertians": {
+  "banner": "Danger (one-tenth of total points lost by the player with the most danger), see ALIEN-EXE-07.",
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 1
+     },
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "credit"
+       }
+      ],
+      "tier": 2
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "credit"
+       }
+      ],
+      "tier": 2
+     },
+     {
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "credit"
+       }
+      ],
+      "tier": 3
+     },
+     {
+      "rewards": [
+       {
+        "n": 9,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "credit"
+       }
+      ],
+      "tier": 3
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 1
+     },
+     {
+      "rewards": [
+       {
+        "n": 1,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "energy"
+       },
+       {
+        "n": 1,
+        "t": "card_any"
+       }
+      ],
+      "tier": 2
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "energy"
+       },
+       {
+        "n": 1,
+        "t": "card_any"
+       }
+      ],
+      "tier": 2
+     },
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "energy"
+       },
+       {
+        "n": 1,
+        "t": "card_any"
+       }
+      ],
+      "tier": 3
+     },
+     {
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "energy"
+       },
+       {
+        "n": 1,
+        "t": "card_any"
+       }
+      ],
+      "tier": 3
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 1
+     },
+     {
+      "rewards": [
+       {
+        "n": 1,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "data"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 2
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "data"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 2
+     },
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "data"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 3
+     },
+     {
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "data"
+       },
+       {
+        "n": 1,
+        "t": "publicity"
+       }
+      ],
+      "tier": 3
+     }
+    ]
+   }
+  ],
+  "image": "ab_exertians",
+  "tier_danger": {
+   "1": 1,
+   "2": 2,
+   "3": 3
+  },
+  "title": "Exertians",
+  "tokens": [
+   {
+    "name": "Milestone tiles (2)",
+    "note": "Placed 20 and 40 points ahead of the leading player. The second tile costs 1 credit to use (rule sheet)."
+   }
+  ]
+ },
+ "mascamites": {
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 4,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "note": "6 empty \"sample\" spaces (check mark with a sample picture): each gets a delivered sample token face up and then gives that token's reward",
+      "rewards": []
+     },
+     {
+      "note": "the designated space where the one face-up sample token starts",
+      "rewards": []
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "image": "ab_mascamites",
+  "title": "Mascamites",
+  "tokens": [
+   {
+    "name": "Sample tokens (7), faces",
+    "note": "Seven sample tokens with different faces and one common back (spider). The face \"2 ?\" is read as 2 random cards.",
+    "sides": [
+     [
+      {
+       "n": 3,
+       "t": "publicity"
+      }
+     ],
+     [
+      {
+       "n": 7,
+       "t": "vp"
+      }
+     ],
+     [
+      {
+       "n": 3,
+       "t": "vp"
+      },
+      {
+       "n": 1,
+       "t": "card_any"
+      }
+     ],
+     [
+      {
+       "n": 2,
+       "t": "data"
+      }
+     ],
+     [
+      {
+       "n": 2,
+       "t": "energy"
+      }
+     ],
+     [
+      {
+       "n": 2,
+       "t": "credit"
+      }
+     ],
+     [
+      {
+       "n": 2,
+       "t": "card_random"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "oumuamua": {
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "cost": [
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ],
+      "note": "top capsule: pay 1 exofossil each time",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       },
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ]
+     },
+     {
+      "cost": [
+       {
+        "n": 4,
+        "t": "exofossil"
+       }
+      ],
+      "rewards": [
+       {
+        "n": 25,
+        "t": "vp"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "cost": [
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ],
+      "note": "top capsule: pay 1 exofossil each time",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       },
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ]
+     },
+     {
+      "cost": [
+       {
+        "n": 4,
+        "t": "exofossil"
+       }
+      ],
+      "rewards": [
+       {
+        "n": 25,
+        "t": "vp"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "cost": [
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ],
+      "note": "top capsule: pay 1 exofossil each time",
+      "repeat": true,
+      "rewards": [
+       {
+        "n": 6,
+        "t": "vp"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       },
+       {
+        "n": 1,
+        "t": "exofossil"
+       }
+      ]
+     },
+     {
+      "cost": [
+       {
+        "n": 4,
+        "t": "exofossil"
+       }
+      ],
+      "rewards": [
+       {
+        "n": 25,
+        "t": "vp"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "image": "ab_oumuamua",
+  "planet_like": {
+   "first_lander_data": [
+    3,
+    2,
+    1
+   ],
+   "first_orbiter": [
+    {
+     "n": 1,
+     "t": "alien_card"
+    }
+   ],
+   "land": [
+    {
+     "n": 9,
+     "t": "vp"
+    },
+    {
+     "n": 2,
+     "t": "exofossil"
+    }
+   ],
+   "note": "The top of the board: orbit rewards, a first-orbiter bonus (1 alien card), lander rewards and three first-lander data spaces, as for a planet (ALIEN-OUM-05).",
+   "orbit": [
+    {
+     "n": 10,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "exofossil"
+    },
+    {
+     "n": 1,
+     "t": "signal_oumuamua"
+    }
+   ]
+  },
+  "tile": {
+   "data_tokens": 3,
+   "on_completion": "each contributor gains 1 exofossil; the tile is refilled with no markers left",
+   "slot_rewards": {
+    "first_marker": [
+     {
+      "n": 1,
+      "t": "vp"
+     }
+    ],
+    "third_marker": [
+     {
+      "n": 2,
+      "t": "vp"
+     }
+    ]
+   }
+  },
+  "title": "'Oumuamua",
+  "tokens": [
+   {
+    "name": "Exofossil tokens (17)",
+    "note": "unlimited supply"
+   }
+  ]
+ }
+}

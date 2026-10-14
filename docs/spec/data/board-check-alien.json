@@ -1,0 +1,108 @@
+{
+ "snapshot_of": "alien species check page",
+ "taken": "2026-10-13",
+ "rows": [
+  {
+   "key": "anomalies-columns",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791857203020
+  },
+  {
+   "key": "anomalies-tokens",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791857387782
+  },
+  {
+   "key": "centaurians-columns",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791857897803
+  },
+  {
+   "key": "centaurians-message",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791857913623
+  },
+  {
+   "key": "centaurians-token-Message-",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791858376738
+  },
+  {
+   "key": "exertians-banner",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791858425561
+  },
+  {
+   "key": "exertians-columns",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791858417598
+  },
+  {
+   "key": "mascamites-columns",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791859710310
+  },
+  {
+   "key": "mascamites-tokens",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791859718895
+  },
+  {
+   "key": "oumuamua-columns",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791862655479
+  },
+  {
+   "key": "oumuamua-planet",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791862674861
+  },
+  {
+   "key": "oumuamua-tile",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791862681620
+  },
+  {
+   "key": "oumuamua-token-Exofossi",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791862682793
+  },
+  {
+   "key": "rule-any-space",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791857173689
+  },
+  {
+   "key": "rule-cost",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791857190103
+  },
+  {
+   "key": "tokens-identified",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791862714430
+  },
+  {
+   "key": "tokens-unknown",
+   "status": "difference",
+   "note": "tab-green-2vp token goes on top of each technology stacks to signal the first tech of each type gives an extra 2 score\ngray boxes are from expansion",
+   "checked_at": 1791862764509
+  }
+ ]
+}

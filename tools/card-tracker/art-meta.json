@@ -1,0 +1,123 @@
+{
+ "sheets": {
+  "sheet-cards-1.webp": {
+   "w": 3735,
+   "h": 3640,
+   "cols": 10,
+   "rows": 7
+  },
+  "sheet-cards-2.webp": {
+   "w": 3735,
+   "h": 3640,
+   "cols": 10,
+   "rows": 7
+  },
+  "sheet-alien-amoeba.webp": {
+   "w": 3720,
+   "h": 2080,
+   "cols": 10,
+   "rows": 4
+  },
+  "sheet-alien-anomalies.webp": {
+   "w": 1868,
+   "h": 1040,
+   "cols": 5,
+   "rows": 2
+  },
+  "sheet-alien-centaurians.webp": {
+   "w": 1868,
+   "h": 1040,
+   "cols": 5,
+   "rows": 2
+  },
+  "sheet-alien-exertians.webp": {
+   "w": 1868,
+   "h": 1560,
+   "cols": 5,
+   "rows": 3
+  },
+  "sheet-alien-glyphids.webp": {
+   "w": 3720,
+   "h": 2080,
+   "cols": 10,
+   "rows": 4
+  },
+  "sheet-alien-mascamites.webp": {
+   "w": 1868,
+   "h": 1040,
+   "cols": 5,
+   "rows": 2
+  },
+  "sheet-alien-oumuamua.webp": {
+   "w": 1868,
+   "h": 1040,
+   "cols": 5,
+   "rows": 2
+  }
+ },
+ "files": [
+  "sheet-cards-1.webp",
+  "sheet-cards-2.webp",
+  "sheet-alien-amoeba.webp",
+  "sheet-alien-anomalies.webp",
+  "sheet-alien-centaurians.webp",
+  "sheet-alien-exertians.webp",
+  "sheet-alien-glyphids.webp",
+  "sheet-alien-mascamites.webp",
+  "sheet-alien-oumuamua.webp",
+  "sa-1.webp",
+  "sa-10.webp",
+  "sa-11.webp",
+  "sa-12.webp",
+  "sa-13.webp",
+  "sa-14.webp",
+  "sa-15.webp",
+  "sa-16.webp",
+  "sa-17.webp",
+  "sa-18.webp",
+  "sa-19.webp",
+  "sa-2.webp",
+  "sa-20.webp",
+  "sa-21.webp",
+  "sa-22.webp",
+  "sa-23.webp",
+  "sa-24.webp",
+  "sa-25.webp",
+  "sa-26.webp",
+  "sa-27.webp",
+  "sa-28.webp",
+  "sa-29.webp",
+  "sa-3.webp",
+  "sa-30.webp",
+  "sa-31.webp",
+  "sa-32.webp",
+  "sa-33.webp",
+  "sa-34.webp",
+  "sa-35.webp",
+  "sa-36.webp",
+  "sa-37.webp",
+  "sa-38.webp",
+  "sa-39.webp",
+  "sa-4.webp",
+  "sa-40.webp",
+  "sa-41.webp",
+  "sa-42.webp",
+  "sa-5.webp",
+  "sa-6.webp",
+  "sa-7.webp",
+  "sa-8.webp",
+  "sa-9.webp",
+  "org-cosmos-strategy-group.jpg",
+  "org-deep-sky-survey.jpg",
+  "org-fenwick-research-center.jpg",
+  "org-futurespan-institute.jpg",
+  "org-helion-assembly.jpg",
+  "org-mission-relay.jpg",
+  "org-orbital-dynamics.jpg",
+  "org-sentinel-probe-network.jpg",
+  "org-stratus-core.jpg",
+  "org-turing-systems.jpg",
+  "org-xenolab.jpg",
+  "ref-rival-actions.webp"
+ ]
+}

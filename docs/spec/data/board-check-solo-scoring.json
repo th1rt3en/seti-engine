@@ -1,0 +1,228 @@
+{
+ "snapshot_of": "solo and scoring check page",
+ "taken": "2026-10-13",
+ "rows": [
+  {
+   "key": "gold-income-A",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874879671
+  },
+  {
+   "key": "gold-income-B",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874881607
+  },
+  {
+   "key": "gold-mission-A",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874818217
+  },
+  {
+   "key": "gold-mission-B",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874825319
+  },
+  {
+   "key": "gold-other-A",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874904809
+  },
+  {
+   "key": "gold-other-B",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874910261
+  },
+  {
+   "key": "gold-tech-A",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874801190
+  },
+  {
+   "key": "gold-tech-B",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874804594
+  },
+  {
+   "key": "obj-L1-16-vp",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874314141
+  },
+  {
+   "key": "obj-L1-5-data",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874316213
+  },
+  {
+   "key": "obj-L1-8-publicity",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874318187
+  },
+  {
+   "key": "obj-L1-land-or-signal",
+   "status": "difference",
+   "note": "not mark a signal, win a sector of any color",
+   "checked_at": 1791874612717
+  },
+  {
+   "key": "obj-L2-asteroid-trace",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874323296
+  },
+  {
+   "key": "obj-L2-blue-or-red-signal",
+   "status": "difference",
+   "note": "win a blue or red sector",
+   "checked_at": 1791874625847
+  },
+  {
+   "key": "obj-L2-comet-3-credit-card",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874335742
+  },
+  {
+   "key": "obj-L2-computer-tech-trace",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874326173
+  },
+  {
+   "key": "obj-L2-jupiter-saturn",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874328144
+  },
+  {
+   "key": "obj-L2-mars-uranus-neptune",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874329553
+  },
+  {
+   "key": "obj-L2-probe-tech-mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874647871
+  },
+  {
+   "key": "obj-L2-red-or-yellow-signal",
+   "status": "difference",
+   "note": "win a red or yellow sector",
+   "checked_at": 1791874659222
+  },
+  {
+   "key": "obj-L2-telescope-tech-mission",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874338734
+  },
+  {
+   "key": "obj-L2-venus-mercury",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874339871
+  },
+  {
+   "key": "obj-L2-yellow-or-blue-signal",
+   "status": "difference",
+   "note": "win a yellow or blue sector",
+   "checked_at": 1791874696279
+  },
+  {
+   "key": "obj-L3-black-signal",
+   "status": "difference",
+   "note": "win a black sector",
+   "checked_at": 1791874586527
+  },
+  {
+   "key": "obj-L3-computer-and-any-tech",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874576141
+  },
+  {
+   "key": "obj-L3-launch-9-publicity",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874712067
+  },
+  {
+   "key": "obj-L3-orbit",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874708078
+  },
+  {
+   "key": "obj-L3-probe-tech-land",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874706440
+  },
+  {
+   "key": "obj-L3-telescope-tech-signal",
+   "status": "difference",
+   "note": "win a sector of any color",
+   "checked_at": 1791874723708
+  },
+  {
+   "key": "obj-L3-trace-launch-scan",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874773250
+  },
+  {
+   "key": "obj-L3-two-blue-traces",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874777424
+  },
+  {
+   "key": "obj-L3-two-scans",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874775235
+  },
+  {
+   "key": "rv-computer",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874293042
+  },
+  {
+   "key": "rv-objtable",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874309975
+  },
+  {
+   "key": "rv-progress",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874300415
+  },
+  {
+   "key": "rv-table",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874277433
+  },
+  {
+   "key": "rv-track",
+   "status": "confirmed",
+   "note": "",
+   "checked_at": 1791874279467
+  }
+ ]
+}
