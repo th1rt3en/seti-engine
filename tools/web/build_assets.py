@@ -354,6 +354,15 @@ def main() -> None:
             tech_fronts[f"{category}-{tech['glyph']}"] = save(im, "tiles", f"front-{category}-{tech['glyph']}", quality=90, alpha_quality=95)
     provenance.append(("tech-tile-front-*.png (12 files)", "apps/web/public/assets/tiles/ (12 files)", "the fronts of the tech tiles"))
 
+    # the Mascamite sample tokens: the common back, and the 7 faces in the order of the engine's data (alien-boards.json, tokens[0].sides)
+    sample_files = ["face-3-publicity", "face-7-vp", "face-3vp-1card", "face-2-data", "face-2-energy", "face-2-credit", "face-2-question"]
+    samples: dict[str, object] = {}
+    for key, file in [("back", "back-spider"), *[(str(k), name) for k, name in enumerate(sample_files)]]:
+        im = Image.open(SRC / f"mascamite-sample-{file}.png").convert("RGBA")
+        im = im.resize((120, round(120 * im.height / im.width)), Image.LANCZOS)
+        samples[key] = save(im, "tiles", f"sample-{file}", quality=90, alpha_quality=95)
+    provenance.append(("mascamite-sample-*.png (8 files)", "apps/web/public/assets/tiles/ (8 files)", "the back and the 7 faces of the Mascamite samples, 120 px wide"))
+
     rival_boards: dict[str, str] = {}
     for name in RIVAL_BOARDS:
         im = Image.open(SRC / f"rival-board-{name}.png").convert("RGBA")
@@ -378,7 +387,7 @@ def main() -> None:
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
              "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
-             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs, "techFronts": tech_fronts},
+             "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs, "techFronts": tech_fronts, "samples": samples},
             indent=1,
             sort_keys=True,
         )

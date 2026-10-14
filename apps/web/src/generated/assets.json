@@ -318,6 +318,16 @@
     "S.9": "/assets/solo/rival-card-9.eae2cb2ec0.webp",
     "back": "/assets/solo/rival-card-back.bfff2932a3.webp"
   },
+  "samples": {
+    "0": "/assets/tiles/sample-face-3-publicity.bba386a8a4.webp",
+    "1": "/assets/tiles/sample-face-7-vp.ef951db657.webp",
+    "2": "/assets/tiles/sample-face-3vp-1card.e521bdd800.webp",
+    "3": "/assets/tiles/sample-face-2-data.a5e4c2e8de.webp",
+    "4": "/assets/tiles/sample-face-2-energy.394eb61b45.webp",
+    "5": "/assets/tiles/sample-face-2-credit.925074f235.webp",
+    "6": "/assets/tiles/sample-face-2-question.51d2dcac87.webp",
+    "back": "/assets/tiles/sample-back-spider.3a5d9a708c.webp"
+  },
   "scoreIcon": "/assets/icons/score.309af1314e.webp",
   "species": {
     "anomalies": "/assets/species/anomalies.02e6f620c6.webp",

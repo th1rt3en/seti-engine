@@ -44,6 +44,7 @@ import slotData from "../generated/slots.json";
 import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ScorePawn, pieceColor } from "./Pieces";
 
 const DISCS = assets.discs as Record<string, string>;
+const SAMPLES = assets.samples as Record<string, string> & { back: string };
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
 const STAR_BOARDS = assets.starBoards as Record<string, string>;
@@ -385,11 +386,16 @@ export function BoardView({
             const piece = p.capsule ? (
               <g key={p.id}>
                 <Marker x={at.x + dx} y={at.y + dy} size={78} color={color(p.player)} title={title} />
-                {/* the sample token under the capsule (a drawn placeholder) */}
-                <circle cx={at.x + dx + 30} cy={at.y + dy - 30} r={22} fill="#3b2a52" stroke="#fff" strokeWidth={5} />
-                <text x={at.x + dx + 30} y={at.y + dy - 20} textAnchor="middle" fontSize={26} fill="#fff">
-                  S
-                </text>
+                {/* the sample token that the capsule carries: its face for its owner (who may look), its back for the others (ALIEN-MASC-04) */}
+                <image
+                  href={SAMPLES[p.sample !== null && p.sample !== undefined && p.sample >= 0 ? String(p.sample) : "back"] ?? SAMPLES.back}
+                  x={at.x + dx + 6}
+                  y={at.y + dy - 66}
+                  width={60}
+                  height={60}
+                >
+                  <title>{p.player === view.viewer ? "The sample that this capsule carries" : "A sample, face down"}</title>
+                </image>
               </g>
             ) : (
               <Figure key={p.id} x={at.x + dx} y={at.y + dy} color={color(p.player)} title={title} />
@@ -459,15 +465,12 @@ export function BoardView({
           const samples = ((mascamites?.extra.samples ?? {}) as Record<string, number[]>)[name]?.length ?? 0;
           return (
             <g key={name}>
-              {/* the sample tokens lying face down on Jupiter and Saturn (a drawn placeholder: the token art is not in the asset repo) */}
+              {/* the sample tokens lying face down on Jupiter and Saturn */}
               {Array.from({ length: samples }, (_, k) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: identical face-down tokens, only their count matters
                 <g key={`sample-${name}-${k}`} transform={`translate(${pos.x + pos.r * 0.45 + k * 30} ${pos.y - pos.r * 0.75 - k * 14})`}>
                   <title>{`${samples} sample${samples === 1 ? "" : "s"} face down on ${name}`}</title>
-                  <circle r={34} fill="#3b2a52" stroke="#fff" strokeWidth={6} />
-                  <text y={12} textAnchor="middle" fontSize={34} fill="#fff">
-                    S
-                  </text>
+                  <image href={SAMPLES.back} x={-38} y={-38} width={76} height={76} />
                 </g>
               ))}
               {st.orbiters.map((player, k) => (
