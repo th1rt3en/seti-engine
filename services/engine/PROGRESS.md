@@ -18,7 +18,7 @@ Status of the Python rules engine against the spec (`docs/spec/`). Run `python t
 - Tests: unit and scenario tests for every system, a smoke test per playable card, and random-play fuzzers (uniform and progress-seeking) for 2, 3 and 4 players.
 
 ## Next (in order)
-1. Website: the species boards and the rival's board are still text (cards and the solar system are drawn); a password reset (D29 has none); `docs/asset-gaps.md`.
+1. Website: the game page shows the board, the star ring, the species boards and a player tracker (see `docs/deploy-web.md`). Still text or missing: the rival's board in solo games, tech stacks and gold tiles on the board (they are under "All details"), traces on the species boards (listed, not placed on the picture), and a password reset (D29 has none); `docs/asset-gaps.md`.
 2. Typed action union for the protocol (actions are generic objects for now).
 3. (Done, D16a) Request signing; the remaining small items are below.
 

@@ -2,8 +2,8 @@
 
 Hidden from everyone but the owner: hands, held Exertian cards and the Exertian cards played face down.
 Hidden from everyone: the draw deck and its order, the contents of the end-of-round stacks, the identity of undiscovered species,
-the species decks, the sample tokens on the planets, the order of the tech tiles in their stacks, the rival's deck order, the objectives
-stack and the random generator state.
+the species decks, the sample tokens on the planets, the tech tiles under the top one of each stack (the top tile lies bonus side up for all
+to see, SETUP-16), the rival's deck order, the objectives stack and the random generator state.
 The server must send a client only `project(state, viewer)`, never the state itself.
 """
 
@@ -13,8 +13,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from . import engine
-from .models import GameState
+from . import engine, tables
+from .models import GameState, PlayerState
 
 HIDDEN = "?"  # a hidden card, tile or token
 
@@ -32,14 +32,53 @@ class Counts(BaseModel):
     objective_stack: int = 0
 
 
+# the income card itself (ROUND-02, INCOME-03); each tucked card adds its own (INCOME-01)
+INCOME_BASE = {"credit": 3, "energy": 2, "card": 1}
+INCOME_KINDS = ("credit", "energy", "card")
+
+
+class PlayerTracker(BaseModel):
+    """What the tracker beside the board shows for one player. Everything here is public information."""
+
+    income: dict[str, int]  # per round: credit, energy, card (the income card plus tucked cards)
+    tucked: dict[str, int]  # how many cards are tucked for each kind of income
+    missions_done: int  # completed missions (CARD-16)
+    end_cards: int  # end-of-game scoring cards in front of the player (CARD-20)
+    score: int
+
+
+def tracker(state: GameState, p: PlayerState) -> PlayerTracker:
+    """INCOME-01, INCOME-03, ROUND-02: the income a player gets at the end of each round, by kind. The solo rival has none (A-025)."""
+    rival_player = state.rival is not None and p.index == state.rival.index
+    tucked = {k: sum(1 for c in p.tucked if tables.cards()[c]["income"] == k) for k in INCOME_KINDS}
+    income = {k: 0 if rival_player else INCOME_BASE[k] + tucked[k] for k in INCOME_KINDS}
+    return PlayerTracker(income=income, tucked=tucked, missions_done=len(p.completed_missions), end_cards=len(p.end_cards), score=p.score)
+
+
+class ReachCell(BaseModel):
+    """A space a probe can reach: the movement it takes and a cheapest path (the spaces entered, the last one is `to`)."""
+
+    to: tuple[int, int]
+    cost: int
+    path: list[tuple[int, int]]
+
+
+class ProbeReach(BaseModel):
+    probe: str
+    cells: list[ReachCell]
+
+
 class View(BaseModel):
     """The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act."""
 
     viewer: int | None
     state: GameState
     counts: Counts
+    trackers: list[PlayerTracker] = Field(default_factory=list)  # one per player, in seat order
     to_act: int | None
     legal: list[dict[str, Any]] = Field(default_factory=list)
+    # where the viewer's probes can go with their movement plus all their energy (FREE-01); empty unless the viewer may move now
+    reach: list[ProbeReach] = Field(default_factory=list)
 
 
 def to_act(state: GameState) -> int | None:
@@ -79,7 +118,7 @@ def project(state: GameState, viewer: int | None) -> View:
         else:
             _hide_tokens(slot.extra)
     for st in s.tech_stacks:
-        st.tiles = [HIDDEN] * len(st.tiles)
+        st.tiles = st.tiles[:1] + [HIDDEN] * max(0, len(st.tiles) - 1)  # SETUP-16: only the top tile of a stack shows its bonus
     if s.rival is not None:
         s.rival.deck = [HIDDEN] * len(s.rival.deck)
         s.rival.advanced = [HIDDEN] * len(s.rival.advanced)
@@ -92,7 +131,14 @@ def project(state: GameState, viewer: int | None) -> View:
     if actor != viewer:
         s.aside = []
     legal = engine.legal_moves(state) if viewer is not None and actor == viewer else []
-    return View(viewer=viewer, state=s, counts=counts, to_act=actor, legal=legal)
+    trackers = [tracker(state, p) for p in state.players]
+    reach: list[ProbeReach] = []
+    if legal and viewer is not None and not state.pending and state.phase == "play":
+        reach = [
+            ProbeReach(probe=pid, cells=[ReachCell(to=to, cost=cost, path=path) for to, cost, path in cells])
+            for pid, cells in engine.move_reach(state, state.players[viewer])
+        ]
+    return View(viewer=viewer, state=s, counts=counts, trackers=trackers, to_act=actor, legal=legal, reach=reach)
 
 
 def _hide_tokens(extra: dict[str, Any]) -> None:

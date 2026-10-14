@@ -339,7 +339,8 @@ def play_towards_progress(players: int, seed: int) -> StepResult:
         if not r.legal:
             break
         good = [m for m in r.legal if m["type"] in PROGRESS_TYPES or (m["type"] == "place_trace" and m["space"] != "overflow")]
-        move = rnd.choice(good) if good and rnd.random() < 0.8 else rnd.choice(r.legal)
+        other = [m for m in r.legal if m["type"] != "exchange"]  # the many ways to exchange cards would crowd out the rest
+        move = rnd.choice(good) if good and rnd.random() < 0.8 else rnd.choice(other or r.legal)
         r = apply(r.state, move)
         check_invariants(r.state)
     return r
@@ -353,3 +354,37 @@ def test_progress_seeking_games_finish_and_discover_species(players: int) -> Non
         assert r.state.phase == "finished"
         discovered += sum(1 for x in r.state.species if x.discovered)
     assert discovered >= 1
+
+
+def test_exchange_two_cards_for_a_resource_or_a_card() -> None:
+    """RES-06, FREE-05 (p.18 'discard 2 cards to get 1 credit, 1 energy, or even 1 new card'): the cards go to the discard pile."""
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    p = s.players[pl]
+    p.hand = ["1", "2", "3"]
+    base = with_state(s)
+    gives = [m for m in base.legal if m["type"] == "exchange" and m["give"] == "card"]
+    assert {tuple(m["cards"]) for m in gives} == {("1", "2"), ("1", "3"), ("2", "3")}  # pairs of the hand, no card twice
+    assert {m["get"] for m in gives} == {"credit", "energy", "card"}
+    assert {m["source"] for m in gives if m["get"] == "card"} == {"deck", *(f"row:{i}" for i in range(len(s.card_row)))}
+    r = do(base, "exchange", give="card", cards=["1", "3"], get="credit")
+    q = r.state.players[pl]
+    assert q.hand == ["2"] and q.credits == p.credits + 1 and r.state.discard[-2:] == ["1", "3"]
+    row_first = s.card_row[0]
+    r = do(base, "exchange", give="card", cards=["2", "3"], get="card", source="row:0")
+    q = r.state.players[pl]
+    assert q.hand == ["1", row_first] and len(r.state.card_row) == len(s.card_row)  # the row is refilled (RES-04)
+    r = do(base, "exchange", give="card", cards=["1", "2"], get="energy")
+    assert r.state.players[pl].energy == p.energy + 1
+
+
+def test_exchange_two_credits_or_energy_for_a_card() -> None:
+    """RES-06: two credits or two energy also buy one card, from the card row or the top of the deck."""
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    s.players[pl].credits, s.players[pl].energy = 2, 0
+    base = with_state(s)
+    hand = len(s.players[pl].hand)
+    r = do(base, "exchange", give="credit", get="card", source="deck")
+    assert r.state.players[pl].credits == 0 and len(r.state.players[pl].hand) == hand + 1
+    assert not any(m["type"] == "exchange" and m["give"] == "energy" for m in base.legal)

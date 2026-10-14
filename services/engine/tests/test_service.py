@@ -33,7 +33,9 @@ def test_the_deck_the_stacks_the_tiles_and_the_generator_are_hidden() -> None:
     assert all(set(x) == {"?"} for x in v.state.end_of_round_stacks) and v.counts.end_of_round_stacks == [
         len(x) for x in s.end_of_round_stacks
     ]
-    assert all(set(t.tiles) <= {"?"} for t in v.state.tech_stacks) and v.state.rng_state == 0
+    # SETUP-16: the top tile of a stack lies bonus side up, the tiles under it are hidden
+    assert all(set(t.tiles[1:]) <= {"?"} and t.tiles[0] == s.tech_stacks[i].tiles[0] for i, t in enumerate(v.state.tech_stacks))
+    assert v.state.rng_state == 0
     assert [t.two_point_tile for t in v.state.tech_stacks] == [t.two_point_tile for t in s.tech_stacks]
 
 

@@ -1,10 +1,22 @@
 "use client";
-import { type Move, describeMove, groupMoves } from "@/lib/moves";
+import {
+  type Move,
+  buyText,
+  describeMove,
+  freeIsOnlyMovement,
+  groupMoves,
+  handHint,
+  handMoveText,
+  isHandMove,
+  sameMove,
+} from "@/lib/moves";
+import { techName } from "@/lib/techs";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { StateView } from "./StateView";
+import { GameView } from "./GameView";
+import { TradeButtons } from "./Trade";
 
 type Server =
   | { t: "lobby"; status: string; seats: ({ name: string } | null)[]; rated: boolean }
@@ -35,6 +47,20 @@ export function GameClient({
   const [online, setOnline] = useState(false);
   const socket = useRef<WebSocket | null>(null);
   const seq = useRef(0);
+  // what the player has picked for the move being made: a card of the hand, a probe and how much energy to turn into movement for it
+  // the places in the hand of the cards that are picked (one for a card's own move, two for a trade), a card of the display or the deck picked
+  // to buy, and the trade moves that wait for the player to click a card of the display
+  const [picked, setPicked] = useState<number[]>([]);
+  const [pickedBuy, setPickedBuy] = useState<string | null>(null);
+  const [rowMode, setRowMode] = useState<Move[] | null>(null);
+  // a tech picked in the stacks (its place in the state)
+  const [pickedTech, setPickedTech] = useState<number | null>(null);
+  const [pickedProbe, setPickedProbe] = useState<string | null>(null);
+  const [extraEnergy, setExtraEnergy] = useState(0);
+  // The moves still to send of a plan (a probe's whole way, with the energy it needs): each goes out when the view of the one before arrives.
+  const plan = useRef<Move[]>([]);
+  const latest = useRef<View | null>(null);
+  const [previous, setPrevious] = useState<View | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [receivedAt, setReceivedAt] = useState(() => Date.now());
   useEffect(() => {
@@ -67,11 +93,29 @@ export function GameClient({
         if (m.t === "lobby") setLobby(m);
         else if (m.t === "view") {
           seq.current = m.seq;
+          setPrevious(latest.current);
+          latest.current = m.view;
           setReceivedAt(Date.now());
           setView(m);
           setError(null);
-        } else if (m.t === "error") setError(m.message);
-        else if (m.t === "ended") setEnded(m.result);
+          setPicked([]);
+          setPickedBuy(null);
+          setRowMode(null);
+          setPickedTech(null);
+          setExtraEnergy(0);
+          const next = plan.current.shift();
+          if (next !== undefined) {
+            // go on only while the next step is still legal (a decision such as a slingshot stops the plan)
+            const legal = m.view.legal as Move[];
+            if (m.view.to_act === m.view.viewer && legal.some((l) => sameMove(l, next))) {
+              ws.send(JSON.stringify({ t: "action", seq: m.seq, action: next }));
+            } else plan.current = [];
+          }
+        } else if (m.t === "error") {
+          plan.current = [];
+          setError(m.message);
+        }
+        if (m.t === "ended") setEnded(m.result);
       };
       ws.onclose = () => {
         if (pinger) clearInterval(pinger);
@@ -115,17 +159,73 @@ export function GameClient({
   const v = view.view;
   const mine = v.legal as Move[];
   const pending = v.state.pending.length > 0;
+  const me = v.viewer === null ? null : (v.state.players[v.viewer] ?? null);
+  const hand = me?.hand ?? [];
+  // moves with a card of the hand are made by picking the card; moving a probe is made on the board
+  const handMoves = mine.filter((m) => isHandMove(m, hand));
+  const reach = ended || v.reach.length === 0 ? [] : v.reach;
+  // exchanges and buying a card are made by picking cards (of the hand, of the display) and not with buttons of their own
+  const exchanges = mine.filter((m) => m.type === "exchange");
+  const buys = mine.filter((m) => m.type === "buy_card");
+  const otherMoves = mine.filter(
+    (m) =>
+      !handMoves.includes(m) &&
+      m.type !== "exchange" &&
+      m.type !== "buy_card" &&
+      m.type !== "research" &&
+      m.type !== "take_tech" &&
+      !(reach.length > 0 && (m.type === "move_energy" || m.type === "move_probe")),
+  );
+  // a free action that gives movement does nothing without a probe on the map
+  const noProbe = !v.state.probes.some((x) => x.player === v.viewer);
+  const cardTrades = exchanges.filter((m) => m.give === "card");
+  const tradable = new Set(cardTrades.flatMap((m) => m.cards as string[]));
+  const pickable = [...new Set([...handMoves.map((m) => String(m.card)), ...tradable])];
+  const pickedIds = picked.map((i) => hand[i]).filter((c): c is string => c !== undefined);
+  const cardOptions = pickedIds.length === 1 ? handMoves.filter((m) => m.card === pickedIds[0]) : [];
+  const tradeMoves =
+    pickedIds.length === 2 ? cardTrades.filter((m) => [...(m.cards as string[])].sort().join() === [...pickedIds].sort().join()) : [];
+  const resourceTrades = ["credit", "energy"].map((g) => exchanges.filter((m) => m.give === g)).filter((l) => l.length > 0);
+  const selectCard = (i: number) =>
+    setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
+  // the display and the deck: clicked to buy a card, or to take the card of a trade
+  const rowSources = rowMode ? rowMode.map((m) => String(m.source)) : buys.map((m) => String(m.source));
+  const selectSource = (source: string) => {
+    if (rowMode) {
+      const m = rowMode.find((x) => x.source === source);
+      if (m) play(m);
+    } else setPickedBuy(pickedBuy === source ? null : source);
+  };
+  // techs are taken by clicking the stack
+  const techMoves = mine.filter((m) => m.type === "research" || m.type === "take_tech");
+  const techOption = pickedTech === null ? undefined : techMoves.find((m) => m.stack === pickedTech);
+  const techStack = pickedTech === null ? undefined : v.state.tech_stacks[pickedTech];
+  const buyOption = pickedBuy === null ? undefined : buys.find((m) => m.source === pickedBuy);
+  // the movement that the player has, and the budget with the energy they turn into movement
+  const movement = me?.movement ?? 0;
+  const energy = me?.energy ?? 0;
+  const extra = Math.min(extraEnergy, energy);
+  const budget = movement + extra;
+  const probe = reach.find((r) => r.probe === pickedProbe) ?? null;
+  const targets = (probe?.cells ?? []).filter((c) => c.cost <= budget);
+  const moveTo = (t: { to: [number, number]; cost: number; path: [number, number][] }) => {
+    if (probe === null) return;
+    const steps: Move[] = [
+      ...Array.from({ length: Math.max(0, t.cost - movement) }, () => ({ type: "move_energy" }) as Move),
+      ...t.path.map(([ring, sector]) => ({ type: "move_probe", probe: probe.probe, to: [ring, sector] }) as Move),
+    ];
+    const first = steps.shift();
+    if (first === undefined) return;
+    plan.current = steps;
+    play(first);
+  };
   // The clock of the player to act runs down on this screen; the server decides what it was when the view was sent.
   const left = (view.remaining ?? []).map((r, i) => (r === null ? null : i === v.to_act ? r - (now - receivedAt) : r));
   const canKick = v.viewer !== null && !ended && v.state.players.length >= 3;
-  return (
+  const moves = (
     <>
-      <p className="small muted">
-        {online ? "Connected" : "Reconnecting..."} · action {view.seq}
-        {view.remaining ? ` · clocks ${left.map((r, i) => `${names[i] ?? i + 1}: ${minutes(r) || "-"}`).join(" | ")}` : ""}
-      </p>
       {ended ? (
-        <section className="card turn">
+        <section className="gameover">
           <h2>Game over ({ended.reason})</h2>
           <p>
             {ended.winners.length > 0 ? `Winner: ${ended.winners.map((w) => names[w] ?? w + 1).join(", ")}.` : "The rival won."}{" "}
@@ -135,25 +235,183 @@ export function GameClient({
       ) : null}
       {error ? <p className="error">{error}</p> : null}
       {mine.length > 0 && !ended ? (
-        <section className="card turn">
-          <h2>{pending ? "Your decision" : "Your turn"}</h2>
-          {groupMoves(mine, pending).map((g) => (
-            <div key={g.title}>
-              <h3>{g.title}</h3>
+        <div className="movegroups">
+          {groupMoves(otherMoves, pending).map((g) => (
+            <div key={g.title} className="mgroup">
+              <span className="glabel">{g.title}</span>
               <div className="moves">
-                {g.moves.map((m, i) => (
-                  <button key={`${m.type}-${i}`} type="button" onClick={() => play(m)}>
-                    {describeMove(m)}
-                  </button>
-                ))}
+                {g.moves.map((m, i) => {
+                  const idle = m.type === "move_energy" && noProbe;
+                  return (
+                    <button
+                      key={`${m.type}-${i}`}
+                      type="button"
+                      disabled={idle}
+                      title={idle ? "You have no probe on the map to move" : undefined}
+                      onClick={() => play(m)}
+                    >
+                      {describeMove(m)}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
-        </section>
-      ) : v.viewer !== null && !ended ? (
-        <p className="muted">Waiting for {v.to_act === null ? "the game" : (names[v.to_act] ?? `player ${v.to_act + 1}`)}.</p>
+          {reach.length > 0 ? (
+            <div className="mgroup moveui">
+              <span className="glabel">Move a probe</span>
+              <div className="moves">
+                {reach.map((r) => {
+                  const at = v.state.probes.find((x) => x.id === r.probe);
+                  return (
+                    <button
+                      key={r.probe}
+                      type="button"
+                      className={r.probe === pickedProbe ? "chip on" : "chip"}
+                      aria-pressed={r.probe === pickedProbe}
+                      onClick={() => setPickedProbe(r.probe === pickedProbe ? null : r.probe)}
+                    >
+                      {at?.capsule ? "Capsule" : "Probe"} {r.probe}
+                      {at ? ` (ring ${at.ring}, sector ${at.sector})` : ""}
+                    </button>
+                  );
+                })}
+              </div>
+              <span className="budget">
+                Move budget <b>{budget}</b> = {movement} movement +
+                <button
+                  type="button"
+                  className="step"
+                  aria-label="Use one energy less"
+                  disabled={extra <= 0}
+                  onClick={() => setExtraEnergy(extra - 1)}
+                >
+                  −
+                </button>
+                <b>{extra}</b> energy
+                <button
+                  type="button"
+                  className="step"
+                  aria-label="Use one energy more"
+                  disabled={extra >= energy}
+                  onClick={() => setExtraEnergy(extra + 1)}
+                >
+                  +
+                </button>
+                <span className="muted small">({energy} available)</span>
+              </span>
+              <span className="handhint">
+                {probe === null
+                  ? "Select a probe on the board or here, then a highlighted space."
+                  : targets.length === 0
+                    ? "No space is in reach: add energy."
+                    : "Click a highlighted space; its number is what the move costs."}
+              </span>
+            </div>
+          ) : null}
+          {resourceTrades.map((list) => (
+            <div key={String(list[0]?.give)} className="mgroup">
+              <span className="glabel">Free action</span>
+              <TradeButtons moves={list} onPlay={play} onPickRow={setRowMode} />
+            </div>
+          ))}
+          {pickable.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">Cards in hand</span>
+              <span className="handhint">
+                {handHint(new Set(handMoves.map((m) => m.type)))}
+                {tradable.size > 0 ? " Select 2 cards to trade them for a credit, an energy or a card." : ""}
+              </span>
+            </div>
+          ) : null}
+          {techMoves.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">{techMoves[0]?.type === "research" ? "Main action" : "Your choice"}</span>
+              <span className="handhint">
+                Click a tech stack to take that tech
+                {techMoves[0]?.type === "research" ? " (6 publicity, and the solar system rotates)" : ""}.
+              </span>
+            </div>
+          ) : null}
+          {buys.length > 0 ? (
+            <div className="mgroup">
+              <span className="glabel">Free action</span>
+              <span className="handhint">Click a card of the display or the deck to buy it for 3 publicity.</span>
+            </div>
+          ) : null}
+        </div>
       ) : null}
-      <StateView view={v} names={names} />
+      {cardOptions.length > 0 ? (
+        <div className="confirmbar">
+          {cardOptions.map((m, i) => {
+            const idle = m.type === "discard_free" && noProbe && freeIsOnlyMovement(m.card);
+            return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: the options come in the order of the engine
+              <div key={i} className="confirm">
+                <span>{handMoveText(m)}</span>
+                <button
+                  type="button"
+                  className="primary"
+                  disabled={idle}
+                  title={idle ? "You have no probe on the map to move" : undefined}
+                  onClick={() => play(m)}
+                >
+                  Confirm
+                </button>
+                {idle ? <span className="muted small">You have no probe on the map.</span> : null}
+              </div>
+            );
+          })}
+          <button type="button" className="secondary" onClick={() => setPicked([])}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {tradeMoves.length > 0 && !rowMode ? (
+        <div className="confirmbar">
+          <TradeButtons moves={tradeMoves} onPlay={play} onPickRow={setRowMode} />
+          <button type="button" className="secondary" onClick={() => setPicked([])}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {rowMode ? (
+        <div className="confirmbar">
+          <span className="confirm">Click the card of the display that you want.</span>
+          <button type="button" className="secondary" onClick={() => setRowMode(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {techOption && techStack ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <span>
+              Confirm taking {techName(techStack.category, techStack.glyph)}?
+              {techOption.type === "research" ? " It costs 6 publicity and the solar system rotates." : ""}
+            </span>
+            <button type="button" className="primary" onClick={() => play(techOption)}>
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPickedTech(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
+      {buyOption && !rowMode ? (
+        <div className="confirmbar">
+          <div className="confirm">
+            <span>{buyText(buyOption.source, v.state.card_row)}</span>
+            <button type="button" className="primary" onClick={() => play(buyOption)}>
+              Confirm
+            </button>
+          </div>
+          <button type="button" className="secondary" onClick={() => setPickedBuy(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
       {canKick
         ? left.map((r, i) =>
             r !== null && r < 0 && i !== v.viewer ? (
@@ -172,13 +430,55 @@ export function GameClient({
             ) : null,
           )
         : null}
-      {v.viewer !== null && !ended ? (
-        <p>
-          <button type="button" className="secondary" onClick={() => window.confirm("Resign the game?") && send({ t: "resign" })}>
-            Resign
-          </button>
-        </p>
-      ) : null}
     </>
+  );
+  const clocks = view.remaining ? (
+    <span className="clocks">
+      {left.map((r, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: seat order
+        <span key={i} className={r !== null && r < 0 ? "clock over" : i === v.to_act ? "clock running" : "clock"}>
+          {names[i] ?? i + 1} {minutes(r) || "-"}
+        </span>
+      ))}
+    </span>
+  ) : null;
+  return (
+    <GameView
+      view={v}
+      names={names}
+      moves={moves}
+      previous={previous}
+      hand={{ selectable: pickable, selected: picked, onSelect: selectCard }}
+      tech={{
+        selectable: techMoves.map((m) => Number(m.stack)),
+        selected: pickedTech,
+        onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
+      }}
+      row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource }}
+      interaction={
+        reach.length > 0
+          ? {
+              probes: reach.map((r) => r.probe),
+              selected: probe?.probe ?? null,
+              onSelectProbe: (id) => setPickedProbe(id === pickedProbe ? null : id),
+              targets: targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
+              onTarget: moveTo,
+            }
+          : undefined
+      }
+      topExtra={
+        <>
+          {clocks}
+          <span className="small muted">
+            {online ? "Connected" : "Reconnecting..."} · action {view.seq}
+          </span>
+          {v.viewer !== null && !ended ? (
+            <button type="button" className="secondary small" onClick={() => window.confirm("Resign the game?") && send({ t: "resign" })}>
+              Resign
+            </button>
+          ) : null}
+        </>
+      }
+    />
   );
 }

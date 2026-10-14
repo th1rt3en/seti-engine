@@ -1,0 +1,53 @@
+// A design preview of the game page with a sample game (no sign-in, no server): `tools/web/make_sample_view.py` makes the sample.
+import { GameView } from "@/components/GameView";
+import type { View } from "@seti/protocol";
+import sample from "../../generated/sample-view.json";
+
+export const metadata = { title: "Game page preview" };
+
+export default function Demo() {
+  const view = structuredClone(sample) as unknown as View;
+  // the sample game has no discovered species: turn the first one face up (a design preview only) to show a revealed board
+  // some orbiters and landers, to show the figures on the planets
+  const planets = view.state.planets;
+  if (planets.jupiter) {
+    planets.jupiter.orbiters = [0, 1];
+    planets.jupiter.landers = [2];
+    planets.jupiter.moon_landers = { Io: 1 };
+  }
+  if (planets.mars) planets.mars.landers = [0];
+  // nobody has passed yet in this round, so the moon token lies on this round's pile
+  view.state.first_pass_done = false;
+  const stack = view.state.tech_stacks[1];
+  if (stack) stack.two_point_tile = false;
+  const first = view.state.species[0];
+  if (first) {
+    first.discovered = true;
+    first.species = "centaurians";
+    first.discovery_spaces = ["p0", "n", "p2"];
+    first.board = { pink: [[0], [1]], yellow: [[2]], blue: [[]] };
+  }
+  const names = ["Alice", "Bob", "Cy"];
+  return (
+    <GameView
+      view={view}
+      names={names}
+      topExtra={<span className="small muted">Sample game for the design preview</span>}
+      moves={
+        <div className="movegroups">
+          <div className="mgroup">
+            <span className="glabel">Main action</span>
+            <div className="moves">
+              {view.legal.slice(0, 6).map((m, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: a static preview
+                <button key={i} type="button">
+                  {String(m.type)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      }
+    />
+  );
+}

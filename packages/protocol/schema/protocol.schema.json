@@ -494,6 +494,11 @@
           "title": "Tech Stacks",
           "type": "array"
         },
+        "turn": {
+          "default": 1,
+          "title": "Turn",
+          "type": "integer"
+        },
         "turn_completed": {
           "default": false,
           "title": "Turn Completed",
@@ -561,6 +566,7 @@
         "stage",
         "start_player",
         "tech_stacks",
+        "turn",
         "turn_completed",
         "turn_fx",
         "winners"
@@ -1048,6 +1054,46 @@
       "title": "PlayerState",
       "type": "object"
     },
+    "PlayerTracker": {
+      "description": "What the tracker beside the board shows for one player. Everything here is public information.",
+      "properties": {
+        "end_cards": {
+          "title": "End Cards",
+          "type": "integer"
+        },
+        "income": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Income",
+          "type": "object"
+        },
+        "missions_done": {
+          "title": "Missions Done",
+          "type": "integer"
+        },
+        "score": {
+          "title": "Score",
+          "type": "integer"
+        },
+        "tucked": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Tucked",
+          "type": "object"
+        }
+      },
+      "required": [
+        "end_cards",
+        "income",
+        "missions_done",
+        "score",
+        "tucked"
+      ],
+      "title": "PlayerTracker",
+      "type": "object"
+    },
     "Probe": {
       "properties": {
         "capsule": {
@@ -1095,6 +1141,27 @@
       "title": "Probe",
       "type": "object"
     },
+    "ProbeReach": {
+      "properties": {
+        "cells": {
+          "items": {
+            "$ref": "#/$defs/ReachCell"
+          },
+          "title": "Cells",
+          "type": "array"
+        },
+        "probe": {
+          "title": "Probe",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cells",
+        "probe"
+      ],
+      "title": "ProbeReach",
+      "type": "object"
+    },
     "ProjectRequest": {
       "properties": {
         "state": {
@@ -1119,6 +1186,55 @@
         "viewer"
       ],
       "title": "ProjectRequest",
+      "type": "object"
+    },
+    "ReachCell": {
+      "description": "A space a probe can reach: the movement it takes and a cheapest path (the spaces entered, the last one is `to`).",
+      "properties": {
+        "cost": {
+          "title": "Cost",
+          "type": "integer"
+        },
+        "path": {
+          "items": {
+            "additionalItems": false,
+            "items": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "title": "Path",
+          "type": "array"
+        },
+        "to": {
+          "additionalItems": false,
+          "items": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "To",
+          "type": "array"
+        }
+      },
+      "required": [
+        "cost",
+        "path",
+        "to"
+      ],
+      "title": "ReachCell",
       "type": "object"
     },
     "RivalState": {
@@ -1407,6 +1523,13 @@
           "title": "Legal",
           "type": "array"
         },
+        "reach": {
+          "items": {
+            "$ref": "#/$defs/ProbeReach"
+          },
+          "title": "Reach",
+          "type": "array"
+        },
         "state": {
           "$ref": "#/$defs/GameState"
         },
@@ -1420,6 +1543,13 @@
             }
           ],
           "title": "To Act"
+        },
+        "trackers": {
+          "items": {
+            "$ref": "#/$defs/PlayerTracker"
+          },
+          "title": "Trackers",
+          "type": "array"
         },
         "viewer": {
           "anyOf": [
@@ -1436,8 +1566,10 @@
       "required": [
         "counts",
         "legal",
+        "reach",
         "state",
         "to_act",
+        "trackers",
         "viewer"
       ],
       "title": "View",

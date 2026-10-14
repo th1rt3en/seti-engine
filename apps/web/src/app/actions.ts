@@ -1,5 +1,6 @@
 "use server";
 import { AuthFailure, SESSION_COOKIE, createGuest, endSession, login, signup, upgradeGuest } from "@/lib/auth";
+import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { currentUser, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
@@ -15,7 +16,10 @@ const back = (path: string, error: string): never => redirect(`${path}?error=${e
 async function challenge(form: FormData, path: string): Promise<void> {
   const h = await headers();
   const ip = h.get("cf-connecting-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  if (!(await verifyTurnstile(field(form, TURNSTILE_FIELD), ip))) back(path, "The security check failed. Please try again.");
+  const token = field(form, TURNSTILE_FIELD);
+  if (loadConfig().turnstileSecret !== "" && token === "")
+    back(path, "The security check has not finished. Wait until it shows as passed, then try again.");
+  if (!(await verifyTurnstile(token, ip))) back(path, "The security check failed. Please try again.");
 }
 
 export async function signupAction(form: FormData): Promise<void> {

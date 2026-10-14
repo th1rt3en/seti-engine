@@ -6,7 +6,7 @@ import { describeMove } from "@/lib/moves";
 import type { ReplayData } from "@/lib/worker";
 import type { View } from "@seti/protocol";
 import { useEffect, useState } from "react";
-import { StateView } from "./StateView";
+import { GameView } from "./GameView";
 
 const REASONS: Record<string, string> = {
   completed: "The game was played to the end.",
@@ -123,7 +123,7 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
         ) : null}
       </section>
       {error ? <p className="error">{error}</p> : null}
-      {view ? <StateView view={view} names={names} /> : <p className="muted">Loading...</p>}
+      {view ? <GameView view={view} names={names} /> : <p className="muted">Loading...</p>}
       <section className="card">
         <h3>All events</h3>
         <ol className="small eventlog">

@@ -129,6 +129,7 @@ export type Glyph = string;
 export type Tiles = string[];
 export type TwoPointTile = boolean;
 export type TechStacks = TechStack[];
+export type Turn = number;
 export type TurnCompleted = boolean;
 export type TurnFx = {
   [k: string]: unknown;
@@ -163,7 +164,21 @@ export type SpeciesDecks = number[];
 export type Legal3 = {
   [k: string]: unknown;
 }[];
+export type Cost = number;
+export type Path = [number, number][];
+/**
+ * @minItems 2
+ * @maxItems 2
+ */
+export type To = [number, number];
+export type Cells = ReachCell[];
+export type Probe1 = string;
+export type Reach = ProbeReach[];
 export type ToAct = number | null;
+export type EndCards1 = number;
+export type MissionsDone = number;
+export type Score1 = number;
+export type Trackers = PlayerTracker[];
 export type Viewer1 = number | null;
 
 /**
@@ -237,6 +252,7 @@ export interface GameState {
   stage: Stage;
   start_player: StartPlayer;
   tech_stacks: TechStacks;
+  turn: Turn;
   turn_completed: TurnCompleted;
   turn_fx: TurnFx;
   winners: Winners1;
@@ -434,8 +450,10 @@ export interface StepResult {
 export interface View {
   counts: Counts;
   legal: Legal3;
+  reach: Reach;
   state: GameState;
   to_act: ToAct;
+  trackers: Trackers;
   viewer: Viewer1;
 }
 /**
@@ -450,4 +468,32 @@ export interface Counts {
   objective_stack: ObjectiveStack;
   rival_deck: RivalDeck;
   species_decks: SpeciesDecks;
+}
+export interface ProbeReach {
+  cells: Cells;
+  probe: Probe1;
+}
+/**
+ * A space a probe can reach: the movement it takes and a cheapest path (the spaces entered, the last one is `to`).
+ */
+export interface ReachCell {
+  cost: Cost;
+  path: Path;
+  to: To;
+}
+/**
+ * What the tracker beside the board shows for one player. Everything here is public information.
+ */
+export interface PlayerTracker {
+  end_cards: EndCards1;
+  income: Income;
+  missions_done: MissionsDone;
+  score: Score1;
+  tucked: Tucked1;
+}
+export interface Income {
+  [k: string]: number;
+}
+export interface Tucked1 {
+  [k: string]: number;
 }

@@ -3,8 +3,8 @@ import cards from "../generated/cards.json";
 
 export type Move = { type: string } & Record<string, unknown>;
 
-type CardInfo = { name: string; cost: number; income: string | null; sector: string | null };
-const CARDS = cards as Record<string, CardInfo>;
+type CardInfo = { name: string; cost: number; income: string | null; sector: string | null; free?: [string, number][] };
+const CARDS = cards as unknown as Record<string, CardInfo>;
 
 export function cardName(id: unknown): string {
   const c = CARDS[String(id)];
@@ -114,4 +114,75 @@ export function groupMoves(moves: Move[], pending: boolean): { title: string; mo
     { title: "Turn", moves: moves.filter((m) => end.has(m.type)) },
   ];
   return groups.filter((g) => g.moves.length > 0);
+}
+
+/** The moves that name a card of the player's hand: the player picks the card in the hand, then confirms. */
+export const HAND_MOVE_TYPES = new Set(["tuck", "discard", "discard_free", "play_card", "scan_hand_discard", "hand_signal"]);
+
+export const isHandMove = (m: Move, hand: string[]): boolean => HAND_MOVE_TYPES.has(m.type) && hand.includes(String(m.card));
+
+/** The two moves are the same (the order of the fields does not matter). */
+export const sameMove = (a: Move, b: Move): boolean => {
+  const key = (m: Move): string =>
+    JSON.stringify(
+      Object.keys(m)
+        .sort()
+        .map((k) => [k, m[k]]),
+    );
+  return key(a) === key(b);
+};
+
+const cardTitle = (id: unknown): string => CARDS[String(id)]?.name ?? String(id);
+const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
+const freeText = (free: [string, number][] | undefined): string =>
+  free && free.length > 0 ? free.map(([k, n]) => `${n} ${k}`).join(", ") : "nothing";
+
+/** What the bar asks when the player has picked a card for this move. */
+export function handMoveText(m: Move): string {
+  const info = CARDS[String(m.card)];
+  const name = cardTitle(m.card);
+  const sector = info?.sector ?? "any";
+  switch (m.type) {
+    case "tuck":
+      return `Confirm tucking ${name} for ${info?.income ?? "no"} income?`;
+    case "play_card":
+      return info && info.cost > 0
+        ? `Pay ${plural(info.cost, "credit")} to play ${name} as your main action?`
+        : `Play ${name} as your main action? It costs nothing.`;
+    case "discard_free":
+      return `Discard ${name} for its free action (${freeText(info?.free)})?`;
+    case "discard":
+      return `Discard ${name}?`;
+    case "scan_hand_discard":
+      return `Discard ${name} from your hand to mark a signal in a ${sector} sector?`;
+    case "hand_signal":
+      return `Discard ${name} to mark a signal in a ${sector} sector?`;
+    default:
+      return describeMove(m);
+  }
+}
+
+/** The card's free action is movement only: it does nothing for a player without a probe on the map. */
+export const freeIsOnlyMovement = (id: unknown): boolean => {
+  const free = CARDS[String(id)]?.free ?? [];
+  return free.length > 0 && free.every(([k]) => k === "move");
+};
+
+/** What the bar asks when the player has picked a card of the display or the deck to buy. */
+export function buyText(source: unknown, row: string[]): string {
+  const s = String(source);
+  if (s === "deck") return "Buy the top card of the deck for 3 publicity?";
+  const id = row[Number(s.slice(4))];
+  return `Buy ${id === undefined ? "this card" : cardTitle(id)} for 3 publicity?`;
+}
+
+/** The hint that goes with the cards of the hand being selectable. */
+export function handHint(types: Set<string>): string {
+  const what: string[] = [];
+  if (types.has("tuck")) what.push("tuck it for income");
+  if (types.has("play_card")) what.push("play it as your main action");
+  if (types.has("discard_free")) what.push("discard it for its free action");
+  if (types.has("discard")) what.push("discard it");
+  if (types.has("scan_hand_discard") || types.has("hand_signal")) what.push("discard it for a signal");
+  return `Select a card in your hand to ${what.join(", or to ")}.`;
 }

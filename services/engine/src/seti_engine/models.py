@@ -164,6 +164,7 @@ class GameState(BaseModel):
     rng_state: int
     phase: Phase = "setup"
     round: int = 1
+    turn: int = 1  # the turn within the round: 1 for the first player's turn, +1 for each following turn (counts the rival's turns too)
     current_player: int = 0
     start_player: int = 0
     players: list[PlayerState]

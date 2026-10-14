@@ -19,9 +19,16 @@ export async function verifyTurnstile(
   if (ip) body.set("remoteip", ip);
   try {
     const res = await fetcher(VERIFY_URL, { method: "POST", body });
-    if (!res.ok) return false;
-    return ((await res.json()) as { success?: boolean }).success === true;
-  } catch {
+    if (!res.ok) {
+      console.warn(`turnstile: siteverify answered ${res.status}`);
+      return false;
+    }
+    const answer = (await res.json()) as { success?: boolean; "error-codes"?: string[]; hostname?: string };
+    if (answer.success !== true)
+      console.warn(`turnstile: refused (${(answer["error-codes"] ?? []).join(", ")}) for ${answer.hostname ?? "?"}`);
+    return answer.success === true;
+  } catch (e) {
+    console.warn("turnstile: siteverify failed", e);
     return false;
   }
 }

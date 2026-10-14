@@ -39,7 +39,7 @@ def move_types() -> dict[str, list[str]]:
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    cards = {cid: {k: c[k] for k in ("name", "cost", "income", "sector", "species", "deck")} for cid, c in tables.cards().items()}
+    cards = {cid: {k: c[k] for k in ("name", "cost", "income", "sector", "species", "deck", "free")} for cid, c in tables.cards().items()}
     (OUT / "cards.json").write_text(json.dumps(cards, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (OUT / "move-types.json").write_text(json.dumps(move_types(), indent=1) + "\n", encoding="utf-8")
     print("wrote", OUT)

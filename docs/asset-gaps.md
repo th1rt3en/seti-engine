@@ -47,3 +47,18 @@ The earlier gap list is now mostly covered: main board, player boards, solar sys
 - 2026-10-12: expansion work is deprioritized (PLAN.md D22) until all expansion assets (items 2 and 3 above) have a source.
 
 - 2026-10-12: correction to the earlier labels. `player-board-a/b/c/d` were mislabeled: they are the solo **rival boards** (renamed `rival-board-4-star`, `-5-star`, `-1-2-star`, `-3-star`), and `solo-rival-board-v1/2/3` are Tabletop Simulator mats (renamed `tts-rival-mat-v*`). **The human player board is not in `assets/`** (gap): its layout is read from the rulebook p.6 and p.14 pictures and the tech board; if you have a clean image of the player board, please add it.
+- 2026-10-14: the game page now needs two pieces of art that are not in `assets/` (item 4 above). Both are drawn as SVG placeholders in `apps/web/src/components/BoardView.tsx`
+  until the owner supplies them: (1) the **data token**, shown as a blue disc in every sector (a picture of the real blue data token, one file); (2) the **probe figure** of each
+  player colour (green, red, purple, white), used for probes in space, for orbiters (with a ring) and for landers (with a base). A top-down or three-quarter picture of each
+  coloured pawn is enough, with a transparent background. Found and now used: `texture-moon-disc.png` (the moon token that marks the disc to rotate next) and
+  `tab-green-2vp-first-taker-tile.png` (the +2 tile on the tech stacks). `solar-rotation-token-white-disc.png` is not used.
+- 2026-10-14 (later): the page now draws the player pieces itself (`apps/web/src/components/Pieces.tsx`), after the photographs on page 2 of the rulebook: the figure (a radio dish on a
+  stem and a round base: probe, with a ring for an orbiter and a base line for a lander), the marker (a short cylinder with a dimple, also in blue for data and in grey for the
+  neutral markers), the publicity counter (microphone-shaped) and the score counter (a crest with a globe in a laurel wreath), each in the four player colours. They replace the
+  earlier placeholders; real pictures of the pieces would still be better if the owner has them. `skybox-milky-way.jpg` (listed above as a TTS background that should not ship) is used
+  as the page background at the owner's request; `card-back-sunny-radio-telescope.png` (the back of the main deck) shows the piles of the coming rounds.
+- 2026-10-14 (later still): the data token is drawn by `DataToken` in `apps/web/src/components/Pieces.tsx` (a blue glossy button with three bars of data). The curved slot of every star
+  is found on the picture of the ring by `tools/web/build_assets.py` (`apps/web/src/generated/slots.json`): a slot is as long as the data of its star, so the tokens lie at equal steps
+  along it from the counter-clockwise end. A marker takes the leftmost token's place and the token lifts off towards its owner's data pile (shown in the tracker).
+
+- 2026-10-14: the symbols for credit, energy, a card of the display and a card of the deck (`apps/web/src/components/Icons.tsx`) are drawn placeholders, as are the tech names in `apps/web/src/lib/techs.ts` (the tiles show icons only, so the 12 short names are our own). If you have the printed symbols or official names, send them.

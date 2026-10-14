@@ -1,9 +1,7 @@
-import { cardName } from "@/lib/moves";
-// The state of a game as one viewer sees it: players, hand, card row, sectors, planets and species. It only shows what the engine's view
+// The details of a game as one viewer sees it: players, techs, sectors, planets, species and gold tiles (the board, the hand and the card row are
+// shown by GameView). It only shows what the engine's view
 // contains (hidden cards are "?"); it works out no rule. Used by the live game page and by the replay.
 import type { View } from "@seti/protocol";
-import { CardImage } from "./CardImage";
-import { SolarSystem } from "./SolarSystem";
 
 const PLANETS = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "oumuamua"];
 
@@ -99,41 +97,6 @@ export function StateView({ view, names }: { view: View; names: string[] }) {
         ))}
       </section>
 
-      {me !== null && s.players[me] ? (
-        <section className="card">
-          <h3>Your hand</h3>
-          <div className="cards">
-            {s.players[me]?.hand.length ? (
-              s.players[me]?.hand.map((c) => <CardImage key={c} id={c} width={130} />)
-            ) : (
-              <span className="muted">empty</span>
-            )}
-          </div>
-          {s.players[me]?.missions.length ? (
-            <>
-              <p className="small muted">Open missions</p>
-              <div className="cards">
-                {s.players[me]?.missions.map((m) => (
-                  <CardImage
-                    key={m.card}
-                    id={m.card}
-                    width={110}
-                    title={`${cardName(m.card)}: ${m.kind === "trigger" ? `${m.used.filter(Boolean).length}/${m.used.length} circles` : "quick mission"}`}
-                  />
-                ))}
-              </div>
-            </>
-          ) : null}
-        </section>
-      ) : null}
-
-      <section className="card">
-        <h3>Card row</h3>
-        <div className="cards">
-          {s.card_row.length ? s.card_row.map((c) => <CardImage key={c} id={c} width={130} />) : <span className="muted">empty</span>}
-        </div>
-      </section>
-
       <section className="card">
         <h3>Sectors</h3>
         <table>
@@ -165,10 +128,6 @@ export function StateView({ view, names }: { view: View; names: string[] }) {
       </section>
 
       <section className="grid">
-        <div className="card wide">
-          <h3>Solar system</h3>
-          <SolarSystem state={s} who={who} />
-        </div>
         <div className="card">
           <h3>Planets</h3>
           <ul>

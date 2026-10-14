@@ -1,3 +1,4 @@
+import { NewGameFields } from "@/components/NewGameFields";
 import { getDb } from "@/lib/db";
 import { lobbyGames } from "@/lib/queries";
 import { currentUser } from "@/lib/session";
@@ -23,41 +24,7 @@ export default async function Lobby({ searchParams }: { searchParams: Promise<{ 
         <section className="card">
           <h2>New game</h2>
           <form action={createGameAction} className="stack">
-            <label>
-              Players (1 is the solo game against the rival)
-              <select name="players" defaultValue="2">
-                <option value="1">1 (solo)</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </label>
-            <label>
-              Solo difficulty (gold stars)
-              <select name="difficulty" defaultValue="3">
-                {[1, 2, 3, 4, 5].map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Clock
-              <select name="clock" defaultValue="none">
-                {Object.entries(CLOCK_PRESETS).map(([k, p]) => (
-                  <option key={k} value={k}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="row">
-              <input type="checkbox" name="rated" disabled={user.isGuest} /> Rated (2 to 4 players, accounts only)
-            </label>
-            <label className="row">
-              <input type="checkbox" name="promo" /> Include the two promo cards
-            </label>
+            <NewGameFields isGuest={user.isGuest} clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label }))} />
             <button type="submit">Create the game</button>
           </form>
         </section>

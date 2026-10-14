@@ -1,8 +1,10 @@
+import assets from "@/generated/assets.json";
 import { currentUser } from "@/lib/session";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { logoutAction } from "./actions";
+import "./game.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +16,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const user = await currentUser();
   return (
     <html lang="en">
-      <body>
+      <body
+        style={{
+          backgroundImage: `linear-gradient(rgba(5, 8, 18, 0.62), rgba(5, 8, 18, 0.72)), url(${assets.background})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
+      >
         <header className="bar">
           <Link href="/" className="brand">
             SETI online

@@ -10,6 +10,7 @@ its corner, placing data) and solar system rotation. See services/engine/PROGRES
 
 from __future__ import annotations
 
+import heapq
 from typing import Any
 
 from pydantic import BaseModel
@@ -54,12 +55,53 @@ def probes_in_space(state: GameState, p: PlayerState) -> list[Probe]:
     return [pr for pr in state.probes if pr.player == p.index]
 
 
-def move_cost(state: GameState, p: PlayerState, probe: Probe) -> int:
-    """Cost to leave the probe's space: 1, plus 1 on asteroids unless the player has the asteroid tech (MOVE-02, TECH-PT03)."""
-    cell = solar.visible(state, probe.ring, probe.sector)[1]
+def leave_cost(state: GameState, p: PlayerState, ring: int, sector: int) -> int:
+    """Cost to leave a space: 1, plus 1 on asteroids unless the player has the asteroid tech (MOVE-02, TECH-PT03)."""
+    cell = solar.visible(state, ring, sector)[1]
     ignore = cards.fx_active(state, "ignore_asteroid")  # FAQ-C026
     extra = 1 if cell == "ASTEROID" and "probe-link" not in p.techs and not ignore else 0
     return 1 + extra
+
+
+def move_cost(state: GameState, p: PlayerState, probe: Probe) -> int:
+    """Cost to move the probe one space (MOVE-01, MOVE-02): the cost to leave the space it is in."""
+    return leave_cost(state, p, probe.ring, probe.sector)
+
+
+def move_reach(state: GameState, p: PlayerState) -> list[tuple[str, list[tuple[tuple[int, int], int, list[tuple[int, int]]]]]]:
+    """Where each of the player's probes can go with the movement they have plus all their energy (FREE-01: 1 energy is 1 movement).
+
+    For every probe: the spaces it can reach, each with the least movement it takes and one cheapest path (the spaces entered, in order).
+    Cheapest paths come from Dijkstra over the adjacency of BOARD-16, so they follow exactly the costs `apply` charges for the single steps.
+    """
+    budget = p.movement + p.energy
+    out: list[tuple[str, list[tuple[tuple[int, int], int, list[tuple[int, int]]]]]] = []
+    for pr in probes_in_space(state, p):
+        start = (pr.ring, pr.sector)
+        best: dict[tuple[int, int], int] = {start: 0}
+        came: dict[tuple[int, int], tuple[int, int]] = {}
+        heap: list[tuple[int, tuple[int, int]]] = [(0, start)]
+        while heap:
+            cost, cell = heapq.heappop(heap)
+            if cost > best[cell]:
+                continue
+            step = leave_cost(state, p, *cell)
+            for nb in solar.adjacent(*cell):
+                nxt = cost + step
+                if nxt <= budget and nxt < best.get(nb, 1 << 30):
+                    best[nb] = nxt
+                    came[nb] = cell
+                    heapq.heappush(heap, (nxt, nb))
+        cells = []
+        for cell, cost in sorted(best.items()):
+            if cell == start:
+                continue
+            path = [cell]
+            while came[path[-1]] != start:
+                path.append(came[path[-1]])
+            cells.append((cell, cost, path[::-1]))
+        out.append((pr.id, cells))
+    return out
 
 
 def legal_moves(state: GameState) -> list[Action]:
@@ -131,6 +173,22 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
     raise ValueError(d.kind)
 
 
+def _exchange_moves(state: GameState, p: PlayerState) -> list[Action]:
+    """RES-06: 2 cards, 2 credits or 2 energy of one kind for 1 card, 1 credit or 1 energy; a card is from the card row or the deck top."""
+    sources = ["deck", *(f"row:{i}" for i in range(len(state.card_row)))]
+    out: list[Action] = []
+    for give in ("credit", "energy"):
+        if (p.credits if give == "credit" else p.energy) >= 2:
+            out += [{"type": "exchange", "give": give, "get": g} for g in ("credit", "energy") if g != give]
+            out += [{"type": "exchange", "give": give, "get": "card", "source": src} for src in sources]
+    hand = sorted(p.hand)
+    pairs = sorted({(a, b) for i, a in enumerate(hand) for b in hand[i + 1 :]})  # two cards of the hand (alien cards count)
+    for a, b in pairs:
+        out += [{"type": "exchange", "give": "card", "cards": [a, b], "get": g} for g in ("credit", "energy")]
+        out += [{"type": "exchange", "give": "card", "cards": [a, b], "get": "card", "source": src} for src in sources]
+    return out
+
+
 def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
     out: list[Action] = []
     if p.energy >= 1:
@@ -144,10 +202,7 @@ def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
     if p.publicity >= 3:  # FREE-06
         out.append({"type": "buy_card", "source": "deck"})
         out += [{"type": "buy_card", "source": f"row:{i}"} for i in range(len(state.card_row))]
-    for give in ("credit", "energy"):  # RES-06 (exchanging cards is added with card play)
-        have = p.credits if give == "credit" else p.energy
-        if have >= 2:
-            out += [{"type": "exchange", "give": give, "get": g} for g in ("credit", "energy") if g != give]
+    out += _exchange_moves(state, p)  # RES-06
     for cid in dict.fromkeys(p.hand):  # FREE-02
         if tables.cards()[cid]["free"]:
             out.append({"type": "discard_free", "card": cid})
@@ -281,12 +336,18 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     elif t == "buy_card":
         effects.pay(p, publicity=3)
         effects.take_from_row_or_deck(s, p, a["source"])
-    elif t == "exchange":
-        if a["give"] == "credit":
+    elif t == "exchange":  # RES-06
+        if a["give"] == "card":
+            for cid in a["cards"]:
+                p.hand.remove(cid)
+                s.discard.append(cid)
+        elif a["give"] == "credit":
             p.credits -= 2
         else:
             p.energy -= 2
-        if a["get"] == "credit":
+        if a["get"] == "card":
+            effects.take_from_row_or_deck(s, p, a["source"])
+        elif a["get"] == "credit":
             p.credits += 1
         else:
             p.energy += 1
@@ -610,6 +671,7 @@ def _next_turn(s: GameState, events: list[dict[str, Any]]) -> None:
         q = (s.current_player + k) % n
         if not s.players[q].passed:
             s.current_player = q
+            s.turn += 1
             return
     _end_round(s, events)
 
@@ -630,6 +692,7 @@ def _end_round(s: GameState, events: list[dict[str, Any]]) -> None:
                 effects.gain_income_resource(s, p, tables.cards()[cid]["income"])
         s.start_player = (s.start_player + 1) % n
         s.round += 1
+        s.turn = 1
         s.first_pass_done = False
         for p in s.players:
             p.passed = False
