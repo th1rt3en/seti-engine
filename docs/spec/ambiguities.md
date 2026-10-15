@@ -51,7 +51,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-044 | Translation board strips and the top row dependency | ruled |
 | A-045 | Glyphids cards | ruled |
 | A-046 | Glyphids board wells | ruled |
-| A-047 | Order of the organelle moves | proposed (in use, to confirm) |
+| A-047 | Order of the organelle moves | ruled |
 | A-048 | Amoeba board readings | ruled |
 | A-049 | Amoeba cards ET.14 and ET.20 | ruled |
 | A-050 | Readings of the 42 main-deck cards | ruled |
@@ -438,24 +438,26 @@ Entry format:
 - Ruling (owner), 2026-10-15: the four possible states of the translation board (two strips, two sides each) are shown with the pictures a, b, c and d, chosen at random at discovery. The picture d (top strip of a, bottom strip of b) is composed from a and b (tools/web/build_expansion_assets.py); the game page shows it with the placed glyph tokens (GlyphidsPanel.tsx).
 
 ## A-045: Glyphids cards
-- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page); the doubled-glyph reading stays as the engine uses it
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-GLY-06
 - Rulebook page and text: the card names and flavor texts are printed in glyphs. A glyph icon with a "?" gives the resource of that glyph if it has been deciphered. Readings used: a repeated glyph in a group gives its resource twice; the "OR" is a choice between two groups; a mission circle may be covered for an undeciphered glyph and then gives nothing; ET.10's quick mission needs a trace of each of the three colors marked for this species (the same layout as the base cards that say "single species"); the end-of-game cards ET.1 and ET.9 score 3 VP per token of the type the player has most and 1 VP per token of the largest set of different kinds.
 - Questions for the owner: confirm each reading.
+- Ruling (owner), 2026-10-15: the glyph script on the Glyphids cards is the gimmick of the species; the cards have no text to transcribe (names and flavor stay empty), only glyph token icons. The readings listed above stand.
 
 ## A-046: Glyphids board wells
-- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
+- Status: ruled (owner, 2026-10-15): accepted as proposed
 - Rule IDs affected: EXP-GLY-04
 - Rulebook page and text: A14 p.3 and p.4 and the picture: each column has an upper well (replenished at once), a 2 VP and a 3 VP space with an alien card, and a lower well that is one space with the 7 VP circle (not replenished).
 - Proposed ruling: as read; marking an upper well gives only its token.
 - Questions for the owner: confirm.
 
 ## A-047: Order of the organelle moves
-- Status: proposed
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-AMO-05
 - Rulebook page and text: A14 p.6: the organelles that gave their bonuses move together, an occupied target is skipped.
 - Proposed ruling: the organelle furthest along its ring moves first; the spaces of the moving organelles count as free.
 - Questions for the owner: confirm with the rulebook example.
+- Ruling (owner), 2026-10-15: the outer organelles move clockwise and the inner ones counter-clockwise, all the organelles that gave their bonuses move simultaneously; if the next space is occupied, the organelle goes on to the next unoccupied space. (The engine counts the spaces of the moving organelles as free, as the move is simultaneous.)
 
 ## A-048: Amoeba board readings
 - Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
