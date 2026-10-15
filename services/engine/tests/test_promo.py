@@ -166,7 +166,7 @@ def settle_until_trigger(r: StepResult) -> StepResult:
 
 def test_landing_at_mars_and_playing_a_card_that_names_mars_trigger_it_too() -> None:
     """PROMO-03: #13 Perseverance Rover names Mars in its flavor text; a card that does not, does not."""
-    assert {"13", "14", "22", "34", "76", "84", "85", "119", "ET.4"} == card_defs.MARS_FLAVOR
+    assert {"13", "14", "22", "34", "76", "84", "85", "119", "ET.4", "SA.31"} == card_defs.MARS_FLAVOR  # A-027, confirmed
     s, pl = mars_game()
     r = settle_until_trigger(play(s, "22"))  # Mars Flyby
     assert r.state.pending and r.state.pending[0].kind == "mission_trigger"

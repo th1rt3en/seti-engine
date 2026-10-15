@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, rewards, rival, rng, tables
+from . import amoeba, arkhos, effects, glyphids, rewards, rival, rng, tables
 from .models import Decision, GameState, PlayerState, Probe, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -55,6 +55,8 @@ def board_moves(s: GameState, p: PlayerState, slot_index: int, colors: tuple[str
                 continue
             if slot.board[color][k] and not space.get("repeat"):
                 continue
+            if slot.species == "arkhos" and space["level"] > arkhos.access(p):  # EXP-ARK-05: deeper levels need breached security cards
+                continue
             if _cost_ok(p, space.get("cost", [])):
                 out.append({"type": "place_trace", "slot": slot_index, "space": "board", "color": color, "index": k})
     if slot.species == "mascamites" and "blue" in colors:  # ALIEN-MASC-05: a sample token makes its blue space markable by anyone
@@ -77,6 +79,10 @@ def mark_board_space(s: GameState, p: PlayerState, slot_index: int, color: str, 
             s.species[oumuamua_slot(s) or 0].extra["supply"] += c["n"]  # paid tokens go back to the supply
     slot.board[color][k].append(p.index)
     rewards.grant(s, p, space["rewards"], events, slot=slot_index)
+    if slot.species == "glyphids" and space.get("well"):
+        glyphids.on_board_space(s, p, color, k, events)  # EXP-GLY-04: the token that lies on the space
+    if slot.species == "amoeba":
+        amoeba.gain_section(s, p, color, events)  # EXP-AMO-03: also the bonuses of the organelles in the section of that color
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -129,9 +135,12 @@ def _discover(s: GameState, index: int, events: Events) -> None:
     slot = s.species[index]
     slot.discovered = True
     events.append({"type": "discovered", "species": slot.species, "slot": index})
+    owners = [int(x[1:]) for x in slot.discovery_spaces if x is not None and x != "n"]
+    if slot.species == "arkhos":  # no species deck: security cards and an exploration deck (EXP-ARK-01)
+        arkhos.discover(s, slot, owners, events)
+        return
     ids = sorted(cid for cid, c in tables.cards().items() if c["species"] == slot.species)
     slot.deck = rng.shuffled(s, ids)  # ALIEN-06
-    owners = [int(x[1:]) for x in slot.discovery_spaces if x is not None and x != "n"]
     if slot.species == "exertians":
         _setup_exertians(s, slot, owners, events)
         return
@@ -149,6 +158,10 @@ def _discover(s: GameState, index: int, events: Events) -> None:
         _setup_anomalies(s, slot, events)
     elif slot.species == "centaurians":
         _setup_centaurians(s, slot, events)
+    elif slot.species == "glyphids":
+        glyphids.setup(s, slot, events)
+    elif slot.species == "amoeba":
+        amoeba.setup(s, slot, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -169,11 +182,13 @@ def _setup_anomalies(s: GameState, slot: SpeciesSlot, events: Events) -> None:
     sectors = [earth_sector, (earth_sector + 3) % 8, (earth_sector - 3) % 8]
     cols = rng.shuffled(s, list(COLORS))  # which anomaly goes where is not ruled: seeded random order (A-004)
     slot.extra["tokens"] = [{"sector": sec, "color": col, "side": rng.below(s, 2)} for sec, col in zip(sectors, cols, strict=True)]
+    for t in slot.extra["tokens"]:  # the side that is up is public: the page shows what the token pays (ALIEN-ANO-01)
+        t["reward"] = _token_reward(t["color"], t["side"])
     events.append(
         {
             "type": "anomalies_placed",
             "earth_sector": earth_sector,
-            "tokens": [{**t, "reward": _token_reward(t["color"], t["side"])} for t in slot.extra["tokens"]],
+            "tokens": [dict(t) for t in slot.extra["tokens"]],
         }
     )
 

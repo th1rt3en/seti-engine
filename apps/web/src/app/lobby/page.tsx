@@ -14,48 +14,75 @@ export default async function Lobby({ searchParams }: { searchParams: Promise<{ 
   const games = await lobbyGames(getDb());
   return (
     <>
-      <h1>Lobby</h1>
-      {error ? <p className="error">{error}</p> : null}
-      {user === null ? (
-        <p>
-          <Link href="/login">Log in</Link> or <Link href="/">play as a guest</Link> to create or join a game.
-        </p>
-      ) : (
-        <section className="card">
+      <header className="pagehead">
+        <h1>Lobby</h1>
+        <p className="muted">Join a game that is waiting for players, or start your own.</p>
+      </header>
+      {error ? <p className="error banner">{error}</p> : null}
+      <div className="lobby">
+        <section className="card newgame">
           <h2>New game</h2>
-          <form action={createGameAction} className="stack">
-            <NewGameFields
-              isGuest={user.isGuest}
-              clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label, mode: p.mode }))}
-            />
-            <button type="submit">Create the game</button>
-          </form>
-        </section>
-      )}
-      <h2>Open games</h2>
-      {games.length === 0 ? <p className="muted">No game is waiting for players.</p> : null}
-      <div className="grid">
-        {games.map((g) => (
-          <section className="card" key={g.id}>
+          {user === null ? (
             <p>
-              <strong>{g.host}</strong> {g.rated ? <span className="pill">rated</span> : <span className="pill">casual</span>}
+              <Link href="/login">Log in</Link> or <Link href="/">play as a guest</Link> to create or join a game.
             </p>
-            <p className="muted">
-              {g.seats.length} of {g.players} players: {g.seats.join(", ")}
-              <br />
-              {g.clock}
-            </p>
-            {user ? (
-              <form action={joinAction}>
-                <input type="hidden" name="id" value={g.id} />
-                <button type="submit">Join</button>
-              </form>
-            ) : null}
-            <p className="small">
-              <Link href={`/games/${g.id}`}>Watch the lobby</Link>
-            </p>
-          </section>
-        ))}
+          ) : (
+            <form action={createGameAction} className="stack">
+              <NewGameFields
+                isGuest={user.isGuest}
+                clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label, mode: p.mode }))}
+              />
+              <button type="submit" className="big">
+                Create the game
+              </button>
+            </form>
+          )}
+        </section>
+        <section className="open">
+          <h2>
+            Open games <span className="count">{games.length}</span>
+          </h2>
+          {games.length === 0 ? (
+            <p className="card muted empty">No game is waiting for players. Create one and others can join it.</p>
+          ) : null}
+          <div className="gamelist">
+            {games.map((g) => (
+              <article className="card game" key={g.id}>
+                <div className="gamehead">
+                  <strong>{g.host}</strong>
+                  <span className="badges">
+                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
+                    {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
+                    {g.organizations ? <span className="pill exp">organizations</span> : null}
+                    {g.promo ? <span className="pill">promo cards</span> : null}
+                  </span>
+                </div>
+                <div className="seats" aria-label={`${g.seats.length} of ${g.players} seats taken`}>
+                  {Array.from({ length: g.players }, (_, i) => `${g.id}-${i}`).map((key, i) => (
+                    <span key={key} className={i < g.seats.length ? "seat taken" : "seat"} title={g.seats[i] ?? "free seat"}>
+                      {g.seats[i]?.slice(0, 1).toUpperCase() ?? "+"}
+                    </span>
+                  ))}
+                  <span className="muted small">
+                    {g.seats.join(", ")} · {g.players - g.seats.length} free
+                  </span>
+                </div>
+                <p className="muted small">{g.clock}</p>
+                <div className="actions">
+                  {user ? (
+                    <form action={joinAction}>
+                      <input type="hidden" name="id" value={g.id} />
+                      <button type="submit">Join</button>
+                    </form>
+                  ) : null}
+                  <Link href={`/games/${g.id}`} className="small">
+                    Open the table
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );

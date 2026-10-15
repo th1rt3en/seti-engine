@@ -3,13 +3,19 @@
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
 // everything comes from the engine's view.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { ORG_NAMES } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
+import { AmoebaPanel } from "./AmoebaPanel";
+import { ArkhosPanel } from "./ArkhosPanel";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
+import { GlyphidsPanel } from "./GlyphidsPanel";
 import { HandDock, type HandSelection } from "./HandDock";
-import { CreditIcon, EnergyIcon, ScoreIcon } from "./Icons";
+import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import { MissionsPanel } from "./MissionsPanel";
+import { OrgPanel } from "./OrgPanel";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
@@ -100,6 +106,8 @@ export function GameView({
   topExtra?: ReactNode;
 }) {
   const s = view.state;
+  // exofossils exist once 'Oumuamua is face up: they show with the other resources (ALIEN-OUM-02)
+  const oumuamua = s.species.some((sp) => sp.discovered && sp.species === "oumuamua");
   const prompt = promptOf(view, names);
   const actor = view.to_act === null ? undefined : s.players[view.to_act];
   return (
@@ -130,6 +138,7 @@ export function GameView({
               <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
                 {s.rival && p.index === s.rival.index ? "Rival" : (names[p.index] ?? `Player ${p.index + 1}`)}
+                {p.organization ? <span className="orgname">{ORG_NAMES[p.organization] ?? p.organization}</span> : null}
                 <span className="res" title="Victory points">
                   <ScoreIcon size={20} />
                   <b>{p.score}</b>
@@ -144,6 +153,18 @@ export function GameView({
                       <EnergyIcon size={18} />
                       <b>{p.energy}</b>
                     </span>
+                    {s.options.expansion ? (
+                      <span className="res" title="Signal tokens">
+                        <SignalTokenIcon size={18} />
+                        <b>{p.signal_tokens}</b>
+                      </span>
+                    ) : null}
+                    {oumuamua ? (
+                      <span className="res" title="Exofossils">
+                        <ExofossilIcon size={18} />
+                        <b>{p.exofossils}</b>
+                      </span>
+                    ) : null}
                   </>
                 )}
               </li>
@@ -157,7 +178,14 @@ export function GameView({
       <div className="gamegrid">
         <main className="col-center">
           <div className="boardwrap">
-            <BoardView view={view} names={names} previous={previous} interaction={interaction} spots={spots} goldChoice={goldChoice} />
+            <BoardView
+              view={view}
+              names={names}
+              previous={previous}
+              interaction={interaction}
+              spots={spots && { ...spots, items: spots.items.filter((sp) => !sp.panel) }}
+              goldChoice={goldChoice}
+            />
             <RoundPiles view={view} />
           </div>
         </main>
@@ -165,10 +193,16 @@ export function GameView({
         <aside className="col-aux" aria-label="Publicity track and tech stacks">
           <PublicityTrack view={view} names={names} />
           <TechStacks view={view} pick={tech} />
+          <RowDock view={view} row={row} inline />
+          <MissionsPanel view={view} names={names} />
+          <OrgPanel view={view} names={names} spots={spots} />
+          <ArkhosPanel view={view} names={names} spots={spots} />
+          <GlyphidsPanel view={view} names={names} spots={spots} />
+          <AmoebaPanel view={view} names={names} spots={spots} />
         </aside>
       </div>
 
-      <SoloPanel view={view} />
+      <SoloPanel view={view} spots={spots} />
 
       <BarHeight />
       <TrackerDock>

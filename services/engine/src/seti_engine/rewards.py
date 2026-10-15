@@ -16,12 +16,13 @@ Events = list[dict[str, Any]]
 TRACE_COLORS = ("pink", "yellow", "blue")  # LIFE-01; column order of the three discovery spaces
 DISCOVERY_VP = (5, 3)  # BOARD-40: left slot 5 VP, right slot 3 VP, each with 1 publicity
 OVERFLOW_VP = 3  # LIFE-01
+NEUTRAL = -1  # EXP-QS-03: the marker color of the neutral quick start pieces
 
 
 def grant(
     s: GameState, p: PlayerState, rewards: list[dict[str, Any]], events: Events, planet: str | None = None, slot: int | None = None
 ) -> None:
-    from . import rival, species  # noqa: PLC0415 - these import this module
+    from . import arkhos, cards, glyphids, rival, species  # noqa: PLC0415 - these import this module
 
     if rival.is_rival(s, p.index):  # SOLO-10: the rival takes rewards in its own way
         rival.grant(s, rewards, events, planet, slot)
@@ -50,6 +51,32 @@ def grant(
             s.pending += [Decision(kind="income_tuck", player=p.index) for _ in range(n)]  # INCOME-01; FAQ-01: may be declined
         elif t == "move":
             p.movement += n
+        elif t == "signal_token":
+            p.signal_tokens += n  # EXP-SIG-01
+        elif t == "vp_empty_species_space":  # AM.14: 1 VP for each empty space of the species board
+            for sl in s.species:
+                if sl.species == r["species"]:
+                    effects.gain_score(s, p, sum(1 for spaces in sl.board.values() for m in spaces if not m))
+        elif t == "scan_free":  # a free scan from an exploration reward
+            cards.run_step(s, p, {"t": "scan_free"}, events)
+        elif t == "organelle":  # AM.17: a mission circle whose reward is one organelle of a section (EXP-AMO-04)
+            from . import amoeba  # noqa: PLC0415 - amoeba imports this module
+
+            amoeba.request_pick(s, p, r["color"])
+        elif t == "organelles":  # EXP-AMO-03: the organelle bonuses of a marked space are gained by species.mark_board_space
+            pass
+        elif t == "glyph_space":  # the token of a Glyphids board space is taken by the marking (species.mark_board_space)
+            pass
+        elif t == "glyph_resource":  # EXP-GLY-06: the resource of a deciphered glyph
+            glyphids.glyph_resource(s, p, r["glyph"], events)
+        elif t == "explore_minor" or t == "explore_major":  # EXP-ARK-04: reveal the next exploration card, gain its minor or major reward
+            for _ in range(n):
+                arkhos.explore(s, p, t.removeprefix("explore_"), events)
+        elif t == "explore":
+            arkhos.explore(s, p, r["level"], events)
+        elif t == "research":  # a free research (rotate, then take a tech) from an exploration reward
+            cards.run_step(s, p, {"t": "rotate"}, events)
+            cards.run_step(s, p, {"t": "research", "cat": r.get("cat", "any")}, events)
         elif t == "exofossil":
             species.gain_exofossil(s, p, n)
         elif t == "exofossil_pay":
@@ -142,20 +169,23 @@ def resolve_sector(s: GameState, index: int, events: Events) -> None:
 
         species.resolve_tile(s, events)
         return
+    from . import glyphids  # noqa: PLC0415 - glyphids imports this module
+
     sec = s.sectors[index]
     star = _star(sec.star)
-    ranking = _ranking(sec.markers)
+    ranking = _ranking(sec.markers, exclude=NEUTRAL)  # EXP-QS-04: the neutral color never wins
     winner = ranking[0]
     first = not sec.winners
     sec.winners.append(winner)  # SECTOR-14: the winner's marker beside the star stays; it never counts for the next win
     objectives.on_event(s, s.players[winner], [{"e": "win_sector", "color": sec.color}])  # SOLO-OBJ-04
     w = s.players[winner]
     w.sector_wins += 1
+    glyphids.take(s, w, f"sector:{index}", events)  # EXP-GLY-04
     events.append({"type": "sector_won", "player": winner, "sector": index})
-    for q in sorted(set(sec.markers)):
+    for q in sorted(set(sec.markers) - {NEUTRAL}):
         effects.gain_publicity(s, s.players[q])  # SECTOR-12
     grant(s, w, star["first_win" if first else "later_win"], events)  # SECTOR-15, SECTOR-16
-    second = _ranking(sec.markers, exclude=winner)  # SECTOR-13
+    second = _ranking(sec.markers, exclude=winner)  # SECTOR-13, EXP-QS-04: a neutral marker may stay as second
     sec.markers = [second[0]] if second else []
     sec.data_remaining = sec.capacity - len(sec.markers)
 
@@ -201,13 +231,16 @@ def trace_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
 def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
     """Mark a trace on the space `a` names; it counts for the color of that space (CARD-46, A-017, A-022)."""
     from . import (
+        arkhos,  # noqa: PLC0415 - arkhos imports this module
         cards,  # noqa: PLC0415 - cards imports this module
+        orgs,  # noqa: PLC0415 - orgs imports this module
         species,  # noqa: PLC0415 - species imports this module
     )
 
     slot = s.species[a["slot"]]
     kind = a["color"]  # A-017, A-022: every space, overflow ones too, has a color; a trace counts for the color of its space
     p.trace_log.append((a["slot"], kind))
+    orgs.on_trace(p, kind)  # Xenolab (EXP-ORG-13)
     if a["space"] == "board":
         species.mark_board_space(s, p, a["slot"], a["color"], a["index"], events)
     elif a["space"] == "sample":  # a Mascamite sample token on a blue space (ALIEN-MASC-05)
@@ -216,6 +249,7 @@ def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events)
         slot.overflow.append(p.index)
         slot.overflow_kinds.append(kind)
         effects.gain_score(s, p, OVERFLOW_VP)
+        arkhos.on_overflow(s, p, a["slot"], kind)  # EXP-ARK-06
     else:
         slot.discovery_spaces[TRACE_COLORS.index(a["color"])] = f"p{p.index}"
         effects.gain_score(s, p, DISCOVERY_VP[a["slot"]])  # LIFE-03
@@ -224,4 +258,4 @@ def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events)
             slot.complete = True  # ALIEN-01: revealed after the turn
     events.append({"type": "trace", "player": p.index, "slot": a["slot"], "space": a["space"]})
     s.last_trace_kind = kind
-    cards.fire(s, p, [{"e": "trace", "kind": kind}], events)  # FAQ-C107 ("any" matches only the generic circles)
+    cards.fire(s, p, [{"e": "trace", "kind": kind, "species": slot.species}], events)  # FAQ-C107 ("any" matches only the generic circles)

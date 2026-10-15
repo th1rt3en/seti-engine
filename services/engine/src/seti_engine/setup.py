@@ -7,12 +7,13 @@ Order of random draws (all from the seeded generator, so a game is reproducible 
 
 from __future__ import annotations
 
-from . import rival, rng, species, tables
+from . import orgs, rival, rng, species, tables
 from .models import (
     COLORS,
     GLYPHS,
     PLANET_ORDER,
     SPECIES_BASE,
+    SPECIES_EXPANSION,
     TECH_CATEGORIES,
     Decision,
     GameState,
@@ -56,7 +57,11 @@ def new_game(options: Options) -> GameState:
     state.disc_angles = [rng.below(state, 8) for _ in range(3)]
 
     # two of the five alien species, hidden (SETUP-11)
-    drawn = rng.shuffled(state, list(SPECIES_BASE))
+    pool = [
+        *SPECIES_BASE,
+        *(SPECIES_EXPANSION if options.expansion else []),
+    ]  # EXP-03; the solo rival knows them too (EXP-SOLO-07, EXP-ARK-08, EXP-GLY-08, EXP-AMO-06)
+    drawn = rng.shuffled(state, pool)
     picked = _sandbox_species(options, drawn) if options.sandbox else drawn[:2]  # SANDBOX-06: the sandbox can choose them
     state.species = [SpeciesSlot(species=s, board=species.new_board(s)) for s in picked]
 
@@ -79,19 +84,27 @@ def new_game(options: Options) -> GameState:
         state.planets[name] = PlanetState(first_land_data_taken=[False] * slots, first_land_owners=[None] * slots)
 
     # deck
-    deck_ids = [cid for cid, c in tables.cards().items() if c["deck"] == "base" or (c["deck"] == "promo" and options.promo_cards)]
+    deck_ids = [
+        cid
+        for cid, c in tables.cards().items()
+        if c["deck"] == "base"
+        or (c["deck"] == "promo" and options.promo_cards)
+        or (c["deck"] == "promo2" and options.promo_set_2)
+        or (c["deck"] == "expansion" and options.expansion)
+    ]
     deck_ids.sort(key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else 0, x))  # fixed order before the shuffle
     state.deck = rng.shuffled(state, deck_ids)
     state.card_row = [state.deck.pop() for _ in range(3)]
     # end-of-round stacks: dealt face down from the main deck at setup (A-003), 1 more card than players each, rounds 1 to 4
-    for _ in range(4):
-        state.end_of_round_stacks.append([state.deck.pop() for _ in range(n + 1)])
+    for r in range(4):  # EXP-ORG-03: with organizations only the stacks of rounds 2 to 4 are prepared
+        skip = options.organizations and r == 0
+        state.end_of_round_stacks.append([] if skip else [state.deck.pop() for _ in range(n + 1)])
 
     # players (SETUP-30 to SETUP-38)
     for i in range(n):
         is_rival = solo and i == 1
         p = PlayerState(index=i, color=COLORS[i], credits=0 if is_rival else 4, energy=0 if is_rival else 3, publicity=4)
-        if not is_rival:  # the rival has no hand and no resources (SOLO-10)
+        if not is_rival and not options.organizations:  # the rival has no hand and no resources (SOLO-10); organizations deal 4 cards below
             p.hand = [state.deck.pop() for _ in range(5)]
         state.players.append(p)
 
@@ -100,6 +113,11 @@ def new_game(options: Options) -> GameState:
     for rank in range(n):  # starting scores 1, 2, 3, 4 by turn order (SETUP-32)
         state.players[(state.start_player + rank) % n].score = rank + 1
 
+    if options.organizations:  # EXP-ORG-03, EXP-ORG-04: organizations and quick start cards instead of the income card
+        if solo:  # EXP-SOLO-05: the player sees the neutral cards and the revealed objectives before the choice; the rival gets nothing
+            rival.setup_solo(state, options.difficulty)
+        orgs.deal(state, [i for rank in range(n) if (i := (state.start_player + rank) % n) != 1 or not solo])
+        return state
     # each player tucks one card for income, in turn order: the engine waits for each choice (SETUP-36, FAQ-01)
     for rank in range(n):
         pl = (state.start_player + rank) % n

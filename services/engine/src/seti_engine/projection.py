@@ -136,6 +136,11 @@ def project(state: GameState, viewer: int | None) -> View:
             p.hand = [HIDDEN] * len(p.hand)
             p.exertian_hand = [HIDDEN] * len(p.exertian_hand)
             p.exertian_played = [HIDDEN] * len(p.exertian_played)
+            p.security = {c: HIDDEN for c in p.security}  # face-down, only the trace color shows (EXP-ARK-03)
+            if p.org_data.get("fs_card"):
+                p.org_data["fs_card"] = HIDDEN  # Futurespan's prepared card lies face down
+            p.offered_orgs = [HIDDEN] * len(p.offered_orgs)  # EXP-ORG-04: the cards offered at setup are the player's secret
+            p.offered_quick = [HIDDEN] * len(p.offered_quick)
     for slot in s.species:
         slot.deck = [HIDDEN] * len(slot.deck)
         if not slot.discovered:
@@ -143,6 +148,11 @@ def project(state: GameState, viewer: int | None) -> View:
             slot.extra = {}
         else:
             _hide_tokens(slot.extra)
+            if "supply" in slot.extra and slot.species == "glyphids":
+                slot.extra["supply"] = [HIDDEN] * len(slot.extra["supply"])  # EXP-GLY-03: the face-down stack of glyph tokens
+            for key in ("explore_deck", "explore_aside"):  # EXP-ARK-01: the order and the cards set aside are secret
+                if key in slot.extra:
+                    slot.extra[key] = [HIDDEN] * len(slot.extra[key])
     s.undo, s.undo_log = None, []  # UNDO-01: the state to go back to holds the hands and the decks; nobody is shown it
     for d in s.stashed:
         if d.player != viewer:

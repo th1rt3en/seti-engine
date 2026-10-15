@@ -2,7 +2,6 @@
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 import {
   type Move,
-  buyText,
   describeMove,
   freeIsOnlyMovement,
   groupMoves,
@@ -10,6 +9,7 @@ import {
   handMoveText,
   irreversibleText,
   isHandMove,
+  rowMoveText,
   sameMove,
 } from "@/lib/moves";
 import { type Note, buildSpots } from "@/lib/targets";
@@ -247,6 +247,9 @@ export function GameClient({
   // exchanges and buying a card are made by picking cards (of the hand, of the display) and not with buttons of their own
   const exchanges = mine.filter((m) => m.type === "exchange");
   const buys = mine.filter((m) => m.type === "buy_card");
+  // taking a card, and discarding a card of the display for a signal, are made by clicking the card of the display (or the deck) too
+  const ROW_MOVES = ["buy_card", "take_card", "row_pick", "scan_discard", "scan_token"];
+  const rowMoves = mine.filter((m) => ROW_MOVES.includes(m.type) && m.source !== undefined);
   // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
   const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
   const placed = new Set([...handled].map((i) => mine[i]));
@@ -255,7 +258,8 @@ export function GameClient({
     (m) =>
       !placed.has(m) &&
       m.type !== "sandbox" &&
-      m.type !== "take_round_card" &&
+      !isOffer(m) &&
+      !rowMoves.includes(m) &&
       m.type !== "place_computer_tech" &&
       m.type !== "choose_gold" &&
       !handMoves.includes(m) &&
@@ -278,7 +282,7 @@ export function GameClient({
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
   // the display and the deck: clicked to buy a card, or to take the card of a trade
-  const rowSources = rowMode ? rowMode.map((m) => String(m.source)) : buys.map((m) => String(m.source));
+  const rowSources = rowMode ? rowMode.map((m) => String(m.source)) : [...new Set(rowMoves.map((m) => String(m.source)))];
   const selectSource = (source: string) => {
     if (rowMode) {
       const m = rowMode.find((x) => x.source === source);
@@ -292,8 +296,11 @@ export function GameClient({
   const spotOption = spots.find((sp) => sp.id === pickedSpot);
   const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
-  const offers = [...new Set(mine.filter((m) => m.type === "take_round_card").map((m) => String(m.card)))];
-  const offerMove = pickedOffer === null ? undefined : mine.find((m) => m.type === "take_round_card" && m.card === pickedOffer);
+  // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
+  const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
+  const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
+  const offers = [...new Set(mine.filter(isOffer).map(offerId))];
+  const offerMove = pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && offerId(m) === pickedOffer);
   // a tech for the computer goes in a slot picked on the player board
   const slotMoves = mine.filter((m) => m.type === "place_computer_tech");
   const slotMove = pickedSlot === null ? undefined : slotMoves.find((m) => m.slot === pickedSlot);
@@ -304,7 +311,7 @@ export function GameClient({
   const goldMoves = mine.filter((m) => m.type === "choose_gold");
   const goldTile = pickedGold === null ? undefined : v.state.gold_tiles.find((g) => g.tile === pickedGold);
   const goldMove = goldTile === undefined ? undefined : goldMoves.find((m) => m.tile === goldTile.tile);
-  const buyOption = pickedBuy === null ? undefined : buys.find((m) => m.source === pickedBuy);
+  const buyOptions = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
   const energy = me?.energy ?? 0;
@@ -383,7 +390,7 @@ export function GameClient({
                       title={idle ? "You have no probe on the map to move" : undefined}
                       onClick={() => play(m)}
                     >
-                      {m.type === "launch" || m.type === "scan" ? <ActionIcon name={m.type} /> : null}
+                      {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? <ActionIcon name={m.type} /> : null}
                       {describeMove(m)}
                       {m.type === "pick_sample" || m.type === "deliver_sample" ? (
                         <SampleReward note={v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))]} />
@@ -481,7 +488,7 @@ export function GameClient({
           {spots.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Click a highlighted place on the board.</span>
+              <span className="handhint">Click a highlighted place on the board or on a panel beside it.</span>
             </div>
           ) : null}
           {techMoves.length > 0 ? (
@@ -491,6 +498,12 @@ export function GameClient({
                 Click a tech stack to take that tech
                 {techMoves[0]?.type === "research" ? " (6 publicity, and the solar system rotates)" : ""}.
               </span>
+            </div>
+          ) : null}
+          {rowMoves.length > 0 && buys.length === 0 && !rowMode ? (
+            <div className="mgroup">
+              <span className="glabel">Your choice</span>
+              <span className="handhint">Click a card of the display{rowSources.includes("deck") ? " or the deck" : ""}.</span>
             </div>
           ) : null}
           {buys.length > 0 ? (
@@ -613,7 +626,7 @@ export function GameClient({
       {spotMove ? (
         <div className="confirmbar">
           <div className="confirm">
-            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} />
+            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} fallback={describeMove(spotMove)} />
             <button type="button" className="primary" onClick={() => play(spotMove)}>
               Confirm
             </button>
@@ -639,14 +652,16 @@ export function GameClient({
           </button>
         </div>
       ) : null}
-      {buyOption && !rowMode ? (
+      {buyOptions.length > 0 && !rowMode ? (
         <div className="confirmbar">
-          <div className="confirm">
-            <span>{buyText(buyOption.source, v.state.card_row)}</span>
-            <button type="button" className="primary" onClick={() => play(buyOption)}>
-              Confirm
-            </button>
-          </div>
+          {buyOptions.map((m) => (
+            <div key={m.type} className="confirm">
+              <span>{rowMoveText(m, v.state.card_row)}</span>
+              <button type="button" className="primary" onClick={() => play(m)}>
+                Confirm
+              </button>
+            </div>
+          ))}
           <button type="button" className="secondary" onClick={() => setPickedBuy(null)}>
             Cancel
           </button>
@@ -718,17 +733,22 @@ export function GameClient({
           : undefined
       }
       overlay={
-        boardOpen ? (
-          <PlayerBoardPanel
-            view={v}
-            names={names}
-            shown={boardPlayer}
-            onShow={setBoardPlayer}
-            onClose={() => setBoardOpen(false)}
-            choice={slotChoice}
-            onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
-          />
-        ) : null
+        <>
+          <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
+            {boardOpen ? "Close player boards" : "Player boards"}
+          </button>
+          {boardOpen ? (
+            <PlayerBoardPanel
+              view={v}
+              names={names}
+              shown={boardPlayer}
+              onShow={setBoardPlayer}
+              onClose={() => setBoardOpen(false)}
+              choice={slotChoice}
+              onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
+            />
+          ) : null}
+        </>
       }
       hand={{
         selectable: pickable,
@@ -764,11 +784,6 @@ export function GameClient({
         <>
           {clocks}
           {v.viewer !== null ? soundButton : null}
-          {v.state.players.length > 0 ? (
-            <button type="button" className="secondary small" onClick={() => setBoardOpen(!boardOpen)}>
-              Player boards
-            </button>
-          ) : null}
           <span className="small muted">
             {online ? "Connected" : "Reconnecting..."} · action {view.seq}
           </span>

@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
 import { CardImage } from "./CardImage";
 import { MascamiteTab } from "./Mascamites";
+import { MissionCard } from "./MissionsPanel";
 
 /** The cards of the hand that a move can be made with, the places (in the hand) of those that are picked, and what happens when one is clicked. */
 export interface HandSelection {
@@ -161,17 +162,22 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </span>
               </>
             ) : null}
-            {player.missions.length > 0 || player.kept_cards.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
+            {player.missions.length > 0 || player.kept_cards.length > 0 || player.message_cards.length > 0 ? (
+              <span className="handsep" aria-hidden="true" />
+            ) : null}
+            {player.message_cards.map((m) => (
+              <CardImage
+                key={`message-${m.card}`}
+                id={m.card}
+                size="mission"
+                title={`${cardName(m.card)}: its message marker is at ${m.target} points; the green part resolves when your score reaches it`}
+              />
+            ))}
             {player.kept_cards.map((c) => (
               <CardImage key={c} id={c} size="mission" title={`${cardName(c)}: kept in front of you`} />
             ))}
             {player.missions.map((m) => (
-              <CardImage
-                key={m.card}
-                id={m.card}
-                size="mission"
-                title={`Open mission ${cardName(m.card)}: ${m.kind === "trigger" ? `${m.used.filter(Boolean).length}/${m.used.length} circles` : "quick mission"}`}
-              />
+              <MissionCard key={m.card} mission={m} />
             ))}
           </div>
         </div>

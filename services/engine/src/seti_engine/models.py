@@ -12,6 +12,7 @@ TECH_CATEGORIES = ["probe", "telescope", "computer"]
 GLYPHS = ["dot", "link", "branch", "cross"]
 PLANET_ORDER = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune"]
 SPECIES_BASE = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"]
+SPECIES_EXPANSION = ["arkhos", "glyphids", "amoeba"]  # EXP-03: the new species the engine can play (Glyphids and Amoeba follow)
 
 Phase = Literal["setup", "play", "finished"]
 
@@ -20,8 +21,18 @@ class Options(BaseModel):
     players: int = Field(ge=1, le=4)  # 1 is the solo game against the rival (SOLO-01)
     difficulty: int = Field(default=3, ge=1, le=5)  # solo only: the number of gold stars (SOLO-04)
     promo_cards: bool = False  # PLAN.md D23: SE EN 01 and SE EN 02 are shuffled into the deck when on
+    promo_set_2: bool = False  # PROMO-04: SE EN 03 and SE DE 04 are shuffled into the deck when on
     # PLAN.md D33: a practice game for one player, without the rival, in which cards, resources and the discs can be added or changed freely
     sandbox: bool = False
+    # PLAN.md D35 (docs/spec/expansion.md): the Space Agencies expansion. `expansion` puts signal tokens in the game (and, as their data
+    # is supplied,
+    # the 42 cards and 3 species, A-028, A-032); `organizations` (needs `expansion`) is the organization module with quick start cards and
+    # 4 rounds;
+    # `neutral_quick_start` (needs `expansion`, 1 or 2 players) marks the neutral pieces of 4 quick start cards before the players choose
+    expansion: bool = False
+    organizations: bool = False
+    neutral_quick_start: bool = False
+    beginner_organizations: bool = False  # EXP-ORG-05: the first game tip (organizations 1 to 4, 2 quick start cards)
     # sandbox only: the two face-down alien species, left to right; None leaves a slot to chance (SANDBOX-06)
     sandbox_species: list[str | None] = Field(default_factory=lambda: list[str | None]([None, None]))
     seed: int = 0
@@ -30,6 +41,12 @@ class Options(BaseModel):
     def _sandbox_is_solo(self) -> Options:
         if self.sandbox and self.players != 1:
             raise ValueError("the sandbox is a game for one player")
+        if (self.organizations or self.neutral_quick_start) and not self.expansion:
+            raise ValueError("organizations and neutral quick start cards are part of the expansion")
+        if self.beginner_organizations and not self.organizations:
+            raise ValueError("the beginner organizations are an option of the organization module")
+        if self.neutral_quick_start and self.players > 2:
+            raise ValueError("the neutral quick start cards are for games of 1 or 2 players")
         chosen = [x for x in self.sandbox_species if x is not None]
         if len(self.sandbox_species) != 2 or any(x not in SPECIES_BASE for x in chosen) or len(set(chosen)) != len(chosen):
             raise ValueError("sandbox_species lists two different base species, or null for chance")
@@ -90,6 +107,21 @@ class PlayerState(BaseModel):
     missions: list[MissionState] = Field(default_factory=list)  # CARD-10: face-up missions still to complete
     completed_missions: list[str] = Field(default_factory=list)  # CARD-16: face down
     kept_cards: list[str] = Field(default_factory=list)  # cards kept in front of the player, no mission or end card (SE EN 01)
+    signal_tokens: int = 0  # EXP-SIG-01: unlimited supply
+    glyphs: list[str] = Field(default_factory=list)  # Glyphids (EXP-GLY-04): the glyph tokens not yet placed on the translation board
+    # Arkhos (EXP-ARK-03): trace color -> the security card still in front of the player
+    security: dict[str, str] = Field(default_factory=dict)
+    # the organization module (EXP-ORG-*): the organization, the 2 + 3 cards offered at setup (only the player sees them),
+    # the quick start cards chosen
+    organization: str | None = None
+    offered_orgs: list[str] = Field(default_factory=list)
+    offered_quick: list[str] = Field(default_factory=list)
+    quick_start: list[str] = Field(default_factory=list)
+    org_used: bool = False  # the once per round ability has been used this round (EXP-ORG-10)
+    org_marks: list[str] = Field(default_factory=list)  # reward spaces marked on Cosmos Strategy Group or Helion Assembly (EXP-ORG-11)
+    org_data: dict[str, Any] = Field(
+        default_factory=dict
+    )  # per organization: the Futurespan card and token, the Xenolab tiles, a stored card corner
     end_cards: list[str] = Field(default_factory=list)  # CARD-20: end-of-game scoring cards in front of the player
     exertian_hand: list[str] = Field(default_factory=list)  # Exertian cards held (not in hand, ALIEN-EXE-02)
     exertian_played: list[str] = Field(default_factory=list)  # Exertian cards played face down (ALIEN-EXE-01)
@@ -119,6 +151,7 @@ class GoldTile(BaseModel):
     tile: str  # "Tech", "Mission", "Income", "Other"
     side: str  # "A" or "B"
     markers: list[int] = Field(default_factory=list)  # players in the order they chose it
+    low_markers: list[int] = Field(default_factory=list)  # Mission Relay starts on the lowest-scoring space (EXP-ORG-13)
 
 
 class SpeciesSlot(BaseModel):
@@ -163,6 +196,7 @@ class RivalState(BaseModel):
     computer: int = 0  # data on the rival's computer, 0 to 6 (its unlimited data pool is `PlayerState.data_pool`, SOLO-17)
     techs: list[str] = Field(default_factory=list)  # stored techs (SOLO-18)
     arrow: str = "left"  # decision arrow of the card being resolved
+    breaching: bool = False  # EXP-ARK-08: the rival is playing its Arkhos card, so an overflow space of Arkhos breaches a security card
     messages_in_reserve: int = 0  # Centaurian message tokens the rival may still place (SOLO-ALIEN-02)
 
 
@@ -173,6 +207,9 @@ class ObjectiveState(BaseModel):
     row: list[str] = Field(default_factory=list)  # up to 3 revealed objectives
     marks: dict[str, list[bool]] = Field(default_factory=dict)  # objective id -> tasks marked
     pile: list[str] = Field(default_factory=list)  # completed objectives not yet spent
+    long_term: list[str] = Field(
+        default_factory=list
+    )  # EXP-SOLO-04, EXP-SOLO-06: the two long-term tiles in play (their marks are in `marks`)
 
 
 class GameState(BaseModel):
@@ -205,6 +242,7 @@ class GameState(BaseModel):
     rotations: int = 0  # solar system rotations so far (next disc = rotations % 3 + 1)
     first_pass_done: bool = False  # this round
     oumuamua_placed: bool = False
+    neutral_quick: list[str] = Field(default_factory=list)  # the quick start cards revealed for the neutral pieces (EXP-QS-03)
     pluto_owner: int | None = None  # the player who played the promo card SE EN 01: only they can orbit or land at Pluto (PROMO-02)
     probes: list[Probe] = Field(default_factory=list)
     planets: dict[str, PlanetState] = Field(default_factory=dict)

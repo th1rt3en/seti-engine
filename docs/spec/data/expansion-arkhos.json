@@ -1,0 +1,507 @@
+{
+ "source": "docs/spec/data/expansion-transcription.json (a transcription of the owner-supplied pictures, owner check pending; see ambiguities A-040 to A-042)",
+ "board": {
+  "title": "Arkhos",
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "level": 0,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 2
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 1,
+      "rewards": [
+       {
+        "t": "explore_minor",
+        "n": 1
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 2,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 5
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 3,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 7
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "level": 0,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 2
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 1,
+      "rewards": [
+       {
+        "t": "explore_minor",
+        "n": 1
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 2,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 5
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 3,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 7
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "level": 0,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 2
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 1,
+      "rewards": [
+       {
+        "t": "explore_minor",
+        "n": 1
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 2,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 5
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "level": 3,
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 7
+       },
+       {
+        "t": "explore_minor",
+        "n": 1
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "exploration": [
+  {
+   "id": "ET 39",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 1
+    },
+    {
+     "t": "card_random",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "card_random",
+     "n": 2
+    },
+    {
+     "t": "scan_free",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "id": "ET 36",
+   "minor": [
+    {
+     "t": "publicity",
+     "n": 2
+    }
+   ],
+   "major": [
+    {
+     "t": "publicity",
+     "n": 3
+    },
+    {
+     "t": "trace",
+     "n": 1,
+     "kind": "blue"
+    }
+   ]
+  },
+  {
+   "id": "ET 33",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 1
+    },
+    {
+     "t": "signal_token",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "signal_color",
+     "n": 1,
+     "color": "yellow"
+    },
+    {
+     "t": "signal_color",
+     "n": 1,
+     "color": "red"
+    },
+    {
+     "t": "signal_color",
+     "n": 1,
+     "color": "blue"
+    },
+    {
+     "t": "signal_any",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "id": "ET 40",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 4
+    }
+   ],
+   "major": [
+    {
+     "t": "data",
+     "n": 1
+    },
+    {
+     "t": "research",
+     "n": 1,
+     "cat": "any"
+    }
+   ]
+  },
+  {
+   "id": "ET 37",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 1
+    },
+    {
+     "t": "energy",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "signal_token",
+     "n": 1
+    },
+    {
+     "t": "energy",
+     "n": 4
+    }
+   ]
+  },
+  {
+   "id": "ET 34",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 1
+    },
+    {
+     "t": "credit",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "launch",
+     "n": 1,
+     "nolimit": true
+    },
+    {
+     "t": "trace",
+     "n": 1,
+     "kind": "pink"
+    }
+   ]
+  },
+  {
+   "id": "ET 41",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 1
+    },
+    {
+     "t": "card_random",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "publicity",
+     "n": 1
+    },
+    {
+     "t": "data",
+     "n": 1
+    },
+    {
+     "t": "credit",
+     "n": 1
+    },
+    {
+     "t": "energy",
+     "n": 1
+    },
+    {
+     "t": "card_any",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "id": "ET 38",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 2
+    },
+    {
+     "t": "publicity",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "launch",
+     "n": 1,
+     "nolimit": true
+    },
+    {
+     "t": "move",
+     "n": 3
+    }
+   ]
+  },
+  {
+   "id": "ET 35",
+   "minor": [
+    {
+     "t": "vp",
+     "n": 1
+    },
+    {
+     "t": "energy",
+     "n": 1
+    }
+   ],
+   "major": [
+    {
+     "t": "energy",
+     "n": 2
+    },
+    {
+     "t": "trace",
+     "n": 1,
+     "kind": "yellow"
+    }
+   ]
+  }
+ ],
+ "security": [
+  {
+   "id": "AK.21",
+   "printed": "ET.21",
+   "name": "Exterior Scan",
+   "trace": "pink",
+   "sector": "red",
+   "income": "card"
+  },
+  {
+   "id": "AK.22",
+   "printed": "ET.22",
+   "name": "Exterior Scan",
+   "trace": "pink",
+   "sector": "blue",
+   "income": "energy"
+  },
+  {
+   "id": "AK.23",
+   "printed": "ET.23",
+   "name": "Exterior Scan",
+   "trace": "pink",
+   "sector": "yellow",
+   "income": "credit"
+  },
+  {
+   "id": "AK.24",
+   "printed": "ET.24",
+   "name": "Exterior Scan",
+   "trace": "pink",
+   "sector": "black",
+   "income": "energy"
+  },
+  {
+   "id": "AK.29",
+   "printed": "ET.29",
+   "name": "Forced Entry",
+   "trace": "yellow",
+   "sector": "yellow",
+   "income": "card"
+  },
+  {
+   "id": "AK.30",
+   "printed": "ET.30",
+   "name": "Forced Entry",
+   "trace": "yellow",
+   "sector": "red",
+   "income": "energy"
+  },
+  {
+   "id": "AK.31",
+   "printed": "ET.31",
+   "name": "Forced Entry",
+   "trace": "yellow",
+   "sector": "blue",
+   "income": "credit"
+  },
+  {
+   "id": "AK.32",
+   "printed": "ET.32",
+   "name": "Forced Entry",
+   "trace": "yellow",
+   "sector": "black",
+   "income": "credit"
+  },
+  {
+   "id": "AK.25",
+   "printed": "ET.25",
+   "name": "Proximity Maneuvers",
+   "trace": "blue",
+   "sector": "blue",
+   "income": "card"
+  },
+  {
+   "id": "AK.26",
+   "printed": "ET.26",
+   "name": "Proximity Maneuvers",
+   "trace": "blue",
+   "sector": "yellow",
+   "income": "energy"
+  },
+  {
+   "id": "AK.27",
+   "printed": "ET.27",
+   "name": "Proximity Maneuvers",
+   "trace": "blue",
+   "sector": "red",
+   "income": "credit"
+  },
+  {
+   "id": "AK.28",
+   "printed": "ET.28",
+   "name": "Proximity Maneuvers",
+   "trace": "blue",
+   "sector": "black",
+   "income": "card"
+  }
+ ]
+}

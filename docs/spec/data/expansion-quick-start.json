@@ -1,0 +1,429 @@
+{
+ "source": "tools/card-tracker/cards-extracted.json (community extraction); owner check pending",
+ "quick_start_cards": [
+  {
+   "id": "SR.1",
+   "marks": [
+    {
+     "trace": "yellow",
+     "alienIndex": 1
+    }
+   ],
+   "place_text": "in the discovery space of the right species",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.2",
+   "marks": [
+    {
+     "trace": "pink",
+     "alienIndex": 1
+    }
+   ],
+   "place_text": "in the discovery space of the right species",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.3",
+   "marks": [
+    {
+     "starName": "barnards_star",
+     "count": 2
+    }
+   ],
+   "place_text": "in Barnard's Star",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.4",
+   "marks": [
+    {
+     "starName": "proxima_centauri",
+     "count": 2
+    }
+   ],
+   "place_text": "in Proxima Centauri",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.5",
+   "marks": [
+    {
+     "starName": "sirius_a",
+     "count": 2
+    }
+   ],
+   "place_text": "in Sirius A",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.6",
+   "marks": [
+    {
+     "starName": "procyon",
+     "count": 2
+    }
+   ],
+   "place_text": "in Procyon",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.7",
+   "marks": [
+    {
+     "starName": "kepler_22",
+     "count": 2
+    }
+   ],
+   "place_text": "in Kepler 22",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.8",
+   "marks": [
+    {
+     "starName": "sixty_one_virginis",
+     "count": 2
+    }
+   ],
+   "place_text": "in 61 Virginis",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.9",
+   "marks": [
+    {
+     "starName": "beta_pictoris",
+     "count": 2
+    }
+   ],
+   "place_text": "in Beta Pictoris",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "data",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.10",
+   "marks": [
+    {
+     "starName": "vega",
+     "count": 1
+    }
+   ],
+   "place_text": "in Vega",
+   "lower": [
+    {
+     "effect": "signal_token",
+     "n": 1
+    },
+    {
+     "effect": "data",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.11",
+   "marks": [
+    {
+     "planet": "saturn"
+    }
+   ],
+   "place_text": "at Saturn",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 4
+    },
+    {
+     "effect": "publicity",
+     "n": 2
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.12",
+   "marks": [
+    {
+     "planet": "venus"
+    }
+   ],
+   "place_text": "at Venus",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "energy",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.13",
+   "marks": [
+    {
+     "planet": "jupiter"
+    }
+   ],
+   "place_text": "at Jupiter",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "data",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.14",
+   "marks": [
+    {
+     "planet": "mercury"
+    }
+   ],
+   "place_text": "at Mercury",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 2
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "credit",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.15",
+   "marks": [
+    {
+     "planet": "uranus"
+    }
+   ],
+   "place_text": "at Uranus",
+   "lower": [],
+   "income_increase": "card"
+  },
+  {
+   "id": "SR.16",
+   "marks": [
+    {
+     "planet": "neptune"
+    }
+   ],
+   "place_text": "at Neptune",
+   "lower": [],
+   "income_increase": "data"
+  },
+  {
+   "id": "SR.17",
+   "marks": [
+    {
+     "planet": "mars"
+    }
+   ],
+   "place_text": "at Mars",
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    },
+    {
+     "effect": "card",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.18",
+   "marks": [],
+   "place_text": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "credit",
+     "n": 1
+    },
+    {
+     "effect": "card",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.19",
+   "marks": [],
+   "place_text": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "energy",
+     "n": 1
+    },
+    {
+     "effect": "card",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.20",
+   "marks": [],
+   "place_text": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 4
+    },
+    {
+     "effect": "signal_token",
+     "n": 1
+    },
+    {
+     "effect": "publicity",
+     "n": 1
+    }
+   ],
+   "income_increase": null
+  },
+  {
+   "id": "SR.21",
+   "marks": [],
+   "place_text": null,
+   "lower": [
+    {
+     "effect": "score",
+     "n": 3
+    },
+    {
+     "effect": "publicity",
+     "n": 3
+    }
+   ],
+   "income_increase": null
+  }
+ ]
+}

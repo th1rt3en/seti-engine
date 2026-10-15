@@ -134,6 +134,11 @@ def test_trace_on_a_board_counts_for_missions() -> None:
 # --- Anomalies -------------------------------------------------------------------------------------------------------------------
 
 
+def sandbox_free_reward(token: dict[str, Any]) -> list[dict[str, Any]]:
+    faces = next(x for x in tables.alien_boards()["anomalies"]["tokens"] if x["column"] == token["color"])["sides"]
+    return list(faces[token["side"]])
+
+
 def test_anomalies_are_placed_in_earths_sector_and_three_sectors_either_side() -> None:
     """ALIEN-ANO-01: the placement is logged with each token's sector, color, face and reward."""
     r = discover(game(), 0)
@@ -146,6 +151,7 @@ def test_anomalies_are_placed_in_earths_sector_and_three_sectors_either_side() -
     assert len(placed) == 1 and placed[0]["earth_sector"] == e
     assert [(t["sector"], t["color"], t["side"]) for t in placed[0]["tokens"]] == [(t["sector"], t["color"], t["side"]) for t in toks]
     assert all(t["reward"] for t in placed[0]["tokens"])
+    assert all(t["reward"] == sandbox_free_reward(t) for t in toks)  # the state carries what each token pays, for the page
 
 
 def test_rotation_into_an_anomaly_pays_the_highest_marker_of_its_column() -> None:

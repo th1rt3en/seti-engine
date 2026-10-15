@@ -1,5 +1,7 @@
 // Words for the legal moves the engine offers. The UI offers only these moves (decision D10); it never works out a rule itself.
 import cards from "../generated/cards.json";
+import organizations from "../generated/organizations.json";
+import quickStart from "../generated/quick-start.json";
 
 export type Move = { type: string } & Record<string, unknown>;
 
@@ -8,8 +10,20 @@ const CARDS = cards as unknown as Record<string, CardInfo>;
 
 export function cardName(id: unknown): string {
   const c = CARDS[String(id)];
-  return c ? `${c.name} (${String(id)})` : String(id);
+  if (c) return `${c.name} (${String(id)})`;
+  return ORGS[String(id)]?.name ?? String(id); // the organizations are pictured like cards
 }
+
+const ORGS = organizations as unknown as Record<string, { name: string; number: number; abilities: Record<string, string> }>;
+const QUICK = quickStart as unknown as Record<string, { marks: string; lower: { effect: string; n: number }[] }>;
+export const ORG_NAMES: Record<string, string> = Object.fromEntries(Object.entries(ORGS).map(([id, o]) => [id, o.name]));
+const orgName = (id: unknown): string => ORGS[String(id)]?.name ?? String(id);
+const quickText = (id: unknown): string => {
+  const q = QUICK[String(id)];
+  if (!q) return String(id);
+  const gains = q.lower.map((e) => `${e.n} ${e.effect === "score" ? "VP" : e.effect.replace("_", " ")}`).join(", ");
+  return `${String(id)}${q.marks ? `: mark ${q.marks}` : ""}${gains ? `; gain ${gains}` : ""}`;
+};
 
 const cap = (s: unknown): string => {
   const t = String(s);
@@ -57,6 +71,37 @@ export const LABELS: Record<string, Label> = {
   skip_tuck: () => "Do not tuck a card",
   discard: (m) => `Discard ${cardName(m.card)}`,
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
+  choose_org: (m) =>
+    `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
+  choose_quick: (m) => `Keep the quick start card ${quickText(m.card)}`,
+  org_free: (m) => orgFreeLabel(m),
+  breach: () => "Breach your security card of that color (take it into your hand)",
+  skip_breach: () => "Do not breach the security card",
+  corner_pick: (m) => `Choose ${String(m.kind)}: gain it for each card in your hand with that icon in its free-action corner`,
+  decipher: (m) =>
+    `Place the ${String(m.glyph)} glyph token in the ${String(m.row)} row, slot ${Number(m.index) + 1}, and gain its resource`,
+  glyph_group: (m) => `Gain the resources of glyph group ${Number(m.group) + 1}`,
+  pick_organelle: (m) => `Gain the bonus of the organelle on space ${String(m.space)}`,
+  amoeba_remove: (m) => `Remove your marker from the ${String(m.color)} space ${Number(m.index) + 1} of the Amoeba board`,
+  spend_credit: () => "Spend 1 credit for 2 VP and 2 publicity",
+  spend_done: () => "Stop spending credits",
+  restructure_card: (m) => `Discard ${cardName(m.card)} and gain its income resource`,
+  restructure_done: () => "Stop discarding cards",
+  return_mission: (m) => `Return the mission ${cardName(m.card)} to your hand`,
+  discard_corner: (m) => `Discard ${cardName(m.card)} and gain its free-action corner 3 times`,
+  discard_corner_none: () => "No card to discard",
+  od_step: (m) => `Orbital Dynamics: move probe ${String(m.probe)} one step`,
+  org_mark: (m) => `Mark the ${String(m.space).replace("_", " ")} reward space on your organization and gain it`,
+  org_skip: () => "Do not mark a reward space",
+  org_main: (m) =>
+    m.org === "futurespan_institute"
+      ? "Futurespan Institute: play the prepared card for free"
+      : m.tile === "launch"
+        ? "Xenolab: launch a probe (1 credit, flips the launch tile)"
+        : m.tile === "scan"
+          ? "Xenolab: scan (2 energy, flips the scan tile)"
+          : `Xenolab: research the tech in stack ${Number(m.stack) + 1} (4 publicity, flips the research tile)`,
+  scan_token: (m) => `Discard a signal token and ${source(m.source)} for a signal`,
   choose_gold: (m) => `Mark the ${String(m.tile)} gold scoring tile`,
   orbit: (m) => `Orbit ${m.at === "pluto" ? "Pluto " : ""}with probe ${String(m.probe)} (1 credit, 1 energy)`,
   land: (m) => `Land ${m.at === "pluto" ? "on Pluto " : ""}with probe ${String(m.probe)}${m.moon ? ` on ${String(m.moon)}` : ""}`,
@@ -103,6 +148,25 @@ export const LABELS: Record<string, Label> = {
   remove_lander: (m) => `Remove your lander ${m.moon ? `on ${String(m.moon)}` : `at ${planet(m.planet)}`}`,
 };
 
+function orgFreeLabel(m: Move): string {
+  const org = String(m.org);
+  const name = orgName(org);
+  if (org === "fenwick_research_center") return `${name}: spend 1 publicity for ${source(m.source)}, then gain its free-action corner`;
+  if (org === "mission_relay") return `${name}: spend 2 publicity for ${source(m.source)}, then gain its income resource`;
+  if (org === "stratus_core") return `${name}: gain the free-action corners of all cards in the card row`;
+  if (org === "deep_sky_survey") return `${name}: switch ${cardName(m.card)} with card ${Number(m.row) + 1} of the card row`;
+  if (org === "sentinel_probe_network") return `${name}: gain the free-action corner of the card you played`;
+  if (org === "futurespan_institute")
+    return m.delay
+      ? `${name}: move the token 3 spaces farther and gain a card`
+      : `${name}: prepare ${cardName(m.card)} (the token goes 10 points per credit of cost + 5 ahead)`;
+  if (org === "cosmos_strategy_group") return `${name}: gain ${source(m.source)} and clear your marked reward spaces`;
+  if (org === "helion_assembly")
+    return `${name}: destroy your ${String(m.tech)} tech, tuck ${cardName(m.card)} for income and clear your marked reward spaces`;
+  if (org === "turing_systems") return `${name}: use the ${String(m.tech)} tech this turn`;
+  return `${name}: use the once-per-round ability`;
+}
+
 export function describeMove(m: Move): string {
   const label = LABELS[m.type];
   return label ? label(m) : `${m.type} ${JSON.stringify(Object.fromEntries(Object.entries(m).filter(([k]) => k !== "type")))}`;
@@ -119,6 +183,9 @@ export const FREE_ACTION_TYPES = new Set([
   "place_lower",
   "complete_mission",
   "deliver_sample",
+  "org_free",
+  "decipher",
+  "od_step",
 ]);
 
 export function groupMoves(moves: Move[], pending: boolean, answeringFree = false): { title: string; moves: Move[] }[] {
@@ -161,7 +228,17 @@ export function irreversibleText(m: Move): string {
 }
 
 /** The moves that name a card of the player's hand: the player picks the card in the hand, then confirms. */
-export const HAND_MOVE_TYPES = new Set(["tuck", "discard", "discard_free", "play_card", "scan_hand_discard", "hand_signal"]);
+export const HAND_MOVE_TYPES = new Set([
+  "tuck",
+  "discard",
+  "discard_free",
+  "play_card",
+  "scan_hand_discard",
+  "hand_signal",
+  "restructure_card", // Turing Systems restructuring: the cards to discard are picked in the hand
+  "discard_corner", // Sentinel Probe Network
+  "org_free", // Futurespan, Deep Sky Survey, Helion Assembly: the card is picked in the hand
+]);
 
 export const isHandMove = (m: Move, hand: string[]): boolean => HAND_MOVE_TYPES.has(m.type) && hand.includes(String(m.card));
 
@@ -176,7 +253,7 @@ export const sameMove = (a: Move, b: Move): boolean => {
   return key(a) === key(b);
 };
 
-const cardTitle = (id: unknown): string => CARDS[String(id)]?.name ?? String(id);
+const cardTitle = (id: unknown): string => CARDS[String(id)]?.name ?? ORGS[String(id)]?.name ?? String(id);
 const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
 const freeText = (free: [string, number][] | undefined): string =>
   free && free.length > 0 ? free.map(([k, n]) => `${n} ${k}`).join(", ") : "nothing";
@@ -184,7 +261,7 @@ const freeText = (free: [string, number][] | undefined): string =>
 /** What the bar asks when the player has picked a card for this move. */
 export function handMoveText(m: Move): string {
   const info = CARDS[String(m.card)];
-  const name = cardTitle(m.card);
+  const name = cardTitle(m.type === "choose_org" ? m.org : m.card);
   const sector = info?.sector ?? "any";
   switch (m.type) {
     case "tuck":
@@ -203,6 +280,10 @@ export function handMoveText(m: Move): string {
       return `Discard ${name} to mark a signal in a ${sector} sector?`;
     case "take_round_card":
       return `Confirm keeping ${name} from the end-of-round cards? The others go back.`;
+    case "choose_org":
+      return `Take the organization ${name}? The other one goes back to the box.`;
+    case "choose_quick":
+      return `Keep the quick start card ${quickText(m.card)}?`;
     default:
       return describeMove(m);
   }
@@ -237,6 +318,26 @@ export const freeIsOnlyMovement = (id: unknown): boolean => {
 };
 
 /** What the bar asks when the player has picked a card of the display or the deck to buy. */
+/** What the bar asks when the player has clicked a card of the display (or the deck) for one of the moves that name it. */
+export function rowMoveText(m: Move, row: string[]): string {
+  const s = String(m.source);
+  const id = s === "deck" ? undefined : row[Number(s.slice(4))];
+  const card = s === "deck" ? "the top card of the deck" : id === undefined ? "this card" : cardTitle(id);
+  switch (m.type) {
+    case "buy_card":
+      return buyText(m.source, row);
+    case "take_card":
+      return `Take ${card}?`;
+    case "row_pick":
+    case "scan_discard":
+      return `Discard ${card} for a signal in a sector of its color?`;
+    case "scan_token":
+      return `Discard a signal token and ${card} for a signal?`;
+    default:
+      return describeMove(m);
+  }
+}
+
 export function buyText(source: unknown, row: string[]): string {
   const s = String(source);
   if (s === "deck") return "Buy the top card of the deck for 3 publicity?";

@@ -289,6 +289,13 @@
           "title": "Neutral Markers",
           "type": "object"
         },
+        "neutral_quick": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Neutral Quick",
+          "type": "array"
+        },
         "objectives": {
           "anyOf": [
             {
@@ -584,6 +591,7 @@
         "log",
         "main_done",
         "neutral_markers",
+        "neutral_quick",
         "objectives",
         "options",
         "oumuamua_placed",
@@ -626,6 +634,13 @@
     },
     "GoldTile": {
       "properties": {
+        "low_markers": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Low Markers",
+          "type": "array"
+        },
         "markers": {
           "items": {
             "type": "integer"
@@ -643,6 +658,7 @@
         }
       },
       "required": [
+        "low_markers",
         "markers",
         "side",
         "tile"
@@ -740,6 +756,13 @@
     "ObjectiveState": {
       "description": "The player's objectives in the solo game (SOLO-OBJ-*).",
       "properties": {
+        "long_term": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Long Term",
+          "type": "array"
+        },
         "marks": {
           "additionalProperties": {
             "items": {
@@ -773,6 +796,7 @@
         }
       },
       "required": [
+        "long_term",
         "marks",
         "pile",
         "row",
@@ -783,12 +807,32 @@
     },
     "Options": {
       "properties": {
+        "beginner_organizations": {
+          "default": false,
+          "title": "Beginner Organizations",
+          "type": "boolean"
+        },
         "difficulty": {
           "default": 3,
           "maximum": 5,
           "minimum": 1,
           "title": "Difficulty",
           "type": "integer"
+        },
+        "expansion": {
+          "default": false,
+          "title": "Expansion",
+          "type": "boolean"
+        },
+        "neutral_quick_start": {
+          "default": false,
+          "title": "Neutral Quick Start",
+          "type": "boolean"
+        },
+        "organizations": {
+          "default": false,
+          "title": "Organizations",
+          "type": "boolean"
         },
         "players": {
           "maximum": 4,
@@ -799,6 +843,11 @@
         "promo_cards": {
           "default": false,
           "title": "Promo Cards",
+          "type": "boolean"
+        },
+        "promo_set_2": {
+          "default": false,
+          "title": "Promo Set 2",
           "type": "boolean"
         },
         "sandbox": {
@@ -974,6 +1023,13 @@
           "title": "Exofossils",
           "type": "integer"
         },
+        "glyphs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Glyphs",
+          "type": "array"
+        },
         "gold_markers": {
           "items": {
             "type": "string"
@@ -1032,12 +1088,55 @@
           "title": "Movement",
           "type": "integer"
         },
+        "offered_orgs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Offered Orgs",
+          "type": "array"
+        },
+        "offered_quick": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Offered Quick",
+          "type": "array"
+        },
         "orbiters": {
           "additionalProperties": {
             "type": "integer"
           },
           "title": "Orbiters",
           "type": "object"
+        },
+        "org_data": {
+          "additionalProperties": true,
+          "title": "Org Data",
+          "type": "object"
+        },
+        "org_marks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Org Marks",
+          "type": "array"
+        },
+        "org_used": {
+          "default": false,
+          "title": "Org Used",
+          "type": "boolean"
+        },
+        "organization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization"
         },
         "passed": {
           "default": false,
@@ -1054,6 +1153,13 @@
           "title": "Publicity",
           "type": "integer"
         },
+        "quick_start": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Quick Start",
+          "type": "array"
+        },
         "score": {
           "default": 0,
           "title": "Score",
@@ -1062,6 +1168,18 @@
         "sector_wins": {
           "default": 0,
           "title": "Sector Wins",
+          "type": "integer"
+        },
+        "security": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Security",
+          "type": "object"
+        },
+        "signal_tokens": {
+          "default": 0,
+          "title": "Signal Tokens",
           "type": "integer"
         },
         "techs": {
@@ -1109,6 +1227,7 @@
         "exertian_hand",
         "exertian_played",
         "exofossils",
+        "glyphs",
         "gold_markers",
         "hand",
         "index",
@@ -1118,12 +1237,21 @@
         "messages",
         "missions",
         "movement",
+        "offered_orgs",
+        "offered_quick",
         "orbiters",
+        "org_data",
+        "org_marks",
+        "org_used",
+        "organization",
         "passed",
         "probes_launched",
         "publicity",
+        "quick_start",
         "score",
         "sector_wins",
+        "security",
+        "signal_tokens",
         "techs",
         "trace_log",
         "tucked"
@@ -1366,6 +1494,11 @@
           "title": "Arrow",
           "type": "string"
         },
+        "breaching": {
+          "default": false,
+          "title": "Breaching",
+          "type": "boolean"
+        },
         "computer": {
           "default": 0,
           "title": "Computer",
@@ -1409,6 +1542,7 @@
       "required": [
         "advanced",
         "arrow",
+        "breaching",
         "computer",
         "deck",
         "index",

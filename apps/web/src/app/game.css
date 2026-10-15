@@ -1702,3 +1702,196 @@ button:disabled {
 .playerboard .pbspace.pickable:focus circle {
   fill: #1a2a55;
 }
+
+.orgname {
+  font-size: 11px;
+  color: #c4a8ff;
+  border: 1px solid rgba(167, 129, 255, 0.5);
+  border-radius: 999px;
+  padding: 0 6px;
+}
+
+.glyphpanel h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.translation {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+.glyphhold {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.glyphhold img {
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+/* places on the panels of the expansion (the circles are measured in the picture of the panel, so their stroke is thinner than on the board) */
+.spotshape.panelspot {
+  stroke-width: 4;
+  stroke-dasharray: 10 6;
+}
+.exppanel h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.exppanel svg.panelsvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+.exppanel .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: flex-start;
+}
+.exppanel .orgcard img,
+.exppanel .qcards img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+.exppanel .qcards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+.exppanel .selectable {
+  outline: 3px dashed #6ef0a5;
+  outline-offset: 2px;
+  animation: spotpulse 1.6s ease-in-out infinite;
+}
+.exppanel .chips {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.exppanel .chip {
+  text-align: left;
+  font-size: 12px;
+  border: 1px dashed #6ef0a5;
+  background: rgba(110, 240, 165, 0.12);
+  color: inherit;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.exppanel .chip.chosen {
+  background: rgba(110, 240, 165, 0.5);
+  border-style: solid;
+}
+.exppanel .tiles {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.exppanel .tiles img {
+  width: 52px;
+  height: auto;
+}
+.exppanel .sec {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.exppanel .sec img {
+  width: 30%;
+  border-radius: 4px;
+}
+.exppanel .sec .selectable {
+  cursor: pointer;
+}
+
+.objective .task.pick {
+  border: 2px dashed #6ef0a5;
+  background: rgba(110, 240, 165, 0.16);
+  color: inherit;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  padding: 0;
+}
+.objective .task.pick.chosen {
+  background: rgba(110, 240, 165, 0.55);
+  border-style: solid;
+}
+
+/* the card row: below the tech stacks on a wide screen (three cards in one row), a floating panel on a narrow one */
+.rowinline {
+  display: none;
+  padding: 8px;
+}
+.rowinline .rowbody {
+  padding: 0;
+  overflow: visible;
+}
+.rowinline .rowtitle {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.rowinline .rowbody .cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+@media (min-width: 1100px) {
+  .rowinline {
+    display: block;
+  }
+  .rowdock.floating {
+    display: none;
+  }
+}
+
+/* missions: the card with its circles under it */
+.missioncard {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.missioncard .circles {
+  display: flex;
+  gap: 4px;
+  font-size: 15px;
+  line-height: 1;
+}
+.missioncard .circle {
+  color: var(--muted);
+}
+.missioncard .circle.taken {
+  color: #6ef0a5;
+}
+.missionspanel .missionrow {
+  margin-bottom: 10px;
+}
+.missionspanel .missioncards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.missionspanel .missioncards .card-mission {
+  width: clamp(80px, 5.2vw, 120px);
+}
+/* the player boards button: always in view, at the right edge */
+.boardsfab {
+  position: fixed;
+  right: 14px;
+  top: calc(var(--bar-bottom, var(--bar-h)) + 14px);
+  z-index: 60;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}

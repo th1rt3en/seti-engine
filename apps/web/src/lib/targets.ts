@@ -2,11 +2,61 @@
 // and says what each one means (`view.notes`, from move_notes.py); this file only says where on the picture each of them is, so that the board can
 // highlight the place and the player can click it. A move that has no place here stays a button of the bar.
 import type { View } from "@seti/protocol";
-import { ALIEN, ALIEN_COLUMN, ALIEN_TOP, DISCOVERY, MOON, OUMUAMUA_TILE, PLANET, RING_BOUNDS, alienColumn, polar } from "./geometry";
+import {
+  ALIEN,
+  ALIEN_COLUMN,
+  ALIEN_TOP,
+  DISCOVERY,
+  MOON,
+  OUMUAMUA_TILE,
+  PLANET,
+  RING_BOUNDS,
+  RING_RADIUS,
+  alienColumn,
+  orbitSlot,
+  polar,
+  sectorDegrees,
+} from "./geometry";
 import type { Move } from "./moves";
 import { SPECIES_SPACES } from "./speciesSpaces";
 
 const TRACE_COLORS = ["pink", "yellow", "blue"];
+
+/** The holes of the Glyphids translation board in its picture (750 x 690): the top row of 3 and the bottom row of 4 (EXP-GLY-05). */
+export const GLYPH_HOLES: Record<"top" | "bottom", [number, number][]> = {
+  top: [
+    [200, 160],
+    [375, 160],
+    [545, 160],
+  ],
+  bottom: [
+    [112, 440],
+    [290, 440],
+    [468, 440],
+    [640, 440],
+  ],
+};
+
+/** The reward spaces printed on the organization boards of Cosmos Strategy Group and Helion Assembly, in the picture of the card (560 x 421). */
+export const ORG_SPACES: Record<string, Record<string, [number, number]>> = {
+  cosmos_strategy_group: { credit: [45, 215], publicity: [125, 215], data: [205, 215] },
+  helion_assembly: { energy: [40, 130], signal_token: [120, 130], data: [200, 130] },
+};
+
+/** The nine organelle spaces of the Amoeba board in its picture (573 x 1044): 6 outer spaces clockwise, 3 inner ones counter-clockwise. */
+export const ORGANELLE_SPACES: Record<string, [number, number]> = {
+  Y1: [228, 148],
+  Y2: [340, 138],
+  B1: [478, 355],
+  B2: [418, 460],
+  P1: [172, 465],
+  P2: [112, 353],
+  IY: [292, 242],
+  IP: [230, 350],
+  IB: [350, 335],
+};
+/** The picture of the Amoeba board is 573 wide; the places of the markers are measured on the species boards of the base board (777 wide). */
+export const AMOEBA_SCALE = 573 / 777;
 
 /** What the engine says about a move (see move_notes.py). */
 export type Note = {
@@ -39,6 +89,10 @@ export type Spot = {
   /** The move of the engine that this place stands for, as its place in `view.legal`. */
   move: number;
   label: string;
+  /** The place lies on a panel beside the board, in the picture of that panel (not on the board itself). */
+  panel?: "glyphids" | "amoeba" | "arkhos" | "org" | "objectives";
+  /** What the place holds, for panels that draw it (a glyph token, a chip). */
+  glyph?: string;
 };
 
 /** The wedge of the star ring that is sector `i`: between the outer ring of the solar system and the outer edge of the stars. */
@@ -82,11 +136,8 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const at = MOON[moonKey(n.moon)];
         if (at) spot = { id: `moon:${n.moon}`, shape: { kind: "circle", x: at.x, y: at.y + 20, r: 78 } };
       } else if (n.action === "orbit") {
-        const k = st.orbiters.length;
-        spot = {
-          id: `orbit:${n.planet}`,
-          shape: { kind: "circle", x: pos.x - pos.r * 0.55 + k * 84, y: pos.y - pos.r * 0.32 + 10, r: 76 },
-        };
+        const at = orbitSlot(n.planet, st.orbiters.length) ?? { x: pos.x, y: pos.y };
+        spot = { id: `orbit:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y + 10, r: 62 } };
       } else {
         const k = st.landers.length;
         spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: pos.x - pos.r * 0.55 + k * 84, y: pos.y + pos.r * 0.22 + 20, r: 76 } };
@@ -118,6 +169,53 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
     if (!spot) return;
     handled.add(i);
     if (!spots.has(spot.id)) spots.set(spot.id, { ...spot, move: i, label: spot.id });
+  });
+  // the moves of the Space Agencies expansion: they carry their own place, so the engine needs no note for them
+  const none = { kind: "circle", x: 0, y: 0, r: 0 } as const;
+  const add = (i: number, id: string, shape: Spot["shape"], extra?: Partial<Spot>) => {
+    handled.add(i);
+    if (!spots.has(id)) spots.set(id, { id, shape, move: i, label: id, ...extra });
+  };
+  const mineOrg = (view.viewer === null ? null : s.players?.[view.viewer]?.organization) ?? "";
+  const first = s.pending?.[0];
+  const breachColor = first?.kind === "breach" ? String(first.data?.color ?? "") : "";
+  legal.forEach((m, i) => {
+    if (m.type === "od_step") {
+      // Orbital Dynamics: one step for a probe, to a space next to it
+      const to = m.to as [number, number];
+      const at = polar(RING_RADIUS[to[0]] ?? 270, sectorDegrees(to[1]));
+      add(i, `od:${String(m.probe)}:${to[0]}-${to[1]}`, { kind: "circle", x: at.x, y: at.y, r: 80 });
+    } else if (m.type === "decipher") {
+      const at = GLYPH_HOLES[m.row === "top" ? "top" : "bottom"][Number(m.index)];
+      if (at)
+        add(
+          i,
+          `glyph:${String(m.row)}:${String(m.index)}:${String(m.glyph)}`,
+          { ...none, x: at[0], y: at[1], r: 70 },
+          { panel: "glyphids", glyph: String(m.glyph) },
+        );
+    } else if (m.type === "pick_organelle") {
+      const at = ORGANELLE_SPACES[String(m.space)];
+      if (at) add(i, `organelle:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 40 }, { panel: "amoeba" });
+    } else if (m.type === "amoeba_remove") {
+      const at = SPECIES_SPACES.amoeba?.[String(m.color)]?.[Number(m.index)];
+      if (at)
+        add(
+          i,
+          `amoeba:${String(m.color)}:${String(m.index)}`,
+          { ...none, x: at[0] * AMOEBA_SCALE, y: at[1] * AMOEBA_SCALE, r: 34 },
+          { panel: "amoeba" },
+        );
+    } else if (m.type === "breach") {
+      add(i, `breach:${breachColor}`, { ...none }, { panel: "arkhos", glyph: breachColor });
+    } else if (m.type === "mark_objective") {
+      add(i, `task:${String(m.objective)}:${String(m.task)}`, { ...none }, { panel: "objectives" });
+    } else if (m.type === "org_mark" && ORG_SPACES[mineOrg]?.[String(m.space)]) {
+      const at = ORG_SPACES[mineOrg]?.[String(m.space)] ?? [0, 0];
+      add(i, `orgspace:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 34 }, { panel: "org" });
+    } else if ((m.type === "org_free" && m.card === undefined) || m.type === "org_main" || m.type === "org_mark" || m.type === "org_skip") {
+      add(i, `org:${i}`, { ...none }, { panel: "org" });
+    }
   });
   return { spots: [...spots.values()], handled };
 }

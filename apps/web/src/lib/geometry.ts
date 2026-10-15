@@ -73,6 +73,34 @@ export const PLANET: Record<string, { x: number; y: number; r: number }> = {
   neptune: { x: 3058, y: 1543, r: 168 },
 };
 
+/**
+ * The orbit of each planet: a green guide line starts at the bonus space of the first orbiter (upper left of the planet) and runs clockwise over the
+ * planet. `bonus` is where the bonus space lies, measured from the planet's centre in planet radii (read from the picture of the board). The
+ * orbiters lie on the circle through it around the planet, the first one covering the bonus space.
+ */
+export const ORBIT_BONUS: Record<string, [number, number]> = {
+  mercury: [-1.0, -1.11],
+  venus: [-0.88, -0.89],
+  mars: [-0.93, -0.97],
+  jupiter: [-0.84, -0.85],
+  saturn: [-0.83, -1.04],
+  uranus: [-0.83, -1.05],
+  neptune: [-0.96, -0.9],
+};
+export const ORBIT_SPACING = 96; // between two orbiters along the ring, in board pixels
+
+/** Where the `k`-th orbiter (0 is the first, on the bonus space) of a planet lies. */
+export function orbitSlot(planet: string, k: number): { x: number; y: number } | null {
+  const pos = PLANET[planet];
+  const bonus = ORBIT_BONUS[planet];
+  if (!pos || !bonus) return null;
+  const dx = bonus[0] * pos.r;
+  const dy = bonus[1] * pos.r;
+  const radius = Math.hypot(dx, dy);
+  const angle = Math.atan2(dy, dx) + (k * ORBIT_SPACING) / radius; // clockwise on the screen: over the top of the planet
+  return { x: pos.x + radius * Math.cos(angle), y: pos.y + radius * Math.sin(angle) };
+}
+
 /** The moons, by the lower-case first word of their name in the engine's data. */
 export const MOON: Record<string, { x: number; y: number }> = {
   io: { x: 1871, y: 735 },
@@ -104,7 +132,7 @@ export const DISCOVERY: { x: number; y: number }[][] = [
  * The species boards sit above the base board, their three bottom cut-outs around the three discovery spaces of the notch below (the board and
  * its notches are printed so). The picture of a species board is 777 x 1415; its middle cut-out is at x = 388 and the cut-outs are 270 apart.
  */
-export const ALIEN = { w: 777, h: 1415, centre: 388, scale: 1.09, bottom: 330, middleX: [680, 2820] };
+export const ALIEN = { w: 777, h: 1415, centre: 388, scale: 1, bottom: 331, middleX: [680, 2820] };
 export const ALIEN_TOP = ALIEN.bottom - ALIEN.h * ALIEN.scale;
 
 /**
@@ -135,7 +163,7 @@ export const GOLD_SLOTS = [
  * The deck of a discovered species lies in a column to the right of its board: the back of the deck on top (with the number of cards left over it)
  * and the card that lies face up below it. Sizes in board pixels; the column starts `gap` after the right edge of the board.
  */
-export const ALIEN_COLUMN = { w: 541, h: 753, gap: 30, between: 36 }; // two cards and the space between them are as high as the board (1415 x 1.09)
+export const ALIEN_COLUMN = { w: 381, h: 530, gap: 30, between: 36 }; // the two cards and the space between them end just above the top edge of the board (y = 25), from the top of the species boards
 
 export function alienColumn(slot: number): { deck: { x: number; y: number }; faceUp: { x: number; y: number } } {
   const left = (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale;
@@ -157,3 +185,7 @@ export const PLAYER_COLOR: Record<string, string> = {
   white: "#f3f3f3",
 };
 export const SECTOR_COLOR: Record<string, string> = { yellow: "#e0b000", red: "#d9503c", blue: "#3b82d6", black: "#3a3f47" };
+
+/** The four reward hexes across the top of the Centaurian board, on its picture (777 x 1415 px): the middle of each. A player who reaches their
+ * message milestone covers one with their message tile (ALIEN-CEN-04). The tile is drawn at this height on the picture. */
+export const CENTAURIAN_HEXES = { y: 130, xs: [230, 337, 445, 553], tileHeight: 170 };

@@ -1,0 +1,6773 @@
+{
+ "items": [
+  {
+   "key": "main-01",
+   "group": "Main deck",
+   "title": "1 Reusable Lander",
+   "pics": [
+    "main-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "1"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "If you land on a planet (not a moon) which had a [lander] already, return this card to your hand."
+    ],
+    [
+     "effect",
+     "Land (gold land hexagon) with a probe, without paying the land cost.\nIf you landed on a planet (not a moon) that already had a lander, return this card to your hand."
+    ],
+    [
+     "flavor",
+     "Imagine building a new car for every trip you take – that's how space probes work these days. Reusability is the next logical step in their evolution."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-02",
+   "group": "Main deck",
+   "title": "2 Tracking and Data Relay Satellite",
+   "pics": [
+    "main-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "2"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Choose [publicity], [data], or [orbit]. Gain it once for each card you show from your hand that has the icon in its free-action corner effect."
+    ],
+    [
+     "effect",
+     "Choose publicity, data or movement. Gain it once for each card you show from your hand that has that icon in its free-action corner effect."
+    ],
+    [
+     "flavor",
+     "NASA's seven Tracking and Data Relay Satellites allow near-constant communication with the International Space Station, the Hubble Space Telescope, and many other spacecraft."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-10",
+   "group": "Main deck",
+   "title": "3 NASA Deep Space Network",
+   "pics": [
+    "main-10"
+   ],
+   "fields": [
+    [
+     "id",
+     "3"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "black"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "[signal+card] [signal+card] [signal+card]"
+    ],
+    [
+     "effect",
+     "Gain 3 signal tokens."
+    ],
+    [
+     "flavor",
+     "With stations in the USA, Spain, and Australia, NASA's Deep Space Network enables constant communication with deep space probes – no matter where they may roam."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-11",
+   "group": "Main deck",
+   "title": "4 Breakthrough Message",
+   "pics": [
+    "main-11"
+   ],
+   "fields": [
+    [
+     "id",
+     "4"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "black"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "[signal+card] [1 movement]"
+    ],
+    [
+     "effect",
+     "Gain 1 signal token and 1 movement."
+    ],
+    [
+     "flavor",
+     "What should the first thing aliens learn from us be? The Breakthrough Message initiative gives each of us an opportunity to come up with this essential message."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-12",
+   "group": "Main deck",
+   "title": "5 Servicing Mission",
+   "pics": [
+    "main-12"
+   ],
+   "fields": [
+    [
+     "id",
+     "5"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then, if you have a probe on a space adjacent to Earth, return this card to your hand."
+    ],
+    [
+     "effect",
+     "Gain 1 data and 1 movement.\nThen, if you have a probe on a space adjacent to Earth, return this card to your hand."
+    ],
+    [
+     "flavor",
+     "Astronauts in orbit don't have time to get bored – but with rigorous training, even extraordinary repairs can become routine."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-20",
+   "group": "Main deck",
+   "title": "6 Live Landing Broadcast",
+   "pics": [
+    "main-20"
+   ],
+   "fields": [
+    [
+     "id",
+     "6"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then mark a [signal] in the sector where you landed."
+    ],
+    [
+     "effect",
+     "Gain 1 movement.\nLand (land hexagon) with a probe, without paying the land cost.\nThen mark a signal in the sector where you landed."
+    ],
+    [
+     "flavor",
+     "Long years of research, preparation, testing, and engineering work boil down to a few key moments that we on Earth can follow right as they are happening."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-21",
+   "group": "Main deck",
+   "title": "7 Twin Probes",
+   "pics": [
+    "main-21"
+   ],
+   "fields": [
+    [
+     "id",
+     "7"
+    ],
+    [
+     "cost",
+     "3"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "mission_quick"
+    ],
+    [
+     "text",
+     "Have 2 probes in space at two different planets (except Earth) -> [2 credits]."
+    ],
+    [
+     "effect",
+     "Rotate the solar system, then research a probe tech (orange chip).\nQuick mission: have 2 probes in space at two different planets (Earth does not count) -> gain 2 credits."
+    ],
+    [
+     "flavor",
+     "You can conduct two missions to different targets within one project. You just have to reuse your probe blueprints."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-22",
+   "group": "Main deck",
+   "title": "8 Quantum Data Storage",
+   "pics": [
+    "main-22"
+   ],
+   "fields": [
+    [
+     "id",
+     "8"
+    ],
+    [
+     "cost",
+     "3"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "end_scoring"
+    ],
+    [
+     "text",
+     "[3 points] for each remaining [data] in your data pool."
+    ],
+    [
+     "effect",
+     "Rotate the solar system, then research a computer tech (blue chip).\nEnd of game: 3 VP for each data remaining in your data pool."
+    ],
+    [
+     "flavor",
+     "It's hard to imagine, but thanks to quantum memories, the entire history of humanity could one day be stored on a watch."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-03",
+   "group": "Main deck",
+   "title": "9 Lunar Crater Radio Telescope",
+   "pics": [
+    "main-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "9"
+    ],
+    [
+     "cost",
+     "3"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "mission_quick"
+    ],
+    [
+     "text",
+     "(grey orbit icon) (pink telescope tech icon). Mark 3 signals [3 grey signal icons with checkmarks] -> gain 3 publicity."
+    ],
+    [
+     "effect",
+     "Rotate the solar system, then research a telescope tech (pink chip).\nQuick mission: win 3 sectors (any colors) -> gain 3 publicity. (owner)"
+    ],
+    [
+     "flavor",
+     "The far side of the Moon, a quiet place, isolated from Earth's radio traffic. The perfect location to monitor signals from space using a giant telescope."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-13",
+   "group": "Main deck",
+   "title": "10 First Human in Space",
+   "pics": [
+    "main-13"
+   ],
+   "fields": [
+    [
+     "id",
+     "10"
+    ],
+    [
+     "cost",
+     "4"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "end_scoring"
+    ],
+    [
+     "text",
+     "10 [publicity]. [1 point] for each remaining [publicity]."
+    ],
+    [
+     "effect",
+     "Gain 10 publicity.\nEnd of game: 1 VP for each publicity you have left."
+    ],
+    [
+     "flavor",
+     "You don't have to be interested in space, its exploration, or rocket science to know this name. Yuri Gagarin."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-23",
+   "group": "Main deck",
+   "title": "11 Psyche Probe",
+   "pics": [
+    "main-23"
+   ],
+   "fields": [
+    [
+     "id",
+     "11"
+    ],
+    [
+     "cost",
+     "3"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "mission_quick"
+    ],
+    [
+     "text",
+     "Have a probe on asteroids"
+    ],
+    [
+     "effect",
+     "Launch a probe (launch hexagon), gain 1 publicity.\nQuick mission: have a probe on asteroids -> gain 3 VP and 2 energy."
+    ],
+    [
+     "flavor",
+     "The metallic asteroid Psyche could be the future embryo of a planet. A probe of the same name is expected to find out more when it visits the asteroid in 2029."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-04",
+   "group": "Main deck",
+   "title": "12 Two-planet Flyby Maneuver",
+   "pics": [
+    "main-04"
+   ],
+   "fields": [
+    [
+     "id",
+     "12"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "If you visit at least 2 different planets this turn, gain [3 points]."
+    ],
+    [
+     "effect",
+     "Gain 2 movement.\nIf you visit at least 2 different planets this turn, gain 3 VP."
+    ],
+    [
+     "flavor",
+     "A journey to another planet can take years, and a probe often has only hours to explore it. So it makes sense to visit more than one planet during the journey."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-05",
+   "group": "Main deck",
+   "title": "13 James Clerk Maxwell Telescope",
+   "pics": [
+    "main-05"
+   ],
+   "fields": [
+    [
+     "id",
+     "13"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then gain [signal+card icon]."
+    ],
+    [
+     "effect",
+     "Perform a scan action (scan hexagon) for free, then gain 1 signal token. (owner)"
+    ],
+    [
+     "flavor",
+     "This Hawaii-based telescope is used to observe interstellar gas. It is the largest single-dish microwave radio telescope in the world."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-14",
+   "group": "Main deck",
+   "title": "14 Reusable Rocket",
+   "pics": [
+    "main-14"
+   ],
+   "fields": [
+    [
+     "id",
+     "14"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "If another player has a probe on Earth, return this card to your hand."
+    ],
+    [
+     "effect",
+     "Launch a probe (launch hexagon), gain 1 publicity.\nIf another player has a probe on Earth, return this card to your hand."
+    ],
+    [
+     "flavor",
+     "For decades, it was believed that a rocket's first flight was also its last. These days, some rockets have flown more than twenty times."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-15",
+   "group": "Main deck",
+   "title": "15 Iterative Engineering",
+   "pics": [
+    "main-15"
+   ],
+   "fields": [
+    [
+     "id",
+     "15"
+    ],
+    [
+     "cost",
+     "3"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Gain the [3 points] / [1 publicity] / [1 energy] / [1 ? card] bonus printed on the tech tile again."
+    ],
+    [
+     "effect",
+     "Rotate the solar system, then research any tech (multicolor chip).\nThen gain again the bonus printed on the tech tile (3 VP, 1 publicity, 1 energy or 1 card)."
+    ],
+    [
+     "flavor",
+     "Nothing is so perfect that it can't be improved. Iterative engineering focuses on improving already working systems."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-24",
+   "group": "Main deck",
+   "title": "16 Astronaut Training Experience",
+   "pics": [
+    "main-24"
+   ],
+   "fields": [
+    [
+     "id",
+     "16"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "mission_quick"
+    ],
+    [
+     "text",
+     "Have 0 publicity"
+    ],
+    [
+     "effect",
+     "Gain 4 publicity.\nQuick mission: have 0 publicity -> gain 2 VP and 1 publicity."
+    ],
+    [
+     "flavor",
+     "Do you want to experience the high G's of a rocket launch? Weightlessness? Or maybe use a space toilet? You don't even need to become an astronaut."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-25",
+   "group": "Main deck",
+   "title": "17 Paid Media Coverage",
+   "pics": [
+    "main-25"
+   ],
+   "fields": [
+    [
+     "id",
+     "17"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "You can spend any amount of credits to gain 2 VP and 2 publicity for each credit spent."
+    ],
+    [
+     "effect",
+     "You may spend any number of credits; for each credit spent gain 2 VP and 2 publicity."
+    ],
+    [
+     "flavor",
+     "Popularizing science costs money. But if paid promotion can attract more interested people, it's money well spent."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-06",
+   "group": "Main deck",
+   "title": "18 Contracted Research",
+   "pics": [
+    "main-06"
+   ],
+   "fields": [
+    [
+     "id",
+     "18"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Set your [publicity] to 0. [orbit/land icon] [tech] that someone else has already researched."
+    ],
+    [
+     "effect",
+     "Set your publicity to 0.\nRotate the solar system, then research a tech that another player has already researched. (owner)"
+    ],
+    [
+     "flavor",
+     "Many space research projects span multiple areas of focus, so it is sometimes necessary to hire a team of people who understand the issue better than you do."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-16",
+   "group": "Main deck",
+   "title": "19 New Assignment",
+   "pics": [
+    "main-16"
+   ],
+   "fields": [
+    [
+     "id",
+     "19"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Remove one of your [orbiter] from any planet to place a probe on the space with that planet on the solar system board (ignoring your probe limit)."
+    ],
+    [
+     "effect",
+     "Remove one of your orbiters from any planet and place a probe on the space of that planet in the solar system, ignoring your probe limit."
+    ],
+    [
+     "flavor",
+     "After its original mission is complete, a space probe may be tasked with a new objective. Some probes continue working long past their expected lifespan."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-26",
+   "group": "Main deck",
+   "title": "20 Well Executed Project",
+   "pics": [
+    "main-26"
+   ],
+   "fields": [
+    [
+     "id",
+     "20"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Discard a non-alien card from your hand. Gain its free-action corner effect 3 times."
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nDiscard a non-alien card from your hand and gain its free-action corner effect 3 times."
+    ],
+    [
+     "flavor",
+     "Meticulous planning, a great team of people, a worthy goal and perfect execution. Sometimes, things just come together nicely."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-07",
+   "group": "Main deck",
+   "title": "21 Orbital Refueling",
+   "pics": [
+    "main-07"
+   ],
+   "fields": [
+    [
+     "id",
+     "21"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "Visit a planet where you have an [orbiter]:"
+    ],
+    [
+     "effect",
+     "Triggered mission, two circles: each time you visit a planet where you have an orbiter, you may cover a circle and gain 1 energy."
+    ],
+    [
+     "flavor",
+     "Launching a spacecraft from Earth is so energy-intensive that it doesn't have much fuel left for its actual journey. The solution is to refuel directly in orbit."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-08",
+   "group": "Main deck",
+   "title": "22 TESS Satellite",
+   "pics": [
+    "main-08"
+   ],
+   "fields": [
+    [
+     "id",
+     "22"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "[signal] [signal] in a sector where you have 3 or more signals. Don't gain any [data] from them."
+    ],
+    [
+     "effect",
+     "Mark 2 signals in a sector where you have 3 or more signals. Do not gain any data from them."
+    ],
+    [
+     "flavor",
+     "Planets outside the Solar System are hard to find. They are easiest to observe when they transit their parent star. These observations are the task of the TESS satellite."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-17",
+   "group": "Main deck",
+   "title": "23 Neutral Buoyancy Training",
+   "pics": [
+    "main-17"
+   ],
+   "fields": [
+    [
+     "id",
+     "23"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "Gain 1 publicity. Trigger [launch] -> [1 ? ]; trigger [orbit or land] -> [3 points]."
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nTriggered mission: when you launch a probe, gain 1 random card (owner); when you orbit or land, gain 3 VP."
+    ],
+    [
+     "flavor",
+     "While not a perfect simulation, immersing an astronaut in a precisely weighted suit in a pool of water is a useful method of preparing them for work in zero gravity."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-18",
+   "group": "Main deck",
+   "title": "24 Space Elevator",
+   "pics": [
+    "main-18"
+   ],
+   "fields": [
+    [
+     "id",
+     "24"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "(no printed text)"
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nTriggered mission, two circles: whenever you research a probe (orange) tech, you may launch a probe for free, up to twice. (owner)"
+    ],
+    [
+     "flavor",
+     "A space elevator is a long-standing dream of enthusiasts and visionaries alike. Building one is a colossal challenge – but not beyond the realm of possibility."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-27",
+   "group": "Main deck",
+   "title": "25 LIGO",
+   "pics": [
+    "main-27"
+   ],
+   "fields": [
+    [
+     "id",
+     "25"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "(two circles: a tech chip trigger with a signal in sector reward)"
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nTriggered mission, two circles: whenever you research a telescope (pink) tech, you may gain 1 signal token, up to twice. (owner)"
+    ],
+    [
+     "flavor",
+     "The goal of LIGO is to detect gravitational waves. This is almost like astronomical archaeology, allowing us to see way back to the Big Bang."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-28",
+   "group": "Main deck",
+   "title": "26 New AI Models",
+   "pics": [
+    "main-28"
+   ],
+   "fields": [
+    [
+     "id",
+     "26"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "(two circles)"
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nTriggered mission, two circles: whenever you research a computer (blue) tech, you may gain 1 data, up to twice. (owner)"
+    ],
+    [
+     "flavor",
+     "\"I know that you and Frank were planning to disconnect me. And I'm afraid that's something I cannot allow to happen.\" -HAL 9000-"
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-09",
+   "group": "Main deck",
+   "title": "27 Better Solar Panels",
+   "pics": [
+    "main-09"
+   ],
+   "fields": [
+    [
+     "id",
+     "27"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "If you have 0 energy, gain [1 energy] for each of your probes in space."
+    ],
+    [
+     "effect",
+     "If you have 0 energy, gain 1 energy for each of your probes in space."
+    ],
+    [
+     "flavor",
+     "Since 1970, the efficiency of solar panels has increased from about 5% to 26%. This makes it possible to carry out increasingly demanding scientific experiments."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-19",
+   "group": "Main deck",
+   "title": "28 Restructuring",
+   "pics": [
+    "main-19"
+   ],
+   "fields": [
+    [
+     "id",
+     "28"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "mission_quick"
+    ],
+    [
+     "text",
+     "Discard any number of cards from your hand. Then gain resources according to their income corner. Have 0 credits, 0 energy and no cards in hand -> [2 publicity] [1 card]."
+    ],
+    [
+     "effect",
+     "Discard any number of cards from your hand, gaining the resource of each one's income corner.\nQuick mission: have 0 credits, 0 energy and no cards in hand -> gain 2 publicity and 1 card."
+    ],
+    [
+     "flavor",
+     "When an organization's structure becomes too large and inflexible, a radical change may be needed in order to continue making progress."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-29",
+   "group": "Main deck",
+   "title": "29 Abandoned Mission",
+   "pics": [
+    "main-29"
+   ],
+   "fields": [
+    [
+     "id",
+     "29"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Return a mission you have not completed yet to your hand to gain 2 data."
+    ],
+    [
+     "effect",
+     "Return a mission you have not completed yet to your hand, then gain 2 data."
+    ],
+    [
+     "flavor",
+     "Each space mission is a colossal investment. Even so, they are sometimes canceled, but the experience gained from them is used in other projects."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-30",
+   "group": "Main deck",
+   "title": "30 Akatsuki Orbiter",
+   "pics": [
+    "main-30"
+   ],
+   "fields": [
+    [
+     "id",
+     "30"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then gain 1 data for each computer tech you have."
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nOrbit (orbit hexagon) with a probe for free.\nThen gain 1 data for each computer tech you have."
+    ],
+    [
+     "flavor",
+     "Despite reaching Venus five years later than was planned, this Japanese probe managed to complete its mission of studying the planet's atmospheric anyway."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-31",
+   "group": "Main deck",
+   "title": "31 Ingenuity Helicopter",
+   "pics": [
+    "main-31"
+   ],
+   "fields": [
+    [
+     "id",
+     "31"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "end_scoring"
+    ],
+    [
+     "text",
+     "for each planet where you have a lander (moons do not count)."
+    ],
+    [
+     "effect",
+     "Land (land hexagon) with a probe for free.\nEnd of game: 6 VP for each planet where you have 2 landers (moons do not count). (owner)"
+    ],
+    [
+     "flavor",
+     "It was designed to work on Mars for 30 days - instead, it worked for 2 years. It was supposed to only fly 5 times - it flew 72 times. That was the helicopter Ingenuity."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-40",
+   "group": "Main deck",
+   "title": "32 MUREP Idea Competition",
+   "pics": [
+    "main-40"
+   ],
+   "fields": [
+    [
+     "id",
+     "32"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Discard all cards from your hand (if any). Then gain"
+    ],
+    [
+     "effect",
+     "Discard all cards from your hand (if any).\nThen gain 1 publicity and 2 random cards."
+    ],
+    [
+     "flavor",
+     "One of the requirements for working with NASA is fluent use of acronyms. We didn't even put the full one in this card title."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-41",
+   "group": "Main deck",
+   "title": "33 Delayed Launch",
+   "pics": [
+    "main-41"
+   ],
+   "fields": [
+    [
+     "id",
+     "33"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "When you pass:"
+    ],
+    [
+     "effect",
+     "Gain 1 publicity.\nTriggered mission, one circle: when you pass, you may launch a probe."
+    ],
+    [
+     "flavor",
+     "Rocket launches may be delayed for various reasons. In 2014, an ISS resupply mission was delayed by a sailboat crossing the planned flight path."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-32",
+   "group": "Main deck",
+   "title": "34 Private Sector Investment",
+   "pics": [
+    "main-32"
+   ],
+   "fields": [
+    [
+     "id",
+     "34"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then gain 1 ? for each tech of the type you have the most of."
+    ],
+    [
+     "effect",
+     "Tuck a card from your hand for its income (rising arrow = income) (owner).\nThen gain 1 random card (owner) for each tech of the type you have the most of."
+    ],
+    [
+     "flavor",
+     "Getting an investment from the private sector can mean the difference between completion and failure for some scientific projects."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-33",
+   "group": "Main deck",
+   "title": "35 NASA Exoplanet Archive",
+   "pics": [
+    "main-33"
+   ],
+   "fields": [
+    [
+     "id",
+     "35"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "mission_quick"
+    ],
+    [
+     "text",
+     "Have a total of at least 12 data in your computer and data pool"
+    ],
+    [
+     "effect",
+     "Gain 1 signal token.\nQuick mission: have a total of at least 12 data in your computer and data pool -> gain 1 energy."
+    ],
+    [
+     "flavor",
+     "When this was written, the NASA Exoplanet Archive contained 5905 confirmed exoplanets. With weekly updates, that number is almost definitely different today."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-34",
+   "group": "Main deck",
+   "title": "36 Big Ear Radio Telescope",
+   "pics": [
+    "main-34"
+   ],
+   "fields": [
+    [
+     "id",
+     "36"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "black"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "(three signals: yellow, red, blue)"
+    ],
+    [
+     "effect",
+     "Mark one signal in a yellow sector, one in a red sector and one in a blue sector."
+    ],
+    [
+     "flavor",
+     "Otherwise known as the Ohio State University Radio Observatory, this telescope was used in the longest-running full-scale SETI project (1973-1995)."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-37",
+   "group": "Main deck",
+   "title": "37 Pandora Satellite",
+   "pics": [
+    "main-37"
+   ],
+   "fields": [
+    [
+     "id",
+     "37"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "[signal mark] in each sector where you already have a signal. Don't gain any [data] from them."
+    ],
+    [
+     "effect",
+     "Mark 1 signal in each sector where you already have a signal. Do not gain data from them."
+    ],
+    [
+     "flavor",
+     "This small satellite, which will hopefully already be in orbit when you read this, will study the atmospheres of exoplanets using both visible and infrared light."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-35",
+   "group": "Main deck",
+   "title": "38 Space Rendezvous",
+   "pics": [
+    "main-35"
+   ],
+   "fields": [
+    [
+     "id",
+     "38"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then gain [3 VP] if you have a probe on a space with another probe."
+    ],
+    [
+     "effect",
+     "Gain 1 publicity and 1 movement.\nIf you have a probe on a space with another probe, gain 3 VP."
+    ],
+    [
+     "flavor",
+     "In 1965, Gemini 6 completed the first successful space rendezvous by coming within 30 cm of its sister craft Gemini 7."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-42",
+   "group": "Main deck",
+   "title": "39 Grand Tour Program",
+   "pics": [
+    "main-42"
+   ],
+   "fields": [
+    [
+     "id",
+     "39"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "end_scoring"
+    ],
+    [
+     "text",
+     "[2 VP] for each planet (not a moon) where you have [orbiter] or [lander]."
+    ],
+    [
+     "effect",
+     "Gain 2 movement.\nEnd of game: 2 VP for each planet (not a moon) where you have an orbiter or a lander."
+    ],
+    [
+     "flavor",
+     "Capitalizing on a specific alignment of Jupiter, Saturn, Uranus and Neptune that only occurs once per 175 years, this project could have used one probe to visit them all."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-36",
+   "group": "Main deck",
+   "title": "40 Hall-effect Thruster",
+   "pics": [
+    "main-36"
+   ],
+   "fields": [
+    [
+     "id",
+     "40"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "effect",
+     "Gain 5 movement."
+    ],
+    [
+     "flavor",
+     "First used in the 1970s, Hall-effect thrusters are a highly efficient form of electric propulsion, accelerating ionized gas using an electromagnetic field to create thrust."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-43",
+   "group": "Main deck",
+   "title": "41 Exoplanet Survey",
+   "pics": [
+    "main-43"
+   ],
+   "fields": [
+    [
+     "id",
+     "41"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "end_scoring"
+    ],
+    [
+     "text",
+     "Have a signal in a yellow, red, blue, and black sector"
+    ],
+    [
+     "effect",
+     "Gain 1 signal token, 1 publicity and 1 card of your choice.\nEnd of game: have a signal in a yellow, a red, a blue and a black sector -> 4 VP."
+    ],
+    [
+     "flavor",
+     "Since exoplanets are so far away, getting images of them is extremely difficult. Most exoplanets have only been detected through indirect methods."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-39",
+   "group": "Main deck",
+   "title": "42 LOFAR Array",
+   "pics": [
+    "main-39"
+   ],
+   "fields": [
+    [
+     "id",
+     "42"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "yellow"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "end_scoring"
+    ],
+    [
+     "text",
+     "Have a signal or [marker check] in each sector"
+    ],
+    [
+     "effect",
+     "Perform a scan action (scan hexagon) for free.\nEnd of game: have a signal or a won-sector marker in each sector -> 8 VP."
+    ],
+    [
+     "flavor",
+     "Science has no borders - a saying nicely demonstrated by the Low-Frequency Array, with thousands of antennas spread over eight European countries."
+    ],
+    [
+     "changed_from_v1",
+     "effect re-read with the owner's glossary"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "main-00",
+   "group": "Main deck (promo cards)",
+   "title": "SE EN 01 Pluto",
+   "pics": [
+    "main-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "SE EN 01"
+    ],
+    [
+     "cost",
+     "0"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: move; n: 1"
+    ],
+    [
+     "sector",
+     "red"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "other"
+    ],
+    [
+     "text",
+     "Keep this card in front of you. If you have a probe in the outermost ring, you may use an [orbit icon] or [land icon] action to place that probe on Pluto."
+    ],
+    [
+     "effect",
+     "Subtitle: Not a Planet Since 2006\nKeep this card in front of you (stays in play).\nIf you have a probe in the outermost ring, you may use an orbit action (green satellite hexagon) or a land action (yellow rover hexagon) to place that probe on Pluto.\nPicture of Pluto shows orbit rewards: 11 points-in-green-laurel, 3 publicity, a pink-yellow-blue tech/trace-like icon; and land rewards: 11 points, 4 data, a yellow icon (appears to be a rock/life-trace type symbol)"
+    ],
+    [
+     "flavor",
+     "At a 2006 conference in Prague, the International Astronomical Union relegated Pluto to the status of a dwarf planet. Still, it manages to remain big in our hearts!"
+    ],
+    [
+     "changed_from_v1",
+     "promo card, not part of the 42 cards (owner)"
+    ]
+   ],
+   "uncertain": [
+    "Pluto picture icons: orbit side = 11 score, 3 publicity, and a pink/yellow multi-color shape; land side = 11 score, 4 data, and a yellow symbol; exact meaning of the colored shape icons not clear",
+    "Free corner icon looks like a movement arrow with 1 (shown as probe-arrow); not the standard data icon",
+    "Cost 0 diamond has a credit icon"
+   ]
+  },
+  {
+   "key": "main-38",
+   "group": "Main deck (promo cards)",
+   "title": "SE EN 03 Space Agencies",
+   "pics": [
+    "main-38"
+   ],
+   "fields": [
+    [
+     "id",
+     "SE EN 03"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: movement; n: 1"
+    ],
+    [
+     "sector",
+     "black"
+    ],
+    [
+     "income",
+     "card"
+    ],
+    [
+     "card_type",
+     "other"
+    ],
+    [
+     "text",
+     "The next time you play SETI with quick start cards, gain one extra card to choose from at the start of the game."
+    ],
+    [
+     "effect",
+     "Orange launch hexagon icon (launch).\nPink square icon: signal mark with a card (card-row signal / card icon).\nPromo card: next time you play with quick start cards, gain one extra card to choose from at game start."
+    ],
+    [
+     "flavor",
+     "Each launch carries not just instruments, but intent - agencies striving to be the first, the best, or simply to be remembered."
+    ],
+    [
+     "changed_from_v1",
+     "promo card, not part of the 42 cards (owner)"
+    ]
+   ],
+   "uncertain": [
+    "Meaning of the two icons (launch hexagon and pink signal+card square) is not explained by printed text; see promo sheet.",
+    "Corner icon is a probe-on-shield movement icon, n=1; kind inferred."
+   ]
+  },
+  {
+   "key": "main-44",
+   "group": "Main deck (promo cards)",
+   "title": "SE EN 02 Gateway to Mars",
+   "pics": [
+    "main-44"
+   ],
+   "fields": [
+    [
+     "id",
+     "SE EN 02"
+    ],
+    [
+     "cost",
+     "1"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: data; n: 1"
+    ],
+    [
+     "sector",
+     "blue"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "card_type",
+     "mission_triggerable"
+    ],
+    [
+     "text",
+     "When you [orbit/land icon] at Mars (or its moons) or when you play a card mentioning \"Mars\" in its flavor text:"
+    ],
+    [
+     "effect",
+     "Trigger: when you orbit or land (green/orange hexagon icon) at Mars (or its moons), or when you play a card mentioning Mars in its flavor text.\nGain 2 publicity.\nGain 5 VP."
+    ],
+    [
+     "flavor",
+     "For man to reach Mars, we require the coordinated development of new propulsion systems, life support systems, radiation protection, and other key technologies."
+    ],
+    [
+     "changed_from_v1",
+     "promo card, not part of the 42 cards (owner)"
+    ]
+   ],
+   "uncertain": [
+    "Trigger hexagon (green orbiter + gold lander) printed as icon, verb read as orbit or land.",
+    "Tile is low resolution."
+   ]
+  },
+  {
+   "key": "main-45",
+   "group": "Main deck (promo cards)",
+   "title": "SE DE 04 DLR",
+   "pics": [
+    "main-45"
+   ],
+   "fields": [
+    [
+     "id",
+     "SE DE 04"
+    ],
+    [
+     "cost",
+     "2"
+    ],
+    [
+     "cost_kind",
+     "credit"
+    ],
+    [
+     "free_corner",
+     "kind: publicity; n: 1"
+    ],
+    [
+     "sector",
+     "black"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "card_type",
+     "instant"
+    ],
+    [
+     "text",
+     "Then receive according to the color of the launch sector:"
+    ],
+    [
+     "effect",
+     "Launch (orange rocket hexagon).\nThen receive according to color of the launch sector:\nYellow sector: 2 movement.\nBlue sector: 2 data.\nRed sector: 2 publicity.\nBlack sector: 6 VP."
+    ],
+    [
+     "flavor",
+     "The German Aerospace Center (DLR) conducts Earth observation and space missions and uses, among other things, the mobile rocket base MORABA for this purpose."
+    ],
+    [
+     "changed_from_v1",
+     "promo card, not part of the 42 cards (owner)"
+    ]
+   ],
+   "uncertain": [
+    "Promo-type card (SE DE 04); tile is low resolution."
+   ]
+  },
+  {
+   "key": "qs-00",
+   "group": "Quick start cards",
+   "title": "Q.18",
+   "pics": [
+    "qs-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.18"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: energy; n: 1\neffect: random_card; n: 1; note: black diamond with white '1' and '?' = 1 RANDOM card from the draw pile"
+    ],
+    [
+     "existing_id",
+     "SR.19"
+    ],
+    [
+     "changed_from_v1",
+     "card icon read as RANDOM card (1 with '?')"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-01",
+   "group": "Quick start cards",
+   "title": "Q.17",
+   "pics": [
+    "qs-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.17"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: credit; n: 1\neffect: random_card; n: 1; note: black diamond with white '1' and '?' = 1 RANDOM card from the draw pile"
+    ],
+    [
+     "existing_id",
+     "SR.18"
+    ],
+    [
+     "changed_from_v1",
+     "card icon read as RANDOM card (1 with '?')"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-02",
+   "group": "Quick start cards",
+   "title": "Q.16",
+   "pics": [
+    "qs-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.16"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: publicity; n: 3"
+    ],
+    [
+     "existing_id",
+     "SR.21"
+    ],
+    [
+     "changed_from_v1",
+     "no change (re-checked against picture)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-03",
+   "group": "Quick start cards",
+   "title": "Q.8",
+   "pics": [
+    "qs-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.8"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n1 black signal (round signal icon of that sector colour) in Vega (one black circle with 4 dots)"
+    ],
+    [
+     "bottom_half",
+     "effect: signal_token; n: 1; note: pink rounded-square icon (grey signal disc + white card) = SIGNAL TOKEN per glossary (rulebook p.8: discardable during a scan to mark a signal)\neffect: data; n: 1"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Vega"
+    ],
+    [
+     "existing_id",
+     "SR.10"
+    ],
+    [
+     "changed_from_v1",
+     "signal token icon now confirmed by glossary (was 'identified by shape only'); it is one token, not 'signal + card'\nwording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-04",
+   "group": "Quick start cards",
+   "title": "Q.7",
+   "pics": [
+    "qs-04"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.7"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 black signals (round signal icons of that sector colour) in Beta Pictoris"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Beta Pictoris"
+    ],
+    [
+     "existing_id",
+     "SR.9"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-05",
+   "group": "Quick start cards",
+   "title": "Q.6",
+   "pics": [
+    "qs-05"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.6"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 blue signals (round signal icons of that sector colour) in Sirius A"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Sirius A"
+    ],
+    [
+     "existing_id",
+     "SR.5"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-06",
+   "group": "Quick start cards",
+   "title": "Q.15",
+   "pics": [
+    "qs-06"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.15"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n1 yellow life trace (yellow triangle with fist/rock icon) in the discovery space of the right species"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: publicity; n: 1"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in the discovery space of the right species"
+    ],
+    [
+     "existing_id",
+     "SR.1"
+    ],
+    [
+     "changed_from_v1",
+     "trace wording aligned to glossary (life trace; yellow = fist, pink = molecule/dots)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-07",
+   "group": "Quick start cards",
+   "title": "Q.14",
+   "pics": [
+    "qs-07"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.14"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n1 pink life trace (pink triangle with molecule/dots icon) in the discovery space of the right species"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: publicity; n: 1"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in the discovery space of the right species"
+    ],
+    [
+     "existing_id",
+     "SR.2"
+    ],
+    [
+     "changed_from_v1",
+     "trace wording aligned to glossary (life trace; yellow = fist, pink = molecule/dots)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-08",
+   "group": "Quick start cards",
+   "title": "Q.13",
+   "pics": [
+    "qs-08"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.13"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter (green circle with satellite icon) at Saturn"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 4; note: green laurel with number = victory points\neffect: publicity; n: 2"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Saturn"
+    ],
+    [
+     "existing_id",
+     "SR.11"
+    ],
+    [
+     "changed_from_v1",
+     "no change (re-checked against picture)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-09",
+   "group": "Quick start cards",
+   "title": "Q.5",
+   "pics": [
+    "qs-09"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.5"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 blue signals (round signal icons of that sector colour) in Procyon"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Procyon"
+    ],
+    [
+     "existing_id",
+     "SR.6"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-10",
+   "group": "Quick start cards",
+   "title": "Q.4",
+   "pics": [
+    "qs-10"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.4"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 red signals (round signal icons of that sector colour) in Barnard's Star"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Barnard's Star"
+    ],
+    [
+     "existing_id",
+     "SR.3"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-11",
+   "group": "Quick start cards",
+   "title": "Q.3",
+   "pics": [
+    "qs-11"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.3"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 red signals (round signal icons of that sector colour) in Proxima Centauri"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Proxima Centauri"
+    ],
+    [
+     "existing_id",
+     "SR.4"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-12",
+   "group": "Quick start cards",
+   "title": "Q.12",
+   "pics": [
+    "qs-12"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.12"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter at Jupiter"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: publicity; n: 1\neffect: data; n: 1"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Jupiter"
+    ],
+    [
+     "existing_id",
+     "SR.13"
+    ],
+    [
+     "changed_from_v1",
+     "no change (re-checked against picture)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-13",
+   "group": "Quick start cards",
+   "title": "Q.11",
+   "pics": [
+    "qs-13"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.11"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter at Mars"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: publicity; n: 1\neffect: random_card; n: 1; note: black diamond with white '1' and '?' = 1 RANDOM card from the draw pile"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Mars"
+    ],
+    [
+     "existing_id",
+     "SR.17"
+    ],
+    [
+     "changed_from_v1",
+     "card icon read as RANDOM card (1 with '?')"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-14",
+   "group": "Quick start cards",
+   "title": "Q.10",
+   "pics": [
+    "qs-14"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.10"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter at Mercury"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: publicity; n: 1\neffect: credit; n: 1"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Mercury"
+    ],
+    [
+     "existing_id",
+     "SR.14"
+    ],
+    [
+     "changed_from_v1",
+     "no change (re-checked against picture)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-15",
+   "group": "Quick start cards",
+   "title": "Q.2",
+   "pics": [
+    "qs-15"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.2"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 yellow signals (round signal icons of that sector colour) in 61 Virginis"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in 61 Virginis"
+    ],
+    [
+     "existing_id",
+     "SR.8"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-16",
+   "group": "Quick start cards",
+   "title": "Q.1",
+   "pics": [
+    "qs-16"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.1"
+    ],
+    [
+     "top_half",
+     "Mark (without gaining any bonuses for doing so):\n2 yellow signals (round signal icons of that sector colour) in Kepler 22"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 2; note: green laurel with number = victory points\neffect: data; n: 2"
+    ],
+    [
+     "text",
+     "Mark (without gaining any bonuses for doing so): in Kepler 22"
+    ],
+    [
+     "existing_id",
+     "SR.7"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: round coloured signal icons = a sector of that colour (glossary); content unchanged"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-17",
+   "group": "Quick start cards",
+   "title": "Q.9",
+   "pics": [
+    "qs-17"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.9"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter at Venus"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 3; note: green laurel with number = victory points\neffect: publicity; n: 1\neffect: energy; n: 1"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Venus"
+    ],
+    [
+     "existing_id",
+     "SR.12"
+    ],
+    [
+     "changed_from_v1",
+     "no change (re-checked against picture)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-18",
+   "group": "Quick start cards",
+   "title": "Q.21",
+   "pics": [
+    "qs-18"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.21"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter at Uranus"
+    ],
+    [
+     "bottom_half",
+     "Increase your income (rising-graph icon) with this card (and gain the 1 random card immediately)."
+    ],
+    [
+     "income_icon",
+     "black footer tab with white '?' (card income)"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Uranus. Increase your [income icon] with this card (and gain the [1 card] immediately)."
+    ],
+    [
+     "existing_id",
+     "SR.15"
+    ],
+    [
+     "changed_from_v1",
+     "income icon read as the income (rising arrow/graph) symbol, glossary; reward icon in text: Q.21 = 1 random card, Q.20 = 1 data (unchanged meaning)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-19",
+   "group": "Quick start cards",
+   "title": "Q.20",
+   "pics": [
+    "qs-19"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.20"
+    ],
+    [
+     "top_half",
+     "Place (without gaining any bonuses for doing so):\n1 orbiter at Neptune"
+    ],
+    [
+     "bottom_half",
+     "Increase your income (rising-graph icon) with this card (and gain the 1 data immediately)."
+    ],
+    [
+     "income_icon",
+     "blue footer tab with data icon (data income)"
+    ],
+    [
+     "text",
+     "Place (without gaining any bonuses for doing so): at Neptune. Increase your [income icon] with this card (and gain the [1 data] immediately)."
+    ],
+    [
+     "existing_id",
+     "SR.16"
+    ],
+    [
+     "changed_from_v1",
+     "income icon read as the income (rising arrow/graph) symbol, glossary; reward icon in text: Q.21 = 1 random card, Q.20 = 1 data (unchanged meaning)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "qs-20",
+   "group": "Quick start cards",
+   "title": "Q.19",
+   "pics": [
+    "qs-20"
+   ],
+   "fields": [
+    [
+     "id",
+     "Q.19"
+    ],
+    [
+     "bottom_half",
+     "effect: score; n: 4; note: green laurel with number = victory points\neffect: signal_token; n: 1; note: pink rounded-square icon (grey signal disc + white card) = SIGNAL TOKEN per glossary (rulebook p.8: discardable during a scan to mark a signal)\neffect: publicity; n: 1"
+    ],
+    [
+     "existing_id",
+     "SR.20"
+    ],
+    [
+     "changed_from_v1",
+     "signal token icon now confirmed by glossary (was 'identified by shape only'); it is one token, not 'signal + card'"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-00",
+   "group": "Organizations",
+   "title": "9 Xenolab",
+   "pics": [
+    "org-00"
+   ],
+   "fields": [
+    [
+     "number",
+     "9"
+    ],
+    [
+     "tagline",
+     "From life signs to launch plans."
+    ],
+    [
+     "starting_resources",
+     "credit: 2; energy: 2; card: 1; publicity: 1; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "3"
+    ],
+    [
+     "income",
+     "credit: 2; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 0"
+    ],
+    [
+     "main_action",
+     "As a main action, you may pay the cost indicated on a tile to gain its effect. Then flip it over."
+    ],
+    [
+     "setup",
+     "Start with these tiles as shown."
+    ],
+    [
+     "special_board",
+     "Three tiles shown at start (active sides). Blue-cornered tile (blue life-trace triangle in corner): LAUNCH hexagon (orange rocket), cost 1 credit. Yellow-cornered tile (yellow trace in corner): SCAN hexagon (pink radio dish), cost 2 energy. Pink-cornered tile (pink trace in corner): hexagon with a multicolor tech chip = research any tech, cost 4 publicity. Flip diagram: after use the tile is flipped (inactive side shows the trace triangle and a dim action); gaining a life trace of the matching colour flips it back (rotate/flip arrows)."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Yellow tile: now SCAN (pink hexagon with radio dish), was 'magenta hexagon with a shape, not legible'\nPink tile: now research any tech (multicolor chip hexagon), was 'chip-style hexagon (research tech)'; blue tile: LAUNCH hexagon confirmed\nCorner icons identified as blue/yellow/pink life traces, flip-back rule tied to the matching colour\nincome_unit_note rewritten (signal token, random card)"
+    ]
+   ],
+   "uncertain": [
+    "Pink tile icon is a hexagon showing a multicolor chip (no rotate ring); read as 'research a tech' by the glossary chip rule",
+    "Trace icons in tile corners are very small; colours (blue, yellow, pink) clear, their shape is not"
+   ]
+  },
+  {
+   "key": "org-01",
+   "group": "Organizations",
+   "title": "10 Futurespan Institute",
+   "pics": [
+    "org-01"
+   ],
+   "fields": [
+    [
+     "number",
+     "10"
+    ],
+    [
+     "tagline",
+     "Shaping centuries, not just cycles."
+    ],
+    [
+     "starting_resources",
+     "credit: 3; energy: 3; card: 1; publicity: 3; data: 0"
+    ],
+    [
+     "starting_other",
+     "Futurespan token (gold card with a planet/ring, printed in the header before the resources)."
+    ],
+    [
+     "tuck_income_cards",
+     "2"
+    ],
+    [
+     "income",
+     "credit: 2; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 0"
+    ],
+    [
+     "free_action_once_per_round",
+     "Advance the Futurespan token 3 spaces (+3 with triple-arrow track icon) to gain 1 card (card of your choice: diamond '1' with card-shaped notch and no '?')."
+    ],
+    [
+     "main_action",
+     "Not a main action as such: 'If your score counter is on or ahead of the token, you can take the token back and play the card as a main action for free.'"
+    ],
+    [
+     "setup",
+     "As a free action, spend your token to prepare a card from your hand face up. Place the token a number of points ahead of your score counter, based on the card's cost: cost 1 = +15, cost 2 = +25, cost 3 = +35, cost 4 = +45."
+    ],
+    [
+     "special_board",
+     "Futurespan token (gold card-with-planet icon) placed on the score track. Header icon of token shown in starting resources (token + 3 publicity, 3 credit, 3 energy, 1 card). Free action marker 1x."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Free action reward is 1 card of your choice (row or deck; notch icon without '?'), previously just '1 card'\nStarting token recorded in starting_other (was an uncertainty note)\nTile costs: card with cost-1/2/3/4 credit icons = +15/+25/+35/+45 re-checked, unchanged; 'advance' symbol is a triple arrow (track spaces)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-02",
+   "group": "Organizations",
+   "title": "11 Helion Assembly",
+   "pics": [
+    "org-02"
+   ],
+   "fields": [
+    [
+     "number",
+     "11"
+    ],
+    [
+     "tagline",
+     "Built to deliver. And deliver returns."
+    ],
+    [
+     "starting_resources",
+     "credit: 3; energy: 2; card: 0; publicity: 7; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "0"
+    ],
+    [
+     "income",
+     "credit: 3; energy: 1; card: 1; publicity: 1; data: 0; signal_token: 0"
+    ],
+    [
+     "free_action_once_per_round",
+     "Place one of your probe techs or telescope techs beside your board to increase your income (rising-graph icon). Then clear all the spaces above. You cannot use the tech's ability, but it still counts as if you have it for all other purposes."
+    ],
+    [
+     "special_board",
+     "Row of three reward circles, each under a tech chip trigger: orange probe chip -> 1 energy (green); pink telescope chip -> 1 SIGNAL TOKEN (pink rounded square); blue computer chip -> 1 data (blue). Free action line below: a probe-tech or telescope-tech chip crossed out in red, '/' between them, arrow to the income (rising graph) icon; under it three empty grey circles with clear-arrows, joined by a thin line to the reward row (the reward circles get cleared)."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Pink telescope reward is a SIGNAL TOKEN (confirmed, was 'read as signal token')\nReward row reinterpreted as triggers (tech chip above, reward in circle) per glossary instead of 'picture only'\nFree action: crossed-out probe/telescope chip then income-increase icon, tech placed beside board; text unchanged\npassive field cleared (the reward row is in special_board)"
+    ]
+   ],
+   "uncertain": [
+    "How a reward circle gets covered is not written; by the glossary it is a triggered mission-like row: each time you research that tech type you may mark the circle and gain its reward (needs ruling/rulebook check)",
+    "Whether the three grey clear-circles are the markers' storage or only the 'clear' symbol"
+   ]
+  },
+  {
+   "key": "org-03",
+   "group": "Organizations",
+   "title": "1 Orbital Dynamics",
+   "pics": [
+    "org-03"
+   ],
+   "fields": [
+    [
+     "number",
+     "1"
+    ],
+    [
+     "tagline",
+     "Flight paths, perfected."
+    ],
+    [
+     "starting_resources",
+     "credit: 2; energy: 2; card: 0; publicity: 3; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "2"
+    ],
+    [
+     "income",
+     "credit: 3; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 0"
+    ],
+    [
+     "passive",
+     "+ probe icon (white satellite-style probe): Your limit of probes in space is 1 higher."
+    ],
+    [
+     "free_action_once_per_round",
+     "Gain one move with up to 2 of your probes (icon: probe with '1' movement, not-equal sign, probe with '1' movement: two different probes, 1 movement each)."
+    ],
+    [
+     "setup",
+     "Header shows 2 LAUNCH hexagons (orange rocket) before the resources: start with 2 probes launched."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Free action icons read as 1 MOVEMENT each for two different probes (not-equal sign)\nHeader launch hexagons named LAUNCH; no change in numbers (start 3 publicity, 2 credit, 2 energy; income 3 credit, 1 energy, 1 random card; tuck 2)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-04",
+   "group": "Organizations",
+   "title": "2 Fenwick Research Center",
+   "pics": [
+    "org-04"
+   ],
+   "fields": [
+    [
+     "number",
+     "2"
+    ],
+    [
+     "tagline",
+     "Where trusted science meets public imagination."
+    ],
+    [
+     "starting_resources",
+     "credit: 3; energy: 1; card: 0; publicity: 4; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "3"
+    ],
+    [
+     "income",
+     "credit: 3; energy: 1; card: 0; publicity: 1; data: 0; signal_token: 0"
+    ],
+    [
+     "passive",
+     "Hexagon with multicolor tech chip and '5 publicity': researching a tech costs you only 5 publicity."
+    ],
+    [
+     "free_action_once_per_round",
+     "Spend 1 publicity to gain 1 card (diamond 1 with card and '!'), and gain the card's free-action corner effect immediately."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Passive icon identified as the research-a-tech hexagon (multicolor chip) with cost 5 publicity\nFree action gains a card (choice/row-or-deck icon with '!' = its free-action corner), not a random card"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-05",
+   "group": "Organizations",
+   "title": "3 Stratus Core",
+   "pics": [
+    "org-05"
+   ],
+   "fields": [
+    [
+     "number",
+     "3"
+    ],
+    [
+     "tagline",
+     "A new station for a new era of orbital work."
+    ],
+    [
+     "starting_resources",
+     "credit: 3; energy: 2; card: 1; publicity: 3; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "3"
+    ],
+    [
+     "income",
+     "credit: 2; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 0"
+    ],
+    [
+     "free_action_once_per_round",
+     "Gain the free-action corner effect of all 3 cards in the card row (three card icons each with '!'), without discarding them."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "No data change; card icons re-read as card-with-'!' (free-action corner) x3"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-06",
+   "group": "Organizations",
+   "title": "8 Mission Relay",
+   "pics": [
+    "org-06"
+   ],
+   "fields": [
+    [
+     "number",
+     "8"
+    ],
+    [
+     "tagline",
+     "Every mission has a story. We make sure it's heard."
+    ],
+    [
+     "starting_resources",
+     "credit: 3; energy: 2; card: 2; publicity: 2; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "3"
+    ],
+    [
+     "income",
+     "credit: 1; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 0"
+    ],
+    [
+     "passive",
+     "Mission card icon (card with grey lower half) with green arrow : 1 publicity. 'When you play a card with a mission as a main action, gain 1 publicity.'"
+    ],
+    [
+     "free_action_once_per_round",
+     "Spend 2 publicity to gain 1 card (card of your choice, notch icon with '!') and the resource corresponding to its income corner."
+    ],
+    [
+     "setup",
+     "Start with this tile marked as shown. (You can still mark the other three.) Two pictures separated by '/': two-sided gold tile, one side spaces 8,6,4 with the 4 space marked (two checkmark cards icons), other side 4,3,2 with the 2 space marked (one checkmark card icon)."
+    ],
+    [
+     "special_board",
+     "Mission gold scoring tile with 3 visible round spaces on each side (8/6/4 and 4/3/2) showing the lowest space marked at start."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Mission trigger icon read as a card with a mission (grey half) and green play arrow, glossary\nFree action card is a card of choice (not random)\nAdded uncertainty about which side of the tile is used"
+    ]
+   ],
+   "uncertain": [
+    "'(You can still mark the other three.)': each pictured tile side shows 3 spaces with the lowest one marked; 'other three' not further explained",
+    "Which of the two pictured tile sides the player starts on (shown as 'A / B') is not stated; left has two check-card icons, right one"
+   ]
+  },
+  {
+   "key": "org-07",
+   "group": "Organizations",
+   "title": "7 Sentinel Probe Network",
+   "pics": [
+    "org-07"
+   ],
+   "fields": [
+    [
+     "number",
+     "7"
+    ],
+    [
+     "tagline",
+     "Eyes on the stars, multiplied by the many."
+    ],
+    [
+     "starting_resources",
+     "credit: 4; energy: 2; card: 0; publicity: 3; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "1"
+    ],
+    [
+     "income",
+     "credit: 3; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 1"
+    ],
+    [
+     "passive",
+     "LAUNCH hexagon (orange rocket) : grey signal icon with a small launch hexagon (grey = a sector of any colour; here: the launched probe's sector). 'When you launch a probe, mark a signal in its sector.'"
+    ],
+    [
+     "free_action_once_per_round",
+     "Gain the free-action corner effect of a non-alien card you played as a main action this turn. (The card's main effect needs to be fully resolved first.)"
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Signal token income icon confirmed (pink rounded square, glossary); uncertainty removed\nPassive: trigger is the LAUNCH hexagon and reward a grey (any colour) signal\nFree action: card with '!' and green play-arrow = corner effect of a played non-alien card"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-08",
+   "group": "Organizations",
+   "title": "6 Cosmos Strategy Group",
+   "pics": [
+    "org-08"
+   ],
+   "fields": [
+    [
+     "number",
+     "6"
+    ],
+    [
+     "tagline",
+     "Every breakthrough starts with a strategy."
+    ],
+    [
+     "starting_resources",
+     "credit: 4; energy: 2; card: 1; publicity: 1; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "2"
+    ],
+    [
+     "income",
+     "credit: 2; energy: 1; card: 1; publicity: 0; data: 0; signal_token: 0"
+    ],
+    [
+     "passive",
+     "When you play a card as a main action, you can mark a space that matches its sector color and gain the reward."
+    ],
+    [
+     "free_action_once_per_round",
+     "Gain a card (1 card of your choice: notch icon without '?') and clear all the marked reward spaces above."
+    ],
+    [
+     "special_board",
+     "Three reward circles under triggers of two card icons: yellow card / black card -> 1 credit (gold); red card / black card -> 1 publicity (red); blue card / black card -> 1 data (blue). Triggers are cards by SECTOR COLOR (a card shows a colored signal; black cards count for all three). Three empty grey circles with clear-arrows near the free action."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Reward-space triggers described as cards of that sector colour (yellow/red/blue or black)\nFree action card is of your choice (not random)"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-09",
+   "group": "Organizations",
+   "title": "4 Deep Sky Survey",
+   "pics": [
+    "org-09"
+   ],
+   "fields": [
+    [
+     "number",
+     "4"
+    ],
+    [
+     "tagline",
+     "Earth's best telescopes, watching together."
+    ],
+    [
+     "starting_resources",
+     "credit: 3; energy: 2; card: 0; publicity: 3; data: 1"
+    ],
+    [
+     "tuck_income_cards",
+     "2"
+    ],
+    [
+     "income",
+     "credit: 2; energy: 2; card: 1; publicity: 0; data: 0; signal_token: 1"
+    ],
+    [
+     "passive",
+     "Blue computer chip hexagon with '0 energy': Analyzing data costs you no energy."
+    ],
+    [
+     "free_action_once_per_round",
+     "Exchange a card from your hand (hand icon) with one in the card row (swap arrows)."
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Passive icon is a computer-tech hexagon with 0 energy; income signal token confirmed (pink rounded square); uncertainty removed"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "org-10",
+   "group": "Organizations",
+   "title": "5 Turing Systems",
+   "pics": [
+    "org-10"
+   ],
+   "fields": [
+    [
+     "number",
+     "5"
+    ],
+    [
+     "tagline",
+     "One AI. Infinite solutions."
+    ],
+    [
+     "starting_resources",
+     "credit: 4; energy: 2; card: 1; publicity: 2; data: 0"
+    ],
+    [
+     "tuck_income_cards",
+     "2"
+    ],
+    [
+     "income",
+     "credit: 2; energy: 2; card: 1; publicity: 0; data: 1; signal_token: 0"
+    ],
+    [
+     "passive",
+     "Computer tech chip (blue, server) : 1 publicity. 'When you research a computer tech, gain 1 publicity.'"
+    ],
+    [
+     "free_action_once_per_round",
+     "Choose any probe tech (orange chip with rocket) or telescope tech (pink chip with dish). This turn you can use its effect as though you had researched it. (Do not gain the tech's immediate bonuses.)"
+    ],
+    [
+     "income_unit_note",
+     "income tabs on the right: gold = credit, green = energy, black '1?' = 1 random card, red = publicity, blue = data, pink rounded square (grey signal disc + white card) = signal token. Header: starting resources (publicity, credit, energy, random cards, data), then rising-graph icons = number of cards to tuck for income."
+    ],
+    [
+     "changed_from_v1",
+     "Chip colours restated: orange = probe, pink = telescope, blue = computer\nIncome 1 data tab (blue) confirmed"
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "gly-00",
+   "group": "Glyphids cards",
+   "title": "ET.1",
+   "pics": [
+    "gly-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.1"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "orange triangle glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "orange triangle glyph with ?"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "black (four dots)"
+    ],
+    [
+     "text",
+     "3 [score] for each [glyph token] of which type you have the most."
+    ],
+    [
+     "effect",
+     "Main effect: choose ONE of two pairs (OR): [yellow gourd glyph + teal leaf glyph] OR [blue starburst glyph + purple square glyph]. For each glyph of the chosen pair that is already deciphered you gain its resource; an undeciphered glyph gives nothing.\nEnd-of-game scoring (gold box): 3 victory points for each glyph token of the type (of the 7 glyph types) of which you have the most tokens (i.e. 3 VP x the size of your biggest stack of one type; token icon is the green unknown-glyph token)."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with end-of-game scoring"
+    ],
+    [
+     "changed_from_v1",
+     "Free corner is the glyph's resource if deciphered (not 'assumed'); effect text rewritten with 'glyph with ? = resource only if deciphered' rule; end scoring explained; cost uncertainty removed (gold credit)."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)"
+   ]
+  },
+  {
+   "key": "gly-01",
+   "group": "Glyphids cards",
+   "title": "ET.2",
+   "pics": [
+    "gly-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.2"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "orange triangle glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "orange triangle glyph with ?"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "blue (two bars)"
+    ],
+    [
+     "effect",
+     "Main effect: choose ONE of two triples (OR): [purple square, purple square, crimson ring] OR [blue starburst, blue starburst, teal leaf]. For each glyph in the chosen triple that is deciphered, gain its resource (a repeated glyph gives its resource twice); undeciphered ones give nothing."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card"
+    ],
+    [
+     "changed_from_v1",
+     "Corner and effect reworded with the 'resource only if deciphered' rule; OR group clarified (choose one triple; duplicate glyph counts twice - reading of the icons, see uncertain)."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "whether a doubled glyph gives its resource twice is the natural reading of two identical icons, not stated explicitly"
+   ]
+  },
+  {
+   "key": "gly-02",
+   "group": "Glyphids cards",
+   "title": "ET.3",
+   "pics": [
+    "gly-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.3"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 0"
+    ],
+    [
+     "free_corner",
+     "teal leaf glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "teal leaf glyph with ?"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "sector",
+     "yellow (two bars)"
+    ],
+    [
+     "effect",
+     "Triggered mission (grey band, three circles): each circle has a trigger bubble above it showing the orbit-or-land icon (green half with satellite = ORBIT, orange half with rover = LAND). Each time you perform an orbit OR a land action you may cover one circle and gain that circle's reward.\nRewards of the three circles: yellow gourd glyph resource, grey bean glyph resource, blue starburst glyph resource - each only if that glyph is deciphered (otherwise nothing)."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Bubble is now read as the trigger 'orbit or land' (split green orbit / orange land icon) of a triggered mission with 3 circles; rewards are deciphered-glyph resources. v1 had it as a vague 'orbit/land bubble per glyph'."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "it is not certain whether covering a circle for a not-yet-deciphered glyph is allowed (rewards 'no effect' if undeciphered per the species rule); owner to rule if it matters"
+   ]
+  },
+  {
+   "key": "gly-03",
+   "group": "Glyphids cards",
+   "title": "ET.4",
+   "pics": [
+    "gly-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.4"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 0"
+    ],
+    [
+     "free_corner",
+     "grey bean glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "grey bean glyph with ?"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "red (three bars)"
+    ],
+    [
+     "effect",
+     "Triggered mission (three circles): each time you research a tech of the bubble's type you may cover a circle and gain its reward.\nCircle 1: trigger orange chip with rocket = probe tech; reward yellow gourd glyph resource.\nCircle 2: trigger pink chip with dish = telescope (scan) tech; reward orange triangle glyph resource.\nCircle 3: trigger blue chip with server = computer tech; reward crimson ring glyph resource.\nRewards only if that glyph is deciphered."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Chips are tech-type triggers (develop that tech), not 'gain a tech'; circles are rewards = glyph resources if deciphered."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "'research' vs 'develop a tech' wording: trigger is taking a tech of that type (by research/rotate effect or tech action) - exact set of tech-gaining ways to be taken from rulebook"
+   ]
+  },
+  {
+   "key": "gly-04",
+   "group": "Glyphids cards",
+   "title": "ET.5",
+   "pics": [
+    "gly-04"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.5"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "grey bean glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "grey bean glyph with ?"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "yellow (two bars)"
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 signal token (pink rounded square with grey signal disc and white card). It can be discarded during a scan action to mark a signal (rulebook p.8).\nTriggered mission (two circles): trigger pink hexagon with radio dish = SCAN action; each time you perform a scan action you may cover a circle and gain its reward.\nCircle 1 reward: yellow gourd glyph resource. Circle 2 reward: purple square glyph resource (only if deciphered)."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Pink rounded square is a SIGNAL TOKEN (v1: 'signal + card' unclear); pink hexagon with dish is the SCAN action trigger of a triggered mission."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)"
+   ]
+  },
+  {
+   "key": "gly-05",
+   "group": "Glyphids cards",
+   "title": "ET.7",
+   "pics": [
+    "gly-05"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.7"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "blue starburst glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "blue starburst glyph with ?"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "red (three bars)"
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 card of your choice (diamond '1' with card notch, no '?': from the card row or deck).\nTriggered mission (three circles): trigger = multicolor trace icon (pink/yellow/blue = a trace of ANY color); each time you mark a trace you may cover a circle and gain its reward.\nRewards: crimson ring glyph resource, grey bean glyph resource, purple square glyph resource (only if deciphered)."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "'1' icon is 1 card of choice (no '?'), not a random draw; bubbles are triggers (mark a trace of any color) and circles are glyph resources."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "whether the multicolor trace trigger counts traces on any species (including Glyphids) is not stated; the icon has no 'for this species'"
+   ]
+  },
+  {
+   "key": "gly-06",
+   "group": "Glyphids cards",
+   "title": "ET.6",
+   "pics": [
+    "gly-06"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.6"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "purple square glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "purple square glyph with ?"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "sector",
+     "red (three bars)"
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 publicity (red diamond with microphone) and 1 data (blue diamond with binary).\nTriggered mission (two circles): trigger orange hexagon with rocket = LAUNCH action; each time you launch a probe you may cover a circle and gain its reward.\nCircle 1: orange triangle glyph resource. Circle 2: teal leaf glyph resource (only if deciphered)."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Rocket hexagons are the LAUNCH action trigger; circle rewards are glyph resources if deciphered."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)"
+   ]
+  },
+  {
+   "key": "gly-07",
+   "group": "Glyphids cards",
+   "title": "ET.8",
+   "pics": [
+    "gly-07"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.8"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "yellow gourd glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "yellow gourd glyph with ?"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "blue (two bars)"
+    ],
+    [
+     "effect",
+     "Main effect: choose ONE of two triples (OR): [teal leaf, teal leaf, crimson ring] OR [grey bean, grey bean, orange triangle]. For each glyph in the chosen triple that is deciphered, gain its resource (twice for the doubled glyph); undeciphered gives nothing."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card"
+    ],
+    [
+     "changed_from_v1",
+     "Reworded with the deciphered-glyph rule; OR clarified."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "whether a doubled glyph gives its resource twice is the natural reading, not stated"
+   ]
+  },
+  {
+   "key": "gly-08",
+   "group": "Glyphids cards",
+   "title": "ET.9",
+   "pics": [
+    "gly-08"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.9"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "teal leaf glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "teal leaf glyph with ?"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "sector",
+     "yellow (two bars)"
+    ],
+    [
+     "text",
+     "1 [score] for each [glyph token] in your largest set."
+    ],
+    [
+     "effect",
+     "Main effect: choose ONE of two pairs (OR): [yellow gourd + purple square] OR [blue starburst + orange triangle]; gain the resource of each deciphered glyph of the pair.\nEnd-of-game scoring (gold box): 1 victory point for each glyph token in your largest set of different tokens (a set = at most one token of each of the 7 glyph types, so up to 7 VP)."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with end-of-game scoring"
+    ],
+    [
+     "changed_from_v1",
+     "End-of-game box explained (set = different glyph types per aliens.txt end-of-game scoring); main effect reworded."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "'largest set' = the biggest set of different glyph types you hold; the printed card does not define set, taken from the alien aid scoring of sets"
+   ]
+  },
+  {
+   "key": "gly-09",
+   "group": "Glyphids cards",
+   "title": "ET.10",
+   "pics": [
+    "gly-09"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.10"
+    ],
+    [
+     "name_note",
+     "printed in alien glyph script"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 2"
+    ],
+    [
+     "free_corner",
+     "crimson ring glyph (with ?): gain that glyph's resource, only if that glyph has been deciphered; otherwise no effect"
+    ],
+    [
+     "free_corner_icon",
+     "crimson ring glyph with ?"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "blue (two bars)"
+    ],
+    [
+     "text",
+     "for this species"
+    ],
+    [
+     "effect",
+     "Main effect: perform a LAUNCH action (orange hexagon with rocket), and gain the teal leaf glyph resource (if deciphered).\nQuick mission (grey box): condition = the three trace icons (pink molecule, yellow fist, blue squiggle) 'for this species' - i.e. traces marked on the Glyphids species board; reward = crimson ring glyph resource and blue starburst glyph resource (only if deciphered), gained once."
+    ],
+    [
+     "flavor_note",
+     "alien glyph script"
+    ],
+    [
+     "card_type",
+     "glyphid species card with quick mission"
+    ],
+    [
+     "changed_from_v1",
+     "Box is a quick mission (grey box, condition -> arrow -> reward) with the glyph resources as reward; launch hexagon = perform a launch."
+    ]
+   ],
+   "uncertain": [
+    "name, flavor and bottom text are printed in alien glyph script (cannot be transcribed)",
+    "the three trace triangles side by side: either 'a trace of any one color' or 'a trace of each color (pink, yellow and blue) marked for this species'; icon does not make it clear - owner to rule (the same layout appears on amo-05 ET.14)"
+   ]
+  },
+  {
+   "key": "amo-00",
+   "group": "Amoeba cards",
+   "title": "ET.11 Biosignature Screening",
+   "pics": [
+    "amo-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.11"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 data"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "red (three bars)"
+    ],
+    [
+     "text",
+     "2 [score] for each [pink trace] you have marked for this species."
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 card of your choice (diamond '1' with card notch, no '?'), then take the single pink organelle icon effect: choose one organelle in the pink section of the Amoeba board and gain its reward (then the organelles that were gained from move one step, mutating).\nEnd-of-game scoring (gold box): 2 victory points for each pink trace you have marked on the Amoeba board (for this species)."
+    ],
+    [
+     "flavor",
+     "Analysis of the asteroid fragment revealed isotopes and organic compounds associated with the presence of life. To confirm it, further studies will be required."
+    ],
+    [
+     "card_type",
+     "amoeba species card with end-of-game scoring"
+    ],
+    [
+     "changed_from_v1",
+     "Card icon is 1 card of choice (v1: 'draw 1 card'); organelle icon explained with the mutating rule from aliens.txt; end scoring clarified."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "amo-01",
+   "group": "Amoeba cards",
+   "title": "ET.12 Physical Characterization",
+   "pics": [
+    "amo-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.12"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 data"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "yellow (two bars)"
+    ],
+    [
+     "text",
+     "2 [score] for each [yellow trace] you have marked for this species."
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 card of your choice, then the single yellow organelle icon: choose one organelle in the yellow section and gain its reward (then mutate).\nEnd-of-game scoring: 2 victory points for each yellow trace you have marked on the Amoeba board."
+    ],
+    [
+     "flavor",
+     "Electron microscopy has given us our first high-resolution images of this new form of life. It appears to have some similiarities with certain terrestrial amoebas."
+    ],
+    [
+     "card_type",
+     "amoeba species card with end-of-game scoring"
+    ],
+    [
+     "changed_from_v1",
+     "Same fixes as ET.11 (card of choice, organelle rule)."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "amo-02",
+   "group": "Amoeba cards",
+   "title": "ET.13 Genome Characterization",
+   "pics": [
+    "amo-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.13"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 data"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "sector",
+     "blue (two bars)"
+    ],
+    [
+     "text",
+     "2 [score] for each [blue trace] you have marked for this species."
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 card of your choice, then the single blue organelle icon: choose one organelle in the blue section and gain its reward (then mutate).\nEnd-of-game scoring: 2 victory points for each blue trace you have marked on the Amoeba board."
+    ],
+    [
+     "flavor",
+     "The lifeform's genetic information is clearly characterized by DNA, just like in terrestrial organisms. There are surprisingly few differences to an Earth analogue."
+    ],
+    [
+     "card_type",
+     "amoeba species card with end-of-game scoring"
+    ],
+    [
+     "changed_from_v1",
+     "Same fixes as ET.11."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "amo-03",
+   "group": "Amoeba cards",
+   "title": "ET.16 Automated Analysis",
+   "pics": [
+    "amo-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.16"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 2"
+    ],
+    [
+     "free_corner",
+     "2 publicity"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "blue (two bars)"
+    ],
+    [
+     "effect",
+     "Main effect: gain 3 data (blue diamond '3' with binary), then the single blue organelle icon: choose one organelle in the blue section and gain its reward (then mutate).\nTriggered mission (two circles): each time you mark a PINK trace (pink triangle with molecule) you may cover circle 1 and gain 1 data; each time you mark a YELLOW trace (yellow triangle with fist) you may cover circle 2 and gain 1 data.\nThe trigger icons carry no 'for this species', so they refer to a pink / yellow trace on any species board (see uncertain)."
+    ],
+    [
+     "flavor",
+     "Performing hundreds of tests using environmental suits would be extremely tiring for researchers. Fortunately, a lot of those tests could be performed by robots instead."
+    ],
+    [
+     "card_type",
+     "amoeba species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Bubbles are trace-color triggers of a triggered mission with a reward of 1 data each (v1 only guessed); blue organelle icon described."
+    ]
+   ],
+   "uncertain": [
+    "trace trigger without 'for this species': presumably any trace of that color on any species; not stated"
+   ]
+  },
+  {
+   "key": "amo-04",
+   "group": "Amoeba cards",
+   "title": "ET.15 Low-gravity Research",
+   "pics": [
+    "amo-04"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.15"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 2"
+    ],
+    [
+     "free_corner",
+     "2 publicity"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "yellow (two bars)"
+    ],
+    [
+     "effect",
+     "Main effect: perform a LAUNCH action (orange hexagon with rocket), then the single yellow organelle icon: choose one organelle in the yellow section and gain its reward (then mutate).\nTriggered mission (two circles): each time you mark a BLUE trace (blue triangle with squiggle) you may cover a circle and gain 1 data (twice at most)."
+    ],
+    [
+     "flavor",
+     "An alien lifeform like this one could present a significant risk to Earth's ecosystem. Extensive studies were conducted in orbit before bringing the sample planetside."
+    ],
+    [
+     "card_type",
+     "amoeba species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Rocket hexagon = launch action; blue-trace triggers with 1 data rewards (a triggered mission); organelle icon described."
+    ]
+   ],
+   "uncertain": [
+    "trace trigger without 'for this species': presumably any species; not stated"
+   ]
+  },
+  {
+   "key": "amo-05",
+   "group": "Amoeba cards",
+   "title": "ET.14 Breakthrough Theory",
+   "pics": [
+    "amo-05"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.14"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 card (dark diamond '1' with a white card shape and a torn white fragment; read as 'take 1 card of your choice', not certain)"
+    ],
+    [
+     "income",
+     "random card (?)"
+    ],
+    [
+     "sector",
+     "red (three bars)"
+    ],
+    [
+     "text",
+     "for this species except discovery spaces 1 [score] for each empty space on this species board"
+    ],
+    [
+     "effect",
+     "Main effect: gain 3 publicity (red diamond '3' with microphone).\nQuick mission (grey box): condition = the three trace icons (pink, yellow, blue) 'for this species except discovery spaces' (a trace marked on the Amoeba board on a space other than the three discovery spaces); reward = 1 victory point for each empty space on the Amoeba board, gained once."
+    ],
+    [
+     "flavor",
+     "Based on the data we have gathered up till now, scientists speculate about a possible common point of origin for this lifeform and life on Earth."
+    ],
+    [
+     "card_type",
+     "amoeba species card with quick mission"
+    ],
+    [
+     "changed_from_v1",
+     "Box is a quick mission (condition -> reward), not just scoring; corner re-read as 1 VP + a 1-card icon (v1 'unidentified fragment')."
+    ]
+   ],
+   "uncertain": [
+    "three trace triangles side by side: 'a trace of any color' or 'a trace of each color' - not clear; same layout on gly-09",
+    "corner second icon: dark '1' diamond showing a card and a torn white fragment; read as 1 card of choice, not certain",
+    "'empty space' count is taken when the mission is completed (timing not stated)"
+   ]
+  },
+  {
+   "key": "amo-06",
+   "group": "Amoeba cards",
+   "title": "ET.17 Safety Protocols",
+   "pics": [
+    "amo-06"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.17"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 card (dark diamond '1' with a white card shape and a torn white fragment; read as 'take 1 card of your choice', not certain)"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "sector",
+     "red (three bars)"
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 publicity (red diamond with microphone).\nTriggered mission (three circles): each time you research a tech of the bubble's type you may cover the circle and gain its reward: orange chip with rocket (probe tech) -> a single yellow organelle (choose one in the yellow section, gain its reward); pink chip with dish (telescope tech) -> a single pink organelle; blue chip with server (computer tech) -> a single blue organelle. Organelles mutate after each gain."
+    ],
+    [
+     "flavor",
+     "Due to their potential resistance to our immune systems, safety regulations against the Amoeba have been tightened even further. A breach of containment could prove fatal."
+    ],
+    [
+     "card_type",
+     "amoeba species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Chips are tech-type triggers, circles are single-organelle rewards of the stated color; corner re-read."
+    ]
+   ],
+   "uncertain": [
+    "corner second icon: dark '1' diamond with card and torn fragment; read as 1 card of choice, not certain"
+   ]
+  },
+  {
+   "key": "amo-07",
+   "group": "Amoeba cards",
+   "title": "ET.18 Scientific Papers",
+   "pics": [
+    "amo-07"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.18"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 data"
+    ],
+    [
+     "income",
+     "credit"
+    ],
+    [
+     "sector",
+     "blue (two bars)"
+    ],
+    [
+     "text",
+     "for this species / for this species"
+    ],
+    [
+     "effect",
+     "Main effect: gain 2 random cards (diamond '2' with '?').\nTriggered mission (two circles): trigger = multicolor trace icon 'for this species' (a trace of any color marked on the Amoeba board); each time you do, you may cover a circle and gain 1 publicity (twice at most)."
+    ],
+    [
+     "flavor",
+     "Studies of the new lifeform have been published in many scientific journals. After all, research is most useful if you can share the information with the rest of the world."
+    ],
+    [
+     "card_type",
+     "amoeba species card with triggered mission"
+    ],
+    [
+     "changed_from_v1",
+     "Trigger is 'mark a trace of any color on this species'; reward 1 publicity; draw is 2 random cards (kept)."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "amo-08",
+   "group": "Amoeba cards",
+   "title": "ET.19 Extreme Conditions Testing",
+   "pics": [
+    "amo-08"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.19"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 0"
+    ],
+    [
+     "free_corner",
+     "2 publicity"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "black (four dots)"
+    ],
+    [
+     "text",
+     "Remove one of your markers from a space on this species to gain [pink organelles] / [yellow organelles] / [blue organelles] based on the color of the space."
+    ],
+    [
+     "effect",
+     "Effect: remove one of your own markers from a space of the Amoeba board and gain the three-organelle cluster of the space's color: pink space -> all pink-section organelle bonuses, yellow -> all yellow, blue -> all blue (like marking a space gives all bonuses of the matching section, rulebook alien aid), then the organelles that were gained from mutate (move one step).\nNo other effect; a plain text card."
+    ],
+    [
+     "flavor",
+     "The lifeform proved remarkably resistant to harsh conditions, adapting to increasing radiation, pressure and temperature much faster than anything we've seen before."
+    ],
+    [
+     "card_type",
+     "amoeba species card"
+    ],
+    [
+     "changed_from_v1",
+     "Triple organelle icon read as 'all organelle bonuses of that section' (per aliens.txt Amoeba board); cost 0 and corner kept."
+    ]
+   ],
+   "uncertain": [
+    "whether the removed marker also frees the space for re-marking / the space bonus is not given again is not stated"
+   ]
+  },
+  {
+   "key": "amo-09",
+   "group": "Amoeba cards",
+   "title": "ET.20 Place of Origin",
+   "pics": [
+    "amo-09"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.20"
+    ],
+    [
+     "cost",
+     "type: credit; amount: 1"
+    ],
+    [
+     "free_corner",
+     "1 victory point + 1 card (dark diamond '1' with a white card shape and a torn white fragment; read as 'take 1 card of your choice', not certain)"
+    ],
+    [
+     "income",
+     "energy"
+    ],
+    [
+     "sector",
+     "yellow (two bars)"
+    ],
+    [
+     "effect",
+     "Main effect: gain 1 signal token (pink rounded square with grey signal disc and white card), gain 1 publicity, then the single pink organelle icon: choose one organelle in the pink section and gain its reward (then mutate)."
+    ],
+    [
+     "flavor",
+     "Consolidating data from multiple sources, we have managed to plot the trajectory and pinpoint the likely origin of the asteroid where the lifeform was found."
+    ],
+    [
+     "card_type",
+     "amoeba species card"
+    ],
+    [
+     "changed_from_v1",
+     "Pink rounded square is a SIGNAL TOKEN (v1: unclear mark-a-signal guess); corner re-read."
+    ]
+   ],
+   "uncertain": [
+    "corner second icon: dark '1' diamond with card and torn fragment; read as 1 card of choice, not certain"
+   ]
+  },
+  {
+   "key": "exp-00",
+   "group": "Arkhos exploration cards",
+   "title": "ET 39",
+   "pics": [
+    "exp-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 39"
+    ],
+    [
+     "minor_reward",
+     "gain 1 VP; gain 1 random card from the draw pile (black-outlined diamond '1?')"
+    ],
+    [
+     "major_reward",
+     "gain 2 random cards from the draw pile (diamond '2?'); perform a SCAN action (pink hexagon with radio dish)"
+    ],
+    [
+     "changed_from_v1",
+     "major: pink hexagon with dish was read as a pink trace; now a SCAN action. '1?' / '2?' now explicitly random cards from the draw pile."
+    ]
+   ],
+   "uncertain": [
+    "order of the two major effects is left to right (2 random cards, then scan); whether the card draw has to come first is not stated"
+   ]
+  },
+  {
+   "key": "exp-01",
+   "group": "Arkhos exploration cards",
+   "title": "ET 36",
+   "pics": [
+    "exp-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 36"
+    ],
+    [
+     "minor_reward",
+     "gain 2 publicity"
+    ],
+    [
+     "major_reward",
+     "gain 3 publicity; mark 1 blue life trace (blue triangle with squiggle)"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: blue triangle = blue life trace per glossary (was 'Arkhos blue trace')."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "exp-02",
+   "group": "Arkhos exploration cards",
+   "title": "ET 33",
+   "pics": [
+    "exp-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 33"
+    ],
+    [
+     "minor_reward",
+     "gain 1 VP; gain 1 signal token"
+    ],
+    [
+     "major_reward",
+     "mark a signal in a yellow sector, mark a signal in a red sector, mark a signal in a blue sector (three coloured round signal icons); then mark a signal in a sector of any colour (grey signal icon)"
+    ],
+    [
+     "text",
+     "Then mark a [grey signal] in any sector."
+    ],
+    [
+     "changed_from_v1",
+     "pink square icon is now 'gain 1 signal token' (glossary), no longer 'assumed'; round icons spelled out as signals in sectors of that colour."
+    ]
+   ],
+   "uncertain": [
+    "whether the three coloured signals may be placed in any order and whether each must be a different sector (it is one per colour) is not printed beyond the icons"
+   ]
+  },
+  {
+   "key": "exp-03",
+   "group": "Arkhos exploration cards",
+   "title": "ET 40",
+   "pics": [
+    "exp-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 40"
+    ],
+    [
+     "minor_reward",
+     "gain 4 VP"
+    ],
+    [
+     "major_reward",
+     "gain 1 data; ROTATE the solar system and take a tech of any type (grey ring with dot + multicolour chip = research any tech: rotate, then take the tech)"
+    ],
+    [
+     "changed_from_v1",
+     "grey ring was read as an 'orbit' icon and the chip as a separate tech; now one effect: research a tech of your choice (rotate + tech). Data diamond is 'gain 1 data'."
+    ]
+   ],
+   "uncertain": [
+    "the ring and chip are separate icons side by side; glossary says rotate + tech chip = research that tech, so read as the one effect 'research any tech'"
+   ]
+  },
+  {
+   "key": "exp-04",
+   "group": "Arkhos exploration cards",
+   "title": "ET 37",
+   "pics": [
+    "exp-04"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 37"
+    ],
+    [
+     "minor_reward",
+     "gain 1 VP; gain 1 energy"
+    ],
+    [
+     "major_reward",
+     "gain 1 signal token; gain 4 energy"
+    ],
+    [
+     "changed_from_v1",
+     "pink square is now 'signal token' (not assumed)."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "exp-05",
+   "group": "Arkhos exploration cards",
+   "title": "ET 34",
+   "pics": [
+    "exp-05"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 34"
+    ],
+    [
+     "minor_reward",
+     "gain 1 VP; gain 1 credit"
+    ],
+    [
+     "major_reward",
+     "perform a LAUNCH action (orange hexagon with rocket) and mark 1 pink life trace (pink triangle with molecule); text: ignore the limit of probes in space for this launch"
+    ],
+    [
+     "text",
+     "Ignore the limit of probes in space for this launch."
+    ],
+    [
+     "changed_from_v1",
+     "launch hexagon named as the LAUNCH action; pink triangle named as a pink life trace."
+    ]
+   ],
+   "uncertain": [
+    "no cost is shown on the launch icon (the usual launch cost of 2 credits is not printed); whether the launch is free is not stated on the card"
+   ]
+  },
+  {
+   "key": "exp-06",
+   "group": "Arkhos exploration cards",
+   "title": "ET 41",
+   "pics": [
+    "exp-06"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 41"
+    ],
+    [
+     "minor_reward",
+     "gain 1 VP; gain 1 random card from the draw pile (diamond '1?')"
+    ],
+    [
+     "major_reward",
+     "gain 1 publicity; gain 1 data; gain 1 credit; gain 1 energy; gain 1 card of your choice (from the card row or the deck; white-outlined diamond '1' with a card-shaped notch and no '?')"
+    ],
+    [
+     "changed_from_v1",
+     "last diamond now '1 card of your choice (row or deck)' per glossary; '1?' now random card."
+    ]
+   ],
+   "uncertain": [
+    "credit diamond is olive/gold with the credit symbol; read as credit"
+   ]
+  },
+  {
+   "key": "exp-07",
+   "group": "Arkhos exploration cards",
+   "title": "ET 38",
+   "pics": [
+    "exp-07"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 38"
+    ],
+    [
+     "minor_reward",
+     "gain 2 VP; gain 1 publicity"
+    ],
+    [
+     "major_reward",
+     "perform a LAUNCH action (orange hexagon with rocket); gain 3 movement (number 3 with the shield/probe-arrow shape); text: ignore the limit of probes in space for this launch"
+    ],
+    [
+     "text",
+     "Ignore the limit of probes in space for this launch."
+    ],
+    [
+     "changed_from_v1",
+     "'3' shape is now confirmed as 3 movement (glossary); launch hexagon named as LAUNCH action."
+    ]
+   ],
+   "uncertain": [
+    "no launch cost printed"
+   ]
+  },
+  {
+   "key": "exp-08",
+   "group": "Arkhos exploration cards",
+   "title": "ET 35",
+   "pics": [
+    "exp-08"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET 35"
+    ],
+    [
+     "minor_reward",
+     "gain 1 VP; gain 1 energy"
+    ],
+    [
+     "major_reward",
+     "gain 2 energy; mark 1 yellow life trace (yellow triangle with fist)"
+    ],
+    [
+     "changed_from_v1",
+     "wording only: yellow triangle = yellow life trace."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec1-00",
+   "group": "Arkhos security cards",
+   "title": "ET.21 Exterior Scan",
+   "pics": [
+    "sec1-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.21"
+    ],
+    [
+     "back_trace_color",
+     "pink"
+    ],
+    [
+     "sector_color",
+     "red"
+    ],
+    [
+     "top_right_signal",
+     "one red signal icon (marks a signal in a red sector)"
+    ],
+    [
+     "income",
+     "random card (bottom-right corner: black '?' box = income random card)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "When the first images were published, some people refused to believe. Some refuse to this day, even when explorers have seen it with their own eyes."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec1-01",
+   "group": "Arkhos security cards",
+   "title": "ET.22 Exterior Scan",
+   "pics": [
+    "sec1-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.22"
+    ],
+    [
+     "back_trace_color",
+     "pink"
+    ],
+    [
+     "sector_color",
+     "blue"
+    ],
+    [
+     "top_right_signal",
+     "one blue signal icon (marks a signal in a blue sector)"
+    ],
+    [
+     "income",
+     "energy (bottom-right corner: green lightning = income energy)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Images fail to convey the sheer size of the object. Or perhaps our human brains are simply not capable of understanding something so massive."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec1-02",
+   "group": "Arkhos security cards",
+   "title": "ET.23 Exterior Scan",
+   "pics": [
+    "sec1-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.23"
+    ],
+    [
+     "back_trace_color",
+     "pink"
+    ],
+    [
+     "sector_color",
+     "yellow"
+    ],
+    [
+     "top_right_signal",
+     "one yellow signal icon (marks a signal in a yellow sector)"
+    ],
+    [
+     "income",
+     "credit (bottom-right corner: gold credit symbol = income credit)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Close imaging of the surface was one of the first tasks undertaken by the exploration team, primarily aimed at locating a suitable point of entry."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec1-03",
+   "group": "Arkhos security cards",
+   "title": "ET.24 Exterior Scan",
+   "pics": [
+    "sec1-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.24"
+    ],
+    [
+     "back_trace_color",
+     "pink"
+    ],
+    [
+     "sector_color",
+     "black"
+    ],
+    [
+     "top_right_signal",
+     "four small white dots on a black corner (black sector signal)"
+    ],
+    [
+     "income",
+     "energy (bottom-right corner: green lightning = income energy)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Images of the surface show countless impact marks, scrapes and other imperfections the object accumulated during its long journey through space."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": [
+    "black sector: top-right corner is black with four white dots, read as black signal; matches glossary (black round signal icon)"
+   ]
+  },
+  {
+   "key": "sec2-00",
+   "group": "Arkhos security cards",
+   "title": "ET.29 Forced Entry",
+   "pics": [
+    "sec2-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.29"
+    ],
+    [
+     "back_trace_color",
+     "blue"
+    ],
+    [
+     "sector_color",
+     "yellow"
+    ],
+    [
+     "top_right_signal",
+     "one yellow signal icon (marks a signal in a yellow sector)"
+    ],
+    [
+     "income",
+     "random card (bottom-right corner: black '?' box = income random card)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Analysing the surface with the hope of finding a convenient opening proved to be fruitless. A more brute-force method of entry was chosen instead."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec2-01",
+   "group": "Arkhos security cards",
+   "title": "ET.30 Forced Entry",
+   "pics": [
+    "sec2-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.30"
+    ],
+    [
+     "back_trace_color",
+     "blue"
+    ],
+    [
+     "sector_color",
+     "red"
+    ],
+    [
+     "top_right_signal",
+     "one red signal icon (marks a signal in a red sector)"
+    ],
+    [
+     "income",
+     "energy (bottom-right corner: green lightning = income energy)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Getting inside proved to be its own challenge. It took Earth's best and brightest to come up with a solution."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec2-02",
+   "group": "Arkhos security cards",
+   "title": "ET.31 Forced Entry",
+   "pics": [
+    "sec2-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.31"
+    ],
+    [
+     "back_trace_color",
+     "blue"
+    ],
+    [
+     "sector_color",
+     "blue"
+    ],
+    [
+     "top_right_signal",
+     "one blue signal icon (marks a signal in a blue sector)"
+    ],
+    [
+     "income",
+     "credit (bottom-right corner: gold credit symbol = income credit)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "To penetrate the thick outer plating, a high-powered cutting laser was required, but first the technology to create one had to be developed."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec2-03",
+   "group": "Arkhos security cards",
+   "title": "ET.32 Forced Entry",
+   "pics": [
+    "sec2-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.32"
+    ],
+    [
+     "back_trace_color",
+     "blue"
+    ],
+    [
+     "sector_color",
+     "black"
+    ],
+    [
+     "top_right_signal",
+     "four small white dots on a black corner (black sector signal)"
+    ],
+    [
+     "income",
+     "credit (bottom-right corner: gold credit symbol = income credit)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Cutting through the hull was a difficult and dangerous task, mostly because of the rather dangerous tool used for the job."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": [
+    "black sector: top-right corner is black with four white dots, read as black signal; matches glossary (black round signal icon)"
+   ]
+  },
+  {
+   "key": "sec3-00",
+   "group": "Arkhos security cards",
+   "title": "ET.25 Proximity Maneuvers",
+   "pics": [
+    "sec3-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.25"
+    ],
+    [
+     "back_trace_color",
+     "yellow"
+    ],
+    [
+     "sector_color",
+     "blue"
+    ],
+    [
+     "top_right_signal",
+     "one blue signal icon (marks a signal in a blue sector)"
+    ],
+    [
+     "income",
+     "random card (bottom-right corner: black '?' box = income random card)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Although it was extremely risky, there was no question that we would investigate the object. Getting to it was just one of the hurdles we needed to overcome."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec3-01",
+   "group": "Arkhos security cards",
+   "title": "ET.26 Proximity Maneuvers",
+   "pics": [
+    "sec3-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.26"
+    ],
+    [
+     "back_trace_color",
+     "yellow"
+    ],
+    [
+     "sector_color",
+     "yellow"
+    ],
+    [
+     "top_right_signal",
+     "one yellow signal icon (marks a signal in a yellow sector)"
+    ],
+    [
+     "income",
+     "energy (bottom-right corner: green lightning = income energy)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Reaching close proximity with the object required extensive trajectory calculations, two gravity assists and just a bit of luck."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec3-02",
+   "group": "Arkhos security cards",
+   "title": "ET.27 Proximity Maneuvers",
+   "pics": [
+    "sec3-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.27"
+    ],
+    [
+     "back_trace_color",
+     "yellow"
+    ],
+    [
+     "sector_color",
+     "red"
+    ],
+    [
+     "top_right_signal",
+     "one red signal icon (marks a signal in a red sector)"
+    ],
+    [
+     "income",
+     "credit (bottom-right corner: gold credit symbol = income credit)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Navigating around the object brought its own set of issues. A long-ago impact with a large asteroid created its own debris field, making any approach potentially hazardous."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": []
+  },
+  {
+   "key": "sec3-03",
+   "group": "Arkhos security cards",
+   "title": "ET.28 Proximity Maneuvers",
+   "pics": [
+    "sec3-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "ET.28"
+    ],
+    [
+     "back_trace_color",
+     "yellow"
+    ],
+    [
+     "sector_color",
+     "black"
+    ],
+    [
+     "top_right_signal",
+     "four small white dots on a black corner (black sector signal)"
+    ],
+    [
+     "income",
+     "random card (bottom-right corner: black '?' box = income random card)"
+    ],
+    [
+     "free_action_corner",
+     "top-left: Arkhos minor-exploration icon (grey orb in a red triangle). Discard the card for its free action: reveal the next exploration card and gain its minor exploration reward (aliens aid p.2)."
+    ],
+    [
+     "main_action",
+     "play as main action for 2 credits (gold diamond '2' with credit symbol, left of the title): reveal the next exploration card and gain its major exploration reward"
+    ],
+    [
+     "text",
+     "Reveal an exploration card and gain its major exploration reward."
+    ],
+    [
+     "flavor",
+     "Massive enough to create its own gravity field, maneuvering a spacecraft anywhere near the object was a tricky proposal only possible thanks to advanced flight computers."
+    ],
+    [
+     "changed_from_v1",
+     "income now stated with the glossary corner meanings; top-left icon identified as the minor-exploration reward icon from the alien aid; black sector signal described as four white dots on black; cost diamond named as 2 credits. No readings contradicted."
+    ]
+   ],
+   "uncertain": [
+    "black sector: top-right corner is black with four white dots, read as black signal; matches glossary (black round signal icon)"
+   ]
+  },
+  {
+   "key": "rival-00",
+   "group": "Rival action cards",
+   "title": "S.1",
+   "pics": [
+    "rival-00"
+   ],
+   "fields": [
+    [
+     "id",
+     "S.1"
+    ],
+    [
+     "dir",
+     "left"
+    ],
+    [
+     "card_kind",
+     "new extra starting action card of the Space Agencies solo mode (rulebook solo p.7: shuffle it into the rival's action deck); has the same rival-card layout as base cards, light purple frame, no species name"
+    ],
+    [
+     "actions",
+     "1. Mark 1 life trace of any colour (large triangle split into pink, yellow and blue segments = wild trace). The rival marks it by the existing rule SOLO-RIVAL-11 for wild traces (consider all columns, lowest free space, decision arrow on ties).\n2. Then advance 1 step on the progress track for each gold star of the chosen difficulty level (orange arrow '1' = rival advances 1 step; gold star = one star of the difficulty)."
+    ],
+    [
+     "text",
+     "Then [orange arrow 1] for each [gold star] of your difficulty level."
+    ],
+    [
+     "changed_from_v1",
+     "triangle now clearly 'wild life trace' with the SOLO-RIVAL-11 procedure; the arrow is the progress-track advance (not 'advance 1 step' in a vague sense); card is the new extra starting action card (rulebook solo setup)."
+    ]
+   ],
+   "uncertain": [
+    "the card has no preceding action; the word 'Then' hints the trace is the whole first action and the advancement follows in the same action - assumed one action card turn doing both",
+    "a progress advance may cross a growth icon and add an advanced card, per base rule SOLO-RIVAL-02; not printed on the card",
+    "trace goes to 'any species board column of the rival' - the card does not say whether the Arkhos preference rule (alien aid solo rules) also applies"
+   ]
+  },
+  {
+   "key": "rival-01",
+   "group": "Rival action cards",
+   "title": "S.2",
+   "pics": [
+    "rival-01"
+   ],
+   "fields": [
+    [
+     "id",
+     "S.2"
+    ],
+    [
+     "species",
+     "glyphids"
+    ],
+    [
+     "dir",
+     "left"
+    ],
+    [
+     "card_kind",
+     "species card (like base S.15 to S.19); in the same way the base S.3/S.4 species-check card is replaced when the species is discovered (SOLO-RIVAL-09). Green frame"
+    ],
+    [
+     "actions",
+     "1. PROBE action: move a probe from Earth 4 movement (icon '4' with the shield shape = 4 movement; only if the rival has a probe on Earth, else skip). Only check planets that carry a Glyphids symbol (green Glyphid mark in the heading). Planets are checked in this order: Mercury, Neptune, Uranus, Saturn, Jupiter, Mars, Venus (arrows > between them) and the first one reachable with 4 movement is the target.\n   After arriving: (a) if the rival has a probe tech (orange chip with red X = discard a probe tech) it discards it and lands on a moon of that planet (moon with rover hexagon) if a moon space is free; (b) otherwise it LANDS (gold rover hexagon) if possible; (c) otherwise ORBITS (green satellite hexagon). Preferred order: moon-landing with probe tech, then lander, then orbiter, so lander preferred over orbiter.\n2. SCAN action (pink hexagon with dish; always possible): mark 2 signals in the sector of Earth (two grey signal icons with Earth badge) and 1 signal from the card row (grey signal with card icon; leftmost, because the arrow points left). Plus: discard a telescope tech (pink chip with red X) to mark 1 extra card-row signal (grey signal with card icon)."
+    ],
+    [
+     "text",
+     "Only check planets with [Glyphids symbol]."
+    ],
+    [
+     "changed_from_v1",
+     "now fully decoded using the base solo rival icons and rules (spec solo-rival-cards.md): 4 = 4 movement, hexagons = launch/orbit/land/scan, chips with red X = discard that tech, grey signal with Earth = signal in Earth sector, grey signal with card = card-row signal. v1 said 'not decoded'."
+    ]
+   ],
+   "uncertain": [
+    "the card has no launch action and no tech action; there is no probe-on-Earth fallback, so the card relies on skipping the probe action when no probe is on Earth",
+    "whether the 'orbit' hexagon after the lander is the preferred lander-then-orbiter order or two options as in the base rival cards (separated by a bracket) - the card shows chevrons '>' between the icons, read as priority order",
+    "the 'asteroid with rover hexagon' is read as moon landing (like base rival cards); it could be a landing on an asteroid-belt space",
+    "in the base probe cards moons are preferred only if a probe tech is discarded; the chip with X before the moon is read that way"
+   ]
+  },
+  {
+   "key": "rival-02",
+   "group": "Rival action cards",
+   "title": "S.3",
+   "pics": [
+    "rival-02"
+   ],
+   "fields": [
+    [
+     "id",
+     "S.3"
+    ],
+    [
+     "species",
+     "arkhos"
+    ],
+    [
+     "dir",
+     "right"
+    ],
+    [
+     "card_kind",
+     "species card for Arkhos (red frame); replaces a base species-check card (SOLO-RIVAL-09) when Arkhos is discovered"
+    ],
+    [
+     "actions",
+     "The rival breaches one of its three security cards at random (the only way the rival breaches security cards, aliens aid solo rules), marking an overflow space below the Arkhos board in the matching colour, and gains 3 VP.\nThen the rival gains 2 minor exploration rewards (two Arkhos minor-exploration icons = reveal the next exploration card and gain its minor reward, twice).\nA large multicolour triangle (pink/yellow/blue = wild life trace) is printed at the bottom of the card with no text; its effect is not stated."
+    ],
+    [
+     "text",
+     "The rival breaches one of their security cards at random and marks an overflow space below this species in the matching color (gaining [3 VP]). Then they gain [exploration icon] [exploration icon]."
+    ],
+    [
+     "changed_from_v1",
+     "exploration icons confirmed as the minor-exploration reward (alien aid: 'reveal the next exploration card and gain its minor exploration reward') x2; the multicolour triangle at the bottom is noted. 3 VP is the green laurel '3'."
+    ]
+   ],
+   "uncertain": [
+    "multicolour triangle at the bottom of the card has no text; it likely is a decoration/wild trace marker of the rival's alien-card row, meaning not given",
+    "what happens when the rival has no security cards left; not printed",
+    "the minor exploration rewards of the rival: how the rival resolves e.g. choice rewards (random card, card of choice, any tech) is not printed on the card"
+   ]
+  },
+  {
+   "key": "rival-03",
+   "group": "Rival action cards",
+   "title": "S.4",
+   "pics": [
+    "rival-03"
+   ],
+   "fields": [
+    [
+     "id",
+     "S.4"
+    ],
+    [
+     "species",
+     "amoeba"
+    ],
+    [
+     "dir",
+     "right"
+    ],
+    [
+     "card_kind",
+     "species card for Amoeba (blue/pink/yellow frame)"
+    ],
+    [
+     "actions",
+     "1. If one of the sections on the Amoeba board has 3 organelle tokens, the rival gains all organelle bonuses in that section (and moves the tokens as usual).\n2. Research a tech: rotate the solar system (grey ring with dot) and take a tech (multicolour chip = tech chosen by the rival's progress-track rule, SOLO-RIVAL-06), with no publicity cost (none printed), and advance 1 on the progress track (orange arrow 1)."
+    ],
+    [
+     "text",
+     "If one of the sections on the Amoeba board has 3 organelle tokens, the rival gains all organelle bonuses in that section (and moves the tokens as usual)."
+    ],
+    [
+     "changed_from_v1",
+     "ring + chip now 'rotate and research a tech' (one action; same procedure as base card S.4's tech action with cost 0 and progress 1) instead of two separate icons 'orbit icon' and 'tech icon'."
+    ]
+   ],
+   "uncertain": [
+    "whether the text is the first action that can fail (skip to the tech action if no section has 3 tokens) as the base species cards work; assumed yes",
+    "the base ids S.1 to S.4 clash with these ids; expansion ids need a prefix, the card prints only 'S.1' to 'S.4'",
+    "which tech the rival takes is the base rule via the progress marker; the multicolour chip stands for 'any tech' following the track"
+   ]
+  },
+  {
+   "key": "objectives/long-term-1",
+   "group": "Long-term objectives",
+   "title": "Long-term objective 1",
+   "pics": [
+    "objectives/long-term-1"
+   ],
+   "fields": [
+    [
+     "id",
+     "LT-1"
+    ],
+    [
+     "tile_layout",
+     "green corner with satellite icon at top left; three columns, each with a trigger icon on top, a check circle (task slot) below it, and at the bottom a penalty icon; left tabs with numbers 2, 3, 4"
+    ],
+    [
+     "tasks",
+     "Task 1: Trigger: mark a life trace of any colour (multicolour pink/yellow/blue triangle). Rule: the first time you mark a life trace, you may mark this task.\nTask 2: same trigger and effect, a second time you mark a life trace.\nTask 3: same trigger and effect, a third time you mark a life trace."
+    ],
+    [
+     "rule_sentence",
+     "Whenever you mark a life trace (of any colour), you may mark one task of this objective; complete all three tasks to remove the tile."
+    ],
+    [
+     "scoring",
+     "none printed; no VP (solo rulebook: uncompleted long-term objectives are not scored)"
+    ],
+    [
+     "penalty",
+     "at the end of rounds 2, 3 and 4 the rival advances 1 step (orange arrow '1') for each uncompleted task still visible (grey tile with a red prohibition sign = uncompleted task > orange arrow 1); completed tile is removed and cannot be spent to stop rival advancement"
+    ],
+    [
+     "changed_from_v1",
+     "triangle named as the 'wild' life trace trigger (was 'trace marked? Arkhos trace?'); three tasks written as rule sentence; penalty from the solo rulebook p.7."
+    ]
+   ],
+   "uncertain": [
+    "it is not printed whether a trace marked by an exchange, trace from a species board or the start of the game counts; rulebook says starting effects do not complete tasks",
+    "left tab numbers 2, 3, 4 are next to the task and penalty rows; read as the rounds 2,3,4 in which the penalty applies (solo rulebook says rounds 2, 3 and 4); they could also tag rows"
+   ]
+  },
+  {
+   "key": "objectives/long-term-2",
+   "group": "Long-term objectives",
+   "title": "Long-term objective 2",
+   "pics": [
+    "objectives/long-term-2"
+   ],
+   "fields": [
+    [
+     "id",
+     "LT-2"
+    ],
+    [
+     "tile_layout",
+     "as LT-1"
+    ],
+    [
+     "tasks",
+     "Task 1: Trigger: income (rising arrow over green and gold bars = take income: tuck a card from the hand for its income). Mark this task when you tuck a card for income.\nTask 2: same, a second time.\nTask 3: same, a third time."
+    ],
+    [
+     "rule_sentence",
+     "Whenever you tuck a card from your hand to increase your income, you may mark one task of this objective; complete all three tasks to remove the tile."
+    ],
+    [
+     "scoring",
+     "none printed"
+    ],
+    [
+     "penalty",
+     "same as LT-1 (rival advances 1 step per uncompleted task at the end of rounds 2, 3, 4)"
+    ],
+    [
+     "changed_from_v1",
+     "icon is now 'tuck a card for income' (glossary: rising arrow = income) instead of 'income increase: probably gain new income'."
+    ]
+   ],
+   "uncertain": [
+    "whether a tucked card gained through an effect (not the 'tuck income' free action) counts is not printed",
+    "number of tucked cards per trigger is one"
+   ]
+  },
+  {
+   "key": "objectives/long-term-3",
+   "group": "Long-term objectives",
+   "title": "Long-term objective 3",
+   "pics": [
+    "objectives/long-term-3"
+   ],
+   "fields": [
+    [
+     "id",
+     "LT-3"
+    ],
+    [
+     "tile_layout",
+     "as LT-1"
+    ],
+    [
+     "tasks",
+     "Task 1: Trigger: research a probe tech (orange chip with rocket). Mark this task when you take a probe (launch) tech.\nTask 2: Trigger: research a telescope tech (pink chip with radio dish).\nTask 3: Trigger: research a computer tech (blue chip with server)."
+    ],
+    [
+     "rule_sentence",
+     "Whenever you gain a probe tech, you may mark task 1; a telescope tech, task 2; a computer tech, task 3. Complete all three tasks (one tech of each type) to remove the tile."
+    ],
+    [
+     "scoring",
+     "none printed"
+    ],
+    [
+     "penalty",
+     "same as LT-1"
+    ],
+    [
+     "changed_from_v1",
+     "chips named by glossary (probe/telescope/computer); trigger is 'research/gain that tech' (rotate + tech), not 'take a tech' vaguely."
+    ]
+   ],
+   "uncertain": [
+    "whether any gain of a tech counts (as bonus from a card or tile) or only the research-tech action; following the standard objective trigger rule it is any gain, not checked"
+   ]
+  },
+  {
+   "key": "board-arkhos",
+   "group": "Species boards",
+   "title": "Arkhos board",
+   "pics": [
+    "boards/arkhos"
+   ],
+   "fields": [
+    [
+     "size",
+     "500\n900"
+    ],
+    [
+     "layout",
+     "3 columns (pink left, yellow middle and lower than the others, blue right) x 4 rows = 12 spaces, one per color per security level. Rows are separated by glowing lines; open-padlock icons at the left edge show the level: row 1 none = level 0 (open from the start, the top three spaces), row 2 one padlock = level 1, row 3 two = level 2, row 4 three = level 3. Each space is a circle ringed in its trace color with a small colored nub."
+    ],
+    [
+     "icons",
+     "Red triangle with a grey dot = 'reveal the next exploration card and gain its MINOR exploration reward' (alien aid p.2: red = minor, blue = major). No blue (major) triangle is printed on this board. Teal/green laurel with number = victory points. Padlock icons at the left edge are drawn OPEN (unlocked) padlocks. Two red triangles in one space = two such reveals, one after the other."
+    ],
+    [
+     "spaces_top_to_bottom_left_to_right_by_row",
+     "color: pink; level: 0; rewards: t: vp; n: 2\nt: exploration_minor; n: 1; order: 0\ncolor: yellow; level: 0; rewards: t: vp; n: 2\nt: exploration_minor; n: 1; order: 4\ncolor: blue; level: 0; rewards: t: vp; n: 2\nt: exploration_minor; n: 1; order: 8\ncolor: pink; level: 1; rewards: t: exploration_minor; n: 1\nt: exploration_minor; n: 1; order: 1\ncolor: yellow; level: 1; rewards: t: exploration_minor; n: 1\nt: exploration_minor; n: 1; order: 5\ncolor: blue; level: 1; rewards: t: exploration_minor; n: 1\nt: exploration_minor; n: 1; order: 9\ncolor: pink; level: 2; rewards: t: vp; n: 5\nt: exploration_minor; n: 1; order: 2\ncolor: yellow; level: 2; rewards: t: vp; n: 5\nt: exploration_minor; n: 1; order: 6\ncolor: blue; level: 2; rewards: t: vp; n: 5\nt: exploration_minor; n: 1; order: 10\ncolor: pink; level: 3; rewards: t: vp; n: 7\nt: exploration_minor; n: 1; order: 3\ncolor: yellow; level: 3; rewards: t: vp; n: 7\nt: exploration_minor; n: 1; order: 7\ncolor: blue; level: 3; rewards: t: vp; n: 7\nt: exploration_minor; n: 1; order: 11"
+    ],
+    [
+     "spaces_by_column",
+     "pink: color: pink; level: 0; rewards: t: vp; n: 2\nt: exploration_minor; n: 1; order: 0\ncolor: pink; level: 1; rewards: t: exploration_minor; n: 1\nt: exploration_minor; n: 1; order: 1\ncolor: pink; level: 2; rewards: t: vp; n: 5\nt: exploration_minor; n: 1; order: 2\ncolor: pink; level: 3; rewards: t: vp; n: 7\nt: exploration_minor; n: 1; order: 3; yellow: color: yellow; level: 0; rewards: t: vp; n: 2\nt: exploration_minor; n: 1; order: 4\ncolor: yellow; level: 1; rewards: t: exploration_minor; n: 1\nt: exploration_minor; n: 1; order: 5\ncolor: yellow; level: 2; rewards: t: vp; n: 5\nt: exploration_minor; n: 1; order: 6\ncolor: yellow; level: 3; rewards: t: vp; n: 7\nt: exploration_minor; n: 1; order: 7; blue: color: blue; level: 0; rewards: t: vp; n: 2\nt: exploration_minor; n: 1; order: 8\ncolor: blue; level: 1; rewards: t: exploration_minor; n: 1\nt: exploration_minor; n: 1; order: 9\ncolor: blue; level: 2; rewards: t: vp; n: 5\nt: exploration_minor; n: 1; order: 10\ncolor: blue; level: 3; rewards: t: vp; n: 7\nt: exploration_minor; n: 1; order: 11"
+    ],
+    [
+     "no_cost_no_top_capsule",
+     "True"
+    ],
+    [
+     "discovery_overflow",
+     "No discovery or overflow spaces are drawn on this board; the bottom edge has three round notches only (overflow/discovery spaces are on the main board)."
+    ],
+    [
+     "padlocks",
+     "Left edge: level 0 (top row) none; level 1 row one open padlock; level 2 row two; level 3 row three. Matches alien aid p.2: 1 breached card gives level 1, 2 give levels 1+2, all 3 give everything; a player with no security cards left in front of them may mark anything."
+    ],
+    [
+     "changed_from_v1",
+     "Padlock icons re-read as OPEN padlocks and tied to the aid's breach rule (levels 1-3); no change to the 12 spaces, VP values (2/0/5/7) or rewards after re-checking the picture.\nRemoved the v1 uncertainty about 'owner must hold the breached cards' (aid p.2 states it).\nReworded the double-triangle reading: kept as two minor reveals, flagged as picture-only inference."
+    ]
+   ],
+   "uncertain": [
+    "Level 1 spaces show two red (minor) triangles: read as 2 separate reveals of the exploration deck (2 minor rewards); a picture cannot show whether it is 2 reveals or one combined reward. Rulebook wording 'reveal the next exploration card' per triangle supports 2 reveals. No VP on level 1 spaces.",
+    "No major (blue) exploration icon is printed on the board; major rewards come only from security cards played as a main action for 2 credits (alien aid).",
+    "Yellow column is drawn lower than the pink and blue ones; only layout, no rule effect."
+   ]
+  },
+  {
+   "key": "board-glyphids",
+   "group": "Species boards",
+   "title": "Glyphids board",
+   "pics": [
+    "boards/glyphids"
+   ],
+   "fields": [
+    [
+     "size",
+     "777\n1415"
+    ],
+    [
+     "layout",
+     "3 columns (pink left, yellow middle - offset lower than the other two, blue right), each column top to bottom: tall token well (swirl icon), 2 VP + alien card, 3 VP + alien card, lower well with 7 VP space. Upper part of the board is a picture of the alien source (a dark star burst in green swirls)."
+    ],
+    [
+     "icons",
+     "Teal laurel with number = VP. Teal square with '1' and a white alien head = draw 1 Glyphids card (aid: from the top of the deck or take the face-up card and replace it). Two white curved arrows in a circle at the top edge of each of the three upper wells = REPLENISH (aid: those spaces are replenished immediately); this is not the grey ring-with-dot 'rotate' icon."
+    ],
+    [
+     "columns",
+     "pink: kind: top_well_space; note: Tall dark well, green outline at the top with the replenish icon; its lower part is outlined in the trace color with a colored nub, so the well is itself the trace-colored markable space (the aid calls these 'the top three spaces'). It holds a glyph token placed face up (setup: one of the 6 designated spaces); marking it takes the token and it is replenished immediately; if the token supply is empty the space has no effect any more. Printed reward: none besides the token. Two tiny dots of the trace color inside the lower part have no readable meaning.; rewards: ; holds_glyph_token: True; replenish: True\nkind: space; rewards: t: vp; n: 2\nt: alien_card; n: 1\nkind: space; rewards: t: vp; n: 3\nt: alien_card; n: 1\nkind: bottom_well_and_7vp_space; note: Lower well with a plain green outline (no replenish icon) that holds a glyph token, directly above a trace-colored circle printing 7 VP. The circle is the markable space (the well sits above it); the token is taken when that space is marked, not replenished.; rewards: t: vp; n: 7; holds_glyph_token: True; replenish: False; yellow: kind: top_well_space; note: Tall dark well, green outline at the top with the replenish icon; its lower part is outlined in the trace color with a colored nub, so the well is itself the trace-colored markable space (the aid calls these 'the top three spaces'). It holds a glyph token placed face up (setup: one of the 6 designated spaces); marking it takes the token and it is replenished immediately; if the token supply is empty the space has no effect any more. Printed reward: none besides the token. Two tiny dots of the trace color inside the lower part have no readable meaning.; rewards: ; holds_glyph_token: True; replenish: True\nkind: space; rewards: t: vp; n: 2\nt: alien_card; n: 1\nkind: space; rewards: t: vp; n: 3\nt: alien_card; n: 1\nkind: bottom_well_and_7vp_space; note: Lower well with a plain green outline (no replenish icon) that holds a glyph token, directly above a trace-colored circle printing 7 VP. The circle is the markable space (the well sits above it); the token is taken when that space is marked, not replenished.; rewards: t: vp; n: 7; holds_glyph_token: True; replenish: False; blue: kind: top_well_space; note: Tall dark well, green outline at the top with the replenish icon; its lower part is outlined in the trace color with a colored nub, so the well is itself the trace-colored markable space (the aid calls these 'the top three spaces'). It holds a glyph token placed face up (setup: one of the 6 designated spaces); marking it takes the token and it is replenished immediately; if the token supply is empty the space has no effect any more. Printed reward: none besides the token. Two tiny dots of the trace color inside the lower part have no readable meaning.; rewards: ; holds_glyph_token: True; replenish: True\nkind: space; rewards: t: vp; n: 2\nt: alien_card; n: 1\nkind: space; rewards: t: vp; n: 3\nt: alien_card; n: 1\nkind: bottom_well_and_7vp_space; note: Lower well with a plain green outline (no replenish icon) that holds a glyph token, directly above a trace-colored circle printing 7 VP. The circle is the markable space (the well sits above it); the token is taken when that space is marked, not replenished.; rewards: t: vp; n: 7; holds_glyph_token: True; replenish: False"
+    ],
+    [
+     "designated_token_spaces",
+     "6 (aid: 'each of the 6 designated spaces') = the 3 top wells + the 3 lower wells, which are the only places on the board that hold tokens. Only the 3 top ones are replenished."
+    ],
+    [
+     "cost",
+     "none"
+    ],
+    [
+     "token_setup_from_aid",
+     "Shuffle all 35 tokens, place one face up on: each of the 6 designated Glyphids-board spaces, beside each of the 7 planets, on each of the 8 sectors, and on each tech stack that still has its 2-point token on top. Remaining tokens: face-down stack near the species board."
+    ],
+    [
+     "changed_from_v1",
+     "Top wells re-classified from 'token_well' to 'top_well_space': they carry the trace-color outline and are the markable spaces; replenish icon identified as two circular arrows (replenish), not rotate.\nBottom wells: kind renamed 'bottom_well_and_7vp_space', note clarified; same 7 VP.\nAdded the glyph-token setup list from the alien aid (6 designated spaces, 7 planets, 8 sectors, tech stacks).\nAlien-card icon described as 'teal square with 1 and alien head = draw 1 Glyphids card'.\nRewards (2 VP + card, 3 VP + card, 7 VP) re-checked and unchanged."
+    ]
+   ],
+   "uncertain": [
+    "Whether the lower well and the 7 VP circle below it are one space (token is gained by marking the circle) or two parts: read as one space, picture gives a gap between them; no ruling printed.",
+    "The two small dots inside each top well: no readable meaning (decor).",
+    "Picture bottom-right has an AI-generation watermark badge (not game content); the board art is low resolution."
+   ]
+  },
+  {
+   "key": "board-amoeba",
+   "group": "Species boards",
+   "title": "Amoeba board",
+   "pics": [
+    "boards/amoeba"
+   ],
+   "fields": [
+    [
+     "size",
+     "573\n1044"
+    ],
+    [
+     "layout",
+     "Top: the cell picture with 9 round organelle spaces in 3 colored sections (yellow top, blue right, pink left): 6 outer spaces on a ring with white arrows going clockwise and 3 inner spaces on an inner ring with arrows going counter-clockwise. Bottom: 3 columns (pink left, yellow middle and lower, blue right) x 4 marking spaces, each ringed in its color; every marking space shows the 'organelle bonuses' icon (three small cells in the section color = gain all bonuses of the organelles in the section of that color, then mutate them)."
+    ],
+    [
+     "outer_ring_spaces_clockwise",
+     "id: Y1; color: yellow; pos: top left; marked_with_gear: True; moves_to: Y2\nid: Y2; color: yellow; pos: top right; marked_with_gear: True; moves_to: B1\nid: B1; color: blue; pos: right upper; marked_with_gear: False; moves_to: B2\nid: B2; color: blue; pos: right lower; marked_with_gear: False; moves_to: P1 (long arrow along the bottom, pointing left)\nid: P1; color: pink; pos: bottom; marked_with_gear: True; moves_to: P2\nid: P2; color: pink; pos: left; marked_with_gear: True; moves_to: Y1 (arrow up the left side)"
+    ],
+    [
+     "inner_ring_spaces_counter_clockwise",
+     "id: IY; color: yellow; pos: inner top; marked_with_gear: False; moves_to: IP (arrow pointing down-left)\nid: IP; color: pink; pos: inner left; marked_with_gear: False; moves_to: IB (arrow pointing right)\nid: IB; color: blue; pos: inner right; marked_with_gear: True; moves_to: IY (arrow pointing up)"
+    ],
+    [
+     "setup",
+     "Aid: shuffle the 5 organelle tokens and deal them face up on the marked spaces. The marked (gear) spaces are 5: Y1, Y2, P1, P2, IB (a faint white gear is printed on each); B1, B2, IY, IP have no gear."
+    ],
+    [
+     "mutation_rule",
+     "Gaining organelle bonuses (marking an Amoeba board space or card effect) -> then move all those organelles 1 space along the arrows; outer clockwise, inner counter-clockwise; skip occupied target spaces to the next empty one (rule sheet, example: the 2-point organelle skips the next two occupied spaces)."
+    ],
+    [
+     "columns",
+     "pink: color: pink; rewards: ; organelle_bonus: all organelles in the section of this color; index_in_column: 1\ncolor: pink; rewards: t: vp; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 2\ncolor: pink; rewards: t: alien_card; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 3\ncolor: pink; rewards: t: vp; n: 1\nt: alien_card; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 4; yellow: color: yellow; rewards: ; organelle_bonus: all organelles in the section of this color; index_in_column: 1\ncolor: yellow; rewards: t: vp; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 2\ncolor: yellow; rewards: t: alien_card; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 3\ncolor: yellow; rewards: t: vp; n: 1\nt: alien_card; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 4; blue: color: blue; rewards: ; organelle_bonus: all organelles in the section of this color; index_in_column: 1\ncolor: blue; rewards: t: vp; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 2\ncolor: blue; rewards: t: alien_card; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 3\ncolor: blue; rewards: t: vp; n: 1\nt: alien_card; n: 1; organelle_bonus: all organelles in the section of this color; index_in_column: 4"
+    ],
+    [
+     "icons",
+     "Teal laurel '1' = 1 VP; teal square '1' with a white alien head = draw 1 Amoeba card (from top of deck or the face-up card, aid p.7); three small cells in the section color = organelle bonuses of that section. White arrows on the cell picture = the mutation direction. Gear = starting organelle space."
+    ],
+    [
+     "changed_from_v1",
+     "Re-checked all 12 marking spaces and 9 organelle spaces: no value changes (rewards per column: none, 1 VP, 1 Amoeba card, 1 VP + 1 Amoeba card; ring order and gear spaces unchanged).\nSetup and mutation text tied to the aid wording; inner ring direction noted as counter-clockwise (IY -> IP -> IB -> IY, arrows down-left, right, up).\nDropped the v1 'which row is the top capsule' uncertainty (not a game concept on this board).\nIcons note: alien-head square called 'draw 1 Amoeba card' and the cells icon explained."
+    ]
+   ],
+   "uncertain": [
+    "Section membership of the inner spaces is taken from the background colour (IY yellow, IP pink/purple, IB blue).",
+    "The top marking space of each column prints only the organelle-bonus icon (no VP or card); the aid does not say any space is special.",
+    "The yellow column is drawn lower than the pink and blue ones; layout only."
+   ]
+  },
+  {
+   "key": "board-translation",
+   "group": "Species boards",
+   "title": "Glyphids translation board",
+   "pics": [
+    "boards/glyphids-track-a",
+    "boards/glyphids-track-b",
+    "boards/glyphids-track-c"
+   ],
+   "fields": [
+    [
+     "size",
+     "750\n690"
+    ],
+    [
+     "layout",
+     "Translation board (750x690, attached to the Glyphids board). Header bar: glyph token with a not-equal sign, then 1 / 3 / 5 / 8 / 11 / 15 / 20 VP (end-of-game scoring of sets of different unplaced glyph tokens, 1 to 7 unique; all sets are scored). Below it a top row of 3 token cutouts and a bottom row of 4 token cutouts. The reward icons are printed on two removable STRIPS (one under each row of cutouts): a 3-icon top strip and a 4-icon bottom strip. Top-row slots can only be filled when both bottom slots beneath them are filled (aid)."
+    ],
+    [
+     "strips",
+     "Aid: 'Insert the two strips a random side up in the cutouts' (component line: '2 strips'). So there are exactly two strips with two printed sides each. Reading the three pictures: the TOP strip (3 icons) shows side T1 = credit, energy, signal token (picture a) and side T2 = energy, signal token, credit (pictures b and c). The BOTTOM strip (4 icons) shows side B1 = data, random card, 3 VP, publicity (pictures a and c) and side B2 = random card, publicity, data, 3 VP (picture b). Picture a = T1+B1, b = T2+B2, c = T2+B1. The fourth combination T1+B2 is not pictured but follows from 'a random side up' for each strip."
+    ],
+    [
+     "variants",
+     "a: top_row_slots_left_to_right: t: credit; n: 1\nt: energy; n: 1\nt: signal_token; n: 1; bottom_row_slots_left_to_right: t: data; n: 1\nt: card_random; n: 1\nt: vp; n: 3\nt: publicity; n: 1; note: T1+B1: top: 1 credit, 1 energy, 1 signal token; bottom: 1 data, 1 random card, 3 VP, 1 publicity; b: top_row_slots_left_to_right: t: energy; n: 1\nt: signal_token; n: 1\nt: credit; n: 1; bottom_row_slots_left_to_right: t: card_random; n: 1\nt: publicity; n: 1\nt: data; n: 1\nt: vp; n: 3; note: T2+B2: top: 1 energy, 1 signal token, 1 credit; bottom: 1 random card, 1 publicity, 1 data, 3 VP; c: top_row_slots_left_to_right: t: energy; n: 1\nt: signal_token; n: 1\nt: credit; n: 1; bottom_row_slots_left_to_right: t: data; n: 1\nt: card_random; n: 1\nt: vp; n: 3\nt: publicity; n: 1; note: T2+B1: top: 1 energy, 1 signal token, 1 credit; bottom: 1 data, 1 random card, 3 VP, 1 publicity; d_not_pictured: top_row_slots_left_to_right: t: credit; n: 1\nt: energy; n: 1\nt: signal_token; n: 1; bottom_row_slots_left_to_right: t: card_random; n: 1\nt: publicity; n: 1\nt: data; n: 1\nt: vp; n: 3; note: T1+B2 (inferred only, no picture): top: 1 credit, 1 energy, 1 signal token; bottom: 1 random card, 1 publicity, 1 data, 3 VP"
+    ],
+    [
+     "slot_to_slot_dependency",
+     "Aid: top-row slots can only be filled if both slots beneath them are filled. From picture geometry (top cutouts at x about 190, 370, 550; bottom cutouts at about 130, 300, 450, 640 of 750): top slot 1 sits over bottom 1+2, top 2 over bottom 2+3, top 3 over bottom 3+4. Inferred from the picture, not stated."
+    ],
+    [
+     "icon_notes",
+     "Gold/olive diamond '1' with the credit symbol = 1 credit; green diamond '1' with lightning = 1 energy; pink/magenta rounded square with a grey signal disc and a white card = 1 SIGNAL TOKEN (exactly the art of token-signal.png; not 'signal + card'); blue diamond '1' with binary digits = 1 data; dark diamond '1' with '?' = 1 random card from the draw pile; teal laurel '3' = 3 VP; red-orange diamond '1' with a white microphone = 1 publicity. Rival (aid): if the reward is a signal token it gains a 1-move icon instead."
+    ],
+    [
+     "strip_sides",
+     "top_strip: T1: t: credit; n: 1\nt: energy; n: 1\nt: signal_token; n: 1; T2: t: energy; n: 1\nt: signal_token; n: 1\nt: credit; n: 1; bottom_strip: B1: t: data; n: 1\nt: card_random; n: 1\nt: vp; n: 3\nt: publicity; n: 1; B2: t: card_random; n: 1\nt: publicity; n: 1\nt: data; n: 1\nt: vp; n: 3"
+    ],
+    [
+     "printed_sides_that_exist",
+     "4 combinations are possible (2 sides x 2 strips): T1+B1 (picture a), T2+B2 (picture b), T2+B1 (picture c), T1+B2 (no picture supplied). The 3 supplied pictures are 3 of the 4. Each strip has exactly 2 sides is inferred from 'two strips ... a random side up' plus the fact that every top row picture equals T1 or T2 and every bottom row equals B1 or B2."
+    ],
+    [
+     "changed_from_v1",
+     "Resolved the 3 pictures against 2 strips: top strip sides T1/T2, bottom strip sides B1/B2; pictures are a=T1+B1, b=T2+B2, c=T2+B1; a fourth combination T1+B2 exists but is not pictured ('d_not_pictured', inferred).\nv1 listed a/b/c as three independent strip arrangements; replaced by 'strip_sides' and 'printed_sides_that_exist'.\nSignal-token icon described per glossary (a single token, not signal+card).\nRival replacement text kept from the aid; header bar described."
+    ]
+   ],
+   "uncertain": [
+    "That each strip has exactly two sides, and that those sides are T1/T2 and B1/B2: inferred from three pictures plus the aid line 'two strips ... a random side up'. Picture of T1+B2 not supplied.",
+    "Top-vs-bottom slot dependency pairing (1-2, 2-3, 3-4) is inferred from picture geometry.",
+    "Picture shows the cutouts as black (transparent) holes; the strips sit behind them. Bottom-right of each picture has a faint watermark."
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-black",
+   "group": "Tokens and tiles",
+   "title": "Glyph token black (dark grey)",
+   "pics": [
+    "tokens/glyphids-token-black"
+   ],
+   "fields": [
+    [
+     "color",
+     "black (dark grey)"
+    ],
+    [
+     "glyph",
+     "white thick outline of a smooth elongated oval, slightly bean/boomerang-shaped, tilted"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-bue",
+   "group": "Tokens and tiles",
+   "title": "Glyph token blue",
+   "pics": [
+    "tokens/glyphids-token-bue"
+   ],
+   "fields": [
+    [
+     "color",
+     "blue"
+    ],
+    [
+     "glyph",
+     "white outline of an irregular star-like blob with about 6 rounded lobes, hollow centre"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-cyan",
+   "group": "Tokens and tiles",
+   "title": "Glyph token teal (cyan)",
+   "pics": [
+    "tokens/glyphids-token-cyan"
+   ],
+   "fields": [
+    [
+     "color",
+     "teal (cyan)"
+    ],
+    [
+     "glyph",
+     "white outline of a kidney bean with a notch on the lower left"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-orange",
+   "group": "Tokens and tiles",
+   "title": "Glyph token orange",
+   "pics": [
+    "tokens/glyphids-token-orange"
+   ],
+   "fields": [
+    [
+     "color",
+     "orange"
+    ],
+    [
+     "glyph",
+     "white outline of a rounded three-cornered shape with concave sides (pointing right)"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-pink",
+   "group": "Tokens and tiles",
+   "title": "Glyph token purple (pink)",
+   "pics": [
+    "tokens/glyphids-token-pink"
+   ],
+   "fields": [
+    [
+     "color",
+     "purple (pink)"
+    ],
+    [
+     "glyph",
+     "white outline of a four-pointed squarish star with concave sides"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-red",
+   "group": "Tokens and tiles",
+   "title": "Glyph token red",
+   "pics": [
+    "tokens/glyphids-token-red"
+   ],
+   "fields": [
+    [
+     "color",
+     "red"
+    ],
+    [
+     "glyph",
+     "white outline of a round rounded-square blob, thick ring, slightly flattened on the upper right"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/glyphids-token-yellow",
+   "group": "Tokens and tiles",
+   "title": "Glyph token yellow (gold)",
+   "pics": [
+    "tokens/glyphids-token-yellow"
+   ],
+   "fields": [
+    [
+     "color",
+     "yellow (gold)"
+    ],
+    [
+     "glyph",
+     "white outline of a dumbbell/peanut shape with a slanted narrow waist"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/organelle-token-1-card",
+   "group": "Tokens and tiles",
+   "title": "Organelle token",
+   "pics": [
+    "tokens/organelle-token-1-card"
+   ],
+   "fields": [
+    [
+     "bonus",
+     "t: card_random; n: 1"
+    ],
+    [
+     "icon",
+     "dark diamond with white '1' and a '?' = 1 random card from the draw pile"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/organelle-token-1-data",
+   "group": "Tokens and tiles",
+   "title": "Organelle token",
+   "pics": [
+    "tokens/organelle-token-1-data"
+   ],
+   "fields": [
+    [
+     "bonus",
+     "t: data; n: 1"
+    ],
+    [
+     "icon",
+     "blue diamond '1' with binary 0100/0011/0100 = 1 data"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/organelle-token-1-pub",
+   "group": "Tokens and tiles",
+   "title": "Organelle token",
+   "pics": [
+    "tokens/organelle-token-1-pub"
+   ],
+   "fields": [
+    [
+     "bonus",
+     "t: publicity; n: 1"
+    ],
+    [
+     "icon",
+     "orange-red diamond '1' with white microphone = 1 publicity"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/organelle-token-2-score",
+   "group": "Tokens and tiles",
+   "title": "Organelle token",
+   "pics": [
+    "tokens/organelle-token-2-score"
+   ],
+   "fields": [
+    [
+     "bonus",
+     "t: vp; n: 2"
+    ],
+    [
+     "icon",
+     "teal laurel '2' = 2 VP"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/organelle-token-4-score",
+   "group": "Tokens and tiles",
+   "title": "Organelle token",
+   "pics": [
+    "tokens/organelle-token-4-score"
+   ],
+   "fields": [
+    [
+     "bonus",
+     "t: vp; n: 4"
+    ],
+    [
+     "icon",
+     "teal laurel '4' = 4 VP"
+    ]
+   ],
+   "uncertain": [
+    null
+   ]
+  },
+  {
+   "key": "tokens/xenolab-tile-1",
+   "group": "Tokens and tiles",
+   "title": "Xenolab tile 1",
+   "pics": [
+    "tokens/xenolab-tile-1",
+    "tokens/xenolab-tile-1-back"
+   ],
+   "fields": [
+    [
+     "id",
+     "1"
+    ],
+    [
+     "size",
+     "101\n106"
+    ],
+    [
+     "front",
+     "description: Blue glass-cube tile; orange hexagon with a rocket (LAUNCH) with a gold diamond '1' + credit symbol below it; blue top-right corner with a small white blue-trace squiggle.; trace_color: blue; corner: top-right blue corner with white squiggle; action_hexagon: orange hexagon with a rocket = LAUNCH; cost: t: credit; n: 1; state: active (face up at game start, shown on the Xenolab card)"
+    ],
+    [
+     "back",
+     "description: Used side: a light-blue triangle with a white squiggle (blue life trace) next to two circular arrows (flip back); the action hexagon and cost appear small and greyed in a slot at the bottom.; trace_icon: blue triangle with a squiggle; state: used (flipped after paying its cost); flips_back_when: you gain a blue life trace"
+    ],
+    [
+     "trigger_to_flip_back",
+     "gaining a blue life trace flips this tile (and only this one) back to its active side"
+    ],
+    [
+     "rule",
+     "Xenolab (organization card #9, picture org-00.png): the 3 tiles start active (as shown on the card: blue launch 1 credit, yellow scan 2 energy, pink research 4 publicity). As a main action pay the cost shown on one active tile to gain its effect, then flip it. When you gain a life trace, flip the matching-color tile to its active side."
+    ]
+   ],
+   "uncertain": [
+    "Action: LAUNCH main action (glossary: orange hexagon with rocket = launch); cost: 1 credit; the exact launch rule (probe launched and the usual 2-credit price replaced by 1) is my reading of the card text 'pay the cost indicated on a tile to gain its effect'."
+   ]
+  },
+  {
+   "key": "tokens/xenolab-tile-2",
+   "group": "Tokens and tiles",
+   "title": "Xenolab tile 2",
+   "pics": [
+    "tokens/xenolab-tile-2",
+    "tokens/xenolab-tile-2-back"
+   ],
+   "fields": [
+    [
+     "id",
+     "2"
+    ],
+    [
+     "size",
+     "101\n106"
+    ],
+    [
+     "front",
+     "description: Orange/yellow tile; dark magenta hexagon with a pink radio dish (SCAN) with a green diamond '2' + lightning below; yellow top-right corner with a small white cracked-rock/fist symbol.; trace_color: yellow; corner: top-right yellow corner with a white cracked-rock/fist symbol; action_hexagon: pink hexagon with a radio dish = SCAN (dark magenta hexagon, pink dish); cost: t: energy; n: 2; state: active (face up at game start, shown on the Xenolab card)"
+    ],
+    [
+     "back",
+     "description: Used side: yellow triangle with a white fist/cracked-rock symbol and two circular arrows; greyed hexagon and cost at the bottom.; trace_icon: yellow triangle with a fist; state: used (flipped after paying its cost); flips_back_when: you gain a yellow life trace"
+    ],
+    [
+     "trigger_to_flip_back",
+     "gaining a yellow life trace flips this tile (and only this one) back to its active side"
+    ],
+    [
+     "rule",
+     "Xenolab (organization card #9, picture org-00.png): the 3 tiles start active (as shown on the card: blue launch 1 credit, yellow scan 2 energy, pink research 4 publicity). As a main action pay the cost shown on one active tile to gain its effect, then flip it. When you gain a life trace, flip the matching-color tile to its active side."
+    ]
+   ],
+   "uncertain": [
+    "Action: SCAN main action (glossary: pink hexagon with a dish = scan); cost 2 energy. Whether the usual base-game scan cost (1 credit + 2 energy) is replaced entirely by this 2 energy is not printed."
+   ]
+  },
+  {
+   "key": "tokens/xenolab-tile-3",
+   "group": "Tokens and tiles",
+   "title": "Xenolab tile 3",
+   "pics": [
+    "tokens/xenolab-tile-3",
+    "tokens/xenolab-tile-3-back"
+   ],
+   "fields": [
+    [
+     "id",
+     "3"
+    ],
+    [
+     "size",
+     "101\n106"
+    ],
+    [
+     "front",
+     "description: Pink tile; white hexagon with orange/pink/blue diagonal stripes (research a tech of any type) with a red-orange diamond '4' + white microphone below; pink top-right corner with a small white molecule symbol.; trace_color: pink; corner: top-right pink corner with a white molecule symbol; action_hexagon: white hexagon with orange, pink and blue diagonal stripes = research a tech (multicolor chip = any tech); cost: t: publicity; n: 4; state: active (face up at game start, shown on the Xenolab card)"
+    ],
+    [
+     "back",
+     "description: Used side: pink triangle with a white three-circle molecule symbol and two circular arrows; greyed hexagon and cost at the bottom.; trace_icon: pink triangle with a molecule; state: used (flipped after paying its cost); flips_back_when: you gain a pink life trace"
+    ],
+    [
+     "trigger_to_flip_back",
+     "gaining a pink life trace flips this tile (and only this one) back to its active side"
+    ],
+    [
+     "rule",
+     "Xenolab (organization card #9, picture org-00.png): the 3 tiles start active (as shown on the card: blue launch 1 credit, yellow scan 2 energy, pink research 4 publicity). As a main action pay the cost shown on one active tile to gain its effect, then flip it. When you gain a life trace, flip the matching-color tile to its active side."
+    ]
+   ],
+   "uncertain": [
+    "Action: research a tech of any color (striped hexagon = multicolor chip; glossary: rotate + tech chip = research that tech; whether this tile includes the rotate step is not shown, the hexagon has no grey rotate ring). Cost: 4 publicity (red-orange diamond with microphone, the '4' is clear in the card picture)."
+   ]
+  },
+  {
+   "key": "tokens/token-futurespan",
+   "group": "Tokens and tiles",
+   "title": "Futurespan token",
+   "pics": [
+    "tokens/token-futurespan"
+   ],
+   "fields": [
+    [
+     "size",
+     "188\n282"
+    ],
+    [
+     "description",
+     "Tall orange rectangular token (188x282, about 2:3). Low-resolution picture: a white/grey cylindrical spacecraft with a robot arm, rotated, on an orange background (a crop of the Futurespan card's scene). On the organization card the token icon is a small orange card-shaped tile with a white swirl/ship (the icon appears in the card text, top bar and free-action line). Placed on the scoring track."
+    ],
+    [
+     "rules",
+     "Futurespan Institute (organization card #10, picture org-01.png). Free action: spend your token to prepare a card from your hand face up; place the token ahead of your score counter by the card's cost: cost 1 = +15, cost 2 = +25, cost 3 = +35, cost 4 = +45 points. If your score counter is on or ahead of the token, you can take the token back and play the card as a main action for free. Once per round free action (1x): advance the token 3 spaces (+3 with three chevrons) to gain 1 card (white card-notch diamond '1', no '?', i.e. 1 card of your choice from row or deck per glossary; card text just says 'gain 1 card'). FAQ (rulebook p.8): only 1 card prepared at a time; a prepared card is not in hand and can only be played for free once the token is reached; the once-per-round ability needs the token on the scoring track."
+    ],
+    [
+     "cost_to_distance_table",
+     "1: 15; 2: 25; 3: 35; 4: 45; note: Table read from the card picture (zoomed crop) and the exp/img/fs_costs.png crop: four gold boxes, each showing a card with a credit-cost diamond (1, 2, 3, 4) '=' and '+15', '+25', '+35', '+45' over three chevrons (points ahead on the scoring track). No entry for cost 0 or cost 5+."
+    ],
+    [
+     "card_context",
+     "start_resources: 3 publicity, 3 credits, 3 energy and 1 random card, plus the Futurespan token (top black bar: token icon, red '3' publicity, gold '3' credit, green '3' energy, '1?'); income_increases: 2 rising-arrow icons: tuck 2 cards for income at setup; round_income: 2 credits, 1 energy, 1 random card (bottom right)"
+    ],
+    [
+     "changed_from_v1",
+     "Cost table re-verified on a zoomed crop: +15 / +25 / +35 / +45 for cost 1 / 2 / 3 / 4 (v1 values were right; now stored as a structured table).\nDescription corrected: token art is a crop of a white spacecraft, not 'an astronaut'.\nAdded FAQ rules (one card at a time, prepared card not in hand, once-per-round needs token on the track) and card context (start resources, 2 income increases).\nFree-action reward diamond read with the glossary: '1' with a card notch and no '?' = 1 card of your choice.\nAdded uncertainty: no table entry for cost 0 or 5+."
+    ]
+   ],
+   "uncertain": [
+    "Token picture is low resolution; exact artwork unreadable (spacecraft crop).",
+    "The cost table has no entry for cards of cost 0 or 5 or more; not printed. Whether 'card cost' means credit cost only (the diamonds in the table show the credit symbol) is the literal reading; energy-cost cards are not covered.",
+    "'Advance the token 3 spaces' (3 score-track points); the card says '+3 chevrons'."
+   ]
+  },
+  {
+   "key": "tokens/token-signal",
+   "group": "Tokens and tiles",
+   "title": "Signal token",
+   "pics": [
+    "tokens/token-signal"
+   ],
+   "fields": [
+    [
+     "size",
+     "167\n161"
+    ],
+    [
+     "description",
+     "Rounded square (167x161): dark magenta top half with a pink band at the bottom; a grey disc with white vertical signal bars and a white card (page) overlapping at the lower right. This is the SIGNAL TOKEN art (glossary: it is not 'signal + card'); the same art is used on cards, in the Glyphids translation strip and in income icons."
+    ],
+    [
+     "rules",
+     "10 signal tokens in the box; rulebook p.3 says their supply is unlimited (use a substitute if they run out). Some new effects, cards, species spaces and income give 1 signal token. Use: during a scan action you can discard signal tokens: for each token discarded, you may discard 1 additional card from the card row and mark a signal in the matching sector. At most 2 signal tokens per scan action because the card row is replenished after the whole scan (rulebook p.8). A card without a scan action (even if it marks signals) does not let you use tokens. Solo rival gains a 1-move icon (orange arrow triangle with 1) instead."
+    ],
+    [
+     "changed_from_v1",
+     "Icon described as a single signal token per glossary (not 'signal + card').\nRules re-read from rulebook p.8 (max 2 tokens per scan, only for cards with a scan action).\nSupply: 10 in the box, unlimited per rulebook (v1 right)."
+    ]
+   ],
+   "uncertain": [
+    "Supply: 10 tokens in the box, rulebook says the supply is unlimited (see rulebook.txt line 28).",
+    "Solo-rival replacement icon (orange arrow triangle '1') read as 1 movement."
+   ]
+  }
+ ],
+ "notes": {
+  "glyph_tokens": {
+   "files": "glyphids-token-{black,bue,cyan,orange,pink,red,yellow,back}.png",
+   "size": "about 210x250 shield shape (pointed bottom, two-horned notched top)",
+   "note": "7 glyph types, one per token color; component line: 35 glyph tokens (so 5 per glyph if evenly split; per-glyph count is not printed). Token carries no resource itself; its resource comes from the translation-board slot it was placed in (one token of each type can be placed, once). Tokens are gained by orbit/land at a planet with a token, winning a sector with a token, developing a tech with a token, or marking a Glyphids-board space with a token. Unplaced tokens score as sets at game end.",
+   "back": "glyphids-token-back.png: swirling green background with a dark blue star-burst in the centre (same art as the top of the Glyphids board), same shield shape.",
+   "resource": "Not on the token. Translation slots give: top row 1 credit, 1 energy, 1 signal token; bottom row 1 data, 1 random card, 3 VP, 1 publicity (arrangement depends on the strip sides, see glyphids_translation). Glyphids cards show glyph icons that give the resource of the slot where that glyph type has been deciphered; undeciphered = no effect.",
+   "end_scoring": "Unplaced tokens, per set of different glyphs: 1/3/5/8/11/15/20 VP for 1..7 unique; all your sets are scored. Rival: 3 VP per glyph token regardless of type.",
+   "uncertain": [
+    "File name for blue is 'bue' (typo in the picture file).",
+    "Glyph shapes are described by sight; names of the colors are my wording (the 'black' token is dark grey, 'pink' is purple).",
+    "Per-glyph token count not printed (35 total)."
+   ],
+   "changed_from_v1": [
+    "Glyph shape descriptions refined (blue: about 6 lobes; orange: concave-sided triangle; red: flattened blob).",
+    "Added how tokens are gained and set-scoring from the aid; added 5-per-glyph note as inference only.",
+    "Color names tidied (purple for pink, gold for yellow); token facts otherwise unchanged."
+   ]
+  },
+  "organelle_tokens": {
+   "files": "organelle-token-*.png",
+   "note": "5 tokens (aid: 5x), round slightly bumpy pale-grey/white discs (109x110). Section color is NOT on the token: it depends on the board space it stands on. Dealt face up on the 5 gear spaces at setup; after the bonuses of a section are gained, the organelles of that section move one space (outer clockwise, inner counter-clockwise, skipping occupied spaces).",
+   "back": "organelle-token-back.png (155x151): round swirl of yellow (top/left), blue (right) and pink (bottom-left) with a large white gear, matching the gear printed on the 5 starting spaces. The aid does not describe a use of the back in play (probably the marker/box art).",
+   "note_rules": "Rulebook example: 4 VP + 1 random card in the pink section; mutation example 2 VP, 1 publicity, 1 data.",
+   "uncertain": [
+    "The gear back is not described in the rules as a face used in play.",
+    "Bonus values read from the icons; each of the 5 tokens is unique (1 card, 1 data, 1 publicity, 2 VP, 4 VP)."
+   ],
+   "changed_from_v1": [
+    "Card bonus clarified per glossary: black diamond '1?' = 1 random card from the draw pile.",
+    "Setup, mutation and back description re-written from the picture and aid; bonus list unchanged."
+   ]
+  }
+ },
+ "organization_notes": [
+  "Re-done with glossary. Header: publicity, credit, energy, random cards (black '1?'), data; rising-graph icons = cards to tuck; right tabs = base income (credit, energy, random card, publicity/data/signal token).",
+  "Tile order: org-00 Xenolab (9), 01 Futurespan (10), 02 Helion (11), 03 Orbital Dynamics (1), 04 Fenwick (2), 05 Stratus (3), 06 Mission Relay (8), 07 Sentinel (7), 08 Cosmos (6), 09 Deep Sky (4), 10 Turing (5).",
+  "Signal token income: Sentinel, Deep Sky (1 each); Helion reward uses a signal token too."
+ ],
+ "quickstart_notes": [
+  "Printed ids are Q.1..Q.21 (small vertical text, bottom-left).",
+  "Re-done with glossary: pink rounded square = signal token (Q.8, Q.19); '1 with ?' black diamond = 1 random card (Q.11, Q.17, Q.18, Q.21).",
+  "Orbiter = green circle with satellite (a circle, not the green ORBIT hexagon); text says 'Place'. Coloured round signal icons name a sector colour; each named star (Vega, Beta Pictoris black; Sirius A, Procyon blue; Barnard's Star, Proxima Centauri red; 61 Virginis, Kepler 22 yellow).",
+  "No hexagons, rotate rings or movement shapes occur on the quick start cards; nothing else changed.",
+  "Printed bottom icons: laurel = victory points; red microphone = publicity; blue 0100 = data; gold = credit; green bolt = energy."
+ ],
+ "quickstart_diff": [
+  "All 21 cards match existing effects and amounts exactly (existing ids SR.n; mapping in existing_id per card).",
+  "Printed card ids are Q.n, existing uses SR.n (needs mapping, see existing_id).",
+  "Existing has no sector colour for star marks: printed colours are Vega black, Beta Pictoris black, Sirius A blue, Procyon blue, Barnard's Star red, Proxima Centauri red, 61 Virginis yellow, Kepler 22 yellow.",
+  "Existing signal_token effects (SR.10, SR.20) correspond to a magenta icon whose meaning is not printed as text: shape-identification only.",
+  "Uranus/Neptune: existing income_increase card/data matches footer tabs (black '?' / blue data)."
+ ]
+}

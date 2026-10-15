@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import cards, species, tables
+from . import cards, glyphids, species, tables
 from .models import GameState, GoldTile, PlayerState
 
 TECH_CATEGORIES = ("probe", "telescope", "computer")
@@ -55,12 +55,14 @@ def gold_points(s: GameState, p: PlayerState) -> int:
     for g in s.gold_tiles:
         if p.index in g.markers:
             total += tile_values(g)[min(g.markers.index(p.index), 2)] * sets_for(s, p, g)
+        elif p.index in g.low_markers:
+            total += tile_values(g)[2] * sets_for(s, p, g)
     return total
 
 
 def solvay_points(s: GameState, p: PlayerState) -> int:
     """#113 Solvay Conference, FAQ-C113: the best tile the player did not mark, scored as if on its lowest (rightmost) value."""
-    options = [tile_values(g)[2] * sets_for(s, p, g) for g in s.gold_tiles if p.index not in g.markers]
+    options = [tile_values(g)[2] * sets_for(s, p, g) for g in s.gold_tiles if p.index not in g.markers and p.index not in g.low_markers]
     return max(options, default=0)
 
 
@@ -72,11 +74,14 @@ def final_scores(s: GameState) -> list[dict[str, Any]]:
         cards_pts = cards.end_points(s, p)
         gold = 0 if is_rival else gold_points(s, p)  # the rival does not score gold tiles (SOLO-END-01)
         exertian = cards.exertian_points(s, p)
-        rows.append({"player": p.index, "board": p.score, "cards": cards_pts, "gold": gold, "exertian": exertian, "loss": 0})
-    totals = [r["board"] + r["cards"] + r["gold"] + r["exertian"] for r in rows]
+        glyph = 3 * len(p.glyphs) if is_rival else glyphids.end_points(p)  # EXP-GLY-07; EXP-GLY-08: the rival scores 3 per token
+        rows.append(
+            {"player": p.index, "board": p.score, "cards": cards_pts, "gold": gold, "exertian": exertian, "glyphs": glyph, "loss": 0}
+        )
+    totals = [r["board"] + r["cards"] + r["gold"] + r["exertian"] + r["glyphs"] for r in rows]
     for r, loss in zip(rows, species.exertian_losses(s, totals), strict=True):  # ALIEN-EXE-07: after all other points
         r["loss"] = loss
-        r["total"] = r["board"] + r["cards"] + r["gold"] + r["exertian"] - loss
+        r["total"] = r["board"] + r["cards"] + r["gold"] + r["exertian"] + r["glyphs"] - loss
         r["danger"] = species.danger(s, s.players[r["player"]])
     return rows
 

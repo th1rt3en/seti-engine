@@ -1,0 +1,408 @@
+{
+ "source": "docs/spec/data/expansion-transcription.json and the board picture (owner check pending; ambiguities A-047 to A-049)",
+ "board": {
+  "title": "Amoeba",
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "alien_card",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 1
+       },
+       {
+        "t": "alien_card",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "alien_card",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 1
+       },
+       {
+        "t": "alien_card",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "alien_card",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "t": "vp",
+        "n": 1
+       },
+       {
+        "t": "alien_card",
+        "n": 1
+       },
+       {
+        "t": "organelles",
+        "n": 1
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "rings": {
+  "outer": [
+   [
+    "Y1",
+    "yellow"
+   ],
+   [
+    "Y2",
+    "yellow"
+   ],
+   [
+    "B1",
+    "blue"
+   ],
+   [
+    "B2",
+    "blue"
+   ],
+   [
+    "P1",
+    "pink"
+   ],
+   [
+    "P2",
+    "pink"
+   ]
+  ],
+  "inner": [
+   [
+    "IY",
+    "yellow"
+   ],
+   [
+    "IP",
+    "pink"
+   ],
+   [
+    "IB",
+    "blue"
+   ]
+  ],
+  "start": [
+   "Y1",
+   "Y2",
+   "P1",
+   "P2",
+   "IB"
+  ]
+ },
+ "organelles": [
+  [
+   {
+    "t": "card_random",
+    "n": 1
+   }
+  ],
+  [
+   {
+    "t": "data",
+    "n": 1
+   }
+  ],
+  [
+   {
+    "t": "publicity",
+    "n": 1
+   }
+  ],
+  [
+   {
+    "t": "vp",
+    "n": 2
+   }
+  ],
+  [
+   {
+    "t": "vp",
+    "n": 4
+   }
+  ]
+ ],
+ "cards": [
+  {
+   "id": "AM.11",
+   "printed": "ET.11",
+   "cost": 1,
+   "income": "energy",
+   "sector": "red",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "data",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "AM.12",
+   "printed": "ET.12",
+   "cost": 1,
+   "income": "card",
+   "sector": "yellow",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "data",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "AM.13",
+   "printed": "ET.13",
+   "cost": 1,
+   "income": "credit",
+   "sector": "blue",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "data",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "AM.14",
+   "printed": "ET.14",
+   "cost": 1,
+   "income": "card",
+   "sector": "red",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "move",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "AM.15",
+   "printed": "ET.15",
+   "cost": 2,
+   "income": "energy",
+   "sector": "yellow",
+   "free": [
+    [
+     "publicity",
+     2
+    ]
+   ]
+  },
+  {
+   "id": "AM.16",
+   "printed": "ET.16",
+   "cost": 2,
+   "income": "card",
+   "sector": "blue",
+   "free": [
+    [
+     "publicity",
+     2
+    ]
+   ]
+  },
+  {
+   "id": "AM.17",
+   "printed": "ET.17",
+   "cost": 1,
+   "income": "credit",
+   "sector": "red",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "move",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "AM.18",
+   "printed": "ET.18",
+   "cost": 1,
+   "income": "credit",
+   "sector": "blue",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "data",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "AM.19",
+   "printed": "ET.19",
+   "cost": 0,
+   "income": "energy",
+   "sector": "black",
+   "free": [
+    [
+     "publicity",
+     2
+    ]
+   ]
+  },
+  {
+   "id": "AM.20",
+   "printed": "ET.20",
+   "cost": 1,
+   "income": "energy",
+   "sector": "yellow",
+   "free": [
+    [
+     "score",
+     1
+    ],
+    [
+     "move",
+     1
+    ]
+   ]
+  }
+ ]
+}

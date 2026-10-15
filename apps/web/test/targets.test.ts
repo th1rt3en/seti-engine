@@ -104,3 +104,48 @@ describe("a signal in the sector with 'Oumuamua", () => {
     expect(handled.size).toBe(2);
   });
 });
+
+describe("the places of the Space Agencies expansion", () => {
+  it("puts a glyph token, an organelle, a marker to remove and a probe step at their own places", () => {
+    const v = view(
+      [
+        { type: "decipher", glyph: "red", row: "bottom", index: 1 },
+        { type: "decipher", glyph: "blue", row: "bottom", index: 1 },
+        { type: "pick_organelle", space: "IB" },
+        { type: "amoeba_remove", color: "pink", index: 0 },
+        { type: "od_step", probe: "p1", to: [2, 3] },
+        { type: "org_main", org: "xenolab", tile: "scan" },
+        { type: "pass" },
+      ],
+      [null, null, null, null, null, null, null],
+    );
+    const { spots, handled } = buildSpots(v);
+    expect(spots.filter((s) => s.panel === "glyphids").map((s) => s.glyph)).toEqual(["red", "blue"]); // two kinds for one hole
+    expect(spots.find((s) => s.id === "organelle:IB")?.panel).toBe("amoeba");
+    expect(spots.find((s) => s.id === "amoeba:pink:0")?.panel).toBe("amoeba");
+    expect(spots.find((s) => s.id.startsWith("od:"))?.panel).toBeUndefined(); // on the board itself
+    expect(spots.find((s) => s.id === "org:5")?.panel).toBe("org");
+    expect(handled.has(6)).toBe(false);
+    expect([...handled].sort()).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+
+  it("offers the security card of the decision's color for a breach", () => {
+    const v = {
+      ...view([{ type: "breach" }, { type: "skip_breach" }], [null, null]),
+    } as unknown as View;
+    (v.state as unknown as { pending: unknown[] }).pending = [{ kind: "breach", player: 0, data: { color: "pink" } }];
+    const { spots } = buildSpots(v);
+    expect(spots.map((s) => s.id)).toEqual(["breach:pink"]);
+  });
+});
+
+describe("the reward spaces on an organization board", () => {
+  it("are places on the card of the player's own organization", () => {
+    const v = view([{ type: "org_mark", space: "data" }, { type: "org_skip" }], [null, null]);
+    (v as unknown as { viewer: number }).viewer = 0;
+    (v.state as unknown as { players: unknown[] }).players = [{ organization: "cosmos_strategy_group" }];
+    const { spots, handled } = buildSpots(v);
+    expect(spots.map((s) => s.id)).toEqual(["orgspace:data", "org:1"]); // "do not mark" is a chip on the organization panel
+    expect(handled.has(0)).toBe(true);
+  });
+});

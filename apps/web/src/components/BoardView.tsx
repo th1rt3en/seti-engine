@@ -1,4 +1,5 @@
 "use client";
+import { alienBack, cardImage } from "@/lib/cardImages";
 // The base board with everything on it: the three discs turned to where the game has them, the four star boards in the order they were
 // placed, the data and markers of every sector, the probes, orbiters and landers (each shown as its owner's figure), the markers on the
 // species' discovery spaces, every player's score counter, the neutral markers still waiting at 20 and 30 points, and the moon token that
@@ -9,6 +10,7 @@ import {
   ALIEN_COLUMN,
   ALIEN_TOP,
   BOARD,
+  CENTAURIAN_HEXES,
   CENTER,
   DIAL,
   DIAL_POCKET,
@@ -28,6 +30,7 @@ import {
   STAR_BOARD_HOME,
   alienColumn,
   goldPlace,
+  orbitSlot,
   polar,
   scoreDegrees,
   sectorDegrees,
@@ -40,15 +43,23 @@ import type { View } from "@seti/protocol";
 import { type ReactNode, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
-import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ScorePawn, pieceColor } from "./Pieces";
+import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
+import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
 
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
+/** The picture of a species board: the five of the base game and the three of the Space Agencies expansion. */
+const EXPANSION_BOARDS = expansionAssets as Record<string, string>;
+const alienFace = (species: string): string =>
+  (assets.species as Record<string, string>)[species] ?? EXPANSION_BOARDS[`boards/${species}`] ?? assets.species.back;
 const STAR_BOARDS = assets.starBoards as Record<string, string>;
+/** How far (degrees) an Anomaly token lies from the middle of its sector: planets are about 20 degrees wide at the outermost ring. */
+const ANOMALY_SIDE_DEGREES = 15;
 const LANES = [1500, 1538, 1576, 1614];
 const EXERTIAN_LANE = 1440; // the Exertian milestone tiles lie just inside the players' lanes // radius of each player's lane on the score track
 
@@ -141,7 +152,7 @@ export function BoardView({
         <image href={assets.board} x={0} y={0} width={BOARD.w} height={BOARD.h} />
         {/* the species boards lie on the base board, over its edge at the top; their cut-outs show the discovery spaces */}
         {s.species.map((sp, i) => {
-          const face = (assets.species as Record<string, string>)[sp.discovered ? sp.species : "back"] ?? assets.species.back;
+          const face = alienFace(sp.discovered ? sp.species : "back");
           return (
             <image
               // biome-ignore lint/suspicious/noArrayIndexKey: the two slots are fixed
@@ -160,9 +171,9 @@ export function BoardView({
         {s.species.map((sp, i) => {
           // the deck of a discovered species lies to the right of its board: its back with the cards left over it, and the card that lies face up
           if (!sp.discovered) return null;
-          const back = (assets.alienBacks as Record<string, string>)[sp.species];
+          const back = alienBack(sp.species);
           const at = alienColumn(i);
-          const faceUp = sp.face_up ? (assets.cards as Record<string, string>)[sp.face_up] : undefined;
+          const faceUp = sp.face_up ? cardImage(sp.face_up) : undefined;
           return (
             <g key={`alien-deck-${sp.species}`}>
               {back ? (
@@ -240,6 +251,20 @@ export function BoardView({
                     size={84}
                     color={color(player)}
                     title={`${who(player)}: marker on the ${g.tile} tile`}
+                  />
+                );
+              })}
+              {/* Mission Relay starts on the lowest-scoring space of the Mission tile (EXP-ORG-13) */}
+              {(g.low_markers ?? []).map((player) => {
+                const at = GOLD_SLOTS[GOLD_SLOTS.length - 1] ?? { x: 0, y: 0 };
+                return (
+                  <Marker
+                    key={`low-${player}`}
+                    x={at.x + 60}
+                    y={at.y - 70}
+                    size={70}
+                    color={color(player)}
+                    title={`${who(player)}: marker on the lowest-scoring space of the ${g.tile} tile`}
                   />
                 );
               })}
@@ -374,6 +399,20 @@ export function BoardView({
           );
         })}
 
+        {/* the Anomaly tokens (ALIEN-ANO-01): on the outermost ring, a little to the side of the middle of their sector so that they never cover Uranus
+            or Neptune; they stay where they are while the discs turn, Earth moves to them */}
+        {s.species.flatMap((sp) =>
+          sp.discovered && sp.species === "anomalies"
+            ? ((sp.extra?.tokens ?? []) as AnomalyToken[]).map((tok) => (
+                <AnomalyTokenView
+                  key={`anomaly-${tok.sector}`}
+                  token={tok}
+                  at={polar(RING_RADIUS[4] ?? 870, sectorDegrees(tok.sector) - ANOMALY_SIDE_DEGREES)}
+                />
+              ))
+            : [],
+        )}
+
         {Array.from(spaces.entries()).flatMap(([key, group]) => {
           const [ring, sector] = key.split("-").map(Number) as [number, number];
           const at = polar(RING_RADIUS[ring] ?? 270, sectorDegrees(sector));
@@ -399,7 +438,7 @@ export function BoardView({
                 </image>
               </g>
             ) : (
-              <Figure key={p.id} x={at.x + dx} y={at.y + dy} color={color(p.player)} title={title} />
+              <ProbePiece key={p.id} x={at.x + dx} y={at.y + dy} size={100} color={color(p.player)} title={title} />
             );
             return pick ? (
               <g
@@ -474,16 +513,20 @@ export function BoardView({
                   <image href={SAMPLES.back} x={-38} y={-38} width={76} height={76} />
                 </g>
               ))}
-              {st.orbiters.map((player, k) => (
-                <g
-                  // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
-                  key={`o${k}`}
-                  transform={`translate(${pos.x - pos.r * 0.55 + k * 84} ${pos.y - pos.r * 0.32})`}
-                >
-                  <ellipse cy={10} rx={74} ry={26} fill="none" stroke="#fff" strokeWidth={7} opacity={0.95} />
-                  <Figure x={0} y={0} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
-                </g>
-              ))}
+              {/* the orbiters lie on the ring around the planet, the first on the bonus space */}
+              {st.orbiters.map((player, k) => {
+                const at = orbitSlot(name, k) ?? { x: pos.x, y: pos.y };
+                return (
+                  <g
+                    // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
+                    key={`o${k}`}
+                    transform={`translate(${at.x} ${at.y})`}
+                  >
+                    <ellipse cy={10} rx={54} ry={20} fill="none" stroke="#fff" strokeWidth={6} opacity={0.95} />
+                    <Figure x={0} y={0} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
+                  </g>
+                );
+              })}
               {st.landers.map((player, k) => (
                 <g
                   // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
@@ -505,6 +548,32 @@ export function BoardView({
               })}
             </g>
           );
+        })}
+
+        {/* the message tiles that cover the reward hexes of the Centaurian board (ALIEN-CEN-04): the tile of the player who took the reward */}
+        {s.species.flatMap((sp, i) => {
+          if (!sp.discovered || sp.species !== "centaurians") return [];
+          const covered = (sp.extra?.covered ?? []) as (number | null)[];
+          return covered.map((player, k) => {
+            const x = CENTAURIAN_HEXES.xs[k];
+            if (player === null || player === undefined || x === undefined) return null;
+            const at = onAlienBoard(i, x, CENTAURIAN_HEXES.y);
+            const h = CENTAURIAN_HEXES.tileHeight * ALIEN.scale;
+            const colour = s.players[player]?.color === "red" ? "orange" : (s.players[player]?.color ?? "white");
+            return (
+              <image
+                // biome-ignore lint/suspicious/noArrayIndexKey: the four hexes are fixed
+                key={`cen-hex-${i}-${k}`}
+                href={TILES[colour] ?? TILES.white}
+                x={at.x - (h * 72) / 128 / 2}
+                y={at.y - h / 2}
+                width={(h * 72) / 128}
+                height={h}
+              >
+                <title>{`${who(player)}: message tile covers this reward`}</title>
+              </image>
+            );
+          });
         })}
 
         {/* the markers on the spaces of a species board that have been taken, and on its overflow spaces (under the discovery spaces) */}

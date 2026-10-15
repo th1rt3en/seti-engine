@@ -17,7 +17,7 @@ UNDONE_POINTS = 5  # SOLO-OBJ-07
 
 
 def tile(obj_id: str) -> dict[str, Any]:
-    for o in tables.objectives()["objectives"]:
+    for o in [*tables.objectives()["objectives"], *tables.expansion_solo()["long_term"]]:
         if o["id"] == obj_id:
             found: dict[str, Any] = o
             return found
@@ -25,17 +25,25 @@ def tile(obj_id: str) -> dict[str, Any]:
 
 
 def setup(s: GameState, difficulty: int) -> None:
-    """SOLO-OBJ-01 to SOLO-OBJ-03: shuffle each level, take the numbers of the rival's board, stack III, II, I, reveal the top 3."""
+    """SOLO-OBJ-01 to SOLO-OBJ-03: shuffle each level, take the numbers of the rival's board, stack III, II, I, reveal the top 3.
+    EXP-SOLO-04 (with the expansion): level I is left out, and 2 of the 3 long-term tiles are revealed at random."""
     if difficulty == 1:  # SOLO-OBJ-08: no objectives on 1 star
         return
     counts = next(b["objectives"][str(difficulty)] for b in tables.solo_boards()["boards"] if difficulty in b["stars"])
     stack: list[str] = []
     for level in reversed(LEVELS):  # level III at the bottom, level I on top
+        if level == "I" and s.options.expansion:
+            continue  # EXP-SOLO-04
         ids = [o["id"] for o in tables.objectives()["objectives"] if o["level"] == level]
         stack += rng.shuffled(s, ids)[: counts[level]]
     s.objectives = ObjectiveState(stack=stack)
     for _ in range(3):
         reveal(s)
+    if s.options.expansion:  # EXP-SOLO-04: shuffle the 3 long-term tiles, reveal 2 (the third is not used)
+        ids = rng.shuffled(s, [o["id"] for o in tables.expansion_solo()["long_term"]])[:2]
+        s.objectives.long_term = sorted(ids)
+        for oid in ids:
+            s.objectives.marks[oid] = [False] * len(tile(oid)["tasks"])
 
 
 def reveal(s: GameState) -> None:
@@ -93,7 +101,9 @@ def _matches(alt: dict[str, Any], ev: dict[str, Any]) -> bool:
     if k == "orbit_or_land":
         return bool(e in ("orbit", "land") and ev.get("planet") == alt["planet"])
     if k == "life_trace":
-        return bool(e == "trace" and ev.get("kind") == alt["color"])
+        return bool(e == "trace" and alt["color"] in ("any", ev.get("kind")))  # EXP-SOLO-06: LT-1 takes a trace of any color
+    if k == "tuck_income":
+        return bool(e == "tuck_income")  # EXP-SOLO-06: LT-2, a card tucked from the hand for its income
     if k == "visit":
         return bool(e == ("visit_asteroids" if alt["what"] == "asteroids" else "visit_comet"))
     if k == "complete_mission":
@@ -108,9 +118,13 @@ def candidates(s: GameState, evs: list[dict[str, Any]]) -> list[list[Any]]:
     out: list[list[Any]] = []
     if ob is None:
         return out
-    for oid in ob.row:
+    for oid in [*ob.row, *ob.long_term]:
+        seen: list[Any] = []
         for i, task in enumerate(tile(oid)["tasks"]):
             if not ob.marks[oid][i] and any(_matches(alt, ev) for alt in task for ev in evs):
+                if oid in ob.long_term and task in seen:
+                    continue  # three alike tasks of one tile are one choice
+                seen.append(task)
                 out.append([oid, i])
     return out
 
@@ -150,6 +164,7 @@ def end_turn(s: GameState) -> None:
     for oid in completed(s):
         ob.row.remove(oid)
         ob.pile.append(oid)
+    ob.long_term = [oid for oid in ob.long_term if not all(ob.marks[oid])]  # EXP-SOLO-06: removed from the game, never spent
     while len(ob.row) < 3 and ob.stack:
         reveal(s)
     check_thresholds(s)
@@ -170,6 +185,11 @@ def end_round(s: GameState, rnd: int, events: Events) -> None:
         events.append({"type": "objectives_spent", "round": rnd, "spent": spent, "short": short})
         if short:
             rival.advance(s, PENALTY_PROGRESS * short, events)
+        if rnd >= 2:  # EXP-SOLO-06: 1 advance for each uncompleted task of a long-term tile still in play
+            open_tasks = sum(marks.count(False) for oid, marks in ob.marks.items() if oid in ob.long_term)
+            if open_tasks:
+                events.append({"type": "long_term_penalty", "round": rnd, "tasks": open_tasks})
+                rival.advance(s, open_tasks, events)
     else:
         undone = len([o for o in ob.row if not all(ob.marks[o])]) + len(ob.stack)
         events.append({"type": "objectives_uncompleted", "count": undone})

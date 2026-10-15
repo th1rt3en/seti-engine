@@ -11,8 +11,8 @@ import copy
 from collections import deque
 from typing import Any
 
-from . import alien_steps, card_defs, effects, objectives, rewards, solar, tables, techs
-from .models import Decision, GameState, MissionState, PlanetState, PlayerState
+from . import alien_steps, amoeba, card_defs, effects, expansion_steps, objectives, orgs, rewards, solar, tables, techs
+from .models import Decision, GameState, MissionState, PlanetState, PlayerState, Probe
 
 Action = dict[str, Any]
 Events = list[dict[str, Any]]
@@ -45,9 +45,10 @@ def play_moves(s: GameState, p: PlayerState) -> list[Action]:
     ]
 
 
-def play(s: GameState, p: PlayerState, cid: str, events: Events) -> None:
-    """PLAY-01: pay the cost, then resolve the effect. The card goes to the discard pile afterwards unless it stays (PLAY-02)."""
-    cost = card_cost(cid)
+def play(s: GameState, p: PlayerState, cid: str, events: Events, free: bool = False) -> None:
+    """PLAY-01: pay the cost, then resolve the effect. The card goes to the discard pile afterwards unless it stays (PLAY-02). `free` is
+    Futurespan Institute's prepared card (EXP-ORG-12)."""
+    cost = 0 if free else card_cost(cid)
     if pays_energy(cid):
         effects.pay(p, energy=cost)
     else:
@@ -59,8 +60,10 @@ def play(s: GameState, p: PlayerState, cid: str, events: Events) -> None:
     s.queue = copy.deepcopy(card_defs.CARDS[cid].get("fx", []))
     events.append({"type": "play_card", "player": p.index, "card": cid})
     m = card_defs.CARDS[cid].get("mission")
+    orgs.on_card_played(s, p, cid, tables.cards()[cid]["deck"] == "alien")
     if m:  # A-019: a mission is in play from the moment its card is played, so its own effect can trigger it
         p.missions.append(MissionState(card=cid, kind=m["kind"], used=[False] * len(m.get("circles", []))))
+        orgs.on_mission_played(s, p)  # Mission Relay (EXP-ORG-13)
     if cost > 0 and not pays_energy(cid):
         fire(s, p, [{"e": "play_cost", "cost": cost}], events)  # FAQ-C106
     if cid in card_defs.MARS_FLAVOR:
@@ -120,11 +123,19 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         "exofossil_pay",
         "signal_oumuamua",
         "signal_any",
+        "explore",
+        "signal_token",
+        "glyph_resource",
     ):
         if t == "trace":
             _trace_step(s, p, st)
         else:
             rewards.grant(s, p, [st], events)
+    elif t == "organelle":  # EXP-AMO-04: a card's single organelle icon
+        amoeba.request_pick(s, p, st["color"])
+    elif t == "amoeba_remove":  # EXP-AMO-04 (ET.19)
+        if amoeba.remove_moves(s, p):
+            s.pending.append(Decision(kind="amoeba_remove", player=p.index))
     elif t == "pluto":
         # PROMO-02: the card makes Pluto a planet that only its player can use: one orbiter space and one lander space
         s.pluto_owner = p.index
@@ -223,7 +234,9 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         effects.refill_card_row(s)
     elif t == "remove_orbiter":
         if remove_orbiter_moves(s, p):
-            s.pending.append(Decision(kind="remove_orbiter", player=p.index, data={"r": st["r"]}))
+            s.pending.append(
+                Decision(kind="remove_orbiter", player=p.index, data={"r": st["r"], "probe_at_planet": st.get("probe_at_planet", False)})
+            )
     elif t == "remove_lander":
         if remove_lander_moves(s, p):
             s.pending.append(Decision(kind="remove_lander", player=p.index, data={"r": st["r"]}))
@@ -248,7 +261,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
     elif t == "lagrange":
         if any(pr.player == p.index for pr in s.probes):
             s.pending.append(Decision(kind="pick_probe", player=p.index, data={"n": 1, "lagrange": True}))
-    elif not alien_steps.run_step(s, p, st, events):
+    elif not alien_steps.run_step(s, p, st, events) and not expansion_steps.run_step(s, p, st, events):
         raise ValueError(f"unknown step {t}")
 
 
@@ -272,8 +285,9 @@ def _research_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
         and ts.tiles
         and techs.tech_name(ts.category, ts.glyph) not in p.techs  # TECHACT-07
         and (
-            not st.get("copy") or any(techs.tech_name(ts.category, ts.glyph) in q.techs for q in s.players if q.index != p.index)
-        )  # FAQ-C081
+            not (st.get("copy") or st.get("owned_by_other"))
+            or any(techs.tech_name(ts.category, ts.glyph) in q.techs for q in s.players if q.index != p.index)
+        )  # FAQ-C081, SA.18
     ]
     if stacks:  # TECHACT-06: with all techs of the type already owned the tech part is ignored
         s.pending.append(
@@ -291,7 +305,7 @@ def land_free_moves(s: GameState, p: PlayerState, opts: dict[str, Any]) -> list[
         if planet not in s.planets:
             continue
         out.append({"type": "land_free", "probe": pr.id})
-        if opts.get("any_moon") or "probe-cross" in p.techs:
+        if opts.get("any_moon") or effects.tech_active(p, "probe-cross"):
             for moon in planet_moons(planet):
                 if opts.get("occupied") or moon not in s.planets[planet].moon_landers:
                     out.append({"type": "land_free", "probe": pr.id, "moon": moon})
@@ -333,7 +347,9 @@ def take_free_tech(s: GameState, p: PlayerState, d: Decision, a: Action, events:
     st = s.tech_stacks[a["stack"]]
     name = techs.tech_name(st.category, st.glyph)
     other_has = any(name in q.techs for q in s.players if q.index != p.index)
-    techs.take_tech(s, p, a["stack"], events, tile_bonus=not d.data.get("copy"), first_bonus=not d.data.get("copy"))
+    tile = techs.take_tech(s, p, a["stack"], events, tile_bonus=not d.data.get("copy"), first_bonus=not d.data.get("copy"))
+    if d.data.get("tile_again"):  # SA.15: the bonus printed on the tech tile again
+        rewards.grant(s, p, [techs.TILE_BONUS[tile]], events)
     if d.data.get("then_vp_per_tech"):
         effects.gain_score(s, p, d.data["then_vp_per_tech"] * sum(1 for t in p.techs if t.startswith(st.category + "-")))
     if d.data.get("copy_bonus") and other_has:
@@ -356,6 +372,9 @@ def _count(s: GameState, p: PlayerState, what: str) -> int:
         return sum(1 for c in p.tucked if cards[c]["income"] == what.removeprefix("tucked_income_"))
     if what == "publicity":
         return p.publicity
+    counted = expansion_steps.count(s, p, what)
+    if counted is not None:
+        return counted
     raise ValueError(what)
 
 
@@ -396,6 +415,9 @@ def cond_ok(s: GameState, p: PlayerState, c: dict[str, Any]) -> bool:
     alien = alien_steps.cond_ok(s, p, c)
     if alien is not None:
         return alien
+    expansion = expansion_steps.cond_ok(s, p, c)
+    if expansion is not None:
+        return expansion
     if k == "orbland":
         planets = [c["planet"]] if c["planet"] else list(s.planets)
         total = sum(_at(p, pl, not c["landers_only"], not c["orbiters_only"], c["moons"]) for pl in planets)
@@ -507,18 +529,22 @@ def fire(s: GameState, p: PlayerState, evs: list[dict[str, Any]], events: Events
         if m.kind != "trigger":
             continue
         for i, circ in enumerate(card_defs.CARDS[m.card]["mission"]["circles"]):
-            if not m.used[i] and any(_matches(circ["on"], e) for e in evs):
+            if not m.used[i] and any(_matches(circ["on"], e, p) for e in evs):
                 options.append([m.card, i])
     if options:
         s.pending.insert(0, Decision(kind="mission_trigger", player=p.index, data={"options": options}))
 
 
-def _matches(spec: dict[str, Any], ev: dict[str, Any]) -> bool:
+def _matches(spec: dict[str, Any], ev: dict[str, Any], p: PlayerState | None = None) -> bool:
     if "any" in spec:  # a circle with several ways to trigger it (SE EN 02)
-        return any(_matches(one, ev) for one in spec["any"])
+        return any(_matches(one, ev, p) for one in spec["any"])
+    if spec.get("own_orbiter") and (
+        p is None or p.orbiters.get(ev.get("planet", ""), 0) < 1
+    ):  # SA.21: a planet where the player has an orbiter
+        return False
     if spec["e"] != ev["e"]:
         return False
-    for key in ("planet", "cat", "kind", "color", "cost", "corner"):
+    for key in ("planet", "cat", "kind", "color", "cost", "corner", "species"):
         if key in spec and spec[key] != "*" and spec[key] != ev.get(key):
             return False
     if spec.get("own_turn") and not ev.get("own_turn"):
@@ -603,6 +629,11 @@ def _fire_fx(s: GameState, p: PlayerState, kind: str, planet: str | None, events
 
 def _unique_planet(s: GameState, p: PlayerState, planet: str, events: Events) -> None:
     for w in s.turn_fx:
+        if w["k"] == "planets_threshold" and w["player"] == p.index and not w["done"] and planet not in w["seen"]:
+            w["seen"].append(planet)  # SA.12: the reward once, when the n-th different planet is visited
+            if len(w["seen"]) >= w["n"]:
+                w["done"] = True
+                rewards.grant(s, p, w["r"], events)
         if w["k"] == "unique_planets" and w["player"] == p.index and planet not in w["seen"]:
             w["seen"].append(planet)  # FAQ-C025: each planet counts once, Earth included
             rewards.grant(s, p, w["r"], events)
@@ -630,6 +661,11 @@ def gain_corner(s: GameState, p: PlayerState, cid: str) -> None:
             effects.gain_data(s, p, n)
         elif kind == "score":
             effects.gain_score(s, p, n)
+        elif kind.startswith("glyph:"):  # EXP-GLY-06: the resource of that glyph if it has been deciphered
+            rewards.grant(s, p, [{"t": "glyph_resource", "glyph": kind.removeprefix("glyph:")}], [])
+        elif kind == "explore_minor":  # EXP-ARK-07: a security card discarded for its free action
+            for _ in range(n):
+                rewards.grant(s, p, [{"t": "explore_minor"}], [])
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -656,6 +692,10 @@ def end_points(s: GameState, p: PlayerState) -> int:
             from . import scoring  # noqa: PLC0415
 
             total += scoring.solvay_points(s, p)
+        elif w == "per_species_color":  # EXP-AMO-04: traces of one color marked for this species
+            j = alien_steps.slot_of(s, e["species"])
+            assert j is not None
+            total += n * sum(1 for sl, k in p.trace_log if sl == j and k == e["kind"])
         elif w == "per_species_traces":
             i = alien_steps.slot_of(s, e["species"])
             assert i is not None
@@ -664,7 +704,10 @@ def end_points(s: GameState, p: PlayerState) -> int:
             if any(_probe_on(s, pr, "asteroid") for pr in s.probes if pr.player == p.index):
                 total += n
         else:
-            raise ValueError(w)
+            points = expansion_steps.end_points(s, p, e)
+            if points is None:
+                raise ValueError(w)
+            total += points
     return total
 
 
@@ -696,6 +739,9 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
     alien = alien_steps.decision_moves(s, d)
     if alien is not None:
         return alien
+    expansion = expansion_steps.decision_moves(s, d)
+    if expansion is not None:
+        return expansion
     if d.kind == "slingshot":
         return [{"type": "slingshot_pick", "choice": "publicity"}, {"type": "slingshot_pick", "choice": "move"}]
     return None
@@ -756,6 +802,11 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         p.orbiters[a["planet"]] -= 1
         if a["first"]:
             st.first_orbiter = None  # the space is free again; the other orbiters do not slide (FAQ-C015)
+        if d.data.get("probe_at_planet"):  # SA.19: a probe on the space of that planet, whatever the probe limit
+            pos = solar.find_cell(s, f"PLANET:{a['planet'].upper()}")
+            if pos is not None:
+                s.probe_counter += 1
+                s.probes.append(Probe(id=f"probe{s.probe_counter}", player=p.index, ring=pos[0], sector=pos[1]))
         rewards.grant(s, p, d.data["r"], events)
     elif t == "remove_lander":
         st = s.planets[a["planet"]]
@@ -771,7 +822,7 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         rewards.grant(s, p, d.data["r"], events)
     elif t == "take_tech":
         take_free_tech(s, p, d, a, events)
-    elif not alien_steps.resolve_decision(s, p, d, a, events):
+    elif not alien_steps.resolve_decision(s, p, d, a, events) and not expansion_steps.resolve_decision(s, p, d, a, events):
         return False
     return True
 

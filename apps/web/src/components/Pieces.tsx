@@ -109,6 +109,30 @@ export function Figure({ x, y, size = 104, color, title }: { x: number; y: numbe
   );
 }
 
+/** A space probe: a round token (so that it fits the orbit and landing spaces) with a probe on it: a body, two solar panels and a dish. */
+export function ProbePiece({ x, y, size = 104, color, title }: { x: number; y: number; size?: number; color: PieceColor; title?: string }) {
+  const ink = "#fff";
+  return (
+    <Piece x={x} y={y} size={size} title={title}>
+      <circle cy={7} r={45} fill={edge(color)} />
+      <circle r={45} fill={gradient(color, "top")} stroke={edge(color)} strokeWidth={4} />
+      <circle r={35} fill={gradient(color, "dimple")} stroke={edge(color)} strokeWidth={2} />
+      <g stroke={edge(color)} strokeWidth={2} strokeLinejoin="round">
+        <rect x={-31} y={-9} width={19} height={22} rx={2} fill={ink} fillOpacity={0.92} />
+        <rect x={12} y={-9} width={19} height={22} rx={2} fill={ink} fillOpacity={0.92} />
+        <path d="M-12 2 H12" strokeWidth={4} />
+        <path d="M-8 -12 L-4 -17 H4 L8 -12 V12 L4 17 H-4 L-8 12 Z" fill={ink} />
+      </g>
+      <path d="M-21 -2 H-12 M-21 5 H-12 M12 -2 H21 M12 5 H21" stroke={edge(color)} strokeOpacity={0.6} strokeWidth={1.5} />
+      <g transform="rotate(-20 0 -23)">
+        <ellipse cy={-23} rx={13} ry={7} fill={ink} stroke={edge(color)} strokeWidth={2} />
+        <circle cy={-23} r={2.5} fill={edge(color)} />
+      </g>
+      <path d="M-30 -22 A38 38 0 0 1 -6 -36" fill="none" stroke="#fff" strokeOpacity={0.55} strokeWidth={4} strokeLinecap="round" />
+    </Piece>
+  );
+}
+
 /** The publicity counter: a microphone-shaped pawn. */
 export function PublicityPawn({
   x,

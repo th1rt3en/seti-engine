@@ -13,7 +13,7 @@ OUT = os.path.join(ROOT, 'services', 'engine', 'src', 'seti_engine', 'data')
 os.makedirs(OUT, exist_ok=True)
 
 for name in ('solar-system.json', 'stars.json', 'planets.json', 'tech-board.json', 'player-board.json', 'gold-tiles.json', 'alien-boards.json',
-             'solo-boards.json', 'objectives.json', 'rival-action-cards.json'):
+             'solo-boards.json', 'objectives.json', 'rival-action-cards.json', 'expansion-organizations.json', 'expansion-quick-start.json', 'expansion-arkhos.json', 'expansion-glyphids.json', 'expansion-amoeba.json', 'expansion-deck.json', 'promo-set-2.json', 'expansion-solo.json'):
     with open(os.path.join(SPEC, name), encoding='utf-8') as f:
         data = json.load(f)
     with open(os.path.join(OUT, name), 'w', encoding='utf-8') as f:
