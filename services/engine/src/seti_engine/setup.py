@@ -84,7 +84,11 @@ def new_game(options: Options) -> GameState:
         state.planets[name] = PlanetState(first_land_data_taken=[False] * slots, first_land_owners=[None] * slots)
 
     # deck
-    deck_ids = [cid for cid, c in tables.cards().items() if c["deck"] == "base" or (c["deck"] == "promo" and options.promo_cards)]
+    deck_ids = [
+        cid
+        for cid, c in tables.cards().items()
+        if c["deck"] == "base" or (c["deck"] == "promo" and options.promo_cards) or (c["deck"] == "expansion" and options.expansion)
+    ]
     deck_ids.sort(key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else 0, x))  # fixed order before the shuffle
     state.deck = rng.shuffled(state, deck_ids)
     state.card_row = [state.deck.pop() for _ in range(3)]

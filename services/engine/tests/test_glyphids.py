@@ -126,8 +126,7 @@ def test_unplaced_tokens_score_by_sets_of_different_types() -> None:  # EXP-GLY-
 def test_the_glyph_cards_with_a_defined_effect() -> None:  # EXP-GLY-06
     from seti_engine import card_defs, cards
 
-    assert all(cards.playable(c) for c in ("GL.3", "GL.4", "GL.6", "GL.7"))
-    assert not cards.playable("GL.1")  # the cards that offer a choice wait for the owner's check (A-045)
+    assert all(cards.playable(f"GL.{n}") for n in range(1, 11))
     assert card_defs.CARDS["GL.3"]["mission"]["kind"] == "trigger"
 
 
@@ -151,3 +150,120 @@ def test_random_games_with_glyphids_finish() -> None:  # EXP-GLY-01 to EXP-GLY-0
                 break
             s = apply(s, rng.choice([m for m in legal_moves(s) if m["type"] != "undo"])).state
         assert s.phase == "finished" and s.species[0].discovered
+
+
+# the ten Glyphids cards (EXP-GLY-06, A-045)
+
+
+def _with_glyphs(deciphered_slots: dict[str, tuple[str, int]]) -> GameState:
+    s = discovered()
+    s.current_player = 0
+    s.phase = "play"
+    extra = s.species[0].extra
+    for glyph, (row, k) in deciphered_slots.items():
+        extra[row][k] = glyph
+    return s
+
+
+def _play(s: GameState, cid: str, answer: bool = True):  # type: ignore[no-untyped-def]
+    from seti_engine.engine import apply as step
+
+    s.players[0].hand.append(cid)
+    s.players[0].credits = s.players[0].energy = 9
+    r = step(s, {"type": "play_card", "card": cid})
+    while answer and r.state.pending:
+        r = step(r.state, r.legal[0])
+    return r
+
+
+def test_gl_corner_gives_the_resource_of_a_deciphered_glyph() -> None:  # GL.1 to GL.10 (corners)
+    s = _with_glyphs({"orange": ("bottom", 3)})
+    p = s.players[0]
+    side = s.species[0].extra["sides"][1]
+    reward = tables.glyphids()["translation"]["bottom"][side][3]
+    from seti_engine import cards
+
+    before = (p.score, p.publicity, p.data_pool, len(p.hand))
+    cards.gain_corner(s, p, "GL.1")  # orange
+    after = (p.score, p.publicity, p.data_pool, len(p.hand))
+    assert after != before and reward["t"] in {"vp", "publicity", "data", "card_random"}
+    cards.gain_corner(s, p, "GL.3")  # cyan, not deciphered: nothing
+    assert (p.score, p.publicity, p.data_pool, len(p.hand)) == after
+
+
+def test_gl1_and_gl9_choose_a_group_and_score_tokens_at_the_end() -> None:  # GL.1, GL.9
+    s = _with_glyphs({"yellow": ("bottom", 0), "blue": ("bottom", 1)})
+    r = _play(s, "GL.1", answer=False)
+    assert r.state.pending[0].kind == "glyph_group"
+    assert {m["group"] for m in r.legal if m["type"] == "glyph_group"} == {0, 1}
+    r = apply(r.state, {"type": "glyph_group", "group": 0})
+    p = r.state.players[0]
+    p.glyphs = ["red", "red", "red", "blue"]
+    assert cards_end(r.state, p) == 9  # 3 VP for each token of the type with the most tokens
+    s2 = _with_glyphs({})
+    r2 = _play(s2, "GL.9")
+    p2 = r2.state.players[0]
+    p2.glyphs = ["red", "red", "blue", "cyan"]
+    assert cards_end(r2.state, p2) == 3  # 1 VP for each glyph in the largest set of different glyphs
+
+
+def cards_end(s: GameState, p) -> int:  # type: ignore[no-untyped-def]
+    from seti_engine import cards
+
+    return int(cards.end_points(s, p))
+
+
+def test_gl2_and_gl8_choose_a_triple_and_a_doubled_glyph_pays_twice() -> None:  # GL.2, GL.8 (A-045)
+    s = _with_glyphs({"pink": ("bottom", 2)})  # the 3 VP slot or another strip face: any resource
+    r = _play(s, "GL.2", answer=False)
+    assert r.state.pending[0].kind == "glyph_group"
+    p = r.state.players[0]
+    before = (p.score, p.publicity, p.data_pool, len(p.hand))
+    from seti_engine.engine import apply as step
+
+    r = step(r.state, {"type": "glyph_group", "group": 0})  # pink, pink, red: the pink resource twice
+    p = r.state.players[0]
+    assert (p.score, p.publicity, p.data_pool, len(p.hand)) != before
+    assert cards_playable("GL.8")
+
+
+def cards_playable(cid: str) -> bool:
+    from seti_engine import cards
+
+    return bool(cards.playable(cid))
+
+
+def test_gl3_to_gl7_missions_cover_a_circle_for_a_glyph_resource() -> None:  # GL.3 to GL.7
+    from seti_engine import cards
+
+    s = _with_glyphs({})
+    expected = {
+        "GL.3": [{"e": "orbit_or_land"}],
+        "GL.4": [{"e": "tech", "cat": "probe"}],
+        "GL.5": [{"e": "scan"}],
+        "GL.6": [{"e": "launch"}],
+    }
+    for cid, events in expected.items():
+        r = _play(_with_glyphs({}), cid)
+        st = r.state
+        cards.fire(st, st.players[0], events, [])
+        assert st.pending and st.pending[0].kind == "mission_trigger", cid
+    r = _play(_with_glyphs({}), "GL.7")
+    cards.fire(r.state, r.state.players[0], [{"e": "trace", "kind": "pink", "species": "arkhos"}], [])
+    assert r.state.pending[0].kind == "mission_trigger"
+    assert s is not None
+
+
+def test_gl5_gl7_main_effects() -> None:  # GL.5, GL.7
+    r = _play(_with_glyphs({}), "GL.5")
+    assert r.state.players[0].signal_tokens == 1
+    s = _with_glyphs({})
+    hand = len(s.players[0].hand)
+    r = _play(s, "GL.7")
+    assert len(r.state.players[0].hand) == hand + 1  # the card played is out, one card is in (and the card put in the hand for the test)
+
+
+def test_gl10_launches_and_has_a_quick_mission_for_this_species() -> None:  # GL.10
+    r = _play(_with_glyphs({}), "GL.10")
+    st = r.state
+    assert any(pr.player == 0 for pr in st.probes) and "GL.10" in [m.card for m in st.players[0].missions]

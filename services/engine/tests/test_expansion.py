@@ -386,3 +386,21 @@ def test_every_organization_plays_a_whole_game(org: str) -> None:  # EXP-ORG-13,
             m = [x for x in legal_moves(s) if x["type"] != "undo"]
             s = act(s, **rng.choice(m))
         assert s.phase == "finished"
+
+
+def test_orbital_dynamics_moves_two_different_probes_one_step_each() -> None:  # EXP-ORG-13, A-039
+    from seti_engine.models import Probe
+
+    s = with_org("orbital_dynamics", energy=0)
+    p = cur(s)
+    p.movement = 0
+    s.probes = [Probe(id="a", player=p.index, ring=2, sector=1), Probe(id="b", player=p.index, ring=2, sector=5)]
+    assert can(s, "org_free", org="orbital_dynamics")
+    s = act(s, type="org_free", org="orbital_dynamics")
+    step = next(m for m in legal_moves(s) if m["type"] == "od_step" and m["probe"] == "a")
+    s = act(s, **step)
+    assert cur(s).movement == 0 and next(pr for pr in s.probes if pr.id == "a").ring == step["to"][0]
+    assert not any(m["type"] == "od_step" and m["probe"] == "a" for m in legal_moves(s))  # a probe moves once
+    s = act(s, **next(m for m in legal_moves(s) if m["type"] == "od_step" and m["probe"] == "b"))
+    assert not any(m["type"] == "od_step" for m in legal_moves(s))  # two probes at most
+    assert not can(s, "org_free", org="orbital_dynamics")  # once per round

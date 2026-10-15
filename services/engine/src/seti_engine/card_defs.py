@@ -445,14 +445,68 @@ ALIEN_CARDS: dict[str, dict[str, Any]] = {
 CARDS.update(ALIEN_CARDS)
 
 
+CARDS.update(
+    {
+        # the 42 cards of the Space Agencies main deck (EXP-03); readings of the pictures are in docs/spec/ambiguities.md (A-050)
+        "SA.1": {"fx": [R("land_free", return_if_occupied=True)]},
+        "SA.2": {"fx": [R("show_corner")]},
+        "SA.3": {"fx": [R("signal_token", 3)]},
+        "SA.4": {"fx": [R("signal_token"), move(1)]},
+        "SA.5": {"fx": [data(1), move(1), when({"c": "adjacent_earth"}, R("return_card"))]},
+        "SA.6": {"fx": [move(1), R("land_free", signal_here=True)]},
+        "SA.7": {"fx": [ROT, research("probe")], "mission": quick({"c": "probes_planets", "n": 2}, credit(2))},
+        "SA.8": {"fx": [ROT, research("computer")], "end": end("per_data", 3)},
+        "SA.9": {"fx": [ROT, research("telescope")], "mission": quick(wins(None, 3), pub(3))},
+        "SA.10": {"fx": [pub(10)], "end": end("per_publicity", 1)},
+        "SA.11": {"fx": [LAUNCH, pub(1)], "mission": quick({"c": "probe_on", "where": "asteroid"}, vp(3), energy(2))},
+        "SA.12": {"fx": [move(2), watch({"k": "planets_threshold", "n": 2, "r": [vp(3)]})]},
+        "SA.13": {"fx": [scan_free(), R("signal_token")]},
+        "SA.14": {"fx": [LAUNCH, pub(1), when({"c": "other_on_earth"}, R("return_card"))]},
+        "SA.15": {"fx": [ROT, research("any", tile_again=True)]},
+        "SA.16": {"fx": [pub(4)], "mission": quick({"c": "publicity_eq", "n": 0}, vp(2), pub(1))},
+        "SA.17": {"fx": [R("paid_media")]},
+        "SA.18": {"fx": [R("set_publicity", to=0), ROT, research("any", owned_by_other=True)]},
+        "SA.19": {"fx": [R("remove_orbiter", r=[], probe_at_planet=True)]},
+        "SA.20": {"fx": [pub(1), R("discard_corner", times=3)]},
+        "SA.21": {"mission": trig(*(circle({"e": "visit", "planet": "*", "own_orbiter": True}, energy(1)) for _ in range(2)))},
+        "SA.22": {"fx": [R("sig_in_rich_sector", 2, min=3)]},
+        "SA.23": {"fx": [pub(1)], "mission": trig(circle({"e": "launch"}, rnd(1)), circle({"e": "orbit_or_land"}, vp(3)))},
+        "SA.24": {"fx": [pub(1)], "mission": trig(*(circle({"e": "tech", "cat": "probe"}, LAUNCH) for _ in range(2)))},
+        "SA.25": {"fx": [pub(1)], "mission": trig(*(circle({"e": "tech", "cat": "telescope"}, R("signal_token")) for _ in range(2)))},
+        "SA.26": {"fx": [pub(1)], "mission": trig(*(circle({"e": "tech", "cat": "computer"}, data(1)) for _ in range(2)))},
+        "SA.27": {"fx": [R("energy_per_probe")]},
+        "SA.28": {"fx": [R("restructure")], "mission": quick({"c": "no_resources"}, pub(2), card(1))},
+        "SA.29": {"fx": [R("return_mission", r=[data(2)])]},
+        "SA.30": {"fx": [pub(1), R("orbit_free"), R("per", count="tech_computer", r=data(1))]},
+        "SA.31": {"fx": [R("land_free")], "end": end("per_planets_two_landers", 6)},
+        "SA.32": {"fx": [R("discard_hand"), pub(1), rnd(2)]},
+        "SA.33": {"fx": [pub(1)], "mission": trig(circle({"e": "pass"}, LAUNCH))},
+        "SA.34": {"fx": [TUCK, R("per", count="max_tech_type", r=rnd(1))]},
+        "SA.35": {"fx": [R("signal_token")], "mission": quick({"c": "data_total", "n": 12}, energy(1))},
+        "SA.36": {"fx": [sig_color("yellow"), sig_color("red"), sig_color("blue")]},
+        "SA.37": {"fx": [R("sig_each_marked")]},
+        "SA.38": {"fx": [pub(1), move(1), when({"c": "probe_shared"}, vp(3))]},
+        "SA.39": {"fx": [move(2)], "end": end("per_planets_orb_or_land", 2)},
+        "SA.40": {"fx": [move(5)]},
+        "SA.41": {"fx": [R("signal_token"), pub(1), card(1)], "end": end("sig_all_colors", 4)},
+        "SA.42": {"fx": [scan_free()], "end": end("signals_each_sector", 8)},
+    }
+)
+
+
+def _GG(groups: list[list[str]]) -> Step:  # noqa: N802 - EXP-GLY-06: choose one group of glyph icons
+    return R("glyph_group", groups=groups)
+
+
 def _GL(glyph: str) -> Step:  # noqa: N802 - EXP-GLY-06
     return R("glyph_resource", glyph=glyph)
 
 
 CARDS.update(
     {
-        # Glyphids: a mission whose circles give the resource of a glyph once it is deciphered (EXP-GLY-06); the cards that offer a choice
-        # between glyph groups, the end-of-game cards and the conversion card wait for the owner's check of the pictures (A-045)
+        # Glyphids: icons with a "?" give the resource of that glyph when it has been deciphered (EXP-GLY-06); a group of glyphs is a choice
+        "GL.1": {"fx": [_GG([["yellow", "cyan"], ["blue", "pink"]])], "end": end("glyph_most", 3)},
+        "GL.2": {"fx": [_GG([["pink", "pink", "red"], ["blue", "blue", "cyan"]])]},
         "GL.3": {"mission": trig(*(circle({"e": "orbit_or_land"}, _GL(g)) for g in ("yellow", "black", "blue")))},
         "GL.4": {
             "mission": trig(
@@ -461,8 +515,12 @@ CARDS.update(
                 circle({"e": "tech", "cat": "computer"}, _GL("red")),
             )
         },
+        "GL.5": {"fx": [R("signal_token")], "mission": trig(circle({"e": "scan"}, _GL("yellow")), circle({"e": "scan"}, _GL("pink")))},
         "GL.6": {"fx": [pub(1), data(1)], "mission": trig(circle({"e": "launch"}, _GL("orange")), circle({"e": "launch"}, _GL("cyan")))},
-        "GL.7": {"fx": [rnd(1)], "mission": trig(*(circle({"e": "trace", "kind": ANY}, _GL(g)) for g in ("red", "black", "pink")))},
+        "GL.7": {"fx": [card(1)], "mission": trig(*(circle({"e": "trace", "kind": ANY}, _GL(g)) for g in ("red", "black", "pink")))},
+        "GL.8": {"fx": [_GG([["cyan", "cyan", "red"], ["black", "black", "orange"]])]},
+        "GL.9": {"fx": [_GG([["yellow", "pink"], ["blue", "orange"]])], "end": end("glyph_set", 1)},
+        "GL.10": {"fx": [LAUNCH, _GL("cyan")], "mission": quick(species_all("glyphids"), _GL("red"), _GL("blue"))},
     }
 )
 
@@ -473,10 +531,14 @@ def _AM(color: str) -> Step:  # noqa: N802 - EXP-AMO-04: one organelle of the se
 
 CARDS.update(
     {
-        # Amoeba (ET.14 and ET.20 wait for the owner's check of the pictures, A-049)
+        # Amoeba (ET.20 waits for the owner's check of its third icon, A-049)
         "AM.11": {"fx": [card(1), _AM("pink")], "end": end("per_species_color", 2, species="amoeba", kind="pink")},
         "AM.12": {"fx": [card(1), _AM("yellow")], "end": end("per_species_color", 2, species="amoeba", kind="yellow")},
         "AM.13": {"fx": [card(1), _AM("blue")], "end": end("per_species_color", 2, species="amoeba", kind="blue")},
+        "AM.14": {
+            "fx": [pub(3)],
+            "mission": quick({"c": "species_colors_board", "species": "amoeba"}, R("vp_empty_species_space", species="amoeba")),
+        },
         "AM.15": {
             "fx": [LAUNCH, _AM("yellow")],
             "mission": trig(*(circle({"e": "trace", "kind": "blue", "species": "amoeba"}, data(1)) for _ in range(2))),

@@ -28,7 +28,8 @@ def fields(d: dict, skip: set[str]) -> list[list[str]]:
 
 def main(src: pathlib.Path) -> None:
     def load(name: str):  # noqa: ANN202
-        return json.loads((src / name).read_text(encoding="utf-8"))
+        newer = src / "v2" / name  # the second reading, made with the owner's icon glossary, replaces the first
+        return json.loads((newer if newer.exists() else src / name).read_text(encoding="utf-8"))
 
     items: list[dict] = []
 
@@ -44,8 +45,8 @@ def main(src: pathlib.Path) -> None:
             }
         )
 
-    for name in ("main-a.json", "main-b1.json", "main-b2.json"):
-        for c in load(name):
+    for name in ("main.json",) if (src / "v2" / "main.json").exists() else ("main-a.json", "main-b1.json", "main-b2.json"):
+        for c in json.loads(((src / "v2" / name) if (src / "v2" / name).exists() else (src / name)).read_text(encoding="utf-8")):
             stem = c["file"].rsplit(".", 1)[0]
             if c["file"] in CARD_ID_FIXES:
                 c["id"] = CARD_ID_FIXES[c["file"]]

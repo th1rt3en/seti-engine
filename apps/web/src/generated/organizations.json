@@ -13,7 +13,7 @@
       "signalToken": 0
     },
     "name": "Cosmos Strategy Group",
-    "number": null,
+    "number": 6,
     "resources": {
       "card": 1,
       "credit": 4,
@@ -36,7 +36,7 @@
       "signalToken": 1
     },
     "name": "Deep Sky Survey",
-    "number": null,
+    "number": 4,
     "resources": {
       "card": 0,
       "credit": 3,
@@ -59,7 +59,7 @@
       "signalToken": 0
     },
     "name": "Fenwick Research Center",
-    "number": null,
+    "number": 2,
     "resources": {
       "card": 0,
       "credit": 3,
@@ -82,7 +82,7 @@
       "signalToken": 0
     },
     "name": "Futurespan Institute",
-    "number": null,
+    "number": 10,
     "resources": {
       "card": 1,
       "credit": 3,
@@ -105,7 +105,7 @@
       "signalToken": 0
     },
     "name": "Helion Assembly",
-    "number": null,
+    "number": 11,
     "resources": {
       "card": 0,
       "credit": 3,
@@ -129,7 +129,7 @@
       "signalToken": 0
     },
     "name": "Mission Relay",
-    "number": null,
+    "number": 8,
     "resources": {
       "card": 2,
       "credit": 3,
@@ -152,7 +152,7 @@
       "signalToken": 0
     },
     "name": "Orbital Dynamics",
-    "number": null,
+    "number": 1,
     "resources": {
       "card": 0,
       "credit": 2,
@@ -175,7 +175,7 @@
       "signalToken": 1
     },
     "name": "Sentinel Probe Network",
-    "number": null,
+    "number": 7,
     "resources": {
       "card": 0,
       "credit": 4,
@@ -197,7 +197,7 @@
       "signalToken": 0
     },
     "name": "Stratus Core",
-    "number": null,
+    "number": 3,
     "resources": {
       "card": 1,
       "credit": 3,
@@ -220,7 +220,7 @@
       "signalToken": 0
     },
     "name": "Turing Systems",
-    "number": null,
+    "number": 5,
     "resources": {
       "card": 1,
       "credit": 4,
@@ -243,7 +243,7 @@
       "signalToken": 0
     },
     "name": "Xenolab",
-    "number": null,
+    "number": 9,
     "resources": {
       "card": 1,
       "credit": 2,

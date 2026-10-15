@@ -307,6 +307,8 @@ def main_moves(s: GameState, p: PlayerState, can_launch: bool, research: list[Ac
 def end_turn(s: GameState, p: PlayerState) -> None:
     """The Sentinel corner and the borrowed Turing tech only last for the turn."""
     p.org_data.pop("corner", None)
+    p.org_data.pop("od_left", None)
+    p.org_data.pop("od_used", None)
     p.org_data.pop("borrowed", None)
 
 
@@ -352,6 +354,8 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
         return [{**base, "tech": t, "card": c} for t in techs for c in dict.fromkeys(p.hand)]
     if o == "sentinel_probe_network" and p.org_data.get("corner"):
         return [base]
+    if o == "orbital_dynamics" and any(pr.player == p.index and not pr.capsule for pr in s.probes):
+        return [base]  # A-039: two different probes move 1 step each
     if o == "turing_systems":
         names = sorted(
             f"{st.category}-{st.glyph}"
@@ -404,6 +408,8 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         p.org_data.setdefault("disabled", []).append(a["tech"])
         effects.tuck_card(s, p, a["card"])
         p.org_marks = []
+    elif o == "orbital_dynamics":  # EXP-ORG-13, A-039: the steps are taken with od_step moves until the end of the turn
+        p.org_data["od_left"], p.org_data["od_used"] = 2, []
     elif o == "sentinel_probe_network":
         cards.gain_corner(s, p, p.org_data.pop("corner"))
     elif o == "turing_systems":  # until the end of the turn, as if researched, without the immediate bonuses

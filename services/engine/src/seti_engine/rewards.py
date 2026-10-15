@@ -53,6 +53,16 @@ def grant(
             p.movement += n
         elif t == "signal_token":
             p.signal_tokens += n  # EXP-SIG-01
+        elif t == "vp_empty_species_space":  # AM.14: 1 VP for each empty space of the species board
+            for sl in s.species:
+                if sl.species == r["species"]:
+                    effects.gain_score(s, p, sum(1 for spaces in sl.board.values() for m in spaces if not m))
+        elif t == "scan_free":  # a free scan from an exploration reward
+            cards.run_step(s, p, {"t": "scan_free"}, events)
+        elif t == "organelle":  # AM.17: a mission circle whose reward is one organelle of a section (EXP-AMO-04)
+            from . import amoeba  # noqa: PLC0415 - amoeba imports this module
+
+            amoeba.request_pick(s, p, r["color"])
         elif t == "organelles":  # EXP-AMO-03: the organelle bonuses of a marked space are gained by species.mark_board_space
             pass
         elif t == "glyph_space":  # the token of a Glyphids board space is taken by the marking (species.mark_board_space)

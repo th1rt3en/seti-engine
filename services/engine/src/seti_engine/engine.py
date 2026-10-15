@@ -215,7 +215,7 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
         return [{"type": "place_computer_tech", "slot": k} for k in d.data["slots"]]
     if d.kind == "signal":
         if d.data["color"] == "any":
-            return [{"type": "mark_signal", "sector": i} for i in range(len(state.sectors))]
+            return [{"type": "mark_signal", "sector": i} for i in d.data.get("sectors", range(len(state.sectors)))]
         return [{"type": "mark_signal", "sector": i} for i in rewards.sectors_of_color(state, d.data["color"])]
     if d.kind == "trace":
         return rewards.trace_moves(state, d)
@@ -254,6 +254,10 @@ def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
             if cost <= p.movement:
                 for ring, sector in solar.adjacent(pr.ring, pr.sector):
                     out.append({"type": "move_probe", "probe": pr.id, "to": [ring, sector]})
+    if p.org_data.get("od_left", 0) > 0:  # Orbital Dynamics' free action (A-039): 1 step each for up to 2 different probes
+        for pr in probes_in_space(state, p):
+            if pr.id not in p.org_data["od_used"] and not pr.capsule:
+                out += [{"type": "od_step", "probe": pr.id, "to": [ring, sector]} for ring, sector in solar.adjacent(pr.ring, pr.sector)]
     if p.publicity >= 3:  # FREE-06
         out.append({"type": "buy_card", "source": "deck"})
         out += [{"type": "buy_card", "source": f"row:{i}"} for i in range(len(state.card_row))]
@@ -349,6 +353,7 @@ FREE_TYPES = frozenset(
         "deliver_sample",
         "org_free",
         "decipher",
+        "od_step",
     }
 )  # the free actions (FREE-01 to FREE-07, TECH-21)
 # moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
@@ -515,6 +520,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         s.pass_rotated = False
         s.pass_card_asked = False
         events.append({"type": "pass", "player": p.index})
+        cards.fire(s, p, [{"e": "pass"}], events)  # SA.33
     elif t == "end_turn":
         s.stage = "turn_end"
     elif t == "move_energy":
@@ -565,6 +571,12 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         orgs.free_action(s, p, a, events)  # EXP-ORG-10
     elif t == "decipher":
         glyphids.decipher(s, p, a, events)  # EXP-GLY-05
+    elif t == "od_step":  # Orbital Dynamics (A-039): a normal move, paid by the ability
+        probe = next(pr for pr in s.probes if pr.id == a["probe"])
+        p.movement += move_cost(s, p, probe)
+        p.org_data["od_left"] -= 1
+        p.org_data["od_used"].append(probe.id)
+        _do_action(s, {"type": "move_probe", "probe": a["probe"], "to": a["to"]}, events)
 
 
 def _org_main(s: GameState, p: PlayerState, a: Action, events: list[dict[str, Any]]) -> None:
@@ -598,7 +610,7 @@ def _orbit_land_free_moves(s: GameState, p: PlayerState, d: Decision) -> list[Ac
     for pr in probes_in_space(s, p):
         if not pr.capsule and planet_at(s, pr) is not None:
             out.append({"type": "orbit_free", "probe": pr.id})
-    return out + cards.land_free_moves(s, p, d.data)
+    return out if d.data.get("orbit_only") else out + cards.land_free_moves(s, p, d.data)
 
 
 def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = False, opts: dict[str, Any] | None = None) -> None:
@@ -642,6 +654,8 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
     is_moon = "moon" in a
     if opts.get("bonus_vp") and (planet in opts.get("bonus_planets", []) or (is_moon and opts.get("bonus_moon"))):
         effects.gain_score(s, p, opts["bonus_vp"])  # #13 Perseverance Rover
+    if opts.get("signal_here"):  # SA.6: a signal in the sector where the probe landed
+        rewards.mark_signal(s, p, probe.sector, events)
     if is_moon:
         st.moon_landers.setdefault(a["moon"], p.index)
         p.landers[a["moon"]] = p.landers.get(a["moon"], 0) + 1
@@ -652,6 +666,8 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
         if opts.get("collect"):
             s.queue.insert(0, {"t": "collect_sample", "planet": planet})
         return
+    if opts.get("return_if_occupied") and st.landers:  # SA.1: a planet that had a lander already
+        s.play_return = True
     st.landers.append(p.index)
     p.landers[planet] = p.landers.get(planet, 0) + 1
     events.append({"type": "land", "player": p.index, "planet": planet})

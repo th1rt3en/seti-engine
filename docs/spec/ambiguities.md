@@ -324,11 +324,102 @@ Entry format:
 - Questions for the owner: confirm the amounts, and for Cosmos which color maps to which space (yellow to credit, red to publicity, blue to data, as in the extracted data).
 
 ## A-039: Orbital Dynamics' once-per-round free action
-- Status: open
+- Status: proposed (the engine uses reading 3 of the second transcription: up to 2 different probes move 1 step each, the steps paid by the ability, taken with `od_step` moves until the end of the turn)
 - Rule IDs affected: EXP-ORG-13 (Orbital Dynamics)
 - Rulebook page and text: R16 p.2 (picture): "Once per round: move at most 2 different probes of yours with 1 step each".
 - Readings: (1) each step costs 1 movement as a normal move would, but needs no energy or movement point (a normal move cost, including leaving an asteroid field or the extra cost of leaving a planet, is still paid from nowhere, i.e. free); (2) each step is a move that only costs what the board space adds (visiting publicity icons, asteroid leaving costs); (3) a step is exactly 1 movement point, gained for free, spent as usual.
 - Consequence: whether the action can move a probe out of an asteroid field or from a planet, and whether publicity is gained from the spaces entered.
 - Proposed ruling: none yet; the engine does not offer this action until the owner rules.
 - Questions for the owner: choose the reading.
+
+## A-040: Arkhos board and security cards (picture readings)
+- Status: proposed (the engine uses these readings)
+- Rule IDs affected: EXP-ARK-03, EXP-ARK-05, EXP-ARK-06
+- Rulebook page and text: A14 p.1 to p.2 and the board picture: 4 security levels of 3 spaces; the level 1 spaces show two red triangles (two minor exploration rewards); level 0 and 2 and 3 show VP and one minor reward (2, 5, 7 VP). The three security card sets (Exterior Scan, Forced Entry, Proximity Maneuvers) are read as pink, blue and yellow from the order of the files; the pictures of the cards show fronts only.
+- Readings: (1) as above; (2) the double triangle is one combined reward.
+- Consequence: rewards of the level 1 spaces; which card a player is dealt for a trace color.
+- Proposed ruling: reading 1, the sets as pink (ET.21 to 24), yellow (ET.25 to 28), blue (ET.29 to 32).
+- Questions for the owner: confirm the level 1 rewards and which set has which back color.
+
+## A-041: Is breaching a choice?
+- Status: proposed
+- Rule IDs affected: EXP-ARK-06
+- Rulebook page and text: A14 p.2: "they can breach their security card" when they mark an overflow space.
+- Readings: (1) a choice the player makes each time (yes or no); (2) always happens.
+- Proposed ruling: reading 1 (a `breach` decision with a decline). A breached card goes into the hand and counts toward the hand limit, so declining can matter.
+- Questions for the owner: confirm.
+
+## A-042: Arkhos exploration cards (picture readings)
+- Status: proposed
+- Rule IDs affected: EXP-ARK-02, EXP-ARK-04
+- Rulebook page and text: the nine exploration cards have no printed name; each shows a minor and a major reward (second reading with the owner's icon glossary): ET 33 minor 1 VP and a signal token, major signals in a yellow, a red and a blue sector and then one in any sector; ET 34 and ET 38 majors launch a probe ignoring the limit (no launch cost printed); ET 39 major is 2 random cards and a scan action; ET 40 major is 1 data and a research (rotate and any tech); ET 41 major is 1 publicity, data, credit, energy and a card of the player's choice. The data is in `docs/spec/data/expansion-arkhos.json`.
+- Proposed ruling: as read; the launches are free of the credit cost.
+- Questions for the owner: check the verification page entries for the nine cards.
+
+## A-043: Number of glyph tokens of each kind
+- Status: proposed
+- Rule IDs affected: EXP-GLY-03
+- Rulebook page and text: A14 p.3: 35 glyph tokens of 7 kinds; the count per kind is not stated.
+- Proposed ruling: 5 of each kind.
+- Questions for the owner: confirm.
+
+## A-044: Translation board strips and the top row dependency
+- Status: proposed
+- Rule IDs affected: EXP-GLY-02, EXP-GLY-05
+- Rulebook page and text: A14 p.3 and p.4: two strips are put in a random side up; "top row slots can only be filled when both slots beneath them are filled". The pictures show three arrangements; read as two strips with two sides each (top: credit, energy, signal token or energy, signal token, credit; bottom: data, random card, 3 VP, publicity or random card, publicity, data, 3 VP), so four combinations exist (one has no picture). The picture has 3 top and 4 bottom slots: top slot k is above bottom slots k and k+1.
+- Proposed ruling: as read.
+- Questions for the owner: confirm the strip sides and the geometry.
+
+## A-045: Glyphids cards
+- Status: proposed
+- Rule IDs affected: EXP-GLY-06
+- Rulebook page and text: the card names and flavor texts are printed in glyphs. A glyph icon with a "?" gives the resource of that glyph if it has been deciphered. Readings used: a repeated glyph in a group gives its resource twice; the "OR" is a choice between two groups; a mission circle may be covered for an undeciphered glyph and then gives nothing; ET.10's quick mission needs a trace of each of the three colors marked for this species (the same layout as the base cards that say "single species"); the end-of-game cards ET.1 and ET.9 score 3 VP per token of the type the player has most and 1 VP per token of the largest set of different kinds.
+- Questions for the owner: confirm each reading.
+
+## A-046: Glyphids board wells
+- Status: proposed
+- Rule IDs affected: EXP-GLY-04
+- Rulebook page and text: A14 p.3 and p.4 and the picture: each column has an upper well (replenished at once), a 2 VP and a 3 VP space with an alien card, and a lower well that is one space with the 7 VP circle (not replenished).
+- Proposed ruling: as read; marking an upper well gives only its token.
+- Questions for the owner: confirm.
+
+## A-047: Order of the organelle moves
+- Status: proposed
+- Rule IDs affected: EXP-AMO-05
+- Rulebook page and text: A14 p.6: the organelles that gave their bonuses move together, an occupied target is skipped.
+- Proposed ruling: the organelle furthest along its ring moves first; the spaces of the moving organelles count as free.
+- Questions for the owner: confirm with the rulebook example.
+
+## A-048: Amoeba board readings
+- Status: proposed
+- Rule IDs affected: EXP-AMO-02, EXP-AMO-03
+- Rulebook page and text: the board picture: the outer ring Y1, Y2, B1, B2, P1, P2 clockwise and the inner ring IY, IP, IB counter-clockwise, gears on Y1, Y2, P1, P2 and IB (the start spaces); each column of 4 marking spaces gives only the organelles, then 1 VP, then an alien card, then 1 VP and an alien card; the section of an inner space is the color of its background.
+- Proposed ruling: as read.
+- Questions for the owner: confirm.
+
+## A-049: Amoeba cards ET.14 and ET.20
+- Status: open for ET.20, proposed for ET.14
+- Rule IDs affected: EXP-AMO-04
+- Rulebook page and text: ET.20's third icon (a pink organelle with a ring and a phone-like mark) is not identified, so the card cannot be played. ET.14's quick mission asks for a trace of each color on this species except the discovery spaces and gives 1 VP per empty space of the species board; the engine counts board and overflow spaces.
+- Questions for the owner: what is ET.20's third icon?
+
+## A-050: Readings of the 42 main-deck cards
+- Status: proposed
+- Rule IDs affected: EXP-03
+- Rulebook page and text: after the owner's notes (the verification page, 2026-10-15): SA.2 counts the cards of the hand with the chosen icon in their corner; SA.12 counts Earth as a planet (FAQ-C025); SA.15 gains the printed bonus of the tile again; SA.18 keeps the tile bonus; SA.28 gains the income resource of each discarded card (a random card for the "?" kind); SA.34 tuck is optional (INCOME-01); SA.36 one signal in each of three sectors of the three colors; SA.42 counts a won-sector marker like a signal. The pictures not read with certainty are listed in the verification page.
+- Questions for the owner: confirm.
+
+## A-051: Helion Assembly's free action
+- Status: proposed
+- Rule IDs affected: EXP-ORG-13 (Helion Assembly)
+- Rulebook page and text: "Place one of your probe techs or telescope techs beside your board to increase your income. Then clear all the spaces above. You cannot use the tech's ability, but it still counts as owned for all other purposes." How the income increases is not written; the picture shows the income icon (a tuck).
+- Proposed ruling: the engine tucks a card from the hand for income as part of it (the community extraction said so).
+- Questions for the owner: what does the placed tech give?
+
+## A-052: Futurespan token distance for other costs
+- Status: proposed
+- Rule IDs affected: EXP-ORG-12
+- Rulebook page and text: the card shows +15, +25, +35, +45 for cost 1, 2, 3, 4 only.
+- Proposed ruling: a cost of 0 gives +5 and costs of 5 or more give 10 x cost + 5 (the formula of the first reading).
+- Questions for the owner: rule on 0 and 5 or more.
 

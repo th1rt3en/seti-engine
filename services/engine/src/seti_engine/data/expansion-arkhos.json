@@ -184,9 +184,8 @@
      "t": "card_random"
     },
     {
-     "kind": "pink",
      "n": 1,
-     "t": "trace"
+     "t": "scan_free"
     }
    ],
    "minor": [
@@ -343,7 +342,7 @@
     },
     {
      "n": 1,
-     "t": "card_random"
+     "t": "card_any"
     }
    ],
    "minor": [

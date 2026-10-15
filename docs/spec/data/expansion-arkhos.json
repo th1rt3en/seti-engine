@@ -195,9 +195,8 @@
      "n": 2
     },
     {
-     "t": "trace",
-     "n": 1,
-     "kind": "pink"
+     "t": "scan_free",
+     "n": 1
     }
    ]
   },
@@ -353,7 +352,7 @@
      "n": 1
     },
     {
-     "t": "card_random",
+     "t": "card_any",
      "n": 1
     }
    ]

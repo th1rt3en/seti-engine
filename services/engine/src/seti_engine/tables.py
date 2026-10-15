@@ -24,6 +24,16 @@ def cards() -> dict[str, dict[str, Any]]:
     """The static facts of the cards. The quick start cards that are tucked for income (SR.15, SR.16; EXP-QS-02) are in it too, with deck
     "quick" so that no deck is built from them, because a tucked card is looked up like any other for its income."""
     out: dict[str, dict[str, Any]] = dict(load("cards.json"))
+    for dc in deck()["cards"]:  # the 42 cards that join the main deck (EXP-03)
+        out[dc["id"]] = {
+            "name": dc["name"],
+            "deck": "expansion",
+            "cost": dc["cost"],
+            "income": dc["income"],
+            "sector": dc["sector"],
+            "species": None,
+            "free": dc["free"],
+        }
     for ac in amoeba()["cards"]:  # the Amoeba species deck (EXP-AMO-01)
         out[ac["id"]] = {
             "name": f"Amoeba {ac['printed']}",
@@ -70,6 +80,11 @@ def cards() -> dict[str, dict[str, Any]]:
 
 def glyphids() -> dict[str, Any]:
     out: dict[str, Any] = load("expansion-glyphids.json")
+    return out
+
+
+def deck() -> dict[str, Any]:
+    out: dict[str, Any] = load("expansion-deck.json")
     return out
 
 

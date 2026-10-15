@@ -1,0 +1,593 @@
+{
+ "cards": [
+  {
+   "cost": 1,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.1",
+   "income": "credit",
+   "name": "Reusable Lander",
+   "number": 1,
+   "sector": "red"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.2",
+   "income": "card",
+   "name": "Tracking and Data Relay Satellite",
+   "number": 2,
+   "sector": "red"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.3",
+   "income": "energy",
+   "name": "NASA Deep Space Network",
+   "number": 3,
+   "sector": "black"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.4",
+   "income": "credit",
+   "name": "Breakthrough Message",
+   "number": 4,
+   "sector": "black"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.5",
+   "income": "credit",
+   "name": "Servicing Mission",
+   "number": 5,
+   "sector": "blue"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.6",
+   "income": "card",
+   "name": "Live Landing Broadcast",
+   "number": 6,
+   "sector": "blue"
+  },
+  {
+   "cost": 3,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.7",
+   "income": "energy",
+   "name": "Twin Probes",
+   "number": 7,
+   "sector": "red"
+  },
+  {
+   "cost": 3,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.8",
+   "income": "energy",
+   "name": "Quantum Data Storage",
+   "number": 8,
+   "sector": "yellow"
+  },
+  {
+   "cost": 3,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.9",
+   "income": "card",
+   "name": "Lunar Crater Radio Telescope",
+   "number": 9,
+   "sector": "blue"
+  },
+  {
+   "cost": 4,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.10",
+   "income": "energy",
+   "name": "First Human in Space",
+   "number": 10,
+   "sector": "red"
+  },
+  {
+   "cost": 3,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.11",
+   "income": "card",
+   "name": "Psyche Probe",
+   "number": 11,
+   "sector": "red"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.12",
+   "income": "credit",
+   "name": "Two-planet Flyby Maneuver",
+   "number": 12,
+   "sector": "yellow"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.13",
+   "income": "card",
+   "name": "James Clerk Maxwell Telescope",
+   "number": 13,
+   "sector": "yellow"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.14",
+   "income": "energy",
+   "name": "Reusable Rocket",
+   "number": 14,
+   "sector": "blue"
+  },
+  {
+   "cost": 3,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.15",
+   "income": "credit",
+   "name": "Iterative Engineering",
+   "number": 15,
+   "sector": "blue"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.16",
+   "income": "credit",
+   "name": "Astronaut Training Experience",
+   "number": 16,
+   "sector": "blue"
+  },
+  {
+   "cost": 0,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.17",
+   "income": "credit",
+   "name": "Paid Media Coverage",
+   "number": 17,
+   "sector": "yellow"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.18",
+   "income": "credit",
+   "name": "Contracted Research",
+   "number": 18,
+   "sector": "red"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.19",
+   "income": "energy",
+   "name": "New Assignment",
+   "number": 19,
+   "sector": "yellow"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.20",
+   "income": "card",
+   "name": "Well Executed Project",
+   "number": 20,
+   "sector": "red"
+  },
+  {
+   "cost": 0,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.21",
+   "income": "card",
+   "name": "Orbital Refueling",
+   "number": 21,
+   "sector": "blue"
+  },
+  {
+   "cost": 0,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.22",
+   "income": "credit",
+   "name": "TESS Satellite",
+   "number": 22,
+   "sector": "yellow"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.23",
+   "income": "energy",
+   "name": "Neutral Buoyancy Training",
+   "number": 23,
+   "sector": "yellow"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.24",
+   "income": "card",
+   "name": "Space Elevator",
+   "number": 24,
+   "sector": "yellow"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.25",
+   "income": "energy",
+   "name": "LIGO",
+   "number": 25,
+   "sector": "red"
+  },
+  {
+   "cost": 0,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.26",
+   "income": "credit",
+   "name": "New AI Models",
+   "number": 26,
+   "sector": "blue"
+  },
+  {
+   "cost": 0,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.27",
+   "income": "card",
+   "name": "Better Solar Panels",
+   "number": 27,
+   "sector": "red"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.28",
+   "income": "credit",
+   "name": "Restructuring",
+   "number": 28,
+   "sector": "red"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.29",
+   "income": "energy",
+   "name": "Abandoned Mission",
+   "number": 29,
+   "sector": "blue"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.30",
+   "income": "energy",
+   "name": "Akatsuki Orbiter",
+   "number": 30,
+   "sector": "blue"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.31",
+   "income": "credit",
+   "name": "Ingenuity Helicopter",
+   "number": 31,
+   "sector": "yellow"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.32",
+   "income": "credit",
+   "name": "MUREP Idea Competition",
+   "number": 32,
+   "sector": "red"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.33",
+   "income": "energy",
+   "name": "Delayed Launch",
+   "number": 33,
+   "sector": "blue"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.34",
+   "income": "energy",
+   "name": "Private Sector Investment",
+   "number": 34,
+   "sector": "red"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.35",
+   "income": "card",
+   "name": "NASA Exoplanet Archive",
+   "number": 35,
+   "sector": "yellow"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.36",
+   "income": "card",
+   "name": "Big Ear Radio Telescope",
+   "number": 36,
+   "sector": "black"
+  },
+  {
+   "cost": 0,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.37",
+   "income": "card",
+   "name": "Pandora Satellite",
+   "number": 37,
+   "sector": "yellow"
+  },
+  {
+   "cost": 1,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.38",
+   "income": "energy",
+   "name": "Space Rendezvous",
+   "number": 38,
+   "sector": "yellow"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.39",
+   "income": "credit",
+   "name": "Grand Tour Program",
+   "number": 39,
+   "sector": "red"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "data",
+     1
+    ]
+   ],
+   "id": "SA.40",
+   "income": "credit",
+   "name": "Hall-effect Thruster",
+   "number": 40,
+   "sector": "blue"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SA.41",
+   "income": "energy",
+   "name": "Exoplanet Survey",
+   "number": 41,
+   "sector": "blue"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SA.42",
+   "income": "card",
+   "name": "LOFAR Array",
+   "number": 42,
+   "sector": "yellow"
+  }
+ ],
+ "source": "docs/spec/data/expansion-transcription.json and the card pictures (owner check pending)"
+}

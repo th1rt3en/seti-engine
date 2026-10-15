@@ -28,6 +28,15 @@ def move_types() -> dict[str, list[str]]:
             rnd = random.Random(seed)
             extra = {"expansion": True, "organizations": True} if orgs else {}
             r = start(Options(players=players, seed=seed, difficulty=difficulty, **extra))
+            if orgs:  # the new species are found at once, so that their moves are played too
+                from seti_engine import species
+
+                state = r.state
+                state.species[seed % 2].species = ("arkhos", "glyphids", "amoeba")[seed % 3]
+                state.species[seed % 2].board = species.new_board(state.species[seed % 2].species)
+                state.species[seed % 2].discovery_spaces = ["p0", "p1", "p0"]
+                state.species[seed % 2].complete = True
+                r = type(r)(state=state, events=r.events, legal=r.legal)
             for _ in range(20000):
                 if not r.legal:
                     break

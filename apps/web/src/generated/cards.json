@@ -1241,6 +1241,204 @@
     "sector": "yellow",
     "species": null
   },
+  "AK.21": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "card",
+    "name": "Exterior Scan",
+    "sector": "red",
+    "species": "arkhos"
+  },
+  "AK.22": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "energy",
+    "name": "Exterior Scan",
+    "sector": "blue",
+    "species": "arkhos"
+  },
+  "AK.23": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "credit",
+    "name": "Exterior Scan",
+    "sector": "yellow",
+    "species": "arkhos"
+  },
+  "AK.24": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "energy",
+    "name": "Exterior Scan",
+    "sector": "black",
+    "species": "arkhos"
+  },
+  "AK.25": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "card",
+    "name": "Proximity Maneuvers",
+    "sector": "blue",
+    "species": "arkhos"
+  },
+  "AK.26": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "energy",
+    "name": "Proximity Maneuvers",
+    "sector": "yellow",
+    "species": "arkhos"
+  },
+  "AK.27": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "credit",
+    "name": "Proximity Maneuvers",
+    "sector": "red",
+    "species": "arkhos"
+  },
+  "AK.28": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "card",
+    "name": "Proximity Maneuvers",
+    "sector": "black",
+    "species": "arkhos"
+  },
+  "AK.29": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "card",
+    "name": "Forced Entry",
+    "sector": "yellow",
+    "species": "arkhos"
+  },
+  "AK.30": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "energy",
+    "name": "Forced Entry",
+    "sector": "red",
+    "species": "arkhos"
+  },
+  "AK.31": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "credit",
+    "name": "Forced Entry",
+    "sector": "blue",
+    "species": "arkhos"
+  },
+  "AK.32": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["explore_minor", 1]],
+    "income": "credit",
+    "name": "Forced Entry",
+    "sector": "black",
+    "species": "arkhos"
+  },
+  "AM.11": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["data", 1]],
+    "income": "energy",
+    "name": "Amoeba ET.11",
+    "sector": "red",
+    "species": "amoeba"
+  },
+  "AM.12": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["data", 1]],
+    "income": "card",
+    "name": "Amoeba ET.12",
+    "sector": "yellow",
+    "species": "amoeba"
+  },
+  "AM.13": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["data", 1]],
+    "income": "credit",
+    "name": "Amoeba ET.13",
+    "sector": "blue",
+    "species": "amoeba"
+  },
+  "AM.14": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["move", 1]],
+    "income": "card",
+    "name": "Amoeba ET.14",
+    "sector": "red",
+    "species": "amoeba"
+  },
+  "AM.15": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["publicity", 2]],
+    "income": "energy",
+    "name": "Amoeba ET.15",
+    "sector": "yellow",
+    "species": "amoeba"
+  },
+  "AM.16": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["publicity", 2]],
+    "income": "card",
+    "name": "Amoeba ET.16",
+    "sector": "blue",
+    "species": "amoeba"
+  },
+  "AM.17": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["move", 1]],
+    "income": "credit",
+    "name": "Amoeba ET.17",
+    "sector": "red",
+    "species": "amoeba"
+  },
+  "AM.18": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["data", 1]],
+    "income": "credit",
+    "name": "Amoeba ET.18",
+    "sector": "blue",
+    "species": "amoeba"
+  },
+  "AM.19": {
+    "cost": 0,
+    "deck": "alien",
+    "free": [["publicity", 2]],
+    "income": "energy",
+    "name": "Amoeba ET.19",
+    "sector": "black",
+    "species": "amoeba"
+  },
+  "AM.20": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["score", 1], ["move", 1]],
+    "income": "energy",
+    "name": "Amoeba ET.20",
+    "sector": "yellow",
+    "species": "amoeba"
+  },
   "ET.1": {
     "cost": 1,
     "deck": "alien",
@@ -1735,6 +1933,474 @@
     "name": "Orbital Monitoring",
     "sector": "yellow",
     "species": "mascamites"
+  },
+  "GL.1": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:orange", 1]],
+    "income": "card",
+    "name": "Glyphids ET.1",
+    "sector": "black",
+    "species": "glyphids"
+  },
+  "GL.10": {
+    "cost": 2,
+    "deck": "alien",
+    "free": [["glyph:red", 1]],
+    "income": "card",
+    "name": "Glyphids ET.10",
+    "sector": "blue",
+    "species": "glyphids"
+  },
+  "GL.2": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:orange", 1]],
+    "income": "energy",
+    "name": "Glyphids ET.2",
+    "sector": "blue",
+    "species": "glyphids"
+  },
+  "GL.3": {
+    "cost": 0,
+    "deck": "alien",
+    "free": [["glyph:cyan", 1]],
+    "income": "credit",
+    "name": "Glyphids ET.3",
+    "sector": "yellow",
+    "species": "glyphids"
+  },
+  "GL.4": {
+    "cost": 0,
+    "deck": "alien",
+    "free": [["glyph:black", 1]],
+    "income": "card",
+    "name": "Glyphids ET.4",
+    "sector": "red",
+    "species": "glyphids"
+  },
+  "GL.5": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:black", 1]],
+    "income": "energy",
+    "name": "Glyphids ET.5",
+    "sector": "yellow",
+    "species": "glyphids"
+  },
+  "GL.6": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:pink", 1]],
+    "income": "credit",
+    "name": "Glyphids ET.6",
+    "sector": "red",
+    "species": "glyphids"
+  },
+  "GL.7": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:blue", 1]],
+    "income": "card",
+    "name": "Glyphids ET.7",
+    "sector": "red",
+    "species": "glyphids"
+  },
+  "GL.8": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:yellow", 1]],
+    "income": "energy",
+    "name": "Glyphids ET.8",
+    "sector": "blue",
+    "species": "glyphids"
+  },
+  "GL.9": {
+    "cost": 1,
+    "deck": "alien",
+    "free": [["glyph:cyan", 1]],
+    "income": "credit",
+    "name": "Glyphids ET.9",
+    "sector": "yellow",
+    "species": "glyphids"
+  },
+  "SA.1": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "Reusable Lander",
+    "sector": "red",
+    "species": null
+  },
+  "SA.10": {
+    "cost": 4,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "energy",
+    "name": "First Human in Space",
+    "sector": "red",
+    "species": null
+  },
+  "SA.11": {
+    "cost": 3,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "card",
+    "name": "Psyche Probe",
+    "sector": "red",
+    "species": null
+  },
+  "SA.12": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "Two-planet Flyby Maneuver",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.13": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "card",
+    "name": "James Clerk Maxwell Telescope",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.14": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "energy",
+    "name": "Reusable Rocket",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.15": {
+    "cost": 3,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "Iterative Engineering",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.16": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "credit",
+    "name": "Astronaut Training Experience",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.17": {
+    "cost": 0,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "Paid Media Coverage",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.18": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "Contracted Research",
+    "sector": "red",
+    "species": null
+  },
+  "SA.19": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "energy",
+    "name": "New Assignment",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.2": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "card",
+    "name": "Tracking and Data Relay Satellite",
+    "sector": "red",
+    "species": null
+  },
+  "SA.20": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "card",
+    "name": "Well Executed Project",
+    "sector": "red",
+    "species": null
+  },
+  "SA.21": {
+    "cost": 0,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "card",
+    "name": "Orbital Refueling",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.22": {
+    "cost": 0,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "TESS Satellite",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.23": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "energy",
+    "name": "Neutral Buoyancy Training",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.24": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "card",
+    "name": "Space Elevator",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.25": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "energy",
+    "name": "LIGO",
+    "sector": "red",
+    "species": null
+  },
+  "SA.26": {
+    "cost": 0,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "New AI Models",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.27": {
+    "cost": 0,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "card",
+    "name": "Better Solar Panels",
+    "sector": "red",
+    "species": null
+  },
+  "SA.28": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "Restructuring",
+    "sector": "red",
+    "species": null
+  },
+  "SA.29": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "energy",
+    "name": "Abandoned Mission",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.3": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "energy",
+    "name": "NASA Deep Space Network",
+    "sector": "black",
+    "species": null
+  },
+  "SA.30": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "energy",
+    "name": "Akatsuki Orbiter",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.31": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "Ingenuity Helicopter",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.32": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "MUREP Idea Competition",
+    "sector": "red",
+    "species": null
+  },
+  "SA.33": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "energy",
+    "name": "Delayed Launch",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.34": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "energy",
+    "name": "Private Sector Investment",
+    "sector": "red",
+    "species": null
+  },
+  "SA.35": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "card",
+    "name": "NASA Exoplanet Archive",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.36": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "card",
+    "name": "Big Ear Radio Telescope",
+    "sector": "black",
+    "species": null
+  },
+  "SA.37": {
+    "cost": 0,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "card",
+    "name": "Pandora Satellite",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.38": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "energy",
+    "name": "Space Rendezvous",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.39": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "Grand Tour Program",
+    "sector": "red",
+    "species": null
+  },
+  "SA.4": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "Breakthrough Message",
+    "sector": "black",
+    "species": null
+  },
+  "SA.40": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "credit",
+    "name": "Hall-effect Thruster",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.41": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["move", 1]],
+    "income": "energy",
+    "name": "Exoplanet Survey",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.42": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "card",
+    "name": "LOFAR Array",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.5": {
+    "cost": 1,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "credit",
+    "name": "Servicing Mission",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.6": {
+    "cost": 2,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "card",
+    "name": "Live Landing Broadcast",
+    "sector": "blue",
+    "species": null
+  },
+  "SA.7": {
+    "cost": 3,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "energy",
+    "name": "Twin Probes",
+    "sector": "red",
+    "species": null
+  },
+  "SA.8": {
+    "cost": 3,
+    "deck": "expansion",
+    "free": [["publicity", 1]],
+    "income": "energy",
+    "name": "Quantum Data Storage",
+    "sector": "yellow",
+    "species": null
+  },
+  "SA.9": {
+    "cost": 3,
+    "deck": "expansion",
+    "free": [["data", 1]],
+    "income": "card",
+    "name": "Lunar Crater Radio Telescope",
+    "sector": "blue",
+    "species": null
   },
   "SE_EN_01": {
     "cost": 0,

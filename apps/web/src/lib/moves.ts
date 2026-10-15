@@ -74,6 +74,22 @@ export const LABELS: Record<string, Label> = {
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
   choose_quick: (m) => `Keep the quick start card ${quickText(m.card)}`,
   org_free: (m) => orgFreeLabel(m),
+  breach: () => "Breach your security card of that color (take it into your hand)",
+  skip_breach: () => "Do not breach the security card",
+  corner_pick: (m) => `Choose ${String(m.kind)}: gain it for each card in your hand with that icon in its free-action corner`,
+  decipher: (m) =>
+    `Place the ${String(m.glyph)} glyph token in the ${String(m.row)} row, slot ${Number(m.index) + 1}, and gain its resource`,
+  glyph_group: (m) => `Gain the resources of glyph group ${Number(m.group) + 1}`,
+  pick_organelle: (m) => `Gain the bonus of the organelle on space ${String(m.space)}`,
+  amoeba_remove: (m) => `Remove your marker from the ${String(m.color)} space ${Number(m.index) + 1} of the Amoeba board`,
+  spend_credit: () => "Spend 1 credit for 2 VP and 2 publicity",
+  spend_done: () => "Stop spending credits",
+  restructure_card: (m) => `Discard ${cardName(m.card)} and gain its income resource`,
+  restructure_done: () => "Stop discarding cards",
+  return_mission: (m) => `Return the mission ${cardName(m.card)} to your hand`,
+  discard_corner: (m) => `Discard ${cardName(m.card)} and gain its free-action corner 3 times`,
+  discard_corner_none: () => "No card to discard",
+  od_step: (m) => `Orbital Dynamics: move probe ${String(m.probe)} one step`,
   org_mark: (m) => `Mark the ${String(m.space).replace("_", " ")} reward space on your organization and gain it`,
   org_skip: () => "Do not mark a reward space",
   org_main: (m) =>
@@ -167,6 +183,8 @@ export const FREE_ACTION_TYPES = new Set([
   "complete_mission",
   "deliver_sample",
   "org_free",
+  "decipher",
+  "od_step",
 ]);
 
 export function groupMoves(moves: Move[], pending: boolean, answeringFree = false): { title: string; moves: Move[] }[] {

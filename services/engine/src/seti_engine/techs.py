@@ -52,7 +52,7 @@ def research_moves(s: GameState, p: PlayerState, category: str | None = None) ->
     ]
 
 
-def take_tech(s: GameState, p: PlayerState, stack: int, events: Events, tile_bonus: bool = True, first_bonus: bool = True) -> None:
+def take_tech(s: GameState, p: PlayerState, stack: int, events: Events, tile_bonus: bool = True, first_bonus: bool = True) -> str:
     """TECHACT-02 to TECHACT-05 (the rotation is done by the caller first). `tile_bonus` False is card #81 (FAQ-C081)."""
     st = s.tech_stacks[stack]
     tile = st.tiles.pop(0)
@@ -70,6 +70,7 @@ def take_tech(s: GameState, p: PlayerState, stack: int, events: Events, tile_bon
     if st.category == "computer":
         free = [pos for pos in COMPUTER_SLOTS if pos not in p.computer_techs]
         s.pending.append(Decision(kind="computer_slot", player=p.index, data={"tech": name, "slots": free}))
+    return tile
 
 
 def _stack_extra(category: str, glyph: str) -> list[dict[str, Any]]:

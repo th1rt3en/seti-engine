@@ -91,8 +91,8 @@ def test_removing_a_marker_gains_the_organelles_of_its_section() -> None:  # EXP
 
 
 def test_the_amoeba_cards() -> None:  # EXP-AMO-04
-    assert all(cards.playable(c) for c in ("AM.11", "AM.12", "AM.13", "AM.15", "AM.16", "AM.17", "AM.18", "AM.19"))
-    assert not cards.playable("AM.14") and not cards.playable("AM.20")  # waiting for the owner's check (A-049)
+    assert all(cards.playable(c) for c in ("AM.11", "AM.12", "AM.13", "AM.14", "AM.15", "AM.16", "AM.17", "AM.18", "AM.19"))
+    assert cards.playable("AM.14") and not cards.playable("AM.20")  # AM.20 waits for the owner's check of its third icon (A-049)
     s = discovered()
     p = s.players[0]
     s.species[0].board["pink"][0].append(0)
@@ -129,3 +129,16 @@ def test_random_games_with_amoeba_finish() -> None:  # EXP-AMO-01 to EXP-AMO-05,
                 break
             s = apply(s, rng.choice([m for m in legal_moves(s) if m["type"] != "undo"])).state
         assert s.phase == "finished" and s.species[0].discovered
+
+
+def test_a_mission_circle_can_give_an_organelle() -> None:  # AM.17, EXP-AMO-04
+    from seti_engine import cards
+    from seti_engine.models import MissionState
+
+    s = discovered()
+    s.current_player = 0
+    p = s.players[0]
+    p.missions.append(MissionState(card="AM.17", kind="trigger", used=[False, False, False]))
+    cards.fire(s, p, [{"e": "tech", "cat": "probe"}], [])
+    r = apply(s, {"type": "cover", "card": "AM.17", "circle": 0})
+    assert r.state.pending[0].kind == "organelle" and r.state.pending[0].data["color"] == "yellow"
