@@ -737,6 +737,7 @@ export function GameClient({
               offers={setupOffers}
               selected={pickedOffer}
               kept={me?.quick_start.length ?? 0}
+              quickOffered={(me?.offered_quick ?? []).filter((q) => q !== "?")}
               onSelect={(id) => setPickedOffer(pickedOffer === id ? null : id)}
               onConfirm={() => {
                 if (setupMove) {

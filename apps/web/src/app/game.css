@@ -1951,7 +1951,6 @@ button:disabled {
 .setupcards {
   display: grid;
   gap: 18px;
-  flex: 1;
   align-content: start;
 }
 .setupcards.orgs {
@@ -1991,6 +1990,7 @@ button:disabled {
   gap: 4px;
 }
 .setupbar {
+  margin-top: auto;
   position: sticky;
   bottom: 0;
   display: flex;
@@ -2057,4 +2057,18 @@ button:disabled {
 .settingspanel .stack {
   display: grid;
   gap: 6px;
+}
+
+/* the quick start cards shown under the organizations */
+.setupquick h3 {
+  margin: 8px 0 0;
+}
+.setupcards.quick.small {
+  grid-template-columns: repeat(auto-fit, minmax(min(30%, 220px), 260px));
+  justify-content: start;
+}
+.setupcards.quick.small img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
