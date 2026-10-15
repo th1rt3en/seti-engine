@@ -101,17 +101,43 @@ export function orbitSlot(planet: string, k: number): { x: number; y: number } |
   return { x: pos.x + radius * Math.cos(angle), y: pos.y + radius * Math.sin(angle) };
 }
 
-/** The moons, by the lower-case first word of their name in the engine's data. */
+// The landing spaces, measured on the 1800 px wide picture of the board and scaled to board pixels.
+const F = BOARD.w / 1800;
+const at = (x: number, y: number): { x: number; y: number } => ({ x: x * F, y: y * F });
+/**
+ * The round landing spaces of each planet: the first lander covers the first circle (its data bonus), the second lander the second (Mars has
+ * two). `hex` is the landing reward of the planet; landers beyond the circles lie to the right of it.
+ */
+export const LAND_SPACES: Record<string, { circles: { x: number; y: number }[]; hex: { x: number; y: number } }> = {
+  mercury: { circles: [at(163, 886)], hex: at(197, 860) },
+  venus: { circles: [at(195, 608)], hex: at(240, 577) },
+  mars: { circles: [at(482, 652), at(457, 607)], hex: at(510, 605) },
+  jupiter: { circles: [at(727, 393)], hex: at(790, 355) },
+  saturn: { circles: [at(1108, 545)], hex: at(1148, 503) },
+  uranus: { circles: [at(1483, 540)], hex: at(1517, 505) },
+  neptune: { circles: [at(1522, 843)], hex: at(1567, 803) },
+};
+
+/** Where the `k`-th lander (0 is the first) of a planet lies: on its landing circle, the later ones beside the landing reward. */
+export function landSlot(planet: string, k: number): { x: number; y: number } | null {
+  const land = LAND_SPACES[planet];
+  if (!land) return null;
+  const circle = land.circles[k];
+  if (circle) return circle;
+  return { x: land.hex.x + 100 * (k - land.circles.length + 1), y: land.hex.y + 70 };
+}
+
+/** The moons, by the lower-case first word of their name in the engine's data: the round landing space of each. */
 export const MOON: Record<string, { x: number; y: number }> = {
-  io: { x: 1871, y: 735 },
-  europa: { x: 1838, y: 856 },
-  callisto: { x: 1366, y: 1024 },
-  ganymede: { x: 1641, y: 1004 },
-  enceladus: { x: 2489, y: 996 },
-  titan: { x: 2441, y: 1178 },
-  titania: { x: 3128, y: 1066 },
-  triton: { x: 3198, y: 1762 },
-  phobos: { x: 814, y: 1375 },
+  io: at(953, 336),
+  europa: at(944, 430),
+  callisto: at(697, 516),
+  ganymede: at(843, 507),
+  enceladus: at(1287, 505),
+  titan: at(1252, 585),
+  titania: at(1618, 535),
+  triton: at(1657, 893),
+  phobos: at(434, 701),
 };
 
 /** The three discovery spaces (pink, yellow, blue) of each alien species: the left group is the first species, the right group the second. */

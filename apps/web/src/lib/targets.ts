@@ -13,6 +13,7 @@ import {
   RING_BOUNDS,
   RING_RADIUS,
   alienColumn,
+  landSlot,
   orbitSlot,
   polar,
   sectorDegrees,
@@ -120,13 +121,13 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       if (!st || !pos) return;
       if (n.moon) {
         const at = MOON[moonKey(n.moon)];
-        if (at) spot = { id: `moon:${n.moon}`, shape: { kind: "circle", x: at.x, y: at.y + 20, r: 78 } };
+        if (at) spot = { id: `moon:${n.moon}`, shape: { kind: "circle", x: at.x, y: at.y, r: 62 } };
       } else if (n.action === "orbit") {
         const at = orbitSlot(n.planet, st.orbiters.length) ?? { x: pos.x, y: pos.y };
-        spot = { id: `orbit:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y + 10, r: 62 } };
+        spot = { id: `orbit:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y, r: 62 } };
       } else {
-        const k = st.landers.length;
-        spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: pos.x - pos.r * 0.55 + k * 84, y: pos.y + pos.r * 0.22 + 20, r: 76 } };
+        const at = landSlot(n.planet, st.landers.length) ?? pos;
+        spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y, r: 62 } };
       }
     } else if (n.oumuamua_tile) {
       // the data slot of the 'Oumuamua tile on disc 3: it turns with the disc (the turn of the disc is in `view.state.disc_angles`)
