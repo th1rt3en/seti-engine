@@ -583,6 +583,34 @@ export function BoardView({
           });
         })}
 
+        {/* the glyph tokens that still lie on the board (EXP-GLY-03): beside each planet, on each sector, on the wells of the Glyphids board
+            (the ones on tech stacks are drawn on the stacks) */}
+        {glyphSlot >= 0
+          ? Object.entries(((s.species[glyphSlot]?.extra ?? {}) as GlyphExtra).tokens ?? {}).map(([where, glyph]) => {
+              const href = glyphToken(glyph);
+              if (!href) return null;
+              const [kind = "", a = "", b = ""] = where.split(":");
+              let at: { x: number; y: number } | null = null;
+              if (kind === "planet") {
+                const pos = PLANET[a];
+                if (pos) at = { x: pos.x - pos.r * 0.55, y: pos.y + pos.r * 0.85 };
+              } else if (kind === "sector") {
+                const sec = s.sectors[Number(a)];
+                const slot = sec ? SLOTS[sec.star] : undefined;
+                if (slot) at = polar(slot.r * STAR.scale + 130, sectorDegrees(Number(a)));
+              } else if (kind === "board") {
+                const spot = SPECIES_SPACES.glyphids?.[a]?.[Number(b)];
+                if (spot) at = onAlienBoard(glyphSlot, spot[0], spot[1]);
+              }
+              if (!at) return null;
+              return (
+                <image key={`gt-${where}`} href={href} x={at.x - 40} y={at.y - 46} width={80} height={92}>
+                  <title>{`${glyph} glyph token (${kind})`}</title>
+                </image>
+              );
+            })
+          : null}
+
         {/* the markers on the spaces of a species board that have been taken, and on its overflow spaces (under the discovery spaces) */}
         {s.species.map((sp, i) => {
           const marks: ReactNode[] = [];
@@ -816,7 +844,7 @@ function GoldZoom({
   );
 }
 
-type GlyphExtra = { sides?: number[]; top?: (string | null)[]; bottom?: (string | null)[] };
+type GlyphExtra = { sides?: number[]; top?: (string | null)[]; bottom?: (string | null)[]; tokens?: Record<string, string> };
 
 /** The translation board of the Glyphids above their board: the arrangement of the strips that was drawn, and the glyph tokens in its holes. */
 function GlyphTrack({ slot, extra }: { slot: number; extra: GlyphExtra }) {

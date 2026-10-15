@@ -1,6 +1,7 @@
-import { TECH_INFO } from "@/lib/techs";
 // The twelve tech stacks, each cut out of the base board and turned the right way up, one above the other. On every stack lies its top tile
 // (the bonus on it is what the next player to take it gets), the +2 tile while the first taker has not come, and a count of the tiles left.
+import { glyphToken } from "@/lib/glyphids";
+import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
 
@@ -30,6 +31,11 @@ export interface TechPick {
 
 export function TechStacks({ view, pick }: { view: View; pick?: TechPick }) {
   const stacks = view.state.tech_stacks;
+  // the glyph tokens that lie on tech stacks with their +2 tile (EXP-GLY-03)
+  const glyphs = (view.state.species.find((sp) => sp.discovered && sp.species === "glyphids")?.extra.tokens ?? {}) as Record<
+    string,
+    string
+  >;
   return (
     <section className="techstacks" aria-label="Tech stacks">
       {CATEGORIES.map((cat) => (
@@ -68,6 +74,17 @@ export function TechStacks({ view, pick }: { view: View; pick?: TechPick }) {
                       width={pocket.w * 0.92}
                       height={pocket.w * 0.92 * (120 / 179)}
                     />
+                  ) : null}
+                  {glyphs[`tech:${index}`] ? (
+                    <image
+                      href={glyphToken(glyphs[`tech:${index}`] ?? "")}
+                      x={pocket.x - 6}
+                      y={pocket.y + pocket.h - 74}
+                      width={58}
+                      height={66}
+                    >
+                      <title>{`${glyphs[`tech:${index}`]} glyph token: taken with this tech`}</title>
+                    </image>
                   ) : null}
                   <g transform={`translate(${pocket.x + pocket.w - 30} ${pocket.y + pocket.h - 30})`}>
                     <circle r={26} fill="rgba(8,12,26,0.88)" stroke="#fff" strokeWidth={4} />
