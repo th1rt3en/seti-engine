@@ -20,11 +20,15 @@ const SLOT_POSITIONS = [0, 2, 4, 5];
 /** The picture is the colorful panel of the printed board; the page adds a header with the income above it and the missions below it. */
 const HEAD = 96;
 /** The six computer spaces on the picture of the board (the centre of each, all in one row). */
-const SPACE = { x: [345, 423, 503, 576, 658, 743], y: HEAD + 225 };
+const SPACE = { x: [346, 420, 502, 572, 660, 747], y: HEAD + 227 };
 /** The diameter of each computer space on the picture: the spaces of the publicity and the income icons (2nd and 4th) are smaller. The data token and the
  * highlight of the free action "place data" are drawn to fit them, centred on the space. */
 const SPACE_DIAMETER = [40, 32, 40, 32, 40, 40];
 const TILE = { w: 84, h: 118 };
+/** On the picture of a computer tech (175 x 246) its upper circle, which lies over the printed space, is centred 30.5% down; the dashed circle for the
+ * data of its lower space is centred 70% down and is as wide as the upper one. */
+const TILE_UPPER = 0.305;
+const TILE_LOWER = 0.7;
 /** The columns of the probe and telescope techs on the picture, by glyph (dot, link, branch, cross). */
 const TECH_X: Record<"probe" | "telescope", number[]> = { probe: [108, 192, 343, 432], telescope: [628, 782, 866, 955] };
 const TECH_Y = HEAD + 32;
@@ -58,7 +62,7 @@ export interface LowerChoice {
 /** One slot of the computer for a tech: the tech that lies there with the data on its lower space, or nothing (when it can be picked it is highlighted). */
 function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; pos: number; choice?: SlotChoice; lower?: LowerChoice }) {
   const x = (SPACE.x[pos] ?? 0) - TILE.w / 2;
-  const y = SPACE.y - 46;
+  const y = SPACE.y - TILE.h * TILE_UPPER;
   const placed = p.computer_techs[String(pos)];
   const choosable = choice?.slots.includes(pos) ?? false;
   const front = placed ? FRONTS[placed.tech] : undefined;
@@ -67,7 +71,14 @@ function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; 
       {front ? (
         <>
           <image href={front} x={x} y={y} width={TILE.w} height={TILE.h} />
-          {placed?.lower_filled ? <DataToken x={x + TILE.w / 2} y={y + TILE.h * 0.82} size={34} title="Data on the lower space" /> : null}
+          {placed?.lower_filled ? (
+            <DataToken
+              x={x + TILE.w / 2}
+              y={y + TILE.h * TILE_LOWER}
+              size={(SPACE_DIAMETER[0] ?? 40) / 0.88}
+              title="Data on the lower space"
+            />
+          ) : null}
           <title>{`${TECH_INFO[placed?.tech ?? ""]?.name ?? placed?.tech}: ${TECH_INFO[placed?.tech ?? ""]?.effect ?? ""}`}</title>
         </>
       ) : null}
@@ -81,7 +92,13 @@ function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; 
           onClick={() => lower.onPlace(pos)}
           onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && lower.onPlace(pos)}
         >
-          <circle cx={x + TILE.w / 2} cy={y + TILE.h * 0.82} r={24} className="spotshape" style={{ strokeWidth: 5 }} />
+          <circle
+            cx={x + TILE.w / 2}
+            cy={y + TILE.h * TILE_LOWER}
+            r={(SPACE_DIAMETER[0] ?? 40) / 2 + 3}
+            className="spotshape"
+            style={{ strokeWidth: 5 }}
+          />
           <title>Place 1 data here (free action)</title>
         </g>
       ) : null}
