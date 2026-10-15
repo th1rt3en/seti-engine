@@ -192,6 +192,7 @@ export function GameView({
         <aside className="col-aux" aria-label="Publicity track and tech stacks">
           <PublicityTrack view={view} names={names} />
           <TechStacks view={view} pick={tech} />
+          <RowDock view={view} row={row} inline />
           <OrgPanel view={view} names={names} spots={spots} />
           <ArkhosPanel view={view} names={names} spots={spots} />
           <GlyphidsPanel view={view} names={names} spots={spots} />

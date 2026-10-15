@@ -1825,3 +1825,29 @@ button:disabled {
   background: rgba(110, 240, 165, 0.55);
   border-style: solid;
 }
+
+/* the card row: below the tech stacks on a wide screen (three cards in one row), a floating panel on a narrow one */
+.rowinline {
+  display: none;
+  padding: 8px;
+}
+.rowinline .rowbody {
+  padding: 0;
+  overflow: visible;
+}
+.rowinline .rowtitle {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.rowinline .rowbody .cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+@media (min-width: 1100px) {
+  .rowinline {
+    display: block;
+  }
+  .rowdock.floating {
+    display: none;
+  }
+}

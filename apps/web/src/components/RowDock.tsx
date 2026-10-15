@@ -14,11 +14,12 @@ export interface RowSelection {
   onSelect: (source: string) => void;
 }
 
-export function RowDock({ view, row }: { view: View; row?: RowSelection }) {
+/** `inline`: on a wide screen the card row lies in the column of the tech stacks, below them, all cards in one row; the floating panel serves the narrow screens. */
+export function RowDock({ view, row, inline }: { view: View; row?: RowSelection; inline?: boolean }) {
   const [folded, toggle, set] = useDock("row", () => window.innerWidth < 1700);
   const s = view.state;
   const wanted = (row?.selectable.length ?? 0) > 0;
-  const shut = folded;
+  const shut = inline ? false : folded;
   // the panel opens by itself when a card of it can be picked (to buy it, or to take it in a trade), and can be folded again at any time
   const wasWanted = useRef(false);
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when a card of the row becomes pickable
@@ -27,8 +28,8 @@ export function RowDock({ view, row }: { view: View; row?: RowSelection }) {
     wasWanted.current = wanted;
   }, [wanted]);
   return (
-    <aside className={shut ? "rowdock dock folded" : "rowdock dock"} aria-label="Card row">
-      <button type="button" className="handtab" onClick={toggle} aria-expanded={!shut}>
+    <aside className={inline ? "rowinline card" : shut ? "rowdock floating dock folded" : "rowdock floating dock"} aria-label="Card row">
+      <button type="button" className="handtab" onClick={toggle} aria-expanded={!shut} hidden={inline}>
         <span>
           Card row{" "}
           <span className="muted small">
@@ -39,6 +40,14 @@ export function RowDock({ view, row }: { view: View; row?: RowSelection }) {
       </button>
       {shut ? null : (
         <div className="rowbody">
+          {inline ? (
+            <h3 className="rowtitle">
+              Card row{" "}
+              <span className="muted small">
+                deck {view.counts.deck} · discard {s.discard.length}
+              </span>
+            </h3>
+          ) : null}
           <div className="cards">
             {s.card_row.length === 0 ? <span className="muted">empty</span> : null}
             {s.card_row.map((c, i) => {
