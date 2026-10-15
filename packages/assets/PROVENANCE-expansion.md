@@ -16,6 +16,7 @@ the repository; the original files are not. Do not edit by hand.
 | `space-agencies-rival-action-cards.jpg` | `apps/web/public/assets/expansion/solo/rival-NN.<hash>.webp` (4 cells) |
 | `space-agencies-organizations.jpg` | `apps/web/public/assets/expansion/organizations/org-NN.<hash>.webp` (11 cells) |
 | `space-agencies-main-deck-cards.jpg` (Pandora Satellite, the data icon in its text) | `/assets/expansion/tokens/icon-data.7160fadb9d.webp` |
+| `alien-board-glyphids-track-variant-a.png` (above y 430) and `-b.png` (below) | `/assets/expansion/boards/glyphids-track-d.8b7c440c1b.webp` (composed) |
 | `quickstart-card-back.jpg` | `/assets/expansion/quickstart/back.a9e2052ecf.webp` |
 | `glyphid-card-back.jpg` | `/assets/expansion/glyphids/card-back.e8e4204bb9.webp` |
 | `amoeba-card-back.jpg` | `/assets/expansion/amoeba/card-back.3265ac53e7.webp` |
