@@ -1,22 +1,22 @@
 // Small symbols for the resources: credit, energy and cards (a card of the display and a card of the deck have different symbols).
 // Drawn here until the owner supplies the printed symbols (docs/asset-gaps.md).
 import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
+
+/** The printed symbols supplied by the owner (credit, energy, publicity, exofossil, victory points). */
+const ICON = expansionAssets as Record<string, string>;
+
+function Printed({ name, label, size }: { name: string; label: string; size: number }) {
+  return (
+    <img src={ICON[`tokens/icon-${name}`]} alt={label} title={label} width={size} height={size} className="resicon" decoding="async" />
+  );
+}
 
 const SIZE = 22;
 
 /** The globe of the scoring track: the icon of victory points, wherever a score is shown. */
 export function ScoreIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <img
-      src={assets.scoreIcon}
-      alt="points"
-      title="Victory points"
-      width={size}
-      height={size}
-      className="resicon scoreicon"
-      decoding="async"
-    />
-  );
+  return <Printed name="score" label="Victory points" size={size} />;
 }
 
 /** The hexagon icon of a main action, as printed on the player aid. */
@@ -27,24 +27,11 @@ export function ActionIcon({ name, size = 30 }: { name: string; size?: number })
 }
 
 export function CreditIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="credit" className="resicon">
-      <title>Credit</title>
-      <circle cx="12" cy="12" r="10.5" fill="#e0b000" stroke="#7a5a00" strokeWidth="1.5" />
-      <circle cx="12" cy="12" r="7.2" fill="none" stroke="#fff3b0" strokeWidth="1.3" />
-      <path d="M14.6 8.6A3.6 3.6 0 1 0 14.6 15.4" fill="none" stroke="#5c4300" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
+  return <Printed name="credit" label="Credit" size={size} />;
 }
 
 export function EnergyIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="energy" className="resicon">
-      <title>Energy</title>
-      <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill="#3fae49" stroke="#1f6b27" strokeWidth="1.5" />
-      <path d="M13.5 3.5 6.5 13.2h4.4L9.8 20.5l7.7-10.2h-4.6z" fill="#fff" />
-    </svg>
-  );
+  return <Printed name="energy" label="Energy" size={size} />;
 }
 
 /** A card of the card row (the display): a card with the row's three cards beside it. */
@@ -77,14 +64,7 @@ export function DeckCardIcon({ size = SIZE }: { size?: number }) {
 
 /** Publicity: the red pennant with a microphone, as printed. */
 export function PublicityIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="publicity" className="resicon">
-      <title>Publicity</title>
-      <path d="M2 3h15l5 9-5 9H2z" fill="#e0452f" stroke="#8a2112" strokeWidth="1.4" strokeLinejoin="round" />
-      <rect x="9" y="6" width="5" height="9" rx="2.5" fill="#fff" />
-      <path d="M7.5 12a4.5 4.5 0 0 0 9 0M12 16.5V19" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
+  return <Printed name="publicity" label="Publicity" size={size} />;
 }
 
 /** A data token: the blue glossy disc. */
@@ -114,24 +94,21 @@ export function AlienCardIcon({ size = SIZE }: { size?: number }) {
 
 /** An exofossil of 'Oumuamua. */
 export function ExofossilIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="exofossil" className="resicon">
-      <title>Exofossil</title>
-      <ellipse cx="12" cy="12" rx="10" ry="7" fill="#b89a6a" stroke="#6b5530" strokeWidth="1.4" transform="rotate(-20 12 12)" />
-      <path d="M5 13c3-6 9-8 14-4" fill="none" stroke="#6b5530" strokeWidth="1.2" />
-    </svg>
-  );
+  return <Printed name="exofossil" label="Exofossil" size={size} />;
 }
 
 /** A signal token of the Space Agencies expansion. */
 export function SignalTokenIcon({ size = SIZE }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="signal token" className="resicon">
-      <title>Signal token</title>
-      <circle cx="12" cy="12" r="10" fill="#7c4dff" stroke="#3b1f99" strokeWidth="1.4" />
-      <path d="M7 12a5 5 0 0 1 10 0M9.500 12a2.500 2.500 0 0 1 5 0" fill="none" stroke="#fff" strokeWidth="1.500" strokeLinecap="round" />
-      <circle cx="12" cy="12.500" r="1.200" fill="#fff" />
-    </svg>
+    <img
+      src={ICON["tokens/token-signal"]}
+      alt="Signal token"
+      title="Signal token"
+      width={size}
+      height={size}
+      className="resicon"
+      decoding="async"
+    />
   );
 }
 

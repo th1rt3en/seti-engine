@@ -1,6 +1,7 @@
+import assets from "../generated/assets.json";
 // An Anomaly token on the outermost ring of the solar system (ALIEN-ANO-01): a hexagon in the colour of its life trace column with the reward of the
 // side that is up. No picture of the token is among the assets yet, so it is drawn (docs/asset-gaps.md); a picture can replace the hexagon here.
-import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
 import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, PublicityIcon } from "./Icons";
 
 export type AnomalyToken = { sector: number; color: string; side: number; reward?: { t: string; n: number }[] };
@@ -8,7 +9,7 @@ export type AnomalyToken = { sector: number; color: string; side: number; reward
 const COLORS: Record<string, string> = { pink: "#e0559a", yellow: "#f2c230", blue: "#3a9bff" };
 const ICONS: Record<string, (size: number) => React.ReactNode> = {
   // the points icon is a picture, which an <svg> draws with <image>
-  vp: (s) => <image href={assets.scoreIcon} width={s} height={s} />,
+  vp: (s) => <image href={(expansionAssets as Record<string, string>)["tokens/icon-score"]} width={s} height={s} />,
   credit: (s) => <CreditIcon size={s} />,
   energy: (s) => <EnergyIcon size={s} />,
   publicity: (s) => <PublicityIcon size={s} />,
