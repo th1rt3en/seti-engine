@@ -7,6 +7,7 @@ import { cardImage } from "@/lib/cardImages";
 // slots are highlighted and clicked.
 import { PLAYER_COLOR } from "@/lib/geometry";
 import { glyphToken } from "@/lib/glyphids";
+import { cardName } from "@/lib/moves";
 import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
@@ -154,7 +155,20 @@ function Board({
   const glyphids = view.state.species.some((sp) => sp.discovered && sp.species === "glyphids");
   const strip = glyphids ? GLYPH_STRIP : 0;
   const owned = GLYPH_KINDS.map((kind) => ({ kind, n: (p.glyphs ?? []).filter((g) => g === kind).length })).filter((o) => o.n > 0);
-  const height = HEAD + BOARD.h + strip + 26 + rows * (MISSIONS.h + 50) + 6;
+  // the cards in front of the player, in the order they were played (public): Centaurian message cards, then the Exertian cards played face down
+  const messages = p.message_cards ?? [];
+  const played = p.exertian_played ?? [];
+  const front = [
+    ...messages.map((m) => ({
+      key: `msg-${m.card}`,
+      card: m.card as string | null,
+      label: `Message card ${cardName(m.card)}: marker at ${m.target} points`,
+    })),
+    ...played.map((_, i) => ({ key: `exo-${i}`, card: null, label: `Exertian card played face down (${i + 1})` })),
+  ];
+  const frontRows = Math.ceil(front.length / 6);
+  const frontY = HEAD + BOARD.h + strip + 26 + rows * (MISSIONS.h + 50);
+  const height = frontY + (frontRows > 0 ? 40 + frontRows * (MISSIONS.h + 30) : 0) + 6;
   return (
     <svg viewBox={`0 0 ${BOARD.w} ${height}`} className="playerboard" role="img" aria-label={`The board of player ${player + 1}`}>
       <PieceDefs />
@@ -279,6 +293,30 @@ function Board({
               </text>
             </g>
           ))}
+        </g>
+      ) : null}
+
+      {front.length > 0 ? (
+        <g>
+          <text x={MISSIONS.x} y={frontY + 22} className="pbcardtitle">
+            In front of the player, in the order played
+          </text>
+          {front.map((f, i) => {
+            const x = MISSIONS.x + (i % 6) * (MISSIONS.w + MISSIONS.gap);
+            const y = frontY + 40 + Math.floor(i / 6) * (MISSIONS.h + 30);
+            const src = f.card ? cardImage(f.card) : assets.cardBack;
+            return (
+              <g key={f.key}>
+                {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}
+                {f.card ? (
+                  <text x={x + MISSIONS.w / 2} y={y + MISSIONS.h + 20} textAnchor="middle" className="pbhint">
+                    message
+                  </text>
+                ) : null}
+                <title>{f.label}</title>
+              </g>
+            );
+          })}
         </g>
       ) : null}
 

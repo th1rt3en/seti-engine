@@ -2226,3 +2226,34 @@ button:disabled {
   border-radius: 6px;
   padding: 2px 5px;
 }
+
+/* the Exertian cards have a tab of their own only on a phone */
+.exertdock {
+  display: none;
+}
+@media (max-width: 760px) {
+  .exertdock {
+    display: block;
+  }
+  .game:has(.exertdock) .dock > .handtab {
+    width: 20%;
+  }
+  .game:has(.exertdock) .rowdock > .handtab {
+    left: 20%;
+  }
+  .game:has(.exertdock) .exertdock > .handtab {
+    left: 40%;
+  }
+  .game:has(.exertdock) .trackerdock > .handtab {
+    left: 60%;
+  }
+  .game:has(.exertdock) .movelog > .handtab {
+    left: 80%;
+  }
+}
+/* the cards in front of a player on the board: message cards and Exertian cards played face down */
+.pbcardtitle {
+  fill: #cfdcf3;
+  font-size: 22px;
+  font-weight: 700;
+}
