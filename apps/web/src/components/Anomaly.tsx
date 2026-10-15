@@ -1,6 +1,7 @@
+import { CENTER } from "@/lib/geometry";
 import assets from "../generated/assets.json";
 // An Anomaly token on the outermost ring of the solar system (ALIEN-ANO-01): a hexagon in the colour of its life trace column with the reward of the
-// side that is up. No picture of the token is among the assets yet, so it is drawn (docs/asset-gaps.md); a picture can replace the hexagon here.
+// side that is up, drawn with the pictures the owner supplied (`anomalyTokens` in assets.json); a hexagon is drawn only if a picture is missing.
 import expansionAssets from "../generated/expansion-assets.json";
 import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, PublicityIcon } from "./Icons";
 
@@ -26,6 +27,8 @@ const NAMES: Record<string, string> = {
   card_any: "card",
   card: "card",
 };
+const PICTURES = (assets as unknown as { anomalyTokens?: Record<string, string> }).anomalyTokens ?? {};
+const W = 200; // the picture of a token on the board (264 x 159 pixels, shown at this width)
 const R = 70;
 const HEX = Array.from({ length: 6 }, (_, k) => {
   const a = (Math.PI / 3) * k + Math.PI / 6;
@@ -37,6 +40,20 @@ export function AnomalyTokenView({ token, at }: { token: AnomalyToken; at: { x: 
   const colour = COLORS[token.color] ?? "#ffffff";
   const reward = token.reward ?? [];
   const what = reward.map((r) => `${r.n} ${NAMES[r.t] ?? r.t}`).join(" and ");
+  const picture = PICTURES[`${token.color}-${token.side}`];
+  if (picture) {
+    // the oval lies along the ring (its long side tangent to it), turned so that the reward is not upside down
+    let turn = (Math.atan2(at.y - CENTER.y, at.x - CENTER.x) * 180) / Math.PI + 90;
+    turn = ((turn % 360) + 360) % 360;
+    if (turn > 90 && turn < 270) turn -= 180;
+    const h = (W * 159) / 264;
+    return (
+      <g transform={`translate(${at.x} ${at.y}) rotate(${turn.toFixed(1)})`}>
+        <title>{`Anomaly (${token.color}): when Earth reaches this sector, the player with the highest ${token.color} trace gains ${what || "its reward"}`}</title>
+        <image href={picture} x={-W / 2} y={-h / 2} width={W} height={h} />
+      </g>
+    );
+  }
   return (
     <g transform={`translate(${at.x} ${at.y})`}>
       <title>{`Anomaly (${token.color}): when Earth reaches this sector, the player with the highest ${token.color} trace gains ${what || "its reward"}`}</title>
