@@ -3,6 +3,7 @@
 // It takes over the whole screen, on a phone too: the organization boards keep their rectangular shape, and the player clicks one and confirms.
 import { cardImage } from "@/lib/cardImages";
 import { ORG_NAMES } from "@/lib/moves";
+import { useState } from "react";
 import organizations from "../generated/organizations.json";
 
 const ORGS = organizations as unknown as Record<string, { name: string; abilities: Record<string, string> }>;
@@ -12,6 +13,7 @@ export function SetupChoice({
   offers,
   selected,
   kept,
+  quickOffered = [],
   onSelect,
   onConfirm,
 }: {
@@ -20,10 +22,24 @@ export function SetupChoice({
   selected: string | null;
   /** How many quick start cards the player has kept already (they keep 2). */
   kept: number;
+  /** The quick start cards that were dealt to the player: shown under the organizations, so that the choice can take them into account. */
+  quickOffered?: string[];
   onSelect: (id: string) => void;
   onConfirm: () => void;
 }) {
   const org = kind === "org";
+  // the player can put the choice aside to look at the board (the neutral cards, the objectives, the planets) and bring it back
+  const [aside, setAside] = useState(false);
+  if (aside) {
+    return (
+      <div className="setupaside" role="region" aria-label="The choice is put aside">
+        <span>{org ? "Choosing your organization" : `Choosing quick start card ${kept + 1} of 2`}</span>
+        <button type="button" className="primary" onClick={() => setAside(false)}>
+          Back to the choice
+        </button>
+      </div>
+    );
+  }
   return (
     <div
       className="setupchoice"
@@ -61,7 +77,21 @@ export function SetupChoice({
             );
           })}
         </div>
+        {org && quickOffered.length > 0 ? (
+          <section className="setupquick" aria-label="Your quick start cards">
+            <h3>Your quick start cards</h3>
+            <p className="muted small">You will keep two of these three after choosing your organization.</p>
+            <div className="setupcards quick small">
+              {quickOffered.map((id) => (
+                <img key={id} src={cardImage(id)} alt={`Quick start card ${id}`} />
+              ))}
+            </div>
+          </section>
+        ) : null}
         <div className="setupbar">
+          <button type="button" className="secondary big" onClick={() => setAside(true)} title="Hide the choice to look at the board">
+            View the board
+          </button>
           <button type="button" className="primary big" disabled={selected === null} onClick={onConfirm}>
             {org ? "Take this organization" : "Keep this card"}
           </button>
