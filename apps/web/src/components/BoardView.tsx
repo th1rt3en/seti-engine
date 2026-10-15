@@ -438,7 +438,7 @@ export function BoardView({
                 </image>
               </g>
             ) : (
-              <ProbePiece key={p.id} x={at.x + dx} y={at.y + dy} size={112} color={color(p.player)} title={title} />
+              <ProbePiece key={p.id} x={at.x + dx} y={at.y + dy} size={100} color={color(p.player)} title={title} />
             );
             return pick ? (
               <g
