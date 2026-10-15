@@ -36,7 +36,7 @@ import {
   scoreDegrees,
   sectorDegrees,
 } from "@/lib/geometry";
-import { glyphToken, holeAt, trackBox } from "@/lib/glyphids";
+import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
 import { type Spot, onAlienBoard } from "@/lib/targets";
@@ -620,7 +620,7 @@ export function BoardView({
                 // beside the first data token (the counter-clockwise end of the slot), clear of the capsules where the winners of the sector put their markers
                 if (slot) at = polar(slot.r * STAR.scale + 80, sectorDegrees(Number(a)) + slot.hi + 3);
               } else if (kind === "board") {
-                const spot = SPECIES_SPACES.glyphids?.[a]?.[Number(b)];
+                const spot = WELL_SLOTS[a]?.[Number(b)];
                 if (spot) at = onAlienBoard(glyphSlot, spot[0], spot[1]);
               }
               if (!at) return null;

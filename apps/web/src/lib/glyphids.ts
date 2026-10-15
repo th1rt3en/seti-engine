@@ -42,3 +42,13 @@ export function holeAt(slot: number, row: "top" | "bottom", index: number): { x:
   const box = trackBox(slot);
   return { x: box.x + hole[0] * box.k, y: box.y + hole[1] * box.k };
 }
+
+/**
+ * The big slots of the Glyphids board where a glyph token lies (EXP-GLY-03): the upper one above the first space of each column and the lower one
+ * above its last; the small spaces under them are for the markers. Measured on the 777 x 1415 picture of the board, by the index of the space.
+ */
+export const WELL_SLOTS: Record<string, Record<number, [number, number]>> = {
+  pink: { 0: [148, 520], 3: [148, 1085] },
+  yellow: { 0: [390, 580], 3: [390, 1150] },
+  blue: { 0: [630, 515], 3: [630, 1085] },
+};
