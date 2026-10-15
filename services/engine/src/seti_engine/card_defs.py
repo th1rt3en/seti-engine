@@ -430,6 +430,9 @@ ALIEN_CARDS: dict[str, dict[str, Any]] = {
     # Promo cards (PLAN.md D23, PROMO-01 to PROMO-03)
     "SE_EN_01": {"fx": [R("pluto")], "keep": True},
     "SE_EN_02": {"mission": trig(circle(MARS_TRIGGER, pub(2)), circle(MARS_TRIGGER, vp(5)))},
+    # Promo set 2 (PROMO-04): the memory of SE EN 03 between games is not implemented (A-035, owner 2026-10-15)
+    "SE_EN_03": {"fx": [LAUNCH, R("signal_token")]},
+    "SE_DE_04": {"fx": [LAUNCH, R("dlr")]},
     # Centaurians (they cost energy; the green part resolves when the message marker is reached)
     "ET.31": {"fx": [*message(), LAUNCH], "green": [R("tuck_self")]},
     "ET.32": {"fx": [*message(), data(2)], "green": [R("tuck_self")]},
@@ -531,7 +534,7 @@ def _AM(color: str) -> Step:  # noqa: N802 - EXP-AMO-04: one organelle of the se
 
 CARDS.update(
     {
-        # Amoeba (ET.20 waits for the owner's check of its third icon, A-049)
+        # Amoeba (ET.20: the third icon is read as a pink organelle, A-049)
         "AM.11": {"fx": [card(1), _AM("pink")], "end": end("per_species_color", 2, species="amoeba", kind="pink")},
         "AM.12": {"fx": [card(1), _AM("yellow")], "end": end("per_species_color", 2, species="amoeba", kind="yellow")},
         "AM.13": {"fx": [card(1), _AM("blue")], "end": end("per_species_color", 2, species="amoeba", kind="blue")},
@@ -563,6 +566,7 @@ CARDS.update(
             "mission": trig(*(circle({"e": "trace", "kind": ANY, "species": "amoeba"}, pub(1)) for _ in range(2))),
         },
         "AM.19": {"fx": [R("amoeba_remove")]},
+        "AM.20": {"fx": [R("signal_token"), pub(1), _AM("pink")]},
     }
 )
 for _sc in ("AK.21", "AK.22", "AK.23", "AK.24", "AK.25", "AK.26", "AK.27", "AK.28", "AK.29", "AK.30", "AK.31", "AK.32"):

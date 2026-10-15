@@ -2402,6 +2402,15 @@
     "sector": "blue",
     "species": null
   },
+  "SE_DE_04": {
+    "cost": 2,
+    "deck": "promo2",
+    "free": [["publicity", 1]],
+    "income": "energy",
+    "name": "DLR",
+    "sector": "black",
+    "species": null
+  },
   "SE_EN_01": {
     "cost": 0,
     "deck": "promo",
@@ -2418,6 +2427,15 @@
     "income": "credit",
     "name": "Gateway to Mars",
     "sector": "blue",
+    "species": null
+  },
+  "SE_EN_03": {
+    "cost": 2,
+    "deck": "promo2",
+    "free": [["move", 1]],
+    "income": "card",
+    "name": "Space Agencies",
+    "sector": "black",
     "species": null
   },
   "SR.15": {

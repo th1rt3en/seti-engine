@@ -14,6 +14,7 @@ export interface NewGame {
     players: number;
     difficulty?: number;
     promo_cards?: boolean;
+    promo_set_2?: boolean;
     sandbox?: boolean;
     sandbox_species?: (string | null)[];
     expansion?: boolean;

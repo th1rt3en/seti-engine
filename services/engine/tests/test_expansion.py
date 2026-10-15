@@ -312,12 +312,9 @@ def test_helion_marks_a_space_for_a_tech_and_its_free_action_clears_them() -> No
     s = with_org("helion_assembly")
     p = cur(s)
     p.techs.append("probe-dot")
-    orgs.on_tech(s, p, "probe")
-    assert s.pending[-1].data["spaces"] == ["energy"]
     energy = p.energy
-    s.pending = [s.pending[-1]]
-    s = act(s, type="org_mark", space="energy")
-    assert cur(s).energy == energy + 1
+    orgs.on_tech(s, p, "probe")  # the reward is gained and the space is blocked at once (owner, 2026-10-15)
+    assert not s.pending and p.org_marks == ["energy"] and p.energy == energy + 1
     card = cur(s).hand[0]
     s = act(s, type="org_free", org="helion_assembly", tech="probe-dot", card=card)
     assert cur(s).org_marks == [] and card in cur(s).tucked and cur(s).org_data["disabled"] == ["probe-dot"]

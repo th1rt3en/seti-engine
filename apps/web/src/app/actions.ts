@@ -106,6 +106,7 @@ export async function createGameAction(form: FormData): Promise<void> {
         ? { sandbox_species: [field(form, "species1") || null, field(form, "species2") || null] }
         : {}),
       promo_cards: form.get("promo") === "on",
+      promo_set_2: form.get("promo2") === "on",
       ...expansionOptions,
     },
     clock: (preset as NonNullable<typeof preset>).clock,

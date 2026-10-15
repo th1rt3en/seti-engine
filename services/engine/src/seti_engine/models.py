@@ -21,6 +21,7 @@ class Options(BaseModel):
     players: int = Field(ge=1, le=4)  # 1 is the solo game against the rival (SOLO-01)
     difficulty: int = Field(default=3, ge=1, le=5)  # solo only: the number of gold stars (SOLO-04)
     promo_cards: bool = False  # PLAN.md D23: SE EN 01 and SE EN 02 are shuffled into the deck when on
+    promo_set_2: bool = False  # PROMO-04: SE EN 03 and SE DE 04 are shuffled into the deck when on
     # PLAN.md D33: a practice game for one player, without the rival, in which cards, resources and the discs can be added or changed freely
     sandbox: bool = False
     # PLAN.md D35 (docs/spec/expansion.md): the Space Agencies expansion. `expansion` puts signal tokens in the game (and, as their data

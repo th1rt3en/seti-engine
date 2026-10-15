@@ -34,6 +34,7 @@ export type NeutralQuickStart = boolean;
 export type Organizations = boolean;
 export type Players = number;
 export type PromoCards = boolean;
+export type PromoSet2 = boolean;
 export type Sandbox = boolean;
 export type SandboxSpecies = (string | null)[];
 export type Seed = number;
@@ -326,6 +327,7 @@ export interface Options {
   organizations?: Organizations;
   players: Players;
   promo_cards?: PromoCards;
+  promo_set_2?: PromoSet2;
   sandbox?: Sandbox;
   sandbox_species?: SandboxSpecies;
   seed?: Seed;

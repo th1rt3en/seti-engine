@@ -42,9 +42,12 @@ def addable_cards(s: GameState) -> list[str]:
     shown = discovered_species(s)
     out = []
     for cid, c in tables.cards().items():
-        if c["deck"] == "promo" and not s.options.promo_cards:
+        if (c["deck"] == "promo" and not s.options.promo_cards) or (c["deck"] == "promo2" and not s.options.promo_set_2):
             continue
-        if c["deck"] not in ("base", "promo") and c["species"] not in shown:
+        if c["deck"] == "expansion" and s.options.expansion:
+            out.append(cid)  # the 42 cards of the Space Agencies main deck
+            continue
+        if c["deck"] not in ("base", "promo", "promo2") and c["species"] not in shown:
             continue
         out.append(cid)
     return sorted(out, key=lambda x: (x.startswith("ET."), int(x.split(".")[-1]) if x.split(".")[-1].isdigit() else 0, x))

@@ -24,6 +24,16 @@ def cards() -> dict[str, dict[str, Any]]:
     """The static facts of the cards. The quick start cards that are tucked for income (SR.15, SR.16; EXP-QS-02) are in it too, with deck
     "quick" so that no deck is built from them, because a tucked card is looked up like any other for its income."""
     out: dict[str, dict[str, Any]] = dict(load("cards.json"))
+    for pc in load("promo-set-2.json")["cards"]:  # promo set 2 (PROMO-04), a game setting like promo set 1
+        out[pc["id"]] = {
+            "name": pc["name"],
+            "deck": "promo2",
+            "cost": pc["cost"],
+            "income": pc["income"],
+            "sector": pc["sector"],
+            "species": None,
+            "free": pc["free"],
+        }
     for dc in deck()["cards"]:  # the 42 cards that join the main deck (EXP-03)
         out[dc["id"]] = {
             "name": dc["name"],

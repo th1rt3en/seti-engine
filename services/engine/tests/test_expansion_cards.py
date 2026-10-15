@@ -496,3 +496,58 @@ def test_a_card_that_names_mars_triggers_gateway_to_mars() -> None:  # A-027 (ow
     s.players[s.current_player].missions.append(MissionState(card="SE_EN_02", kind="trigger", used=[False, False]))
     r = go(s, 31, answer=False)
     assert any(d.kind == "mission_trigger" for d in r.state.pending)
+
+
+def test_helion_gains_its_reward_and_blocks_the_space_when_a_tech_is_researched() -> None:  # EXP-ORG-11 (owner 2026-10-15)
+    from test_expansion import with_org
+
+    from seti_engine import orgs
+
+    s = with_org("helion_assembly")
+    p = s.players[s.current_player]
+    energy, data = p.energy, p.data_pool
+    orgs.on_tech(s, p, "probe")
+    assert p.energy == energy + 1 and p.org_marks == ["energy"] and not s.pending
+    orgs.on_tech(s, p, "probe")  # the space is blocked until the free action clears it
+    assert p.energy == energy + 1
+    orgs.on_tech(s, p, "computer")
+    assert p.data_pool == data + 1
+
+
+def test_xenolab_research_does_not_rotate_a_disc() -> None:  # EXP-ORG-13 (owner 2026-10-15)
+    from test_expansion import act, with_org
+
+    s = with_org("xenolab", credits=0, energy=0, publicity=4)
+    angles = list(s.disc_angles)
+    stack = next(m["stack"] for m in legal_moves(s) if m["type"] == "org_main" and m["tile"] == "research")
+    s = act(s, type="org_main", org="xenolab", tile="research", stack=stack)
+    assert s.disc_angles == angles and s.rotations == 0
+
+
+def test_promo_set_2_cards() -> None:  # PROMO-04 (owner 2026-10-15)
+    from seti_engine.models import Options
+
+    assert Options(players=2, promo_set_2=True).promo_set_2
+    s = ready()
+    r = go(s, 1)  # any card to have a state
+    st = r.state
+    give(st, "SE_EN_03")
+    st.main_done = False
+    r = settle(do(with_state(st), "play_card", card="SE_EN_03"))
+    assert me(r).signal_tokens == 1 and any(pr.player == r.state.current_player for pr in r.state.probes)
+    s = ready(publicity=0)
+    give(s, "SE_DE_04")
+    color = s.sectors[solar.earth(s)[1]].color
+    before = (
+        me(StepResult(state=s, events=[], legal=[])).movement,
+        s.players[s.current_player].data_pool,
+        s.players[s.current_player].publicity,
+        s.players[s.current_player].score,
+    )
+    r = settle(do(with_state(s), "play_card", card="SE_DE_04"))
+    p = me(r)
+    after = (p.movement, p.data_pool, p.publicity, p.score)
+    gained = {"yellow": after[0] - before[0], "blue": after[1] - before[1], "red": after[2] - before[2], "black": after[3] - before[3]}[
+        color
+    ]
+    assert gained == (6 if color == "black" else 2)

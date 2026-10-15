@@ -1,0 +1,31 @@
+{
+ "cards": [
+  {
+   "cost": 2,
+   "free": [
+    [
+     "move",
+     1
+    ]
+   ],
+   "id": "SE_EN_03",
+   "income": "card",
+   "name": "Space Agencies",
+   "sector": "black"
+  },
+  {
+   "cost": 2,
+   "free": [
+    [
+     "publicity",
+     1
+    ]
+   ],
+   "id": "SE_DE_04",
+   "income": "energy",
+   "name": "DLR",
+   "sector": "black"
+  }
+ ],
+ "source": "the owner's promo set 2 (2026-10-15): SE EN 03 Space Agencies and SE DE 04 DLR; transcription main-38 and main-45"
+}

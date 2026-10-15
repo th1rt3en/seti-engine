@@ -242,8 +242,11 @@ def on_tech(s: GameState, p: PlayerState, category: str) -> None:
     matching reward space (EXP-ORG-11)."""
     if p.organization == "turing_systems" and category == "computer":
         effects.gain_publicity(s, p)
-    if p.organization == "helion_assembly" and HELION_SPACES[category] not in p.org_marks:
-        s.pending.append(Decision(kind="org_mark", player=p.index, data={"spaces": [HELION_SPACES[category]]}))
+    if (
+        p.organization == "helion_assembly" and HELION_SPACES[category] not in p.org_marks
+    ):  # the owner: the reward is gained and the space blocked
+        p.org_marks.append(HELION_SPACES[category])
+        rewards.grant(s, p, [{"t": HELION_SPACES[category]}], [])
 
 
 def mark_moves(s: GameState, d: Decision) -> list[Action]:

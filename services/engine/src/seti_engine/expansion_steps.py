@@ -75,6 +75,15 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         done = glyphids.deciphered(s)
         if any(g in done for group in st["groups"] for g in group):
             s.pending.append(Decision(kind="glyph_group", player=p.index, data={"groups": st["groups"]}))
+    elif t == "dlr":  # SE DE 04: a reward by the color of the sector the probe was launched in (Earth's sector)
+        color = s.sectors[solar.earth(s)[1]].color
+        reward = {
+            "yellow": {"t": "move", "n": 2},
+            "blue": {"t": "data", "n": 2},
+            "red": {"t": "publicity", "n": 2},
+            "black": {"t": "vp", "n": 6},
+        }[color]
+        rewards.grant(s, p, [reward], events)
     elif t == "orbit_free":  # SA.30
         s.pending.append(Decision(kind="orbit_land_free", player=p.index, data={"orbit_only": True}))
     else:

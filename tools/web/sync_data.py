@@ -65,6 +65,8 @@ if __name__ == "__main__":
         first = it["title"].split(" ", 1)[0]
         if it["group"] == "Main deck":
             images[f"SA.{first}"] = it["key"]
+        elif it["group"] == "Main deck (promo cards)" and first == "SE":
+            images["_".join(it["title"].split(" ")[:3])] = it["key"]  # SE_EN_03, SE_DE_04
         elif it["group"] == "Glyphids cards":
             images[f"GL.{first.split('.')[1]}"] = it["key"]
         elif it["group"] == "Amoeba cards":

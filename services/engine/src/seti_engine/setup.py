@@ -87,7 +87,10 @@ def new_game(options: Options) -> GameState:
     deck_ids = [
         cid
         for cid, c in tables.cards().items()
-        if c["deck"] == "base" or (c["deck"] == "promo" and options.promo_cards) or (c["deck"] == "expansion" and options.expansion)
+        if c["deck"] == "base"
+        or (c["deck"] == "promo" and options.promo_cards)
+        or (c["deck"] == "promo2" and options.promo_set_2)
+        or (c["deck"] == "expansion" and options.expansion)
     ]
     deck_ids.sort(key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else 0, x))  # fixed order before the shuffle
     state.deck = rng.shuffled(state, deck_ids)

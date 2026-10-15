@@ -59,6 +59,64 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-052 | Futurespan token distance for other costs | proposed (in use, to confirm) |
 | A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
 
+## Overview (rewritten by tools/spec/ambiguity_overview.py; the entries below hold the details)
+
+| ID | Title | Status |
+|---|---|---|
+| A-001 | Promo cards SE EN 01 and SE EN 02 | ruled |
+| A-002 | Rival probe placement when neither first space is available | ruled |
+| A-003 | End-of-round cards | ruled |
+| A-004 | Deal order at setup | ruled |
+| A-005 | Completed sectors versus later free actions | ruled |
+| A-006 | Income after passing | ruled |
+| A-007 | Disc geometry and pushed probes | ruled |
+| A-008 | Neutral milestone placement | ruled |
+| A-009 | Nonplayer markers used per milestone crossing | ruled |
+| A-010 | Which cards are the advanced rival cards | ruled |
+| A-012 | Rival runs out of advanced cards | ruled |
+| A-013 | Tucking a card with no cards in hand | ruled |
+| A-014 | Rival and Mascamite samples or anomalies | ruled |
+| A-015 | Unused movement at the end of a turn | ruled |
+| A-016 | Landing on a moon, first-lander data and planet landers | ruled |
+| A-017 | Counting traces by kind, and "spaces from Earth" | ruled |
+| A-018 | Cards that remove an orbiter or lander (#15, #84) | ruled |
+| A-019 | A mission card and its own effect | ruled |
+| A-020 | Where discarded alien cards go | ruled |
+| A-021 | Data taken from the 'Oumuamua tile | ruled |
+| A-022 | Overflow markers on the "Other" gold tile, side A | ruled |
+| A-023 | What happens to the rival's action cards between rounds | ruled |
+| A-024 | Details of the rival's choices | ruled |
+| A-025 | The rival has no income and no starting cards | ruled |
+| A-026 | May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)? | ruled |
+| A-027 | Which cards mention Mars in their flavor text (SE EN 02) | ruled |
+| A-028 | Effects of the 42 expansion main-deck cards | data supplied, to confirm |
+| A-029 | Alien cards that give signal tokens and the other new icons | resolved |
+| A-030 | Which organizations are numbered 1 to 4 | resolved |
+| A-031 | Organization income at the start of rounds 3, 4 and 5 versus the base income rules | proposed (in use, to confirm) |
+| A-032 | Boards, tokens and cards of Arkhos, Glyphids and Amoeba | data supplied, to confirm |
+| A-033 | The extra rival starting card and the four rival action cards of the expansion | ruled |
+| A-034 | The three long-term objective tiles and the advance symbol | ruled |
+| A-035 | The promo card "Space Agencies" that remembers a previous game | ruled |
+| A-036 | Details of the neutral quick start marks and of preparing a card at Futurespan | proposed (in use, to confirm) |
+| A-037 | Xenolab tiles and traces | ruled |
+| A-038 | Rewards of the reward spaces of Cosmos Strategy Group and Helion Assembly | partly |
+| A-039 | Orbital Dynamics' once-per-round free action | proposed (in use, to confirm) |
+| A-040 | Arkhos board and security cards (picture readings) | ruled |
+| A-041 | Is breaching a choice? | proposed (in use, to confirm) |
+| A-042 | Arkhos exploration cards (picture readings) | ruled |
+| A-043 | Number of glyph tokens of each kind | proposed (in use, to confirm) |
+| A-044 | Translation board strips and the top row dependency | ruled |
+| A-045 | Glyphids cards | ruled |
+| A-046 | Glyphids board wells | ruled |
+| A-047 | Order of the organelle moves | proposed (in use, to confirm) |
+| A-048 | Amoeba board readings | ruled |
+| A-049 | Amoeba cards ET.14 and ET.20 | ruled |
+| A-050 | Readings of the 42 main-deck cards | ruled |
+| A-051 | Helion Assembly's free action | proposed (in use, to confirm) |
+| A-052 | Futurespan token distance for other costs | proposed (in use, to confirm) |
+| A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
+| A-054 | Mission Relay's starting marker | ruled |
+
 Entry format:
 
 ```
@@ -331,14 +389,14 @@ Entry format:
 - Questions for the owner: please supply the pictures of the three boards (and the translation strips), the species cards, the exploration and security cards and the glyph tokens.
 
 ## A-033: The extra rival starting card and the four rival action cards of the expansion
-- Status: data supplied 2026-10-15 (the four cards are transcribed: S.1 wild trace and advances per star; S.2 Glyphids, S.3 Arkhos, S.4 Amoeba); solo with the expansion is NOT implemented yet. Open readings: the order of the chevrons on S.2 (moon, lander, orbiter as a priority or as options), the unlabelled multicolor triangle on S.3, and the ids (S.1 to S.4 clash with the base cards, so the expansion cards need another prefix). Waiting for the owner to confirm those readings.
+- Status: ruled for the pictures (owner, 2026-10-15: the four rival cards were marked correct); solo with the expansion is not implemented yet
 - Rule IDs affected: EXP-SOLO-02
 - Rulebook page and text: R16 p.6 shows the new starting card (the picture reads "Then [1 advance] for each [gold star] of your difficulty level" next to a species-board icon). The rest of the card (its main action) is not legible, and the other three rival action cards are not shown.
 - Consequence: solo with the expansion.
 - Proposed ruling: implement when the card pictures are supplied.
 
 ## A-034: The three long-term objective tiles and the advance symbol
-- Status: data supplied 2026-10-15; not implemented. Readings (second transcription): tile 1 asks for a life trace of any color, three times; tile 2 for a tuck for income, three times; tile 3 for a probe tech, a telescope tech and a computer tech, one task each; the rival advances 1 step for each uncompleted task at the end of rounds 2, 3 and 4 (the tabs 2, 3 and 4 on the tiles read as those rounds). Waiting for the owner to confirm the tasks, the number of advances and the meaning of the tabs.
+- Status: ruled for the pictures (owner, 2026-10-15: the three tiles and their readings were marked correct); not implemented yet
 - Rule IDs affected: EXP-SOLO-04, EXP-SOLO-06, EXP-SOLO-07
 - Rulebook page and text: R16 p.6-7 show the three tiles (each with three tasks) and the text "the rival gets [advance symbol] for each uncompleted task": the number printed with the symbol is not readable in the extracted text.
 - Consequence: the penalty at the end of rounds 2, 3 and 4 and the fallback of EXP-SOLO-07 (how many advances).
@@ -346,13 +404,14 @@ Entry format:
 - Questions for the owner: how many spaces does the rival advance for each uncompleted long-term task, and what are the tasks of the three tiles?
 
 ## A-035: The promo card "Space Agencies" that remembers a previous game
-- Status: open (the picture is supplied: SE EN 03 launches a probe and gives a signal token; only the memory between games needs the owner's choice of reading; the card is not implemented)
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-PROMO-01
 - Rulebook page and text: P3: the effect transfers to the next game with organizations: one extra quick start card is dealt, the player still chooses 2.
 - Readings: (1) not implemented (the engine and the website keep nothing between games); (2) a lobby option "dealt one extra quick start card" chosen per player at the start; (3) a flag on the account.
 - Consequence: a small advantage that cannot be checked by the engine.
 - Proposed ruling: reading 1 for now: the promo card is not in the deck and its after-game bonus is not offered. The card itself (launch a probe, gain a signal token) is easy once the owner wants it.
 - Questions for the owner: which reading?
+- Ruling (owner), 2026-10-15: SE EN 03 "Space Agencies" and SE DE 04 "DLR" belong to promo set 2 (SE EN 01 and SE EN 02 are set 1). SE EN 03: launch a probe for free and gain a signal token; its text about the next game cannot be implemented in a digital game that resolves it later and is left out. SE DE 04: launch a probe, then a reward by the color of the sector of the launch (yellow 2 movement, blue 2 data, red 2 publicity, black 6 VP). Both are in the deck when the game setting "promo set 2" is on (PROMO-04).
 
 ## A-036: Details of the neutral quick start marks and of preparing a card at Futurespan
 - Status: proposed (the engine uses these readings; the owner is asked to confirm)
@@ -364,21 +423,23 @@ Entry format:
 - Questions for the owner: confirm or rule otherwise.
 
 ## A-037: Xenolab tiles and traces
-- Status: proposed
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-ORG-13 (Xenolab)
 - Rulebook page and text: R16 p.2 (picture): the three tiles show launch (1 credit), scan (2 energy) and research (4 publicity), with a blue, a yellow and a pink corner; "When you gain a life trace, flip the matching tile to its active side".
 - Readings: the corner color is the trace color that reactivates the tile: launch is reactivated by a blue trace, scan by a yellow trace, research by a pink trace (the order of the tiles in the picture).
 - Proposed ruling: that mapping; a trace gained in any way (also from a quick start card at setup? no: setup marks give no benefits) reactivates the matching inactive tile.
 - Questions for the owner: confirm the colors of the three tiles.
+- Ruling (owner), 2026-10-15: blue tile: pay 1 credit to perform a launch action, then flip the tile; yellow (orange) tile: pay 2 energy to perform a scan action, then flip it; pink tile: pay 4 publicity to research a tech of any color without rotating a disc, then flip it. A tile is flipped back whenever the player marks a trace of its color.
 
 ## A-038: Rewards of the reward spaces of Cosmos Strategy Group and Helion Assembly
-- Status: proposed (the engine uses this reading)
+- Status: partly ruled (owner, 2026-10-15: Helion Assembly; Cosmos Strategy Group stays proposed)
 - Rule IDs affected: EXP-ORG-11, EXP-ORG-13
 - Rulebook page and text: R16 p.2 and p.8 (pictures and FAQ): Cosmos Strategy Group shows three reward spaces (credit, publicity, data) that a card of a matching sector color marks (black matches all); Helion Assembly shows three spaces (energy for a probe tech, a signal token for a scan tech, data for a computer tech). The amounts are not legible in the picture; the extracted data names the resources only (Helion: "grants 1 energy", "1 signal token", "1 data").
 - Readings: (1) every space gives 1 of its resource; (2) some give more.
 - Consequence: the resources gained.
 - Proposed ruling: reading 1. Marking is a choice (the rule says "may").
 - Questions for the owner: confirm the amounts, and for Cosmos which color maps to which space (yellow to credit, red to publicity, blue to data, as in the extracted data).
+- Ruling (owner), 2026-10-15, Helion Assembly: researching an orange tech gives 1 energy, a pink tech 1 signal token and a blue tech 1 data, and a marker is placed to block that space; all markers are cleared by the organization's free action. The engine does this automatically (no choice).
 
 ## A-039: Orbital Dynamics' once-per-round free action
 - Status: proposed (the engine uses reading 3 of the second transcription: up to 2 different probes move 1 step each, the steps paid by the ability, taken with `od_step` moves until the end of the turn)
@@ -390,7 +451,7 @@ Entry format:
 - Questions for the owner: choose the reading.
 
 ## A-040: Arkhos board and security cards (picture readings)
-- Status: proposed (the engine uses these readings)
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
 - Rule IDs affected: EXP-ARK-03, EXP-ARK-05, EXP-ARK-06
 - Rulebook page and text: A14 p.1 to p.2 and the board picture: 4 security levels of 3 spaces; the level 1 spaces show two red triangles (two minor exploration rewards); level 0 and 2 and 3 show VP and one minor reward (2, 5, 7 VP). The three security card sets (Exterior Scan, Forced Entry, Proximity Maneuvers) are read as pink, blue and yellow from the order of the files; the pictures of the cards show fronts only.
 - Readings: (1) as above; (2) the double triangle is one combined reward.
@@ -407,7 +468,7 @@ Entry format:
 - Questions for the owner: confirm.
 
 ## A-042: Arkhos exploration cards (picture readings)
-- Status: proposed
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
 - Rule IDs affected: EXP-ARK-02, EXP-ARK-04
 - Rulebook page and text: the nine exploration cards have no printed name; each shows a minor and a major reward (second reading with the owner's icon glossary): ET 33 minor 1 VP and a signal token, major signals in a yellow, a red and a blue sector and then one in any sector; ET 34 and ET 38 majors launch a probe ignoring the limit (no launch cost printed); ET 39 major is 2 random cards and a scan action; ET 40 major is 1 data and a research (rotate and any tech); ET 41 major is 1 publicity, data, credit, energy and a card of the player's choice. The data is in `docs/spec/data/expansion-arkhos.json`.
 - Proposed ruling: as read; the launches are free of the credit cost.
@@ -421,20 +482,20 @@ Entry format:
 - Questions for the owner: confirm.
 
 ## A-044: Translation board strips and the top row dependency
-- Status: proposed
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
 - Rule IDs affected: EXP-GLY-02, EXP-GLY-05
 - Rulebook page and text: A14 p.3 and p.4: two strips are put in a random side up; "top row slots can only be filled when both slots beneath them are filled". The pictures show three arrangements; read as two strips with two sides each (top: credit, energy, signal token or energy, signal token, credit; bottom: data, random card, 3 VP, publicity or random card, publicity, data, 3 VP), so four combinations exist (one has no picture). The picture has 3 top and 4 bottom slots: top slot k is above bottom slots k and k+1.
 - Proposed ruling: as read.
 - Questions for the owner: confirm the strip sides and the geometry.
 
 ## A-045: Glyphids cards
-- Status: proposed
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page); the doubled-glyph reading stays as the engine uses it
 - Rule IDs affected: EXP-GLY-06
 - Rulebook page and text: the card names and flavor texts are printed in glyphs. A glyph icon with a "?" gives the resource of that glyph if it has been deciphered. Readings used: a repeated glyph in a group gives its resource twice; the "OR" is a choice between two groups; a mission circle may be covered for an undeciphered glyph and then gives nothing; ET.10's quick mission needs a trace of each of the three colors marked for this species (the same layout as the base cards that say "single species"); the end-of-game cards ET.1 and ET.9 score 3 VP per token of the type the player has most and 1 VP per token of the largest set of different kinds.
 - Questions for the owner: confirm each reading.
 
 ## A-046: Glyphids board wells
-- Status: proposed
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
 - Rule IDs affected: EXP-GLY-04
 - Rulebook page and text: A14 p.3 and p.4 and the picture: each column has an upper well (replenished at once), a 2 VP and a 3 VP space with an alien card, and a lower well that is one space with the 7 VP circle (not replenished).
 - Proposed ruling: as read; marking an upper well gives only its token.
@@ -448,20 +509,21 @@ Entry format:
 - Questions for the owner: confirm with the rulebook example.
 
 ## A-048: Amoeba board readings
-- Status: proposed
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
 - Rule IDs affected: EXP-AMO-02, EXP-AMO-03
 - Rulebook page and text: the board picture: the outer ring Y1, Y2, B1, B2, P1, P2 clockwise and the inner ring IY, IP, IB counter-clockwise, gears on Y1, Y2, P1, P2 and IB (the start spaces); each column of 4 marking spaces gives only the organelles, then 1 VP, then an alien card, then 1 VP and an alien card; the section of an inner space is the color of its background.
 - Proposed ruling: as read.
 - Questions for the owner: confirm.
 
 ## A-049: Amoeba cards ET.14 and ET.20
-- Status: open for ET.20, proposed for ET.14
+- Status: ruled for ET.14, ET.17 and the corners; ET.20's third icon proposed
 - Rule IDs affected: EXP-AMO-04
 - Rulebook page and text: ET.20's third icon (a pink organelle with a ring and a phone-like mark) is not identified, so the card cannot be played. ET.14's quick mission asks for a trace of each color on this species except the discovery spaces and gives 1 VP per empty space of the species board; the engine counts board and overflow spaces.
 - Questions for the owner: what is ET.20's third icon?
+- Ruling (owner), 2026-10-15: ET.14 is a quick mission: at least one trace of each color on this species, not counting the discovery spaces, gives 1 VP for each empty space of the Amoeba board at the time it is completed. The corner icon of ET.17 and ET.20 is 1 movement. ET.19: the space a marker is removed from is open again for every player. ET.20's third icon is now played as one pink organelle (proposed).
 
 ## A-050: Readings of the 42 main-deck cards
-- Status: proposed
+- Status: ruled (owner, 2026-10-15: every picture of this entry was marked correct on the verification page)
 - Rule IDs affected: EXP-03
 - Rulebook page and text: after the owner's notes (the verification page, 2026-10-15): SA.2 counts the cards of the hand with the chosen icon in their corner; SA.12 counts Earth as a planet (FAQ-C025); SA.15 gains the printed bonus of the tile again; SA.18 keeps the tile bonus; SA.28 gains the income resource of each discarded card (a random card for the "?" kind); SA.34 tuck is optional (INCOME-01); SA.36 one signal in each of three sectors of the three colors; SA.42 counts a won-sector marker like a signal. The pictures not read with certainty are listed in the verification page.
 - Questions for the owner: confirm.
@@ -486,4 +548,10 @@ Entry format:
 - Rulebook page and text: none; the icons of a card are printed in a row.
 - Readings: (1) left to right as printed; (2) the player chooses the order.
 - Ruling (owner), 2026-10-15: all effects are resolved from left to right. Where an effect needs a choice, the later effects wait for it (the engine already waits for each decision before it runs the next step). Checked: the 42 main-deck cards, the Glyphids, Amoeba and Arkhos cards and the exploration rewards are written in the printed order; the starting resources of an organization follow its header (Orbital Dynamics' two launches come first).
+
+## A-054: Mission Relay's starting marker
+- Status: ruled
+- Rule IDs affected: EXP-ORG-13 (Mission Relay)
+- Rulebook page and text: "Start with this tile marked as shown. (You can still mark the other three.)" with a picture of two gold tile faces.
+- Ruling (owner), 2026-10-15: there are 4 gold scoring tiles each game with a random face up; this organization lets the player mark at once the rightmost (lowest-scoring) space of the tile that scores missions, whichever face is up; the player may still mark the other 3 tiles by the normal rules.
 

@@ -837,6 +837,11 @@
           "title": "Promo Cards",
           "type": "boolean"
         },
+        "promo_set_2": {
+          "default": false,
+          "title": "Promo Set 2",
+          "type": "boolean"
+        },
         "sandbox": {
           "default": false,
           "title": "Sandbox",

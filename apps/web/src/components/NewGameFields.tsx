@@ -100,7 +100,10 @@ export function NewGameFields({
         </label>
       )}
       <label className="row">
-        <input type="checkbox" name="promo" /> Include the two promo cards
+        <input type="checkbox" name="promo" /> Include the two promo cards (set 1)
+      </label>
+      <label className="row">
+        <input type="checkbox" name="promo2" /> Include the promo cards of set 2 (Space Agencies, DLR)
       </label>
       <fieldset className="expansion">
         <legend>Space Agencies expansion</legend>

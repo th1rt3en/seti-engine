@@ -598,8 +598,7 @@ def _org_main(s: GameState, p: PlayerState, a: Action, events: list[dict[str, An
         events.append({"type": "scan", "player": p.index})
         cards.fire(s, p, [{"e": "scan"}], events)
     else:
-        effects.pay(p, publicity=4)
-        _rotate(s, events)
+        effects.pay(p, publicity=4)  # the owner: a tech of any type without rotating a disc
         techs.take_tech(s, p, a["stack"], events)
         cards.fire(s, p, [{"e": "tech", "cat": s.tech_stacks[a["stack"]].category}], events)
 
