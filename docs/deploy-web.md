@@ -44,3 +44,8 @@ and end-of-game cards come from the engine's view (`view.trackers`), the turn co
 
 - There is no password reset: a player who loses the password loses the account (D29).
 - The takedown contact (seti.web.tobiko11@gmail.com) is in the footer (`apps/web/src/app/layout.tsx`) and in `LEGAL.md`; change both if it changes.
+
+## Deploying without a Linux machine (GitHub Actions)
+
+`.github/workflows/deploy-web.yml` builds the site on a Linux runner and deploys it. Add the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+(GitHub, Settings, Secrets and variables, Actions), then run it from the Actions tab ("Deploy website", Run workflow). It is manual only.
