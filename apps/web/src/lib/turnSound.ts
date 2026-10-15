@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const KEY = "seti-turn-sound";
+const PREFIX = "● Your turn · ";
 let context: AudioContext | null = null;
 
 function audio(): AudioContext | null {
@@ -59,7 +60,6 @@ export function useTurnSound(myTurn: boolean): [boolean, () => void] {
   const [on, setOn] = useState(true);
   const onRef = useRef(true);
   const previous = useRef<boolean | null>(null);
-  const baseTitle = useRef<string | null>(null);
 
   useEffect(() => {
     try {
@@ -79,12 +79,22 @@ export function useTurnSound(myTurn: boolean): [boolean, () => void] {
     previous.current = myTurn;
   }, [myTurn]);
 
+  // the tab title starts with "● Your turn · " while it is the player's turn to act. The title is put back if the page rewrites it (Next.js does
+  // when it re-renders the head), and it is restored when the turn passes or the page closes.
   useEffect(() => {
-    if (baseTitle.current === null) baseTitle.current = document.title;
-    const base = baseTitle.current.replace(/^● Your turn · /, "");
-    document.title = myTurn ? `● Your turn · ${base}` : base;
+    const strip = (s: string): string => s.replace(PREFIX, "");
+    const apply = () => {
+      const current = document.title;
+      const want = myTurn ? `${PREFIX}${strip(current)}` : strip(current);
+      if (current !== want) document.title = want;
+    };
+    apply();
+    const node = document.querySelector("title");
+    const observer = node ? new MutationObserver(apply) : null;
+    if (node) observer?.observe(node, { childList: true, characterData: true, subtree: true });
     return () => {
-      document.title = base;
+      observer?.disconnect();
+      document.title = strip(document.title);
     };
   }, [myTurn]);
 
