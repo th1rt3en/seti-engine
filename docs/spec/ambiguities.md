@@ -32,11 +32,11 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-025 | The rival has no income and no starting cards | ruled |
 | A-026 | May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)? | ruled |
 | A-027 | Which cards mention Mars in their flavor text (SE EN 02) | ruled |
-| A-028 | Effects of the 42 expansion main-deck cards | data supplied, to confirm |
+| A-028 | Effects of the 42 expansion main-deck cards | resolved |
 | A-029 | Alien cards that give signal tokens and the other new icons | resolved |
 | A-030 | Which organizations are numbered 1 to 4 | resolved |
 | A-031 | Organization income at the start of rounds 3, 4 and 5 versus the base income rules | proposed (in use, to confirm) |
-| A-032 | Boards, tokens and cards of Arkhos, Glyphids and Amoeba | data supplied, to confirm |
+| A-032 | Boards, tokens and cards of Arkhos, Glyphids and Amoeba | resolved |
 | A-033 | The extra rival starting card and the four rival action cards of the expansion | ruled |
 | A-034 | The three long-term objective tiles and the advance symbol | ruled |
 | A-035 | The promo card "Space Agencies" that remembers a previous game | ruled |
@@ -291,7 +291,7 @@ Entry format:
 - Questions for the owner: is this list right (a missed card means a missed trigger)?
 
 ## A-028: Effects of the 42 expansion main-deck cards
-- Status: data supplied 2026-10-15 (the owner's zips); implemented; the readings still to confirm are A-050. The proposed ruling below is obsolete: the 42 cards are in the deck whenever `expansion` is on.
+- Status: resolved (the data was supplied 2026-10-15, implemented, and its readings are ruled in A-040 to A-050)
 - Rule IDs affected: EXP-03
 - Rulebook page and text: R16 "Using this expansion": shuffle the 42 new cards into the main deck. The rulebook does not list the cards.
 - Readings: the effects are printed on the cards (pictures). The repository's extraction has the effects of 16 of the 42 (`effectsRaw`) and fragments of the text for 33; most main actions (launch, land, rotate, tech icons) and many rewards exist only in the pictures. The card pictures are not in the repository (`docs/asset-gaps.md` item 2).
@@ -323,7 +323,7 @@ Entry format:
 - Questions for the owner: confirm.
 
 ## A-032: Boards, tokens and cards of Arkhos, Glyphids and Amoeba
-- Status: data supplied 2026-10-15; implemented. Readings to confirm: A-040 to A-049 (A-049: Amoeba ET.20 is still open because one icon is not identified). The proposed ruling below is obsolete.
+- Status: resolved (the data was supplied 2026-10-15, implemented, and its readings are ruled in A-040 to A-050)
 - Rule IDs affected: EXP-ARK-*, EXP-GLY-*, EXP-AMO-*
 - Rulebook page and text: A14 describes the rules of the three species; the boards (the rewards of every space, the overflow spaces, the translation board and its strips, the organelle spaces and their directions), the 10 + 10 species cards, the 9 exploration cards, the 12 security cards and the 35 glyph tokens are pictures that the repository does not hold (the alien-aid pictures show the boards at a size that is too small to read every reward with certainty).
 - Readings: n/a.
