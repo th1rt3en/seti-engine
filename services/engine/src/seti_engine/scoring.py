@@ -74,7 +74,7 @@ def final_scores(s: GameState) -> list[dict[str, Any]]:
         cards_pts = cards.end_points(s, p)
         gold = 0 if is_rival else gold_points(s, p)  # the rival does not score gold tiles (SOLO-END-01)
         exertian = cards.exertian_points(s, p)
-        glyph = glyphids.end_points(p)  # EXP-GLY-07 (the rival scores 3 per token, EXP-GLY-08, not yet)
+        glyph = 3 * len(p.glyphs) if is_rival else glyphids.end_points(p)  # EXP-GLY-07; EXP-GLY-08: the rival scores 3 per token
         rows.append(
             {"player": p.index, "board": p.score, "cards": cards_pts, "gold": gold, "exertian": exertian, "glyphs": glyph, "loss": 0}
         )

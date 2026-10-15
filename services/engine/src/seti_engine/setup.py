@@ -59,8 +59,8 @@ def new_game(options: Options) -> GameState:
     # two of the five alien species, hidden (SETUP-11)
     pool = [
         *SPECIES_BASE,
-        *(SPECIES_EXPANSION if options.expansion and not solo else []),
-    ]  # EXP-03; the rival does not know them yet (A-033)
+        *(SPECIES_EXPANSION if options.expansion else []),
+    ]  # EXP-03; the solo rival knows them too (EXP-SOLO-07, EXP-ARK-08, EXP-GLY-08, EXP-AMO-06)
     drawn = rng.shuffled(state, pool)
     picked = _sandbox_species(options, drawn) if options.sandbox else drawn[:2]  # SANDBOX-06: the sandbox can choose them
     state.species = [SpeciesSlot(species=s, board=species.new_board(s)) for s in picked]

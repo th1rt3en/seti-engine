@@ -28,13 +28,16 @@ def discover(s: GameState, slot: SpeciesSlot, owners: list[int], events: Events)
     slot.extra["explore_aside"] = order[:ASIDE]
     slot.extra["explore_deck"] = order[ASIDE:]
     slot.extra["explore_discard"] = []
-    for p in s.players:  # EXP-ARK-03: 1 random card of each trace color in front of every player (the rival is not dealt any, A-033)
-        if s.rival is not None and p.index == s.rival.index:
-            continue
+    for p in s.players:  # EXP-ARK-03, EXP-ARK-08: 1 random card of each trace color in front of every player, the rival too
         p.security = {c: rng.choice(s, [x["id"] for x in tables.arkhos()["security"] if x["trace"] == c]) for c in COLORS}
     events.append({"type": "arkhos_discovered", "slot": s.species.index(slot)})
+    from . import rival  # noqa: PLC0415 - rival imports this module
+
     for pl in owners:  # EXP-ARK-01: a minor exploration reward for each marker on a discovery space
-        explore(s, s.players[pl], "minor", events)
+        if rival.is_rival(s, pl):
+            rival.advance(s, 1, events)  # EXP-ARK-08: the rival gains an advance for contributing
+        else:
+            explore(s, s.players[pl], "minor", events)
 
 
 def explore(s: GameState, p: PlayerState, level: str, events: Events) -> None:
@@ -62,6 +65,15 @@ def access(p: PlayerState) -> int:
 
 def on_overflow(s: GameState, p: PlayerState, slot: int, color: str) -> None:
     """EXP-ARK-06: marking an overflow space of Arkhos lets the player breach their security card of that color."""
+    from . import rival  # noqa: PLC0415 - rival imports this module
+
+    if s.species[slot].species == "arkhos" and rival.is_rival(s, p.index):
+        # EXP-ARK-08: a breach effect is an advance for the rival; it breaches only by playing its Arkhos card
+        if s.rival is not None and s.rival.breaching:
+            p.security.pop(color, None)
+        else:
+            rival.advance(s, 1)
+        return
     if s.species[slot].species == "arkhos" and color in p.security:
         s.pending.append(Decision(kind="breach", player=p.index, data={"color": color}))
 

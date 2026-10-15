@@ -85,6 +85,68 @@
      "color": "any"
     }
    ]
+  },
+  {
+   "id": "SE.2",
+   "tier": "species",
+   "species": "glyphids",
+   "dir": "left",
+   "actions": [
+    {
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "mercury",
+      "neptune",
+      "uranus",
+      "saturn",
+      "jupiter",
+      "mars",
+      "venus"
+     ],
+     "preference": "lander",
+     "glyphPlanets": true
+    },
+    {
+     "kind": "telescope",
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "oumuamuaSignals": 0
+    }
+   ]
+  },
+  {
+   "id": "SE.3",
+   "tier": "species",
+   "species": "arkhos",
+   "dir": "right",
+   "actions": [
+    {
+     "kind": "text",
+     "effect": "arkhos_breach",
+     "text": "The rival breaches one of their security cards at random and marks an overflow space of that color (3 VP). Then 2 minor explorations."
+    }
+   ]
+  },
+  {
+   "id": "SE.4",
+   "tier": "species",
+   "species": "amoeba",
+   "dir": "right",
+   "actions": [
+    {
+     "kind": "text",
+     "effect": "amoeba_section",
+     "text": "If a section of the Amoeba board has 3 organelles, the rival gains all their bonuses."
+    },
+    {
+     "kind": "tech",
+     "costPublicity": 0,
+     "progress": 1
+    }
+   ]
   }
  ]
 }

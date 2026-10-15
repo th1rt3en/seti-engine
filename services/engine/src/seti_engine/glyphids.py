@@ -52,8 +52,35 @@ def take(s: GameState, p: PlayerState, where: str, events: Events) -> None:
         return
     p.glyphs.append(g)
     events.append({"type": "glyph", "player": p.index, "glyph": g, "where": where})
+    from . import rival  # noqa: PLC0415 - rival imports this module
+
+    if rival.is_rival(s, p.index):
+        _rival_places(s, p, g, events)
     if where.startswith("board:") and where.endswith(":0") and extra["supply"]:
         extra["tokens"][where] = extra["supply"].pop()
+
+
+def _rival_places(s: GameState, p: PlayerState, glyph: str, events: Events) -> None:
+    """EXP-GLY-08: a token of a type that is not deciphered yet is placed at once, on a top slot when one is open (the decision arrow breaks
+    ties), and its reward is gained (a signal token is an advance, see rival.grant). Other tokens are kept: 3 points each at the end."""
+    from . import rival  # noqa: PLC0415 - rival imports this module
+
+    if glyph in deciphered(s):
+        return
+    i = slot_index(s)
+    assert i is not None
+    extra = s.species[i].extra
+    needs = data()["translation"]["needs"]
+    top = [("top", k) for k, g in enumerate(extra["top"]) if g is None and all(extra["bottom"][b] is not None for b in needs[str(k)])]
+    bottom = [("bottom", k) for k, g in enumerate(extra["bottom"]) if g is None]
+    options = top or bottom
+    if not options:
+        return
+    row, k = rival.pick(s, options)
+    p.glyphs.remove(glyph)
+    extra[row][k] = glyph
+    events.append({"type": "decipher", "player": p.index, "glyph": glyph, "row": row, "index": k})
+    rewards.grant(s, p, slot_reward(s, row, k), events)
 
 
 def on_board_space(s: GameState, p: PlayerState, color: str, k: int, events: Events) -> None:

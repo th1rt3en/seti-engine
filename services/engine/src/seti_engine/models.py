@@ -196,6 +196,7 @@ class RivalState(BaseModel):
     computer: int = 0  # data on the rival's computer, 0 to 6 (its unlimited data pool is `PlayerState.data_pool`, SOLO-17)
     techs: list[str] = Field(default_factory=list)  # stored techs (SOLO-18)
     arrow: str = "left"  # decision arrow of the card being resolved
+    breaching: bool = False  # EXP-ARK-08: the rival is playing its Arkhos card, so an overflow space of Arkhos breaches a security card
     messages_in_reserve: int = 0  # Centaurian message tokens the rival may still place (SOLO-ALIEN-02)
 
 

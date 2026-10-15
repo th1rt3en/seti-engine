@@ -117,6 +117,7 @@ export type Queue = {
 }[];
 export type Advanced = string[];
 export type Arrow = string;
+export type Breaching = boolean;
 export type Computer1 = number;
 export type Deck1 = string[];
 export type Index1 = number;
@@ -466,6 +467,7 @@ export interface Probe {
 export interface RivalState {
   advanced: Advanced;
   arrow: Arrow;
+  breaching: Breaching;
   computer: Computer1;
   deck: Deck1;
   index: Index1;

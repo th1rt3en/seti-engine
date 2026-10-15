@@ -1494,6 +1494,11 @@
           "title": "Arrow",
           "type": "string"
         },
+        "breaching": {
+          "default": false,
+          "title": "Breaching",
+          "type": "boolean"
+        },
         "computer": {
           "default": 0,
           "title": "Computer",
@@ -1537,6 +1542,7 @@
       "required": [
         "advanced",
         "arrow",
+        "breaching",
         "computer",
         "deck",
         "index",

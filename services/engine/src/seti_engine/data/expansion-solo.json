@@ -84,6 +84,68 @@
    "dir": "left",
    "id": "SE.1",
    "tier": "expansion"
+  },
+  {
+   "actions": [
+    {
+     "glyphPlanets": true,
+     "kind": "probe",
+     "moonLanding": true,
+     "movement": 4,
+     "planets": [
+      "mercury",
+      "neptune",
+      "uranus",
+      "saturn",
+      "jupiter",
+      "mars",
+      "venus"
+     ],
+     "preference": "lander"
+    },
+    {
+     "cardRowSignals": 1,
+     "earthSignals": 2,
+     "extraCardRowSignalWithTelescopeTech": 1,
+     "kind": "telescope",
+     "oumuamuaSignals": 0
+    }
+   ],
+   "dir": "left",
+   "id": "SE.2",
+   "species": "glyphids",
+   "tier": "species"
+  },
+  {
+   "actions": [
+    {
+     "effect": "arkhos_breach",
+     "kind": "text",
+     "text": "The rival breaches one of their security cards at random and marks an overflow space of that color (3 VP). Then 2 minor explorations."
+    }
+   ],
+   "dir": "right",
+   "id": "SE.3",
+   "species": "arkhos",
+   "tier": "species"
+  },
+  {
+   "actions": [
+    {
+     "effect": "amoeba_section",
+     "kind": "text",
+     "text": "If a section of the Amoeba board has 3 organelles, the rival gains all their bonuses."
+    },
+    {
+     "costPublicity": 0,
+     "kind": "tech",
+     "progress": 1
+    }
+   ],
+   "dir": "right",
+   "id": "SE.4",
+   "species": "amoeba",
+   "tier": "species"
   }
  ],
  "source": "R16 p.6-7 (EXP-SOLO-*), transcribed in expansion-transcription.json; owner checked 2026-10-15 (A-033, A-034)"

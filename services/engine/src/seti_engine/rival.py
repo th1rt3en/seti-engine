@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import cards, effects, objectives, rewards, rng, solar, species, tables, techs
+from . import arkhos, cards, effects, objectives, rewards, rng, solar, species, tables, techs
 from .models import GameState, PlayerState, Probe, RivalState
 
 Events = list[dict[str, Any]]
@@ -29,7 +29,16 @@ TRACK = [
 ]  # SOLO-DATA-11, clockwise; the growth icon lies between the last and the first
 TRACK_CATEGORY = {"blue": "computer", "pink": "telescope", "orange": "probe"}
 ADVANCED = [f"S.{i}" for i in range(5, 15)]  # A-010
-SPECIES_CARD = {"mascamites": "S.15", "anomalies": "S.16", "oumuamua": "S.17", "centaurians": "S.18", "exertians": "S.19"}
+SPECIES_CARD = {
+    "mascamites": "S.15",
+    "anomalies": "S.16",
+    "oumuamua": "S.17",
+    "centaurians": "S.18",
+    "exertians": "S.19",
+    "glyphids": "SE.2",  # the species cards of the expansion (A-033)
+    "arkhos": "SE.3",
+    "amoeba": "SE.4",
+}
 COMPUTER_SPACES = 6
 COMPUTER_PUBLICITY = 2  # the second space gives 1 publicity (SOLO-DATA-12)
 COMPUTER_PROGRESS = 4  # the fourth gives 4 progress
@@ -145,7 +154,26 @@ def grant(s: GameState, rws: list[dict[str, Any]], events: Events, planet: str |
         elif t == "signal_oumuamua":  # SOLO-ALIEN-01: always on the tile
             for _ in range(n):
                 species.mark_tile(s, p, events)
-        elif t in ("move", "launch", "exofossil_pay", "sample_peek"):
+        elif t == "signal_token":
+            advance(s, n, events)  # EXP-GLY-08: a signal token is an advance for the rival
+        elif t in ("explore_minor", "explore_major"):
+            for _ in range(n):
+                arkhos.explore(s, p, t.removeprefix("explore_"), events)
+        elif t == "explore":
+            arkhos.explore(s, p, r["level"], events)
+        elif t in (
+            "move",
+            "launch",
+            "exofossil_pay",
+            "sample_peek",
+            "organelle",
+            "organelles",
+            "glyph_space",
+            "glyph_resource",
+            "scan_free",
+            "research",
+            "vp_empty_species_space",
+        ):
             continue  # nothing for the rival
 
 
@@ -195,7 +223,9 @@ def trace(s: GameState, kind: str, events: Events, only_slot: int | None = None)
                     options.append((len(rewards.TRACE_COLORS) + 2, i, {"slot": i, "space": "discovery", "color": c}))  # below the board
                 continue
             free = [
-                m for m in species.board_moves(s, p, i, (c,)) if m["space"] == "board" and _rival_can_pay(s, slot.species, c, m["index"])
+                m
+                for m in species.board_moves(s, p, i, (c,))
+                if m["space"] == "board" and _rival_can_pay(s, slot.species, c, m["index"]) and _rival_wants(s, i, c, m["index"])
             ]
             if free:
                 k = max(m["index"] for m in free)
@@ -203,12 +233,29 @@ def trace(s: GameState, kind: str, events: Events, only_slot: int | None = None)
     if options:
         lowest = max(o[0] for o in options)
         best = [o for o in options if o[0] == lowest]
+        arkhos_first = [o for o in best if s.species[o[1]].species == "arkhos"]
+        best = arkhos_first or best  # EXP-ARK-08: with equally low spaces on both species the rival prefers Arkhos
         chosen = pick(s, sorted(best, key=lambda o: (o[1], colors.index(o[2]["color"]))))
         action = chosen[2]
     else:
         slots = [i for i in range(len(s.species)) if only_slot in (None, i)]
         action = {"slot": pick(s, slots), "space": "overflow", "color": colors[0]}
     rewards.place_trace(s, p, action, events)
+
+
+def _rival_wants(s: GameState, slot_index: int, color: str, k: int) -> bool:
+    """EXP-GLY-08: an upper space of the Glyphids board whose token is gone (it is empty) is ignored; EXP-AMO-06: Amoeba spaces that would
+    give the bonuses of 1 organelle or none are ignored. (Spaces of Arkhos that the rival cannot reach are left out by
+    `species.board_moves`, EXP-ARK-08.)"""
+    slot = s.species[slot_index]
+    if slot.species == "glyphids":
+        space = next(c for c in species.board_data("glyphids")["columns"] if c["color"] == color)["spaces"][k]
+        return not space.get("well") or f"board:{color}:{k}" in slot.extra.get("tokens", {})
+    if slot.species == "amoeba":
+        from . import amoeba  # noqa: PLC0415 - amoeba imports rewards
+
+        return len(amoeba.in_section(slot.extra, color)) >= 2
+    return True
 
 
 def _rival_can_pay(s: GameState, species_name: str, color: str, k: int) -> bool:
@@ -442,10 +489,13 @@ def _probe(s: GameState, a: dict[str, Any], events: Events) -> bool:
         if "movementByPlanet" in a
         else [(pl, a["movement"]) for pl in ([a["target"]] if "target" in a else a["planets"])]
     )
+    glyph = species_slot_extra(s, "glyphids")
     for planet, movement in plans:
         pos = solar.find_cell(s, f"PLANET:{planet.upper()}")
         if pos is None or planet not in s.planets:
             continue
+        if a.get("glyphPlanets") and (glyph is None or f"planet:{planet}" not in glyph.get("tokens", {})):
+            continue  # SE.2 (A-033): only the planets that still carry a glyph token
         reach = _moves(s, earth, movement)
         if pos in reach:
             effects.gain_publicity(s, p, reach[pos])
@@ -455,6 +505,10 @@ def _probe(s: GameState, a: dict[str, Any], events: Events) -> bool:
                 _take_sample(s, planet)
             return True
     return False
+
+
+def species_slot_extra(s: GameState, name: str) -> dict[str, Any] | None:
+    return next((sl.extra for sl in s.species if sl.species == name and sl.discovered), None)
 
 
 def _arrive(s: GameState, planet: str, a: dict[str, Any], events: Events) -> None:
@@ -550,6 +604,30 @@ def _text(s: GameState, a: dict[str, Any], events: Events) -> bool:
             return False
         trace(s, tok["color"], events, only_slot=i)
         gain_vp(s, 3, events)
+        return True
+    if e == "arkhos_breach":  # EXP-ARK-08: its only way to breach; the overflow space gives 3 VP (LIFE-01)
+        i = next((k for k, sl in enumerate(s.species) if sl.species == "arkhos" and sl.discovered), None)
+        if i is None:
+            return False
+        left = sorted(p.security)
+        if left:
+            color = left[rng.below(s, len(left))]
+            r.breaching = True
+            rewards.place_trace(s, p, {"slot": i, "space": "overflow", "color": color}, events)
+            r.breaching = False
+        for _ in range(2):
+            arkhos.explore(s, p, "minor", events)
+        return True
+    if e == "amoeba_section":  # EXP-AMO-06 / A-033: a section with 3 organelles gives all its bonuses
+        from . import amoeba  # noqa: PLC0415 - amoeba imports rewards
+
+        i = amoeba.slot_index(s)
+        if i is None:
+            return False
+        full = [c for c in ("pink", "yellow", "blue") if len(amoeba.in_section(s.species[i].extra, c)) == 3]
+        if not full:
+            return False
+        amoeba.gain_section(s, p, pick(s, full), events)
         return True
     if e == "centaurians_countdown":
         if r.messages_in_reserve > 0 and not p.messages:
