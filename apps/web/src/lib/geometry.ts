@@ -135,7 +135,7 @@ export const GOLD_SLOTS = [
  * The deck of a discovered species lies in a column to the right of its board: the back of the deck on top (with the number of cards left over it)
  * and the card that lies face up below it. Sizes in board pixels; the column starts `gap` after the right edge of the board.
  */
-export const ALIEN_COLUMN = { w: 495, h: 689, gap: 30, between: 36 }; // two cards and the space between them are as high as the board (1415 x 1)
+export const ALIEN_COLUMN = { w: 381, h: 530, gap: 30, between: 36 }; // the two cards and the space between them end just above the top edge of the board (y = 25), from the top of the species boards
 
 export function alienColumn(slot: number): { deck: { x: number; y: number }; faceUp: { x: number; y: number } } {
   const left = (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale;
