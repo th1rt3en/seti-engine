@@ -424,3 +424,11 @@ def test_orbital_dynamics_step_out_of_an_asteroid_field_needs_more_movement() ->
     assert bool(steps) == (cost <= 1)  # a dearer step is not offered without the extra movement
     cur(s).movement = max(0, cost - 1)
     assert any(m["type"] == "od_step" for m in legal_moves(s))
+
+
+def test_futurespan_prepares_only_cards_that_cost_1_to_4() -> None:  # EXP-ORG-12, A-052 (owner)
+    s = with_org("futurespan_institute")
+    p = cur(s)
+    p.hand = ["SA.17", "SA.8", "SA.10", "SA.1"]  # costs 0, 3, 4, 1
+    offered = {m["card"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("card")}
+    assert offered == {"SA.8", "SA.10", "SA.1"}

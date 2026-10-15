@@ -336,7 +336,7 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
     base: Action = {"type": "org_free", "org": o}
     if o == "futurespan_institute":
         if not p.org_data.get("fs_card"):  # EXP-ORG-12: one prepared card at a time
-            return [{**base, "card": c} for c in dict.fromkeys(p.hand)]
+            return [{**base, "card": c} for c in dict.fromkeys(p.hand) if 1 <= prepare_cost(c) <= 4]  # A-052: costs 1 to 4 only
         if not p.org_used:  # once per round while the token is on the scoring track: 3 spaces farther, and a card
             return [{**base, "delay": True}]
         return []
@@ -381,7 +381,7 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         else:
             p.hand.remove(a["card"])
             p.org_data["fs_card"] = a["card"]
-            p.org_data["fs_token"] = p.score + 10 * prepare_cost(a["card"]) + 5  # A-036 (c)
+            p.org_data["fs_token"] = p.score + 10 * prepare_cost(a["card"]) + 5  # the card shows +15, +25, +35, +45 (A-052)
         events.append({"type": "org_free", "player": p.index, "org": o})
         return
     p.org_used = True

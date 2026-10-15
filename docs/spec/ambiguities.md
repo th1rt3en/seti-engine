@@ -56,7 +56,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-049 | Amoeba cards ET.14 and ET.20 | ruled |
 | A-050 | Readings of the 42 main-deck cards | ruled |
 | A-051 | Helion Assembly's free action | proposed (in use, to confirm) |
-| A-052 | Futurespan token distance for other costs | proposed (in use, to confirm) |
+| A-052 | Futurespan token distance for other costs | ruled |
 | A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
 | A-054 | Mission Relay's starting marker | ruled |
 
@@ -487,11 +487,12 @@ Entry format:
 - Questions for the owner: what does the placed tech give?
 
 ## A-052: Futurespan token distance for other costs
-- Status: proposed
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-ORG-12
 - Rulebook page and text: the card shows +15, +25, +35, +45 for cost 1, 2, 3, 4 only.
 - Proposed ruling: a cost of 0 gives +5 and costs of 5 or more give 10 x cost + 5 (the formula of the first reading).
 - Questions for the owner: rule on 0 and 5 or more.
+- Ruling (owner), 2026-10-15: no card costs 5 or more, and a card that costs 0 cannot be prepared. Only cards of cost 1 to 4 are offered; the token goes 15, 25, 35 or 45 points ahead.
 
 ## A-053: In which order are the effects of a card, organization or board space resolved?
 - Status: ruled
