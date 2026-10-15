@@ -24,6 +24,16 @@ def cards() -> dict[str, dict[str, Any]]:
     """The static facts of the cards. The quick start cards that are tucked for income (SR.15, SR.16; EXP-QS-02) are in it too, with deck
     "quick" so that no deck is built from them, because a tucked card is looked up like any other for its income."""
     out: dict[str, dict[str, Any]] = dict(load("cards.json"))
+    for sc in arkhos()["security"]:  # the Arkhos security cards (EXP-ARK-03): discarded for a minor, played for a major exploration reward
+        out[sc["id"]] = {
+            "name": sc["name"],
+            "deck": "alien",
+            "cost": 2,
+            "income": sc["income"],
+            "sector": sc["sector"],
+            "species": "arkhos",
+            "free": [["explore_minor", 1]],
+        }
     for qid, q in quick_start_cards().items():
         if q["income_increase"]:
             out[qid] = {
@@ -35,6 +45,11 @@ def cards() -> dict[str, dict[str, Any]]:
                 "species": None,
                 "free": [],
             }
+    return out
+
+
+def arkhos() -> dict[str, Any]:
+    out: dict[str, Any] = load("expansion-arkhos.json")
     return out
 
 
@@ -93,7 +108,8 @@ def planet_info(name: str) -> dict[str, Any]:
 
 
 def alien_boards() -> dict[str, Any]:
-    out: dict[str, Any] = load("alien-boards.json")
+    """The boards of the species: the five of the base game and those of the expansion (EXP-03)."""
+    out: dict[str, Any] = {**load("alien-boards.json"), "arkhos": arkhos()["board"]}
     return out
 
 

@@ -1,0 +1,508 @@
+{
+ "board": {
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "level": 0,
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 1,
+      "rewards": [
+       {
+        "n": 1,
+        "t": "explore_minor"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 2,
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 3,
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "level": 0,
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 1,
+      "rewards": [
+       {
+        "n": 1,
+        "t": "explore_minor"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 2,
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 3,
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "level": 0,
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 1,
+      "rewards": [
+       {
+        "n": 1,
+        "t": "explore_minor"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 2,
+      "rewards": [
+       {
+        "n": 5,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     },
+     {
+      "level": 3,
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "explore_minor"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "title": "Arkhos"
+ },
+ "exploration": [
+  {
+   "id": "ET 39",
+   "major": [
+    {
+     "n": 2,
+     "t": "card_random"
+    },
+    {
+     "kind": "pink",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "minor": [
+    {
+     "n": 1,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "card_random"
+    }
+   ]
+  },
+  {
+   "id": "ET 36",
+   "major": [
+    {
+     "n": 3,
+     "t": "publicity"
+    },
+    {
+     "kind": "blue",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "minor": [
+    {
+     "n": 2,
+     "t": "publicity"
+    }
+   ]
+  },
+  {
+   "id": "ET 33",
+   "major": [
+    {
+     "color": "yellow",
+     "n": 1,
+     "t": "signal_color"
+    },
+    {
+     "color": "red",
+     "n": 1,
+     "t": "signal_color"
+    },
+    {
+     "color": "blue",
+     "n": 1,
+     "t": "signal_color"
+    },
+    {
+     "n": 1,
+     "t": "signal_any"
+    }
+   ],
+   "minor": [
+    {
+     "n": 1,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "signal_token"
+    }
+   ]
+  },
+  {
+   "id": "ET 40",
+   "major": [
+    {
+     "n": 1,
+     "t": "data"
+    },
+    {
+     "cat": "any",
+     "n": 1,
+     "t": "research"
+    }
+   ],
+   "minor": [
+    {
+     "n": 4,
+     "t": "vp"
+    }
+   ]
+  },
+  {
+   "id": "ET 37",
+   "major": [
+    {
+     "n": 1,
+     "t": "signal_token"
+    },
+    {
+     "n": 4,
+     "t": "energy"
+    }
+   ],
+   "minor": [
+    {
+     "n": 1,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "energy"
+    }
+   ]
+  },
+  {
+   "id": "ET 34",
+   "major": [
+    {
+     "n": 1,
+     "nolimit": true,
+     "t": "launch"
+    },
+    {
+     "kind": "pink",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "minor": [
+    {
+     "n": 1,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "credit"
+    }
+   ]
+  },
+  {
+   "id": "ET 41",
+   "major": [
+    {
+     "n": 1,
+     "t": "publicity"
+    },
+    {
+     "n": 1,
+     "t": "data"
+    },
+    {
+     "n": 1,
+     "t": "credit"
+    },
+    {
+     "n": 1,
+     "t": "energy"
+    },
+    {
+     "n": 1,
+     "t": "card_random"
+    }
+   ],
+   "minor": [
+    {
+     "n": 1,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "card_random"
+    }
+   ]
+  },
+  {
+   "id": "ET 38",
+   "major": [
+    {
+     "n": 1,
+     "nolimit": true,
+     "t": "launch"
+    },
+    {
+     "n": 3,
+     "t": "move"
+    }
+   ],
+   "minor": [
+    {
+     "n": 2,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "publicity"
+    }
+   ]
+  },
+  {
+   "id": "ET 35",
+   "major": [
+    {
+     "n": 2,
+     "t": "energy"
+    },
+    {
+     "kind": "yellow",
+     "n": 1,
+     "t": "trace"
+    }
+   ],
+   "minor": [
+    {
+     "n": 1,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "energy"
+    }
+   ]
+  }
+ ],
+ "security": [
+  {
+   "id": "AK.21",
+   "income": "card",
+   "name": "Exterior Scan",
+   "printed": "ET.21",
+   "sector": "red",
+   "trace": "pink"
+  },
+  {
+   "id": "AK.22",
+   "income": "energy",
+   "name": "Exterior Scan",
+   "printed": "ET.22",
+   "sector": "blue",
+   "trace": "pink"
+  },
+  {
+   "id": "AK.23",
+   "income": "credit",
+   "name": "Exterior Scan",
+   "printed": "ET.23",
+   "sector": "yellow",
+   "trace": "pink"
+  },
+  {
+   "id": "AK.24",
+   "income": "energy",
+   "name": "Exterior Scan",
+   "printed": "ET.24",
+   "sector": "black",
+   "trace": "pink"
+  },
+  {
+   "id": "AK.29",
+   "income": "card",
+   "name": "Forced Entry",
+   "printed": "ET.29",
+   "sector": "yellow",
+   "trace": "blue"
+  },
+  {
+   "id": "AK.30",
+   "income": "energy",
+   "name": "Forced Entry",
+   "printed": "ET.30",
+   "sector": "red",
+   "trace": "blue"
+  },
+  {
+   "id": "AK.31",
+   "income": "credit",
+   "name": "Forced Entry",
+   "printed": "ET.31",
+   "sector": "blue",
+   "trace": "blue"
+  },
+  {
+   "id": "AK.32",
+   "income": "credit",
+   "name": "Forced Entry",
+   "printed": "ET.32",
+   "sector": "black",
+   "trace": "blue"
+  },
+  {
+   "id": "AK.25",
+   "income": "card",
+   "name": "Proximity Maneuvers",
+   "printed": "ET.25",
+   "sector": "blue",
+   "trace": "yellow"
+  },
+  {
+   "id": "AK.26",
+   "income": "energy",
+   "name": "Proximity Maneuvers",
+   "printed": "ET.26",
+   "sector": "yellow",
+   "trace": "yellow"
+  },
+  {
+   "id": "AK.27",
+   "income": "credit",
+   "name": "Proximity Maneuvers",
+   "printed": "ET.27",
+   "sector": "red",
+   "trace": "yellow"
+  },
+  {
+   "id": "AK.28",
+   "income": "card",
+   "name": "Proximity Maneuvers",
+   "printed": "ET.28",
+   "sector": "black",
+   "trace": "yellow"
+  }
+ ],
+ "source": "docs/spec/data/expansion-transcription.json (a transcription of the owner-supplied pictures, owner check pending; see ambiguities A-040 to A-042)"
+}

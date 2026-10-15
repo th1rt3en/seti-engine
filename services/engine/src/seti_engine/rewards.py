@@ -22,7 +22,7 @@ NEUTRAL = -1  # EXP-QS-03: the marker color of the neutral quick start pieces
 def grant(
     s: GameState, p: PlayerState, rewards: list[dict[str, Any]], events: Events, planet: str | None = None, slot: int | None = None
 ) -> None:
-    from . import rival, species  # noqa: PLC0415 - these import this module
+    from . import arkhos, cards, rival, species  # noqa: PLC0415 - these import this module
 
     if rival.is_rival(s, p.index):  # SOLO-10: the rival takes rewards in its own way
         rival.grant(s, rewards, events, planet, slot)
@@ -53,6 +53,14 @@ def grant(
             p.movement += n
         elif t == "signal_token":
             p.signal_tokens += n  # EXP-SIG-01
+        elif t == "explore_minor" or t == "explore_major":  # EXP-ARK-04: reveal the next exploration card, gain its minor or major reward
+            for _ in range(n):
+                arkhos.explore(s, p, t.removeprefix("explore_"), events)
+        elif t == "explore":
+            arkhos.explore(s, p, r["level"], events)
+        elif t == "research":  # a free research (rotate, then take a tech) from an exploration reward
+            cards.run_step(s, p, {"t": "rotate"}, events)
+            cards.run_step(s, p, {"t": "research", "cat": r.get("cat", "any")}, events)
         elif t == "exofossil":
             species.gain_exofossil(s, p, n)
         elif t == "exofossil_pay":
@@ -204,6 +212,7 @@ def trace_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
 def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
     """Mark a trace on the space `a` names; it counts for the color of that space (CARD-46, A-017, A-022)."""
     from . import (
+        arkhos,  # noqa: PLC0415 - arkhos imports this module
         cards,  # noqa: PLC0415 - cards imports this module
         orgs,  # noqa: PLC0415 - orgs imports this module
         species,  # noqa: PLC0415 - species imports this module
@@ -221,6 +230,7 @@ def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events)
         slot.overflow.append(p.index)
         slot.overflow_kinds.append(kind)
         effects.gain_score(s, p, OVERFLOW_VP)
+        arkhos.on_overflow(s, p, a["slot"], kind)  # EXP-ARK-06
     else:
         slot.discovery_spaces[TRACE_COLORS.index(a["color"])] = f"p{p.index}"
         effects.gain_score(s, p, DISCOVERY_VP[a["slot"]])  # LIFE-03

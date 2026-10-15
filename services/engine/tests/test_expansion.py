@@ -6,7 +6,7 @@ import pytest
 
 from seti_engine import orgs, tables
 from seti_engine.engine import apply, legal_moves, start
-from seti_engine.models import GameState, Options
+from seti_engine.models import SPECIES_BASE, SPECIES_EXPANSION, GameState, Options
 from seti_engine.projection import project
 
 OPTS = {"expansion": True, "organizations": True}
@@ -50,8 +50,10 @@ def test_the_options_need_the_expansion() -> None:  # EXP-01
 def test_the_expansion_alone_changes_nothing_else() -> None:  # EXP-01, EXP-03
     base = start(Options(players=2, seed=4)).state
     with_exp = start(Options(players=2, seed=4, expansion=True)).state
-    assert base.players[0].hand == with_exp.players[0].hand
+    # the new species join the draw of the two species, so the random order after it differs; everything else is as in the base game
     assert base.round == with_exp.round == 1
+    assert len(base.players[0].hand) == len(with_exp.players[0].hand) == 5
+    assert {sl.species for sl in with_exp.species} <= {*SPECIES_BASE, *SPECIES_EXPANSION}
 
 
 def test_setup_deals_two_organizations_and_three_quick_start_cards() -> None:  # EXP-ORG-03, EXP-ORG-04

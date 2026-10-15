@@ -123,6 +123,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         "exofossil_pay",
         "signal_oumuamua",
         "signal_any",
+        "explore",
     ):
         if t == "trace":
             _trace_step(s, p, st)
@@ -633,6 +634,9 @@ def gain_corner(s: GameState, p: PlayerState, cid: str) -> None:
             effects.gain_data(s, p, n)
         elif kind == "score":
             effects.gain_score(s, p, n)
+        elif kind == "explore_minor":  # EXP-ARK-07: a security card discarded for its free action
+            for _ in range(n):
+                rewards.grant(s, p, [{"t": "explore_minor"}], [])
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

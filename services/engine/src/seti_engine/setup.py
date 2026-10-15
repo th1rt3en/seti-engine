@@ -13,6 +13,7 @@ from .models import (
     GLYPHS,
     PLANET_ORDER,
     SPECIES_BASE,
+    SPECIES_EXPANSION,
     TECH_CATEGORIES,
     Decision,
     GameState,
@@ -56,7 +57,11 @@ def new_game(options: Options) -> GameState:
     state.disc_angles = [rng.below(state, 8) for _ in range(3)]
 
     # two of the five alien species, hidden (SETUP-11)
-    drawn = rng.shuffled(state, list(SPECIES_BASE))
+    pool = [
+        *SPECIES_BASE,
+        *(SPECIES_EXPANSION if options.expansion and not solo else []),
+    ]  # EXP-03; the rival does not know them yet (A-033)
+    drawn = rng.shuffled(state, pool)
     picked = _sandbox_species(options, drawn) if options.sandbox else drawn[:2]  # SANDBOX-06: the sandbox can choose them
     state.species = [SpeciesSlot(species=s, board=species.new_board(s)) for s in picked]
 

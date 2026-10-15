@@ -12,6 +12,7 @@ TECH_CATEGORIES = ["probe", "telescope", "computer"]
 GLYPHS = ["dot", "link", "branch", "cross"]
 PLANET_ORDER = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune"]
 SPECIES_BASE = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"]
+SPECIES_EXPANSION = ["arkhos"]  # EXP-03: the new species the engine can play (Glyphids and Amoeba follow)
 
 Phase = Literal["setup", "play", "finished"]
 
@@ -108,6 +109,8 @@ class PlayerState(BaseModel):
     completed_missions: list[str] = Field(default_factory=list)  # CARD-16: face down
     kept_cards: list[str] = Field(default_factory=list)  # cards kept in front of the player, no mission or end card (SE EN 01)
     signal_tokens: int = 0  # EXP-SIG-01: unlimited supply
+    # Arkhos (EXP-ARK-03): trace color -> the security card still in front of the player
+    security: dict[str, str] = Field(default_factory=dict)
     # the organization module (EXP-ORG-*): the organization, the 2 + 3 cards offered at setup (only the player sees them),
     # the quick start cards chosen
     organization: str | None = None

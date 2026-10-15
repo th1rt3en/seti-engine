@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, rewards, rival, rng, tables
+from . import arkhos, effects, rewards, rival, rng, tables
 from .models import Decision, GameState, PlayerState, Probe, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -54,6 +54,8 @@ def board_moves(s: GameState, p: PlayerState, slot_index: int, colors: tuple[str
             if not space["rewards"]:  # Mascamite sample spaces come with the Mascamite slice
                 continue
             if slot.board[color][k] and not space.get("repeat"):
+                continue
+            if slot.species == "arkhos" and space["level"] > arkhos.access(p):  # EXP-ARK-05: deeper levels need breached security cards
                 continue
             if _cost_ok(p, space.get("cost", [])):
                 out.append({"type": "place_trace", "slot": slot_index, "space": "board", "color": color, "index": k})
@@ -129,9 +131,12 @@ def _discover(s: GameState, index: int, events: Events) -> None:
     slot = s.species[index]
     slot.discovered = True
     events.append({"type": "discovered", "species": slot.species, "slot": index})
+    owners = [int(x[1:]) for x in slot.discovery_spaces if x is not None and x != "n"]
+    if slot.species == "arkhos":  # no species deck: security cards and an exploration deck (EXP-ARK-01)
+        arkhos.discover(s, slot, owners, events)
+        return
     ids = sorted(cid for cid, c in tables.cards().items() if c["species"] == slot.species)
     slot.deck = rng.shuffled(s, ids)  # ALIEN-06
-    owners = [int(x[1:]) for x in slot.discovery_spaces if x is not None and x != "n"]
     if slot.species == "exertians":
         _setup_exertians(s, slot, owners, events)
         return

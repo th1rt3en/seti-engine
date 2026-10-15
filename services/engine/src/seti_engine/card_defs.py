@@ -443,3 +443,5 @@ ALIEN_CARDS: dict[str, dict[str, Any]] = {
     "ET.40": {"fx": [*message(), R("sig_twice", 2)], "green": [R("tuck_self")]},
 }
 CARDS.update(ALIEN_CARDS)
+for _sc in ("AK.21", "AK.22", "AK.23", "AK.24", "AK.25", "AK.26", "AK.27", "AK.28", "AK.29", "AK.30", "AK.31", "AK.32"):
+    CARDS[_sc] = {"fx": [R("explore", level="major")]}  # EXP-ARK-07: played as a main action, a security card gives a major reward
