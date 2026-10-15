@@ -473,3 +473,26 @@ def test_sa42_lofar_array() -> None:  # SA.42
     assert cards.end_points(st, p) == 0
     st.sectors[7].winners.append(p.index)  # a won sector counts as well
     assert cards.end_points(st, p) == 8
+
+
+def test_effects_resolve_from_left_to_right() -> None:  # EXP-ORDER-01, A-053
+    s = ready()
+    pr = put_probe(s, "mars")
+    r = go(s, 6, answer=False)  # movement, then the landing, then the signal
+    assert me(r).movement == 1 and r.state.pending[0].kind == "land_free"
+    assert len(r.state.sectors[pr.sector].markers) == len(s.sectors[pr.sector].markers)  # the signal waits for the landing
+    r = apply(r.state, next(m for m in r.legal if m["type"] == "land_free"))
+    r = settle(r)
+    assert len(r.state.sectors[pr.sector].markers) >= len(s.sectors[pr.sector].markers) + 1
+    s = ready()
+    r = go(s, 34, answer=False)  # the tuck comes before the cards for techs
+    assert r.state.pending[0].kind == "income_tuck"
+
+
+def test_a_card_that_names_mars_triggers_gateway_to_mars() -> None:  # A-027 (owner), SA.31
+    assert "SA.31" in card_defs.MARS_FLAVOR
+    s = ready()
+    put_probe(s, "venus")
+    s.players[s.current_player].missions.append(MissionState(card="SE_EN_02", kind="trigger", used=[False, False]))
+    r = go(s, 31, answer=False)
+    assert any(d.kind == "mission_trigger" for d in r.state.pending)

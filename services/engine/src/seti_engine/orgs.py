@@ -110,6 +110,8 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
     org = by_id(p.organization)
     for cid in p.quick_start:
         place_marks(s, p, cid)  # EXP-QS-01: no benefits
+    for _ in range(org["probes"]):  # EXP-ORDER-01: the launches are printed before the resources in the header of Orbital Dynamics
+        effects.launch_probe(s, p, events)
     res = org["starting_resources"]
     p.credits += res["credit"]
     p.energy += res["energy"]
@@ -117,8 +119,6 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
     effects.gain_data(s, p, res["data"])
     for _ in range(res["card"]):
         effects.draw_random_card(s, p)
-    for _ in range(org["probes"]):
-        effects.launch_probe(s, p, events)
     for cid in p.quick_start:  # EXP-QS-02: the bottom half
         lower(s, p, cid)
     if p.organization == "mission_relay":  # EXP-ORG-13: the lowest-scoring space of the Mission tile

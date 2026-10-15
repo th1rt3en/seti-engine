@@ -4,6 +4,8 @@ Sources (kept out of the repository by the owner's instruction; cited by section
 
 The expansion is optional. With it off, the base game is exactly as in the other spec files (EXP-01).
 
+- **EXP-ORDER-01** (A-053, owner 2026-10-15) The effects of a card, an organization, a quick start card or a board space are resolved from left to right as printed. An effect that needs a choice is finished before the next one starts.
+
 ## Components and the options
 
 - **EXP-01** (D19, D35) The game options are `expansion` (the cards, species and signal tokens of the expansion are in the game), `organizations` (needs `expansion`: the organization module with quick start cards and 4 rounds) and `neutral_quick_start` (needs `expansion` and 1 or 2 players, optional module of R16 "Adjustments for 1-2 players"). With `expansion` off the engine behaves exactly as without the expansion.

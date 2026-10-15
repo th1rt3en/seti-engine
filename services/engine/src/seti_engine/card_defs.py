@@ -126,8 +126,8 @@ def circle(on: dict[str, Any], *r: Step) -> dict[str, Any]:
     return {"on": on, "r": list(r)}
 
 
-# the cards whose flavor text names Mars, read from the card art (owner to confirm, A-027): #13, #14, #22, #34, #76, #84, #85, #119, ET.4
-MARS_FLAVOR = frozenset({"13", "14", "22", "34", "76", "84", "85", "119", "ET.4"})
+# the cards whose flavor text names Mars (confirmed by the owner, A-027): #13, #14, #22, #34, #76, #84, #85, #119, ET.4, SA.31
+MARS_FLAVOR = frozenset({"13", "14", "22", "34", "76", "84", "85", "119", "ET.4", "SA.31"})
 # SE EN 02: an orbit or a landing at Mars (or its moons), or playing a card that names Mars in its flavor text
 MARS_TRIGGER = {"any": [{"e": "orbit", "planet": "mars"}, {"e": "land", "planet": "mars"}, {"e": "play_mars"}]}
 

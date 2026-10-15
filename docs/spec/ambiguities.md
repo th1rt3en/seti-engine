@@ -2,7 +2,7 @@
 
 Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule 3). The owner rules, and the ruling is copied into the spec with its rule ID.
 
-## Overview (kept up to date by hand; the entries below hold the details)
+## Overview (rewritten by tools/spec/ambiguity_overview.py; the entries below hold the details)
 
 | ID | Title | Status |
 |---|---|---|
@@ -31,7 +31,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-024 | Details of the rival's choices | ruled |
 | A-025 | The rival has no income and no starting cards | ruled |
 | A-026 | May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)? | ruled |
-| A-027 | Which cards mention Mars in their flavor text (SE EN 02) | proposed (in use, to confirm) |
+| A-027 | Which cards mention Mars in their flavor text (SE EN 02) | ruled |
 | A-028 | Effects of the 42 expansion main-deck cards | data supplied, to confirm |
 | A-029 | Alien cards that give signal tokens and the other new icons | resolved |
 | A-030 | Which organizations are numbered 1 to 4 | resolved |
@@ -57,6 +57,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-050 | Readings of the 42 main-deck cards | proposed (in use, to confirm) |
 | A-051 | Helion Assembly's free action | proposed (in use, to confirm) |
 | A-052 | Futurespan token distance for other costs | proposed (in use, to confirm) |
+| A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
 
 Entry format:
 
@@ -280,7 +281,7 @@ Entry format:
 - Ruling (owner), 2026-10-14: neither reading. The row is refilled after the whole scan action (SCAN-03, FAQ-15), but at once whenever a free action (3 publicity, or a trade) takes a card from the display. A free action may interrupt the main action but not another free action (FREE-00). In general every move can be taken back unless it reveals hidden information (drawing or revealing a card from the deck, passing to see and draw from the round pile, revealing a species); the page then warns that the move cannot be undone and asks for a confirmation (UNDO-01, D32). So a trade or purchase of a display card cannot be taken back, because its replacement comes from the deck.
 
 ## A-027: Which cards mention Mars in their flavor text (SE EN 02)
-- Status: proposed (the engine uses this list; the owner is asked to confirm it)
+- Status: ruled (owner, 2026-10-15: the list is right; the expansion card SA.31 Ingenuity Helicopter, whose flavor text says "work on Mars", is added to it)
 - Rule IDs affected: PROMO-03
 - Rulebook page and text: SE EN 02 "Gateway to Mars": "When you orbit or land at Mars (or its moons) or when you play a card mentioning \"Mars\" in its flavor text". The card data holds no flavor texts.
 - Readings: (1) the italic flavor text at the bottom of each card, as printed; (2) the card name or its effect text.
@@ -478,4 +479,11 @@ Entry format:
 - Rulebook page and text: the card shows +15, +25, +35, +45 for cost 1, 2, 3, 4 only.
 - Proposed ruling: a cost of 0 gives +5 and costs of 5 or more give 10 x cost + 5 (the formula of the first reading).
 - Questions for the owner: rule on 0 and 5 or more.
+
+## A-053: In which order are the effects of a card, organization or board space resolved?
+- Status: ruled
+- Rule IDs affected: EXP-ORDER-01 (all cards, organizations, quick start cards and board spaces that show several effects)
+- Rulebook page and text: none; the icons of a card are printed in a row.
+- Readings: (1) left to right as printed; (2) the player chooses the order.
+- Ruling (owner), 2026-10-15: all effects are resolved from left to right. Where an effect needs a choice, the later effects wait for it (the engine already waits for each decision before it runs the next step). Checked: the 42 main-deck cards, the Glyphids, Amoeba and Arkhos cards and the exploration rewards are written in the printed order; the starting resources of an organization follow its header (Orbital Dynamics' two launches come first).
 
