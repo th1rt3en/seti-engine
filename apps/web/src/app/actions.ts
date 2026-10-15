@@ -82,9 +82,9 @@ export async function createGameAction(form: FormData): Promise<void> {
   const difficulty = Math.min(5, Math.max(1, Number(field(form, "difficulty")) || 3));
   const rated = form.get("rated") === "on" && players >= 2;
   const sandbox = players === 1 && form.get("sandbox") === "on";
-  // the Space Agencies expansion: organizations need 2 to 4 players or the sandbox, the neutral pieces 1 to 2 (D35)
+  // the Space Agencies expansion: organizations work in every game, solo included (EXP-SOLO-01); the neutral pieces are for 1 to 2 players (D35)
   const expansion = form.get("expansion") === "on";
-  const organizations = expansion && form.get("organizations") === "on" && (players > 1 || sandbox);
+  const organizations = expansion && form.get("organizations") === "on";
   const expansionOptions = expansion
     ? {
         expansion: true,

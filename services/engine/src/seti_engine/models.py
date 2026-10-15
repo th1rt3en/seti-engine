@@ -12,7 +12,7 @@ TECH_CATEGORIES = ["probe", "telescope", "computer"]
 GLYPHS = ["dot", "link", "branch", "cross"]
 PLANET_ORDER = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune"]
 SPECIES_BASE = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"]
-SPECIES_EXPANSION = ["arkhos", "glyphids", "amoeba"]  # EXP-03: the new species the engine can play (Glyphids and Amoeba follow)
+SPECIES_EXPANSION = ["arkhos", "glyphids", "amoeba"]  # EXP-03: the three new species
 
 Phase = Literal["setup", "play", "finished"]
 
@@ -48,8 +48,14 @@ class Options(BaseModel):
         if self.neutral_quick_start and self.players > 2:
             raise ValueError("the neutral quick start cards are for games of 1 or 2 players")
         chosen = [x for x in self.sandbox_species if x is not None]
-        if len(self.sandbox_species) != 2 or any(x not in SPECIES_BASE for x in chosen) or len(set(chosen)) != len(chosen):
-            raise ValueError("sandbox_species lists two different base species, or null for chance")
+        allowed = [
+            *SPECIES_BASE,
+            *(SPECIES_EXPANSION if self.expansion else []),
+        ]  # SANDBOX-06: the species of the expansion with the expansion
+        if len(self.sandbox_species) != 2 or any(x not in allowed for x in chosen) or len(set(chosen)) != len(chosen):
+            raise ValueError(
+                "sandbox_species lists two different species of the game (the expansion's with the expansion), or null for chance"
+            )
         if chosen and not self.sandbox:
             raise ValueError("the species can only be chosen in the sandbox")
         return self

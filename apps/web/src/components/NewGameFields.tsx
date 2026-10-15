@@ -20,10 +20,17 @@ export function NewGameFields({
   const [second, setSecond] = useState("");
   // the Space Agencies expansion (D35): the organization module also works in the solo game; the neutral pieces are for 1 to 2 players
   const [expansion, setExpansion] = useState(false);
-  const [organizations, setOrganizations] = useState(false);
+  const [organizations, setOrganizations] = useState(true); // the intended way to play the expansion: organizations, 4 rounds
   const orgsAllowed = true; // EXP-SOLO-01: the solo game against the rival can use them too
   const orgsOn = expansion && organizations && orgsAllowed;
-  const SPECIES = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"];
+  const SPECIES = [
+    "anomalies",
+    "centaurians",
+    "exertians",
+    "mascamites",
+    "oumuamua",
+    ...(expansion ? ["arkhos", "glyphids", "amoeba"] : []), // the species of the expansion, when it is in the game (SANDBOX-06)
+  ];
   const speciesSelect = (name: string, label: string, value: string, onChange: (v: string) => void, taken: string) => (
     <label>
       {label}
@@ -108,8 +115,21 @@ export function NewGameFields({
       <fieldset className="expansion">
         <legend>Space Agencies expansion</legend>
         <label className="row">
-          <input type="checkbox" name="expansion" checked={expansion} onChange={(e) => setExpansion(e.target.checked)} /> Include the Space
-          Agencies expansion
+          <input
+            type="checkbox"
+            name="expansion"
+            checked={expansion}
+            onChange={(e) => {
+              setExpansion(e.target.checked);
+              if (!e.target.checked) {
+                // the species of the expansion can no longer be chosen
+                const base = (v: string) => (["arkhos", "glyphids", "amoeba"].includes(v) ? "" : v);
+                setFirst(base(first));
+                setSecond(base(second));
+              }
+            }}
+          />{" "}
+          Include the Space Agencies expansion
         </label>
         {expansion ? (
           <>
@@ -136,8 +156,9 @@ export function NewGameFields({
               </>
             ) : null}
             <p className="small muted">
-              The 42 new cards and the three new alien species are not in the game yet. For now the expansion adds signal tokens and the
-              organization module.
+              Adds the 42 new cards, signal tokens, the three new alien species (Arkhos, Glyphids, Amoeba) and the organization module.
+              Organizations and 4 rounds are the intended way to play it; untick them to play the base game's setup with the expansion's
+              cards and species.
             </p>
           </>
         ) : null}
