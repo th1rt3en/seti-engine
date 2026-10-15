@@ -75,7 +75,7 @@ export function TechStacks({ view, pick }: { view: View; pick?: TechPick }) {
                       height={pocket.w * 0.92 * (120 / 179)}
                     />
                   ) : null}
-                  {glyphs[`tech:${index}`] ? (
+                  {stack?.two_point_tile && glyphs[`tech:${index}`] ? (
                     <image
                       href={glyphToken(glyphs[`tech:${index}`] ?? "")}
                       x={pocket.x - 6}
