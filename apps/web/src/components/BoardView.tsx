@@ -1,4 +1,5 @@
 "use client";
+import { alienBack, cardImage } from "@/lib/cardImages";
 // The base board with everything on it: the three discs turned to where the game has them, the four star boards in the order they were
 // placed, the data and markers of every sector, the probes, orbiters and landers (each shown as its owner's figure), the markers on the
 // species' discovery spaces, every player's score counter, the neutral markers still waiting at 20 and 30 points, and the moon token that
@@ -41,6 +42,7 @@ import type { View } from "@seti/protocol";
 import { type ReactNode, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
 import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ScorePawn, pieceColor } from "./Pieces";
@@ -50,6 +52,10 @@ const TILES = assets.milestoneTiles as Record<string, string> & { white: string 
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
+/** The picture of a species board: the five of the base game and the three of the Space Agencies expansion. */
+const EXPANSION_BOARDS = expansionAssets as Record<string, string>;
+const alienFace = (species: string): string =>
+  (assets.species as Record<string, string>)[species] ?? EXPANSION_BOARDS[`boards/${species}`] ?? assets.species.back;
 const STAR_BOARDS = assets.starBoards as Record<string, string>;
 /** How far (degrees) an Anomaly token lies from the middle of its sector: planets are about 20 degrees wide at the outermost ring. */
 const ANOMALY_SIDE_DEGREES = 15;
@@ -145,7 +151,7 @@ export function BoardView({
         <image href={assets.board} x={0} y={0} width={BOARD.w} height={BOARD.h} />
         {/* the species boards lie on the base board, over its edge at the top; their cut-outs show the discovery spaces */}
         {s.species.map((sp, i) => {
-          const face = (assets.species as Record<string, string>)[sp.discovered ? sp.species : "back"] ?? assets.species.back;
+          const face = alienFace(sp.discovered ? sp.species : "back");
           return (
             <image
               // biome-ignore lint/suspicious/noArrayIndexKey: the two slots are fixed
@@ -164,9 +170,9 @@ export function BoardView({
         {s.species.map((sp, i) => {
           // the deck of a discovered species lies to the right of its board: its back with the cards left over it, and the card that lies face up
           if (!sp.discovered) return null;
-          const back = (assets.alienBacks as Record<string, string>)[sp.species];
+          const back = alienBack(sp.species);
           const at = alienColumn(i);
-          const faceUp = sp.face_up ? (assets.cards as Record<string, string>)[sp.face_up] : undefined;
+          const faceUp = sp.face_up ? cardImage(sp.face_up) : undefined;
           return (
             <g key={`alien-deck-${sp.species}`}>
               {back ? (

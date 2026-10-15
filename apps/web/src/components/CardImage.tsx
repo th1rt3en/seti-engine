@@ -1,13 +1,11 @@
 "use client";
+import { cardImage } from "@/lib/cardImages";
 // A card image (generated/assets.json). A hidden card ("?") is shown as a card back. The files are WebP images with the hash of their content
 // in the name, so Cloudflare and the browser keep them for good. Hovering a card shows it large beside it.
 import { cardName } from "@/lib/moves";
 import { ZOOM_SECONDS, touchScreen, useLongPress } from "@/lib/touch";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import assets from "../generated/assets.json";
-
-const CARDS = assets.cards as Record<string, string>;
 /** The enlarged card is a quarter of the window wide, between these. */
 const zoomWidth = (): number => Math.round(Math.min(500, Math.max(320, window.innerWidth * 0.26)));
 const RATIO = 1040 / 747;
@@ -44,7 +42,7 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
   );
   const longPress = useLongPress(() => touchScreen() && showOnTouch());
   const height = Math.round(width * RATIO);
-  const src = CARDS[id];
+  const src = cardImage(id);
 
   if (id === "?" || src === undefined) {
     return (

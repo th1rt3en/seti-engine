@@ -58,5 +58,19 @@ if __name__ == "__main__":
     (OUT / "organizations.json").write_text(json.dumps(orgs, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     quick = {qid: {"marks": q["place_text"], "lower": q["lower"]} for qid, q in tables.quick_start_cards().items()}
     (OUT / "quick-start.json").write_text(json.dumps(quick, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    # which picture shows which expansion card (the keys of apps/web/src/generated/expansion-assets.json), from the verified transcription
+    tr = json.loads((ROOT / "docs" / "spec" / "data" / "expansion-transcription.json").read_text(encoding="utf-8"))
+    images: dict[str, str] = {}
+    for it in tr["items"]:
+        first = it["title"].split(" ", 1)[0]
+        if it["group"] == "Main deck":
+            images[f"SA.{first}"] = it["key"]
+        elif it["group"] == "Glyphids cards":
+            images[f"GL.{first.split('.')[1]}"] = it["key"]
+        elif it["group"] == "Amoeba cards":
+            images[f"AM.{first.split('.')[1]}"] = it["key"]
+        elif it["group"] == "Arkhos security cards":
+            images[f"AK.{first.split('.')[1]}"] = it["key"]
+    (OUT / "expansion-card-images.json").write_text(json.dumps(images, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (OUT / "move-types.json").write_text(json.dumps(move_types(), indent=1) + "\n", encoding="utf-8")
     print("wrote", OUT)
