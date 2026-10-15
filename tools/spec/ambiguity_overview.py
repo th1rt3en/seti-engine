@@ -15,7 +15,7 @@ def short(status: str) -> str:
 
 
 t = F.read_text(encoding="utf-8")
-t = re.sub(r"## Overview \(kept up to date.*?\n\n(?=Entry format)", "", t, flags=re.S)
+t = re.sub(r"## Overview \(.*?\n\n(?=## Overview \(|Entry format)", "", t, flags=re.S)
 rows = re.findall(r"^## (A-\d+): (.*?)\n- Status: (.*?)$", t, flags=re.M)
 table = "## Overview (rewritten by tools/spec/ambiguity_overview.py; the entries below hold the details)\n\n| ID | Title | Status |\n|---|---|---|\n"
 table += "".join(f"| {i} | {title} | {short(st)} |\n" for i, title, st in rows) + "\n"
