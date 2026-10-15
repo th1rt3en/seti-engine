@@ -432,3 +432,15 @@ def test_futurespan_prepares_only_cards_that_cost_1_to_4() -> None:  # EXP-ORG-1
     p.hand = ["SA.17", "SA.8", "SA.10", "SA.1"]  # costs 0, 3, 4, 1
     offered = {m["card"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("card")}
     assert offered == {"SA.8", "SA.10", "SA.1"}
+
+
+def test_exp_org_08_the_tracker_shows_the_income_of_the_organization() -> None:
+    from seti_engine import orgs, projection
+
+    s = start(Options(players=2, seed=3, expansion=True, organizations=True)).state
+    p = s.players[0]
+    p.organization = "helion_assembly"
+    inc = orgs.by_id("helion_assembly")["income"]
+    shown = projection.tracker(s, p).income
+    assert shown["credit"] == inc["credit"] and shown["energy"] == inc["energy"]
+    assert shown["publicity"] == inc["publicity"] and shown["data"] == inc["data"]

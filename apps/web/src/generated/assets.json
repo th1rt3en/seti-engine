@@ -295,9 +295,9 @@
     "L3-two-scans": "/assets/solo/objective-L3-two-scans.180b6dcae6.webp"
   },
   "playerBoard": {
-    "h": 1183,
-    "src": "/assets/board/player-board.8385e32ead.webp",
-    "w": 1581
+    "h": 336,
+    "src": "/assets/board/player-board.eb23f49a5c.webp",
+    "w": 1020
   },
   "printedIcons": {
     "card-random": "/assets/icons/card-random.210e1efc11.webp",
