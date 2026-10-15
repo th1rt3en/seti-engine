@@ -46,7 +46,7 @@ import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
-import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
+import { DataToken, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
 
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
@@ -523,7 +523,7 @@ export function BoardView({
                     transform={`translate(${at.x} ${at.y})`}
                   >
                     <ellipse cy={10} rx={54} ry={20} fill="none" stroke="#fff" strokeWidth={6} opacity={0.95} />
-                    <Figure x={0} y={0} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
+                    <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
                   </g>
                 );
               })}
@@ -534,7 +534,7 @@ export function BoardView({
                   transform={`translate(${pos.x - pos.r * 0.55 + k * 84} ${pos.y + pos.r * 0.22})`}
                 >
                   <rect x={-44} y={46} width={88} height={12} rx={5} fill="#fff" stroke="#000" strokeWidth={3} />
-                  <Figure x={0} y={0} color={color(player)} title={`${who(player)}: lander at ${name}`} />
+                  <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander at ${name}`} />
                 </g>
               ))}
               {Object.entries(st.moon_landers ?? {}).map(([moon, player]) => {
@@ -542,7 +542,7 @@ export function BoardView({
                 return at ? (
                   <g key={moon} transform={`translate(${at.x} ${at.y})`}>
                     <rect x={-44} y={46} width={88} height={12} rx={5} fill="#fff" stroke="#000" strokeWidth={3} />
-                    <Figure x={0} y={0} color={color(player)} title={`${who(player)}: lander on ${moon}`} />
+                    <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander on ${moon}`} />
                   </g>
                 ) : null;
               })}

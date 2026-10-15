@@ -13,6 +13,28 @@ function Printed({ name, label, size }: { name: string; label: string; size: num
 }
 
 const SIZE = 22;
+const PRINTED = assets.printedIcons as Record<string, string>;
+
+/** Income: the rising chart on its badge, cut from the printed player board. */
+export function IncomeIcon({ size = SIZE }: { size?: number }) {
+  return <img src={PRINTED.income} alt="Income" title="Income" width={size} height={size} className="resicon" decoding="async" />;
+}
+
+/** A random card from the deck ("card ?"): the white card with a question mark, cut from the printed player board. */
+export function RandomCardIcon({ size = SIZE }: { size?: number }) {
+  const w = Math.round(size * 0.72);
+  return (
+    <img
+      src={PRINTED["card-random"]}
+      alt="Random card"
+      title="A random card from the deck"
+      width={w}
+      height={size}
+      className="resicon"
+      decoding="async"
+    />
+  );
+}
 
 /** The globe of the scoring track: the icon of victory points, wherever a score is shown. */
 export function ScoreIcon({ size = SIZE }: { size?: number }) {
