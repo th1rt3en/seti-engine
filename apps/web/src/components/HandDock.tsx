@@ -1,5 +1,5 @@
 "use client";
-// The player's hand and open missions as a floating panel in the bottom left corner. It can be folded down to a tab so that more of the
+// The player's hand (the open missions are on the player board) as a floating panel in the bottom left corner. It can be folded down to a tab so that more of the
 // board shows; whether it is folded is remembered in this browser.
 import { cardName } from "@/lib/moves";
 import { useBottomSpace, useDock } from "@/lib/useDock";
@@ -9,7 +9,6 @@ import { useEffect, useRef as useRefHook } from "react";
 import { type CardAction, CardActions } from "./CardActions";
 import { CardImage } from "./CardImage";
 import { MascamiteTab } from "./Mascamites";
-import { MissionCard } from "./MissionsPanel";
 
 /** The cards of the hand that a move can be made with, the places (in the hand) of those that are picked, and what happens when one is clicked. */
 export interface HandSelection {
@@ -89,10 +88,7 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   return (
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
-        <span>
-          Hand ({player.hand.length + (selection?.offered?.length ?? 0)})
-          {player.missions.length > 0 ? ` · ${player.missions.length} missions` : ""}
-        </span>
+        <span>Hand ({player.hand.length + (selection?.offered?.length ?? 0)})</span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
       {folded ? null : (
@@ -100,7 +96,7 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
           {exertians || mascamites ? (
             <div className="handtabs" role="tablist">
               <button type="button" role="tab" aria-selected={!showExertian && !showMascamite} onClick={() => setTab("hand")}>
-                Hand and missions
+                Hand
               </button>
               {exertians ? (
                 <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
@@ -167,9 +163,7 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </span>
               </>
             ) : null}
-            {player.missions.length > 0 || player.kept_cards.length > 0 || player.message_cards.length > 0 ? (
-              <span className="handsep" aria-hidden="true" />
-            ) : null}
+            {player.kept_cards.length > 0 || player.message_cards.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
             {player.message_cards.map((m) => (
               <CardImage
                 key={`message-${m.card}`}
@@ -180,9 +174,6 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
             ))}
             {player.kept_cards.map((c) => (
               <CardImage key={c} id={c} size="mission" title={`${cardName(c)}: kept in front of you`} />
-            ))}
-            {player.missions.map((m) => (
-              <MissionCard key={m.card} mission={m} />
             ))}
           </div>
         </div>
