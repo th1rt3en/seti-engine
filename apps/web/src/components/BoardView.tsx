@@ -597,7 +597,8 @@ export function BoardView({
               } else if (kind === "sector") {
                 const sec = s.sectors[Number(a)];
                 const slot = sec ? SLOTS[sec.star] : undefined;
-                if (slot) at = polar(slot.r * STAR.scale + 130, sectorDegrees(Number(a)));
+                // beside the first data token (the counter-clockwise end of the slot), clear of the capsules where the winners of the sector put their markers
+                if (slot) at = polar(slot.r * STAR.scale + 95, sectorDegrees(Number(a)) + slot.hi + 3);
               } else if (kind === "board") {
                 const spot = SPECIES_SPACES.glyphids?.[a]?.[Number(b)];
                 if (spot) at = onAlienBoard(glyphSlot, spot[0], spot[1]);
