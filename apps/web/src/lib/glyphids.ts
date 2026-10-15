@@ -25,7 +25,7 @@ export const glyphToken = (glyph: string): string | undefined => ASSET[`tokens/g
 /** The lower edge of the frame in the picture, and how far below the top of the species board that edge lies: the translation board overlaps the top
  * of the species board and nearly touches its top token spaces (the topmost lie 655 px below the top of the board picture). */
 const TRACK_EDGE = 682;
-const TRACK_BOTTOM_AT = 575;
+const TRACK_BOTTOM_AT = 490;
 
 /** Where the translation board lies on the game board: attached to the top of the Glyphids board in `slot`, as wide as the board. */
 export function trackBox(slot: number): { x: number; y: number; w: number; h: number; k: number } {
