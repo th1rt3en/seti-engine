@@ -653,7 +653,7 @@ def fire_pushed(s: GameState, events: Events) -> None:
     s.pushed = []
 
 
-def gain_corner(s: GameState, p: PlayerState, cid: str) -> None:
+def gain_corner(s: GameState, p: PlayerState, cid: str, events: Events | None = None) -> None:
     """The free-action corner of a card (top-left), without discarding it."""
     for kind, n in tables.cards()[cid]["free"]:
         if kind == "move":
@@ -665,7 +665,7 @@ def gain_corner(s: GameState, p: PlayerState, cid: str) -> None:
         elif kind == "score":
             effects.gain_score(s, p, n)
         elif kind.startswith("glyph:"):  # EXP-GLY-06: the resource of that glyph if it has been deciphered
-            rewards.grant(s, p, [{"t": "glyph_resource", "glyph": kind.removeprefix("glyph:")}], [])
+            rewards.grant(s, p, [{"t": "glyph_resource", "glyph": kind.removeprefix("glyph:")}], events if events is not None else [])
         elif kind == "explore_minor":  # EXP-ARK-07: a security card discarded for its free action
             for _ in range(n):
                 rewards.grant(s, p, [{"t": "explore_minor"}], [])

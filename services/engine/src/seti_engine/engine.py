@@ -565,7 +565,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     elif t == "discard_free":
         p.hand.remove(a["card"])
         s.discard.append(a["card"])
-        cards.gain_corner(s, p, a["card"])
+        cards.gain_corner(s, p, a["card"], events)
         corners = {k for k, _ in tables.cards()[a["card"]]["free"] if k in ("publicity", "data", "move")}
         cards.fire(s, p, [{"e": "discard_free", "corner": k} for k in corners], events)  # FAQ-C138
     elif t == "place_data":

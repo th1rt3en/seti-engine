@@ -96,6 +96,10 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
   switch (ev.type) {
     case "signal":
       return `${who} marks a signal in ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
+    case "glyph_resource":
+      return (ev.reward as RewardItem[]).length > 0
+        ? `${who}: the ${String(ev.glyph)} glyph is deciphered and gives ${rewardText(ev.reward as RewardItem[])}`
+        : `${who}: the ${String(ev.glyph)} glyph has not been deciphered yet, so its icon has no effect`;
     case "signal_tile":
       return `${who} marks a signal on the 'Oumuamua tile`;
     case "trace":

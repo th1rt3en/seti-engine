@@ -140,8 +140,11 @@ def decipher(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) ->
 def glyph_resource(s: GameState, p: PlayerState, glyph: str, events: Events) -> None:
     """EXP-GLY-06: the icon of a glyph on a card gives the resource of its slot when the glyph has been deciphered, otherwise nothing."""
     where = deciphered(s).get(glyph)
+    reward = slot_reward(s, where[0], where[1]) if where is not None else []
+    # the log says what the icon did, or that it did nothing
+    events.append({"type": "glyph_resource", "player": p.index, "glyph": glyph, "reward": reward})
     if where is not None:
-        rewards.grant(s, p, slot_reward(s, where[0], where[1]), events)
+        rewards.grant(s, p, reward, events)
 
 
 def end_points(p: PlayerState) -> int:
