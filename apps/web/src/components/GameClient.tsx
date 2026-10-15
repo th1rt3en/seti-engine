@@ -69,6 +69,7 @@ export function GameClient({
   const [error, setError] = useState<string | null>(null);
   // the moves made so far (the server sends all of them when the page connects, then each new one)
   const [log, setLog] = useState<LogEntry[]>([]);
+  const logRef = useRef<LogEntry[]>([]); // the same log, to check that a new entry follows the ones that were received
   const [online, setOnline] = useState(false);
   const socket = useRef<WebSocket | null>(null);
   const seq = useRef(0);
@@ -186,7 +187,14 @@ export function GameClient({
             } else plan.current = [];
           }
         } else if (m.t === "log") {
-          setLog((old) => (m.from === 0 ? m.entries : m.from === old.length ? [...old, ...m.entries] : old));
+          // a message that does not follow the entries held means one was missed: connect again, the server then sends the whole log
+          if (m.from === 0) logRef.current = m.entries;
+          else if (m.from === logRef.current.length) logRef.current = [...logRef.current, ...m.entries];
+          else {
+            ws.close();
+            return;
+          }
+          setLog(logRef.current);
         } else if (m.t === "error") {
           plan.current = [];
           endWait();

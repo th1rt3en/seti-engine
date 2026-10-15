@@ -118,6 +118,8 @@ export interface Connection {
 
 export type SubmitResult = { ok: true } | { ok: false; code: string; message: string; legal?: Action[] };
 
+/** How many moves of the log go in one message to a connecting client. */
+const LOG_CHUNK = 40;
 const logKey = (seq: number): string => `log:${String(seq).padStart(7, "0")}`;
 
 /** The player the engine waits for (the same rule as the engine's `to_act`). */
@@ -469,7 +471,12 @@ export class GameRoom {
   // --- connections ---------------------------------------------------------------------------------------------------------
 
   /** Send a new connection what it needs to see now. */
-  async connect(conn: Connection): Promise<void> {
+  connect(conn: Connection): Promise<void> {
+    // one at a time with the moves, so that the log sent is the one the moves that follow continue
+    return this.serial(() => this.doConnect(conn));
+  }
+
+  private async doConnect(conn: Connection): Promise<void> {
     const meta = await this.meta();
     if (meta === undefined) {
       conn.send({ t: "error", code: "unknown_game", message: "no such game" });
@@ -478,8 +485,10 @@ export class GameRoom {
     if (meta.status === "lobby") conn.send(lobbyMessage(meta));
     else {
       await this.sendView(conn, meta);
-      const log = await this.d.store.list<LogEntry>("log:");
-      conn.send({ t: "log", from: 0, entries: log.map(publicEntry) });
+      // the log goes in pieces of LOG_CHUNK moves: a long game (a solo rival can play several turns in one move) would make one very large message
+      const log = (await this.d.store.list<LogEntry>("log:")).map(publicEntry);
+      for (let from = 0; from === 0 || from < log.length; from += LOG_CHUNK)
+        conn.send({ t: "log", from, entries: log.slice(from, from + LOG_CHUNK) });
     }
   }
 

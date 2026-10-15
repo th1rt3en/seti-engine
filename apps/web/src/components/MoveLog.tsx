@@ -181,12 +181,18 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
             const deltas = e.events.filter((ev) => ev.type === "delta") as Delta[];
             const mine = deltas.find((d) => d.player === e.seat);
             const rival = ctx.rival;
-            const rivalEvents = e.events.filter((ev) => ev.type.startsWith("rival_"));
             const rivalDelta = rival === null ? undefined : deltas.find((d) => d.player === rival);
             const others = deltas.filter((d) => d.player !== e.seat && d.player !== rival);
             const byRival = (ev: GameEvent): boolean => rival !== null && ev.player === rival;
             const notes = e.events.filter((ev) => !ev.type.startsWith("rival_") && ev.type !== "delta" && !byRival(ev));
-            const rivalMore = e.events.filter((ev) => ev.type !== "delta" && !ev.type.startsWith("rival_") && byRival(ev));
+            // the rival can take several turns in one move (when the player has passed it plays on until it passes too): one block for each,
+            // starting at the card it plays or at its pass, with what it caused (signals, wins) in the order the engine reported it
+            const turns: GameEvent[][] = [];
+            for (const ev of e.events) {
+              if (ev.type === "rival_card" || ev.type === "rival_pass") turns.push([ev]);
+              else if (turns.length > 0 && ev.type !== "delta" && (ev.type.startsWith("rival_") || byRival(ev)))
+                turns[turns.length - 1]?.push(ev);
+            }
             return (
               <li key={e.seq}>
                 <span className="lognum">{e.seq + 1}</span>
@@ -207,18 +213,22 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                     {ctx.who(d.player)} <Changes changes={d.changes} size={16} />
                   </span>
                 ))}
-                {rivalEvents.length > 0 || rivalMore.length > 0 || rivalDelta ? (
+                {turns.map((turn, n) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the turns of a move come in a fixed order
+                  <span key={`rt${n}`} className="logrival">
+                    <b className="logrivalhead">{turns.length > 1 ? `Rival's turn ${n + 1} of ${turns.length}` : "Rival's turn"}</b>
+                    {turn.map((ev, k) => {
+                      const line = ev.type.startsWith("rival_") ? rivalLine(ev) : eventLine(ev, ctx);
+                      // biome-ignore lint/suspicious/noArrayIndexKey: events of a turn are never reordered
+                      return line ? <span key={k}>{line}</span> : null;
+                    })}
+                    {n === turns.length - 1 && rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+                  </span>
+                ))}
+                {turns.length === 0 && rivalDelta ? (
                   <span className="logrival">
                     <b className="logrivalhead">Rival's turn</b>
-                    {rivalEvents.map((ev) => {
-                      const line = rivalLine(ev);
-                      return line ? <span key={JSON.stringify(ev)}>{line}</span> : null;
-                    })}
-                    {rivalMore.map((ev) => {
-                      const line = eventLine(ev, ctx);
-                      return line ? <span key={`m${JSON.stringify(ev)}`}>{line}</span> : null;
-                    })}
-                    {rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+                    <Changes changes={rivalDelta.changes} size={16} />
                   </span>
                 ) : null}
               </li>
