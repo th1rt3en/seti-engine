@@ -20,7 +20,7 @@ import { SqliteDb, migrationSql } from "@/lib/db";
 import { engineAuth } from "@/lib/engineAuth";
 import { glyphIconReward } from "@/lib/glyphids";
 import { LABELS, cardName, cornerGlyph, describeMove, groupMoves, handMoveText, irreversibleText } from "@/lib/moves";
-import { computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
+import { allPlayers, computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { createGame, gameMeta } from "@/lib/worker";
 import { importSPKI, jwtVerify } from "jose";
@@ -197,6 +197,16 @@ describe("lobby, leaderboard and profile", () => {
       host: "Ann",
       expansion: false,
     });
+  });
+
+  it("lists every registered player by name, with the starting rating when unrated, and finds by name", async () => {
+    const { db } = await seed();
+    const carl = await signup(db, "carl", "password1");
+    const all = await allPlayers(db);
+    expect(all.map((r) => r.name)).toEqual(["Ann", "Bob", "carl"]); // guests left out, any case sorted together
+    expect(all.find((r) => r.user_id === carl.id)).toMatchObject({ rating: 1500, rated_games: 0, games: 0 });
+    expect((await allPlayers(db, "AN")).map((r) => r.name)).toEqual(["Ann"]);
+    expect(await allPlayers(db, "%")).toEqual([]); // a wildcard is not a wildcard
   });
 
   it("ranks registered players by rating (guests are left out)", async () => {
