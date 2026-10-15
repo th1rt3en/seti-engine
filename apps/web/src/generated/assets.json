@@ -13,6 +13,13 @@
     "mascamites": "/assets/cards/back-mascamites.6416db3ab8.webp",
     "oumuamua": "/assets/cards/back-oumuamua.5dde23ac61.webp"
   },
+  "anomalyTokens": {
+    "blue-0": "/assets/species/anomaly-blue-0.f3aa12197a.webp",
+    "blue-1": "/assets/species/anomaly-blue-1.ca209ef9c7.webp",
+    "pink-0": "/assets/species/anomaly-pink-0.165537e1ef.webp",
+    "pink-1": "/assets/species/anomaly-pink-1.6e5c5169a2.webp",
+    "yellow-1": "/assets/species/anomaly-yellow-1.ad5d668c6d.webp"
+  },
   "background": "/assets/bg/milky-way.4e4312f4fa.webp",
   "board": "/assets/board/board.e442b44b14.webp",
   "cardBack": "/assets/cards/back.bd43dd92fe.webp",
