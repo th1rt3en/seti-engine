@@ -206,3 +206,12 @@ def test_the_species_choice_is_refused_outside_the_sandbox_and_when_it_makes_no_
         Options(players=1, sandbox=True, sandbox_species=["glyphids", None])
     with pytest.raises(ValueError):
         Options(players=1, sandbox=True, sandbox_species=["exertians"])
+
+
+def test_sandbox_06_the_species_of_the_expansion_can_be_chosen_with_the_expansion() -> None:
+    s = start(Options(players=1, sandbox=True, expansion=True, seed=3, sandbox_species=["arkhos", "amoeba"])).state
+    assert [sl.species for sl in s.species] == ["arkhos", "amoeba"]
+    mixed = start(Options(players=1, sandbox=True, expansion=True, seed=3, sandbox_species=["glyphids", None])).state
+    assert mixed.species[0].species == "glyphids" and mixed.species[1].species != "glyphids"
+    with pytest.raises(ValueError):  # not without the expansion
+        Options(players=1, sandbox=True, sandbox_species=["arkhos", None])
