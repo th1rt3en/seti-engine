@@ -66,6 +66,8 @@ export const LABELS: Record<string, Label> = {
   place_data: () => "Place 1 data in the computer",
   data_done: () => "Take the data (any extra is lost)",
   resolve_sector: (m) => `Resolve sector ${Number(m.sector)} next`,
+  show_move: (m) => `Show ${cardName(m.card)} from your hand: gain 1 movement`,
+  show_move_done: () => "Stop showing cards",
   place_lower: (m) => `Place 1 data under computer tech ${Number(m.slot) + 1}`,
   tuck: (m) => `Tuck ${cardName(m.card)} for income`,
   skip_tuck: () => "Do not tuck a card",
@@ -114,7 +116,7 @@ export const LABELS: Record<string, Label> = {
   scan_mercury: () => "Pay 1 publicity for a signal in Mercury's sector",
   scan_probe: (m) => (m.mode === "launch" ? "Pay 1 energy to launch a probe" : "Pay 1 energy for 1 movement"),
   scan_done: () => "Finish the scan",
-  research: (m) => `Research the tech in stack ${Number(m.stack) + 1} (6 publicity)`,
+  research: (m) => `Research the tech in stack ${Number(m.stack) + 1}`,
   take_tech: (m) => `Take the tech in stack ${Number(m.stack) + 1}`,
   place_computer_tech: (m) => `Put the tech in computer slot ${Number(m.slot) + 1}`,
   analyze: () => "Analyze data (1 energy)",
@@ -237,6 +239,7 @@ export const HAND_MOVE_TYPES = new Set([
   "hand_signal",
   "restructure_card", // Turing Systems restructuring: the cards to discard are picked in the hand
   "discard_corner", // Sentinel Probe Network
+  "show_move", // #74 Pre-launch Testing: the cards to show are picked in the hand
   "org_free", // Futurespan, Deep Sky Survey, Helion Assembly: the card is picked in the hand
 ]);
 
@@ -280,6 +283,8 @@ export function handMoveText(m: Move): string {
       return `Discard ${name} to mark a signal in a ${sector} sector?`;
     case "take_round_card":
       return `Confirm keeping ${name} from the end-of-round cards? The others go back.`;
+    case "show_move":
+      return `Show ${name} to everybody and gain 1 movement? The card stays in your hand.`;
     case "choose_org":
       return `Take the organization ${name}? The other one goes back to the box.`;
     case "choose_quick":

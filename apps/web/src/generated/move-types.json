@@ -56,6 +56,8 @@
   "scan_mercury": [],
   "scan_probe": ["mode"],
   "scan_token": ["source"],
+  "show_move": ["card"],
+  "show_move_done": [],
   "signal_where": ["where"],
   "skip_breach": [],
   "skip_tuck": [],

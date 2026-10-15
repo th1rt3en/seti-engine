@@ -3,7 +3,6 @@
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
 // everything comes from the engine's view.
 import { PLAYER_COLOR } from "@/lib/geometry";
-import { ORG_NAMES } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { AmoebaPanel } from "./AmoebaPanel";
@@ -15,6 +14,7 @@ import { GlyphidsPanel } from "./GlyphidsPanel";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { MissionsPanel } from "./MissionsPanel";
+import { OrgName } from "./OrgName";
 import { OrgPanel } from "./OrgPanel";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
@@ -138,7 +138,7 @@ export function GameView({
               <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
                 {s.rival && p.index === s.rival.index ? "Rival" : (names[p.index] ?? `Player ${p.index + 1}`)}
-                {p.organization ? <span className="orgname">{ORG_NAMES[p.organization] ?? p.organization}</span> : null}
+                {p.organization ? <OrgName id={p.organization} className="orgname" /> : null}
                 <span className="res" title="Victory points">
                   <ScoreIcon size={20} />
                   <b>{p.score}</b>

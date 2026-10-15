@@ -2072,3 +2072,32 @@ button:disabled {
   height: auto;
   border-radius: 8px;
 }
+
+/* the choice put aside: a small bar at the top, under the bar of the game, while the player looks at the board */
+.setupaside {
+  position: fixed;
+  left: 50%;
+  top: calc(var(--bar-bottom, var(--bar-h, 80px)) + 8px);
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 2px solid #6ef0a5;
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+  max-width: calc(100vw - 24px);
+}
+.setupbar {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* a card name in the log: the card shows enlarged after a second on it */
+.cardlink {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}

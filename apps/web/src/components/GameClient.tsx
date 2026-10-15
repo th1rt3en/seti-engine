@@ -239,6 +239,8 @@ export function GameClient({
   const names = view.names.length > 0 ? view.names : lobbyNames;
   const v = view.view;
   const mine = v.legal as Move[];
+  // what researching a tech costs in publicity: the engine says (an organization can lower it); 6 when it does not
+  const researchCost = (m: Move | undefined): number => (m ? ((v.notes[mine.indexOf(m)] as Note)?.cost?.publicity ?? 6) : 6);
   const pending = v.state.pending.length > 0;
   const me = v.viewer === null ? null : (v.state.players[v.viewer] ?? null);
   const hand = me?.hand ?? [];
@@ -383,7 +385,7 @@ export function GameClient({
           </div>
         </div>
       ) : null}
-      {mine.length > 0 && !ended ? (
+      {mine.length > 0 && !ended && !unsure ? ( // the "cannot be undone" question replaces the action prompt; Cancel brings the prompt back
         <div className="movegroups">
           {groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow").map((g) => (
             <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
@@ -504,7 +506,7 @@ export function GameClient({
               <span className="glabel">{techMoves[0]?.type === "research" ? "Main action" : "Your choice"}</span>
               <span className="handhint">
                 Click a tech stack to take that tech
-                {techMoves[0]?.type === "research" ? " (6 publicity, and the solar system rotates)" : ""}.
+                {techMoves[0]?.type === "research" ? ` (${researchCost(techMoves[0])} publicity, and the solar system rotates)` : ""}.
               </span>
             </div>
           ) : null}
@@ -649,7 +651,7 @@ export function GameClient({
           <div className="confirm">
             <span>
               Confirm taking {techName(techStack.category, techStack.glyph)}?
-              {techOption.type === "research" ? " It costs 6 publicity and the solar system rotates." : ""}
+              {techOption.type === "research" ? ` It costs ${researchCost(techOption)} publicity and the solar system rotates.` : ""}
             </span>
             <button type="button" className="primary" onClick={() => play(techOption)}>
               Confirm
@@ -759,6 +761,17 @@ export function GameClient({
               onClose={() => setBoardOpen(false)}
               choice={slotChoice}
               onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
+              lower={
+                ended
+                  ? undefined
+                  : {
+                      slots: mine.filter((m) => m.type === "place_lower").map((m) => Number(m.slot)),
+                      onPlace: (slot) => {
+                        const m = mine.find((x) => x.type === "place_lower" && x.slot === slot);
+                        if (m) play(m);
+                      },
+                    }
+              }
             />
           ) : null}
         </>

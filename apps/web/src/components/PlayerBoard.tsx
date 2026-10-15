@@ -46,8 +46,14 @@ export interface SlotChoice {
   onPick: (slot: number) => void;
 }
 
+/** Placing data on the lower space of a computer tech (a free action, TECH-21): the slots (the engine's numbers) that can take it, and the click. */
+export interface LowerChoice {
+  slots: number[];
+  onPlace: (slot: number) => void;
+}
+
 /** One slot of the computer for a tech: the tech that lies there with the data on its lower space, or nothing (when it can be picked it is highlighted). */
-function Slot({ p, pos, choice }: { p: View["state"]["players"][number]; pos: number; choice?: SlotChoice }) {
+function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; pos: number; choice?: SlotChoice; lower?: LowerChoice }) {
   const x = (SPACE.x[pos] ?? 0) - TILE.w / 2;
   const y = SPACE.y - 46;
   const placed = p.computer_techs[String(pos)];
@@ -61,6 +67,20 @@ function Slot({ p, pos, choice }: { p: View["state"]["players"][number]; pos: nu
           {placed?.lower_filled ? <DataToken x={x + TILE.w / 2} y={y + TILE.h * 0.82} size={34} title="Data on the lower space" /> : null}
           <title>{`${TECH_INFO[placed?.tech ?? ""]?.name ?? placed?.tech}: ${TECH_INFO[placed?.tech ?? ""]?.effect ?? ""}`}</title>
         </>
+      ) : null}
+      {placed && lower?.slots.includes(pos) && !placed.lower_filled ? (
+        <g
+          // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+          role="button"
+          tabIndex={0}
+          aria-label="Place 1 data on the lower space of this computer tech (free action)"
+          className="spot"
+          onClick={() => lower.onPlace(pos)}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && lower.onPlace(pos)}
+        >
+          <circle cx={x + TILE.w / 2} cy={y + TILE.h * 0.82} r={24} className="spotshape" style={{ strokeWidth: 5 }} />
+          <title>Place 1 data here (free action)</title>
+        </g>
       ) : null}
       {choosable ? (
         <rect
@@ -92,7 +112,13 @@ function Slot({ p, pos, choice }: { p: View["state"]["players"][number]; pos: nu
   );
 }
 
-function Board({ view, player, choice, onPlaceData }: { view: View; player: number; choice?: SlotChoice; onPlaceData?: () => void }) {
+function Board({
+  view,
+  player,
+  choice,
+  onPlaceData,
+  lower,
+}: { view: View; player: number; choice?: SlotChoice; onPlaceData?: () => void; lower?: LowerChoice }) {
   const p = view.state.players[player];
   if (!p) return null;
   const techs = new Set(p.techs);
@@ -132,7 +158,7 @@ function Board({ view, player, choice, onPlaceData }: { view: View; player: numb
       <image href={BOARD.src} x={0} y={HEAD} width={BOARD.w} height={BOARD.h} />
 
       {SLOT_POSITIONS.map((pos) => (
-        <Slot key={`slot-${pos}`} p={p} pos={pos} choice={choice} />
+        <Slot key={`slot-${pos}`} p={p} pos={pos} choice={choice} lower={lower} />
       ))}
 
       {SPACE.x.map((x, i) => {
@@ -234,6 +260,7 @@ export function PlayerBoardPanel({
   onClose,
   choice,
   onPlaceData,
+  lower,
 }: {
   view: View;
   names: string[];
@@ -243,6 +270,8 @@ export function PlayerBoardPanel({
   choice?: SlotChoice;
   /** The free action "place data": given when the viewer may do it; the first empty space of their computer is then clickable. */
   onPlaceData?: () => void;
+  /** The free action "place data on a computer tech's lower space": the slots that can take it, highlighted on the board. */
+  lower?: LowerChoice;
 }) {
   const s = view.state;
   const players = s.players.filter((p) => !(s.rival && p.index === s.rival.index));
@@ -262,6 +291,9 @@ export function PlayerBoardPanel({
         </button>
       </header>
       {choice ? <p className="handhint">Click the slot of the computer where the new tech goes.</p> : null}
+      {lower && lower.slots.length > 0 && shown === view.viewer ? (
+        <p className="handhint">Click a highlighted data space under a computer tech to place a data from your pool there (free action).</p>
+      ) : null}
       {onPlaceData && shown === view.viewer ? (
         <p className="handhint">Click the highlighted computer space to place a data from your pool (free action).</p>
       ) : null}
@@ -270,6 +302,7 @@ export function PlayerBoardPanel({
         player={shown}
         choice={shown === view.viewer ? choice : undefined}
         onPlaceData={shown === view.viewer ? onPlaceData : undefined}
+        lower={shown === view.viewer ? lower : undefined}
       />
     </section>
   );

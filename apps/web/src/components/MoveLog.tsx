@@ -3,11 +3,12 @@
 // The server sends every client the same log with the identity of hidden cards left out (apps/worker/src/core/publicLog.ts). A move is one line
 // with what it gave and took (the engine's `delta` events) as icons; in the solo game what the rival did after it is a block of its own.
 import type { GameEvent } from "@/lib/events";
-import { logText } from "@/lib/moves";
+import { cardName, logText } from "@/lib/moves";
 import { techName } from "@/lib/techs";
 import { useBottomSpace, useDock } from "@/lib/useDock";
 import { type ReactNode, useEffect, useRef } from "react";
 import assets from "../generated/assets.json";
+import { CardText } from "./CardText";
 import { Changes } from "./Reward";
 import { TapZoomImage } from "./TapZoom";
 
@@ -137,6 +138,8 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
       }`;
     case "tech":
       return `${who} takes the tech ${techOf(ev.tech)}`;
+    case "show_card":
+      return `${who} shows ${cardName(ev.card)} from their hand`;
     case "mission_completed":
       return `${who} completes a mission`;
     case "neutral_marker":
@@ -188,13 +191,14 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
               <li key={e.seq}>
                 <span className="lognum">{e.seq + 1}</span>
                 <span className="logmove">
-                  <b>{ctx.who(e.seat)}</b> {logText(e.action)} {mine ? <Changes changes={mine.changes} size={16} /> : null}
+                  <b>{ctx.who(e.seat)}</b> <CardText text={logText(e.action)} />{" "}
+                  {mine ? <Changes changes={mine.changes} size={16} /> : null}
                 </span>
                 {notes.map((ev) => {
                   const line = eventLine(ev, ctx);
                   return line ? (
                     <span key={JSON.stringify(ev)} className="logevent">
-                      {line}
+                      {typeof line === "string" ? <CardText text={line} /> : line}
                     </span>
                   ) : null;
                 })}

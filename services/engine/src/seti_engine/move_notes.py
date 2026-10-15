@@ -7,7 +7,7 @@ a move that needs no note). Nothing here changes the state or the moves.
 
 from typing import Any
 
-from . import engine, rewards, solar, species
+from . import engine, orgs, rewards, solar, species, techs
 from .models import GameState
 
 Note = dict[str, Any] | None
@@ -79,6 +79,9 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
         if move["where"] == "tile":
             note["oumuamua_tile"] = True
         return note
+    if kind == "research":  # TECHACT-01: the publicity it costs, which an organization can lower (Fenwick Research Center: 5, EXP-ORG-13)
+        actor = state.pending[0].player if state.pending else state.current_player
+        return {"cost": {"publicity": orgs.research_cost(state.players[actor], techs.RESEARCH_COST)}}
     if kind == "take_alien":  # the top of the deck of a species (hidden), or the card that lies face up
         slot_index = state.pending[0].data["slot"]
         face_up = state.species[slot_index].face_up

@@ -551,3 +551,34 @@ def test_promo_set_2_cards() -> None:  # PROMO-04 (owner 2026-10-15)
         color
     ]
     assert gained == (6 if color == "black" else 2)
+
+
+def test_card_74_the_player_picks_the_cards_to_show_and_each_gives_a_movement() -> None:
+    """#74 Pre-launch Testing (FAQ-C073): after the launch the player may show cards of the hand with a movement corner: 1 movement for
+    each, named in the log; the cards stay in the hand."""
+    from seti_engine import tables
+    from seti_engine.engine import apply, legal_moves, start
+    from seti_engine.models import Options
+
+    cards = tables.cards()
+    with_move = [c for c, v in cards.items() if v["deck"] == "base" and any(k == "move" for k, _ in v["free"])][:3]
+    s = start(Options(players=2, seed=5)).state
+    while s.pending:
+        s = apply(s, legal_moves(s)[0]).state
+    s.stage, s.main_done = None, False
+    p = s.players[s.current_player]
+    p.hand, p.credits, p.movement = ["74", *with_move], 5, 0
+    r = apply(s, {"type": "play_card", "card": "74"})
+    me = r.state.players[s.current_player]
+    assert me.movement == 0 and r.state.pending[0].kind == "show_move"  # nothing is given until the player picks
+    assert {m["card"] for m in r.legal if m["type"] == "show_move"} == set(with_move)
+    assert {"type": "show_move_done"} in r.legal
+    r = apply(r.state, {"type": "show_move", "card": with_move[0]})
+    assert [e["card"] for e in r.events if e["type"] == "show_card"] == [with_move[0]]
+    assert r.state.players[s.current_player].movement == 1 and with_move[0] in r.state.players[s.current_player].hand
+    assert with_move[0] not in {m["card"] for m in r.legal if m["type"] == "show_move"}  # a card is shown once
+    r = apply(r.state, {"type": "show_move_done"})  # the player may stop
+    assert not r.state.pending and r.state.players[s.current_player].movement == 1
+    assert (
+        any(e["type"] == "delta" and e["changes"].get("move") == 1 for e in apply(s, {"type": "play_card", "card": "74"}).events) is False
+    )

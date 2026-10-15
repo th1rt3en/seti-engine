@@ -224,7 +224,7 @@ CARDS: dict[str, dict[str, Any]] = {
     "71": {"fx": [ROT, research("any", then_vp_per_tech=2)]},
     "72": {"fx": [ROT, research("any", copy_bonus=[pub(2)])]},
     "73": {"fx": [R("clean_space")]},  # FAQ-C073
-    "74": {"fx": [LAUNCH, R("per", count="hand_move_corner", r=move(1))]},
+    "74": {"fx": [LAUNCH, R("show_move")]},  # the player picks the cards to show from the hand (FAQ-C073)
     "75": {"fx": [R("trace_vp", vp=1)]},
     "76": {
         "mission": trig(circle(tech_on("probe"), energy(1)), circle(tech_on("telescope"), pub(1)), circle(tech_on("computer"), card(1)))
