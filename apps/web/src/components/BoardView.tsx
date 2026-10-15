@@ -30,12 +30,13 @@ import {
   STAR_BOARD_HOME,
   alienColumn,
   goldPlace,
+  landSlot,
   orbitSlot,
   polar,
   scoreDegrees,
   sectorDegrees,
 } from "@/lib/geometry";
-import { glyphToken, holeAt, trackBox } from "@/lib/glyphids";
+import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
 import { type Spot, onAlienBoard } from "@/lib/targets";
@@ -144,7 +145,7 @@ export function BoardView({
 
   // the translation board of the Glyphids is attached above their board: the page makes room for it at the top
   const glyphSlot = s.species.findIndex((sp) => sp.discovered && sp.species === "glyphids");
-  const trackHeight = glyphSlot < 0 ? 0 : Math.ceil(trackBox(glyphSlot).h);
+  const trackHeight = glyphSlot < 0 ? 0 : Math.max(0, Math.ceil(ALIEN_TOP - trackBox(glyphSlot).y));
   return (
     <>
       <svg
@@ -529,7 +530,7 @@ export function BoardView({
                     key={`o${k}`}
                     transform={`translate(${at.x} ${at.y})`}
                   >
-                    <ellipse cy={10} rx={54} ry={20} fill="none" stroke="#fff" strokeWidth={6} opacity={0.95} />
+                    <ellipse cy={6} rx={54} ry={20} fill="none" stroke="#fff" strokeWidth={6} opacity={0.95} />
                     <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
                   </g>
                 );
@@ -538,9 +539,8 @@ export function BoardView({
                 <g
                   // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
                   key={`l${k}`}
-                  transform={`translate(${pos.x - pos.r * 0.55 + k * 84} ${pos.y + pos.r * 0.22})`}
+                  transform={`translate(${(landSlot(name, k) ?? pos).x} ${(landSlot(name, k) ?? pos).y})`}
                 >
-                  <rect x={-44} y={46} width={88} height={12} rx={5} fill="#fff" stroke="#000" strokeWidth={3} />
                   <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander at ${name}`} />
                 </g>
               ))}
@@ -548,7 +548,6 @@ export function BoardView({
                 const at = MOON[moon.toLowerCase().split(/[ _]/)[0] ?? ""];
                 return at ? (
                   <g key={moon} transform={`translate(${at.x} ${at.y})`}>
-                    <rect x={-44} y={46} width={88} height={12} rx={5} fill="#fff" stroke="#000" strokeWidth={3} />
                     <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander on ${moon}`} />
                   </g>
                 ) : null;
@@ -582,6 +581,56 @@ export function BoardView({
             );
           });
         })}
+
+        {/* the face-down stack of glyph tokens (EXP-GLY-03), to the left of the Glyphids board, with the number of tokens left */}
+        {glyphSlot >= 0
+          ? (() => {
+              const left = (ALIEN.middleX[glyphSlot] ?? 680) - ALIEN.centre * ALIEN.scale;
+              const remaining = ((s.species[glyphSlot]?.extra as GlyphExtra | undefined)?.supply ?? []).length;
+              const cx = left - 120;
+              const cy = ALIEN_TOP + 300;
+              return (
+                <g>
+                  <image href={EXPANSION_BOARDS["tokens/glyphids-token-back"]} x={cx - 75} y={cy - 85} width={150} height={170}>
+                    <title>{`${remaining} glyph tokens left face down`}</title>
+                  </image>
+                  <circle cx={cx + 52} cy={cy + 62} r={34} fill="rgba(8,12,26,0.9)" stroke="#fff" strokeWidth={5} />
+                  <text x={cx + 52} y={cy + 76} textAnchor="middle" fontSize={42} fontWeight={700} fill="#fff">
+                    {remaining}
+                  </text>
+                </g>
+              );
+            })()
+          : null}
+
+        {/* the glyph tokens that still lie on the board (EXP-GLY-03): beside each planet, on each sector, on the wells of the Glyphids board
+            (the ones on tech stacks are drawn on the stacks) */}
+        {glyphSlot >= 0
+          ? Object.entries(((s.species[glyphSlot]?.extra ?? {}) as GlyphExtra).tokens ?? {}).map(([where, glyph]) => {
+              const href = glyphToken(glyph);
+              if (!href) return null;
+              const [kind = "", a = "", b = ""] = where.split(":");
+              let at: { x: number; y: number } | null = null;
+              if (kind === "planet") {
+                const pos = PLANET[a];
+                if (pos) at = { x: pos.x - pos.r * 1.1, y: pos.y + pos.r * 0.15 };
+              } else if (kind === "sector") {
+                const sec = s.sectors[Number(a)];
+                const slot = sec ? SLOTS[sec.star] : undefined;
+                // beside the first data token (the counter-clockwise end of the slot), clear of the capsules where the winners of the sector put their markers
+                if (slot) at = polar(slot.r * STAR.scale + 80, sectorDegrees(Number(a)) + slot.hi + 3);
+              } else if (kind === "board") {
+                const spot = WELL_SLOTS[a]?.[Number(b)];
+                if (spot) at = onAlienBoard(glyphSlot, spot[0], spot[1]);
+              }
+              if (!at) return null;
+              return (
+                <image key={`gt-${where}`} href={href} x={at.x - 62} y={at.y - 71} width={124} height={142}>
+                  <title>{`${glyph} glyph token (${kind})`}</title>
+                </image>
+              );
+            })
+          : null}
 
         {/* the markers on the spaces of a species board that have been taken, and on its overflow spaces (under the discovery spaces) */}
         {s.species.map((sp, i) => {
@@ -816,7 +865,13 @@ function GoldZoom({
   );
 }
 
-type GlyphExtra = { sides?: number[]; top?: (string | null)[]; bottom?: (string | null)[] };
+type GlyphExtra = {
+  supply?: unknown[];
+  sides?: number[];
+  top?: (string | null)[];
+  bottom?: (string | null)[];
+  tokens?: Record<string, string>;
+};
 
 /** The translation board of the Glyphids above their board: the arrangement of the strips that was drawn, and the glyph tokens in its holes. */
 function GlyphTrack({ slot, extra }: { slot: number; extra: GlyphExtra }) {
