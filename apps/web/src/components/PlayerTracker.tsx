@@ -8,12 +8,23 @@ import { cardName } from "@/lib/moves";
 import { ORG_NAMES } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import {
+  CreditIcon,
+  DataIcon,
+  DeckCardIcon,
+  EnergyIcon,
+  ExofossilIcon,
+  IncomeIcon,
+  PublicityIcon,
+  RandomCardIcon,
+  ScoreIcon,
+  SignalTokenIcon,
+} from "./Icons";
 
 const KINDS = [
   { key: "credit", label: "Credits", icon: <CreditIcon size={18} /> },
   { key: "energy", label: "Energy", icon: <EnergyIcon size={18} /> },
-  { key: "card", label: "Cards", icon: <DeckCardIcon size={18} /> },
+  { key: "card", label: "Cards", icon: <RandomCardIcon size={18} /> },
 ] as const;
 
 /** A label with its icon in front of it. */
@@ -42,7 +53,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
   const group = (title: string): ReactNode => (
     <tr className="group">
       <th scope="row" colSpan={columns}>
-        {title}
+        {title.toLowerCase().includes("income") ? <IncomeIcon size={18} /> : null} {title}
       </th>
     </tr>
   );

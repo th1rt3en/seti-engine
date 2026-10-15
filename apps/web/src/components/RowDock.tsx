@@ -29,15 +29,17 @@ export function RowDock({ view, row, inline }: { view: View; row?: RowSelection;
   }, [wanted]);
   return (
     <aside className={inline ? "rowinline card" : shut ? "rowdock floating dock folded" : "rowdock floating dock"} aria-label="Card row">
-      <button type="button" className="handtab" onClick={toggle} aria-expanded={!shut} hidden={inline}>
-        <span>
-          Card row{" "}
-          <span className="muted small">
-            deck {view.counts.deck} · discard {s.discard.length}
+      {inline ? null : (
+        <button type="button" className="handtab" onClick={toggle} aria-expanded={!shut}>
+          <span>
+            Card row{" "}
+            <span className="muted small">
+              deck {view.counts.deck} · discard {s.discard.length}
+            </span>
           </span>
-        </span>
-        <span aria-hidden="true">{shut ? "▸" : "◂"}</span>
-      </button>
+          <span aria-hidden="true">{shut ? "▸" : "◂"}</span>
+        </button>
+      )}
       {shut ? null : (
         <div className="rowbody">
           {inline ? (

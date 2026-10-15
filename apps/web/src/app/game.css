@@ -1888,10 +1888,37 @@ button:disabled {
 .boardsfab {
   position: fixed;
   right: 14px;
-  top: calc(var(--bar-bottom, var(--bar-h)) + 14px);
+  top: calc(var(--bar-bottom, var(--bar-h)) + 70px); /* below the tab of the player tracker, which sits at the top right */
   z-index: 60;
   font-weight: 700;
   padding: 10px 16px;
   border-radius: 999px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
+/* the numbers drawn on the player board picture */
+.pbincome {
+  font-size: 30px;
+  font-weight: 800;
+  fill: #111;
+}
+.pbhint {
+  font-size: 18px;
+  fill: #cfdcf0;
+}
+
+@media (min-width: 1100px) {
+  /* on a wide screen the card row is in the right column and the top left corner is free */
+  .boardsfab {
+    right: auto;
+    left: 14px;
+    top: calc(var(--bar-bottom, var(--bar-h)) + 14px);
+  }
+}
+@media (max-width: 760px) {
+  .boardsfab {
+    top: auto;
+    bottom: 76px;
+    right: 10px;
+  }
 }

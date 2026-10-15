@@ -294,6 +294,15 @@
     "L3-two-blue-traces": "/assets/solo/objective-L3-two-blue-traces.6dd2681a27.webp",
     "L3-two-scans": "/assets/solo/objective-L3-two-scans.180b6dcae6.webp"
   },
+  "playerBoard": {
+    "h": 1183,
+    "src": "/assets/board/player-board.8385e32ead.webp",
+    "w": 1581
+  },
+  "printedIcons": {
+    "card-random": "/assets/icons/card-random.210e1efc11.webp",
+    "income": "/assets/icons/income.e3599fc770.webp"
+  },
   "publicity": {
     "h": 1270,
     "src": "/assets/board/publicity.05200f178e.webp",
