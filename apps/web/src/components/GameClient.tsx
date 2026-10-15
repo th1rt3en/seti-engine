@@ -104,6 +104,32 @@ export function GameClient({
     return () => clearInterval(t);
   }, []);
 
+  const send = useCallback((msg: unknown) => socket.current?.send(JSON.stringify(msg)), []);
+  // A move that has been sent and is waiting for the server's answer: the prompt is hidden behind a loading symbol and no second move goes out until
+  // the new view (or an error) arrives, so that a click repeated on a slow connection cannot send the move twice. A guard of 20 seconds frees the page.
+  const [waiting, setWaiting] = useState(false);
+  const waitingRef = useRef(false);
+  const waitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const endWait = useCallback(() => {
+    waitingRef.current = false;
+    setWaiting(false);
+    if (waitTimer.current !== null) clearTimeout(waitTimer.current);
+    waitTimer.current = null;
+  }, []);
+  const sendAction = useCallback(
+    (action: unknown) => {
+      if (waitingRef.current) return; // the answer to the last move has not come yet
+      waitingRef.current = true;
+      setWaiting(true);
+      waitTimer.current = setTimeout(() => {
+        endWait();
+        setError("The server did not answer in time. Check your connection and try again.");
+      }, 20_000);
+      send({ t: "action", seq: seq.current, action });
+    },
+    [send, endWait],
+  );
+
   useEffect(() => {
     let closed = false;
     let retry = 1000;
@@ -129,6 +155,7 @@ export function GameClient({
         if (m.t === "lobby") setLobby(m);
         else if (m.t === "view") {
           seq.current = m.seq;
+          endWait();
           setPrevious(latest.current);
           latest.current = m.view;
           setReceivedAt(Date.now());
@@ -151,12 +178,15 @@ export function GameClient({
             const legal = m.view.legal as Move[];
             if (m.view.to_act === m.view.viewer && legal.some((l) => sameMove(l, next))) {
               ws.send(JSON.stringify({ t: "action", seq: m.seq, action: next }));
+              waitingRef.current = true; // the next step of the plan is on its way too
+              setWaiting(true);
             } else plan.current = [];
           }
         } else if (m.t === "log") {
           setLog((old) => (m.from === 0 ? m.entries : m.from === old.length ? [...old, ...m.entries] : old));
         } else if (m.t === "error") {
           plan.current = [];
+          endWait();
           setError(m.message);
         }
         if (m.t === "ended") setEnded(m.result);
@@ -164,6 +194,7 @@ export function GameClient({
       ws.onclose = () => {
         if (pinger) clearInterval(pinger);
         setOnline(false);
+        endWait(); // the answer to a move sent on a lost connection will not come: the view that follows the reconnection says what happened
         if (!closed) {
           timer = setTimeout(open, retry);
           retry = Math.min(retry * 2, 10_000);
@@ -177,7 +208,7 @@ export function GameClient({
       if (pinger) clearInterval(pinger);
       socket.current?.close();
     };
-  }, [gameId, wsBase, signedIn]);
+  }, [gameId, wsBase, signedIn, endWait]);
 
   // the boards open at the request of the tracker, and by themselves when a computer tech has to be put in a slot
   useEffect(() => {
@@ -197,7 +228,6 @@ export function GameClient({
     }
   }, [choosing, viewer]);
 
-  const send = useCallback((msg: unknown) => socket.current?.send(JSON.stringify(msg)), []);
   // a move that shows something hidden cannot be taken back: the player confirms it first (UNDO-01)
   const [unsure, setUnsure] = useState<Move | null>(null);
   const play = (move: Move) => {
@@ -208,11 +238,11 @@ export function GameClient({
       setUnsure(move);
       return;
     }
-    send({ t: "action", seq: seq.current, action: move });
+    sendAction(move);
   };
   const playConfirmed = (move: Move) => {
     setUnsure(null);
-    send({ t: "action", seq: seq.current, action: move });
+    sendAction(move);
   };
 
   // D34: a ting when it becomes the player's turn to act
@@ -351,6 +381,12 @@ export function GameClient({
   // The clock of the player to act runs down on this screen; the server decides what it was when the view was sent.
   const left = (view.remaining ?? []).map((r, i) => (r === null ? null : i === v.to_act ? r - (now - receivedAt) : r));
   const canKick = v.viewer !== null && !ended && v.state.players.length >= 3;
+  const sendingPrompt = (
+    <div className="sendingmove" role="status" aria-live="polite">
+      <span className="spinner" aria-hidden="true" />
+      <span>Sending your move...</span>
+    </div>
+  );
   const moves = (
     <>
       {ended ? (
@@ -367,9 +403,7 @@ export function GameClient({
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
-      {sandboxMarker && !ended ? (
-        <SandboxPanel marker={sandboxMarker as never} send={(a) => send({ t: "action", seq: seq.current, action: a })} handCards={hand} />
-      ) : null}
+      {sandboxMarker && !ended ? <SandboxPanel marker={sandboxMarker as never} send={(a) => sendAction(a)} handCards={hand} /> : null}
       {unsure ? (
         <div className="confirmbar">
           <div className="confirm warn">
@@ -711,7 +745,7 @@ export function GameClient({
     <GameView
       view={v}
       names={names}
-      moves={moves}
+      moves={waiting && !ended ? sendingPrompt : moves}
       previous={previous}
       log={
         <MoveLog

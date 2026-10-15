@@ -17,25 +17,11 @@ import {
   polar,
   sectorDegrees,
 } from "./geometry";
+import { holeAt } from "./glyphids";
 import type { Move } from "./moves";
 import { SPECIES_SPACES } from "./speciesSpaces";
 
 const TRACE_COLORS = ["pink", "yellow", "blue"];
-
-/** The holes of the Glyphids translation board in its picture (750 x 690): the top row of 3 and the bottom row of 4 (EXP-GLY-05). */
-export const GLYPH_HOLES: Record<"top" | "bottom", [number, number][]> = {
-  top: [
-    [200, 160],
-    [375, 160],
-    [545, 160],
-  ],
-  bottom: [
-    [112, 440],
-    [290, 440],
-    [468, 440],
-    [640, 440],
-  ],
-};
 
 /** The reward spaces printed on the organization boards of Cosmos Strategy Group and Helion Assembly, in the picture of the card (560 x 421). */
 export const ORG_SPACES: Record<string, Record<string, [number, number]>> = {
@@ -186,13 +172,15 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       const at = polar(RING_RADIUS[to[0]] ?? 270, sectorDegrees(to[1]));
       add(i, `od:${String(m.probe)}:${to[0]}-${to[1]}`, { kind: "circle", x: at.x, y: at.y, r: 80 });
     } else if (m.type === "decipher") {
-      const at = GLYPH_HOLES[m.row === "top" ? "top" : "bottom"][Number(m.index)];
+      // the holes are on the translation board above the Glyphids board, on the game board itself
+      const gi = s.species.findIndex((sp) => sp.discovered && sp.species === "glyphids");
+      const at = gi < 0 ? null : holeAt(gi, m.row === "top" ? "top" : "bottom", Number(m.index));
       if (at)
         add(
           i,
           `glyph:${String(m.row)}:${String(m.index)}:${String(m.glyph)}`,
-          { ...none, x: at[0], y: at[1], r: 70 },
-          { panel: "glyphids", glyph: String(m.glyph) },
+          { ...none, x: at.x, y: at.y, r: 62 },
+          { glyph: String(m.glyph) },
         );
     } else if (m.type === "pick_organelle") {
       const at = ORGANELLE_SPACES[String(m.space)];

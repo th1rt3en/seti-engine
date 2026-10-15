@@ -35,6 +35,7 @@ import {
   scoreDegrees,
   sectorDegrees,
 } from "@/lib/geometry";
+import { glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
 import { type Spot, onAlienBoard } from "@/lib/targets";
@@ -47,6 +48,7 @@ import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
 import { DataToken, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
+import { TranslationBoard } from "./TranslationBoard";
 
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
@@ -140,10 +142,13 @@ export function BoardView({
     spaces.set(key, [...(spaces.get(key) ?? []), p]);
   }
 
+  // the translation board of the Glyphids is attached above their board: the page makes room for it at the top
+  const glyphSlot = s.species.findIndex((sp) => sp.discovered && sp.species === "glyphids");
+  const trackHeight = glyphSlot < 0 ? 0 : Math.ceil(trackBox(glyphSlot).h);
   return (
     <>
       <svg
-        viewBox={`0 ${Math.floor(ALIEN_TOP)} ${BOARD.w + GOLD_EXTRA} ${BOARD.h - Math.floor(ALIEN_TOP)}`}
+        viewBox={`0 ${Math.floor(ALIEN_TOP) - trackHeight} ${BOARD.w + GOLD_EXTRA} ${BOARD.h - Math.floor(ALIEN_TOP) + trackHeight}`}
         className="board"
         role="img"
         aria-label="The game board"
@@ -167,6 +172,8 @@ export function BoardView({
             </image>
           );
         })}
+
+        {glyphSlot >= 0 ? <GlyphTrack slot={glyphSlot} extra={s.species[glyphSlot]?.extra as GlyphExtra} /> : null}
 
         {s.species.map((sp, i) => {
           // the deck of a discovered species lies to the right of its board: its back with the cards left over it, and the card that lies face up
@@ -743,6 +750,9 @@ export function BoardView({
             ) : (
               <path d={sp.shape.d} className="spotshape" />
             )}
+            {sp.glyph && sp.shape.kind === "circle" && glyphToken(sp.glyph) ? (
+              <image href={glyphToken(sp.glyph)} x={sp.shape.x - 40} y={sp.shape.y - 46} width={80} height={92} opacity={0.85} />
+            ) : null}
           </g>
         ))}
       </svg>
@@ -803,5 +813,31 @@ function GoldZoom({
       </p>
     </div>,
     document.body,
+  );
+}
+
+type GlyphExtra = { sides?: number[]; top?: (string | null)[]; bottom?: (string | null)[] };
+
+/** The translation board of the Glyphids above their board: the arrangement of the strips that was drawn, and the glyph tokens in its holes. */
+function GlyphTrack({ slot, extra }: { slot: number; extra: GlyphExtra }) {
+  const box = trackBox(slot);
+  const holes: { key: string; glyph: string; x: number; y: number }[] = [];
+  for (const row of ["top", "bottom"] as const) {
+    (extra?.[row] ?? []).forEach((glyph, index) => {
+      const at = holeAt(slot, row, index);
+      if (glyph && at) holes.push({ key: `${row}${index}`, glyph, x: at.x, y: at.y });
+    });
+  }
+  return (
+    <g>
+      <g transform={`translate(${box.x} ${box.y}) scale(${box.k})`}>
+        <TranslationBoard sides={extra?.sides} />
+      </g>
+      {holes.map((h) => (
+        <image key={h.key} href={glyphToken(h.glyph)} x={h.x - 55} y={h.y - 62} width={110} height={125}>
+          <title>{`${h.glyph} glyph token`}</title>
+        </image>
+      ))}
+    </g>
   );
 }

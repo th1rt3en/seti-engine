@@ -5,10 +5,9 @@ import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { PanelSpots } from "./PanelSpots";
+import { TranslationBoard } from "./TranslationBoard";
 
 const ASSET = expansionAssets as Record<string, string>;
-// the four arrangements: [top strip side, bottom strip side] -> the picture (a to d, A-044)
-const VARIANT: Record<string, string> = { "0,0": "a", "1,1": "b", "1,0": "c", "0,1": "d" };
 // centres of the holes in the 750 x 690 picture
 const TOP = [
   [200, 160],
@@ -34,9 +33,6 @@ export function GlyphidsPanel({ view, names, spots }: { view: View; names: strin
     tokens?: Record<string, string>;
     supply?: string[];
   };
-  const variant = VARIANT[(extra.sides ?? [0, 0]).join(",")] ?? "a";
-  const src = ASSET[`boards/glyphids-track-${variant}`];
-  if (!src) return null;
   const size = 105;
   const place = (rows: (string | null)[] | undefined, spots: number[][], key: string) =>
     (rows ?? []).map((g, i) => {
@@ -56,8 +52,7 @@ export function GlyphidsPanel({ view, names, spots }: { view: View; names: strin
         role="img"
         aria-label="The translation board with the glyph tokens that have been placed"
       >
-        <rect x="0" y="0" width="750" height="690" fill="#0b1b0e" />
-        <image href={src} x="0" y="0" width="750" height="690" />
+        <TranslationBoard sides={extra.sides} />
         {place(extra.top, TOP, "t")}
         {place(extra.bottom, BOTTOM, "b")}
         {/* the holes a glyph token can be placed in (EXP-GLY-05): each carries the token that would go there, a hole that takes several kinds shows them side by side */}

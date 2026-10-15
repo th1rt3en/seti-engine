@@ -119,8 +119,9 @@ describe("the places of the Space Agencies expansion", () => {
       ],
       [null, null, null, null, null, null, null],
     );
+    (v.state as unknown as { species: unknown[] }).species = [{ species: "glyphids", discovered: true }, { species: "anomalies" }];
     const { spots, handled } = buildSpots(v);
-    expect(spots.filter((s) => s.panel === "glyphids").map((s) => s.glyph)).toEqual(["red", "blue"]); // two kinds for one hole
+    expect(spots.filter((s) => s.id.startsWith("glyph:")).map((s) => s.glyph)).toEqual(["red", "blue"]); // two kinds for one hole
     expect(spots.find((s) => s.id === "organelle:IB")?.panel).toBe("amoeba");
     expect(spots.find((s) => s.id === "amoeba:pink:0")?.panel).toBe("amoeba");
     expect(spots.find((s) => s.id.startsWith("od:"))?.panel).toBeUndefined(); // on the board itself
