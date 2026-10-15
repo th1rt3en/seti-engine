@@ -1,0 +1,163 @@
+<title>Expansion Transcription Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a review desk. A sticky bar holds progress and filters; every item is a row with the picture on the left and the reading on the right. */
+:root {
+  --bg: #f3f5f6; --panel: #ffffff; --ink: #14212a; --muted: #5a6b76; --line: #d4dce1;
+  --accent: #0e7c86; --ok: #1f7a3d; --okbg: #e3f4e8; --bad: #b3261e; --badbg: #fbe7e5; --warn: #8a5a00; --warnbg: #fff1d1;
+  --font: "Atkinson Hyperlegible", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1a20; --panel: #16252d; --ink: #e4edf1; --muted: #93a6b0; --line: #2a3d47;
+  --accent: #4fc3cf; --ok: #6fd18c; --okbg: #17352310; --bad: #ff8a80; --badbg: #3a1c1a; --warn: #f2c25b; --warnbg: #3a2e12; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1a20; --panel: #16252d; --ink: #e4edf1; --muted: #93a6b0; --line: #2a3d47;
+  --accent: #4fc3cf; --ok: #6fd18c; --okbg: #17352310; --bad: #ff8a80; --badbg: #3a1c1a; --warn: #f2c25b; --warnbg: #3a2e12; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font); margin: 0; padding-block: 0 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1100px; margin: 0 auto; }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 12px 0 10px; border-bottom: 1px solid var(--line); }
+h1 { font-size: 20px; margin: 0 0 2px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0 0 10px; font-size: 13px; max-width: 70ch; }
+.meter { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; font-family: var(--mono); font-size: 12.5px; }
+.bar { flex: 1 1 200px; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; display: flex; min-width: 120px; }
+.bar i { display: block; height: 100%; }
+.bar .o { background: var(--ok); } .bar .b { background: var(--bad); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip, .seg button { font: 500 12.5px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.chip[aria-pressed="true"], .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.chip small { opacity: .7; margin-left: 4px; }
+.seg { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+.seg label { color: var(--muted); font-size: 12px; }
+.item { display: grid; grid-template-columns: minmax(180px, 300px) minmax(0, 1fr); gap: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-top: 14px; }
+.item.ok { border-color: var(--ok); } .item.bad { border-color: var(--bad); }
+.pics { display: flex; flex-direction: column; gap: 8px; align-content: start; }
+.pics img { width: 100%; height: auto; border-radius: 6px; cursor: zoom-in; border: 1px solid var(--line); background: #888; }
+.pics.tokens img { max-width: 140px; }
+h2 { font-size: 16px; margin: 0 0 8px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+h2 .grp { font: 500 11px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; }
+dt { font: 500 12px var(--mono); color: var(--muted); padding-top: 2px; }
+dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.unc { margin-top: 10px; background: var(--warnbg); color: var(--warn); border-radius: 6px; padding: 8px 10px; font-size: 13.5px; }
+.unc b { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 2px; }
+.unc ul { margin: 0; padding-left: 18px; }
+.review { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+.review button { font: 700 13px var(--font); padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+.review button.okb[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: var(--bg); }
+.review button.badb[aria-pressed="true"] { background: var(--bad); border-color: var(--bad); color: var(--bg); }
+.review textarea { flex: 1 1 260px; min-height: 56px; font: 14px var(--font); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+button:focus-visible, textarea:focus-visible, img:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { color: var(--muted); font-size: 13px; margin-top: 14px; max-width: 80ch; }
+#lb { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.86); display: none; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
+#lb.on { display: flex; } #lb img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+.status { font: 12px var(--mono); color: var(--muted); }
+@media (max-width: 680px) { .item { grid-template-columns: 1fr; } .pics img { max-width: 320px; } dl { grid-template-columns: 1fr; } dt { padding-top: 6px; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Space Agencies transcription check</h1>
+    <p class="sub">Each picture is shown next to what was read from it. Mark it Correct, or Needs fix with a note on what is wrong. Marks are saved for the whole page and are read back from there.</p>
+    <div class="meter"><span id="count">0 / 0 checked</span><div class="bar" aria-hidden="true"><i class="o" id="bo"></i><i class="b" id="bb"></i></div><span id="badcount"></span><span class="status" id="status"></span></div>
+    <div class="chips" id="groups" role="group" aria-label="Groups"></div>
+    <div class="seg" role="group" aria-label="Filter"><label>Show</label>
+      <button data-f="all" aria-pressed="true">All</button><button data-f="todo" aria-pressed="false">Not checked</button><button data-f="bad" aria-pressed="false">Needs fix</button><button data-f="unc" aria-pressed="false">With doubts</button>
+    </div>
+  </header>
+  <main id="list"></main>
+  <p class="note">The doubts in amber are the transcriber's own. A reading that says "icon only" was described from its shape and the rulebook's iconography, so check those first. Card numbers 9 and 18 were not legible and were deduced from the gaps in 1 to 42.</p>
+</div>
+<div id="lb" role="dialog" aria-label="Picture"><img alt=""></div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const items = DATA.items;
+const sid = (k) => k.replace(/[^A-Za-z0-9]+/g, "_");
+let marks = {}, group = "All", filt = "all", canWrite = true, db = null;
+const $ = (s) => document.querySelector(s);
+const groups = ["All", ...[...new Set(items.map((i) => i.group))]];
+
+function chips() {
+  const el = $("#groups"); el.textContent = "";
+  for (const g of groups) {
+    const n = g === "All" ? items.length : items.filter((i) => i.group === g).length;
+    const done = (g === "All" ? items : items.filter((i) => i.group === g)).filter((i) => marks[sid(i.key)]?.status).length;
+    const b = document.createElement("button"); b.className = "chip"; b.setAttribute("aria-pressed", String(g === group));
+    b.append(g); const s = document.createElement("small"); s.textContent = done + "/" + n; b.append(s);
+    b.onclick = () => { group = g; render(); }; el.append(b);
+  }
+}
+function visible(i) {
+  const m = marks[sid(i.key)];
+  if (group !== "All" && i.group !== group) return false;
+  if (filt === "todo") return !m?.status;
+  if (filt === "bad") return m?.status === "bad";
+  if (filt === "unc") return i.uncertain.length > 0;
+  return true;
+}
+function card(i) {
+  const m = marks[sid(i.key)] || {};
+  const art = document.createElement("article"); art.className = "item" + (m.status ? " " + (m.status === "ok" ? "ok" : "bad") : ""); art.id = "i-" + sid(i.key);
+  const pics = document.createElement("div"); pics.className = "pics" + (i.group === "Tokens and tiles" ? " tokens" : "");
+  for (const p of i.pics) { const im = document.createElement("img"); im.src = p; im.alt = i.title; im.loading = "lazy"; im.tabIndex = 0;
+    const open = () => { $("#lb img").src = p; $("#lb").classList.add("on"); }; im.onclick = open; im.onkeydown = (e) => { if (e.key === "Enter") open(); }; pics.append(im); }
+  const body = document.createElement("div");
+  const h = document.createElement("h2"); h.textContent = i.title; const g = document.createElement("span"); g.className = "grp"; g.textContent = i.group; h.append(g); body.append(h);
+  const dl = document.createElement("dl");
+  for (const [k, v] of i.fields) { const dt = document.createElement("dt"); dt.textContent = k.replace(/_/g, " "); const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); }
+  body.append(dl);
+  if (i.uncertain.length) { const u = document.createElement("div"); u.className = "unc"; u.innerHTML = "<b>Transcriber was unsure</b>"; const ul = document.createElement("ul");
+    for (const t of i.uncertain) { const li = document.createElement("li"); li.textContent = t; ul.append(li); } u.append(ul); body.append(u); }
+  const r = document.createElement("div"); r.className = "review";
+  const ok = document.createElement("button"); ok.className = "okb"; ok.textContent = "Correct"; ok.setAttribute("aria-pressed", String(m.status === "ok"));
+  const bad = document.createElement("button"); bad.className = "badb"; bad.textContent = "Needs fix"; bad.setAttribute("aria-pressed", String(m.status === "bad"));
+  const ta = document.createElement("textarea"); ta.placeholder = "What is wrong or missing?"; ta.value = m.note || ""; ta.id = "n-" + sid(i.key); ta.hidden = m.status !== "bad";
+  ok.disabled = bad.disabled = ta.disabled = !canWrite;
+  ok.onclick = () => save(i, m.status === "ok" ? "" : "ok", ta.value);
+  bad.onclick = () => save(i, m.status === "bad" ? "" : "bad", ta.value);
+  let t; ta.oninput = () => { clearTimeout(t); t = setTimeout(() => save(i, "bad", ta.value), 700); };
+  r.append(ok, bad, ta); body.append(r); art.append(pics, body); return art;
+}
+function render() {
+  chips();
+  const keep = document.activeElement && document.activeElement.tagName === "TEXTAREA" ? document.activeElement.id : null;
+  const list = $("#list"); list.textContent = "";
+  const shown = items.filter(visible);
+  for (const i of shown) list.append(card(i));
+  if (!shown.length) { const p = document.createElement("p"); p.className = "note"; p.textContent = "Nothing matches this filter."; list.append(p); }
+  if (keep && document.getElementById(keep)) { const e = document.getElementById(keep); e.focus(); e.setSelectionRange(e.value.length, e.value.length); }
+  const ok = items.filter((i) => marks[sid(i.key)]?.status === "ok").length, bad = items.filter((i) => marks[sid(i.key)]?.status === "bad").length;
+  $("#count").textContent = (ok + bad) + " / " + items.length + " checked";
+  $("#badcount").textContent = bad ? bad + " need a fix" : "";
+  $("#bo").style.width = (100 * ok / items.length) + "%"; $("#bb").style.width = (100 * bad / items.length) + "%";
+}
+async function save(i, status, note) {
+  const k = sid(i.key), prev = marks[k] || {};
+  marks[k] = { status, note: status === "bad" ? note : prev.note || "" };
+  if (status !== "bad" || !prev.status) render(); else chips();
+  if (!db) { $("#status").textContent = "not saved (offline view)"; return; }
+  try { await db.doc("review/" + k).set({ key: i.key, title: i.title, group: i.group, status, note: marks[k].note, at: Date.now() }); $("#status").textContent = "saved"; }
+  catch (e) { $("#status").textContent = "could not save: " + (e && e.code || "error"); canWrite = false; render(); }
+}
+document.querySelectorAll(".seg button").forEach((b) => b.onclick = () => { filt = b.dataset.f; document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); render(); });
+$("#lb").onclick = () => $("#lb").classList.remove("on");
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#lb").classList.remove("on"); });
+render();
+(async () => {
+  try {
+    db = await window.claude?.use("db");
+    if (!db) { $("#status").textContent = "marks are not saved in this view"; return; }
+    const user = await window.claude?.use("user");
+    if (user) { const w = await user.can("data.write"); if (w === false) canWrite = false; }
+    db.collection("review").onSnapshot((snap) => {
+      const next = {}; for (const d of snap.docs) next[d.id] = d.data();
+      const editing = document.activeElement && document.activeElement.tagName === "TEXTAREA";
+      marks = next; if (editing) chips(); else render();
+    }, () => { $("#status").textContent = "saved marks unavailable"; });
+  } catch (e) { $("#status").textContent = "marks are not saved in this view"; }
+})();
+</script>
