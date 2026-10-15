@@ -1,8 +1,7 @@
 import { CENTER } from "@/lib/geometry";
 import assets from "../generated/assets.json";
 // An Anomaly token on the outermost ring of the solar system (ALIEN-ANO-01): a hexagon in the colour of its life trace column with the reward of the
-// side that is up. The owner supplied the pictures of five of the six faces (`anomalyTokens` in assets.json); the face that is missing (yellow, 1 card)
-// is still drawn as a hexagon (docs/asset-gaps.md).
+// side that is up, drawn with the pictures the owner supplied (`anomalyTokens` in assets.json); a hexagon is drawn only if a picture is missing.
 import expansionAssets from "../generated/expansion-assets.json";
 import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, PublicityIcon } from "./Icons";
 
