@@ -119,6 +119,14 @@ def main(folders: list[pathlib.Path]) -> None:
     icon.putalpha(mask.filter(ImageFilter.GaussianBlur(0.7)))
     manifest["tokens/icon-data"] = save(icon.crop((4, 4, 73, 74)), "tokens", "icon-data", None, 90)
     prov.append(f"| `space-agencies-main-deck-cards.jpg` (Pandora Satellite, the data icon in its text) | `{manifest['tokens/icon-data']}` |")
+    # the fourth arrangement of the translation board strips (top strip of picture a, bottom strip of picture b) has no picture: it is composed
+    # from the two (the owner asked for four pictures, A-044)
+    top = Image.open(find(folders, "alien-board-glyphids-track-variant-a.png")).convert("RGBA")
+    bottom = Image.open(find(folders, "alien-board-glyphids-track-variant-b.png")).convert("RGBA")
+    composed = bottom.copy()
+    composed.paste(top.crop((0, 0, top.width, 430)), (0, 0))
+    manifest["boards/glyphids-track-d"] = save(composed, "boards", "glyphids-track-d", None, 85)
+    prov.append(f"| `alien-board-glyphids-track-variant-a.png` (above y 430) and `-b.png` (below) | `{manifest['boards/glyphids-track-d']}` (composed) |")
     for fname, (folder, name, width) in SINGLES.items():
         manifest[f"{folder}/{name}"] = save(Image.open(find(folders, fname)).convert("RGB"), folder, name, width)
         prov.append(f"| `{fname}` | `{manifest[f'{folder}/{name}']}` |")

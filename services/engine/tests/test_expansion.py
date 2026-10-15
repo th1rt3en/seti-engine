@@ -391,7 +391,11 @@ def test_orbital_dynamics_moves_two_different_probes_one_step_each() -> None:  #
     s = with_org("orbital_dynamics", energy=0)
     p = cur(s)
     p.movement = 0
-    s.probes = [Probe(id="a", player=p.index, ring=2, sector=1), Probe(id="b", player=p.index, ring=2, sector=5)]
+    from seti_engine.engine import move_cost
+
+    cheap = [(r, c) for r in (2, 3) for c in range(8) if move_cost(s, p, Probe(id="t", player=p.index, ring=r, sector=c)) == 1]
+    (r1, c1), (r2, c2) = cheap[0], cheap[-1]
+    s.probes = [Probe(id="a", player=p.index, ring=r1, sector=c1), Probe(id="b", player=p.index, ring=r2, sector=c2)]
     assert can(s, "org_free", org="orbital_dynamics")
     s = act(s, type="org_free", org="orbital_dynamics")
     step = next(m for m in legal_moves(s) if m["type"] == "od_step" and m["probe"] == "a")
@@ -401,3 +405,22 @@ def test_orbital_dynamics_moves_two_different_probes_one_step_each() -> None:  #
     s = act(s, **next(m for m in legal_moves(s) if m["type"] == "od_step" and m["probe"] == "b"))
     assert not any(m["type"] == "od_step" for m in legal_moves(s))  # two probes at most
     assert not can(s, "org_free", org="orbital_dynamics")  # once per round
+
+
+def test_orbital_dynamics_step_out_of_an_asteroid_field_needs_more_movement() -> None:  # EXP-ORG-13, A-039 (owner)
+    from seti_engine import solar
+    from seti_engine.engine import move_cost
+    from seti_engine.models import Probe
+
+    s = with_org("orbital_dynamics", energy=0)
+    p = cur(s)
+    pos = solar.find_cell(s, "ASTEROID")
+    assert pos is not None
+    s.probes = [Probe(id="a", player=p.index, ring=pos[0], sector=pos[1])]
+    p.movement = 0
+    s = act(s, type="org_free", org="orbital_dynamics")
+    cost = move_cost(s, cur(s), s.probes[0])
+    steps = [m for m in legal_moves(s) if m["type"] == "od_step"]
+    assert bool(steps) == (cost <= 1)  # a dearer step is not offered without the extra movement
+    cur(s).movement = max(0, cost - 1)
+    assert any(m["type"] == "od_step" for m in legal_moves(s))

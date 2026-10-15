@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
+import { GlyphidsPanel } from "./GlyphidsPanel";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { PlayerTracker } from "./PlayerTracker";
@@ -181,6 +182,7 @@ export function GameView({
         <aside className="col-aux" aria-label="Publicity track and tech stacks">
           <PublicityTrack view={view} names={names} />
           <TechStacks view={view} pick={tech} />
+          <GlyphidsPanel view={view} names={names} />
         </aside>
       </div>
 

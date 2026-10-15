@@ -444,7 +444,7 @@
    "name": "Forced Entry",
    "printed": "ET.29",
    "sector": "yellow",
-   "trace": "blue"
+   "trace": "yellow"
   },
   {
    "id": "AK.30",
@@ -452,7 +452,7 @@
    "name": "Forced Entry",
    "printed": "ET.30",
    "sector": "red",
-   "trace": "blue"
+   "trace": "yellow"
   },
   {
    "id": "AK.31",
@@ -460,7 +460,7 @@
    "name": "Forced Entry",
    "printed": "ET.31",
    "sector": "blue",
-   "trace": "blue"
+   "trace": "yellow"
   },
   {
    "id": "AK.32",
@@ -468,7 +468,7 @@
    "name": "Forced Entry",
    "printed": "ET.32",
    "sector": "black",
-   "trace": "blue"
+   "trace": "yellow"
   },
   {
    "id": "AK.25",
@@ -476,7 +476,7 @@
    "name": "Proximity Maneuvers",
    "printed": "ET.25",
    "sector": "blue",
-   "trace": "yellow"
+   "trace": "blue"
   },
   {
    "id": "AK.26",
@@ -484,7 +484,7 @@
    "name": "Proximity Maneuvers",
    "printed": "ET.26",
    "sector": "yellow",
-   "trace": "yellow"
+   "trace": "blue"
   },
   {
    "id": "AK.27",
@@ -492,7 +492,7 @@
    "name": "Proximity Maneuvers",
    "printed": "ET.27",
    "sector": "red",
-   "trace": "yellow"
+   "trace": "blue"
   },
   {
    "id": "AK.28",
@@ -500,7 +500,7 @@
    "name": "Proximity Maneuvers",
    "printed": "ET.28",
    "sector": "black",
-   "trace": "yellow"
+   "trace": "blue"
   }
  ],
  "source": "docs/spec/data/expansion-transcription.json (a transcription of the owner-supplied pictures, owner check pending; see ambiguities A-040 to A-042)"

@@ -256,7 +256,8 @@ def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
                     out.append({"type": "move_probe", "probe": pr.id, "to": [ring, sector]})
     if p.org_data.get("od_left", 0) > 0:  # Orbital Dynamics' free action (A-039): 1 step each for up to 2 different probes
         for pr in probes_in_space(state, p):
-            if pr.id not in p.org_data["od_used"] and not pr.capsule:
+            # the free step is 1 movement for this probe; a step that costs more (leaving an asteroid field) needs the rest from the player's own movement
+            if pr.id not in p.org_data["od_used"] and not pr.capsule and move_cost(state, p, pr) - 1 <= p.movement:
                 out += [{"type": "od_step", "probe": pr.id, "to": [ring, sector]} for ring, sector in solar.adjacent(pr.ring, pr.sector)]
     if p.publicity >= 3:  # FREE-06
         out.append({"type": "buy_card", "source": "deck"})
@@ -573,7 +574,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         glyphids.decipher(s, p, a, events)  # EXP-GLY-05
     elif t == "od_step":  # Orbital Dynamics (A-039): a normal move, paid by the ability
         probe = next(pr for pr in s.probes if pr.id == a["probe"])
-        p.movement += move_cost(s, p, probe)
+        p.movement += 1  # the free step; any cost beyond it is paid from the player's own movement (owner, A-039)
         p.org_data["od_left"] -= 1
         p.org_data["od_used"].append(probe.id)
         _do_action(s, {"type": "move_probe", "probe": a["probe"], "to": a["to"]}, events)

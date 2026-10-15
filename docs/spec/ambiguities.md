@@ -117,6 +117,64 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
 | A-054 | Mission Relay's starting marker | ruled |
 
+## Overview (rewritten by tools/spec/ambiguity_overview.py; the entries below hold the details)
+
+| ID | Title | Status |
+|---|---|---|
+| A-001 | Promo cards SE EN 01 and SE EN 02 | ruled |
+| A-002 | Rival probe placement when neither first space is available | ruled |
+| A-003 | End-of-round cards | ruled |
+| A-004 | Deal order at setup | ruled |
+| A-005 | Completed sectors versus later free actions | ruled |
+| A-006 | Income after passing | ruled |
+| A-007 | Disc geometry and pushed probes | ruled |
+| A-008 | Neutral milestone placement | ruled |
+| A-009 | Nonplayer markers used per milestone crossing | ruled |
+| A-010 | Which cards are the advanced rival cards | ruled |
+| A-012 | Rival runs out of advanced cards | ruled |
+| A-013 | Tucking a card with no cards in hand | ruled |
+| A-014 | Rival and Mascamite samples or anomalies | ruled |
+| A-015 | Unused movement at the end of a turn | ruled |
+| A-016 | Landing on a moon, first-lander data and planet landers | ruled |
+| A-017 | Counting traces by kind, and "spaces from Earth" | ruled |
+| A-018 | Cards that remove an orbiter or lander (#15, #84) | ruled |
+| A-019 | A mission card and its own effect | ruled |
+| A-020 | Where discarded alien cards go | ruled |
+| A-021 | Data taken from the 'Oumuamua tile | ruled |
+| A-022 | Overflow markers on the "Other" gold tile, side A | ruled |
+| A-023 | What happens to the rival's action cards between rounds | ruled |
+| A-024 | Details of the rival's choices | ruled |
+| A-025 | The rival has no income and no starting cards | ruled |
+| A-026 | May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)? | ruled |
+| A-027 | Which cards mention Mars in their flavor text (SE EN 02) | ruled |
+| A-028 | Effects of the 42 expansion main-deck cards | data supplied, to confirm |
+| A-029 | Alien cards that give signal tokens and the other new icons | resolved |
+| A-030 | Which organizations are numbered 1 to 4 | resolved |
+| A-031 | Organization income at the start of rounds 3, 4 and 5 versus the base income rules | proposed (in use, to confirm) |
+| A-032 | Boards, tokens and cards of Arkhos, Glyphids and Amoeba | data supplied, to confirm |
+| A-033 | The extra rival starting card and the four rival action cards of the expansion | ruled |
+| A-034 | The three long-term objective tiles and the advance symbol | ruled |
+| A-035 | The promo card "Space Agencies" that remembers a previous game | ruled |
+| A-036 | Details of the neutral quick start marks and of preparing a card at Futurespan | proposed (in use, to confirm) |
+| A-037 | Xenolab tiles and traces | ruled |
+| A-038 | Rewards of the reward spaces of Cosmos Strategy Group and Helion Assembly | partly |
+| A-039 | Orbital Dynamics' once-per-round free action | proposed (in use, to confirm) |
+| A-040 | Arkhos board and security cards (picture readings) | ruled |
+| A-041 | Is breaching a choice? | proposed (in use, to confirm) |
+| A-042 | Arkhos exploration cards (picture readings) | ruled |
+| A-043 | Number of glyph tokens of each kind | proposed (in use, to confirm) |
+| A-044 | Translation board strips and the top row dependency | ruled |
+| A-045 | Glyphids cards | ruled |
+| A-046 | Glyphids board wells | ruled |
+| A-047 | Order of the organelle moves | proposed (in use, to confirm) |
+| A-048 | Amoeba board readings | ruled |
+| A-049 | Amoeba cards ET.14 and ET.20 | ruled |
+| A-050 | Readings of the 42 main-deck cards | ruled |
+| A-051 | Helion Assembly's free action | proposed (in use, to confirm) |
+| A-052 | Futurespan token distance for other costs | proposed (in use, to confirm) |
+| A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
+| A-054 | Mission Relay's starting marker | ruled |
+
 Entry format:
 
 ```

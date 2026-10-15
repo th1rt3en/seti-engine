@@ -1710,3 +1710,23 @@ button:disabled {
   border-radius: 999px;
   padding: 0 6px;
 }
+
+.glyphpanel h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.translation {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+.glyphhold {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.glyphhold img {
+  margin-left: 2px;
+  vertical-align: middle;
+}

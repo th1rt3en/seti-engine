@@ -443,7 +443,7 @@
    "id": "AK.29",
    "printed": "ET.29",
    "name": "Forced Entry",
-   "trace": "blue",
+   "trace": "yellow",
    "sector": "yellow",
    "income": "card"
   },
@@ -451,7 +451,7 @@
    "id": "AK.30",
    "printed": "ET.30",
    "name": "Forced Entry",
-   "trace": "blue",
+   "trace": "yellow",
    "sector": "red",
    "income": "energy"
   },
@@ -459,7 +459,7 @@
    "id": "AK.31",
    "printed": "ET.31",
    "name": "Forced Entry",
-   "trace": "blue",
+   "trace": "yellow",
    "sector": "blue",
    "income": "credit"
   },
@@ -467,7 +467,7 @@
    "id": "AK.32",
    "printed": "ET.32",
    "name": "Forced Entry",
-   "trace": "blue",
+   "trace": "yellow",
    "sector": "black",
    "income": "credit"
   },
@@ -475,7 +475,7 @@
    "id": "AK.25",
    "printed": "ET.25",
    "name": "Proximity Maneuvers",
-   "trace": "yellow",
+   "trace": "blue",
    "sector": "blue",
    "income": "card"
   },
@@ -483,7 +483,7 @@
    "id": "AK.26",
    "printed": "ET.26",
    "name": "Proximity Maneuvers",
-   "trace": "yellow",
+   "trace": "blue",
    "sector": "yellow",
    "income": "energy"
   },
@@ -491,7 +491,7 @@
    "id": "AK.27",
    "printed": "ET.27",
    "name": "Proximity Maneuvers",
-   "trace": "yellow",
+   "trace": "blue",
    "sector": "red",
    "income": "credit"
   },
@@ -499,7 +499,7 @@
    "id": "AK.28",
    "printed": "ET.28",
    "name": "Proximity Maneuvers",
-   "trace": "yellow",
+   "trace": "blue",
    "sector": "black",
    "income": "card"
   }
