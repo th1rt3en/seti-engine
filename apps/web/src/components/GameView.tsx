@@ -14,6 +14,7 @@ import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } fr
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import { MissionsPanel } from "./MissionsPanel";
 import { OrgPanel } from "./OrgPanel";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
@@ -193,6 +194,7 @@ export function GameView({
           <PublicityTrack view={view} names={names} />
           <TechStacks view={view} pick={tech} />
           <RowDock view={view} row={row} inline />
+          <MissionsPanel view={view} names={names} />
           <OrgPanel view={view} names={names} spots={spots} />
           <ArkhosPanel view={view} names={names} spots={spots} />
           <GlyphidsPanel view={view} names={names} spots={spots} />

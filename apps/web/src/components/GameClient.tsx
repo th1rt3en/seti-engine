@@ -733,17 +733,22 @@ export function GameClient({
           : undefined
       }
       overlay={
-        boardOpen ? (
-          <PlayerBoardPanel
-            view={v}
-            names={names}
-            shown={boardPlayer}
-            onShow={setBoardPlayer}
-            onClose={() => setBoardOpen(false)}
-            choice={slotChoice}
-            onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
-          />
-        ) : null
+        <>
+          <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
+            {boardOpen ? "Close player boards" : "Player boards"}
+          </button>
+          {boardOpen ? (
+            <PlayerBoardPanel
+              view={v}
+              names={names}
+              shown={boardPlayer}
+              onShow={setBoardPlayer}
+              onClose={() => setBoardOpen(false)}
+              choice={slotChoice}
+              onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
+            />
+          ) : null}
+        </>
       }
       hand={{
         selectable: pickable,
@@ -779,11 +784,6 @@ export function GameClient({
         <>
           {clocks}
           {v.viewer !== null ? soundButton : null}
-          {v.state.players.length > 0 ? (
-            <button type="button" className="secondary small" onClick={() => setBoardOpen(!boardOpen)}>
-              Player boards
-            </button>
-          ) : null}
           <span className="small muted">
             {online ? "Connected" : "Reconnecting..."} · action {view.seq}
           </span>
