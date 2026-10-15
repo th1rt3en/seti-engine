@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import rewards, rng, tables
+from . import rewards, rng, tables, trail
 from .models import GameState, PlayerState, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -134,7 +134,8 @@ def decipher(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) ->
     p.glyphs.remove(a["glyph"])
     s.species[i].extra[a["row"]][a["index"]] = a["glyph"]
     events.append({"type": "decipher", "player": p.index, "glyph": a["glyph"], "row": a["row"], "index": a["index"]})
-    rewards.grant(s, p, slot_reward(s, a["row"], a["index"]), events)
+    with trail.scope(s, {"kind": "glyph", "glyph": a["glyph"], "what": "decipher"}):
+        rewards.grant(s, p, slot_reward(s, a["row"], a["index"]), events)
 
 
 def glyph_resource(s: GameState, p: PlayerState, glyph: str, events: Events) -> None:
@@ -144,7 +145,8 @@ def glyph_resource(s: GameState, p: PlayerState, glyph: str, events: Events) -> 
     # the log says what the icon did, or that it did nothing
     events.append({"type": "glyph_resource", "player": p.index, "glyph": glyph, "reward": reward})
     if where is not None:
-        rewards.grant(s, p, reward, events)
+        with trail.scope(s, {"kind": "glyph", "glyph": glyph, "what": "icon"}):
+            rewards.grant(s, p, reward, events)
 
 
 def end_points(p: PlayerState) -> int:

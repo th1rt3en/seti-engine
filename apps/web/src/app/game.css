@@ -2160,3 +2160,11 @@ button:disabled {
   outline: 3px solid #ffd166;
   outline-offset: 1px;
 }
+
+/* a gain or a loss of the log with the source that caused it */
+.logsource {
+  display: block;
+}
+.logsource .amounts {
+  margin-left: 4px;
+}

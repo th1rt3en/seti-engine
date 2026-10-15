@@ -289,3 +289,29 @@ def test_discarding_a_glyph_card_for_its_corner_gives_the_resource_and_the_log_s
     done = apply(s, {"type": "discard_free", "card": cid})
     assert done.state.players[0].credits == me.credits + 1
     assert [e["reward"] for e in done.events if e["type"] == "glyph_resource"] == [[{"t": "credit", "n": 1}]]
+
+
+def test_gains_of_a_move_are_listed_by_source() -> None:  # the log: what was gained, and because of what
+    s = discovered()
+    s.current_player = 0
+    s.phase = "play"
+    s.pending = []
+    me = s.players[0]
+    cid = next(c["id"] for c in tables.glyphids()["cards"] if c["corner"] == "orange")
+    s.species[0].extra["sides"] = [0, 0]
+    s.species[0].extra["top"][0] = "orange"
+    me.hand = [cid]
+    r = apply(s, {"type": "discard_free", "card": cid})
+    gains = [e for e in r.events if e["type"] == "gains" and e["player"] == 0]
+    # the credit is the glyph's, the discarded card is the move's
+    assert {"kind": "glyph", "glyph": "orange", "what": "icon"} in [g["source"] for g in gains]
+    credit = next(g for g in gains if g["source"]["kind"] == "glyph")
+    assert credit["changes"] == {"credit": 1}
+    assert next(g for g in gains if g["source"]["kind"] == "move")["changes"] == {"card": -1}
+    # nothing is counted twice: the gains add up to the net change
+    net = next(e for e in r.events if e["type"] == "delta" and e["player"] == 0)["changes"]
+    total: dict[str, int] = {}
+    for g in gains:
+        for k, v in g["changes"].items():
+            total[k] = total.get(k, 0) + v
+    assert total == net

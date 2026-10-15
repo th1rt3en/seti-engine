@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import arkhos, cards, effects, objectives, rewards, rng, solar, species, tables, techs
+from . import arkhos, cards, effects, objectives, rewards, rng, solar, species, tables, techs, trail
 from .models import GameState, PlayerState, Probe, RivalState
 
 Events = list[dict[str, Any]]
@@ -317,16 +317,17 @@ def take_turn(s: GameState, events: Events) -> None:
     r.arrow = card["dir"]
     events.append({"type": "rival_card", "card": cid})
     spent = cid
-    for action in card["actions"]:
-        if action["kind"] == "species_check":
-            slot = action["discoveredSpecies"] - 1
-            if slot < len(s.species) and s.species[slot].discovered:
-                spent = SPECIES_CARD[s.species[slot].species]  # SOLO-RIVAL-09: the card is replaced by the species card
-                _resolve_card(s, tables.rival_cards()[spent], events)
+    with trail.scope(s, {"kind": "rival_turn", "card": cid}, turn=cid):
+        for action in card["actions"]:
+            if action["kind"] == "species_check":
+                slot = action["discoveredSpecies"] - 1
+                if slot < len(s.species) and s.species[slot].discovered:
+                    spent = SPECIES_CARD[s.species[slot].species]  # SOLO-RIVAL-09: the card is replaced by the species card
+                    _resolve_card(s, tables.rival_cards()[spent], events)
+                    break
+                continue
+            if _do(s, action, events):
                 break
-            continue
-        if _do(s, action, events):
-            break
     r.used.append(spent)
     s.stage = "turn_end"
 

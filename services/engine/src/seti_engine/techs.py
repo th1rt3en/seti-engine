@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, glyphids, orgs, rewards, solar, tables
+from . import effects, glyphids, orgs, rewards, solar, tables, trail
 from .models import ComputerTech, Decision, GameState, PlayerState
 
 Action = dict[str, Any]
@@ -59,14 +59,16 @@ def take_tech(s: GameState, p: PlayerState, stack: int, events: Events, tile_bon
     if st.two_point_tile:  # TECHACT-03: the first taker discards the 2-point tile and scores 2
         st.two_point_tile = False
         if first_bonus:
-            effects.gain_score(s, p, 2)
+            with trail.scope(s, {"kind": "tech", "tech": tech_name(st.category, st.glyph), "what": "first"}):
+                effects.gain_score(s, p, 2)
     name = tech_name(st.category, st.glyph)
     p.techs.append(name)
     events.append({"type": "tech", "player": p.index, "tech": name})
     orgs.on_tech(s, p, st.category)  # Turing Systems (EXP-ORG-13)
     glyphids.take(s, p, f"tech:{stack}", events)  # EXP-GLY-04
     extra = _stack_extra(st.category, st.glyph)
-    rewards.grant(s, p, [*([TILE_BONUS[tile]] if tile_bonus else []), *extra], events)  # TECHACT-04
+    with trail.scope(s, {"kind": "tech", "tech": name, "what": "bonus"}):
+        rewards.grant(s, p, [*([TILE_BONUS[tile]] if tile_bonus else []), *extra], events)  # TECHACT-04
     if st.category == "computer":
         free = [pos for pos in COMPUTER_SLOTS if pos not in p.computer_techs]
         s.pending.append(Decision(kind="computer_slot", player=p.index, data={"tech": name, "slots": free}))

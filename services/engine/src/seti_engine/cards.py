@@ -11,7 +11,7 @@ import copy
 from collections import deque
 from typing import Any
 
-from . import alien_steps, amoeba, card_defs, effects, expansion_steps, objectives, orgs, rewards, solar, tables, techs
+from . import alien_steps, amoeba, card_defs, effects, expansion_steps, objectives, orgs, rewards, solar, tables, techs, trail
 from .models import Decision, GameState, MissionState, PlanetState, PlayerState, Probe
 
 Action = dict[str, Any]
@@ -510,7 +510,8 @@ def complete_quick(s: GameState, p: PlayerState, cid: str, events: Events) -> No
     p.missions.remove(m)
     p.completed_missions.append(cid)
     events.append({"type": "mission_completed", "player": p.index, "card": cid})
-    rewards.grant(s, p, card_defs.CARDS[cid]["mission"]["r"], events)
+    with trail.scope(s, {"kind": "mission", "card": cid}):
+        rewards.grant(s, p, card_defs.CARDS[cid]["mission"]["r"], events)
     fire(s, p, [{"e": "mission_done"}], events)
 
 
@@ -561,7 +562,8 @@ def cover(s: GameState, p: PlayerState, cid: str, circle_index: int, events: Eve
     m = next(x for x in p.missions if x.card == cid)
     m.used[circle_index] = True
     events.append({"type": "mission_circle", "player": p.index, "card": cid, "circle": circle_index})
-    rewards.grant(s, p, card_defs.CARDS[cid]["mission"]["circles"][circle_index]["r"], events)
+    with trail.scope(s, {"kind": "mission", "card": cid}):
+        rewards.grant(s, p, card_defs.CARDS[cid]["mission"]["circles"][circle_index]["r"], events)
     if all(m.used):  # CARD-15
         p.missions.remove(m)
         p.completed_missions.append(cid)
