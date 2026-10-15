@@ -7,8 +7,8 @@ import { Cost, Rewards } from "./Reward";
 
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
-export function SpotPrompt({ note }: { note: Note }) {
-  if (!note) return null;
+export function SpotPrompt({ note, fallback }: { note: Note; fallback?: string }) {
+  if (!note) return fallback ? <span className="spotprompt">Confirm: {fallback}?</span> : null;
   if (note.alien) {
     return (
       <span className="spotprompt">
@@ -49,5 +49,5 @@ export function SpotPrompt({ note }: { note: Note }) {
       </span>
     );
   }
-  return null;
+  return fallback ? <span className="spotprompt">Confirm: {fallback}?</span> : null;
 }

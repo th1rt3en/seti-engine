@@ -253,6 +253,20 @@ export function BoardView({
                   />
                 );
               })}
+              {/* Mission Relay starts on the lowest-scoring space of the Mission tile (EXP-ORG-13) */}
+              {(g.low_markers ?? []).map((player) => {
+                const at = GOLD_SLOTS[GOLD_SLOTS.length - 1] ?? { x: 0, y: 0 };
+                return (
+                  <Marker
+                    key={`low-${player}`}
+                    x={at.x + 60}
+                    y={at.y - 70}
+                    size={70}
+                    color={color(player)}
+                    title={`${who(player)}: marker on the lowest-scoring space of the ${g.tile} tile`}
+                  />
+                );
+              })}
               {goldChoice?.tiles.includes(g.tile)
                 ? (() => {
                     const at = GOLD_SLOTS[Math.min(g.markers.length, GOLD_SLOTS.length - 1)] ?? { x: 0, y: 0 };

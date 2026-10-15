@@ -3,6 +3,8 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
+import type { BoardSpots } from "./BoardView";
+import { PanelSpots } from "./PanelSpots";
 
 const ASSET = expansionAssets as Record<string, string>;
 // the four arrangements: [top strip side, bottom strip side] -> the picture (a to d, A-044)
@@ -21,7 +23,7 @@ const BOTTOM = [
 ];
 const token = (glyph: string): string | undefined => ASSET[`tokens/glyphids-token-${glyph === "blue" ? "bue" : glyph}`];
 
-export function GlyphidsPanel({ view, names }: { view: View; names: string[] }) {
+export function GlyphidsPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
   const s = view.state;
   const slot = s.species.find((sp) => sp.discovered && sp.species === "glyphids");
   if (!slot) return null;
@@ -42,6 +44,7 @@ export function GlyphidsPanel({ view, names }: { view: View; names: string[] }) 
       const href = g ? token(g) : undefined;
       const [x, y] = at ?? [];
       if (x === undefined || y === undefined || !href) return null;
+      // biome-ignore lint/suspicious/noArrayIndexKey: the holes of a row are fixed
       return <image key={`${key}-${i}`} href={href} x={x - size / 2.1} y={y - size / 1.9} width={size * 0.95} height={size * 1.1} />;
     });
   return (
@@ -57,6 +60,35 @@ export function GlyphidsPanel({ view, names }: { view: View; names: string[] }) 
         <image href={src} x="0" y="0" width="750" height="690" />
         {place(extra.top, TOP, "t")}
         {place(extra.bottom, BOTTOM, "b")}
+        {/* the holes a glyph token can be placed in (EXP-GLY-05): each carries the token that would go there, a hole that takes several kinds shows them side by side */}
+        <PanelSpots
+          spots={spots}
+          panel="glyphids"
+          render={(sp) => {
+            const same = (spots?.items ?? []).filter(
+              (o) =>
+                o.panel === "glyphids" &&
+                o.shape.kind === "circle" &&
+                sp.shape.kind === "circle" &&
+                o.shape.x === sp.shape.x &&
+                o.shape.y === sp.shape.y,
+            );
+            const k = same.findIndex((o) => o.id === sp.id);
+            const href = sp.glyph ? token(sp.glyph) : undefined;
+            if (!href || sp.shape.kind !== "circle") return null;
+            const w = same.length > 1 ? 58 : 80;
+            return (
+              <image
+                href={href}
+                x={sp.shape.x - (same.length * w) / 2 + k * w}
+                y={sp.shape.y - w * 0.6}
+                width={w}
+                height={w * 1.15}
+                opacity={0.85}
+              />
+            );
+          }}
+        />
       </svg>
       <p className="small muted">
         {Object.keys(extra.tokens ?? {}).length} glyph tokens still lie on the board, planets, sectors and techs;{" "}

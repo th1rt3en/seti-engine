@@ -3,6 +3,8 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
+import type { BoardSpots } from "./BoardView";
 import { ScoreIcon } from "./Icons";
 import { DataToken, Marker, PieceDefs, pieceColor } from "./Pieces";
 import { TapZoomImage } from "./TapZoom";
@@ -98,6 +100,10 @@ const boardOf = (difficulty: number): string => (difficulty <= 2 ? "1-2-star" : 
 const BOARDS = assets.rivalBoards as Record<string, string>;
 const OBJECTIVES = assets.objectives as Record<string, string>;
 const RIVAL_CARDS = assets.rivalCards as Record<string, string>;
+const EXPANSION = expansionAssets as Record<string, string>;
+// the rival's cards of the expansion (EXP-SOLO-02, A-033): the extra starting card and the three species cards
+const EXPANSION_RIVAL: Record<string, string> = { "SE.1": "rival-00", "SE.2": "rival-01", "SE.3": "rival-02", "SE.4": "rival-03" };
+const rivalCardImage = (id: string): string => RIVAL_CARDS[id] ?? EXPANSION[EXPANSION_RIVAL[id] ?? ""] ?? "";
 
 function Rival({ view }: { view: View }) {
   const s = view.state;
@@ -140,7 +146,7 @@ function Rival({ view }: { view: View }) {
             {r.used.map((id, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: the same card cannot be played twice in a round, but the order is the identity
               <figure key={`${id}-${i}`} className="rcard" title={`Card ${id}`}>
-                <TapZoomImage src={RIVAL_CARDS[id] as string} alt={`Rival action card ${id}`} width={330} height={367} />
+                <TapZoomImage src={rivalCardImage(id)} alt={`Rival action card ${id}`} width={330} height={367} />
                 <figcaption>{i + 1}</figcaption>
               </figure>
             ))}
@@ -168,7 +174,7 @@ function Rival({ view }: { view: View }) {
   );
 }
 
-function Objectives({ view }: { view: View }) {
+function Objectives({ view, spots }: { view: View; spots?: BoardSpots }) {
   const ob = view.state.objectives;
   if (!ob) return null;
   return (
@@ -181,19 +187,48 @@ function Objectives({ view }: { view: View }) {
       </h3>
       <div className="objrow">
         {ob.row.length === 0 ? <span className="muted">none</span> : null}
-        {ob.row.map((id) => {
+        {[...ob.row, ...(ob.long_term ?? [])].map((id) => {
           const marks = ob.marks[id] ?? [];
           const done = marks.length > 0 && marks.every(Boolean);
+          const longTerm = id.startsWith("LT-");
+          const src = longTerm ? EXPANSION[`objectives/long-term-${id.slice(3)}`] : OBJECTIVES[id];
           return (
             <figure key={id} className={done ? "objective done" : "objective"}>
-              <img src={OBJECTIVES[id]} alt={`Objective ${id}`} width={240} height={239} loading="lazy" decoding="async" />
+              <img
+                src={src}
+                alt={`${longTerm ? "Long-term objective" : "Objective"} ${id}`}
+                width={240}
+                height={239}
+                loading="lazy"
+                decoding="async"
+              />
               <figcaption>
-                {marks.map((m, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: a task of the tile
-                  <span key={i} className={m ? "task on" : "task"} title={m ? `Task ${i + 1} marked` : `Task ${i + 1} not done`}>
-                    {m ? "✓" : "○"}
-                  </span>
-                ))}
+                {marks.map((m, i) => {
+                  // a task that the player can mark now is a highlighted place on the tile (the player picks one when a trigger fits several)
+                  const spot = spots?.items.find((sp) => sp.id === `task:${id}:${i}`);
+                  const label = m ? `Task ${i + 1} marked` : `Task ${i + 1} not done`;
+                  return spot && spots ? (
+                    <button
+                      // biome-ignore lint/suspicious/noArrayIndexKey: a task of the tile
+                      key={i}
+                      type="button"
+                      className={spots.selected === spot.id ? "task pick chosen" : "task pick"}
+                      aria-pressed={spots.selected === spot.id}
+                      title={`Mark task ${i + 1}`}
+                      onClick={() => spots.onSelect(spot.id)}
+                    >
+                      ○
+                    </button>
+                  ) : (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: a task of the tile
+                    <span key={i} className={m ? "task on" : "task"} title={label}>
+                      {m ? "✓" : "○"}
+                    </span>
+                  );
+                })}
+                {longTerm ? (
+                  <span className="muted small">long-term: the rival advances for each open task after rounds 2 to 4</span>
+                ) : null}
                 {done ? <span className="muted small">complete</span> : null}
               </figcaption>
             </figure>
@@ -204,12 +239,12 @@ function Objectives({ view }: { view: View }) {
   );
 }
 
-export function SoloPanel({ view }: { view: View }) {
+export function SoloPanel({ view, spots }: { view: View; spots?: BoardSpots }) {
   if (!view.state.rival) return null;
   return (
     <div className="solopanel">
       <Rival view={view} />
-      <Objectives view={view} />
+      <Objectives view={view} spots={spots} />
     </div>
   );
 }

@@ -6,12 +6,15 @@ import { PLAYER_COLOR } from "@/lib/geometry";
 import { ORG_NAMES } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
+import { AmoebaPanel } from "./AmoebaPanel";
+import { ArkhosPanel } from "./ArkhosPanel";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import { OrgPanel } from "./OrgPanel";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicityTrack } from "./PublicityTrack";
 import { RoundPiles } from "./RoundPiles";
@@ -174,7 +177,14 @@ export function GameView({
       <div className="gamegrid">
         <main className="col-center">
           <div className="boardwrap">
-            <BoardView view={view} names={names} previous={previous} interaction={interaction} spots={spots} goldChoice={goldChoice} />
+            <BoardView
+              view={view}
+              names={names}
+              previous={previous}
+              interaction={interaction}
+              spots={spots && { ...spots, items: spots.items.filter((sp) => !sp.panel) }}
+              goldChoice={goldChoice}
+            />
             <RoundPiles view={view} />
           </div>
         </main>
@@ -182,11 +192,14 @@ export function GameView({
         <aside className="col-aux" aria-label="Publicity track and tech stacks">
           <PublicityTrack view={view} names={names} />
           <TechStacks view={view} pick={tech} />
-          <GlyphidsPanel view={view} names={names} />
+          <OrgPanel view={view} names={names} spots={spots} />
+          <ArkhosPanel view={view} names={names} spots={spots} />
+          <GlyphidsPanel view={view} names={names} spots={spots} />
+          <AmoebaPanel view={view} names={names} spots={spots} />
         </aside>
       </div>
 
-      <SoloPanel view={view} />
+      <SoloPanel view={view} spots={spots} />
 
       <BarHeight />
       <TrackerDock>

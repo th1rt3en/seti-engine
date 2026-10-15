@@ -4,7 +4,6 @@
   "breach": [],
   "buy_card": ["source"],
   "choose_gold": ["tile"],
-  "choose_land_slot": ["slot"],
   "choose_org": ["org"],
   "choose_quick": ["card"],
   "complete_mission": ["card"],

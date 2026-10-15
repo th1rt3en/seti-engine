@@ -1730,3 +1730,98 @@ button:disabled {
   margin-left: 2px;
   vertical-align: middle;
 }
+
+/* places on the panels of the expansion (the circles are measured in the picture of the panel, so their stroke is thinner than on the board) */
+.spotshape.panelspot {
+  stroke-width: 4;
+  stroke-dasharray: 10 6;
+}
+.exppanel h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.exppanel svg.panelsvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+.exppanel .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: flex-start;
+}
+.exppanel .orgcard img,
+.exppanel .qcards img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+.exppanel .qcards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+.exppanel .selectable {
+  outline: 3px dashed #6ef0a5;
+  outline-offset: 2px;
+  animation: spotpulse 1.6s ease-in-out infinite;
+}
+.exppanel .chips {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.exppanel .chip {
+  text-align: left;
+  font-size: 12px;
+  border: 1px dashed #6ef0a5;
+  background: rgba(110, 240, 165, 0.12);
+  color: inherit;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.exppanel .chip.chosen {
+  background: rgba(110, 240, 165, 0.5);
+  border-style: solid;
+}
+.exppanel .tiles {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.exppanel .tiles img {
+  width: 52px;
+  height: auto;
+}
+.exppanel .sec {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.exppanel .sec img {
+  width: 30%;
+  border-radius: 4px;
+}
+.exppanel .sec .selectable {
+  cursor: pointer;
+}
+
+.objective .task.pick {
+  border: 2px dashed #6ef0a5;
+  background: rgba(110, 240, 165, 0.16);
+  color: inherit;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  padding: 0;
+}
+.objective .task.pick.chosen {
+  background: rgba(110, 240, 165, 0.55);
+  border-style: solid;
+}

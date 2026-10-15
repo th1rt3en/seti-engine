@@ -10,7 +10,8 @@ const CARDS = cards as unknown as Record<string, CardInfo>;
 
 export function cardName(id: unknown): string {
   const c = CARDS[String(id)];
-  return c ? `${c.name} (${String(id)})` : String(id);
+  if (c) return `${c.name} (${String(id)})`;
+  return ORGS[String(id)]?.name ?? String(id); // the organizations are pictured like cards
 }
 
 const ORGS = organizations as unknown as Record<string, { name: string; number: number; abilities: Record<string, string> }>;
@@ -227,7 +228,17 @@ export function irreversibleText(m: Move): string {
 }
 
 /** The moves that name a card of the player's hand: the player picks the card in the hand, then confirms. */
-export const HAND_MOVE_TYPES = new Set(["tuck", "discard", "discard_free", "play_card", "scan_hand_discard", "hand_signal"]);
+export const HAND_MOVE_TYPES = new Set([
+  "tuck",
+  "discard",
+  "discard_free",
+  "play_card",
+  "scan_hand_discard",
+  "hand_signal",
+  "restructure_card", // Turing Systems restructuring: the cards to discard are picked in the hand
+  "discard_corner", // Sentinel Probe Network
+  "org_free", // Futurespan, Deep Sky Survey, Helion Assembly: the card is picked in the hand
+]);
 
 export const isHandMove = (m: Move, hand: string[]): boolean => HAND_MOVE_TYPES.has(m.type) && hand.includes(String(m.card));
 
@@ -242,7 +253,7 @@ export const sameMove = (a: Move, b: Move): boolean => {
   return key(a) === key(b);
 };
 
-const cardTitle = (id: unknown): string => CARDS[String(id)]?.name ?? String(id);
+const cardTitle = (id: unknown): string => CARDS[String(id)]?.name ?? ORGS[String(id)]?.name ?? String(id);
 const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
 const freeText = (free: [string, number][] | undefined): string =>
   free && free.length > 0 ? free.map(([k, n]) => `${n} ${k}`).join(", ") : "nothing";
@@ -250,7 +261,7 @@ const freeText = (free: [string, number][] | undefined): string =>
 /** What the bar asks when the player has picked a card for this move. */
 export function handMoveText(m: Move): string {
   const info = CARDS[String(m.card)];
-  const name = cardTitle(m.card);
+  const name = cardTitle(m.type === "choose_org" ? m.org : m.card);
   const sector = info?.sector ?? "any";
   switch (m.type) {
     case "tuck":
@@ -269,6 +280,10 @@ export function handMoveText(m: Move): string {
       return `Discard ${name} to mark a signal in a ${sector} sector?`;
     case "take_round_card":
       return `Confirm keeping ${name} from the end-of-round cards? The others go back.`;
+    case "choose_org":
+      return `Take the organization ${name}? The other one goes back to the box.`;
+    case "choose_quick":
+      return `Keep the quick start card ${quickText(m.card)}?`;
     default:
       return describeMove(m);
   }

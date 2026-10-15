@@ -1,0 +1,69 @@
+// Arkhos (EXP-ARK-01 to EXP-ARK-07): the exploration card that was revealed last, the sizes of the exploration deck, and every player's security
+// cards (their own face up, the others' face down with only the trace color showing). A breach is made by clicking the security card of that color.
+import { cardImage } from "@/lib/cardImages";
+import type { Spot } from "@/lib/targets";
+import type { View } from "@seti/protocol";
+import expansionAssets from "../generated/expansion-assets.json";
+import type { BoardSpots } from "./BoardView";
+import { CardImage } from "./CardImage";
+
+const ASSET = expansionAssets as Record<string, string>;
+const COLORS = ["pink", "yellow", "blue"] as const;
+
+export function ArkhosPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
+  const s = view.state;
+  const slot = s.species.find((sp) => sp.discovered && sp.species === "arkhos");
+  if (!slot) return null;
+  const extra = slot.extra as { explore_deck?: string[]; explore_aside?: string[]; explore_discard?: string[] };
+  const last = extra.explore_discard?.[extra.explore_discard.length - 1];
+  const breach = (spots?.items ?? []).filter((sp: Spot) => sp.panel === "arkhos");
+  return (
+    <section className="card exppanel" aria-label="Arkhos">
+      <h3>Arkhos</h3>
+      <p className="small muted">
+        Exploration deck: {extra.explore_deck?.length ?? 0} cards · set aside: {extra.explore_aside?.length ?? 0} · revealed:{" "}
+        {extra.explore_discard?.length ?? 0}
+      </p>
+      {last && cardImage(last) ? <CardImage id={last} width={150} title={`Last exploration card: ${last}`} /> : null}
+      {s.players.map((p) => {
+        if (s.rival && p.index === s.rival.index) return null;
+        const entries = COLORS.filter((c) => p.security?.[c] !== undefined);
+        const open = Object.keys(p.security ?? {}).length === 0;
+        return (
+          <div key={p.index}>
+            <b className="small">{names[p.index] ?? `Player ${p.index + 1}`}</b>{" "}
+            <span className="muted small">
+              {open ? "all security cards breached: every space is open" : `${entries.length} security cards`}
+            </span>
+            <div className="sec">
+              {entries.map((c) => {
+                const id = p.security?.[c] ?? "?";
+                const src = id === "?" || !cardImage(id) ? ASSET[`arkhos/security-back-${c}`] : cardImage(id);
+                const spot = p.index === view.viewer ? breach.find((b) => b.glyph === c) : undefined;
+                return spot && spots ? (
+                  <button
+                    key={c}
+                    type="button"
+                    className={spots.selected === spot.id ? "selectable chosen" : "selectable"}
+                    aria-pressed={spots.selected === spot.id}
+                    onClick={() => spots.onSelect(spot.id)}
+                    style={{ width: "30%", padding: 0, border: 0, background: "none" }}
+                  >
+                    <img
+                      src={src}
+                      alt={`Breach the ${c} security card`}
+                      title={`Breach the ${c} security card`}
+                      style={{ width: "100%" }}
+                    />
+                  </button>
+                ) : (
+                  <img key={c} src={src} alt={`${c} security card`} title={`${c} security card`} />
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}

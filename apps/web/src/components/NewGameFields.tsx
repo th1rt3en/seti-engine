@@ -18,10 +18,10 @@ export function NewGameFields({
   const [sandbox, setSandbox] = useState(false);
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
-  // the Space Agencies expansion (D35): its organization module needs 2 to 4 players or the sandbox; the neutral pieces are for 1 to 2 players
+  // the Space Agencies expansion (D35): the organization module also works in the solo game; the neutral pieces are for 1 to 2 players
   const [expansion, setExpansion] = useState(false);
   const [organizations, setOrganizations] = useState(false);
-  const orgsAllowed = !solo || sandbox;
+  const orgsAllowed = true; // EXP-SOLO-01: the solo game against the rival can use them too
   const orgsOn = expansion && organizations && orgsAllowed;
   const SPECIES = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"];
   const speciesSelect = (name: string, label: string, value: string, onChange: (v: string) => void, taken: string) => (
@@ -123,9 +123,6 @@ export function NewGameFields({
               />{" "}
               Organizations and quick start cards (4 rounds)
             </label>
-            {orgsAllowed ? null : (
-              <p className="small muted">Organizations are not available against the solo rival yet; use the sandbox.</p>
-            )}
             {orgsOn ? (
               <>
                 <label className="row">

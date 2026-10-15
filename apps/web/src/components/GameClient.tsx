@@ -255,7 +255,7 @@ export function GameClient({
     (m) =>
       !placed.has(m) &&
       m.type !== "sandbox" &&
-      m.type !== "take_round_card" &&
+      !isOffer(m) &&
       m.type !== "place_computer_tech" &&
       m.type !== "choose_gold" &&
       !handMoves.includes(m) &&
@@ -292,8 +292,11 @@ export function GameClient({
   const spotOption = spots.find((sp) => sp.id === pickedSpot);
   const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
-  const offers = [...new Set(mine.filter((m) => m.type === "take_round_card").map((m) => String(m.card)))];
-  const offerMove = pickedOffer === null ? undefined : mine.find((m) => m.type === "take_round_card" && m.card === pickedOffer);
+  // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
+  const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
+  const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
+  const offers = [...new Set(mine.filter(isOffer).map(offerId))];
+  const offerMove = pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && offerId(m) === pickedOffer);
   // a tech for the computer goes in a slot picked on the player board
   const slotMoves = mine.filter((m) => m.type === "place_computer_tech");
   const slotMove = pickedSlot === null ? undefined : slotMoves.find((m) => m.slot === pickedSlot);
@@ -481,7 +484,7 @@ export function GameClient({
           {spots.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Click a highlighted place on the board.</span>
+              <span className="handhint">Click a highlighted place on the board or on a panel beside it.</span>
             </div>
           ) : null}
           {techMoves.length > 0 ? (
@@ -613,7 +616,7 @@ export function GameClient({
       {spotMove ? (
         <div className="confirmbar">
           <div className="confirm">
-            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} />
+            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} fallback={describeMove(spotMove)} />
             <button type="button" className="primary" onClick={() => play(spotMove)}>
               Confirm
             </button>
