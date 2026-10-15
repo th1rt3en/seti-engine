@@ -1,0 +1,93 @@
+# Deploys the engine (Cloud Run), the game Worker and the website (Cloudflare), in that order. The website is built on Linux because OpenNext's
+# Cloudflare build does not work with Windows paths. The owner starts it by hand: GitHub, Actions, "Deploy", Run workflow; the boxes choose
+# what to deploy (all by default).
+#
+# Repository secrets (Settings, Secrets and variables, Actions):
+#   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID   a token that may edit Workers
+#   GCP_SA_KEY                                    the JSON key of a Google service account that may deploy to Cloud Run from source
+#                                                 (roles: Cloud Run Admin, Cloud Build Editor, Artifact Registry Writer, Storage Admin,
+#                                                 Service Account User)
+# The environment variables and secrets of the Cloud Run service and the Worker secrets stay where they are.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine:
+        description: Deploy the engine (Cloud Run)
+        type: boolean
+        default: true
+      worker:
+        description: Deploy the game Worker (Cloudflare)
+        type: boolean
+        default: true
+      web:
+        description: Deploy the website (Cloudflare)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  GCP_PROJECT: freestyle-190711
+  GCP_REGION: us-central1
+  CLOUD_RUN_SERVICE: seti-engine
+
+jobs:
+  engine:
+    if: ${{ inputs.engine }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy the engine to Cloud Run
+        run: gcloud run deploy "$CLOUD_RUN_SERVICE" --project "$GCP_PROJECT" --region "$GCP_REGION" --source services/engine --quiet
+
+  worker:
+    # runs after the engine (when both are chosen) so that the Worker never calls an engine older than itself
+    needs: engine
+    if: ${{ !cancelled() && !failure() && inputs.worker }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # the version comes from "packageManager" in package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - name: Deploy the Worker
+        working-directory: apps/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler deploy
+
+  web:
+    needs: worker
+    if: ${{ !cancelled() && !failure() && inputs.web }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - name: Build for Cloudflare
+        working-directory: apps/web
+        run: pnpm exec opennextjs-cloudflare build
+      - name: Deploy the website
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler deploy
