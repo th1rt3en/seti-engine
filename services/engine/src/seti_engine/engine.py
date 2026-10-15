@@ -744,6 +744,8 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif t == "tuck":
         effects.tuck_card(s, p, a["card"])
         events.append({"type": "tuck", "player": p.index, "card": a["card"]})
+        if d.kind != "setup_tuck":  # EXP-SOLO-05: the starting tucks do not complete tasks; EXP-SOLO-06 (LT-2): any later tuck does
+            cards.fire(s, p, [{"e": "tuck_income"}], events)
     elif t == "skip_tuck":
         pass
     elif t == "discard":

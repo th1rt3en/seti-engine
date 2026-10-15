@@ -35,6 +35,7 @@ COMPUTER_PUBLICITY = 2  # the second space gives 1 publicity (SOLO-DATA-12)
 COMPUTER_PROGRESS = 4  # the fourth gives 4 progress
 MOON_ORDER = {"jupiter": ["Callisto", "Ganymede", "Europa", "Io"], "saturn": ["Titan", "Enceladus"]}  # left to right (A-024, ruled)
 TECH_BONUS_EXCLUDED = ("launch", "data")  # SOLO-18: never the free launch nor the 2 data of a tech
+EXPANSION_START_CARD = "SE.1"  # EXP-SOLO-02 (the card prints "S.1"; the id differs from the base S.1)
 RIVAL_MESSAGE_RESERVE = 2  # the leftover message tiles (SOLO-ALIEN-02)
 
 
@@ -59,6 +60,8 @@ def is_rival(s: GameState, index: int) -> bool:
 def setup_solo(s: GameState, difficulty: int) -> None:
     board = next(b for b in tables.solo_boards()["boards"] if difficulty in b["stars"])
     deck = rng.shuffled(s, ["S.1", "S.2", "S.3", "S.4"])
+    if s.options.expansion:  # EXP-SOLO-02: the extra starting card is shuffled into the starting deck
+        deck = rng.shuffled(s, [*deck, EXPANSION_START_CARD])
     advanced = rng.shuffled(s, list(ADVANCED))
     if difficulty >= 3:  # SOLO-05: one random advanced card goes into the starting deck
         deck = rng.shuffled(s, [*deck, advanced.pop(0)])
@@ -317,6 +320,10 @@ def _do(s: GameState, a: dict[str, Any], events: Events) -> bool:
         return _probe(s, a, events)
     if k == "telescope":
         _telescope(s, a, events)
+        return True
+    if k == "trace_advance":  # EXP-SOLO-02: a life trace of any color, then 1 advance for each gold star of the difficulty
+        trace(s, a["color"], events)
+        advance(s, s.options.difficulty, events)
         return True
     if k == "text":
         return _text(s, a, events)

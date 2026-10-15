@@ -756,6 +756,13 @@
     "ObjectiveState": {
       "description": "The player's objectives in the solo game (SOLO-OBJ-*).",
       "properties": {
+        "long_term": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Long Term",
+          "type": "array"
+        },
         "marks": {
           "additionalProperties": {
             "items": {
@@ -789,6 +796,7 @@
         }
       },
       "required": [
+        "long_term",
         "marks",
         "pile",
         "row",

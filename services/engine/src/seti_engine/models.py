@@ -45,8 +45,6 @@ class Options(BaseModel):
             raise ValueError("organizations and neutral quick start cards are part of the expansion")
         if self.beginner_organizations and not self.organizations:
             raise ValueError("the beginner organizations are an option of the organization module")
-        if self.organizations and self.players == 1 and not self.sandbox:
-            raise ValueError("the solo game against the rival does not use organizations yet (EXP-SOLO-01, A-033)")
         if self.neutral_quick_start and self.players > 2:
             raise ValueError("the neutral quick start cards are for games of 1 or 2 players")
         chosen = [x for x in self.sandbox_species if x is not None]
@@ -208,6 +206,9 @@ class ObjectiveState(BaseModel):
     row: list[str] = Field(default_factory=list)  # up to 3 revealed objectives
     marks: dict[str, list[bool]] = Field(default_factory=dict)  # objective id -> tasks marked
     pile: list[str] = Field(default_factory=list)  # completed objectives not yet spent
+    long_term: list[str] = Field(
+        default_factory=list
+    )  # EXP-SOLO-04, EXP-SOLO-06: the two long-term tiles in play (their marks are in `marks`)
 
 
 class GameState(BaseModel):

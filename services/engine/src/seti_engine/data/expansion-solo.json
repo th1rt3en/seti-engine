@@ -1,0 +1,90 @@
+{
+ "long_term": [
+  {
+   "id": "LT-1",
+   "image": "objectives/long-term-1",
+   "level": "LT",
+   "tasks": [
+    [
+     {
+      "color": "any",
+      "kind": "life_trace"
+     }
+    ],
+    [
+     {
+      "color": "any",
+      "kind": "life_trace"
+     }
+    ],
+    [
+     {
+      "color": "any",
+      "kind": "life_trace"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "LT-2",
+   "image": "objectives/long-term-2",
+   "level": "LT",
+   "tasks": [
+    [
+     {
+      "kind": "tuck_income"
+     }
+    ],
+    [
+     {
+      "kind": "tuck_income"
+     }
+    ],
+    [
+     {
+      "kind": "tuck_income"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "LT-3",
+   "image": "objectives/long-term-3",
+   "level": "LT",
+   "tasks": [
+    [
+     {
+      "kind": "tech",
+      "type": "probe"
+     }
+    ],
+    [
+     {
+      "kind": "tech",
+      "type": "telescope"
+     }
+    ],
+    [
+     {
+      "kind": "tech",
+      "type": "computer"
+     }
+    ]
+   ]
+  }
+ ],
+ "rival_cards": [
+  {
+   "actions": [
+    {
+     "color": "any",
+     "kind": "trace_advance"
+    }
+   ],
+   "dir": "left",
+   "id": "SE.1",
+   "tier": "expansion"
+  }
+ ],
+ "source": "R16 p.6-7 (EXP-SOLO-*), transcribed in expansion-transcription.json; owner checked 2026-10-15 (A-033, A-034)"
+}

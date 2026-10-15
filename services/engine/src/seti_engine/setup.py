@@ -114,7 +114,9 @@ def new_game(options: Options) -> GameState:
         state.players[(state.start_player + rank) % n].score = rank + 1
 
     if options.organizations:  # EXP-ORG-03, EXP-ORG-04: organizations and quick start cards instead of the income card
-        orgs.deal(state, [(state.start_player + rank) % n for rank in range(n)])
+        if solo:  # EXP-SOLO-05: the player sees the neutral cards and the revealed objectives before the choice; the rival gets nothing
+            rival.setup_solo(state, options.difficulty)
+        orgs.deal(state, [i for rank in range(n) if (i := (state.start_player + rank) % n) != 1 or not solo])
         return state
     # each player tucks one card for income, in turn order: the engine waits for each choice (SETUP-36, FAQ-01)
     for rank in range(n):

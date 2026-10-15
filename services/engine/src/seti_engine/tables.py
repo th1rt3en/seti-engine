@@ -131,9 +131,17 @@ def quick_start_cards() -> dict[str, dict[str, Any]]:
 
 
 def rival_cards() -> dict[str, dict[str, Any]]:
-    """The 19 rival action cards by id (S.1 to S.19)."""
+    """The 19 rival action cards by id (S.1 to S.19), and the rival cards of the expansion (SE.*, EXP-SOLO-02)."""
     data: dict[str, Any] = load("rival-action-cards.json")
-    return {c["id"]: c for c in data["cards"]}
+    out = {c["id"]: c for c in data["cards"]}
+    out.update({c["id"]: c for c in expansion_solo()["rival_cards"]})
+    return out
+
+
+def expansion_solo() -> dict[str, Any]:
+    """The long-term objective tiles and the rival cards of the expansion (EXP-SOLO-*)."""
+    out: dict[str, Any] = load("expansion-solo.json")
+    return out
 
 
 def solo_boards() -> dict[str, Any]:
