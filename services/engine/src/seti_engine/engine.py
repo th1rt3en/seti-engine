@@ -256,7 +256,7 @@ def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
                     out.append({"type": "move_probe", "probe": pr.id, "to": [ring, sector]})
     if p.org_data.get("od_left", 0) > 0:  # Orbital Dynamics' free action (A-039): 1 step each for up to 2 different probes
         for pr in probes_in_space(state, p):
-            # the free step is 1 movement for this probe; a step that costs more (leaving an asteroid field) needs the rest from the player's own movement
+            # the free step is 1 movement for this probe; a dearer step (leaving an asteroid field) needs the rest from the own movement
             if pr.id not in p.org_data["od_used"] and not pr.capsule and move_cost(state, p, pr) - 1 <= p.movement:
                 out += [{"type": "od_step", "probe": pr.id, "to": [ring, sector]} for ring, sector in solar.adjacent(pr.ring, pr.sector)]
     if p.publicity >= 3:  # FREE-06
