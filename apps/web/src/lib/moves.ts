@@ -114,7 +114,7 @@ export const LABELS: Record<string, Label> = {
   scan_mercury: () => "Pay 1 publicity for a signal in Mercury's sector",
   scan_probe: (m) => (m.mode === "launch" ? "Pay 1 energy to launch a probe" : "Pay 1 energy for 1 movement"),
   scan_done: () => "Finish the scan",
-  research: (m) => `Research the tech in stack ${Number(m.stack) + 1} (6 publicity)`,
+  research: (m) => `Research the tech in stack ${Number(m.stack) + 1}`,
   take_tech: (m) => `Take the tech in stack ${Number(m.stack) + 1}`,
   place_computer_tech: (m) => `Put the tech in computer slot ${Number(m.slot) + 1}`,
   analyze: () => "Analyze data (1 energy)",

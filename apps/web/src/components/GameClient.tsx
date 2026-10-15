@@ -239,6 +239,8 @@ export function GameClient({
   const names = view.names.length > 0 ? view.names : lobbyNames;
   const v = view.view;
   const mine = v.legal as Move[];
+  // what researching a tech costs in publicity: the engine says (an organization can lower it); 6 when it does not
+  const researchCost = (m: Move | undefined): number => (m ? ((v.notes[mine.indexOf(m)] as Note)?.cost?.publicity ?? 6) : 6);
   const pending = v.state.pending.length > 0;
   const me = v.viewer === null ? null : (v.state.players[v.viewer] ?? null);
   const hand = me?.hand ?? [];
@@ -504,7 +506,7 @@ export function GameClient({
               <span className="glabel">{techMoves[0]?.type === "research" ? "Main action" : "Your choice"}</span>
               <span className="handhint">
                 Click a tech stack to take that tech
-                {techMoves[0]?.type === "research" ? " (6 publicity, and the solar system rotates)" : ""}.
+                {techMoves[0]?.type === "research" ? ` (${researchCost(techMoves[0])} publicity, and the solar system rotates)` : ""}.
               </span>
             </div>
           ) : null}
@@ -649,7 +651,7 @@ export function GameClient({
           <div className="confirm">
             <span>
               Confirm taking {techName(techStack.category, techStack.glyph)}?
-              {techOption.type === "research" ? " It costs 6 publicity and the solar system rotates." : ""}
+              {techOption.type === "research" ? ` It costs ${researchCost(techOption)} publicity and the solar system rotates.` : ""}
             </span>
             <button type="button" className="primary" onClick={() => play(techOption)}>
               Confirm

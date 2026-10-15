@@ -444,3 +444,14 @@ def test_exp_org_08_the_tracker_shows_the_income_of_the_organization() -> None:
     shown = projection.tracker(s, p).income
     assert shown["credit"] == inc["credit"] and shown["energy"] == inc["energy"]
     assert shown["publicity"] == inc["publicity"] and shown["data"] == inc["data"]
+
+
+def test_exp_org_13_the_note_of_a_research_move_shows_the_cost_of_fenwick() -> None:
+    from seti_engine import move_notes
+
+    s = start(Options(players=2, seed=3, expansion=True, organizations=True)).state
+    move = {"type": "research", "stack": 0}
+    s.players[s.current_player].organization = "fenwick_research_center"
+    assert move_notes.note(s, move) == {"cost": {"publicity": 5}}
+    s.players[s.current_player].organization = "stratus_core"
+    assert move_notes.note(s, move) == {"cost": {"publicity": 6}}
