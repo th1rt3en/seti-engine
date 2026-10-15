@@ -1,11 +1,14 @@
+import { cardImage } from "@/lib/cardImages";
 // The organization module (EXP-ORG-*, EXP-QS-*): every player's organization and quick start cards, the neutral quick start cards, the tiles of
 // Xenolab, the reward spaces marked on Cosmos Strategy Group and Helion Assembly, and the card prepared by Futurespan. What the organization can
 // do now (its abilities, the reward space to mark) is offered as highlighted places on its card.
 import { type Move, describeMove } from "@/lib/moves";
+import { ORG_SPACES } from "@/lib/targets";
 import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
+import { PanelSpots } from "./PanelSpots";
 
 const ASSET = expansionAssets as Record<string, string>;
 const TILES = ["launch", "scan", "research"] as const; // tile 1, 2, 3 of Xenolab
@@ -24,13 +27,42 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
         const tiles = p.org_data?.tiles as Record<string, boolean> | undefined;
         const fsCard = p.org_data?.fs_card as string | undefined;
         const fsToken = p.org_data?.fs_token as number | undefined;
+        const spaces = ORG_SPACES[p.organization ?? ""];
         const canAct = p.index === view.viewer && mine.length > 0;
         return (
           <div key={p.index} style={{ marginBottom: 10 }}>
             <b className="small">{names[p.index] ?? `Player ${p.index + 1}`}</b>
-            <div className={canAct ? "orgcard selectable" : "orgcard"}>
-              <CardImage id={p.organization ?? ""} width={220} />
-            </div>
+            {spaces ? (
+              // the reward spaces are on the organization board itself: a marked one is crossed, a space that can be marked is highlighted
+              <svg
+                viewBox="0 0 560 421"
+                className="panelsvg orgboard"
+                role="img"
+                aria-label={`${p.organization} board with its reward spaces`}
+              >
+                <image href={cardImage(p.organization ?? "")} x={0} y={0} width={560} height={421} />
+                {Object.entries(spaces).map(([name, at]) =>
+                  p.org_marks.includes(name) ? (
+                    <g key={name}>
+                      <circle cx={at[0]} cy={at[1]} r={32} fill="rgba(0,0,0,0.55)" />
+                      <path
+                        d={`M ${at[0] - 18} ${at[1] - 18} L ${at[0] + 18} ${at[1] + 18} M ${at[0] + 18} ${at[1] - 18} L ${at[0] - 18} ${at[1] + 18}`}
+                        stroke="#fff"
+                        strokeWidth={7}
+                      />
+                      <title>{`${name}: marked`}</title>
+                    </g>
+                  ) : null,
+                )}
+                {p.index === view.viewer ? (
+                  <PanelSpots spots={spots && { ...spots, items: spots.items.filter((sp) => sp.id.startsWith("orgspace:")) }} panel="org" />
+                ) : null}
+              </svg>
+            ) : (
+              <div className={canAct ? "orgcard selectable" : "orgcard"}>
+                <CardImage id={p.organization ?? ""} width={220} />
+              </div>
+            )}
             {tiles ? (
               <div className="tiles" aria-label="Xenolab tiles">
                 {TILES.map((t, i) => (
@@ -43,7 +75,7 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
                 ))}
               </div>
             ) : null}
-            {p.org_marks.length > 0 ? <p className="small muted">Marked reward spaces: {p.org_marks.join(", ")}</p> : null}
+            {p.org_marks.length > 0 && !spaces ? <p className="small muted">Marked reward spaces: {p.org_marks.join(", ")}</p> : null}
             {fsToken !== undefined ? (
               <p className="small muted">
                 Futurespan token at {fsToken} points{fsCard ? "; a card is prepared (face down)" : "; no card is prepared"}.
@@ -60,17 +92,19 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
             ) : null}
             {canAct ? (
               <div className="chips">
-                {mine.map((sp) => (
-                  <button
-                    key={sp.id}
-                    type="button"
-                    className={spots?.selected === sp.id ? "chip chosen" : "chip"}
-                    aria-pressed={spots?.selected === sp.id}
-                    onClick={() => spots?.onSelect(sp.id)}
-                  >
-                    {describeMove(legal[sp.move] as Move)}
-                  </button>
-                ))}
+                {mine
+                  .filter((sp) => !sp.id.startsWith("orgspace:"))
+                  .map((sp) => (
+                    <button
+                      key={sp.id}
+                      type="button"
+                      className={spots?.selected === sp.id ? "chip chosen" : "chip"}
+                      aria-pressed={spots?.selected === sp.id}
+                      onClick={() => spots?.onSelect(sp.id)}
+                    >
+                      {describeMove(legal[sp.move] as Move)}
+                    </button>
+                  ))}
               </div>
             ) : null}
           </div>

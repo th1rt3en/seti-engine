@@ -617,6 +617,8 @@ def _text(s: GameState, a: dict[str, Any], events: Events) -> bool:
             r.breaching = True
             rewards.place_trace(s, p, {"slot": i, "space": "overflow", "color": color}, events)
             r.breaching = False
+        else:
+            trace(s, "any", events)  # A-055 (owner): with no security card left the rival marks a trace of any color instead
         for _ in range(2):
             arkhos.explore(s, p, "minor", events)
         return True

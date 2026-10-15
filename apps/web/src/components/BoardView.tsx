@@ -46,7 +46,7 @@ import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
-import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ScorePawn, pieceColor } from "./Pieces";
+import { DataToken, Figure, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
 
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
@@ -438,7 +438,7 @@ export function BoardView({
                 </image>
               </g>
             ) : (
-              <Figure key={p.id} x={at.x + dx} y={at.y + dy} color={color(p.player)} title={title} />
+              <ProbePiece key={p.id} x={at.x + dx} y={at.y + dy} size={112} color={color(p.player)} title={title} />
             );
             return pick ? (
               <g

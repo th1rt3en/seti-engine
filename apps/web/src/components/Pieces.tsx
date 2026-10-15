@@ -109,6 +109,56 @@ export function Figure({ x, y, size = 104, color, title }: { x: number; y: numbe
   );
 }
 
+/** A space probe: a body with a high-gain dish and two solar panels, seen from the side and a little above, standing on a small round foot. */
+export function ProbePiece({ x, y, size = 104, color, title }: { x: number; y: number; size?: number; color: PieceColor; title?: string }) {
+  const panel = (side: 1 | -1) => (
+    <g transform={`translate(${side * 17} -6)`}>
+      <rect
+        x={side === 1 ? 0 : -24}
+        y={-15}
+        width={24}
+        height={30}
+        rx={2}
+        fill={gradient(color, "top")}
+        stroke={edge(color)}
+        strokeWidth={3}
+      />
+      <path
+        d={`M${side === 1 ? 8 : -16} -15 V15 M${side === 1 ? 16 : -8} -15 V15 M${side === 1 ? 0 : -24} 0 H${side === 1 ? 24 : 0}`}
+        stroke={edge(color)}
+        strokeOpacity={0.7}
+        strokeWidth={2}
+      />
+    </g>
+  );
+  return (
+    <Piece x={x} y={y} size={size} title={title}>
+      <ellipse cy={44} rx={26} ry={8} fill={edge(color)} />
+      <ellipse cy={40} rx={24} ry={7} fill={gradient(color, "top")} stroke={edge(color)} strokeWidth={3} />
+      <rect x={-4} y={24} width={8} height={16} fill={gradient(color, "body")} stroke={edge(color)} strokeWidth={2} />
+      <rect x={-42} y={-8} width={84} height={4} fill={edge(color)} />
+      {panel(1)}
+      {panel(-1)}
+      <path
+        d="M-17 -22 L-9 -34 H9 L17 -22 L17 12 L9 24 H-9 L-17 12 Z"
+        fill={gradient(color, "body")}
+        stroke={edge(color)}
+        strokeWidth={3}
+        strokeLinejoin="round"
+      />
+      <rect x={-12} y={-6} width={24} height={9} rx={2} fill={edge(color)} fillOpacity={0.55} />
+      <path d="M0 -34 V-46" stroke={edge(color)} strokeWidth={4} strokeLinecap="round" />
+      <g transform="rotate(-20 0 -50)">
+        <ellipse cy={-48} rx={25} ry={14} fill={edge(color)} />
+        <ellipse cy={-50} rx={24} ry={13} fill={gradient(color, "top")} stroke={edge(color)} strokeWidth={3} />
+        <ellipse cy={-50} rx={15} ry={8} fill={gradient(color, "dimple")} />
+        <circle cy={-60} r={3.5} fill={edge(color)} />
+      </g>
+      <path d="M-12 -28 L-6 -32" stroke="#fff" strokeOpacity={0.6} strokeWidth={4} strokeLinecap="round" />
+    </Piece>
+  );
+}
+
 /** The publicity counter: a microphone-shaped pawn. */
 export function PublicityPawn({
   x,

@@ -66,6 +66,17 @@ def test_exp_ark_08_its_arkhos_card_breaches_at_random_and_explores_twice() -> N
     assert len(s.species[0].overflow) == 1
 
 
+def test_a_055_with_no_security_card_left_the_rival_marks_a_trace_of_any_color() -> None:
+    s = solo_with("arkhos", "amoeba")
+    r = s.players[1]
+    r.security = {}
+    before = len(r.trace_log)
+    ev: list[dict[str, Any]] = []
+    assert rival._text(s, {"kind": "text", "effect": "arkhos_breach"}, ev)
+    assert len(r.trace_log) == before + 1
+    assert len([e for e in ev if e.get("type") == "explore"]) >= 2  # the trace may itself give one
+
+
 def test_exp_ark_08_the_rival_ignores_arkhos_spaces_it_cannot_reach() -> None:
     s = solo_with("arkhos", "amoeba")
     p = s.players[1]

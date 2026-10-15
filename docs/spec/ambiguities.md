@@ -59,7 +59,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-052 | Futurespan token distance for other costs | ruled |
 | A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
 | A-054 | Mission Relay's starting marker | ruled |
-| A-055 | The Arkhos rival card (SE.3): the triangle at the bottom and an empty set of security cards | open |
+| A-055 | The Arkhos rival card (SE.3): the triangle at the bottom and an empty set of security cards | ruled |
 
 Entry format:
 
@@ -511,10 +511,11 @@ Entry format:
 
 
 ## A-055: The Arkhos rival card (SE.3): the triangle at the bottom and an empty set of security cards
-- Status: open (the card is played without the triangle; the owner is asked)
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-ARK-08, EXP-SOLO-07
 - Rulebook page and text: the rival card S.3 of the expansion (picture `rival-02`) reads "The rival breaches one of their security cards at random and marks an overflow space below this species in the matching color (gaining 3 VP). Then they gain 2 minor exploration rewards." A large pink, yellow and blue triangle is printed at the bottom of the card with no text. The card does not say what happens when the rival has no security card left.
 - Readings: (1) the triangle is a wild life trace, as on the extra start card (EXP-SOLO-02), marked by SOLO-RIVAL-11; (2) it is decoration or a species marker and has no effect. For the empty case: (a) the rival skips the breach and gains the two explorations; (b) the whole card is skipped.
 - Consequence: the number of traces the rival marks, and so its progress on the species boards.
 - Proposed ruling: the engine plays reading (2) and (a) until the owner rules, so as not to invent an effect.
 - Questions for the owner: is the triangle a wild life trace, and what does the card do with no security card left?
+- Ruling (owner), 2026-10-15: the triangle is "mark a trace of any color"; if the rival has no security card left, it does that (a trace of any color, marked as SOLO-RIVAL-11) in place of the breach. The engine then still gains the two minor explorations of the card.

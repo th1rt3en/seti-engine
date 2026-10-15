@@ -37,6 +37,12 @@ export const GLYPH_HOLES: Record<"top" | "bottom", [number, number][]> = {
   ],
 };
 
+/** The reward spaces printed on the organization boards of Cosmos Strategy Group and Helion Assembly, in the picture of the card (560 x 421). */
+export const ORG_SPACES: Record<string, Record<string, [number, number]>> = {
+  cosmos_strategy_group: { credit: [45, 215], publicity: [125, 215], data: [205, 215] },
+  helion_assembly: { energy: [40, 130], signal_token: [120, 130], data: [200, 130] },
+};
+
 /** The nine organelle spaces of the Amoeba board in its picture (573 x 1044): 6 outer spaces clockwise, 3 inner ones counter-clockwise. */
 export const ORGANELLE_SPACES: Record<string, [number, number]> = {
   Y1: [228, 148],
@@ -170,6 +176,7 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
     handled.add(i);
     if (!spots.has(id)) spots.set(id, { id, shape, move: i, label: id, ...extra });
   };
+  const mineOrg = (view.viewer === null ? null : s.players?.[view.viewer]?.organization) ?? "";
   const first = s.pending?.[0];
   const breachColor = first?.kind === "breach" ? String(first.data?.color ?? "") : "";
   legal.forEach((m, i) => {
@@ -203,6 +210,9 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       add(i, `breach:${breachColor}`, { ...none }, { panel: "arkhos", glyph: breachColor });
     } else if (m.type === "mark_objective") {
       add(i, `task:${String(m.objective)}:${String(m.task)}`, { ...none }, { panel: "objectives" });
+    } else if (m.type === "org_mark" && ORG_SPACES[mineOrg]?.[String(m.space)]) {
+      const at = ORG_SPACES[mineOrg]?.[String(m.space)] ?? [0, 0];
+      add(i, `orgspace:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 34 }, { panel: "org" });
     } else if ((m.type === "org_free" && m.card === undefined) || m.type === "org_main" || m.type === "org_mark" || m.type === "org_skip") {
       add(i, `org:${i}`, { ...none }, { panel: "org" });
     }

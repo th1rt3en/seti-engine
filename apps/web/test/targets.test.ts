@@ -138,3 +138,14 @@ describe("the places of the Space Agencies expansion", () => {
     expect(spots.map((s) => s.id)).toEqual(["breach:pink"]);
   });
 });
+
+describe("the reward spaces on an organization board", () => {
+  it("are places on the card of the player's own organization", () => {
+    const v = view([{ type: "org_mark", space: "data" }, { type: "org_skip" }], [null, null]);
+    (v as unknown as { viewer: number }).viewer = 0;
+    (v.state as unknown as { players: unknown[] }).players = [{ organization: "cosmos_strategy_group" }];
+    const { spots, handled } = buildSpots(v);
+    expect(spots.map((s) => s.id)).toEqual(["orgspace:data", "org:1"]); // "do not mark" is a chip on the organization panel
+    expect(handled.has(0)).toBe(true);
+  });
+});
