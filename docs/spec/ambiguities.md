@@ -55,7 +55,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-048 | Amoeba board readings | ruled |
 | A-049 | Amoeba cards ET.14 and ET.20 | ruled |
 | A-050 | Readings of the 42 main-deck cards | ruled |
-| A-051 | Helion Assembly's free action | proposed (in use, to confirm) |
+| A-051 | Helion Assembly's free action | ruled |
 | A-052 | Futurespan token distance for other costs | ruled |
 | A-053 | In which order are the effects of a card, organization or board space resolved? | ruled |
 | A-054 | Mission Relay's starting marker | ruled |
@@ -480,11 +480,12 @@ Entry format:
 - Questions for the owner: confirm.
 
 ## A-051: Helion Assembly's free action
-- Status: proposed
+- Status: ruled (owner, 2026-10-15)
 - Rule IDs affected: EXP-ORG-13 (Helion Assembly)
 - Rulebook page and text: "Place one of your probe techs or telescope techs beside your board to increase your income. Then clear all the spaces above. You cannot use the tech's ability, but it still counts as owned for all other purposes." How the income increases is not written; the picture shows the income icon (a tuck).
 - Proposed ruling: the engine tucks a card from the hand for income as part of it (the community extraction said so).
 - Questions for the owner: what does the placed tech give?
+- Ruling (owner), 2026-10-15: reading 1. Placing the tech beside the board increases the income by a tuck: the player also tucks one card from their hand for its income (and gains its resource at once, INCOME-01). The tech still counts as owned but its ability cannot be used.
 
 ## A-052: Futurespan token distance for other costs
 - Status: ruled (owner, 2026-10-15)
