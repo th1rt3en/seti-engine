@@ -104,7 +104,7 @@ export const DISCOVERY: { x: number; y: number }[][] = [
  * The species boards sit above the base board, their three bottom cut-outs around the three discovery spaces of the notch below (the board and
  * its notches are printed so). The picture of a species board is 777 x 1415; its middle cut-out is at x = 388 and the cut-outs are 270 apart.
  */
-export const ALIEN = { w: 777, h: 1415, centre: 388, scale: 1.09, bottom: 330, middleX: [680, 2820] };
+export const ALIEN = { w: 777, h: 1415, centre: 388, scale: 1, bottom: 331, middleX: [680, 2820] };
 export const ALIEN_TOP = ALIEN.bottom - ALIEN.h * ALIEN.scale;
 
 /**
@@ -135,7 +135,7 @@ export const GOLD_SLOTS = [
  * The deck of a discovered species lies in a column to the right of its board: the back of the deck on top (with the number of cards left over it)
  * and the card that lies face up below it. Sizes in board pixels; the column starts `gap` after the right edge of the board.
  */
-export const ALIEN_COLUMN = { w: 541, h: 753, gap: 30, between: 36 }; // two cards and the space between them are as high as the board (1415 x 1.09)
+export const ALIEN_COLUMN = { w: 495, h: 689, gap: 30, between: 36 }; // two cards and the space between them are as high as the board (1415 x 1)
 
 export function alienColumn(slot: number): { deck: { x: number; y: number }; faceUp: { x: number; y: number } } {
   const left = (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale;
