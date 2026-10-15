@@ -1,4 +1,5 @@
 import { GameClient } from "@/components/GameClient";
+import { GameSettings } from "@/components/GameSettings";
 import { loadConfig } from "@/lib/config";
 import { currentUser } from "@/lib/session";
 import { gameMeta } from "@/lib/worker";
@@ -40,7 +41,7 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
     <>
       <h1>
         Game {id.slice(0, 8)} <span className="pill">{meta.rated ? "rated" : "casual"}</span>{" "}
-        <span className="pill">{meta.options.players === 1 ? "solo" : `${meta.options.players} players`}</span>
+        <span className="pill">{meta.options.players === 1 ? "solo" : `${meta.options.players} players`}</span> <GameSettings />
       </h1>
       {meta.status === "lobby" ? (
         <p className="small">

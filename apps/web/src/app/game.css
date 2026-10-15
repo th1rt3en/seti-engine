@@ -338,10 +338,10 @@ main:has(.game) {
   aspect-ratio: 747 / 1040;
 }
 .card-hand {
-  width: clamp(120px, 8.6vw, 190px);
+  width: calc(clamp(120px, 8.6vw, 190px) * var(--hand-scale, 1));
 }
 .card-mission {
-  width: clamp(96px, 6.6vw, 150px);
+  width: calc(clamp(96px, 6.6vw, 150px) * var(--hand-scale, 1));
 }
 .card-row {
   width: calc(50% - 4px);
@@ -1188,10 +1188,10 @@ button:disabled {
     font-size: 0.95rem;
   }
   .card-hand {
-    width: clamp(86px, 26vw, 130px);
+    width: calc(clamp(86px, 26vw, 130px) * var(--hand-scale, 1));
   }
   .card-mission {
-    width: clamp(70px, 20vw, 100px);
+    width: calc(clamp(70px, 20vw, 100px) * var(--hand-scale, 1));
   }
   .rowbody .cards {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1924,4 +1924,137 @@ button:disabled {
 }
 .pbincome.light {
   fill: #fff;
+}
+
+/* the first choice of a game with organizations takes over the whole screen, on a phone too; the organization boards keep their rectangular shape */
+.setupchoice {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow-y: auto;
+  background: rgba(5, 8, 18, 0.97);
+  -webkit-overflow-scrolling: touch;
+}
+.setupinner {
+  min-height: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.setupinner h2 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 36px);
+}
+.setupcards {
+  display: grid;
+  gap: 18px;
+  flex: 1;
+  align-content: start;
+}
+.setupcards.orgs {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+}
+.setupcards.quick {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.setupcard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: var(--panel);
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.setupcard img {
+  width: 100%;
+  height: auto; /* the picture keeps its own proportions: a landscape board, a portrait card */
+  border-radius: 8px;
+  display: block;
+}
+.setupcard:hover,
+.setupcard:focus-visible {
+  border-color: #6ef0a5;
+}
+.setupcard.chosen {
+  border-color: #fff;
+  box-shadow: 0 0 0 4px #6ef0a5;
+}
+.setuptext {
+  display: grid;
+  gap: 4px;
+}
+.setupbar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+  background: linear-gradient(transparent, rgba(5, 8, 18, 0.97) 40%);
+}
+@media (max-width: 760px) {
+  .setupinner {
+    padding: 14px 12px 24px;
+  }
+  .setupcards.quick {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+.setupcard,
+.setuptext {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.setupcards {
+  min-width: 0;
+}
+
+/* the gear in the heading of a game page, with its settings panel */
+.gamesettings {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 1rem;
+}
+.gearbtn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: inherit;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+.gearbtn:hover,
+.gearbtn[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+.settingspanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 70;
+  width: min(320px, 86vw);
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+.settingspanel .stack {
+  display: grid;
+  gap: 6px;
 }

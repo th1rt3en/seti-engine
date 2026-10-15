@@ -27,6 +27,7 @@ import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SandboxPanel } from "./Sandbox";
+import { SetupChoice } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradeButtons } from "./Trade";
 
@@ -216,7 +217,7 @@ export function GameClient({
 
   // D34: a ting when it becomes the player's turn to act
   const myTurn = view !== null && view.view.viewer !== null && view.view.to_act === view.view.viewer && !ended;
-  const [soundOn, toggleSound] = useTurnSound(myTurn);
+  useTurnSound(myTurn); // the sound and the size of the cards are set with the gear in the heading (GameSettings)
 
   if (view === null) {
     return (
@@ -300,8 +301,14 @@ export function GameClient({
   const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
-  const offers = [...new Set(mine.filter(isOffer).map(offerId))];
-  const offerMove = pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && offerId(m) === pickedOffer);
+  // the first choice of a game with organizations (organization, then quick start cards) has a screen of its own
+  const setupMoves = mine.filter((m) => m.type === "choose_org" || m.type === "choose_quick");
+  const setupKind = setupMoves[0]?.type === "choose_org" ? "org" : "quick";
+  const setupOffers = [...new Set(setupMoves.map(offerId))];
+  const offers = [...new Set(mine.filter((m) => isOffer(m) && !setupMoves.includes(m)).map(offerId))];
+  const offerMove =
+    pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
+  const setupMove = pickedOffer === null ? undefined : setupMoves.find((m) => offerId(m) === pickedOffer);
   // a tech for the computer goes in a slot picked on the player board
   const slotMoves = mine.filter((m) => m.type === "place_computer_tech");
   const slotMove = pickedSlot === null ? undefined : slotMoves.find((m) => m.slot === pickedSlot);
@@ -688,17 +695,6 @@ export function GameClient({
         : null}
     </>
   );
-  const soundButton = (
-    <button
-      type="button"
-      className="secondary small soundtoggle"
-      aria-pressed={soundOn}
-      title={soundOn ? "A ting plays when it is your turn: click to switch it off" : "Click to hear a ting when it is your turn"}
-      onClick={toggleSound}
-    >
-      {soundOn ? "🔔 Sound on" : "🔕 Sound off"}
-    </button>
-  );
   const clocks = view.remaining ? (
     <span className="clocks">
       {left.map((r, i) => (
@@ -735,6 +731,21 @@ export function GameClient({
       }
       overlay={
         <>
+          {setupOffers.length > 0 && !ended ? (
+            <SetupChoice
+              kind={setupKind}
+              offers={setupOffers}
+              selected={pickedOffer}
+              kept={me?.quick_start.length ?? 0}
+              onSelect={(id) => setPickedOffer(pickedOffer === id ? null : id)}
+              onConfirm={() => {
+                if (setupMove) {
+                  setPickedOffer(null);
+                  play(setupMove);
+                }
+              }}
+            />
+          ) : null}
           <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
             {boardOpen ? "Close player boards" : "Player boards"}
           </button>
@@ -784,7 +795,6 @@ export function GameClient({
       topExtra={
         <>
           {clocks}
-          {v.viewer !== null ? soundButton : null}
           <span className="small muted">
             {online ? "Connected" : "Reconnecting..."} · action {view.seq}
           </span>
