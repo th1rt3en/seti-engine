@@ -2,9 +2,9 @@
 // A "ting" when it becomes the player's turn to act while the page is open (D34). The sound is made with the Web Audio API, so there is no file.
 // Browsers only allow sound after the person has touched the page once: the first click, tap or key press unlocks it. The player can switch the
 // sound off; that is remembered in this browser.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useGameSettings } from "./gameSettings";
 
-const KEY = "seti-turn-sound";
 const PREFIX = "● Your turn · ";
 let context: AudioContext | null = null;
 
@@ -54,25 +54,14 @@ export function ting(): void {
 
 /**
  * Plays the ting when `myTurn` turns from false to true, and puts "Your turn" in front of the tab title while it is the player's turn.
- * Returns whether the sound is on and a function to switch it.
  */
-export function useTurnSound(myTurn: boolean): [boolean, () => void] {
-  const [on, setOn] = useState(true);
+export function useTurnSound(myTurn: boolean): void {
+  const { sound } = useGameSettings();
   const onRef = useRef(true);
+  onRef.current = sound;
   const previous = useRef<boolean | null>(null);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(KEY);
-      if (saved !== null) {
-        setOn(saved === "1");
-        onRef.current = saved === "1";
-      }
-    } catch {
-      // not remembered
-    }
-    return unlockOnFirstTouch();
-  }, []);
+  useEffect(() => unlockOnFirstTouch(), []);
 
   useEffect(() => {
     if (previous.current === false && myTurn && onRef.current) ting();
@@ -97,21 +86,4 @@ export function useTurnSound(myTurn: boolean): [boolean, () => void] {
       document.title = strip(document.title);
     };
   }, [myTurn]);
-
-  const toggle = useCallback(() => {
-    const next = !onRef.current;
-    onRef.current = next;
-    setOn(next);
-    try {
-      localStorage.setItem(KEY, next ? "1" : "0");
-    } catch {
-      // not remembered
-    }
-    if (next) {
-      void audio()?.resume();
-      ting();
-    }
-  }, []);
-
-  return [on, toggle];
 }

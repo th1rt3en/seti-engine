@@ -217,7 +217,7 @@ export function GameClient({
 
   // D34: a ting when it becomes the player's turn to act
   const myTurn = view !== null && view.view.viewer !== null && view.view.to_act === view.view.viewer && !ended;
-  const [soundOn, toggleSound] = useTurnSound(myTurn);
+  useTurnSound(myTurn); // the sound and the size of the cards are set with the gear in the heading (GameSettings)
 
   if (view === null) {
     return (
@@ -695,17 +695,6 @@ export function GameClient({
         : null}
     </>
   );
-  const soundButton = (
-    <button
-      type="button"
-      className="secondary small soundtoggle"
-      aria-pressed={soundOn}
-      title={soundOn ? "A ting plays when it is your turn: click to switch it off" : "Click to hear a ting when it is your turn"}
-      onClick={toggleSound}
-    >
-      {soundOn ? "🔔 Sound on" : "🔕 Sound off"}
-    </button>
-  );
   const clocks = view.remaining ? (
     <span className="clocks">
       {left.map((r, i) => (
@@ -806,7 +795,6 @@ export function GameClient({
       topExtra={
         <>
           {clocks}
-          {v.viewer !== null ? soundButton : null}
           <span className="small muted">
             {online ? "Connected" : "Reconnecting..."} · action {view.seq}
           </span>

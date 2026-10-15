@@ -338,10 +338,10 @@ main:has(.game) {
   aspect-ratio: 747 / 1040;
 }
 .card-hand {
-  width: clamp(120px, 8.6vw, 190px);
+  width: calc(clamp(120px, 8.6vw, 190px) * var(--hand-scale, 1));
 }
 .card-mission {
-  width: clamp(96px, 6.6vw, 150px);
+  width: calc(clamp(96px, 6.6vw, 150px) * var(--hand-scale, 1));
 }
 .card-row {
   width: calc(50% - 4px);
@@ -1188,10 +1188,10 @@ button:disabled {
     font-size: 0.95rem;
   }
   .card-hand {
-    width: clamp(86px, 26vw, 130px);
+    width: calc(clamp(86px, 26vw, 130px) * var(--hand-scale, 1));
   }
   .card-mission {
-    width: clamp(70px, 20vw, 100px);
+    width: calc(clamp(70px, 20vw, 100px) * var(--hand-scale, 1));
   }
   .rowbody .cards {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2014,4 +2014,47 @@ button:disabled {
 }
 .setupcards {
   min-width: 0;
+}
+
+/* the gear in the heading of a game page, with its settings panel */
+.gamesettings {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 1rem;
+}
+.gearbtn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: inherit;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+.gearbtn:hover,
+.gearbtn[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+.settingspanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 70;
+  width: min(320px, 86vw);
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+.settingspanel .stack {
+  display: grid;
+  gap: 6px;
 }
