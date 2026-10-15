@@ -32,6 +32,7 @@ from . import (
     species,
     tables,
     techs,
+    trail,
 )
 from .models import Decision, GameState, Options, PlayerState, Probe
 from .setup import new_game
@@ -395,6 +396,16 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
     """Play one legal action on a copy of the state and run the automatic steps after it. No undo bookkeeping."""
     s = state.model_copy(deep=True)
     events: list[dict[str, Any]] = []
+    # what the move itself changes is for the move (or for the card being played, when the move goes on with one)
+    answers = bool(state.pending) and action in _decision_moves(state, state.pending[0])  # not a free action in the middle of it
+    playing = action.get("card") if action["type"] == "play_card" else state.playing if answers else None
+    with trail.scope(s, {"kind": "card", "card": playing} if playing else {"kind": "move"}):
+        _play_step(s, action, events)
+    events += trail.events_of(s)
+    return s, events
+
+
+def _play_step(s: GameState, action: Action, events: list[dict[str, Any]]) -> None:
     if s.pending and action not in _decision_moves(s, s.pending[0]):
         # FREE-00: a free action in the middle of the main action; the decisions of the main action wait until the free action is done
         s.stashed, s.pending = s.pending, []
@@ -410,7 +421,6 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
             s.free_active = True
     _advance(s, events)
     objectives.check_thresholds(s)  # SOLO-OBJ-04: reaching a level marks the task at once
-    return s, events
 
 
 def _undo(state: GameState) -> GameState:
@@ -565,7 +575,8 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     elif t == "discard_free":
         p.hand.remove(a["card"])
         s.discard.append(a["card"])
-        cards.gain_corner(s, p, a["card"])
+        with trail.scope(s, {"kind": "corner", "card": a["card"]}):
+            cards.gain_corner(s, p, a["card"], events)
         corners = {k for k, _ in tables.cards()[a["card"]]["free"] if k in ("publicity", "data", "move")}
         cards.fire(s, p, [{"e": "discard_free", "corner": k} for k in corners], events)  # FAQ-C138
     elif t == "place_data":
@@ -633,8 +644,10 @@ def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool =
     p.orbiters[planet] = p.orbiters.get(planet, 0) + 1
     events.append({"type": "orbit", "player": p.index, "planet": planet})
     if first:
-        rewards.grant(s, p, data["first_orbit"], events, slot=species.oumuamua_slot(s))  # ORBIT-04
-    rewards.grant(s, p, data["orbit"], events, planet, slot=species.oumuamua_slot(s))  # ORBIT-03, ORBIT-05
+        with trail.scope(s, {"kind": "planet", "planet": planet, "what": "first_orbit"}):
+            rewards.grant(s, p, data["first_orbit"], events, slot=species.oumuamua_slot(s))  # ORBIT-04
+    with trail.scope(s, {"kind": "planet", "planet": planet, "what": "orbit"}):
+        rewards.grant(s, p, data["orbit"], events, planet, slot=species.oumuamua_slot(s))  # ORBIT-03, ORBIT-05
     glyphids.take(s, p, f"planet:{planet}", events)  # EXP-GLY-04
     cards.fire(s, p, [{"e": "orbit", "planet": planet}, {"e": "orbit_or_land"}], events)  # FAQ-C117
     if (opts or {}).get("collect"):  # Mascamite cards: then look at the samples on the planet and pick one up
@@ -662,7 +675,8 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
         st.moon_landers.setdefault(a["moon"], p.index)
         p.landers[a["moon"]] = p.landers.get(a["moon"], 0) + 1
         events.append({"type": "land", "player": p.index, "planet": planet, "moon": a["moon"]})
-        rewards.grant(s, p, data["moons"][a["moon"]], events, planet)
+        with trail.scope(s, {"kind": "planet", "planet": planet, "what": "moon", "moon": a["moon"]}):
+            rewards.grant(s, p, data["moons"][a["moon"]], events, planet)
         glyphids.take(s, p, f"planet:{planet}", events)  # EXP-GLY-04: a moon counts as its planet
         cards.fire(s, p, [{"e": "land", "planet": planet}, {"e": "orbit_or_land"}], events)
         if opts.get("collect"):
@@ -678,11 +692,13 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
     else:
         open_slots = [k for k, taken in enumerate(st.first_land_data_taken) if not taken]
     if len(open_slots) == 1:  # LAND-04
-        _take_land_data(s, p, planet, open_slots[0])
+        with trail.scope(s, {"kind": "planet", "planet": planet, "what": "first_land"}):
+            _take_land_data(s, p, planet, open_slots[0])
     elif open_slots:  # Mars: the first two landers each choose a space
         s.pending.append(Decision(kind="land_data_slot", player=p.index, data={"planet": planet, "slots": open_slots}))
     glyphids.take(s, p, f"planet:{planet}", events)  # EXP-GLY-04
-    rewards.grant(s, p, data["land"], events, planet, slot=species.oumuamua_slot(s))  # LAND-03
+    with trail.scope(s, {"kind": "planet", "planet": planet, "what": "land"}):
+        rewards.grant(s, p, data["land"], events, planet, slot=species.oumuamua_slot(s))  # LAND-03
     cards.fire(s, p, [{"e": "land", "planet": planet}, {"e": "orbit_or_land"}], events)  # FAQ-C117
     if opts.get("collect"):  # Mascamite cards: then look at the samples on the planet and pick one up
         s.queue.insert(0, {"t": "collect_sample", "planet": planet})
@@ -973,13 +989,15 @@ def _end_round(s: GameState, events: list[dict[str, Any]]) -> None:
             if rival.is_rival(s, p.index):
                 continue  # the rival has no income (A-025)
             if p.organization is not None:
-                orgs.gain_income(s, p)  # EXP-ORG-08, A-031: the organization's income replaces the income card
+                with trail.scope(s, {"kind": "income"}):
+                    orgs.gain_income(s, p)  # EXP-ORG-08, A-031: the organization's income replaces the income card
                 continue
-            p.credits += 3
-            p.energy += 2
-            effects.draw_random_card(s, p)  # the income card's random card (INCOME-03)
-            for cid in p.tucked:
-                effects.gain_income_resource(s, p, tables.cards()[cid]["income"])
+            with trail.scope(s, {"kind": "income"}):
+                p.credits += 3
+                p.energy += 2
+                effects.draw_random_card(s, p)  # the income card's random card (INCOME-03)
+                for cid in p.tucked:
+                    effects.gain_income_resource(s, p, tables.cards()[cid]["income"])
         s.start_player = (s.start_player + 1) % n
         s.round += 1
         s.turn = 1

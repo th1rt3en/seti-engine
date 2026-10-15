@@ -224,6 +224,8 @@ class GameState(BaseModel):
     undo: dict[str, Any] | None = None
     # the actions taken since `undo` was saved, oldest first: taking the last one back replays the others on the saved state (UNDO-01)
     undo_log: list[dict[str, Any]] = Field(default_factory=list)
+    # who gained or lost what because of what, during the step being played (trail.py); empty between steps
+    trail: list[dict[str, Any]] = Field(default_factory=list)
     # decisions of the main action that a free action has interrupted, waiting while the free action's own decisions are answered (FREE-00)
     stashed: list[Decision] = Field(default_factory=list)
     free_active: bool = False  # the decisions now pending belong to a free action, which no other free action may interrupt (FREE-00)

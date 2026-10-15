@@ -11,7 +11,7 @@ import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
 import { GlyphidsPanel } from "./GlyphidsPanel";
-import { HandDock, type HandSelection } from "./HandDock";
+import { ExertianDock, HandDock, type HandSelection } from "./HandDock";
 import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { MissionsPanel } from "./MissionsPanel";
 import { OrgName } from "./OrgName";
@@ -210,6 +210,7 @@ export function GameView({
       </TrackerDock>
       <RowDock view={view} row={row} />
       <HandDock view={view} selection={hand} />
+      <ExertianDock view={view} />
       {log}
       {overlay}
     </div>

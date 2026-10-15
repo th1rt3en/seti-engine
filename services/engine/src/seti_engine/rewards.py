@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, objectives, solar, tables
+from . import effects, objectives, solar, tables, trail
 from .models import Decision, GameState, PlayerState
 
 Events = list[dict[str, Any]]
@@ -120,6 +120,11 @@ def grant(
 
 
 def mark_signal(s: GameState, p: PlayerState, index: int, events: Events, data: bool = True, allow_tile: bool = True) -> None:
+    with trail.scope(s, {"kind": "signal", "sector": index}):
+        _mark_signal(s, p, index, events, data, allow_tile)
+
+
+def _mark_signal(s: GameState, p: PlayerState, index: int, events: Events, data: bool = True, allow_tile: bool = True) -> None:
     """SECTOR-01 to SECTOR-05, SECTOR-10: replace the leftmost data with the player's marker. `data` False sends the data to the supply
     instead of the player (FAQ-C118). In 'Oumuamua's sector the player chooses the sector or the tile (ALIEN-OUM-03)."""
     from . import cards, species  # noqa: PLC0415 - these import this module
@@ -163,6 +168,11 @@ def _ranking(markers: list[int], exclude: int | None = None) -> list[int]:
 
 
 def resolve_sector(s: GameState, index: int, events: Events) -> None:
+    with trail.scope(s, {"kind": "sector", "sector": index}):
+        _resolve_sector(s, index, events)
+
+
+def _resolve_sector(s: GameState, index: int, events: Events) -> None:
     """SECTOR-11 to SECTOR-15: winner, publicity for contributors, second place stays, the rest return and the slot refills."""
     if index == -1:  # the 'Oumuamua tile (ALIEN-OUM-04)
         from . import species  # noqa: PLC0415 - species imports this module
@@ -229,6 +239,11 @@ def trace_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
 
 
 def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
+    with trail.scope(s, {"kind": "trace", "color": a["color"], "slot": a["slot"], "space": a.get("space")}):
+        _place_trace(s, p, a, events)
+
+
+def _place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
     """Mark a trace on the space `a` names; it counts for the color of that space (CARD-46, A-017, A-022)."""
     from . import (
         arkhos,  # noqa: PLC0415 - arkhos imports this module

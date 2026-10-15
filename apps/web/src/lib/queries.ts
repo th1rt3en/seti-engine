@@ -69,6 +69,33 @@ export interface LeaderRow {
   games: number;
 }
 
+export interface PlayerRow {
+  user_id: string;
+  name: string;
+  /** 1500 until the first rated game */
+  rating: number;
+  /** rated games that counted */
+  rated_games: number;
+  /** every game the player sat in that has started */
+  games: number;
+  joined: number;
+}
+
+/** All registered players (guests are left out), by name; `q` keeps the names that contain it. */
+export async function allPlayers(db: Db, q = "", limit = 500): Promise<PlayerRow[]> {
+  const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+  return db.all<PlayerRow>(
+    `SELECT u.id AS user_id, u.name, COALESCE(r.rating, 1500) AS rating, COALESCE(r.games, 0) AS rated_games,
+       (SELECT COUNT(*) FROM game_players gp JOIN games g ON g.id = gp.game_id
+         WHERE gp.user_id = u.id AND g.status IN ('playing', 'finished')) AS games,
+       u.created_at AS joined
+     FROM users u LEFT JOIN ratings r ON r.user_id = u.id
+     WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' ORDER BY u.name COLLATE NOCASE LIMIT ?`,
+    like,
+    limit,
+  );
+}
+
 export interface HistoryRow {
   game_id: string;
   rating_before: number;

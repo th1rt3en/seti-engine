@@ -1413,8 +1413,8 @@ button:disabled {
     grid-column: 1 / -1;
     grid-row: 4;
   }
+  /* the scores and resources of the players stay visible when the bar is folded */
   .topbar.collapsed .movebar,
-  .topbar.collapsed .scorechips,
   .topbar.collapsed .toprow .extra {
     display: none;
   }
@@ -2159,4 +2159,101 @@ button:disabled {
 .glyphchoice.on {
   outline: 3px solid #ffd166;
   outline-offset: 1px;
+}
+
+/* a gain or a loss of the log with the source that caused it */
+.logsource {
+  display: block;
+}
+.logsource .amounts {
+  margin-left: 4px;
+}
+
+/* buttons over a picked card (of the hand, of the card row) */
+.cardwrap {
+  position: relative;
+  display: inline-block;
+}
+.cardactions {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 6px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cardaction {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cardactions button {
+  width: 100%;
+  padding: 5px 6px;
+  font-size: 12px;
+  line-height: 1.15;
+  white-space: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.cardactions button.secondary {
+  background: #16213f;
+  border: 1px solid #6f86c8;
+  color: #fff;
+}
+.cardactions button.primary {
+  background: #1f9d55;
+  border: 1px solid #8fe6b5;
+  color: #fff;
+}
+.cardactions button:disabled {
+  background: #2a3045;
+  border-color: #4a5370;
+  color: #aab3cc;
+  opacity: 0.9;
+}
+.cardactions button.warn {
+  background: #b4472a;
+  border-color: #ffb59c;
+  color: #fff;
+}
+.cardwarn {
+  font-size: 11px;
+  line-height: 1.2;
+  color: #fff;
+  background: rgba(120, 30, 20, 0.9);
+  border-radius: 6px;
+  padding: 2px 5px;
+}
+
+/* the Exertian cards have a tab of their own only on a phone */
+.exertdock {
+  display: none;
+}
+@media (max-width: 760px) {
+  .exertdock {
+    display: block;
+  }
+  .game:has(.exertdock) .dock > .handtab {
+    width: 20%;
+  }
+  .game:has(.exertdock) .rowdock > .handtab {
+    left: 20%;
+  }
+  .game:has(.exertdock) .exertdock > .handtab {
+    left: 40%;
+  }
+  .game:has(.exertdock) .trackerdock > .handtab {
+    left: 60%;
+  }
+  .game:has(.exertdock) .movelog > .handtab {
+    left: 80%;
+  }
+}
+/* the cards in front of a player on the board: message cards and Exertian cards played face down */
+.pbcardtitle {
+  fill: #cfdcf3;
+  font-size: 22px;
+  font-weight: 700;
 }

@@ -1,7 +1,7 @@
 "use client";
 // The log of the moves made in the game, as a panel floating at the bottom right. It can be folded to a tab; the newest move is at the bottom.
 // The server sends every client the same log with the identity of hidden cards left out (apps/worker/src/core/publicLog.ts). A move is one line
-// with what it gave and took (the engine's `delta` events) as icons; in the solo game what the rival did after it is a block of its own.
+// with what it gave and took, one line for each source (the engine's `gains` events), as icons; in the solo game what the rival did after it is a block of its own.
 import type { GameEvent } from "@/lib/events";
 import { cardName, logText } from "@/lib/moves";
 import { techName } from "@/lib/techs";
@@ -55,6 +55,71 @@ const rewardText = (list: RewardItem[]): string =>
   list.map((r) => `${r.n} ${r.t.replace("card_any", "card").replace("vp", "VP")}`).join(" + ");
 const sectorName = (ctx: LogContext, sector: number): string => ctx.stars[sector] ?? `sector ${sector}`;
 
+type Source = { kind: string } & Record<string, unknown>;
+type Gains = GameEvent & { player: number; source: Source; changes: Record<string, number>; turn?: string };
+
+const MOVE_WORDS: Record<string, string> = {
+  launch: "Launch",
+  scan: "Scan",
+  orbit: "Orbiting",
+  land: "Landing",
+  analyze: "Analyzing data",
+  research: "Researching a tech",
+  pass: "Passing",
+  exchange: "Exchange",
+  discard_free: "Discarding a card",
+  place_data: "Placing data",
+  tuck: "Tucking a card",
+};
+
+/** The cause of a gain or a loss, as the engine named it (trail.py), in words that say which card, planet, sector, tech ... it was. */
+function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): string {
+  const planet = cap(src.planet);
+  switch (src.kind) {
+    case "move":
+      return MOVE_WORDS[action.type] ?? cap(action.type.replace(/_/g, " "));
+    case "card":
+      return `Playing ${cardName(src.card)}`;
+    case "corner":
+      return `Free corner of ${cardName(src.card)}`;
+    case "signal":
+      return `Signal in ${sectorName(ctx, Number(src.sector))}`;
+    case "sector":
+      return `Sector ${sectorName(ctx, Number(src.sector))} completed`;
+    case "mission":
+      return `Mission ${cardName(src.card)}`;
+    case "planet":
+      switch (src.what) {
+        case "first_orbit":
+          return `First orbiter of ${planet}`;
+        case "orbit":
+          return `Orbiting ${planet}`;
+        case "first_land":
+          return `First lander's data at ${planet}`;
+        case "land":
+          return `Landing on ${planet}`;
+        case "moon":
+          return `Landing on ${String(src.moon)} (${planet})`;
+        default:
+          return planet;
+      }
+    case "tech":
+      return src.what === "first" ? `First to take ${techOf(src.tech)}` : `Tech ${techOf(src.tech)}`;
+    case "trace": {
+      const species = ctx.species[Number(src.slot)] ?? "a species";
+      return `${cap(src.color)} trace on ${species}`;
+    }
+    case "glyph":
+      return src.what === "decipher" ? `Placing the ${String(src.glyph)} glyph` : `The ${String(src.glyph)} glyph (icon of a card)`;
+    case "income":
+      return "Income of the round";
+    case "rival_turn":
+      return "The rival's turn";
+    default:
+      return cap(src.kind.replace(/_/g, " "));
+  }
+}
+
 /** What the rival did, one event at a time. */
 function rivalLine(ev: GameEvent): ReactNode {
   switch (ev.type) {
@@ -96,6 +161,10 @@ function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
   switch (ev.type) {
     case "signal":
       return `${who} marks a signal in ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
+    case "glyph_resource":
+      return (ev.reward as RewardItem[]).length > 0
+        ? `${who}: the ${String(ev.glyph)} glyph is deciphered and gives ${rewardText(ev.reward as RewardItem[])}`
+        : `${who}: the ${String(ev.glyph)} glyph has not been deciphered yet, so its icon has no effect`;
     case "signal_tile":
       return `${who} marks a signal on the 'Oumuamua tile`;
     case "trace":
@@ -179,20 +248,31 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
           {entries.length === 0 ? <li className="muted">No move yet.</li> : null}
           {entries.map((e) => {
             const deltas = e.events.filter((ev) => ev.type === "delta") as Delta[];
+            // newer entries list each gain or loss under its source; older ones only have the net change of the move
+            const gains = e.events.filter((ev) => ev.type === "gains") as Gains[];
+            const itemised = gains.length > 0;
+            const ownGains = gains.filter((g) => g.source.kind !== "rival_turn" && !(ctx.rival !== null && g.player === ctx.rival));
+            const rivalGains = gains.filter((g) => ctx.rival !== null && g.player === ctx.rival);
             const mine = deltas.find((d) => d.player === e.seat);
             const rival = ctx.rival;
-            const rivalEvents = e.events.filter((ev) => ev.type.startsWith("rival_"));
             const rivalDelta = rival === null ? undefined : deltas.find((d) => d.player === rival);
             const others = deltas.filter((d) => d.player !== e.seat && d.player !== rival);
             const byRival = (ev: GameEvent): boolean => rival !== null && ev.player === rival;
             const notes = e.events.filter((ev) => !ev.type.startsWith("rival_") && ev.type !== "delta" && !byRival(ev));
-            const rivalMore = e.events.filter((ev) => ev.type !== "delta" && !ev.type.startsWith("rival_") && byRival(ev));
+            // the rival can take several turns in one move (when the player has passed it plays on until it passes too): one block for each,
+            // starting at the card it plays or at its pass, with what it caused (signals, wins) in the order the engine reported it
+            const turns: GameEvent[][] = [];
+            for (const ev of e.events) {
+              if (ev.type === "rival_card" || ev.type === "rival_pass") turns.push([ev]);
+              else if (turns.length > 0 && ev.type !== "delta" && (ev.type.startsWith("rival_") || byRival(ev)))
+                turns[turns.length - 1]?.push(ev);
+            }
             return (
               <li key={e.seq}>
                 <span className="lognum">{e.seq + 1}</span>
                 <span className="logmove">
                   <b>{ctx.who(e.seat)}</b> <CardText text={logText(e.action)} />{" "}
-                  {mine ? <Changes changes={mine.changes} size={16} /> : null}
+                  {mine && !itemised ? <Changes changes={mine.changes} size={16} /> : null}
                 </span>
                 {notes.map((ev) => {
                   const line = eventLine(ev, ctx);
@@ -202,23 +282,43 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                     </span>
                   ) : null;
                 })}
-                {others.map((d) => (
-                  <span key={`d${d.player}`} className="logevent">
-                    {ctx.who(d.player)} <Changes changes={d.changes} size={16} />
+                {ownGains.map((g) => (
+                  <span key={`g${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
+                    {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
+                    <CardText text={`${sourceText(g.source, ctx, e.action)}:`} /> <Changes changes={g.changes} size={16} />
                   </span>
                 ))}
-                {rivalEvents.length > 0 || rivalMore.length > 0 || rivalDelta ? (
+                {itemised
+                  ? null
+                  : others.map((d) => (
+                      <span key={`d${d.player}`} className="logevent">
+                        {ctx.who(d.player)} <Changes changes={d.changes} size={16} />
+                      </span>
+                    ))}
+                {turns.map((turn, n) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the turns of a move come in a fixed order
+                  <span key={`rt${n}`} className="logrival">
+                    <b className="logrivalhead">{turns.length > 1 ? `Rival's turn ${n + 1} of ${turns.length}` : "Rival's turn"}</b>
+                    {turn.map((ev, k) => {
+                      const line = ev.type.startsWith("rival_") ? rivalLine(ev) : eventLine(ev, ctx);
+                      // biome-ignore lint/suspicious/noArrayIndexKey: events of a turn are never reordered
+                      return line ? <span key={k}>{line}</span> : null;
+                    })}
+                    {rivalGains
+                      .filter((g) => (g.turn !== undefined ? g.turn === String(turn[0]?.card) : n === turns.length - 1))
+                      .map((g) => (
+                        <span key={`rg${n}-${JSON.stringify(g.source)}`} className="logsource">
+                          {g.source.kind === "rival_turn" ? "Gains" : <CardText text={`${sourceText(g.source, ctx, e.action)}:`} />}{" "}
+                          <Changes changes={g.changes} size={16} />
+                        </span>
+                      ))}
+                    {!itemised && n === turns.length - 1 && rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+                  </span>
+                ))}
+                {turns.length === 0 && !itemised && rivalDelta ? (
                   <span className="logrival">
                     <b className="logrivalhead">Rival's turn</b>
-                    {rivalEvents.map((ev) => {
-                      const line = rivalLine(ev);
-                      return line ? <span key={JSON.stringify(ev)}>{line}</span> : null;
-                    })}
-                    {rivalMore.map((ev) => {
-                      const line = eventLine(ev, ctx);
-                      return line ? <span key={`m${JSON.stringify(ev)}`}>{line}</span> : null;
-                    })}
-                    {rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+                    <Changes changes={rivalDelta.changes} size={16} />
                   </span>
                 ) : null}
               </li>

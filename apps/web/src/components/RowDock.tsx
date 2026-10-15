@@ -5,6 +5,7 @@ import { useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useEffect, useRef } from "react";
 import assets from "../generated/assets.json";
+import { type CardAction, CardActions } from "./CardActions";
 import { CardImage } from "./CardImage";
 
 /** Picking a card of the card row (or the deck): which can be picked, which is, and what happens on a click. The sources are the engine's: "deck" and "row:<place>". */
@@ -12,6 +13,8 @@ export interface RowSelection {
   selectable: string[];
   selected: string | null;
   onSelect: (source: string) => void;
+  /** What can be done with the card that is picked: buttons laid over it (to confirm discarding it for a signal, for example). */
+  actions?: CardAction[];
 }
 
 /** `inline`: on a wide screen the card row lies in the column of the tech stacks, below them, all cards in one row; the floating panel serves the narrow screens. */
@@ -59,16 +62,18 @@ export function RowDock({ view, row, inline }: { view: View; row?: RowSelection;
                 return <CardImage key={`${c}-${i}`} id={c} size="row" />;
               }
               return (
-                <button
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the slot is the identity of a card of the row
-                  key={`${c}-${i}`}
-                  type="button"
-                  className={row.selected === source ? "cardbtn selectable selected" : "cardbtn selectable"}
-                  aria-pressed={row.selected === source}
-                  onClick={() => row.onSelect(source)}
-                >
-                  <CardImage id={c} size="row" />
-                </button>
+                // biome-ignore lint/suspicious/noArrayIndexKey: the slot is the identity of a card of the row
+                <span key={`${c}-${i}`} className="cardwrap">
+                  <button
+                    type="button"
+                    className={row.selected === source ? "cardbtn selectable selected" : "cardbtn selectable"}
+                    aria-pressed={row.selected === source}
+                    onClick={() => row.onSelect(source)}
+                  >
+                    <CardImage id={c} size="row" />
+                  </button>
+                  {row.selected === source && row.actions ? <CardActions actions={row.actions} /> : null}
+                </span>
               );
             })}
             {row?.selectable.includes("deck") ? (

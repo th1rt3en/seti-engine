@@ -1,20 +1,22 @@
 "use client";
-// The player's hand and open missions as a floating panel in the bottom left corner. It can be folded down to a tab so that more of the
+// The player's hand (the open missions are on the player board) as a floating panel in the bottom left corner. It can be folded down to a tab so that more of the
 // board shows; whether it is folded is remembered in this browser.
 import { cardName } from "@/lib/moves";
-import { useBottomSpace, useDock } from "@/lib/useDock";
+import { isPhone, useBottomSpace, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
+import { type CardAction, CardActions } from "./CardActions";
 import { CardImage } from "./CardImage";
 import { MascamiteTab } from "./Mascamites";
-import { MissionCard } from "./MissionsPanel";
 
 /** The cards of the hand that a move can be made with, the places (in the hand) of those that are picked, and what happens when one is clicked. */
 export interface HandSelection {
   selectable: string[];
   selected: number[];
   onSelect: (index: number) => void;
+  /** What can be done with the card that is picked, when it is the only one: buttons laid over it. */
+  actions?: CardAction[];
   /** Cards that are offered to the player to keep one of (the end-of-round cards after passing): they lie with the hand for the moment. */
   offered?: string[];
   offeredSelected?: string | null;
@@ -22,7 +24,7 @@ export interface HandSelection {
 }
 
 /** The tab with the player's Exertian cards (ALIEN-EXE-01 to ALIEN-EXE-07): those still held, those played face down, and the milestones. */
-function ExertianTab({ view }: { view: View }) {
+export function ExertianTab({ view }: { view: View }) {
   const me = view.viewer;
   const player = me === null ? undefined : view.state.players[me];
   const slot = view.state.species.find((sp) => sp.discovered && sp.species === "exertians");
@@ -77,7 +79,8 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const player = me === null ? undefined : view.state.players[me];
   const [tab, setTab] = useState<"hand" | "exertian" | "mascamite">("hand");
   if (!player) return null;
-  const exertians = view.state.species.some((sp) => sp.discovered && sp.species === "exertians");
+  // on a phone the Exertian cards have a tab of the bottom bar of their own (ExertianDock)
+  const exertians = view.state.species.some((sp) => sp.discovered && sp.species === "exertians") && !isPhone();
   const mascamites = view.state.species.some((sp) => sp.discovered && sp.species === "mascamites");
   const showExertian = exertians && tab === "exertian";
   const showMascamite = mascamites && tab === "mascamite";
@@ -86,10 +89,7 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   return (
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
-        <span>
-          Hand ({player.hand.length + (selection?.offered?.length ?? 0)})
-          {player.missions.length > 0 ? ` · ${player.missions.length} missions` : ""}
-        </span>
+        <span>Hand ({player.hand.length + (selection?.offered?.length ?? 0)})</span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
       {folded ? null : (
@@ -97,7 +97,7 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
           {exertians || mascamites ? (
             <div className="handtabs" role="tablist">
               <button type="button" role="tab" aria-selected={!showExertian && !showMascamite} onClick={() => setTab("hand")}>
-                Hand and missions
+                Hand
               </button>
               {exertians ? (
                 <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
@@ -129,16 +129,18 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 );
               }
               return (
-                <button
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the same card can be in hand twice
-                  key={`${c}-${i}`}
-                  type="button"
-                  className={picked ? "cardbtn selectable selected" : "cardbtn selectable"}
-                  aria-pressed={picked}
-                  onClick={() => selection.onSelect(i)}
-                >
-                  <CardImage id={c} size="hand" />
-                </button>
+                // biome-ignore lint/suspicious/noArrayIndexKey: the same card can be in hand twice
+                <span key={`${c}-${i}`} className="cardwrap">
+                  <button
+                    type="button"
+                    className={picked ? "cardbtn selectable selected" : "cardbtn selectable"}
+                    aria-pressed={picked}
+                    onClick={() => selection.onSelect(i)}
+                  >
+                    <CardImage id={c} size="hand" />
+                  </button>
+                  {picked && selection.selected.length === 1 && selection.actions ? <CardActions actions={selection.actions} /> : null}
+                </span>
               );
             })}
             {wanted ? (
@@ -162,24 +164,32 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </span>
               </>
             ) : null}
-            {player.missions.length > 0 || player.kept_cards.length > 0 || player.message_cards.length > 0 ? (
-              <span className="handsep" aria-hidden="true" />
-            ) : null}
-            {player.message_cards.map((m) => (
-              <CardImage
-                key={`message-${m.card}`}
-                id={m.card}
-                size="mission"
-                title={`${cardName(m.card)}: its message marker is at ${m.target} points; the green part resolves when your score reaches it`}
-              />
-            ))}
+            {player.kept_cards.length > 0 || player.message_cards.length > 0 ? <span className="handsep" aria-hidden="true" /> : null}
             {player.kept_cards.map((c) => (
               <CardImage key={c} id={c} size="mission" title={`${cardName(c)}: kept in front of you`} />
             ))}
-            {player.missions.map((m) => (
-              <MissionCard key={m.card} mission={m} />
-            ))}
           </div>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+/** On a phone: the Exertian cards held and played are a tab of the bottom bar of their own, beside the hand. */
+export function ExertianDock({ view }: { view: View }) {
+  const [folded, toggle] = useDock("exertian");
+  const player = view.viewer === null ? undefined : view.state.players[view.viewer];
+  const has = view.state.species.some((sp) => sp.discovered && sp.species === "exertians");
+  if (!player || !has) return null;
+  return (
+    <aside className={folded ? "exertdock dock folded" : "exertdock dock"} aria-label="Your Exertian cards">
+      <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
+        <span>Exertians ({player.exertian_hand.length})</span>
+        <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
+      </button>
+      {folded ? null : (
+        <div className="handbody">
+          <ExertianTab view={view} />
         </div>
       )}
     </aside>

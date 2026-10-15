@@ -1,8 +1,11 @@
 "use client";
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
-import { glyphToken } from "@/lib/glyphids";
+import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
 import {
   type Move,
+  cardInfo,
+  cardSector,
+  cornerGlyph,
   describeMove,
   freeIsOnlyMovement,
   groupMoves,
@@ -10,6 +13,7 @@ import {
   handMoveText,
   irreversibleText,
   isHandMove,
+  rewardWords,
   rowMoveText,
   sameMove,
 } from "@/lib/moves";
@@ -21,6 +25,7 @@ import { useTurnSound } from "@/lib/turnSound";
 import type { View } from "@seti/protocol";
 import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
+import type { CardAction } from "./CardActions";
 import { GameView } from "./GameView";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
@@ -69,6 +74,7 @@ export function GameClient({
   const [error, setError] = useState<string | null>(null);
   // the moves made so far (the server sends all of them when the page connects, then each new one)
   const [log, setLog] = useState<LogEntry[]>([]);
+  const logRef = useRef<LogEntry[]>([]); // the same log, to check that a new entry follows the ones that were received
   const [online, setOnline] = useState(false);
   const socket = useRef<WebSocket | null>(null);
   const seq = useRef(0);
@@ -186,7 +192,14 @@ export function GameClient({
             } else plan.current = [];
           }
         } else if (m.t === "log") {
-          setLog((old) => (m.from === 0 ? m.entries : m.from === old.length ? [...old, ...m.entries] : old));
+          // a message that does not follow the entries held means one was missed: connect again, the server then sends the whole log
+          if (m.from === 0) logRef.current = m.entries;
+          else if (m.from === logRef.current.length) logRef.current = [...logRef.current, ...m.entries];
+          else {
+            ws.close();
+            return;
+          }
+          setLog(logRef.current);
         } else if (m.t === "error") {
           plan.current = [];
           endWait();
@@ -315,6 +328,59 @@ export function GameClient({
   const pickable = [...new Set([...handMoves.map((m) => String(m.card)), ...tradable])];
   const pickedIds = picked.map((i) => hand[i]).filter((c): c is string => c !== undefined);
   const cardOptions = pickedIds.length === 1 ? handMoves.filter((m) => m.card === pickedIds[0]) : [];
+  // what the glyph icon of a Glyphids card's corner gives now (EXP-GLY-06), to show it before the card is discarded
+  const glyphExtra = v.state.species.find((sp) => sp.discovered && sp.species === "glyphids")?.extra as
+    | { sides?: number[]; top?: (string | null)[]; bottom?: (string | null)[] }
+    | undefined;
+  const cornerBonus = (card: unknown): { reward: Reward | null } | undefined => {
+    const g = cornerGlyph(card);
+    return g === null ? undefined : { reward: glyphIconReward(glyphExtra, g) };
+  };
+  // the buttons over a card of the hand that is the only one picked: play it, use its free action, tuck it ...
+  const handActions: CardAction[] = cardOptions.map((m, i) => {
+    const info = cardInfo(m.card);
+    if (m.type === "play_card")
+      return {
+        key: `${m.type}-${i}`,
+        label:
+          info && info.cost > 0 ? `Play: ${info.cost} ${info.pays_energy ? "energy" : "credit"}${info.cost > 1 ? "s" : ""}` : "Play (free)",
+        primary: true,
+        title: handMoveText(m),
+        onClick: () => play(m),
+      };
+    if (m.type === "discard_free") {
+      const bonus = cornerBonus(m.card);
+      const idle = noProbe && freeIsOnlyMovement(m.card);
+      const nothing = bonus !== undefined && bonus.reward === null;
+      return {
+        key: `${m.type}-${i}`,
+        label: bonus
+          ? bonus.reward
+            ? `Free effect: ${rewardWords(bonus.reward)}`
+            : "Free effect: nothing"
+          : "Discard for its free effect",
+        disabled: idle,
+        title: idle ? "You have no probe on the map to move" : handMoveText(m, bonus),
+        warn: nothing ? `The ${cornerGlyph(m.card)} glyph is not on the translation board: you would gain nothing.` : undefined,
+        onClick: () => play(m),
+      };
+    }
+    const label = m.type === "tuck" ? `Tuck: ${info?.income ?? "no"} income` : handMoveText(m).replace(/\?$/, "");
+    return { key: `${m.type}-${i}`, label, title: handMoveText(m), onClick: () => play(m) };
+  });
+  // the main action is taken (or the card cannot be afforded): Play stays in sight, greyed out
+  if (
+    cardOptions.length > 0 &&
+    !cardOptions.some((m) => m.type === "play_card") &&
+    cardOptions.some((m) => m.type === "discard_free" || m.type === "tuck")
+  )
+    handActions.unshift({
+      key: "play-off",
+      label: "Play",
+      disabled: true,
+      title: v.state.main_done ? "You have already taken your main action this turn" : "You cannot play this card now",
+      onClick: () => undefined,
+    });
   const tradeMoves =
     pickedIds.length === 2 ? cardTrades.filter((m) => [...(m.cards as string[])].sort().join() === [...pickedIds].sort().join()) : [];
   const moveGroups = groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow");
@@ -363,7 +429,23 @@ export function GameClient({
   const goldMoves = mine.filter((m) => m.type === "choose_gold");
   const goldTile = pickedGold === null ? undefined : v.state.gold_tiles.find((g) => g.tile === pickedGold);
   const goldMove = goldTile === undefined ? undefined : goldMoves.find((m) => m.tile === goldTile.tile);
-  const buyOptions = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
+  const ROW_SIGNAL_MOVES = ["scan_discard", "scan_token", "row_pick"];
+  const pickedRowMoves = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
+  // discarding a card of the display for a signal (during a scan) is confirmed by a button on the card itself; the other moves keep the bar
+  const buyOptions = pickedRowMoves.filter((m) => !ROW_SIGNAL_MOVES.includes(m.type));
+  const rowCardId = pickedBuy === null || pickedBuy === "deck" ? undefined : v.state.card_row[Number(pickedBuy.slice(4))];
+  const rowActions: CardAction[] = pickedRowMoves
+    .filter((m) => ROW_SIGNAL_MOVES.includes(m.type))
+    .map((m) => {
+      const sector = rowCardId === undefined ? "a" : cardSector(rowCardId);
+      return {
+        key: m.type,
+        label: m.type === "scan_token" ? `Use a signal token: ${sector} signal` : `Discard to mark a ${sector} signal`,
+        primary: true,
+        title: rowMoveText(m, v.state.card_row),
+        onClick: () => play(m),
+      };
+    });
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
   const energy = me?.energy ?? 0;
@@ -420,7 +502,7 @@ export function GameClient({
         <div className="confirmbar">
           <div className="confirm warn">
             <span>
-              <b>Cannot be undone.</b> {irreversibleText(unsure)} Continue with “{describeMove(unsure)}”?
+              <b>No undo.</b> {irreversibleText(unsure)}
             </span>
             <button type="button" className="primary" onClick={() => playConfirmed(unsure)}>
               Continue
@@ -580,32 +662,6 @@ export function GameClient({
               <span className="handhint">Click a card of the display or the deck to buy it for 3 publicity.</span>
             </div>
           ) : null}
-        </div>
-      ) : null}
-      {cardOptions.length > 0 ? (
-        <div className="confirmbar">
-          {cardOptions.map((m, i) => {
-            const idle = m.type === "discard_free" && noProbe && freeIsOnlyMovement(m.card);
-            return (
-              // biome-ignore lint/suspicious/noArrayIndexKey: the options come in the order of the engine
-              <div key={i} className="confirm">
-                <span>{handMoveText(m)}</span>
-                <button
-                  type="button"
-                  className="primary"
-                  disabled={idle}
-                  title={idle ? "You have no probe on the map to move" : undefined}
-                  onClick={() => play(m)}
-                >
-                  Confirm
-                </button>
-                {idle ? <span className="muted small">You have no probe on the map.</span> : null}
-              </div>
-            );
-          })}
-          <button type="button" className="secondary" onClick={() => setPicked([])}>
-            Cancel
-          </button>
         </div>
       ) : null}
       {tradeMoves.length > 0 && !rowMode ? (
@@ -860,6 +916,7 @@ export function GameClient({
         selectable: pickable,
         selected: picked,
         onSelect: selectCard,
+        actions: handActions,
         offered: offers,
         offeredSelected: pickedOffer,
         onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
@@ -870,7 +927,7 @@ export function GameClient({
         onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
       }}
       spots={{ items: spots, selected: pickedSpot, onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id) }}
-      row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource }}
+      row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
       interaction={
         reach.length > 0
           ? {

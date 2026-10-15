@@ -18,8 +18,9 @@ import {
 import { loadConfig } from "@/lib/config";
 import { SqliteDb, migrationSql } from "@/lib/db";
 import { engineAuth } from "@/lib/engineAuth";
-import { LABELS, cardName, describeMove, groupMoves } from "@/lib/moves";
-import { computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
+import { glyphIconReward } from "@/lib/glyphids";
+import { LABELS, cardName, cornerGlyph, describeMove, groupMoves, handMoveText, irreversibleText } from "@/lib/moves";
+import { allPlayers, computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { createGame, gameMeta } from "@/lib/worker";
 import { importSPKI, jwtVerify } from "jose";
@@ -198,6 +199,16 @@ describe("lobby, leaderboard and profile", () => {
     });
   });
 
+  it("lists every registered player by name, with the starting rating when unrated, and finds by name", async () => {
+    const { db } = await seed();
+    const carl = await signup(db, "carl", "password1");
+    const all = await allPlayers(db);
+    expect(all.map((r) => r.name)).toEqual(["Ann", "Bob", "carl"]); // guests left out, any case sorted together
+    expect(all.find((r) => r.user_id === carl.id)).toMatchObject({ rating: 1500, rated_games: 0, games: 0 });
+    expect((await allPlayers(db, "AN")).map((r) => r.name)).toEqual(["Ann"]);
+    expect(await allPlayers(db, "%")).toEqual([]); // a wildcard is not a wildcard
+  });
+
   it("ranks registered players by rating (guests are left out)", async () => {
     const { db } = await seed();
     expect((await leaderboard(db)).map((r) => [r.name, r.rating])).toEqual([
@@ -357,5 +368,28 @@ describe("profile statistics", () => {
 
   it("has no win rate without a game", () => {
     expect(computeStats([])).toMatchObject({ games: 0, winRate: null, avgScore: null, bestScore: null });
+  });
+});
+
+describe("the prompts of the hand", () => {
+  it("says what the free corner of a Glyphids card gives, or that it gives nothing", () => {
+    const m = { type: "discard_free", card: "GL.1" };
+    expect(cornerGlyph("GL.1")).toBe("orange");
+    expect(handMoveText(m, { reward: { t: "credit", n: 1 } })).toContain("the orange glyph gives 1 credit");
+    expect(handMoveText(m, { reward: null })).toContain("not on the translation board, so you gain nothing");
+    expect(cornerGlyph("1")).toBeNull();
+  });
+
+  it("finds the reward of a placed glyph from the sides of the strips", () => {
+    const extra = { sides: [0, 1], top: [null, "orange", null], bottom: ["red", null, null, null] };
+    expect(glyphIconReward(extra, "orange")).toEqual({ t: "energy", n: 1 }); // top side 0, second slot
+    expect(glyphIconReward(extra, "red")).toEqual({ t: "card_random", n: 1 }); // bottom side 1, first slot
+    expect(glyphIconReward(extra, "blue")).toBeNull();
+  });
+
+  it("asks about a move that cannot be undone in one short sentence", () => {
+    expect(irreversibleText({ type: "pass" })).toBe("Pass now? You will see the end-of-round cards.");
+    expect(irreversibleText({ type: "take_card", source: "deck" })).toBe("Draw from the deck? You will see the card.");
+    expect(irreversibleText({ type: "end_turn" }).length).toBeLessThan(60);
   });
 });

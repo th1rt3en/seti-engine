@@ -139,6 +139,23 @@ describe("play", () => {
     expect(viewOf(again).seq).toBe(1);
   });
 
+  it("a connecting client gets a long log in pieces that follow each other, and the next move continues it", async () => {
+    const t = await started();
+    for (let i = 0; i < 95; i++)
+      await t.store.put(`log:${String(i).padStart(7, "0")}`, { seq: i, seat: 0, action: { type: "score" }, at: 0, events: [] });
+    await t.store.put("logcount", 95);
+    const c = new Conn("c", alice.id);
+    await t.room.connect(c);
+    const pieces = c.got.filter((m): m is Extract<ServerMessage, { t: "log" }> => m.t === "log");
+    expect(pieces.map((m) => [m.from, m.entries.length])).toEqual([
+      [0, 40],
+      [40, 40],
+      [80, 15],
+    ]);
+    // each piece starts where the ones before end, so the client can hold them one after the other
+    expect(pieces.flatMap((m) => m.entries.map((e) => e.seq))).toEqual(Array.from({ length: 95 }, (_, i) => i));
+  });
+
   it("connecting to a lobby shows the seats", async () => {
     const t = makeRoom();
     await t.room.init("g", { players: 3 } as Options, none, false, alice);
