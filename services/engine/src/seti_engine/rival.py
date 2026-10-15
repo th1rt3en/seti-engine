@@ -99,6 +99,8 @@ def advance(s: GameState, n: int, events: Events | None = None) -> None:
             r.deck.insert(0, r.advanced.pop(0))
             if events is not None:
                 events.append({"type": "rival_grows"})
+        elif r.progress == 0 and s.options.expansion:  # EXP-SOLO-07: no advanced card left to gain, so one more advance instead
+            r.progress = 1
 
 
 def gain_vp(s: GameState, n: int, events: Events | None = None) -> None:

@@ -1,255 +1,255 @@
 {
-  "cosmos_strategy_group": {
-    "abilities": {
-      "freeAction": "Once per round, gain 1 card from either the card row or the top of the deck, then clear all reward spaces marked on this organization.",
-      "passive": "When you play a card as a main action, you may mark one matching reward space if the card's sector color matches an unmarked space on this organization. Yellow or black cards can mark the credit space, red or black cards can mark the publicity space, and blue or black cards can mark the data space."
-    },
-    "income": {
-      "card": 1,
-      "credit": 2,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Cosmos Strategy Group",
-    "number": 6,
-    "resources": {
-      "card": 1,
-      "credit": 4,
-      "data": 0,
-      "energy": 2,
-      "publicity": 1
-    }
+ "cosmos_strategy_group": {
+  "abilities": {
+   "freeAction": "Once per round, gain 1 card from either the card row or the top of the deck, then clear all reward spaces marked on this organization.",
+   "passive": "When you play a card as a main action, you may mark one matching reward space if the card's sector color matches an unmarked space on this organization. Yellow or black cards can mark the credit space, red or black cards can mark the publicity space, and blue or black cards can mark the data space."
   },
-  "deep_sky_survey": {
-    "abilities": {
-      "freeAction": "Once per round, switch a card from your hand with a card on the card row.",
-      "passive": "You don't need energy to perform Analyze Data."
-    },
-    "income": {
-      "card": 1,
-      "credit": 2,
-      "data": 0,
-      "energy": 2,
-      "publicity": 0,
-      "signalToken": 1
-    },
-    "name": "Deep Sky Survey",
-    "number": 4,
-    "resources": {
-      "card": 0,
-      "credit": 3,
-      "data": 1,
-      "energy": 2,
-      "publicity": 3
-    }
+  "income": {
+   "card": 1,
+   "credit": 2,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 0
   },
-  "fenwick_research_center": {
-    "abilities": {
-      "freeAction": "Once per round, spend 1 publicity to gain any card from the card row or a random card from the main deck, then gain that card's free-action corner bonus.",
-      "passive": "You only need 5 publicity to research tech."
-    },
-    "income": {
-      "card": 0,
-      "credit": 3,
-      "data": 0,
-      "energy": 1,
-      "publicity": 1,
-      "signalToken": 0
-    },
-    "name": "Fenwick Research Center",
-    "number": 2,
-    "resources": {
-      "card": 0,
-      "credit": 3,
-      "data": 0,
-      "energy": 1,
-      "publicity": 4
-    }
-  },
-  "futurespan_institute": {
-    "abilities": {
-      "freeAction": "Prepare one card from your hand by placing it on this organization and setting the countdown to that card's credit cost x 10 + 5. Once per round while the token is on the scoring track, move it 3 spaces farther ahead and gain 1 card.",
-      "mainAction": "Once your score marker reaches or passes the Futurespan token, play the prepared card as a main action without paying its credit cost, then return the token."
-    },
-    "income": {
-      "card": 1,
-      "credit": 2,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Futurespan Institute",
-    "number": 10,
-    "resources": {
-      "card": 1,
-      "credit": 3,
-      "data": 0,
-      "energy": 3,
-      "publicity": 3
-    }
-  },
-  "helion_assembly": {
-    "abilities": {
-      "freeAction": "Once per round, destroy one of your probe/orange or scan/purple techs, then tuck one card from your hand for income and clear all reward spaces marked on this organization.",
-      "passive": "When you develop a tech, you may mark the matching reward space on this organization and gain its reward. Probe/orange tech grants 1 energy, scan/purple tech grants 1 signal token, and computer/blue tech grants 1 data."
-    },
-    "income": {
-      "card": 1,
-      "credit": 3,
-      "data": 0,
-      "energy": 1,
-      "publicity": 1,
-      "signalToken": 0
-    },
-    "name": "Helion Assembly",
-    "number": 11,
-    "resources": {
-      "card": 0,
-      "credit": 3,
-      "data": 0,
-      "energy": 2,
-      "publicity": 7
-    }
-  },
-  "mission_relay": {
-    "abilities": {
-      "freeAction": "Once per round, spend 2 publicity to gain any card from the card row or a random card from the main deck, then immediately gain the resource matching that card's income corner.",
-      "passive": "When you play a card with a mission, gain 1 publicity.",
-      "setup": "At the start of the game, mark the lowest-scoring space on the mission gold scoring tile."
-    },
-    "income": {
-      "card": 1,
-      "credit": 1,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Mission Relay",
-    "number": 8,
-    "resources": {
-      "card": 2,
-      "credit": 3,
-      "data": 0,
-      "energy": 2,
-      "publicity": 2
-    }
-  },
-  "orbital_dynamics": {
-    "abilities": {
-      "freeAction": "Once per round, move at most 2 different probes of yours with 1 step each.",
-      "passive": "Your probe capacity is 1 higher."
-    },
-    "income": {
-      "card": 1,
-      "credit": 3,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Orbital Dynamics",
-    "number": 1,
-    "resources": {
-      "card": 0,
-      "credit": 2,
-      "data": 0,
-      "energy": 2,
-      "publicity": 3
-    }
-  },
-  "sentinel_probe_network": {
-    "abilities": {
-      "freeAction": "Once per round, after you play and fully resolve a non-alien card as a main action this turn, gain that card's free-action corner effect.",
-      "passive": "When you launch a probe, mark a signal in that probe's sector."
-    },
-    "income": {
-      "card": 1,
-      "credit": 3,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 1
-    },
-    "name": "Sentinel Probe Network",
-    "number": 7,
-    "resources": {
-      "card": 0,
-      "credit": 4,
-      "data": 0,
-      "energy": 2,
-      "publicity": 3
-    }
-  },
-  "stratus_core": {
-    "abilities": {
-      "freeAction": "Once per round, gain the free-action corner effects of all 3 cards in the card row without discarding those cards."
-    },
-    "income": {
-      "card": 1,
-      "credit": 2,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Stratus Core",
-    "number": 3,
-    "resources": {
-      "card": 1,
-      "credit": 3,
-      "data": 0,
-      "energy": 2,
-      "publicity": 3
-    }
-  },
-  "turing_systems": {
-    "abilities": {
-      "freeAction": "Once per round, choose any probe or scan tech. Until the end of this turn, you may use that tech's ability as if you had researched it. This does not count as researching the tech and does not grant its immediate bonuses.",
-      "passive": "When you research a computer/blue tech, gain 1 publicity."
-    },
-    "income": {
-      "card": 1,
-      "credit": 2,
-      "data": 1,
-      "energy": 2,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Turing Systems",
-    "number": 5,
-    "resources": {
-      "card": 1,
-      "credit": 4,
-      "data": 0,
-      "energy": 2,
-      "publicity": 2
-    }
-  },
-  "xenolab": {
-    "abilities": {
-      "mainAction": "Xenolab starts with three active action tiles. You may use an active tile as a discounted main action, then flip that tile inactive: spend 1 credit to launch a probe, spend 2 energy to scan, or spend 4 publicity to research any tech.",
-      "passive": "When you gain the trace shown on an inactive tile, flip that tile back active. The trace is still gained normally and is not spent."
-    },
-    "income": {
-      "card": 1,
-      "credit": 2,
-      "data": 0,
-      "energy": 1,
-      "publicity": 0,
-      "signalToken": 0
-    },
-    "name": "Xenolab",
-    "number": 9,
-    "resources": {
-      "card": 1,
-      "credit": 2,
-      "data": 0,
-      "energy": 2,
-      "publicity": 1
-    }
+  "name": "Cosmos Strategy Group",
+  "number": 6,
+  "resources": {
+   "card": 1,
+   "credit": 4,
+   "data": 0,
+   "energy": 2,
+   "publicity": 1
   }
+ },
+ "deep_sky_survey": {
+  "abilities": {
+   "freeAction": "Once per round, switch a card from your hand with a card on the card row.",
+   "passive": "You don't need energy to perform Analyze Data."
+  },
+  "income": {
+   "card": 1,
+   "credit": 2,
+   "data": 0,
+   "energy": 2,
+   "publicity": 0,
+   "signalToken": 1
+  },
+  "name": "Deep Sky Survey",
+  "number": 4,
+  "resources": {
+   "card": 0,
+   "credit": 3,
+   "data": 1,
+   "energy": 2,
+   "publicity": 3
+  }
+ },
+ "fenwick_research_center": {
+  "abilities": {
+   "freeAction": "Once per round, spend 1 publicity to gain any card from the card row or a random card from the main deck, then gain that card's free-action corner bonus.",
+   "passive": "You only need 5 publicity to research tech."
+  },
+  "income": {
+   "card": 0,
+   "credit": 3,
+   "data": 0,
+   "energy": 1,
+   "publicity": 1,
+   "signalToken": 0
+  },
+  "name": "Fenwick Research Center",
+  "number": 2,
+  "resources": {
+   "card": 0,
+   "credit": 3,
+   "data": 0,
+   "energy": 1,
+   "publicity": 4
+  }
+ },
+ "futurespan_institute": {
+  "abilities": {
+   "freeAction": "Prepare one card from your hand by placing it on this organization and setting the countdown to that card's credit cost x 10 + 5. Once per round while the token is on the scoring track, move it 3 spaces farther ahead and gain 1 card.",
+   "mainAction": "Once your score marker reaches or passes the Futurespan token, play the prepared card as a main action without paying its credit cost, then return the token."
+  },
+  "income": {
+   "card": 1,
+   "credit": 2,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 0
+  },
+  "name": "Futurespan Institute",
+  "number": 10,
+  "resources": {
+   "card": 1,
+   "credit": 3,
+   "data": 0,
+   "energy": 3,
+   "publicity": 3
+  }
+ },
+ "helion_assembly": {
+  "abilities": {
+   "freeAction": "Once per round, destroy one of your probe/orange or scan/purple techs, then tuck one card from your hand for income and clear all reward spaces marked on this organization.",
+   "passive": "When you develop a tech, you may mark the matching reward space on this organization and gain its reward. Probe/orange tech grants 1 energy, scan/purple tech grants 1 signal token, and computer/blue tech grants 1 data."
+  },
+  "income": {
+   "card": 1,
+   "credit": 3,
+   "data": 0,
+   "energy": 1,
+   "publicity": 1,
+   "signalToken": 0
+  },
+  "name": "Helion Assembly",
+  "number": 11,
+  "resources": {
+   "card": 0,
+   "credit": 3,
+   "data": 0,
+   "energy": 2,
+   "publicity": 7
+  }
+ },
+ "mission_relay": {
+  "abilities": {
+   "freeAction": "Once per round, spend 2 publicity to gain any card from the card row or a random card from the main deck, then immediately gain the resource matching that card's income corner.",
+   "passive": "When you play a card with a mission, gain 1 publicity.",
+   "setup": "At the start of the game, mark the lowest-scoring space on the mission gold scoring tile."
+  },
+  "income": {
+   "card": 1,
+   "credit": 1,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 0
+  },
+  "name": "Mission Relay",
+  "number": 8,
+  "resources": {
+   "card": 2,
+   "credit": 3,
+   "data": 0,
+   "energy": 2,
+   "publicity": 2
+  }
+ },
+ "orbital_dynamics": {
+  "abilities": {
+   "freeAction": "Once per round, move at most 2 different probes of yours with 1 step each.",
+   "passive": "Your probe capacity is 1 higher."
+  },
+  "income": {
+   "card": 1,
+   "credit": 3,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 0
+  },
+  "name": "Orbital Dynamics",
+  "number": 1,
+  "resources": {
+   "card": 0,
+   "credit": 2,
+   "data": 0,
+   "energy": 2,
+   "publicity": 3
+  }
+ },
+ "sentinel_probe_network": {
+  "abilities": {
+   "freeAction": "Once per round, after you play and fully resolve a non-alien card as a main action this turn, gain that card's free-action corner effect.",
+   "passive": "When you launch a probe, mark a signal in that probe's sector."
+  },
+  "income": {
+   "card": 1,
+   "credit": 3,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 1
+  },
+  "name": "Sentinel Probe Network",
+  "number": 7,
+  "resources": {
+   "card": 0,
+   "credit": 4,
+   "data": 0,
+   "energy": 2,
+   "publicity": 3
+  }
+ },
+ "stratus_core": {
+  "abilities": {
+   "freeAction": "Once per round, gain the free-action corner effects of all 3 cards in the card row without discarding those cards."
+  },
+  "income": {
+   "card": 1,
+   "credit": 2,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 0
+  },
+  "name": "Stratus Core",
+  "number": 3,
+  "resources": {
+   "card": 1,
+   "credit": 3,
+   "data": 0,
+   "energy": 2,
+   "publicity": 3
+  }
+ },
+ "turing_systems": {
+  "abilities": {
+   "freeAction": "Once per round, choose any probe or scan tech. Until the end of this turn, you may use that tech's ability as if you had researched it. This does not count as researching the tech and does not grant its immediate bonuses.",
+   "passive": "When you research a computer/blue tech, gain 1 publicity."
+  },
+  "income": {
+   "card": 1,
+   "credit": 2,
+   "data": 1,
+   "energy": 2,
+   "publicity": 0,
+   "signalToken": 0
+  },
+  "name": "Turing Systems",
+  "number": 5,
+  "resources": {
+   "card": 1,
+   "credit": 4,
+   "data": 0,
+   "energy": 2,
+   "publicity": 2
+  }
+ },
+ "xenolab": {
+  "abilities": {
+   "mainAction": "Xenolab starts with three active action tiles. You may use an active tile as a discounted main action, then flip that tile inactive: spend 1 credit to launch a probe, spend 2 energy to scan, or spend 4 publicity to research any tech.",
+   "passive": "When you gain the trace shown on an inactive tile, flip that tile back active. The trace is still gained normally and is not spent."
+  },
+  "income": {
+   "card": 1,
+   "credit": 2,
+   "data": 0,
+   "energy": 1,
+   "publicity": 0,
+   "signalToken": 0
+  },
+  "name": "Xenolab",
+  "number": 9,
+  "resources": {
+   "card": 1,
+   "credit": 2,
+   "data": 0,
+   "energy": 2,
+   "publicity": 1
+  }
+ }
 }

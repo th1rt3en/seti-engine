@@ -127,3 +127,19 @@ def test_exp_solo_05_starting_tucks_do_not_complete_tasks() -> None:
     ob = r.state.objectives
     assert ob is not None and not any(any(m) for oid, m in ob.marks.items() if oid in ob.long_term)
     assert cards is not None
+
+
+def test_exp_solo_07_with_no_advanced_card_left_the_rival_advances_instead() -> None:
+    s = new()
+    r = s.rival
+    assert r is not None
+    r.advanced = []
+    r.progress = len(rival.TRACK) - 1
+    rival.advance(s, 1)
+    assert r.progress == 1  # past the growth icon, and one more advance
+    base = start(Options(players=1, seed=3)).state
+    assert base.rival is not None
+    base.rival.advanced = []
+    base.rival.progress = len(rival.TRACK) - 1
+    rival.advance(base, 1)
+    assert base.rival.progress == 0  # without the expansion nothing happens (A-012)
