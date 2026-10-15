@@ -80,6 +80,9 @@ export type Spot = {
   panel?: "glyphids" | "amoeba" | "arkhos" | "org" | "objectives";
   /** What the place holds, for panels that draw it (a glyph token, a chip). */
   glyph?: string;
+  /** A hole of the translation board takes several of the player's glyph tokens: the kinds that can be placed there, each with its move (its place in
+   * `view.legal`). The player picks one. */
+  choices?: { glyph: string; move: number }[];
 };
 
 /** The wedge of the star ring that is sector `i`: between the outer ring of the solar system and the outer edge of the stars. */
@@ -176,13 +179,12 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       // the holes are on the translation board above the Glyphids board, on the game board itself
       const gi = s.species.findIndex((sp) => sp.discovered && sp.species === "glyphids");
       const at = gi < 0 ? null : holeAt(gi, m.row === "top" ? "top" : "bottom", Number(m.index));
-      if (at)
-        add(
-          i,
-          `glyph:${String(m.row)}:${String(m.index)}:${String(m.glyph)}`,
-          { ...none, x: at.x, y: at.y, r: 62 },
-          { glyph: String(m.glyph) },
-        );
+      if (at) {
+        const id = `glyph:${String(m.row)}:${String(m.index)}`;
+        add(i, id, { ...none, x: at.x, y: at.y, r: 62 });
+        const spot = spots.get(id);
+        if (spot) spot.choices = [...(spot.choices ?? []), { glyph: String(m.glyph), move: i }];
+      }
     } else if (m.type === "pick_organelle") {
       const at = ORGANELLE_SPACES[String(m.space)];
       if (at) add(i, `organelle:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 40 }, { panel: "amoeba" });

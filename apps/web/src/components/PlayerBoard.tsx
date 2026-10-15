@@ -6,6 +6,7 @@ import { cardImage } from "@/lib/cardImages";
 // missions are drawn over it at the places measured on the picture. When a player has researched a computer tech and must choose its slot, the free
 // slots are highlighted and clicked.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { glyphToken } from "@/lib/glyphids";
 import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
@@ -20,16 +21,23 @@ const SLOT_POSITIONS = [0, 2, 4, 5];
 /** The picture is the colorful panel of the printed board; the page adds a header with the income above it and the missions below it. */
 const HEAD = 96;
 /** The six computer spaces on the picture of the board (the centre of each, all in one row). */
-const SPACE = { x: [345, 423, 503, 576, 658, 743], y: HEAD + 225 };
-/** The diameter of each computer space on the picture: the spaces of the publicity and the income icons (2nd and 4th) are smaller. The data token and the
- * highlight of the free action "place data" are drawn to fit them, centred on the space. */
-const SPACE_DIAMETER = [40, 32, 40, 32, 40, 40];
+const SPACE = { x: [346, 420, 502, 572, 660, 747], y: HEAD + 227 };
+/** The diameter of the data token and of the highlight of the free action "place data", centred on each computer space. The 2nd and 4th spaces (the
+ * publicity and the income icons) are printed smaller, but their data token is drawn as large as the others. */
+const SPACE_DIAMETER = [40, 40, 40, 40, 40, 40];
 const TILE = { w: 84, h: 118 };
+/** On the picture of a computer tech (175 x 246) its upper circle, which lies over the printed space, is centred 30.5% down; the dashed circle for the
+ * data of its lower space is centred 70% down and is as wide as the upper one. */
+const TILE_UPPER = 0.305;
+const TILE_LOWER = 0.7;
 /** The columns of the probe and telescope techs on the picture, by glyph (dot, link, branch, cross). */
 const TECH_X: Record<"probe" | "telescope", number[]> = { probe: [108, 192, 343, 432], telescope: [628, 782, 866, 955] };
 const TECH_Y = HEAD + 32;
 /** The blue base where the data pool lies (the data not yet in the computer). */
 const POOL = { x: [175, 210, 245], y: [HEAD + 225, HEAD + 265] };
+/** The strip under the board with the glyph tokens a player owns (Glyphids, EXP-GLY-04). */
+const GLYPH_STRIP = 84;
+const GLYPH_KINDS = ["black", "blue", "cyan", "orange", "pink", "red", "yellow"];
 const MISSIONS = { x: 20, w: 150, h: 208, gap: 14 };
 const ICON = expansionAssets as Record<string, string>;
 const PRINTED = assets.printedIcons as Record<string, string>;
@@ -58,7 +66,7 @@ export interface LowerChoice {
 /** One slot of the computer for a tech: the tech that lies there with the data on its lower space, or nothing (when it can be picked it is highlighted). */
 function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; pos: number; choice?: SlotChoice; lower?: LowerChoice }) {
   const x = (SPACE.x[pos] ?? 0) - TILE.w / 2;
-  const y = SPACE.y - 46;
+  const y = SPACE.y - TILE.h * TILE_UPPER;
   const placed = p.computer_techs[String(pos)];
   const choosable = choice?.slots.includes(pos) ?? false;
   const front = placed ? FRONTS[placed.tech] : undefined;
@@ -67,7 +75,14 @@ function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; 
       {front ? (
         <>
           <image href={front} x={x} y={y} width={TILE.w} height={TILE.h} />
-          {placed?.lower_filled ? <DataToken x={x + TILE.w / 2} y={y + TILE.h * 0.82} size={34} title="Data on the lower space" /> : null}
+          {placed?.lower_filled ? (
+            <DataToken
+              x={x + TILE.w / 2}
+              y={y + TILE.h * TILE_LOWER}
+              size={(SPACE_DIAMETER[0] ?? 40) / 0.88}
+              title="Data on the lower space"
+            />
+          ) : null}
           <title>{`${TECH_INFO[placed?.tech ?? ""]?.name ?? placed?.tech}: ${TECH_INFO[placed?.tech ?? ""]?.effect ?? ""}`}</title>
         </>
       ) : null}
@@ -81,7 +96,13 @@ function Slot({ p, pos, choice, lower }: { p: View["state"]["players"][number]; 
           onClick={() => lower.onPlace(pos)}
           onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && lower.onPlace(pos)}
         >
-          <circle cx={x + TILE.w / 2} cy={y + TILE.h * 0.82} r={24} className="spotshape" style={{ strokeWidth: 5 }} />
+          <circle
+            cx={x + TILE.w / 2}
+            cy={y + TILE.h * TILE_LOWER}
+            r={(SPACE_DIAMETER[0] ?? 40) / 2 + 3}
+            className="spotshape"
+            style={{ strokeWidth: 5 }}
+          />
           <title>Place 1 data here (free action)</title>
         </g>
       ) : null}
@@ -129,7 +150,11 @@ function Board({
   // the free action "place data" (FREE-03) puts one data of the pool in the leftmost empty space: that space is the one to click
   const next = onPlaceData ? p.computer.indexOf(false) : -1;
   const rows = Math.max(1, Math.ceil(p.missions.length / 6));
-  const height = HEAD + BOARD.h + 26 + rows * (MISSIONS.h + 50) + 6;
+  // the glyph tokens the player owns, when the Glyphids are on the board: one token per kind with how many, under the picture
+  const glyphids = view.state.species.some((sp) => sp.discovered && sp.species === "glyphids");
+  const strip = glyphids ? GLYPH_STRIP : 0;
+  const owned = GLYPH_KINDS.map((kind) => ({ kind, n: (p.glyphs ?? []).filter((g) => g === kind).length })).filter((o) => o.n > 0);
+  const height = HEAD + BOARD.h + strip + 26 + rows * (MISSIONS.h + 50) + 6;
   return (
     <svg viewBox={`0 0 ${BOARD.w} ${height}`} className="playerboard" role="img" aria-label={`The board of player ${player + 1}`}>
       <PieceDefs />
@@ -229,12 +254,40 @@ function Board({
         </text>
       ) : null}
 
+      {glyphids ? (
+        <g>
+          <title>{`Glyph tokens owned: ${(p.glyphs ?? []).length}`}</title>
+          <text x={24} y={HEAD + BOARD.h + 52} className="pbtitle">
+            Glyph tokens
+          </text>
+          <text x={250} y={HEAD + BOARD.h + 52} className="pbincome light">
+            {(p.glyphs ?? []).length}
+          </text>
+          {owned.length === 0 ? (
+            <text x={310} y={HEAD + BOARD.h + 52} className="pbhint">
+              none yet
+            </text>
+          ) : null}
+          {owned.map((o, i) => (
+            <g key={o.kind} transform={`translate(${310 + i * 96} ${HEAD + BOARD.h + 12})`}>
+              <image href={glyphToken(o.kind)} x={0} y={0} width={48} height={56}>
+                <title>{`${o.n} ${o.kind} glyph token${o.n === 1 ? "" : "s"}`}</title>
+              </image>
+              <circle cx={58} cy={40} r={15} fill="rgba(8,12,26,0.92)" stroke="#fff" strokeWidth={2.5} />
+              <text x={58} y={46} textAnchor="middle" fontSize={20} fontWeight={700} fill="#fff">
+                {o.n}
+              </text>
+            </g>
+          ))}
+        </g>
+      ) : null}
+
       {/* the open missions lie on the board, with the circles that are covered */}
       {p.missions.map((m, i) => {
         const col = i % 6;
         const row = Math.floor(i / 6);
         const x = MISSIONS.x + col * (MISSIONS.w + MISSIONS.gap);
-        const y = HEAD + BOARD.h + 26 + row * (MISSIONS.h + 50);
+        const y = HEAD + BOARD.h + strip + 26 + row * (MISSIONS.h + 50);
         const src = cardImage(m.card);
         return (
           <g key={m.card}>

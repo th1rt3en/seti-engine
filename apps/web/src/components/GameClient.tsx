@@ -1,5 +1,6 @@
 "use client";
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
+import { glyphToken } from "@/lib/glyphids";
 import {
   type Move,
   describeMove,
@@ -91,6 +92,8 @@ export function GameClient({
   const [pickedGold, setPickedGold] = useState<string | null>(null);
   // a place picked on the board (land, orbit, signal, trace)
   const [pickedSpot, setPickedSpot] = useState<string | null>(null);
+  // the glyph token picked for a hole of the translation board that takes several (with the hole it was picked for)
+  const [pickedGlyph, setPickedGlyph] = useState<{ spot: string; glyph: string } | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
   const [extraEnergy, setExtraEnergy] = useState(0);
   // The moves still to send of a plan (a probe's whole way, with the energy it needs): each goes out when the view of the one before arrives.
@@ -314,6 +317,7 @@ export function GameClient({
   const cardOptions = pickedIds.length === 1 ? handMoves.filter((m) => m.card === pickedIds[0]) : [];
   const tradeMoves =
     pickedIds.length === 2 ? cardTrades.filter((m) => [...(m.cards as string[])].sort().join() === [...pickedIds].sort().join()) : [];
+  const moveGroups = groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const resourceTrades = ["credit", "energy"].map((g) => exchanges.filter((m) => m.give === g)).filter((l) => l.length > 0);
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
@@ -330,7 +334,15 @@ export function GameClient({
   const techOption = pickedTech === null ? undefined : techMoves.find((m) => m.stack === pickedTech);
   const techStack = pickedTech === null ? undefined : v.state.tech_stacks[pickedTech];
   const spotOption = spots.find((sp) => sp.id === pickedSpot);
-  const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
+  // a hole of the translation board takes any of the glyph tokens the player owns: one alone is taken, else the player picks
+  const glyphChoices = spotOption?.choices;
+  const glyphChoice =
+    glyphChoices === undefined
+      ? undefined
+      : glyphChoices.length === 1
+        ? glyphChoices[0]
+        : glyphChoices.find((c) => pickedGlyph !== null && pickedGlyph.spot === spotOption?.id && pickedGlyph.glyph === c.glyph);
+  const spotMove = spotOption === undefined ? undefined : mine[glyphChoice ? glyphChoice.move : glyphChoices ? -1 : spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
   // the first choice of a game with organizations (organization, then quick start cards) has a screen of its own
@@ -421,8 +433,13 @@ export function GameClient({
       ) : null}
       {mine.length > 0 && !ended && !unsure ? ( // the "cannot be undone" question replaces the action prompt; Cancel brings the prompt back
         <div className="movegroups">
-          {groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow").map((g) => (
-            <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
+          {moveGroups.map((g) => (
+            <MoveGroup
+              key={g.title}
+              title={g.title}
+              count={g.moves.length + (g.title === "Free actions" ? resourceTrades.length : 0)}
+              foldable={g.title === "Free actions"}
+            >
               <div className="moves">
                 {g.moves.map((m, i) => {
                   const idle = m.type === "move_energy" && noProbe;
@@ -443,8 +460,21 @@ export function GameClient({
                   );
                 })}
               </div>
+              {g.title === "Free actions"
+                ? resourceTrades.map((list) => (
+                    <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
+                  ))
+                : null}
             </MoveGroup>
           ))}
+          {resourceTrades.length > 0 && !moveGroups.some((g) => g.title === "Free actions") ? (
+            // with no other free action the trades make the group, which folds on a phone like the others
+            <MoveGroup title="Free actions" count={resourceTrades.length} foldable>
+              {resourceTrades.map((list) => (
+                <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
+              ))}
+            </MoveGroup>
+          ) : null}
           {reach.length > 0 ? (
             <MoveGroup title="Move a probe" count={reach.length} foldable forceOpen={pickedProbe !== null} className="moveui">
               <div className="moves">
@@ -496,12 +526,6 @@ export function GameClient({
               </span>
             </MoveGroup>
           ) : null}
-          {resourceTrades.map((list) => (
-            <div key={String(list[0]?.give)} className="mgroup">
-              <span className="glabel">Free action</span>
-              <TradeButtons moves={list} onPlay={play} onPickRow={setRowMode} />
-            </div>
-          ))}
           {pickable.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Cards in hand</span>
@@ -667,11 +691,33 @@ export function GameClient({
           </button>
         </div>
       ) : null}
-      {spotMove ? (
+      {spotOption ? (
         <div className="confirmbar">
           <div className="confirm">
-            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} fallback={describeMove(spotMove)} />
-            <button type="button" className="primary" onClick={() => play(spotMove)}>
+            {glyphChoices ? (
+              <span className="spotprompt glyphpick">
+                Place which glyph token in this {spotOption.id.split(":")[1]} slot?
+                {glyphChoices.map((c) => {
+                  const owned = (v.state.players[v.viewer ?? 0]?.glyphs ?? []).filter((g) => g === c.glyph).length;
+                  return (
+                    <button
+                      key={c.glyph}
+                      type="button"
+                      className={glyphChoice?.glyph === c.glyph ? "glyphchoice on" : "glyphchoice"}
+                      aria-pressed={glyphChoice?.glyph === c.glyph}
+                      title={`Place a ${c.glyph} glyph token (you have ${owned})`}
+                      onClick={() => setPickedGlyph({ spot: spotOption.id, glyph: c.glyph })}
+                    >
+                      <img src={glyphToken(c.glyph)} alt={`${c.glyph} glyph token`} width={34} height={39} />
+                      {owned > 1 ? <b>×{owned}</b> : null}
+                    </button>
+                  );
+                })}
+              </span>
+            ) : (
+              <SpotPrompt note={(v.notes[spotOption.move] ?? null) as Note} fallback={spotMove ? describeMove(spotMove) : undefined} />
+            )}
+            <button type="button" className="primary" disabled={!spotMove} onClick={() => spotMove && play(spotMove)}>
               Confirm
             </button>
           </div>

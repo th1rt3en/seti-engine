@@ -799,6 +799,23 @@ export function BoardView({
             ) : (
               <path d={sp.shape.d} className="spotshape" />
             )}
+            {sp.choices && sp.shape.kind === "circle"
+              ? sp.choices.slice(0, 3).map((c, n, all) => {
+                  // the kinds that can be placed here, side by side (one alone is drawn larger)
+                  const w = all.length === 1 ? 80 : 46;
+                  return (
+                    <image
+                      key={c.glyph}
+                      href={glyphToken(c.glyph)}
+                      x={(sp.shape.kind === "circle" ? sp.shape.x : 0) - (all.length * w) / 2 + n * w}
+                      y={(sp.shape.kind === "circle" ? sp.shape.y : 0) - w * 0.57}
+                      width={w}
+                      height={w * 1.15}
+                      opacity={0.9}
+                    />
+                  );
+                })
+              : null}
             {sp.glyph && sp.shape.kind === "circle" && glyphToken(sp.glyph) ? (
               <image href={glyphToken(sp.glyph)} x={sp.shape.x - 40} y={sp.shape.y - 46} width={80} height={92} opacity={0.85} />
             ) : null}
