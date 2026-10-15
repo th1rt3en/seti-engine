@@ -1,5 +1,6 @@
 "use client";
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
+import { glyphToken } from "@/lib/glyphids";
 import {
   type Move,
   describeMove,
@@ -91,6 +92,8 @@ export function GameClient({
   const [pickedGold, setPickedGold] = useState<string | null>(null);
   // a place picked on the board (land, orbit, signal, trace)
   const [pickedSpot, setPickedSpot] = useState<string | null>(null);
+  // the glyph token picked for a hole of the translation board that takes several (with the hole it was picked for)
+  const [pickedGlyph, setPickedGlyph] = useState<{ spot: string; glyph: string } | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
   const [extraEnergy, setExtraEnergy] = useState(0);
   // The moves still to send of a plan (a probe's whole way, with the energy it needs): each goes out when the view of the one before arrives.
@@ -331,7 +334,15 @@ export function GameClient({
   const techOption = pickedTech === null ? undefined : techMoves.find((m) => m.stack === pickedTech);
   const techStack = pickedTech === null ? undefined : v.state.tech_stacks[pickedTech];
   const spotOption = spots.find((sp) => sp.id === pickedSpot);
-  const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
+  // a hole of the translation board takes any of the glyph tokens the player owns: one alone is taken, else the player picks
+  const glyphChoices = spotOption?.choices;
+  const glyphChoice =
+    glyphChoices === undefined
+      ? undefined
+      : glyphChoices.length === 1
+        ? glyphChoices[0]
+        : glyphChoices.find((c) => pickedGlyph !== null && pickedGlyph.spot === spotOption?.id && pickedGlyph.glyph === c.glyph);
+  const spotMove = spotOption === undefined ? undefined : mine[glyphChoice ? glyphChoice.move : glyphChoices ? -1 : spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
   // the first choice of a game with organizations (organization, then quick start cards) has a screen of its own
@@ -680,11 +691,33 @@ export function GameClient({
           </button>
         </div>
       ) : null}
-      {spotMove ? (
+      {spotOption ? (
         <div className="confirmbar">
           <div className="confirm">
-            <SpotPrompt note={(v.notes[spotOption?.move ?? 0] ?? null) as Note} fallback={describeMove(spotMove)} />
-            <button type="button" className="primary" onClick={() => play(spotMove)}>
+            {glyphChoices ? (
+              <span className="spotprompt glyphpick">
+                Place which glyph token in this {spotOption.id.split(":")[1]} slot?
+                {glyphChoices.map((c) => {
+                  const owned = (v.state.players[v.viewer ?? 0]?.glyphs ?? []).filter((g) => g === c.glyph).length;
+                  return (
+                    <button
+                      key={c.glyph}
+                      type="button"
+                      className={glyphChoice?.glyph === c.glyph ? "glyphchoice on" : "glyphchoice"}
+                      aria-pressed={glyphChoice?.glyph === c.glyph}
+                      title={`Place a ${c.glyph} glyph token (you have ${owned})`}
+                      onClick={() => setPickedGlyph({ spot: spotOption.id, glyph: c.glyph })}
+                    >
+                      <img src={glyphToken(c.glyph)} alt={`${c.glyph} glyph token`} width={34} height={39} />
+                      {owned > 1 ? <b>×{owned}</b> : null}
+                    </button>
+                  );
+                })}
+              </span>
+            ) : (
+              <SpotPrompt note={(v.notes[spotOption.move] ?? null) as Note} fallback={spotMove ? describeMove(spotMove) : undefined} />
+            )}
+            <button type="button" className="primary" disabled={!spotMove} onClick={() => spotMove && play(spotMove)}>
               Confirm
             </button>
           </div>

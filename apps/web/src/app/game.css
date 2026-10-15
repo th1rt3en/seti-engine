@@ -2142,3 +2142,21 @@ button:disabled {
 .glyphbar.slash {
   fill: #6b4f12;
 }
+
+/* choosing which glyph token to place in a hole of the translation board */
+.glyphpick {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.glyphchoice {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+.glyphchoice.on {
+  outline: 3px solid #ffd166;
+  outline-offset: 1px;
+}
