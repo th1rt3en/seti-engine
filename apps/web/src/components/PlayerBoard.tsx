@@ -6,6 +6,7 @@ import { cardImage } from "@/lib/cardImages";
 // missions are drawn over it at the places measured on the picture. When a player has researched a computer tech and must choose its slot, the free
 // slots are highlighted and clicked.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { glyphToken } from "@/lib/glyphids";
 import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
@@ -34,6 +35,9 @@ const TECH_X: Record<"probe" | "telescope", number[]> = { probe: [108, 192, 343,
 const TECH_Y = HEAD + 32;
 /** The blue base where the data pool lies (the data not yet in the computer). */
 const POOL = { x: [175, 210, 245], y: [HEAD + 225, HEAD + 265] };
+/** The strip under the board with the glyph tokens a player owns (Glyphids, EXP-GLY-04). */
+const GLYPH_STRIP = 84;
+const GLYPH_KINDS = ["black", "blue", "cyan", "orange", "pink", "red", "yellow"];
 const MISSIONS = { x: 20, w: 150, h: 208, gap: 14 };
 const ICON = expansionAssets as Record<string, string>;
 const PRINTED = assets.printedIcons as Record<string, string>;
@@ -146,7 +150,11 @@ function Board({
   // the free action "place data" (FREE-03) puts one data of the pool in the leftmost empty space: that space is the one to click
   const next = onPlaceData ? p.computer.indexOf(false) : -1;
   const rows = Math.max(1, Math.ceil(p.missions.length / 6));
-  const height = HEAD + BOARD.h + 26 + rows * (MISSIONS.h + 50) + 6;
+  // the glyph tokens the player owns, when the Glyphids are on the board: one token per kind with how many, under the picture
+  const glyphids = view.state.species.some((sp) => sp.discovered && sp.species === "glyphids");
+  const strip = glyphids ? GLYPH_STRIP : 0;
+  const owned = GLYPH_KINDS.map((kind) => ({ kind, n: (p.glyphs ?? []).filter((g) => g === kind).length })).filter((o) => o.n > 0);
+  const height = HEAD + BOARD.h + strip + 26 + rows * (MISSIONS.h + 50) + 6;
   return (
     <svg viewBox={`0 0 ${BOARD.w} ${height}`} className="playerboard" role="img" aria-label={`The board of player ${player + 1}`}>
       <PieceDefs />
@@ -246,12 +254,40 @@ function Board({
         </text>
       ) : null}
 
+      {glyphids ? (
+        <g>
+          <title>{`Glyph tokens owned: ${(p.glyphs ?? []).length}`}</title>
+          <text x={24} y={HEAD + BOARD.h + 52} className="pbtitle">
+            Glyph tokens
+          </text>
+          <text x={250} y={HEAD + BOARD.h + 52} className="pbincome light">
+            {(p.glyphs ?? []).length}
+          </text>
+          {owned.length === 0 ? (
+            <text x={310} y={HEAD + BOARD.h + 52} className="pbhint">
+              none yet
+            </text>
+          ) : null}
+          {owned.map((o, i) => (
+            <g key={o.kind} transform={`translate(${310 + i * 96} ${HEAD + BOARD.h + 12})`}>
+              <image href={glyphToken(o.kind)} x={0} y={0} width={48} height={56}>
+                <title>{`${o.n} ${o.kind} glyph token${o.n === 1 ? "" : "s"}`}</title>
+              </image>
+              <circle cx={58} cy={40} r={15} fill="rgba(8,12,26,0.92)" stroke="#fff" strokeWidth={2.5} />
+              <text x={58} y={46} textAnchor="middle" fontSize={20} fontWeight={700} fill="#fff">
+                {o.n}
+              </text>
+            </g>
+          ))}
+        </g>
+      ) : null}
+
       {/* the open missions lie on the board, with the circles that are covered */}
       {p.missions.map((m, i) => {
         const col = i % 6;
         const row = Math.floor(i / 6);
         const x = MISSIONS.x + col * (MISSIONS.w + MISSIONS.gap);
-        const y = HEAD + BOARD.h + 26 + row * (MISSIONS.h + 50);
+        const y = HEAD + BOARD.h + strip + 26 + row * (MISSIONS.h + 50);
         const src = cardImage(m.card);
         return (
           <g key={m.card}>

@@ -314,6 +314,7 @@ export function GameClient({
   const cardOptions = pickedIds.length === 1 ? handMoves.filter((m) => m.card === pickedIds[0]) : [];
   const tradeMoves =
     pickedIds.length === 2 ? cardTrades.filter((m) => [...(m.cards as string[])].sort().join() === [...pickedIds].sort().join()) : [];
+  const moveGroups = groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const resourceTrades = ["credit", "energy"].map((g) => exchanges.filter((m) => m.give === g)).filter((l) => l.length > 0);
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
@@ -421,8 +422,13 @@ export function GameClient({
       ) : null}
       {mine.length > 0 && !ended && !unsure ? ( // the "cannot be undone" question replaces the action prompt; Cancel brings the prompt back
         <div className="movegroups">
-          {groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow").map((g) => (
-            <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
+          {moveGroups.map((g) => (
+            <MoveGroup
+              key={g.title}
+              title={g.title}
+              count={g.moves.length + (g.title === "Free actions" ? resourceTrades.length : 0)}
+              foldable={g.title === "Free actions"}
+            >
               <div className="moves">
                 {g.moves.map((m, i) => {
                   const idle = m.type === "move_energy" && noProbe;
@@ -443,8 +449,21 @@ export function GameClient({
                   );
                 })}
               </div>
+              {g.title === "Free actions"
+                ? resourceTrades.map((list) => (
+                    <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
+                  ))
+                : null}
             </MoveGroup>
           ))}
+          {resourceTrades.length > 0 && !moveGroups.some((g) => g.title === "Free actions") ? (
+            // with no other free action the trades make the group, which folds on a phone like the others
+            <MoveGroup title="Free actions" count={resourceTrades.length} foldable>
+              {resourceTrades.map((list) => (
+                <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
+              ))}
+            </MoveGroup>
+          ) : null}
           {reach.length > 0 ? (
             <MoveGroup title="Move a probe" count={reach.length} foldable forceOpen={pickedProbe !== null} className="moveui">
               <div className="moves">
@@ -496,12 +515,6 @@ export function GameClient({
               </span>
             </MoveGroup>
           ) : null}
-          {resourceTrades.map((list) => (
-            <div key={String(list[0]?.give)} className="mgroup">
-              <span className="glabel">Free action</span>
-              <TradeButtons moves={list} onPlay={play} onPickRow={setRowMode} />
-            </div>
-          ))}
           {pickable.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Cards in hand</span>
