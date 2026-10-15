@@ -35,7 +35,7 @@ import {
   scoreDegrees,
   sectorDegrees,
 } from "@/lib/geometry";
-import { glyphToken, holeAt, trackBox, trackPicture } from "@/lib/glyphids";
+import { glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
 import { type Spot, onAlienBoard } from "@/lib/targets";
@@ -48,6 +48,7 @@ import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
 import { DataToken, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
+import { TranslationBoard } from "./TranslationBoard";
 
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
@@ -820,7 +821,6 @@ type GlyphExtra = { sides?: number[]; top?: (string | null)[]; bottom?: (string 
 /** The translation board of the Glyphids above their board: the arrangement of the strips that was drawn, and the glyph tokens in its holes. */
 function GlyphTrack({ slot, extra }: { slot: number; extra: GlyphExtra }) {
   const box = trackBox(slot);
-  const src = trackPicture(extra?.sides);
   const holes: { key: string; glyph: string; x: number; y: number }[] = [];
   for (const row of ["top", "bottom"] as const) {
     (extra?.[row] ?? []).forEach((glyph, index) => {
@@ -828,12 +828,11 @@ function GlyphTrack({ slot, extra }: { slot: number; extra: GlyphExtra }) {
       if (glyph && at) holes.push({ key: `${row}${index}`, glyph, x: at.x, y: at.y });
     });
   }
-  if (!src) return null;
   return (
     <g>
-      <image href={src} x={box.x} y={box.y} width={box.w} height={box.h}>
-        <title>The Glyphids translation board</title>
-      </image>
+      <g transform={`translate(${box.x} ${box.y}) scale(${box.k})`}>
+        <TranslationBoard sides={extra?.sides} />
+      </g>
       {holes.map((h) => (
         <image key={h.key} href={glyphToken(h.glyph)} x={h.x - 55} y={h.y - 62} width={110} height={125}>
           <title>{`${h.glyph} glyph token`}</title>

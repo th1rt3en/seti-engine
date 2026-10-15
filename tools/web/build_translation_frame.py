@@ -32,7 +32,7 @@ for corner in ((0, 0), (W - 1, 0), (0, H - 1), (W - 1, H - 1)):
         ImageDraw.floodfill(solid, corner, 128)
 outside = np.array(solid) == 128
 sat = arr.max(axis=2) - arr.min(axis=2)
-outside[630:, 520:] |= (lum[630:, 520:] < 45)
+outside[630:, 585:] |= (lum[630:, 585:] < 45)
 outside[630:, 600:] |= (sat[630:, 600:] < 40) | (lum[630:, 600:] < 45)  # the generator watermark (white, not green) beside the lower right corner of the frame
 outside[686:, :] = True  # stray dashes under the frame
 
@@ -66,6 +66,8 @@ frame = src.convert("RGBA")
 black_layer = Image.new("RGBA", (W, H), (0, 0, 0, 255))
 frame = Image.composite(black_layer, frame, mask)
 keep = Image.fromarray(((~outside) * 255).astype("uint8")).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))
+edge = keep.filter(ImageFilter.MedianFilter(9))  # evens the ragged lower edge left by the watermark
+keep.paste(edge.crop((0, 600, W, H)), (0, 600))
 frame.putalpha(keep)
 
 folder = PUB / "assets" / "expansion" / "boards"

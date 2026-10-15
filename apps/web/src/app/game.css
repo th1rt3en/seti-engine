@@ -2124,3 +2124,21 @@ button:disabled {
     transform: rotate(360deg);
   }
 }
+
+/* the translation board of the Glyphids: numbers of the rewards and of the scoring reminder */
+.glyphnum {
+  fill: #fff;
+  stroke: #10241a;
+  stroke-width: 4px;
+  paint-order: stroke;
+  font-weight: 800;
+  font-family: system-ui, sans-serif;
+}
+.glyphbar {
+  fill: #2a1d02;
+  font-weight: 800;
+  font-family: system-ui, sans-serif;
+}
+.glyphbar.slash {
+  fill: #6b4f12;
+}

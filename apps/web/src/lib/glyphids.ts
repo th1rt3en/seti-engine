@@ -19,14 +19,6 @@ export const GLYPH_HOLES: Record<"top" | "bottom", [number, number][]> = {
     [640, 440],
   ],
 };
-// the four arrangements: [top strip side, bottom strip side] -> the picture (a to d)
-const VARIANT: Record<string, string> = { "0,0": "a", "1,1": "b", "1,0": "c", "0,1": "d" };
-
-/** The picture of the translation board for the sides of the two strips. */
-export function trackPicture(sides: number[] | undefined): string | undefined {
-  return ASSET[`boards/glyphids-track-${VARIANT[(sides ?? [0, 0]).join(",")] ?? "a"}`];
-}
-
 /** The picture of a glyph token (the blue one is named "bue" in the assets). */
 export const glyphToken = (glyph: string): string | undefined => ASSET[`tokens/glyphids-token-${glyph === "blue" ? "bue" : glyph}`];
 
