@@ -145,7 +145,7 @@ export function BoardView({
 
   // the translation board of the Glyphids is attached above their board: the page makes room for it at the top
   const glyphSlot = s.species.findIndex((sp) => sp.discovered && sp.species === "glyphids");
-  const trackHeight = glyphSlot < 0 ? 0 : Math.ceil(trackBox(glyphSlot).h);
+  const trackHeight = glyphSlot < 0 ? 0 : Math.max(0, Math.ceil(ALIEN_TOP - trackBox(glyphSlot).y));
   return (
     <>
       <svg

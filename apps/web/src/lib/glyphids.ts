@@ -22,12 +22,17 @@ export const GLYPH_HOLES: Record<"top" | "bottom", [number, number][]> = {
 /** The picture of a glyph token (the blue one is named "bue" in the assets). */
 export const glyphToken = (glyph: string): string | undefined => ASSET[`tokens/glyphids-token-${glyph === "blue" ? "bue" : glyph}`];
 
-/** Where the translation board lies on the game board: above the Glyphids board in `slot`, as wide as the board. */
+/** The lower edge of the frame in the picture, and how far below the top of the species board that edge lies: the translation board overlaps the top
+ * of the species board and nearly touches its top token spaces (the topmost lie 655 px below the top of the board picture). */
+const TRACK_EDGE = 682;
+const TRACK_BOTTOM_AT = 575;
+
+/** Where the translation board lies on the game board: attached to the top of the Glyphids board in `slot`, as wide as the board. */
 export function trackBox(slot: number): { x: number; y: number; w: number; h: number; k: number } {
   const w = ALIEN.w * ALIEN.scale;
   const k = w / TRACK_PICTURE.w;
   const h = TRACK_PICTURE.h * k;
-  return { x: (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale, y: ALIEN_TOP - h, w, h, k };
+  return { x: (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale, y: ALIEN_TOP + TRACK_BOTTOM_AT - TRACK_EDGE * k, w, h, k };
 }
 
 /** A hole of the translation board on the game board. */
