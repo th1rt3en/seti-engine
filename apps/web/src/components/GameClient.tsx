@@ -385,7 +385,7 @@ export function GameClient({
           </div>
         </div>
       ) : null}
-      {mine.length > 0 && !ended ? (
+      {mine.length > 0 && !ended && !unsure ? ( // the "cannot be undone" question replaces the action prompt; Cancel brings the prompt back
         <div className="movegroups">
           {groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow").map((g) => (
             <MoveGroup key={g.title} title={g.title} count={g.moves.length} foldable={g.title === "Free actions"}>
@@ -761,6 +761,17 @@ export function GameClient({
               onClose={() => setBoardOpen(false)}
               choice={slotChoice}
               onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
+              lower={
+                ended
+                  ? undefined
+                  : {
+                      slots: mine.filter((m) => m.type === "place_lower").map((m) => Number(m.slot)),
+                      onPlace: (slot) => {
+                        const m = mine.find((x) => x.type === "place_lower" && x.slot === slot);
+                        if (m) play(m);
+                      },
+                    }
+              }
             />
           ) : null}
         </>

@@ -15,6 +15,24 @@ function Printed({ name, label, size }: { name: string; label: string; size: num
 const SIZE = 22;
 const PRINTED = assets.printedIcons as Record<string, string>;
 
+/** Movement: an arrow in a circle (the free movement of a card's corner). */
+export function MoveIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="movement" className="resicon">
+      <title>Movement</title>
+      <circle cx="12" cy="12" r="10.5" fill="#1f4f4a" stroke="#6fd3c8" strokeWidth="1.4" />
+      <path
+        d="M6 12h10M12.5 7.5 17 12l-4.5 4.5"
+        fill="none"
+        stroke="#e8fffb"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /** Income: the rising chart on its badge, cut from the printed player board. */
 export function IncomeIcon({ size = SIZE }: { size?: number }) {
   return <img src={PRINTED.income} alt="Income" title="Income" width={size} height={size} className="resicon" decoding="async" />;

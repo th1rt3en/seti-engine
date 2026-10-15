@@ -9,6 +9,7 @@ import {
   EnergyIcon,
   ExofossilIcon,
   IncomeIcon,
+  MoveIcon,
   PublicityIcon,
   RandomCardIcon,
   ScoreIcon,
@@ -30,6 +31,7 @@ const ICONS: Record<string, (size: number) => ReactNode> = {
   exofossil: (s) => <ExofossilIcon size={s} />,
   trace: (s) => <TraceIcon size={s} />,
   signal_token: (s) => <SignalTokenIcon size={s} />,
+  move: (s) => <MoveIcon size={s} />,
 };
 
 const NAMES: Record<string, string> = {
@@ -46,6 +48,7 @@ const NAMES: Record<string, string> = {
   exofossil: "exofossil",
   trace: "trace",
   signal_token: "signal token",
+  move: "movement",
 };
 
 /** One amount with its icon: "+2" with the globe, "−1" with a credit. `signed` shows a plus sign for a gain. */

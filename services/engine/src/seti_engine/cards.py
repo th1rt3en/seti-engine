@@ -196,6 +196,9 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
             s.pending.append(Decision(kind="row_pick", player=p.index))
     elif t == "refill_row":
         effects.refill_card_row(s)
+    elif t == "show_move":  # #74 Pre-launch Testing: the player shows cards from the hand, 1 movement for each with a movement corner
+        if _movement_cards(p, []):
+            s.pending.append(Decision(kind="show_move", player=p.index, data={"shown": []}))
     elif t == "hand_signals":
         if any(tables.cards()[c].get("sector") for c in p.hand):
             s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": n}))
@@ -716,6 +719,11 @@ def end_points(s: GameState, p: PlayerState) -> int:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
+def _movement_cards(p: PlayerState, shown: list[str]) -> list[str]:
+    """The cards of the hand that show a free-action movement corner and have not been shown yet by this effect."""
+    return [c for c in dict.fromkeys(p.hand) if c not in shown and any(k == "move" for k, _ in tables.cards()[c]["free"])]
+
+
 def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
     """Legal moves of the decisions that cards create, or None if `d` is not one of them."""
     p = s.players[d.player]
@@ -725,6 +733,8 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
         return [{"type": "gop", "probe": pr.id} for pr in s.probes if pr.id not in d.data["chosen"]] + [{"type": "gop_done"}]
     if d.kind == "row_pick":
         return [{"type": "row_pick", "source": f"row:{i}"} for i in range(len(s.card_row))]
+    if d.kind == "show_move":
+        return [*({"type": "show_move", "card": c} for c in _movement_cards(p, d.data["shown"])), {"type": "show_move_done"}]
     if d.kind == "hand_signal":
         picks = [{"type": "hand_signal", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
         return [*picks, {"type": "hand_signal_done"}]
@@ -786,6 +796,14 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         if d.data["left"] > 1:
             s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": d.data["left"] - 1}))
     elif t == "hand_signal_done":
+        pass
+    elif t == "show_move":  # the card stays in the hand; everybody sees it (the log names it) and the player gains 1 movement
+        p.movement += 1
+        events.append({"type": "show_card", "player": p.index, "card": a["card"]})
+        shown = [*d.data["shown"], a["card"]]
+        if _movement_cards(p, shown):
+            s.pending.insert(0, Decision(kind="show_move", player=p.index, data={"shown": shown}))
+    elif t == "show_move_done":
         pass
     elif t == "cover":
         cover(s, p, a["card"], a["circle"], events)

@@ -471,6 +471,8 @@ def _deltas(before: GameState, after: GameState) -> list[dict[str, Any]]:
             "card": len(new.hand) - len(old.hand),
         }
         changes = {k: v for k, v in changes.items() if v != 0}
+        if new.movement > old.movement:  # movement gained (a spent one is a move of a probe, which the log says itself)
+            changes["move"] = new.movement - old.movement
         if changes:
             out.append({"type": "delta", "player": new.index, "changes": changes})
     return out
