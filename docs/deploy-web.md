@@ -47,5 +47,7 @@ and end-of-game cards come from the engine's view (`view.trackers`), the turn co
 
 ## Deploying without a Linux machine (GitHub Actions)
 
-`.github/workflows/deploy-web.yml` builds the site on a Linux runner and deploys it. Add the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
-(GitHub, Settings, Secrets and variables, Actions), then run it from the Actions tab ("Deploy website", Run workflow). It is manual only.
+`.github/workflows/deploy.yml` ("Deploy") deploys the engine to Cloud Run, then the game Worker, then the website (built on a Linux runner), in that order.
+Run it from the Actions tab (Run workflow); the boxes choose which parts to deploy, all by default. Repository secrets: `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID`, and `GCP_SA_KEY` (the JSON key of a service account with Cloud Run Admin, Cloud Build Editor, Artifact Registry Writer,
+Storage Admin and Service Account User on the project). The Cloud Run environment variables and the Worker secrets stay where they are.
