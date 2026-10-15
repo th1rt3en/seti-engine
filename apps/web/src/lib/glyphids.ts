@@ -52,3 +52,53 @@ export const WELL_SLOTS: Record<string, Record<number, [number, number]>> = {
   yellow: { 0: [390, 580], 3: [390, 1150] },
   blue: { 0: [630, 515], 3: [630, 1085] },
 };
+
+export interface Reward {
+  t: string;
+  n: number;
+}
+// what each strip gives, by side (docs/spec/data/expansion-glyphids.json "translation")
+const TOP_REWARDS: Reward[][] = [
+  [
+    { t: "credit", n: 1 },
+    { t: "energy", n: 1 },
+    { t: "signal_token", n: 1 },
+  ],
+  [
+    { t: "energy", n: 1 },
+    { t: "signal_token", n: 1 },
+    { t: "credit", n: 1 },
+  ],
+];
+const BOTTOM_REWARDS: Reward[][] = [
+  [
+    { t: "data", n: 1 },
+    { t: "card_random", n: 1 },
+    { t: "vp", n: 3 },
+    { t: "publicity", n: 1 },
+  ],
+  [
+    { t: "card_random", n: 1 },
+    { t: "publicity", n: 1 },
+    { t: "data", n: 1 },
+    { t: "vp", n: 3 },
+  ],
+];
+
+/** The reward of a slot of the translation board for the sides of its two strips. */
+export function slotReward(sides: number[] | undefined, row: "top" | "bottom", index: number): Reward | undefined {
+  const side = (row === "top" ? sides?.[0] : sides?.[1]) ?? 0;
+  return (row === "top" ? TOP_REWARDS : BOTTOM_REWARDS)[side]?.[index];
+}
+
+/** What the icon of a glyph on a card gives now (EXP-GLY-06): the reward of the slot the glyph was placed in, or nothing while it has not been placed. */
+export function glyphIconReward(
+  extra: { sides?: number[]; top?: (string | null)[]; bottom?: (string | null)[] } | undefined,
+  glyph: string,
+): Reward | null {
+  for (const row of ["top", "bottom"] as const) {
+    const at = (extra?.[row] ?? []).indexOf(glyph);
+    if (at >= 0) return slotReward(extra?.sides, row, at) ?? null;
+  }
+  return null;
+}

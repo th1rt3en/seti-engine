@@ -18,7 +18,8 @@ import {
 import { loadConfig } from "@/lib/config";
 import { SqliteDb, migrationSql } from "@/lib/db";
 import { engineAuth } from "@/lib/engineAuth";
-import { LABELS, cardName, describeMove, groupMoves } from "@/lib/moves";
+import { glyphIconReward } from "@/lib/glyphids";
+import { LABELS, cardName, cornerGlyph, describeMove, groupMoves, handMoveText, irreversibleText } from "@/lib/moves";
 import { computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { createGame, gameMeta } from "@/lib/worker";
@@ -357,5 +358,28 @@ describe("profile statistics", () => {
 
   it("has no win rate without a game", () => {
     expect(computeStats([])).toMatchObject({ games: 0, winRate: null, avgScore: null, bestScore: null });
+  });
+});
+
+describe("the prompts of the hand", () => {
+  it("says what the free corner of a Glyphids card gives, or that it gives nothing", () => {
+    const m = { type: "discard_free", card: "GL.1" };
+    expect(cornerGlyph("GL.1")).toBe("orange");
+    expect(handMoveText(m, { reward: { t: "credit", n: 1 } })).toContain("the orange glyph gives 1 credit");
+    expect(handMoveText(m, { reward: null })).toContain("not on the translation board, so you gain nothing");
+    expect(cornerGlyph("1")).toBeNull();
+  });
+
+  it("finds the reward of a placed glyph from the sides of the strips", () => {
+    const extra = { sides: [0, 1], top: [null, "orange", null], bottom: ["red", null, null, null] };
+    expect(glyphIconReward(extra, "orange")).toEqual({ t: "energy", n: 1 }); // top side 0, second slot
+    expect(glyphIconReward(extra, "red")).toEqual({ t: "card_random", n: 1 }); // bottom side 1, first slot
+    expect(glyphIconReward(extra, "blue")).toBeNull();
+  });
+
+  it("asks about a move that cannot be undone in one short sentence", () => {
+    expect(irreversibleText({ type: "pass" })).toBe("Pass now? You will see the end-of-round cards.");
+    expect(irreversibleText({ type: "take_card", source: "deck" })).toBe("Draw from the deck? You will see the card.");
+    expect(irreversibleText({ type: "end_turn" }).length).toBeLessThan(60);
   });
 });

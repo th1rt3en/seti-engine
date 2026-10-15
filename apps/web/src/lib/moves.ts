@@ -5,7 +5,14 @@ import quickStart from "../generated/quick-start.json";
 
 export type Move = { type: string } & Record<string, unknown>;
 
-type CardInfo = { name: string; cost: number; income: string | null; sector: string | null; free?: [string, number][] };
+type CardInfo = {
+  name: string;
+  cost: number;
+  income: string | null;
+  sector: string | null;
+  species?: string | null;
+  free?: [string, number][];
+};
 const CARDS = cards as unknown as Record<string, CardInfo>;
 
 export function cardName(id: unknown): string {
@@ -211,21 +218,23 @@ export function groupMoves(moves: Move[], pending: boolean, answeringFree = fals
   return groups.filter((g) => g.moves.length > 0);
 }
 
-/** Why a move cannot be taken back, in words for the confirmation (the engine marks such moves `irreversible`, UNDO-01). */
+/** A short sentence for the question before a move that cannot be taken back: what the move does, and what it shows. */
 export function irreversibleText(m: Move): string {
   switch (m.type) {
     case "pass":
-      return "Passing shows you the end-of-round cards, so it cannot be undone.";
+      return "Pass now? You will see the end-of-round cards.";
     case "end_turn":
-      return "Ending the turn may reveal an alien species, so it cannot be undone.";
+      return "End your turn? A species may be revealed.";
     case "buy_card":
     case "exchange":
     case "take_card":
-      return "Taking a card shows a card from the deck (a card of the display is replaced from the deck), so this cannot be undone.";
+      return m.source === "deck" || m.get === "card"
+        ? "Draw from the deck? You will see the card."
+        : "Take this card? The display is refilled from the deck.";
     case "scan_done":
-      return "Finishing the scan refills the card row from the deck, so it cannot be undone.";
+      return "Finish the scan? The card row is refilled from the deck.";
     default:
-      return "This move shows something that is hidden (a card from the deck, a card, a tile or a species), so it cannot be undone.";
+      return `${describeMove(m)}? It shows something hidden.`;
   }
 }
 
@@ -261,8 +270,40 @@ const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" 
 const freeText = (free: [string, number][] | undefined): string =>
   free && free.length > 0 ? free.map(([k, n]) => `${n} ${k}`).join(", ") : "nothing";
 
-/** What the bar asks when the player has picked a card for this move. */
-export function handMoveText(m: Move): string {
+const REWARD_WORDS: Record<string, [string, string]> = {
+  credit: ["credit", "credits"],
+  energy: ["energy", "energy"],
+  data: ["data", "data"],
+  publicity: ["publicity", "publicity"],
+  vp: ["point", "points"],
+  card_random: ["random card", "random cards"],
+  signal_token: ["signal token", "signal tokens"],
+};
+
+/** "1 credit", "3 points": a reward in words. */
+export const rewardWords = (r: { t: string; n: number }): string => {
+  const w = REWARD_WORDS[r.t];
+  return `${r.n} ${w ? (r.n === 1 ? w[0] : w[1]) : r.t}`;
+};
+
+/** The facts of a card the buttons over it need: its cost and what it is paid with (the Centaurian cards cost energy, the others credits). */
+export const cardInfo = (id: unknown): { cost: number; pays_energy: boolean; income: string | null } | undefined => {
+  const c = CARDS[String(id)];
+  return c ? { cost: c.cost, pays_energy: c.species === "centaurians", income: c.income } : undefined;
+};
+
+/** The color of the sector a card marks a signal in ("any" for a card with no sector). */
+export const cardSector = (id: unknown): string => CARDS[String(id)]?.sector ?? "any";
+
+/** The glyph of the free corner of a card, if it has one (a Glyphids card: its corner is a glyph icon). */
+export const cornerGlyph = (id: unknown): string | null => {
+  const k = CARDS[String(id)]?.free?.[0]?.[0];
+  return typeof k === "string" && k.startsWith("glyph:") ? k.slice(6) : null;
+};
+
+/** What the bar asks when the player has picked a card for this move. `glyph` is what the glyph icon of a Glyphids card's corner gives now: the
+ * reward of its slot, or null while that glyph has not been placed on the translation board. */
+export function handMoveText(m: Move, glyph?: { reward: { t: string; n: number } | null }): string {
   const info = CARDS[String(m.card)];
   const name = cardTitle(m.type === "choose_org" ? m.org : m.card);
   const sector = info?.sector ?? "any";
@@ -273,8 +314,14 @@ export function handMoveText(m: Move): string {
       return info && info.cost > 0
         ? `Pay ${plural(info.cost, "credit")} to play ${name} as your main action?`
         : `Play ${name} as your main action? It costs nothing.`;
-    case "discard_free":
+    case "discard_free": {
+      const g = cornerGlyph(m.card);
+      if (g !== null && glyph !== undefined)
+        return glyph.reward
+          ? `Discard ${name} for its free action: the ${g} glyph gives ${rewardWords(glyph.reward)}?`
+          : `Discard ${name} for its free action? The ${g} glyph is not on the translation board, so you gain nothing.`;
       return `Discard ${name} for its free action (${freeText(info?.free)})?`;
+    }
     case "discard":
       return `Discard ${name}?`;
     case "scan_hand_discard":

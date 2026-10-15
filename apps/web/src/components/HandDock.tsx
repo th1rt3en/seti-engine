@@ -6,6 +6,7 @@ import { useBottomSpace, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
+import { type CardAction, CardActions } from "./CardActions";
 import { CardImage } from "./CardImage";
 import { MascamiteTab } from "./Mascamites";
 import { MissionCard } from "./MissionsPanel";
@@ -15,6 +16,8 @@ export interface HandSelection {
   selectable: string[];
   selected: number[];
   onSelect: (index: number) => void;
+  /** What can be done with the card that is picked, when it is the only one: buttons laid over it. */
+  actions?: CardAction[];
   /** Cards that are offered to the player to keep one of (the end-of-round cards after passing): they lie with the hand for the moment. */
   offered?: string[];
   offeredSelected?: string | null;
@@ -129,16 +132,18 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 );
               }
               return (
-                <button
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the same card can be in hand twice
-                  key={`${c}-${i}`}
-                  type="button"
-                  className={picked ? "cardbtn selectable selected" : "cardbtn selectable"}
-                  aria-pressed={picked}
-                  onClick={() => selection.onSelect(i)}
-                >
-                  <CardImage id={c} size="hand" />
-                </button>
+                // biome-ignore lint/suspicious/noArrayIndexKey: the same card can be in hand twice
+                <span key={`${c}-${i}`} className="cardwrap">
+                  <button
+                    type="button"
+                    className={picked ? "cardbtn selectable selected" : "cardbtn selectable"}
+                    aria-pressed={picked}
+                    onClick={() => selection.onSelect(i)}
+                  >
+                    <CardImage id={c} size="hand" />
+                  </button>
+                  {picked && selection.selected.length === 1 && selection.actions ? <CardActions actions={selection.actions} /> : null}
+                </span>
               );
             })}
             {wanted ? (
