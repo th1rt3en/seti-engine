@@ -35,7 +35,7 @@ Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule
 | A-028 | Effects of the 42 expansion main-deck cards | resolved |
 | A-029 | Alien cards that give signal tokens and the other new icons | resolved |
 | A-030 | Which organizations are numbered 1 to 4 | resolved |
-| A-031 | Organization income at the start of rounds 3, 4 and 5 versus the base income rules | proposed (in use, to confirm) |
+| A-031 | Organization income at the start of rounds 3, 4 and 5 versus the base income rules | ruled |
 | A-032 | Boards, tokens and cards of Arkhos, Glyphids and Amoeba | resolved |
 | A-033 | The extra rival starting card and the four rival action cards of the expansion | ruled |
 | A-034 | The three long-term objective tiles and the advance symbol | ruled |
@@ -314,7 +314,7 @@ Entry format:
 - Resolution: the numbers are printed in the bottom left corner of the cards (R16 p.2): 1 Orbital Dynamics, 2 Fenwick Research Center, 3 Stratus Core, 4 Deep Sky Survey, 5 Turing Systems, 6 Cosmos Strategy Group, 7 Sentinel Probe Network, 8 Mission Relay, 9 Xenolab, 10 Futurespan Institute, 11 Helion Assembly. The first-game option (EXP-ORG-05) uses 1 to 4.
 
 ## A-031: Organization income at the start of rounds 3, 4 and 5 versus the base income rules
-- Status: proposed
+- Status: ruled (owner, 2026-10-15): accepted, reading 1
 - Rule IDs affected: EXP-ORG-08, ROUND-02, INCOME-01 to INCOME-04
 - Rulebook page and text: R16 p.5: "Do not resolve income at game start. You will resolve your income at the start of rounds 3, 4 and 5." Base rulebook p.19: income is resolved at the end of each round (also by tucked cards, INCOME-01).
 - Readings: (1) the organization income replaces the printed income card (3 credits, 2 energy, 1 card in the base game), and the tucked cards add their resource as in INCOME-03; it is resolved once per round at the points of the base game's income, which are the starts of rounds 3, 4 and 5 (no income after round 5 and none before round 2). (2) the income of the organization is given in addition to the base income card.
