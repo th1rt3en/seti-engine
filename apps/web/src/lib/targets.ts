@@ -13,6 +13,7 @@ import {
   RING_BOUNDS,
   RING_RADIUS,
   alienColumn,
+  orbitSlot,
   polar,
   sectorDegrees,
 } from "./geometry";
@@ -129,11 +130,8 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const at = MOON[moonKey(n.moon)];
         if (at) spot = { id: `moon:${n.moon}`, shape: { kind: "circle", x: at.x, y: at.y + 20, r: 78 } };
       } else if (n.action === "orbit") {
-        const k = st.orbiters.length;
-        spot = {
-          id: `orbit:${n.planet}`,
-          shape: { kind: "circle", x: pos.x - pos.r * 0.55 + k * 84, y: pos.y - pos.r * 0.32 + 10, r: 76 },
-        };
+        const at = orbitSlot(n.planet, st.orbiters.length) ?? { x: pos.x, y: pos.y };
+        spot = { id: `orbit:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y + 10, r: 62 } };
       } else {
         const k = st.landers.length;
         spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: pos.x - pos.r * 0.55 + k * 84, y: pos.y + pos.r * 0.22 + 20, r: 76 } };

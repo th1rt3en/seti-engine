@@ -73,6 +73,34 @@ export const PLANET: Record<string, { x: number; y: number; r: number }> = {
   neptune: { x: 3058, y: 1543, r: 168 },
 };
 
+/**
+ * The orbit of each planet: a green guide line starts at the bonus space of the first orbiter (upper left of the planet) and runs clockwise over the
+ * planet. `bonus` is where the bonus space lies, measured from the planet's centre in planet radii (read from the picture of the board). The
+ * orbiters lie on the circle through it around the planet, the first one covering the bonus space.
+ */
+export const ORBIT_BONUS: Record<string, [number, number]> = {
+  mercury: [-1.0, -1.11],
+  venus: [-0.88, -0.89],
+  mars: [-0.93, -0.97],
+  jupiter: [-0.84, -0.85],
+  saturn: [-0.83, -1.04],
+  uranus: [-0.83, -1.05],
+  neptune: [-0.96, -0.9],
+};
+export const ORBIT_SPACING = 96; // between two orbiters along the ring, in board pixels
+
+/** Where the `k`-th orbiter (0 is the first, on the bonus space) of a planet lies. */
+export function orbitSlot(planet: string, k: number): { x: number; y: number } | null {
+  const pos = PLANET[planet];
+  const bonus = ORBIT_BONUS[planet];
+  if (!pos || !bonus) return null;
+  const dx = bonus[0] * pos.r;
+  const dy = bonus[1] * pos.r;
+  const radius = Math.hypot(dx, dy);
+  const angle = Math.atan2(dy, dx) + (k * ORBIT_SPACING) / radius; // clockwise on the screen: over the top of the planet
+  return { x: pos.x + radius * Math.cos(angle), y: pos.y + radius * Math.sin(angle) };
+}
+
 /** The moons, by the lower-case first word of their name in the engine's data. */
 export const MOON: Record<string, { x: number; y: number }> = {
   io: { x: 1871, y: 735 },

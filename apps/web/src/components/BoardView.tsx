@@ -30,6 +30,7 @@ import {
   STAR_BOARD_HOME,
   alienColumn,
   goldPlace,
+  orbitSlot,
   polar,
   scoreDegrees,
   sectorDegrees,
@@ -512,16 +513,20 @@ export function BoardView({
                   <image href={SAMPLES.back} x={-38} y={-38} width={76} height={76} />
                 </g>
               ))}
-              {st.orbiters.map((player, k) => (
-                <g
-                  // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
-                  key={`o${k}`}
-                  transform={`translate(${pos.x - pos.r * 0.55 + k * 84} ${pos.y - pos.r * 0.32})`}
-                >
-                  <ellipse cy={10} rx={74} ry={26} fill="none" stroke="#fff" strokeWidth={7} opacity={0.95} />
-                  <Figure x={0} y={0} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
-                </g>
-              ))}
+              {/* the orbiters lie on the ring around the planet, the first on the bonus space */}
+              {st.orbiters.map((player, k) => {
+                const at = orbitSlot(name, k) ?? { x: pos.x, y: pos.y };
+                return (
+                  <g
+                    // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
+                    key={`o${k}`}
+                    transform={`translate(${at.x} ${at.y})`}
+                  >
+                    <ellipse cy={10} rx={54} ry={20} fill="none" stroke="#fff" strokeWidth={6} opacity={0.95} />
+                    <Figure x={0} y={0} color={color(player)} title={`${who(player)}: orbiter at ${name}`} />
+                  </g>
+                );
+              })}
               {st.landers.map((player, k) => (
                 <g
                   // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
