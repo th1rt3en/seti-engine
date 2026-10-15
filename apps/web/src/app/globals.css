@@ -647,3 +647,9 @@ table.history tr:hover td {
 table.history .pill {
   margin-left: 6px;
 }
+
+/* a small form inside a table cell (the resign button on the profile) */
+form.inline {
+  display: inline;
+  margin-left: 8px;
+}

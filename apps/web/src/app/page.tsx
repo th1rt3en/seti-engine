@@ -43,7 +43,7 @@ export default async function Home() {
     <>
       <section className="hero">
         <p className="eyebrow">Search for Extraterrestrial Intelligence</p>
-        <h1>SETI, online</h1>
+        <h1>SETI online</h1>
         <p className="lead">
           A fan-made, non-commercial version of the board game SETI for one to four players. Launch probes, scan the sky, and be the first
           to find life.

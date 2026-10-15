@@ -1,8 +1,10 @@
 import { RatingChart } from "@/components/RatingChart";
 import { getDb } from "@/lib/db";
 import { profile } from "@/lib/queries";
+import { currentUser } from "@/lib/session";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { resignSoloAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,8 @@ export default async function Player({ params }: { params: Promise<{ id: string 
   const p = await profile(getDb(), id);
   if (p === null) notFound();
   const data = p as NonNullable<typeof p>;
+  const viewer = await currentUser();
+  const own = viewer !== null && viewer.id === id; // the owner of the profile can resign their solo games from it
   const { stats } = data;
   const last = data.history[0];
   const change = last ? last.rating_after - last.rating_before : null;
@@ -132,7 +136,17 @@ export default async function Player({ params }: { params: Promise<{ id: string 
                   </td>
                   <td>
                     {g.status !== "finished" ? (
-                      "in progress"
+                      <>
+                        in progress
+                        {own && o.players === 1 ? (
+                          <form action={resignSoloAction} className="inline">
+                            <input type="hidden" name="id" value={g.id} />
+                            <button type="submit" className="secondary small" title="End this solo game now (it counts as resigned)">
+                              Resign
+                            </button>
+                          </form>
+                        ) : null}
+                      </>
                     ) : (
                       <>
                         {g.rank === 1 ? <span className="pill win">won</span> : <span className="pill">rank {g.rank ?? "?"}</span>}
