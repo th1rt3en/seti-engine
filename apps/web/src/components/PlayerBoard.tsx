@@ -20,7 +20,10 @@ const SLOT_POSITIONS = [0, 2, 4, 5];
 /** The picture is the colorful panel of the printed board; the page adds a header with the income above it and the missions below it. */
 const HEAD = 96;
 /** The six computer spaces on the picture of the board (the centre of each, all in one row). */
-const SPACE = { x: [348, 427, 503, 576, 657, 743], y: HEAD + 225 };
+const SPACE = { x: [345, 423, 503, 576, 658, 743], y: HEAD + 225 };
+/** The diameter of each computer space on the picture: the spaces of the publicity and the income icons (2nd and 4th) are smaller. The data token and the
+ * highlight of the free action "place data" are drawn to fit them, centred on the space. */
+const SPACE_DIAMETER = [40, 32, 40, 32, 40, 40];
 const TILE = { w: 84, h: 118 };
 /** The columns of the probe and telescope techs on the picture, by glyph (dot, link, branch, cross). */
 const TECH_X: Record<"probe" | "telescope", number[]> = { probe: [108, 192, 343, 432], telescope: [628, 782, 866, 955] };
@@ -179,9 +182,19 @@ function Board({
           >
             {clickable ? <title>Place 1 data from your pool here (free action)</title> : null}
             {clickable ? (
-              <circle cx={x} cy={SPACE.y} r={40} fill="rgba(255,209,102,0.2)" stroke="#ffd166" strokeWidth={6} strokeDasharray="10 6" />
+              <circle
+                cx={x}
+                cy={SPACE.y}
+                r={(SPACE_DIAMETER[i] ?? 40) / 2 + 3}
+                fill="rgba(255,209,102,0.2)"
+                stroke="#ffd166"
+                strokeWidth={4}
+                strokeDasharray="8 5"
+              />
             ) : null}
-            {p.computer[i] ? <DataToken x={x} y={SPACE.y} size={56} title={`Data on space ${i + 1}`} /> : null}
+            {p.computer[i] ? (
+              <DataToken x={x} y={SPACE.y} size={(SPACE_DIAMETER[i] ?? 40) / 0.88} title={`Data on space ${i + 1}`} />
+            ) : null}
           </g>
         );
       })}
