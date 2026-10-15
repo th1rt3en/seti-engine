@@ -2,6 +2,62 @@
 
 Agents add entries here and stop work on the affected rule (CLAUDE.md, hard rule 3). The owner rules, and the ruling is copied into the spec with its rule ID.
 
+## Overview (kept up to date by hand; the entries below hold the details)
+
+| ID | Title | Status |
+|---|---|---|
+| A-001 | Promo cards SE EN 01 and SE EN 02 | ruled |
+| A-002 | Rival probe placement when neither first space is available | ruled |
+| A-003 | End-of-round cards | ruled |
+| A-004 | Deal order at setup | ruled |
+| A-005 | Completed sectors versus later free actions | ruled |
+| A-006 | Income after passing | ruled |
+| A-007 | Disc geometry and pushed probes | ruled |
+| A-008 | Neutral milestone placement | ruled |
+| A-009 | Nonplayer markers used per milestone crossing | ruled |
+| A-010 | Which cards are the advanced rival cards | ruled |
+| A-012 | Rival runs out of advanced cards | ruled |
+| A-013 | Tucking a card with no cards in hand | ruled |
+| A-014 | Rival and Mascamite samples or anomalies | ruled |
+| A-015 | Unused movement at the end of a turn | ruled |
+| A-016 | Landing on a moon, first-lander data and planet landers | ruled |
+| A-017 | Counting traces by kind, and "spaces from Earth" | ruled |
+| A-018 | Cards that remove an orbiter or lander (#15, #84) | ruled |
+| A-019 | A mission card and its own effect | ruled |
+| A-020 | Where discarded alien cards go | ruled |
+| A-021 | Data taken from the 'Oumuamua tile | ruled |
+| A-022 | Overflow markers on the "Other" gold tile, side A | ruled |
+| A-023 | What happens to the rival's action cards between rounds | ruled |
+| A-024 | Details of the rival's choices | ruled |
+| A-025 | The rival has no income and no starting cards | ruled |
+| A-026 | May the card row wait until the end of the turn to be refilled (so that a trade for a display card can be taken back)? | ruled |
+| A-027 | Which cards mention Mars in their flavor text (SE EN 02) | proposed (in use, to confirm) |
+| A-028 | Effects of the 42 expansion main-deck cards | data supplied, to confirm |
+| A-029 | Alien cards that give signal tokens and the other new icons | resolved |
+| A-030 | Which organizations are numbered 1 to 4 | resolved |
+| A-031 | Organization income at the start of rounds 3, 4 and 5 versus the base income rules | proposed (in use, to confirm) |
+| A-032 | Boards, tokens and cards of Arkhos, Glyphids and Amoeba | data supplied, to confirm |
+| A-033 | The extra rival starting card and the four rival action cards of the expansion | data supplied, to confirm |
+| A-034 | The three long-term objective tiles and the advance symbol | data supplied, to confirm |
+| A-035 | The promo card "Space Agencies" that remembers a previous game | open |
+| A-036 | Details of the neutral quick start marks and of preparing a card at Futurespan | proposed (in use, to confirm) |
+| A-037 | Xenolab tiles and traces | proposed (in use, to confirm) |
+| A-038 | Rewards of the reward spaces of Cosmos Strategy Group and Helion Assembly | proposed (in use, to confirm) |
+| A-039 | Orbital Dynamics' once-per-round free action | proposed (in use, to confirm) |
+| A-040 | Arkhos board and security cards (picture readings) | proposed (in use, to confirm) |
+| A-041 | Is breaching a choice? | proposed (in use, to confirm) |
+| A-042 | Arkhos exploration cards (picture readings) | proposed (in use, to confirm) |
+| A-043 | Number of glyph tokens of each kind | proposed (in use, to confirm) |
+| A-044 | Translation board strips and the top row dependency | proposed (in use, to confirm) |
+| A-045 | Glyphids cards | proposed (in use, to confirm) |
+| A-046 | Glyphids board wells | proposed (in use, to confirm) |
+| A-047 | Order of the organelle moves | proposed (in use, to confirm) |
+| A-048 | Amoeba board readings | proposed (in use, to confirm) |
+| A-049 | Amoeba cards ET.14 and ET.20 | open |
+| A-050 | Readings of the 42 main-deck cards | proposed (in use, to confirm) |
+| A-051 | Helion Assembly's free action | proposed (in use, to confirm) |
+| A-052 | Futurespan token distance for other costs | proposed (in use, to confirm) |
+
 Entry format:
 
 ```
@@ -233,7 +289,7 @@ Entry format:
 - Questions for the owner: is this list right (a missed card means a missed trigger)?
 
 ## A-028: Effects of the 42 expansion main-deck cards
-- Status: open (missing data)
+- Status: data supplied 2026-10-15 (the owner's zips); implemented; the readings still to confirm are A-050. The proposed ruling below is obsolete: the 42 cards are in the deck whenever `expansion` is on.
 - Rule IDs affected: EXP-03
 - Rulebook page and text: R16 "Using this expansion": shuffle the 42 new cards into the main deck. The rulebook does not list the cards.
 - Readings: the effects are printed on the cards (pictures). The repository's extraction has the effects of 16 of the 42 (`effectsRaw`) and fragments of the text for 33; most main actions (launch, land, rotate, tech icons) and many rewards exist only in the pictures. The card pictures are not in the repository (`docs/asset-gaps.md` item 2).
@@ -242,7 +298,7 @@ Entry format:
 - Questions for the owner: please supply the 42 card pictures (the repo's `assets/` source folder had the English sheets for the base game; the expansion sheets are missing), or confirm another source.
 
 ## A-029: Alien cards that give signal tokens and the other new icons
-- Status: open (missing data)
+- Status: resolved 2026-10-15: the pink rounded square is the signal token (the owner's icon glossary, `/tmp` transcription v2); every card that uses it is implemented (A-045, A-049, A-050 hold the remaining readings).
 - Rule IDs affected: EXP-SIG-01, EXP-03
 - Rulebook page and text: R16 p.8: "It can be found on some of the new cards and alien species."
 - Readings: n/a (data).
@@ -265,7 +321,7 @@ Entry format:
 - Questions for the owner: confirm.
 
 ## A-032: Boards, tokens and cards of Arkhos, Glyphids and Amoeba
-- Status: open (missing data)
+- Status: data supplied 2026-10-15; implemented. Readings to confirm: A-040 to A-049 (A-049: Amoeba ET.20 is still open because one icon is not identified). The proposed ruling below is obsolete.
 - Rule IDs affected: EXP-ARK-*, EXP-GLY-*, EXP-AMO-*
 - Rulebook page and text: A14 describes the rules of the three species; the boards (the rewards of every space, the overflow spaces, the translation board and its strips, the organelle spaces and their directions), the 10 + 10 species cards, the 9 exploration cards, the 12 security cards and the 35 glyph tokens are pictures that the repository does not hold (the alien-aid pictures show the boards at a size that is too small to read every reward with certainty).
 - Readings: n/a.
@@ -274,14 +330,14 @@ Entry format:
 - Questions for the owner: please supply the pictures of the three boards (and the translation strips), the species cards, the exploration and security cards and the glyph tokens.
 
 ## A-033: The extra rival starting card and the four rival action cards of the expansion
-- Status: open (missing data)
+- Status: data supplied 2026-10-15 (the four cards are transcribed: S.1 wild trace and advances per star; S.2 Glyphids, S.3 Arkhos, S.4 Amoeba); solo with the expansion is NOT implemented yet. Open readings: the order of the chevrons on S.2 (moon, lander, orbiter as a priority or as options), the unlabelled multicolor triangle on S.3, and the ids (S.1 to S.4 clash with the base cards, so the expansion cards need another prefix). Waiting for the owner to confirm those readings.
 - Rule IDs affected: EXP-SOLO-02
 - Rulebook page and text: R16 p.6 shows the new starting card (the picture reads "Then [1 advance] for each [gold star] of your difficulty level" next to a species-board icon). The rest of the card (its main action) is not legible, and the other three rival action cards are not shown.
 - Consequence: solo with the expansion.
 - Proposed ruling: implement when the card pictures are supplied.
 
 ## A-034: The three long-term objective tiles and the advance symbol
-- Status: open (missing data)
+- Status: data supplied 2026-10-15; not implemented. Readings (second transcription): tile 1 asks for a life trace of any color, three times; tile 2 for a tuck for income, three times; tile 3 for a probe tech, a telescope tech and a computer tech, one task each; the rival advances 1 step for each uncompleted task at the end of rounds 2, 3 and 4 (the tabs 2, 3 and 4 on the tiles read as those rounds). Waiting for the owner to confirm the tasks, the number of advances and the meaning of the tabs.
 - Rule IDs affected: EXP-SOLO-04, EXP-SOLO-06, EXP-SOLO-07
 - Rulebook page and text: R16 p.6-7 show the three tiles (each with three tasks) and the text "the rival gets [advance symbol] for each uncompleted task": the number printed with the symbol is not readable in the extracted text.
 - Consequence: the penalty at the end of rounds 2, 3 and 4 and the fallback of EXP-SOLO-07 (how many advances).
@@ -289,7 +345,7 @@ Entry format:
 - Questions for the owner: how many spaces does the rival advance for each uncompleted long-term task, and what are the tasks of the three tiles?
 
 ## A-035: The promo card "Space Agencies" that remembers a previous game
-- Status: open
+- Status: open (the picture is supplied: SE EN 03 launches a probe and gives a signal token; only the memory between games needs the owner's choice of reading; the card is not implemented)
 - Rule IDs affected: EXP-PROMO-01
 - Rulebook page and text: P3: the effect transfers to the next game with organizations: one extra quick start card is dealt, the player still chooses 2.
 - Readings: (1) not implemented (the engine and the website keep nothing between games); (2) a lobby option "dealt one extra quick start card" chosen per player at the start; (3) a flag on the account.

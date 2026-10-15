@@ -12,7 +12,7 @@ import json
 import pathlib
 import sys
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "apps" / "web" / "public" / "assets" / "expansion"
@@ -107,6 +107,18 @@ def main(folders: list[pathlib.Path]) -> None:
             cell = sheet.crop((c * cw, r * ch, (c + 1) * cw, (r + 1) * ch))
             manifest[f"{prefix}-{k:02d}"] = save(cell, folder, f"{prefix}-{k:02d}", width)
         prov.append(f"| `{fname}` | `apps/web/public/assets/expansion/{folder}/{prefix}-NN.<hash>.webp` ({used} cells) |")
+    # the data icon (a blue diamond with binary digits) is not among the supplied icons: it is cut from the line "Don't gain any (data) from them" of
+    # the main-deck card Pandora Satellite (tile 37 of the sheet), the white around the diamond made transparent
+    main = Image.open(find(folders, "space-agencies-main-deck-cards.jpg")).convert("RGB")
+    r_, c_ = divmod(37, 10)
+    tile = main.crop((c_ * 744, r_ * 1040, (c_ + 1) * 744, (r_ + 1) * 1040)).crop((350, 782, 428, 860))
+    mask = Image.new("L", tile.size, 0)
+    cx, cy, half = 38.0, 38.5, 31.5
+    ImageDraw.Draw(mask).polygon([(cx, cy - half), (cx + half, cy), (cx, cy + half), (cx - half, cy)], fill=255)
+    icon = tile.convert("RGBA")
+    icon.putalpha(mask.filter(ImageFilter.GaussianBlur(0.7)))
+    manifest["tokens/icon-data"] = save(icon.crop((4, 4, 73, 74)), "tokens", "icon-data", None, 90)
+    prov.append(f"| `space-agencies-main-deck-cards.jpg` (Pandora Satellite, the data icon in its text) | `{manifest['tokens/icon-data']}` |")
     for fname, (folder, name, width) in SINGLES.items():
         manifest[f"{folder}/{name}"] = save(Image.open(find(folders, fname)).convert("RGB"), folder, name, width)
         prov.append(f"| `{fname}` | `{manifest[f'{folder}/{name}']}` |")

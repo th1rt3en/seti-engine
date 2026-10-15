@@ -69,14 +69,7 @@ export function PublicityIcon({ size = SIZE }: { size?: number }) {
 
 /** A data token: the blue glossy disc. */
 export function DataIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="data" className="resicon">
-      <title>Data</title>
-      <circle cx="12" cy="12" r="10.5" fill="#2f7be0" stroke="#173f7a" strokeWidth="1.5" />
-      <circle cx="12" cy="12" r="7.5" fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="1.2" />
-      <path d="M7 9.5h10M7 12.5h6M7 15.5h8" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
+  return <Printed name="data" label="Data" size={size} />;
 }
 
 /** A card of an alien species: the alien head on a teal hexagon. */
