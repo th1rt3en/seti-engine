@@ -249,6 +249,9 @@ export function GameClient({
   const buys = mine.filter((m) => m.type === "buy_card");
   // taking a card, and discarding a card of the display for a signal, are made by clicking the card of the display (or the deck) too
   const ROW_MOVES = ["buy_card", "take_card", "row_pick", "scan_discard", "scan_token"];
+  // the cards that are offered to keep one of (end-of-round cards, organizations, quick start cards)
+  const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
+  const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
   const rowMoves = mine.filter((m) => ROW_MOVES.includes(m.type) && m.source !== undefined);
   // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
   const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
@@ -297,8 +300,6 @@ export function GameClient({
   const spotMove = spotOption === undefined ? undefined : mine[spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
-  const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
-  const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
   const offers = [...new Set(mine.filter(isOffer).map(offerId))];
   const offerMove = pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && offerId(m) === pickedOffer);
   // a tech for the computer goes in a slot picked on the player board
