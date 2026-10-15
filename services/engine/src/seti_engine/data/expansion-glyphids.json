@@ -1,0 +1,347 @@
+{
+ "board": {
+  "columns": [
+   {
+    "color": "pink",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 1,
+        "t": "glyph_space"
+       }
+      ],
+      "well": "top"
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "glyph_space"
+       }
+      ],
+      "well": "low"
+     }
+    ]
+   },
+   {
+    "color": "yellow",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 1,
+        "t": "glyph_space"
+       }
+      ],
+      "well": "top"
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "glyph_space"
+       }
+      ],
+      "well": "low"
+     }
+    ]
+   },
+   {
+    "color": "blue",
+    "spaces": [
+     {
+      "rewards": [
+       {
+        "n": 1,
+        "t": "glyph_space"
+       }
+      ],
+      "well": "top"
+     },
+     {
+      "rewards": [
+       {
+        "n": 2,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 3,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "alien_card"
+       }
+      ]
+     },
+     {
+      "rewards": [
+       {
+        "n": 7,
+        "t": "vp"
+       },
+       {
+        "n": 1,
+        "t": "glyph_space"
+       }
+      ],
+      "well": "low"
+     }
+    ]
+   }
+  ],
+  "title": "Glyphids"
+ },
+ "cards": [
+  {
+   "corner": "orange",
+   "cost": 1,
+   "id": "GL.1",
+   "income": "card",
+   "printed": "ET.1",
+   "sector": "black"
+  },
+  {
+   "corner": "orange",
+   "cost": 1,
+   "id": "GL.2",
+   "income": "energy",
+   "printed": "ET.2",
+   "sector": "blue"
+  },
+  {
+   "corner": "cyan",
+   "cost": 0,
+   "id": "GL.3",
+   "income": "credit",
+   "printed": "ET.3",
+   "sector": "yellow"
+  },
+  {
+   "corner": "black",
+   "cost": 0,
+   "id": "GL.4",
+   "income": "card",
+   "printed": "ET.4",
+   "sector": "red"
+  },
+  {
+   "corner": "black",
+   "cost": 1,
+   "id": "GL.5",
+   "income": "energy",
+   "printed": "ET.5",
+   "sector": "yellow"
+  },
+  {
+   "corner": "pink",
+   "cost": 1,
+   "id": "GL.6",
+   "income": "credit",
+   "printed": "ET.6",
+   "sector": "red"
+  },
+  {
+   "corner": "blue",
+   "cost": 1,
+   "id": "GL.7",
+   "income": "card",
+   "printed": "ET.7",
+   "sector": "red"
+  },
+  {
+   "corner": "yellow",
+   "cost": 1,
+   "id": "GL.8",
+   "income": "energy",
+   "printed": "ET.8",
+   "sector": "blue"
+  },
+  {
+   "corner": "cyan",
+   "cost": 1,
+   "id": "GL.9",
+   "income": "credit",
+   "printed": "ET.9",
+   "sector": "yellow"
+  },
+  {
+   "corner": "red",
+   "cost": 2,
+   "id": "GL.10",
+   "income": "card",
+   "printed": "ET.10",
+   "sector": "blue"
+  }
+ ],
+ "glyphs": [
+  "black",
+  "blue",
+  "cyan",
+  "orange",
+  "pink",
+  "red",
+  "yellow"
+ ],
+ "set_points": [
+  0,
+  1,
+  3,
+  5,
+  8,
+  11,
+  15,
+  20
+ ],
+ "source": "docs/spec/data/expansion-transcription.json (a transcription of the pictures, owner check pending; ambiguities A-043 to A-046)",
+ "tokens_per_glyph": 5,
+ "translation": {
+  "bottom": [
+   [
+    {
+     "n": 1,
+     "t": "data"
+    },
+    {
+     "n": 1,
+     "t": "card_random"
+    },
+    {
+     "n": 3,
+     "t": "vp"
+    },
+    {
+     "n": 1,
+     "t": "publicity"
+    }
+   ],
+   [
+    {
+     "n": 1,
+     "t": "card_random"
+    },
+    {
+     "n": 1,
+     "t": "publicity"
+    },
+    {
+     "n": 1,
+     "t": "data"
+    },
+    {
+     "n": 3,
+     "t": "vp"
+    }
+   ]
+  ],
+  "needs": {
+   "0": [
+    0,
+    1
+   ],
+   "1": [
+    1,
+    2
+   ],
+   "2": [
+    2,
+    3
+   ]
+  },
+  "top": [
+   [
+    {
+     "n": 1,
+     "t": "credit"
+    },
+    {
+     "n": 1,
+     "t": "energy"
+    },
+    {
+     "n": 1,
+     "t": "signal_token"
+    }
+   ],
+   [
+    {
+     "n": 1,
+     "t": "energy"
+    },
+    {
+     "n": 1,
+     "t": "signal_token"
+    },
+    {
+     "n": 1,
+     "t": "credit"
+    }
+   ]
+  ]
+ }
+}

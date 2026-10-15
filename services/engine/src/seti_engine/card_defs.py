@@ -443,5 +443,27 @@ ALIEN_CARDS: dict[str, dict[str, Any]] = {
     "ET.40": {"fx": [*message(), R("sig_twice", 2)], "green": [R("tuck_self")]},
 }
 CARDS.update(ALIEN_CARDS)
+
+
+def _GL(glyph: str) -> Step:  # noqa: N802 - EXP-GLY-06
+    return R("glyph_resource", glyph=glyph)
+
+
+CARDS.update(
+    {
+        # Glyphids: a mission whose circles give the resource of a glyph once it is deciphered (EXP-GLY-06); the cards that offer a choice
+        # between glyph groups, the end-of-game cards and the conversion card wait for the owner's check of the pictures (A-045)
+        "GL.3": {"mission": trig(*(circle({"e": "orbit_or_land"}, _GL(g)) for g in ("yellow", "black", "blue")))},
+        "GL.4": {
+            "mission": trig(
+                circle({"e": "tech", "cat": "probe"}, _GL("yellow")),
+                circle({"e": "tech", "cat": "telescope"}, _GL("orange")),
+                circle({"e": "tech", "cat": "computer"}, _GL("red")),
+            )
+        },
+        "GL.6": {"fx": [pub(1), data(1)], "mission": trig(circle({"e": "launch"}, _GL("orange")), circle({"e": "launch"}, _GL("cyan")))},
+        "GL.7": {"fx": [rnd(1)], "mission": trig(*(circle({"e": "trace", "kind": ANY}, _GL(g)) for g in ("red", "black", "pink")))},
+    }
+)
 for _sc in ("AK.21", "AK.22", "AK.23", "AK.24", "AK.25", "AK.26", "AK.27", "AK.28", "AK.29", "AK.30", "AK.31", "AK.32"):
     CARDS[_sc] = {"fx": [R("explore", level="major")]}  # EXP-ARK-07: played as a main action, a security card gives a major reward

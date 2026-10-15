@@ -15,7 +15,23 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from . import alien_steps, arkhos, cards, effects, objectives, orgs, rewards, rival, sandbox, scoring, solar, species, tables, techs
+from . import (
+    alien_steps,
+    arkhos,
+    cards,
+    effects,
+    glyphids,
+    objectives,
+    orgs,
+    rewards,
+    rival,
+    sandbox,
+    scoring,
+    solar,
+    species,
+    tables,
+    techs,
+)
 from .models import Decision, GameState, Options, PlayerState, Probe
 from .setup import new_game
 
@@ -245,6 +261,7 @@ def _free_moves(state: GameState, p: PlayerState) -> list[Action]:
     out += techs.lower_moves(p)  # TECH-21
     out += cards.mission_moves(state, p)  # FREE-07
     out += orgs.free_moves(state, p)  # EXP-ORG-10
+    out += glyphids.decipher_moves(state, p)  # EXP-GLY-05
     return out
 
 
@@ -326,6 +343,7 @@ FREE_TYPES = frozenset(
         "complete_mission",
         "deliver_sample",
         "org_free",
+        "decipher",
     }
 )  # the free actions (FREE-01 to FREE-07, TECH-21)
 # moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
@@ -540,6 +558,8 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         _place_data(s, p, events)
     elif t == "org_free":
         orgs.free_action(s, p, a, events)  # EXP-ORG-10
+    elif t == "decipher":
+        glyphids.decipher(s, p, a, events)  # EXP-GLY-05
 
 
 def _org_main(s: GameState, p: PlayerState, a: Action, events: list[dict[str, Any]]) -> None:
@@ -596,6 +616,7 @@ def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool =
     if first:
         rewards.grant(s, p, data["first_orbit"], events, slot=species.oumuamua_slot(s))  # ORBIT-04
     rewards.grant(s, p, data["orbit"], events, planet, slot=species.oumuamua_slot(s))  # ORBIT-03, ORBIT-05
+    glyphids.take(s, p, f"planet:{planet}", events)  # EXP-GLY-04
     cards.fire(s, p, [{"e": "orbit", "planet": planet}, {"e": "orbit_or_land"}], events)  # FAQ-C117
     if (opts or {}).get("collect"):  # Mascamite cards: then look at the samples on the planet and pick one up
         s.queue.insert(0, {"t": "collect_sample", "planet": planet})
@@ -621,6 +642,7 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
         p.landers[a["moon"]] = p.landers.get(a["moon"], 0) + 1
         events.append({"type": "land", "player": p.index, "planet": planet, "moon": a["moon"]})
         rewards.grant(s, p, data["moons"][a["moon"]], events, planet)
+        glyphids.take(s, p, f"planet:{planet}", events)  # EXP-GLY-04: a moon counts as its planet
         cards.fire(s, p, [{"e": "land", "planet": planet}, {"e": "orbit_or_land"}], events)
         if opts.get("collect"):
             s.queue.insert(0, {"t": "collect_sample", "planet": planet})
@@ -636,6 +658,7 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
         _take_land_data(s, p, planet, open_slots[0])
     elif open_slots:  # Mars: the first two landers each choose a space
         s.pending.append(Decision(kind="land_data_slot", player=p.index, data={"planet": planet, "slots": open_slots}))
+    glyphids.take(s, p, f"planet:{planet}", events)  # EXP-GLY-04
     rewards.grant(s, p, data["land"], events, planet, slot=species.oumuamua_slot(s))  # LAND-03
     cards.fire(s, p, [{"e": "land", "planet": planet}, {"e": "orbit_or_land"}], events)  # FAQ-C117
     if opts.get("collect"):  # Mascamite cards: then look at the samples on the planet and pick one up

@@ -1010,6 +1010,13 @@
           "title": "Exofossils",
           "type": "integer"
         },
+        "glyphs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Glyphs",
+          "type": "array"
+        },
         "gold_markers": {
           "items": {
             "type": "string"
@@ -1150,6 +1157,13 @@
           "title": "Sector Wins",
           "type": "integer"
         },
+        "security": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Security",
+          "type": "object"
+        },
         "signal_tokens": {
           "default": 0,
           "title": "Signal Tokens",
@@ -1200,6 +1214,7 @@
         "exertian_hand",
         "exertian_played",
         "exofossils",
+        "glyphs",
         "gold_markers",
         "hand",
         "index",
@@ -1222,6 +1237,7 @@
         "quick_start",
         "score",
         "sector_wins",
+        "security",
         "signal_tokens",
         "techs",
         "trace_log",

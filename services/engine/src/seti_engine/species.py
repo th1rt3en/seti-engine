@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import arkhos, effects, rewards, rival, rng, tables
+from . import arkhos, effects, glyphids, rewards, rival, rng, tables
 from .models import Decision, GameState, PlayerState, Probe, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -79,6 +79,8 @@ def mark_board_space(s: GameState, p: PlayerState, slot_index: int, color: str, 
             s.species[oumuamua_slot(s) or 0].extra["supply"] += c["n"]  # paid tokens go back to the supply
     slot.board[color][k].append(p.index)
     rewards.grant(s, p, space["rewards"], events, slot=slot_index)
+    if slot.species == "glyphids" and space.get("well"):
+        glyphids.on_board_space(s, p, color, k, events)  # EXP-GLY-04: the token that lies on the space
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -154,6 +156,8 @@ def _discover(s: GameState, index: int, events: Events) -> None:
         _setup_anomalies(s, slot, events)
     elif slot.species == "centaurians":
         _setup_centaurians(s, slot, events)
+    elif slot.species == "glyphids":
+        glyphids.setup(s, slot, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

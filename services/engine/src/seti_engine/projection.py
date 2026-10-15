@@ -148,6 +148,8 @@ def project(state: GameState, viewer: int | None) -> View:
             slot.extra = {}
         else:
             _hide_tokens(slot.extra)
+            if "supply" in slot.extra and slot.species == "glyphids":
+                slot.extra["supply"] = [HIDDEN] * len(slot.extra["supply"])  # EXP-GLY-03: the face-down stack of glyph tokens
             for key in ("explore_deck", "explore_aside"):  # EXP-ARK-01: the order and the cards set aside are secret
                 if key in slot.extra:
                     slot.extra[key] = [HIDDEN] * len(slot.extra[key])

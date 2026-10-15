@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, orgs, rewards, solar, tables
+from . import effects, glyphids, orgs, rewards, solar, tables
 from .models import ComputerTech, Decision, GameState, PlayerState
 
 Action = dict[str, Any]
@@ -64,6 +64,7 @@ def take_tech(s: GameState, p: PlayerState, stack: int, events: Events, tile_bon
     p.techs.append(name)
     events.append({"type": "tech", "player": p.index, "tech": name})
     orgs.on_tech(s, p, st.category)  # Turing Systems (EXP-ORG-13)
+    glyphids.take(s, p, f"tech:{stack}", events)  # EXP-GLY-04
     extra = _stack_extra(st.category, st.glyph)
     rewards.grant(s, p, [*([TILE_BONUS[tile]] if tile_bonus else []), *extra], events)  # TECHACT-04
     if st.category == "computer":

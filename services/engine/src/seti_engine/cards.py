@@ -634,6 +634,8 @@ def gain_corner(s: GameState, p: PlayerState, cid: str) -> None:
             effects.gain_data(s, p, n)
         elif kind == "score":
             effects.gain_score(s, p, n)
+        elif kind.startswith("glyph:"):  # EXP-GLY-06: the resource of that glyph if it has been deciphered
+            rewards.grant(s, p, [{"t": "glyph_resource", "glyph": kind.removeprefix("glyph:")}], [])
         elif kind == "explore_minor":  # EXP-ARK-07: a security card discarded for its free action
             for _ in range(n):
                 rewards.grant(s, p, [{"t": "explore_minor"}], [])

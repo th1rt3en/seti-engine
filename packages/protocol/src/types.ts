@@ -64,6 +64,7 @@ export type Energy = number;
 export type ExertianHand = string[];
 export type ExertianPlayed = string[];
 export type Exofossils = number;
+export type Glyphs = string[];
 export type GoldMarkers = string[];
 export type Hand = string[];
 export type Index = number;
@@ -367,6 +368,7 @@ export interface PlayerState {
   exertian_hand: ExertianHand;
   exertian_played: ExertianPlayed;
   exofossils: Exofossils;
+  glyphs: Glyphs;
   gold_markers: GoldMarkers;
   hand: Hand;
   index: Index;
@@ -389,6 +391,7 @@ export interface PlayerState {
   quick_start: QuickStart;
   score: Score;
   sector_wins: SectorWins;
+  security: Security;
   signal_tokens: SignalTokens;
   techs: Techs;
   trace_log: TraceLog;
@@ -424,6 +427,9 @@ export interface Orbiters1 {
 }
 export interface OrgData {
   [k: string]: unknown;
+}
+export interface Security {
+  [k: string]: string;
 }
 export interface Probe {
   capsule: Capsule;

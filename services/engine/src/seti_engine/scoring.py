@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import cards, species, tables
+from . import cards, glyphids, species, tables
 from .models import GameState, GoldTile, PlayerState
 
 TECH_CATEGORIES = ("probe", "telescope", "computer")
@@ -74,11 +74,14 @@ def final_scores(s: GameState) -> list[dict[str, Any]]:
         cards_pts = cards.end_points(s, p)
         gold = 0 if is_rival else gold_points(s, p)  # the rival does not score gold tiles (SOLO-END-01)
         exertian = cards.exertian_points(s, p)
-        rows.append({"player": p.index, "board": p.score, "cards": cards_pts, "gold": gold, "exertian": exertian, "loss": 0})
-    totals = [r["board"] + r["cards"] + r["gold"] + r["exertian"] for r in rows]
+        glyph = glyphids.end_points(p)  # EXP-GLY-07 (the rival scores 3 per token, EXP-GLY-08, not yet)
+        rows.append(
+            {"player": p.index, "board": p.score, "cards": cards_pts, "gold": gold, "exertian": exertian, "glyphs": glyph, "loss": 0}
+        )
+    totals = [r["board"] + r["cards"] + r["gold"] + r["exertian"] + r["glyphs"] for r in rows]
     for r, loss in zip(rows, species.exertian_losses(s, totals), strict=True):  # ALIEN-EXE-07: after all other points
         r["loss"] = loss
-        r["total"] = r["board"] + r["cards"] + r["gold"] + r["exertian"] - loss
+        r["total"] = r["board"] + r["cards"] + r["gold"] + r["exertian"] + r["glyphs"] - loss
         r["danger"] = species.danger(s, s.players[r["player"]])
     return rows
 

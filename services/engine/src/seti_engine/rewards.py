@@ -22,7 +22,7 @@ NEUTRAL = -1  # EXP-QS-03: the marker color of the neutral quick start pieces
 def grant(
     s: GameState, p: PlayerState, rewards: list[dict[str, Any]], events: Events, planet: str | None = None, slot: int | None = None
 ) -> None:
-    from . import arkhos, cards, rival, species  # noqa: PLC0415 - these import this module
+    from . import arkhos, cards, glyphids, rival, species  # noqa: PLC0415 - these import this module
 
     if rival.is_rival(s, p.index):  # SOLO-10: the rival takes rewards in its own way
         rival.grant(s, rewards, events, planet, slot)
@@ -53,6 +53,10 @@ def grant(
             p.movement += n
         elif t == "signal_token":
             p.signal_tokens += n  # EXP-SIG-01
+        elif t == "glyph_space":  # the token of a Glyphids board space is taken by the marking (species.mark_board_space)
+            pass
+        elif t == "glyph_resource":  # EXP-GLY-06: the resource of a deciphered glyph
+            glyphids.glyph_resource(s, p, r["glyph"], events)
         elif t == "explore_minor" or t == "explore_major":  # EXP-ARK-04: reveal the next exploration card, gain its minor or major reward
             for _ in range(n):
                 arkhos.explore(s, p, t.removeprefix("explore_"), events)
@@ -153,6 +157,8 @@ def resolve_sector(s: GameState, index: int, events: Events) -> None:
 
         species.resolve_tile(s, events)
         return
+    from . import glyphids  # noqa: PLC0415 - glyphids imports this module
+
     sec = s.sectors[index]
     star = _star(sec.star)
     ranking = _ranking(sec.markers, exclude=NEUTRAL)  # EXP-QS-04: the neutral color never wins
@@ -162,6 +168,7 @@ def resolve_sector(s: GameState, index: int, events: Events) -> None:
     objectives.on_event(s, s.players[winner], [{"e": "win_sector", "color": sec.color}])  # SOLO-OBJ-04
     w = s.players[winner]
     w.sector_wins += 1
+    glyphids.take(s, w, f"sector:{index}", events)  # EXP-GLY-04
     events.append({"type": "sector_won", "player": winner, "sector": index})
     for q in sorted(set(sec.markers) - {NEUTRAL}):
         effects.gain_publicity(s, s.players[q])  # SECTOR-12
