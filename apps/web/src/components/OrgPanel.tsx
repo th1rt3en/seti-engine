@@ -8,6 +8,7 @@ import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
+import { OrgName } from "./OrgName";
 import { PanelSpots } from "./PanelSpots";
 
 const ASSET = expansionAssets as Record<string, string>;
@@ -31,7 +32,7 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
         const canAct = p.index === view.viewer && mine.length > 0;
         return (
           <div key={p.index} style={{ marginBottom: 10 }}>
-            <b className="small">{names[p.index] ?? `Player ${p.index + 1}`}</b>
+            <b className="small">{names[p.index] ?? `Player ${p.index + 1}`}</b> <OrgName id={p.organization ?? ""} className="orgname" />
             {spaces ? (
               // the reward spaces are on the organization board itself: a marked one is crossed, a space that can be marked is highlighted
               <svg
