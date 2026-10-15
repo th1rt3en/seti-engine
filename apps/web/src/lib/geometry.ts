@@ -118,13 +118,20 @@ export const LAND_SPACES: Record<string, { circles: { x: number; y: number }[]; 
   neptune: { circles: [at(1522, 843)], hex: at(1567, 803) },
 };
 
-/** Where the `k`-th lander (0 is the first) of a planet lies: on its landing circle, the later ones beside the landing reward. */
+/** Landers beyond the circles follow an arc along the edge of the planet, starting where the last circle lies and running along its lower side (the orbiters lie over the top). */
+export const LAND_ARC = { radius: 0.9, spacing: 92 }; // the arc's radius in planet radii, and the distance between two landers in board pixels
+
+/** Where the `k`-th lander (0 is the first) of a planet lies: on its landing circle, the later ones along the edge of the planet. */
 export function landSlot(planet: string, k: number): { x: number; y: number } | null {
   const land = LAND_SPACES[planet];
-  if (!land) return null;
+  const pos = PLANET[planet];
+  if (!land || !pos) return null;
   const circle = land.circles[k];
   if (circle) return circle;
-  return { x: land.hex.x + 100 * (k - land.circles.length + 1), y: land.hex.y + 70 };
+  const last = land.circles[land.circles.length - 1] ?? land.hex;
+  const radius = LAND_ARC.radius * pos.r;
+  const angle = Math.atan2(last.y - pos.y, last.x - pos.x) - ((k - land.circles.length + 1) * LAND_ARC.spacing) / radius;
+  return { x: pos.x + radius * Math.cos(angle), y: pos.y + radius * Math.sin(angle) };
 }
 
 /** The moons, by the lower-case first word of their name in the engine's data: the round landing space of each. */

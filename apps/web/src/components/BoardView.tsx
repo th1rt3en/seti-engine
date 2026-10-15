@@ -618,14 +618,14 @@ export function BoardView({
                 const sec = s.sectors[Number(a)];
                 const slot = sec ? SLOTS[sec.star] : undefined;
                 // beside the first data token (the counter-clockwise end of the slot), clear of the capsules where the winners of the sector put their markers
-                if (slot) at = polar(slot.r * STAR.scale + 95, sectorDegrees(Number(a)) + slot.hi + 3);
+                if (slot) at = polar(slot.r * STAR.scale + 80, sectorDegrees(Number(a)) + slot.hi + 3);
               } else if (kind === "board") {
                 const spot = SPECIES_SPACES.glyphids?.[a]?.[Number(b)];
                 if (spot) at = onAlienBoard(glyphSlot, spot[0], spot[1]);
               }
               if (!at) return null;
               return (
-                <image key={`gt-${where}`} href={href} x={at.x - 40} y={at.y - 46} width={80} height={92}>
+                <image key={`gt-${where}`} href={href} x={at.x - 62} y={at.y - 71} width={124} height={142}>
                   <title>{`${glyph} glyph token (${kind})`}</title>
                 </image>
               );
