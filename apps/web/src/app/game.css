@@ -2101,3 +2101,26 @@ button:disabled {
   text-underline-offset: 3px;
   cursor: help;
 }
+
+/* a move is on its way to the server: the prompt is replaced by this until the answer comes */
+.sendingmove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  font-weight: 600;
+}
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--line);
+  border-top-color: #6ef0a5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
