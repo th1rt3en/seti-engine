@@ -15,6 +15,53 @@ export interface LobbyGame {
   solo: boolean;
 }
 
+export interface PlayingGame {
+  id: string;
+  rated: boolean;
+  players: number;
+  seats: string[];
+  clock: string;
+  started_at: number | null;
+  actions: number;
+  expansion: boolean;
+  organizations: boolean;
+  solo: boolean;
+}
+
+/** The games that are being played now, newest first, for the page where anybody can watch. Sandbox games are not listed. */
+export async function playingGames(db: Db, limit = 100): Promise<PlayingGame[]> {
+  const games = await db.all<{
+    id: string;
+    rated: number;
+    options_json: string;
+    clock_json: string;
+    started_at: number | null;
+    actions: number;
+  }>(
+    "SELECT id, rated, options_json, clock_json, started_at, actions FROM games WHERE status = 'playing' ORDER BY started_at DESC LIMIT ?",
+    limit,
+  );
+  const out: PlayingGame[] = [];
+  for (const g of games) {
+    const options = JSON.parse(g.options_json) as { players: number; expansion?: boolean; organizations?: boolean; sandbox?: boolean };
+    if (options.sandbox) continue;
+    const seats = await db.all<{ name: string }>("SELECT name FROM game_players WHERE game_id = ? ORDER BY seat", g.id);
+    out.push({
+      id: g.id,
+      rated: g.rated === 1,
+      players: options.players,
+      seats: seats.map((s) => s.name),
+      clock: describeClock(g.clock_json),
+      started_at: g.started_at,
+      actions: g.actions,
+      expansion: options.expansion === true,
+      organizations: options.organizations === true,
+      solo: options.players === 1,
+    });
+  }
+  return out;
+}
+
 export interface LeaderRow {
   user_id: string;
   name: string;

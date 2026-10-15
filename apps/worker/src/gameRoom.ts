@@ -79,6 +79,7 @@ export class GameRoomDO implements DurableObject {
     }
     if (url.pathname === "/join") return json(await this.room.join(identity));
     if (url.pathname === "/leave") return json(await this.room.leave(identity));
+    if (url.pathname === "/resign") return json(await this.room.resign(identity));
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
   }
 

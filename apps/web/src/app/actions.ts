@@ -5,7 +5,7 @@ import { getDb } from "@/lib/db";
 import { currentUser, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
 import { TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
-import { CLOCK_PRESETS, createGame, joinGame, leaveGame } from "@/lib/worker";
+import { CLOCK_PRESETS, createGame, gameMeta, joinGame, leaveGame, resignGame } from "@/lib/worker";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -123,6 +123,17 @@ export async function joinAction(form: FormData): Promise<void> {
   const reply = await joinGame(me as NonNullable<typeof me>, id);
   if (!reply.ok) back("/lobby", reply.message);
   redirect(`/games/${id}`);
+}
+
+/** Resign one of the user's own solo games (from the profile page): the game ends as resigned, as when the player resigns at the table. */
+export async function resignSoloAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const user = me as NonNullable<typeof me>;
+  const id = field(form, "id");
+  const meta = (await gameMeta(id)) as { options?: { players?: number } } | null;
+  if (meta?.options?.players === 1) await resignGame(user, id); // the Worker checks that the user is the player and that the game is being played
+  redirect(`/players/${user.id}`);
 }
 
 export async function leaveAction(form: FormData): Promise<void> {

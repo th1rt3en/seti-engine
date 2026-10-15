@@ -13,7 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from . import engine, move_notes, species, tables
+from . import engine, move_notes, orgs, species, tables
 from .models import GameState, PlayerState
 
 HIDDEN = "?"  # a hidden card, tile or token
@@ -40,7 +40,9 @@ INCOME_KINDS = ("credit", "energy", "card")
 class PlayerTracker(BaseModel):
     """What the tracker beside the board shows for one player. Everything here is public information."""
 
-    income: dict[str, int]  # per round: credit, energy, card (the income card plus tucked cards)
+    income: dict[
+        str, int
+    ]  # per round: credit, energy, card (the income card plus tucked cards); with an organization also publicity, data and signal
     tucked: dict[str, int]  # how many cards are tucked for each kind of income
     missions_done: int  # completed missions (CARD-16)
     end_cards: int  # end-of-game scoring cards in front of the player (CARD-20)
@@ -56,7 +58,12 @@ def tracker(state: GameState, p: PlayerState, viewer: int | None = None) -> Play
     """INCOME-01, INCOME-03, ROUND-02: the income a player gets at the end of each round, by kind. The solo rival has none (A-025)."""
     rival_player = state.rival is not None and p.index == state.rival.index
     tucked = {k: sum(1 for c in p.tucked if tables.cards()[c]["income"] == k) for k in INCOME_KINDS}
-    income = {k: 0 if rival_player else INCOME_BASE[k] + tucked[k] for k in INCOME_KINDS}
+    if (
+        p.organization is not None
+    ):  # EXP-ORG-08, A-031: the organization's income card (with data, publicity, signal tokens) plus the tucked cards
+        income = orgs.income_of(p)
+    else:
+        income = {k: 0 if rival_player else INCOME_BASE[k] + tucked[k] for k in INCOME_KINDS}
     return PlayerTracker(
         income=income,
         tucked=tucked,

@@ -9,6 +9,7 @@ import { PLAYER_COLOR } from "@/lib/geometry";
 import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
 import { DataToken, PieceDefs } from "./Pieces";
 
 const FRONTS = assets.techFronts as Record<string, string>;
@@ -16,16 +17,27 @@ const BOARD = assets.playerBoard as { src: string; w: number; h: number };
 const GLYPHS = ["dot", "link", "branch", "cross"] as const;
 /** The places of the computer techs: behind the 1st, 3rd, 5th and 6th space of the computer (the engine's numbers 0, 2, 4, 5). */
 const SLOT_POSITIONS = [0, 2, 4, 5];
+/** The picture is the colorful panel of the printed board; the page adds a header with the income above it and the missions below it. */
+const HEAD = 96;
 /** The six computer spaces on the picture of the board (the centre of each, all in one row). */
-const SPACE = { x: [860, 939, 1015, 1088, 1169, 1255], y: 393 };
+const SPACE = { x: [348, 427, 503, 576, 657, 743], y: HEAD + 225 };
 const TILE = { w: 84, h: 118 };
 /** The columns of the probe and telescope techs on the picture, by glyph (dot, link, branch, cross). */
-const TECH_X: Record<"probe" | "telescope", number[]> = { probe: [620, 704, 855, 944], telescope: [1140, 1294, 1378, 1467] };
-const TECH_Y = 200;
-/** The blue base where the data pool lies (the data not yet in the computer), and the five income squares at the top. */
-const POOL = { x: [687, 722, 757], y: [393, 433] };
-const INCOME_SQUARES: Record<string, number> = { card: 313, energy: 394, credit: 475 };
-const MISSIONS = { x: 520, y: 540, w: 150, h: 208, gap: 14 };
+const TECH_X: Record<"probe" | "telescope", number[]> = { probe: [108, 192, 343, 432], telescope: [628, 782, 866, 955] };
+const TECH_Y = HEAD + 32;
+/** The blue base where the data pool lies (the data not yet in the computer). */
+const POOL = { x: [175, 210, 245], y: [HEAD + 225, HEAD + 265] };
+const MISSIONS = { x: 20, w: 150, h: 208, gap: 14 };
+const ICON = expansionAssets as Record<string, string>;
+const PRINTED = assets.printedIcons as Record<string, string>;
+/** The income of each kind in the header, with its printed icon. */
+const INCOME_ICONS: [string, string | undefined][] = [
+  ["card", PRINTED["card-random"]],
+  ["energy", ICON["tokens/icon-energy"]],
+  ["credit", ICON["tokens/icon-credit"]],
+  ["publicity", ICON["tokens/icon-publicity"]], // shown only when the player has that income (an organization)
+  ["data", ICON["tokens/icon-data"]],
+];
 
 /** Picking the slot of a computer tech that was just taken: the free slots (the engine's numbers), the one that is picked, and the click. */
 export interface SlotChoice {
@@ -87,27 +99,37 @@ function Board({ view, player, choice, onPlaceData }: { view: View; player: numb
   const income = view.trackers?.[player]?.income ?? {};
   // the free action "place data" (FREE-03) puts one data of the pool in the leftmost empty space: that space is the one to click
   const next = onPlaceData ? p.computer.indexOf(false) : -1;
+  const rows = Math.max(1, Math.ceil(p.missions.length / 6));
+  const height = HEAD + BOARD.h + 26 + rows * (MISSIONS.h + 50) + 6;
   return (
-    <svg viewBox={`0 0 ${BOARD.w} ${BOARD.h}`} className="playerboard" role="img" aria-label={`The board of player ${player + 1}`}>
+    <svg viewBox={`0 0 ${BOARD.w} ${height}`} className="playerboard" role="img" aria-label={`The board of player ${player + 1}`}>
       <PieceDefs />
-      <image href={BOARD.src} x={0} y={0} width={BOARD.w} height={BOARD.h} />
       <rect
-        x={4}
-        y={4}
-        width={BOARD.w - 8}
-        height={BOARD.h - 8}
-        rx={40}
-        fill="none"
+        x={2}
+        y={2}
+        width={BOARD.w - 4}
+        height={height - 4}
+        rx={26}
+        fill="#0f1830"
         stroke={PLAYER_COLOR[p.color] ?? "#fff"}
-        strokeWidth={8}
+        strokeWidth={5}
       />
-
-      {/* the income of each kind: the income card plus the tucked cards, in the squares above the icons */}
-      {Object.entries(INCOME_SQUARES).map(([kind, x]) => (
-        <text key={kind} x={x} y={101} textAnchor="middle" className="pbincome">
-          {income[kind] ?? 0}
-        </text>
+      {/* the header: the income of each kind (the income card plus the tucked cards) */}
+      <image href={PRINTED.income} x={24} y={22} width={52} height={52}>
+        <title>Income each round</title>
+      </image>
+      <text x={90} y={60} className="pbtitle">
+        Income each round
+      </text>
+      {INCOME_ICONS.filter(([kind]) => ["card", "energy", "credit"].includes(kind) || (income[kind] ?? 0) > 0).map(([kind, src], i) => (
+        <g key={kind}>
+          {src ? <image href={src} x={380 + i * 130} y={24} width={kind === "card" ? 40 : 52} height={52} /> : null}
+          <text x={380 + i * 130 + 58} y={62} className="pbincome light">
+            {income[kind] ?? 0}
+          </text>
+        </g>
       ))}
+      <image href={BOARD.src} x={0} y={HEAD} width={BOARD.w} height={BOARD.h} />
 
       {SLOT_POSITIONS.map((pos) => (
         <Slot key={`slot-${pos}`} p={p} pos={pos} choice={choice} />
@@ -163,7 +185,7 @@ function Board({ view, player, choice, onPlaceData }: { view: View; player: numb
         />
       ))}
       {p.data_pool > 6 ? (
-        <text x={722} y={462} textAnchor="middle" className="pbincome">
+        <text x={210} y={HEAD + 295} textAnchor="middle" className="pbincome light">
           +{p.data_pool - 6}
         </text>
       ) : null}
@@ -173,7 +195,7 @@ function Board({ view, player, choice, onPlaceData }: { view: View; player: numb
         const col = i % 6;
         const row = Math.floor(i / 6);
         const x = MISSIONS.x + col * (MISSIONS.w + MISSIONS.gap);
-        const y = MISSIONS.y + row * (MISSIONS.h + 50);
+        const y = HEAD + BOARD.h + 26 + row * (MISSIONS.h + 50);
         const src = cardImage(m.card);
         return (
           <g key={m.card}>

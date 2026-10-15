@@ -27,6 +27,13 @@ const KINDS = [
   { key: "card", label: "Cards", icon: <RandomCardIcon size={18} /> },
 ] as const;
 
+/** The income rows: publicity and data (organizations) show only when some player has that income. */
+const INCOME_ROWS = [
+  ...KINDS.map((k) => ({ ...k, optional: false })),
+  { key: "publicity", label: "Publicity", icon: <PublicityIcon size={18} />, optional: true },
+  { key: "data", label: "Data", icon: <DataIcon size={18} />, optional: true },
+];
+
 /** A label with its icon in front of it. */
 const labelled = (icon: ReactNode, text: string): ReactNode => (
   <span className="rowlabel">
@@ -66,7 +73,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
       ))}
     </tr>
   );
-  const kindLabel = (k: (typeof KINDS)[number]): ReactNode => labelled(k.icon, k.label);
+  const kindLabel = (k: { icon: ReactNode; label: string }): ReactNode => labelled(k.icon, k.label);
 
   return (
     <section className="tracker" aria-label="Player tracker">
@@ -105,7 +112,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             "score",
           )}
           {group("Income each round")}
-          {KINDS.map((k) =>
+          {INCOME_ROWS.filter((k) => !k.optional || trackers.some((t) => (t.income[k.key] ?? 0) > 0)).map((k) =>
             row(
               kindLabel(k),
               trackers.map((t) => t.income[k.key] ?? 0),

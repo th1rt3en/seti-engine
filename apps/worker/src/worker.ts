@@ -2,6 +2,7 @@
 //   POST /games                 create a game (token), body {options, clock, rated}; answers {id}
 //   POST /games/:id/join        take a seat (token)
 //   POST /games/:id/leave       leave the lobby (token)
+//   POST /games/:id/resign      resign a game that is being played (token; the website uses it for "resign" on the profile page)
 //   GET  /games/:id             public data of the game
 //   GET  /games/:id/log         the action log (seed + log replay the game), once the game is over
 //   GET  /games/:id/replay      everything needed for a replay (header, actions with their events, result), once the game is over
@@ -90,7 +91,7 @@ export default {
     }
     if (action === "" && request.method === "GET") return forward(stub, "/meta", headers);
     if ((action === "log" || action === "replay") && request.method === "GET") return forward(stub, `/${action}`, headers);
-    if ((action === "join" || action === "leave") && request.method === "POST") return forward(stub, `/${action}`, headers, "POST");
+    if ((action === "join" || action === "leave" || action === "resign") && request.method === "POST") return forward(stub, `/${action}`, headers, "POST");
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
   },
 } satisfies ExportedHandler<Env>;

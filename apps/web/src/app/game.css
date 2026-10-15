@@ -1922,3 +1922,6 @@ button:disabled {
     right: 10px;
   }
 }
+.pbincome.light {
+  fill: #fff;
+}

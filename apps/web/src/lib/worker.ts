@@ -45,6 +45,9 @@ export const joinGame = (user: User, id: string, cfg = loadConfig(), fetcher: ty
 export const leaveGame = (user: User, id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
   call(user, `/games/${id}/leave`, "POST", undefined, cfg, fetcher);
 
+export const resignGame = (user: User, id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
+  call(user, `/games/${id}/resign`, "POST", undefined, cfg, fetcher);
+
 /** Public data of a game (no token needed). */
 export async function gameMeta(id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch): Promise<Record<string, unknown> | null> {
   const res = await fetcher(`${cfg.workerUrl}/games/${id}`);
