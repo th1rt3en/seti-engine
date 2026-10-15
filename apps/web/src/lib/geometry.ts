@@ -118,20 +118,22 @@ export const LAND_SPACES: Record<string, { circles: { x: number; y: number }[]; 
   neptune: { circles: [at(1522, 843)], hex: at(1567, 803) },
 };
 
-/** Landers beyond the circles follow an arc along the edge of the planet, starting where the last circle lies and running along its lower side (the orbiters lie over the top). */
-export const LAND_ARC = { radius: 0.9, spacing: 92 }; // the arc's radius in planet radii, and the distance between two landers in board pixels
+/**
+ * Landers beyond the circles follow the gold guide line of the planet: a lane that starts at the landing circles and curls up and over the planet,
+ * around its landing reward. The lane is modelled as an arc around the reward through the last circle, running clockwise on the screen.
+ */
+export const LAND_ARC = { spacing: 96 }; // the distance between two landers along the lane, in board pixels
 
-/** Where the `k`-th lander (0 is the first) of a planet lies: on its landing circle, the later ones along the edge of the planet. */
+/** Where the `k`-th lander (0 is the first) of a planet lies: on its landing circle, the later ones along the gold guide line. */
 export function landSlot(planet: string, k: number): { x: number; y: number } | null {
   const land = LAND_SPACES[planet];
-  const pos = PLANET[planet];
-  if (!land || !pos) return null;
+  if (!land) return null;
   const circle = land.circles[k];
   if (circle) return circle;
   const last = land.circles[land.circles.length - 1] ?? land.hex;
-  const radius = LAND_ARC.radius * pos.r;
-  const angle = Math.atan2(last.y - pos.y, last.x - pos.x) - ((k - land.circles.length + 1) * LAND_ARC.spacing) / radius;
-  return { x: pos.x + radius * Math.cos(angle), y: pos.y + radius * Math.sin(angle) };
+  const radius = Math.hypot(last.x - land.hex.x, last.y - land.hex.y) || 1;
+  const angle = Math.atan2(last.y - land.hex.y, last.x - land.hex.x) + ((k - land.circles.length + 1) * LAND_ARC.spacing) / radius;
+  return { x: land.hex.x + radius * Math.cos(angle), y: land.hex.y + radius * Math.sin(angle) };
 }
 
 /** The moons, by the lower-case first word of their name in the engine's data: the round landing space of each. */
