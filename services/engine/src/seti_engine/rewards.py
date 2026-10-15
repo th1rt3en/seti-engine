@@ -53,6 +53,8 @@ def grant(
             p.movement += n
         elif t == "signal_token":
             p.signal_tokens += n  # EXP-SIG-01
+        elif t == "organelles":  # EXP-AMO-03: the organelle bonuses of a marked space are gained by species.mark_board_space
+            pass
         elif t == "glyph_space":  # the token of a Glyphids board space is taken by the marking (species.mark_board_space)
             pass
         elif t == "glyph_resource":  # EXP-GLY-06: the resource of a deciphered glyph
@@ -246,4 +248,4 @@ def place_trace(s: GameState, p: PlayerState, a: dict[str, Any], events: Events)
             slot.complete = True  # ALIEN-01: revealed after the turn
     events.append({"type": "trace", "player": p.index, "slot": a["slot"], "space": a["space"]})
     s.last_trace_kind = kind
-    cards.fire(s, p, [{"e": "trace", "kind": kind}], events)  # FAQ-C107 ("any" matches only the generic circles)
+    cards.fire(s, p, [{"e": "trace", "kind": kind, "species": slot.species}], events)  # FAQ-C107 ("any" matches only the generic circles)

@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 from . import (
     alien_steps,
+    amoeba,
     arkhos,
     cards,
     effects,
@@ -171,6 +172,10 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
         return [{"type": "resolve_sector", "sector": i} for i in d.data["sectors"] if i in state.completed]
     if d.kind in ("choose_org", "choose_quick"):
         return orgs.choose_moves(state, d)  # EXP-ORG-04
+    if d.kind == "organelle":
+        return amoeba.pick_moves(state, d)  # EXP-AMO-04
+    if d.kind == "amoeba_remove":
+        return amoeba.remove_moves(state, p)  # EXP-AMO-04
     if d.kind == "breach":
         return arkhos.breach_moves(state, d)  # EXP-ARK-06
     if d.kind == "org_mark":
@@ -716,6 +721,10 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
         orgs.resolve_mark(s, p, a)
     elif d.kind == "breach":
         arkhos.breach(s, p, d, a)
+    elif d.kind == "organelle":
+        amoeba.pick(s, p, a, events)
+    elif d.kind == "amoeba_remove":
+        amoeba.remove(s, p, a, events)
     elif t == "tuck":
         effects.tuck_card(s, p, a["card"])
         events.append({"type": "tuck", "player": p.index, "card": a["card"]})

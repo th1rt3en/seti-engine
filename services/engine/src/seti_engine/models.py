@@ -12,7 +12,7 @@ TECH_CATEGORIES = ["probe", "telescope", "computer"]
 GLYPHS = ["dot", "link", "branch", "cross"]
 PLANET_ORDER = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune"]
 SPECIES_BASE = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua"]
-SPECIES_EXPANSION = ["arkhos", "glyphids"]  # EXP-03: the new species the engine can play (Glyphids and Amoeba follow)
+SPECIES_EXPANSION = ["arkhos", "glyphids", "amoeba"]  # EXP-03: the new species the engine can play (Glyphids and Amoeba follow)
 
 Phase = Literal["setup", "play", "finished"]
 

@@ -465,5 +465,43 @@ CARDS.update(
         "GL.7": {"fx": [rnd(1)], "mission": trig(*(circle({"e": "trace", "kind": ANY}, _GL(g)) for g in ("red", "black", "pink")))},
     }
 )
+
+
+def _AM(color: str) -> Step:  # noqa: N802 - EXP-AMO-04: one organelle of the section of that color
+    return R("organelle", color=color)
+
+
+CARDS.update(
+    {
+        # Amoeba (ET.14 and ET.20 wait for the owner's check of the pictures, A-049)
+        "AM.11": {"fx": [card(1), _AM("pink")], "end": end("per_species_color", 2, species="amoeba", kind="pink")},
+        "AM.12": {"fx": [card(1), _AM("yellow")], "end": end("per_species_color", 2, species="amoeba", kind="yellow")},
+        "AM.13": {"fx": [card(1), _AM("blue")], "end": end("per_species_color", 2, species="amoeba", kind="blue")},
+        "AM.15": {
+            "fx": [LAUNCH, _AM("yellow")],
+            "mission": trig(*(circle({"e": "trace", "kind": "blue", "species": "amoeba"}, data(1)) for _ in range(2))),
+        },
+        "AM.16": {
+            "fx": [data(3), _AM("blue")],
+            "mission": trig(
+                circle({"e": "trace", "kind": "pink", "species": "amoeba"}, data(1)),
+                circle({"e": "trace", "kind": "yellow", "species": "amoeba"}, data(1)),
+            ),
+        },
+        "AM.17": {
+            "fx": [pub(1)],
+            "mission": trig(
+                circle({"e": "tech", "cat": "probe"}, _AM("yellow")),
+                circle({"e": "tech", "cat": "telescope"}, _AM("pink")),
+                circle({"e": "tech", "cat": "computer"}, _AM("blue")),
+            ),
+        },
+        "AM.18": {
+            "fx": [rnd(2)],
+            "mission": trig(*(circle({"e": "trace", "kind": ANY, "species": "amoeba"}, pub(1)) for _ in range(2))),
+        },
+        "AM.19": {"fx": [R("amoeba_remove")]},
+    }
+)
 for _sc in ("AK.21", "AK.22", "AK.23", "AK.24", "AK.25", "AK.26", "AK.27", "AK.28", "AK.29", "AK.30", "AK.31", "AK.32"):
     CARDS[_sc] = {"fx": [R("explore", level="major")]}  # EXP-ARK-07: played as a main action, a security card gives a major reward

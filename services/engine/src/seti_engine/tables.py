@@ -24,6 +24,16 @@ def cards() -> dict[str, dict[str, Any]]:
     """The static facts of the cards. The quick start cards that are tucked for income (SR.15, SR.16; EXP-QS-02) are in it too, with deck
     "quick" so that no deck is built from them, because a tucked card is looked up like any other for its income."""
     out: dict[str, dict[str, Any]] = dict(load("cards.json"))
+    for ac in amoeba()["cards"]:  # the Amoeba species deck (EXP-AMO-01)
+        out[ac["id"]] = {
+            "name": f"Amoeba {ac['printed']}",
+            "deck": "alien",
+            "cost": ac["cost"],
+            "income": ac["income"],
+            "sector": ac["sector"],
+            "species": "amoeba",
+            "free": ac["free"],
+        }
     for gc in glyphids()["cards"]:  # the Glyphids species deck (EXP-GLY-01); the corner gives the resource of a glyph if it is deciphered
         out[gc["id"]] = {
             "name": f"Glyphids {gc['printed']}",
@@ -60,6 +70,11 @@ def cards() -> dict[str, dict[str, Any]]:
 
 def glyphids() -> dict[str, Any]:
     out: dict[str, Any] = load("expansion-glyphids.json")
+    return out
+
+
+def amoeba() -> dict[str, Any]:
+    out: dict[str, Any] = load("expansion-amoeba.json")
     return out
 
 
@@ -124,7 +139,12 @@ def planet_info(name: str) -> dict[str, Any]:
 
 def alien_boards() -> dict[str, Any]:
     """The boards of the species: the five of the base game and those of the expansion (EXP-03)."""
-    out: dict[str, Any] = {**load("alien-boards.json"), "arkhos": arkhos()["board"], "glyphids": glyphids()["board"]}
+    out: dict[str, Any] = {
+        **load("alien-boards.json"),
+        "arkhos": arkhos()["board"],
+        "glyphids": glyphids()["board"],
+        "amoeba": amoeba()["board"],
+    }
     return out
 
 

@@ -11,7 +11,7 @@ import copy
 from collections import deque
 from typing import Any
 
-from . import alien_steps, card_defs, effects, objectives, orgs, rewards, solar, tables, techs
+from . import alien_steps, amoeba, card_defs, effects, objectives, orgs, rewards, solar, tables, techs
 from .models import Decision, GameState, MissionState, PlanetState, PlayerState
 
 Action = dict[str, Any]
@@ -129,6 +129,11 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
             _trace_step(s, p, st)
         else:
             rewards.grant(s, p, [st], events)
+    elif t == "organelle":  # EXP-AMO-04: a card's single organelle icon
+        amoeba.request_pick(s, p, st["color"])
+    elif t == "amoeba_remove":  # EXP-AMO-04 (ET.19)
+        if amoeba.remove_moves(s, p):
+            s.pending.append(Decision(kind="amoeba_remove", player=p.index))
     elif t == "pluto":
         # PROMO-02: the card makes Pluto a planet that only its player can use: one orbiter space and one lander space
         s.pluto_owner = p.index
@@ -522,7 +527,7 @@ def _matches(spec: dict[str, Any], ev: dict[str, Any]) -> bool:
         return any(_matches(one, ev) for one in spec["any"])
     if spec["e"] != ev["e"]:
         return False
-    for key in ("planet", "cat", "kind", "color", "cost", "corner"):
+    for key in ("planet", "cat", "kind", "color", "cost", "corner", "species"):
         if key in spec and spec[key] != "*" and spec[key] != ev.get(key):
             return False
     if spec.get("own_turn") and not ev.get("own_turn"):
@@ -665,6 +670,10 @@ def end_points(s: GameState, p: PlayerState) -> int:
             from . import scoring  # noqa: PLC0415
 
             total += scoring.solvay_points(s, p)
+        elif w == "per_species_color":  # EXP-AMO-04: traces of one color marked for this species
+            j = alien_steps.slot_of(s, e["species"])
+            assert j is not None
+            total += n * sum(1 for sl, k in p.trace_log if sl == j and k == e["kind"])
         elif w == "per_species_traces":
             i = alien_steps.slot_of(s, e["species"])
             assert i is not None

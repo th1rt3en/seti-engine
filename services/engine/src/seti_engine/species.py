@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import arkhos, effects, glyphids, rewards, rival, rng, tables
+from . import amoeba, arkhos, effects, glyphids, rewards, rival, rng, tables
 from .models import Decision, GameState, PlayerState, Probe, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -81,6 +81,8 @@ def mark_board_space(s: GameState, p: PlayerState, slot_index: int, color: str, 
     rewards.grant(s, p, space["rewards"], events, slot=slot_index)
     if slot.species == "glyphids" and space.get("well"):
         glyphids.on_board_space(s, p, color, k, events)  # EXP-GLY-04: the token that lies on the space
+    if slot.species == "amoeba":
+        amoeba.gain_section(s, p, color, events)  # EXP-AMO-03: also the bonuses of the organelles in the section of that color
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -158,6 +160,8 @@ def _discover(s: GameState, index: int, events: Events) -> None:
         _setup_centaurians(s, slot, events)
     elif slot.species == "glyphids":
         glyphids.setup(s, slot, events)
+    elif slot.species == "amoeba":
+        amoeba.setup(s, slot, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
