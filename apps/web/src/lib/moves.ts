@@ -318,6 +318,26 @@ export const freeIsOnlyMovement = (id: unknown): boolean => {
 };
 
 /** What the bar asks when the player has picked a card of the display or the deck to buy. */
+/** What the bar asks when the player has clicked a card of the display (or the deck) for one of the moves that name it. */
+export function rowMoveText(m: Move, row: string[]): string {
+  const s = String(m.source);
+  const id = s === "deck" ? undefined : row[Number(s.slice(4))];
+  const card = s === "deck" ? "the top card of the deck" : id === undefined ? "this card" : cardTitle(id);
+  switch (m.type) {
+    case "buy_card":
+      return buyText(m.source, row);
+    case "take_card":
+      return `Take ${card}?`;
+    case "row_pick":
+    case "scan_discard":
+      return `Discard ${card} for a signal in a sector of its color?`;
+    case "scan_token":
+      return `Discard a signal token and ${card} for a signal?`;
+    default:
+      return describeMove(m);
+  }
+}
+
 export function buyText(source: unknown, row: string[]): string {
   const s = String(source);
   if (s === "deck") return "Buy the top card of the deck for 3 publicity?";
