@@ -22,9 +22,9 @@ const SLOT_POSITIONS = [0, 2, 4, 5];
 const HEAD = 96;
 /** The six computer spaces on the picture of the board (the centre of each, all in one row). */
 const SPACE = { x: [346, 420, 502, 572, 660, 747], y: HEAD + 227 };
-/** The diameter of each computer space on the picture: the spaces of the publicity and the income icons (2nd and 4th) are smaller. The data token and the
- * highlight of the free action "place data" are drawn to fit them, centred on the space. */
-const SPACE_DIAMETER = [40, 32, 40, 32, 40, 40];
+/** The diameter of the data token and of the highlight of the free action "place data", centred on each computer space. The 2nd and 4th spaces (the
+ * publicity and the income icons) are printed smaller, but their data token is drawn as large as the others. */
+const SPACE_DIAMETER = [40, 40, 40, 40, 40, 40];
 const TILE = { w: 84, h: 118 };
 /** On the picture of a computer tech (175 x 246) its upper circle, which lies over the printed space, is centred 30.5% down; the dashed circle for the
  * data of its lower space is centred 70% down and is as wide as the upper one. */
