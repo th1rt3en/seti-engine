@@ -13,6 +13,7 @@ import {
   handMoveText,
   irreversibleText,
   isHandMove,
+  orgName,
   rewardWords,
   rowMoveText,
   sameMove,
@@ -33,6 +34,7 @@ import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
+import { OrgFreePanel } from "./OrgFreePanel";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
@@ -98,6 +100,8 @@ export function GameClient({
   const [boardOpen, setBoardOpen] = useState(false);
   // the panel of the free trade
   const [tradeOpen, setTradeOpen] = useState(false);
+  // the panel of an organization's free action that is made with a card of the hand
+  const [orgFreeOpen, setOrgFreeOpen] = useState(false);
   const [boardPlayer, setBoardPlayer] = useState(0);
   const [pickedSlot, setPickedSlot] = useState<number | null>(null);
   // the gold scoring tile picked to mark (by name)
@@ -302,6 +306,8 @@ export function GameClient({
   const reach = ended || v.reach.length === 0 ? [] : v.reach;
   // exchanges and buying a card are made by picking cards (of the hand, of the display) and not with buttons of their own
   const exchanges = mine.filter((m) => m.type === "exchange");
+  // the free actions of an organization that name a card of the hand (Helion Assembly, Deep Sky Survey, Futurespan prepare)
+  const orgCardMoves = mine.filter((m) => m.type === "org_free" && typeof m.card === "string");
   const buys = mine.filter((m) => m.type === "buy_card");
   // taking a card, and discarding a card of the display for a signal, are made by clicking the card of the display (or the deck) too
   const ROW_MOVES = ["buy_card", "take_card", "row_pick", "scan_discard", "scan_token"];
@@ -740,12 +746,19 @@ export function GameClient({
               </div>
             </MoveGroup>
           ))}
-          {exchanges.length > 0 ? (
+          {exchanges.length > 0 || orgCardMoves.length > 0 ? (
             <MoveGroup title="Free action" foldable={false}>
               <div className="moves">
-                <button type="button" onClick={() => setTradeOpen(true)}>
-                  Trade resources
-                </button>
+                {exchanges.length > 0 ? (
+                  <button type="button" onClick={() => setTradeOpen(true)}>
+                    Trade resources
+                  </button>
+                ) : null}
+                {orgCardMoves.length > 0 ? (
+                  <button type="button" onClick={() => setOrgFreeOpen(true)}>
+                    {orgName(orgCardMoves[0]?.org)}: free action
+                  </button>
+                ) : null}
               </div>
             </MoveGroup>
           ) : null}
@@ -830,6 +843,9 @@ export function GameClient({
           ) : null}
           {tradeOpen && !ended && exchanges.length > 0 ? (
             <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
+          ) : null}
+          {orgFreeOpen && !ended && orgCardMoves.length > 0 ? (
+            <OrgFreePanel moves={orgCardMoves} hand={hand} onPlay={play} onClose={() => setOrgFreeOpen(false)} />
           ) : null}
           <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
             {boardOpen ? "Close player boards" : "Player boards"}

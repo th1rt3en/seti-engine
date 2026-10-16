@@ -24,7 +24,7 @@ export function cardName(id: unknown): string {
 const ORGS = organizations as unknown as Record<string, { name: string; number: number; abilities: Record<string, string> }>;
 const QUICK = quickStart as unknown as Record<string, { marks: string; lower: { effect: string; n: number }[] }>;
 export const ORG_NAMES: Record<string, string> = Object.fromEntries(Object.entries(ORGS).map(([id, o]) => [id, o.name]));
-const orgName = (id: unknown): string => ORGS[String(id)]?.name ?? String(id);
+export const orgName = (id: unknown): string => ORGS[String(id)]?.name ?? String(id);
 const quickText = (id: unknown): string => {
   const q = QUICK[String(id)];
   if (!q) return String(id);

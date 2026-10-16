@@ -2527,3 +2527,8 @@ button:disabled {
     display: none;
   }
 }
+
+/* the cards of the hand in the trade and free-action panels: small, side by side */
+.tradehand .card-row {
+  width: clamp(72px, 22vw, 120px);
+}
