@@ -593,6 +593,8 @@ export function GameClient({
       buttons: [confirm("Confirm", () => spotMove && play(spotMove), !spotMove)],
       onCancel: () => setPickedSpot(null),
     };
+  } else if (rowMode) {
+    ask = { text: "Click the card of the display that you want.", buttons: [], onCancel: () => setRowMode(null) };
   } else if (buyOptions.length > 0 && !rowMode) {
     ask = {
       text: buyOptions.map((m) => rowMoveText(m, v.state.card_row)).join(" "),
@@ -604,7 +606,7 @@ export function GameClient({
   const probeContext =
     reach.length > 0 && probe !== null ? (
       <span className="budget">
-        Move budget <b>{budget}</b> = {movement} movement +
+        Moving probe {probe.probe} from {probe.label}: budget <b>{budget}</b> = {movement} movement +
         <button
           type="button"
           className="step"
@@ -625,6 +627,7 @@ export function GameClient({
           +
         </button>
         <span className="muted small">({energy} available)</span>
+        <span className="muted small"> Click a highlighted space; its number is what it costs.</span>
       </span>
     ) : reach.length > 0 && movement > 0 ? (
       // movement left over (from the organization or from a card played as the main action) asks for a probe to spend it on
@@ -740,14 +743,6 @@ export function GameClient({
         <div className="confirmbar">
           <TradeButtons moves={tradeMoves} onPlay={play} onPickRow={setRowMode} />
           <button type="button" className="secondary" onClick={() => setPicked([])}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {rowMode ? (
-        <div className="confirmbar">
-          <span className="confirm">Click the card of the display that you want.</span>
-          <button type="button" className="secondary" onClick={() => setRowMode(null)}>
             Cancel
           </button>
         </div>
