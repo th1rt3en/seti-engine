@@ -2341,3 +2341,153 @@ button:disabled {
   gap: 6px;
   margin-top: 6px;
 }
+
+/* the free trade: a panel with what to spend and what to get */
+.tradepanel {
+  position: fixed;
+  z-index: 120;
+  left: 50%;
+  top: calc(var(--bar-bottom, var(--bar-h)) + 16px);
+  transform: translateX(-50%);
+  width: min(620px, calc(100vw - 20px));
+  max-height: calc(100vh - var(--bar-bottom, var(--bar-h)) - 32px);
+  overflow: auto;
+  padding: 12px 16px 16px;
+  background: color-mix(in srgb, var(--panel) 98%, transparent);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.75);
+}
+.tradepanel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tradepanel h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.tradepanel h3 {
+  margin: 10px 0 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tradechoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tradeopt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+}
+.tradeopt.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #04101a;
+}
+.tradehand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.tradepanel footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* the card row blinks to show where a card is to be taken */
+.flashing {
+  animation: rowflash 0.7s ease-in-out 4;
+  outline: 3px solid #6ef0a5;
+  outline-offset: 3px;
+}
+@keyframes rowflash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(110, 240, 165, 0);
+  }
+  50% {
+    box-shadow: 0 0 34px 10px rgba(110, 240, 165, 0.85);
+  }
+}
+
+/* the context bar in as few rows as it can: the name, a colon and what is asked, on one line that wraps only when it has to */
+.nowtext {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.nowline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+.now .prompt {
+  text-wrap: pretty;
+}
+@media (max-width: 760px) {
+  .now {
+    gap: 8px;
+    padding: 4px 8px;
+  }
+  .now .who,
+  .now .prompt {
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+  .nowline {
+    gap: 0 6px;
+  }
+  .contextactions {
+    margin-top: 3px;
+    gap: 4px;
+  }
+  .contextactions button {
+    padding: 2px 8px;
+    font-size: 0.8rem;
+  }
+  .prompt.asking {
+    gap: 2px 6px;
+    font-weight: 600;
+  }
+  .budget {
+    gap: 4px;
+    font-size: 0.85rem;
+  }
+}
+
+/* phones: the counters, the connection and the buttons share the first row of the bar */
+@media (max-width: 760px) {
+  .topbar .toprow {
+    grid-template-columns: auto auto 1fr auto auto;
+  }
+  .topbar .barfold {
+    grid-column: 5;
+    grid-row: 1;
+    padding: 3px 10px;
+  }
+  .topbar .toprow .extra {
+    grid-column: 4;
+    grid-row: 1;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+  .topbar .toprow .extra > .small.muted {
+    display: none;
+  }
+  .topbar .toprow .extra button {
+    padding: 3px 10px;
+    font-size: 0.8rem;
+  }
+}
+.now .hint {
+  margin-left: 6px;
+}

@@ -60,10 +60,10 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
   const who = s.rival && actor === s.rival.index ? "Rival" : (names[actor] ?? `Player ${actor + 1}`);
   const decision = s.pending[0];
   if (mine) {
-    if (decision) return { who, mine, text: `Your decision: ${humanize(decision.kind)}` };
-    return { who, mine, text: s.main_done ? "Your turn: take free actions, or end the turn" : "Your turn: choose a main action" };
+    if (decision) return { who, mine, text: humanize(decision.kind) };
+    return { who, mine, text: s.main_done ? "take free actions, or end the turn" : "choose a main action" };
   }
-  return { who, mine, text: decision ? `${who} must ${humanize(decision.kind)}` : `Waiting for ${who}` };
+  return { who, mine, text: decision ? `must ${humanize(decision.kind)}` : "is taking a turn" };
 }
 
 export function GameView({
@@ -78,6 +78,7 @@ export function GameView({
   log,
   overlay,
   context,
+  rowFlash,
   contextActions,
   hint,
   interaction,
@@ -100,6 +101,8 @@ export function GameView({
   overlay?: ReactNode;
   /** What the context bar asks at the moment (a choice made on the board): it replaces the prompt of the game. */
   context?: ReactNode;
+  /** The card row blinks to show where a card is to be picked up (after a trade for a card). */
+  rowFlash?: boolean;
   /** Buttons for the answers that are no choice on the board (skip, yes, no ...): in the context bar under its question. */
   contextActions?: ReactNode;
   /** The reminder of what can be done now, behind a small ? button next to the question. */
@@ -138,11 +141,15 @@ export function GameView({
           </div>
           <div className={prompt.mine ? "now mine" : "now"} aria-live="polite">
             {actor ? <span className="dot big" style={{ background: PLAYER_COLOR[actor.color] ?? "#fff" }} /> : null}
-            <div>
-              <b className="who">{prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}` : " "}</b>
-              <div className={context ? "prompt asking" : "prompt"}>
-                {context ?? prompt.text}
-                {hint ? <Hint>{hint}</Hint> : null}
+            <div className="nowtext">
+              <div className="nowline">
+                <b className="who">
+                  {prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}${prompt.mine || context ? ":" : ""}` : " "}
+                </b>
+                <span className={context ? "prompt asking" : "prompt"}>
+                  {context ?? prompt.text}
+                  {hint ? <Hint>{hint}</Hint> : null}
+                </span>
               </div>
               {contextActions ? <div className="contextactions">{contextActions}</div> : null}
             </div>
@@ -207,7 +214,7 @@ export function GameView({
         <aside className="col-aux" aria-label="Publicity track and tech stacks">
           <PublicityTrack view={view} names={names} />
           <TechStacks view={view} pick={tech} />
-          <RowDock view={view} row={row} inline />
+          <RowDock view={view} row={row} inline flash={rowFlash} />
           <MissionsPanel view={view} names={names} />
           <OrgPanel view={view} names={names} spots={spots} />
           <ArkhosPanel view={view} names={names} spots={spots} />
@@ -222,7 +229,7 @@ export function GameView({
       <TrackerDock>
         <PlayerTracker view={view} names={names} previous={previous} />
       </TrackerDock>
-      <RowDock view={view} row={row} />
+      <RowDock view={view} row={row} flash={rowFlash} />
       <HandDock view={view} selection={hand} />
       <ExertianDock view={view} />
       {log}

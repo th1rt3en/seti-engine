@@ -18,7 +18,7 @@ export interface RowSelection {
 }
 
 /** `inline`: on a wide screen the card row lies in the column of the tech stacks, below them, all cards in one row; the floating panel serves the narrow screens. */
-export function RowDock({ view, row, inline }: { view: View; row?: RowSelection; inline?: boolean }) {
+export function RowDock({ view, row, inline, flash }: { view: View; row?: RowSelection; inline?: boolean; flash?: boolean }) {
   const [folded, toggle, set] = useDock("row", () => window.innerWidth < 1700);
   const s = view.state;
   const wanted = (row?.selectable.length ?? 0) > 0;
@@ -30,8 +30,18 @@ export function RowDock({ view, row, inline }: { view: View; row?: RowSelection;
     if (wanted && !wasWanted.current) set(true);
     wasWanted.current = wanted;
   }, [wanted]);
+  // when the row is to blink (a card is to be taken), bring it into view if it is out of it
+  const box = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = box.current;
+    if (flash && el && el.getBoundingClientRect().width > 0) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [flash]);
   return (
-    <aside className={inline ? "rowinline card" : shut ? "rowdock floating dock folded" : "rowdock floating dock"} aria-label="Card row">
+    <aside
+      ref={box}
+      className={`${inline ? "rowinline card" : shut ? "rowdock floating dock folded" : "rowdock floating dock"}${flash ? " flashing" : ""}`}
+      aria-label="Card row"
+    >
       {inline ? null : (
         <button type="button" className="handtab" onClick={toggle} aria-expanded={!shut}>
           <span>

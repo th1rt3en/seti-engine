@@ -37,7 +37,7 @@ import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
-import { TradeButtons } from "./Trade";
+import { TradePanel } from "./TradePanel";
 
 type Server =
   | { t: "lobby"; status: string; seats: ({ name: string } | null)[]; rated: boolean }
@@ -96,6 +96,8 @@ export function GameClient({
   const [pickedTech, setPickedTech] = useState<number | null>(null);
   // the player boards: shown or not, and whose; the slot of the computer picked for a tech that was just researched
   const [boardOpen, setBoardOpen] = useState(false);
+  // the panel of the free trade
+  const [tradeOpen, setTradeOpen] = useState(false);
   const [boardPlayer, setBoardPlayer] = useState(0);
   const [pickedSlot, setPickedSlot] = useState<number | null>(null);
   // the gold scoring tile picked to mark (by name)
@@ -329,9 +331,7 @@ export function GameClient({
   );
   // a free action that gives movement does nothing without a probe on the map
   const noProbe = !v.state.probes.some((x) => x.player === v.viewer);
-  const cardTrades = exchanges.filter((m) => m.give === "card");
-  const tradable = new Set(cardTrades.flatMap((m) => m.cards as string[]));
-  const pickable = [...new Set([...handMoves.map((m) => String(m.card)), ...tradable])];
+  const pickable = [...new Set(handMoves.map((m) => String(m.card)))];
   const pickedIds = picked.map((i) => hand[i]).filter((c): c is string => c !== undefined);
   const cardOptions = pickedIds.length === 1 ? handMoves.filter((m) => m.card === pickedIds[0]) : [];
   // what the glyph icon of a Glyphids card's corner gives now (EXP-GLY-06), to show it before the card is discarded
@@ -387,8 +387,6 @@ export function GameClient({
       title: v.state.main_done ? "You have already taken your main action this turn" : "You cannot play this card now",
       onClick: () => undefined,
     });
-  const tradeMoves =
-    pickedIds.length === 2 ? cardTrades.filter((m) => [...(m.cards as string[])].sort().join() === [...pickedIds].sort().join()) : [];
   // The move bar has only the actions of a turn (launch, scan, analyze, pass, end the turn) and the free trade; the question of everything else is
   // asked in the context bar above it, where the answers that are no choice on the board are buttons (skip, yes, no, take the data ...).
   const BAR_MOVES = new Set(["launch", "scan", "analyze", "pass", "end_turn"]);
@@ -396,7 +394,6 @@ export function GameClient({
   // a free action that moves a probe is no answer for a player with no probe on the map
   const answerMoves = otherMoves.filter((m) => !BAR_MOVES.has(m.type) && !(m.type === "move_energy" && noProbe));
   const moveGroups = groupMoves(barMoves, pending, v.state.pending[0]?.kind === "data_overflow");
-  const resourceTrades = ["credit", "energy"].map((g) => exchanges.filter((m) => m.give === g)).filter((l) => l.length > 0);
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
   // the display and the deck: clicked to buy a card, or to take the card of a trade
@@ -645,10 +642,7 @@ export function GameClient({
           ? "No space is in reach: add energy."
           : "Click a highlighted space; its number is what the move costs.",
     );
-  if (pickable.length > 0)
-    hints.push(
-      `${handHint(new Set(handMoves.map((m) => m.type)))}${tradable.size > 0 ? " Select 2 cards to trade them for a credit, an energy or a card." : ""}`,
-    );
+  if (pickable.length > 0) hints.push(`${handHint(new Set(handMoves.map((m) => m.type)))}`);
   if (goldMoves.length > 0) hints.push("Click the highlighted place of a gold scoring tile beside the board to mark it.");
   if (slotMoves.length > 0) hints.push("Click the slot of the computer on your player board where the new tech goes.");
   if (offers.length > 0) hints.push("Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.");
@@ -715,7 +709,7 @@ export function GameClient({
           </button>
         </div>
       ) : null}
-      {mine.length > 0 && !ended && !ask && !(tradeMoves.length > 0) && !rowMode ? (
+      {mine.length > 0 && !ended && !ask && !rowMode ? (
         <div className="movegroups">
           {moveGroups.map((g) => (
             <MoveGroup key={g.title} title={g.title} foldable={false}>
@@ -730,21 +724,15 @@ export function GameClient({
               </div>
             </MoveGroup>
           ))}
-          {resourceTrades.length > 0 ? (
+          {exchanges.length > 0 ? (
             <MoveGroup title="Free action" foldable={false}>
-              {resourceTrades.map((list) => (
-                <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
-              ))}
+              <div className="moves">
+                <button type="button" onClick={() => setTradeOpen(true)}>
+                  Trade resources
+                </button>
+              </div>
             </MoveGroup>
           ) : null}
-        </div>
-      ) : null}
-      {tradeMoves.length > 0 && !rowMode && !ask ? (
-        <div className="confirmbar">
-          <TradeButtons moves={tradeMoves} onPlay={play} onPickRow={setRowMode} />
-          <button type="button" className="secondary" onClick={() => setPicked([])}>
-            Cancel
-          </button>
         </div>
       ) : null}
       {canKick
@@ -824,6 +812,9 @@ export function GameClient({
               }}
             />
           ) : null}
+          {tradeOpen && !ended && exchanges.length > 0 ? (
+            <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
+          ) : null}
           <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
             {boardOpen ? "Close player boards" : "Player boards"}
           </button>
@@ -870,6 +861,7 @@ export function GameClient({
       contextActions={contextActions}
       hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
       spots={{ items: spots, selected: pickedSpot, onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id) }}
+      rowFlash={rowMode !== null}
       row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
       interaction={
         reach.length > 0
