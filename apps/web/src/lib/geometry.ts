@@ -24,20 +24,24 @@ export const RING_RADIUS = [0, 270, 485, 660, 870];
 /** The ring of nearby stars: four boards of two stars (a 1400 px picture cut into four 700 px quarters, drawn at this scale). */
 export const STAR = { scale: 2.02, quarter: 700, midRadius: 1193 };
 /**
- * Where the marker of a sector's winners lies, as places on the 700 px picture of the star board (the one the star is on). A star whose first
- * win gives a different reward than the later ones has two places: `first` (the reward the first winner's marker covers) and `later`; the others
- * have one reward space, where the markers of all winners lie (FAQ-12, SECTOR-14). Measured on the pictures.
+ * Where the markers of a sector's winners lie, as places on the 700 px picture of the star board the star is on (measured on the pictures).
+ * `first` is the space of the first win reward, where the first winner's marker lies and covers it (FAQ-12, SECTOR-14). From the second win on, the
+ * markers follow the dashed guide line of the star, like orbiters and landers do on a planet: `guide.at` is the small circle of the dashed
+ * capsule (the second winner's place) and `guide.dir` the way the capsule runs, the next markers lying one step after the other.
  */
-export const WIN_SPOTS: Record<string, { board: number; first: [number, number]; later?: [number, number] }> = {
-  "Proxima Centauri": { board: 1, first: [205, 613] },
-  "Kepler 22": { board: 1, first: [568, 250], later: [538, 376] },
-  "Sirius A": { board: 2, first: [313, 128] },
-  "Barnard's Star": { board: 2, first: [565, 458], later: [640, 565] },
-  Vega: { board: 3, first: [455, 133], later: [565, 70] },
-  Procyon: { board: 3, first: [130, 450], later: [165, 325] },
-  "Beta Pictoris": { board: 4, first: [132, 240], later: [60, 135] },
-  "61 Virginis": { board: 4, first: [383, 567] },
-};
+export const WIN_SPOTS: Record<string, { board: number; first: [number, number]; guide: { at: [number, number]; dir: [number, number] } }> =
+  {
+    "Proxima Centauri": { board: 1, first: [205, 613], guide: { at: [73, 543], dir: [0.93, -0.35] } },
+    "Kepler 22": { board: 1, first: [568, 250], guide: { at: [441, 324], dir: [0.5, -0.85] } },
+    "Sirius A": { board: 2, first: [313, 128], guide: { at: [343, 270], dir: [-0.9, 0.4] } },
+    "Barnard's Star": { board: 2, first: [565, 458], guide: { at: [545, 600], dir: [-0.3, -0.95] } },
+    Vega: { board: 3, first: [455, 133], guide: { at: [580, 160], dir: [-0.95, -0.15] } },
+    Procyon: { board: 3, first: [130, 450], guide: { at: [255, 360], dir: [0.2, 0.98] } },
+    "Beta Pictoris": { board: 4, first: [132, 240], guide: { at: [155, 95], dir: [0, 1] } },
+    "61 Virginis": { board: 4, first: [383, 567], guide: { at: [350, 428], dir: [0.6, 0.8] } },
+  };
+/** The distance between two markers along the guide line, on the picture of the star board. */
+export const WIN_STEP = 18;
 
 /** Board id -> its position (0 to 3) in the assembled picture of the ring. */
 export const STAR_BOARD_HOME: Record<number, number> = { 2: 0, 3: 1, 4: 2, 1: 3 };

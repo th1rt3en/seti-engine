@@ -29,6 +29,7 @@ import {
   STAR,
   STAR_BOARD_HOME,
   WIN_SPOTS,
+  WIN_STEP,
   alienColumn,
   goldPlace,
   landSlot,
@@ -620,16 +621,22 @@ export function BoardView({
             return { x: CENTER.x + dx * Math.cos(turn) - dy * Math.sin(turn), y: CENTER.y + dx * Math.sin(turn) + dy * Math.cos(turn) };
           };
           return sec.winners.map((player, n) => {
-            const spot = n === 0 || !spots.later ? spots.first : spots.later;
+            // the first marker on the first win reward, the others along the dashed guide line of the star
+            const spot: [number, number] =
+              n === 0
+                ? spots.first
+                : [
+                    spots.guide.at[0] + spots.guide.dir[0] * (n - 1) * WIN_STEP,
+                    spots.guide.at[1] + spots.guide.dir[1] * (n - 1) * WIN_STEP,
+                  ];
             const at = place(spot);
-            const stacked = spots.later ? (n === 0 ? 0 : n - 1) : n; // a marker beyond the first on the same space lies a little higher
             return (
               <Marker
                 // biome-ignore lint/suspicious/noArrayIndexKey: wins are recorded in order and never change
                 key={`win-${i}-${n}`}
                 x={at.x}
-                y={at.y - stacked * 26}
-                size={92}
+                y={at.y}
+                size={n === 0 ? 92 : 66}
                 color={color(player)}
                 title={`${who(player)}: won the sector of ${sec.star}${n === 0 ? " first" : ""}`}
               />
