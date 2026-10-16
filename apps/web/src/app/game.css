@@ -2333,3 +2333,11 @@ button:disabled {
     max-width: calc(100vw - 16px);
   }
 }
+
+/* the answers in the context bar */
+.contextactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}

@@ -12,6 +12,7 @@ import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { ExertianDock, HandDock, type HandSelection } from "./HandDock";
+import { Hint } from "./Hint";
 import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { MissionsPanel } from "./MissionsPanel";
 import { OrgName } from "./OrgName";
@@ -77,6 +78,8 @@ export function GameView({
   log,
   overlay,
   context,
+  contextActions,
+  hint,
   interaction,
   spots,
   goldChoice,
@@ -97,6 +100,10 @@ export function GameView({
   overlay?: ReactNode;
   /** What the context bar asks at the moment (a choice made on the board): it replaces the prompt of the game. */
   context?: ReactNode;
+  /** Buttons for the answers that are no choice on the board (skip, yes, no ...): in the context bar under its question. */
+  contextActions?: ReactNode;
+  /** The reminder of what can be done now, behind a small ? button next to the question. */
+  hint?: ReactNode;
   /** Picking a probe and a space to move it to. */
   interaction?: BoardInteraction;
   /** Places on the board that a move can be made at (landing, orbiting, signals, traces). */
@@ -133,7 +140,11 @@ export function GameView({
             {actor ? <span className="dot big" style={{ background: PLAYER_COLOR[actor.color] ?? "#fff" }} /> : null}
             <div>
               <b className="who">{prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}` : " "}</b>
-              <div className={context ? "prompt asking" : "prompt"}>{context ?? prompt.text}</div>
+              <div className={context ? "prompt asking" : "prompt"}>
+                {context ?? prompt.text}
+                {hint ? <Hint>{hint}</Hint> : null}
+              </div>
+              {contextActions ? <div className="contextactions">{contextActions}</div> : null}
             </div>
           </div>
           <ul className="scorechips" aria-label="Scores">

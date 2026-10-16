@@ -23,6 +23,7 @@ import { useTurnSound } from "@/lib/turnSound";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import type { CardAction } from "./CardActions";
@@ -388,7 +389,13 @@ export function GameClient({
     });
   const tradeMoves =
     pickedIds.length === 2 ? cardTrades.filter((m) => [...(m.cards as string[])].sort().join() === [...pickedIds].sort().join()) : [];
-  const moveGroups = groupMoves(otherMoves, pending, v.state.pending[0]?.kind === "data_overflow");
+  // The move bar has only the actions of a turn (launch, scan, analyze, pass, end the turn) and the free trade; the question of everything else is
+  // asked in the context bar above it, where the answers that are no choice on the board are buttons (skip, yes, no, take the data ...).
+  const BAR_MOVES = new Set(["launch", "scan", "analyze", "pass", "end_turn"]);
+  const barMoves = otherMoves.filter((m) => BAR_MOVES.has(m.type));
+  // a free action that moves a probe is no answer for a player with no probe on the map
+  const answerMoves = otherMoves.filter((m) => !BAR_MOVES.has(m.type) && !(m.type === "move_energy" && noProbe));
+  const moveGroups = groupMoves(barMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const resourceTrades = ["credit", "energy"].map((g) => exchanges.filter((m) => m.give === g)).filter((l) => l.length > 0);
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
@@ -507,6 +514,175 @@ export function GameClient({
       <span>Sending your move...</span>
     </div>
   );
+  // what is asked now, if the player has picked something to confirm: the text goes to the context bar, the buttons to the move bar
+  type Ask = { text: ReactNode; buttons: { label: string; onClick: () => void; disabled?: boolean }[]; onCancel: () => void };
+  const confirm = (label: string, onClick: () => void, disabled = false) => ({ label, onClick, disabled });
+  let ask: Ask | null = null;
+  if (unsure) {
+    ask = {
+      text: (
+        <>
+          <b>Are you sure? This cannot be undone.</b> {irreversibleText(unsure)}
+        </>
+      ),
+      buttons: [confirm("Continue", () => playConfirmed(unsure))],
+      onCancel: () => setUnsure(null),
+    };
+  } else if (pendingMove && probe) {
+    ask = {
+      text: moveText(pendingMove),
+      buttons: [
+        confirm("Confirm", () => {
+          const t = pendingMove;
+          setPendingMove(null);
+          moveTo(t);
+        }),
+      ],
+      onCancel: () => setPendingMove(null),
+    };
+  } else if (slotMove && slotTech) {
+    ask = {
+      text: (
+        <>
+          Confirm placing {techName(slotTech.split("-")[0] ?? "", slotTech.split("-")[1] ?? "")} on computer space{" "}
+          {Number(slotMove.slot) + 1}? <span className="muted small">{TECH_INFO[slotTech]?.effect}</span>
+        </>
+      ),
+      buttons: [confirm("Confirm", () => play(slotMove))],
+      onCancel: () => setPickedSlot(null),
+    };
+  } else if (goldMove && goldTile) {
+    ask = {
+      text: (
+        <>
+          Confirm marking the <b>{goldTile.tile}</b> gold scoring tile ({GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.per})? You would be
+          the {["first", "second", "third or later"][Math.min(goldTile.markers.length, 2)]} to mark it:{" "}
+          <b>{GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.values[Math.min(goldTile.markers.length, 2)]} points</b> for each.
+        </>
+      ),
+      buttons: [confirm("Confirm", () => play(goldMove))],
+      onCancel: () => setPickedGold(null),
+    };
+  } else if (offerMove) {
+    ask = { text: handMoveText(offerMove), buttons: [confirm("Confirm", () => play(offerMove))], onCancel: () => setPickedOffer(null) };
+  } else if (spotOption) {
+    ask = {
+      text: glyphChoices ? (
+        <span className="spotprompt glyphpick">
+          Place which glyph token in this {spotOption.id.split(":")[1]} slot?
+          {glyphChoices.map((c) => {
+            const owned = (v.state.players[v.viewer ?? 0]?.glyphs ?? []).filter((g) => g === c.glyph).length;
+            return (
+              <button
+                key={c.glyph}
+                type="button"
+                className={glyphChoice?.glyph === c.glyph ? "glyphchoice on" : "glyphchoice"}
+                aria-pressed={glyphChoice?.glyph === c.glyph}
+                title={`Place a ${c.glyph} glyph token (you have ${owned})`}
+                onClick={() => setPickedGlyph({ spot: spotOption.id, glyph: c.glyph })}
+              >
+                <img src={glyphToken(c.glyph)} alt={`${c.glyph} glyph token`} width={34} height={39} />
+                {owned > 1 ? <b>×{owned}</b> : null}
+              </button>
+            );
+          })}
+        </span>
+      ) : (
+        <SpotPrompt note={(v.notes[spotOption.move] ?? null) as Note} fallback={spotMove ? describeMove(spotMove) : undefined} />
+      ),
+      buttons: [confirm("Confirm", () => spotMove && play(spotMove), !spotMove)],
+      onCancel: () => setPickedSpot(null),
+    };
+  } else if (buyOptions.length > 0 && !rowMode) {
+    ask = {
+      text: buyOptions.map((m) => rowMoveText(m, v.state.card_row)).join(" "),
+      buttons: buyOptions.map((m) => confirm(buyOptions.length > 1 ? describeMove(m) : "Confirm", () => play(m))),
+      onCancel: () => setPickedBuy(null),
+    };
+  }
+  // moving a probe: what the context bar says while a probe is picked (the budget and its energy are set there)
+  const probeContext =
+    reach.length > 0 && probe !== null ? (
+      <span className="budget">
+        Move budget <b>{budget}</b> = {movement} movement +
+        <button
+          type="button"
+          className="step"
+          aria-label="Use one energy less"
+          disabled={extra <= 0}
+          onClick={() => setExtraEnergy(extra - 1)}
+        >
+          −
+        </button>
+        <b>{extra}</b> energy
+        <button
+          type="button"
+          className="step"
+          aria-label="Use one energy more"
+          disabled={extra >= energy}
+          onClick={() => setExtraEnergy(extra + 1)}
+        >
+          +
+        </button>
+        <span className="muted small">({energy} available)</span>
+      </span>
+    ) : reach.length > 0 && movement > 0 ? (
+      // movement left over (from the organization or from a card played as the main action) asks for a probe to spend it on
+      <>
+        Select a probe to move ({movement} {movement === 1 ? "move" : "moves"} left)
+      </>
+    ) : undefined;
+  // the reminders of what can be done now: one ? button in the context bar
+  const hints: string[] = [];
+  if (reach.length > 0)
+    hints.push(
+      probe === null
+        ? "Click a probe on the board, then a highlighted space."
+        : targets.length === 0
+          ? "No space is in reach: add energy."
+          : "Click a highlighted space; its number is what the move costs.",
+    );
+  if (pickable.length > 0)
+    hints.push(
+      `${handHint(new Set(handMoves.map((m) => m.type)))}${tradable.size > 0 ? " Select 2 cards to trade them for a credit, an energy or a card." : ""}`,
+    );
+  if (goldMoves.length > 0) hints.push("Click the highlighted place of a gold scoring tile beside the board to mark it.");
+  if (slotMoves.length > 0) hints.push("Click the slot of the computer on your player board where the new tech goes.");
+  if (offers.length > 0) hints.push("Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.");
+  if (spots.length > 0) hints.push("Click a highlighted place on the board or on a panel beside it.");
+  if (techMoves.length > 0)
+    hints.push(
+      `Click a tech stack to take that tech${techMoves[0]?.type === "research" ? ` (${researchCost(techMoves[0])} publicity, and the solar system rotates)` : ""}.`,
+    );
+  if (rowMoves.length > 0 && buys.length === 0 && !rowMode)
+    hints.push(`Click a card of the display${rowSources.includes("deck") ? " or the deck" : ""}.`);
+  if (buys.length > 0) hints.push("Click a card of the display or the deck to buy it for 3 publicity.");
+  const contextNode: ReactNode = ask?.text ?? techContext ?? probeContext;
+  // the answers that are not choices on the board are buttons in the context bar
+  const contextActions =
+    answerMoves.length > 0 && !ask && !ended ? (
+      <>
+        {answerMoves.map((m, i) => {
+          const idle = m.type === "move_energy" && noProbe;
+          return (
+            <button
+              // biome-ignore lint/suspicious/noArrayIndexKey: the answers come in the order of the engine
+              key={`${m.type}-${i}`}
+              type="button"
+              className="secondary small"
+              disabled={idle}
+              title={idle ? "You have no probe on the map to move" : undefined}
+              onClick={() => play(m)}
+            >
+              {describeMove(m)}
+              {m.type === "pick_sample" || m.type === "deliver_sample" ? (
+                <SampleReward note={v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))]} />
+              ) : null}
+            </button>
+          );
+        })}
+      </>
+    ) : undefined;
   const moves = (
     <>
       {ended ? (
@@ -524,173 +700,43 @@ export function GameClient({
       ) : null}
       {error ? <p className="error">{error}</p> : null}
       {sandboxMarker && !ended ? <SandboxPanel marker={sandboxMarker as never} send={(a) => sendAction(a)} handCards={hand} /> : null}
-      {unsure ? (
+      {ask ? (
         <div className="confirmbar">
-          <div className="confirm warn">
-            <span>
-              <b>No undo.</b> {irreversibleText(unsure)}
-            </span>
-            <button type="button" className="primary" onClick={() => playConfirmed(unsure)}>
-              Continue
+          {ask.buttons.map((b) => (
+            <button key={b.label} type="button" className="primary" disabled={b.disabled} onClick={b.onClick}>
+              {b.label}
             </button>
-            <button type="button" className="secondary" onClick={() => setUnsure(null)}>
-              Cancel
-            </button>
-          </div>
+          ))}
+          <button type="button" className="secondary" onClick={ask.onCancel}>
+            Cancel
+          </button>
         </div>
       ) : null}
-      {mine.length > 0 && !ended && !unsure ? ( // the "cannot be undone" question replaces the action prompt; Cancel brings the prompt back
+      {mine.length > 0 && !ended && !ask && !(tradeMoves.length > 0) && !rowMode ? (
         <div className="movegroups">
           {moveGroups.map((g) => (
-            <MoveGroup
-              key={g.title}
-              title={g.title}
-              count={g.moves.length + (g.title === "Free actions" ? resourceTrades.length : 0)}
-              foldable={g.title === "Free actions"}
-            >
+            <MoveGroup key={g.title} title={g.title} foldable={false}>
               <div className="moves">
-                {g.moves.map((m, i) => {
-                  const idle = m.type === "move_energy" && noProbe;
-                  return (
-                    <button
-                      key={`${m.type}-${i}`}
-                      type="button"
-                      disabled={idle}
-                      title={idle ? "You have no probe on the map to move" : undefined}
-                      onClick={() => play(m)}
-                    >
-                      {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? <ActionIcon name={m.type} /> : null}
-                      {describeMove(m)}
-                      {m.type === "pick_sample" || m.type === "deliver_sample" ? (
-                        <SampleReward note={v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))]} />
-                      ) : null}
-                    </button>
-                  );
-                })}
+                {g.moves.map((m, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the moves come in the order of the engine
+                  <button key={`${m.type}-${i}`} type="button" onClick={() => play(m)}>
+                    {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? <ActionIcon name={m.type} /> : null}
+                    {describeMove(m)}
+                  </button>
+                ))}
               </div>
-              {g.title === "Free actions"
-                ? resourceTrades.map((list) => (
-                    <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
-                  ))
-                : null}
             </MoveGroup>
           ))}
-          {resourceTrades.length > 0 && !moveGroups.some((g) => g.title === "Free actions") ? (
-            // with no other free action the trades make the group, which folds on a phone like the others
-            <MoveGroup title="Free actions" count={resourceTrades.length} foldable>
+          {resourceTrades.length > 0 ? (
+            <MoveGroup title="Free action" foldable={false}>
               {resourceTrades.map((list) => (
                 <TradeButtons key={String(list[0]?.give)} moves={list} onPlay={play} onPickRow={setRowMode} />
               ))}
             </MoveGroup>
           ) : null}
-          {reach.length > 0 ? (
-            <MoveGroup title="Move a probe" count={reach.length} foldable forceOpen={pickedProbe !== null} className="moveui">
-              <div className="moves">
-                {reach.map((r) => {
-                  const at = v.state.probes.find((x) => x.id === r.probe);
-                  return (
-                    <button
-                      key={r.probe}
-                      type="button"
-                      className={r.probe === pickedProbe ? "chip on" : "chip"}
-                      aria-pressed={r.probe === pickedProbe}
-                      onClick={() => setPickedProbe(r.probe === pickedProbe ? null : r.probe)}
-                    >
-                      {at?.capsule ? "Capsule" : "Probe"} {r.probe}
-                      {at ? ` (ring ${at.ring}, sector ${at.sector})` : ""}
-                    </button>
-                  );
-                })}
-              </div>
-              <span className="budget">
-                Move budget <b>{budget}</b> = {movement} movement +
-                <button
-                  type="button"
-                  className="step"
-                  aria-label="Use one energy less"
-                  disabled={extra <= 0}
-                  onClick={() => setExtraEnergy(extra - 1)}
-                >
-                  −
-                </button>
-                <b>{extra}</b> energy
-                <button
-                  type="button"
-                  className="step"
-                  aria-label="Use one energy more"
-                  disabled={extra >= energy}
-                  onClick={() => setExtraEnergy(extra + 1)}
-                >
-                  +
-                </button>
-                <span className="muted small">({energy} available)</span>
-              </span>
-              <Hint>
-                {probe === null
-                  ? "Select a probe on the board or here, then a highlighted space."
-                  : targets.length === 0
-                    ? "No space is in reach: add energy."
-                    : "Click a highlighted space; its number is what the move costs."}
-              </Hint>
-            </MoveGroup>
-          ) : null}
-          {pickable.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">Cards in hand</span>
-              <Hint>
-                {handHint(new Set(handMoves.map((m) => m.type)))}
-                {tradable.size > 0 ? " Select 2 cards to trade them for a credit, an energy or a card." : ""}
-              </Hint>
-            </div>
-          ) : null}
-          {goldMoves.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">Your choice</span>
-              <Hint>Click the highlighted place of a gold scoring tile beside the board to mark it.</Hint>
-            </div>
-          ) : null}
-          {slotMoves.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">Your choice</span>
-              <Hint>Click the slot of the computer on your player board where the new tech goes.</Hint>
-            </div>
-          ) : null}
-          {offers.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">Your choice</span>
-              <Hint>Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.</Hint>
-            </div>
-          ) : null}
-          {spots.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">Your choice</span>
-              <Hint>Click a highlighted place on the board or on a panel beside it.</Hint>
-            </div>
-          ) : null}
-          {techMoves.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">{techMoves[0]?.type === "research" ? "Main action" : "Your choice"}</span>
-              <Hint>
-                Click a tech stack to take that tech
-                {techMoves[0]?.type === "research" ? ` (${researchCost(techMoves[0])} publicity, and the solar system rotates)` : ""}.
-              </Hint>
-            </div>
-          ) : null}
-          {rowMoves.length > 0 && buys.length === 0 && !rowMode ? (
-            <div className="mgroup">
-              <span className="glabel">Your choice</span>
-              <Hint>Click a card of the display{rowSources.includes("deck") ? " or the deck" : ""}.</Hint>
-            </div>
-          ) : null}
-          {buys.length > 0 ? (
-            <div className="mgroup">
-              <span className="glabel">Free action</span>
-              <Hint>Click a card of the display or the deck to buy it for 3 publicity.</Hint>
-            </div>
-          ) : null}
         </div>
       ) : null}
-      {tradeMoves.length > 0 && !rowMode ? (
+      {tradeMoves.length > 0 && !rowMode && !ask ? (
         <div className="confirmbar">
           <TradeButtons moves={tradeMoves} onPlay={play} onPickRow={setRowMode} />
           <button type="button" className="secondary" onClick={() => setPicked([])}>
@@ -702,123 +748,6 @@ export function GameClient({
         <div className="confirmbar">
           <span className="confirm">Click the card of the display that you want.</span>
           <button type="button" className="secondary" onClick={() => setRowMode(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {pendingMove && probe ? (
-        <div className="confirmbar">
-          <div className="confirm">
-            <span>{moveText(pendingMove)}</span>
-            <button
-              type="button"
-              className="primary"
-              onClick={() => {
-                const t = pendingMove;
-                setPendingMove(null);
-                moveTo(t);
-              }}
-            >
-              Confirm
-            </button>
-          </div>
-          <button type="button" className="secondary" onClick={() => setPendingMove(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {slotMove && slotTech ? (
-        <div className="confirmbar">
-          <div className="confirm">
-            <span>
-              Confirm placing {techName(slotTech.split("-")[0] ?? "", slotTech.split("-")[1] ?? "")} on computer space{" "}
-              {Number(slotMove.slot) + 1}? <span className="muted small">{TECH_INFO[slotTech]?.effect}</span>
-            </span>
-            <button type="button" className="primary" onClick={() => play(slotMove)}>
-              Confirm
-            </button>
-          </div>
-          <button type="button" className="secondary" onClick={() => setPickedSlot(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {goldMove && goldTile ? (
-        <div className="confirmbar">
-          <div className="confirm">
-            <span>
-              Confirm marking the <b>{goldTile.tile}</b> gold scoring tile ({GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.per})? You
-              would be the {["first", "second", "third or later"][Math.min(goldTile.markers.length, 2)]} to mark it:{" "}
-              <b>{GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.values[Math.min(goldTile.markers.length, 2)]} points</b> for each.
-            </span>
-            <button type="button" className="primary" onClick={() => play(goldMove)}>
-              Confirm
-            </button>
-          </div>
-          <button type="button" className="secondary" onClick={() => setPickedGold(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {offerMove ? (
-        <div className="confirmbar">
-          <div className="confirm">
-            <span>{handMoveText(offerMove)}</span>
-            <button type="button" className="primary" onClick={() => play(offerMove)}>
-              Confirm
-            </button>
-          </div>
-          <button type="button" className="secondary" onClick={() => setPickedOffer(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {spotOption ? (
-        <div className="confirmbar">
-          <div className="confirm">
-            {glyphChoices ? (
-              <span className="spotprompt glyphpick">
-                Place which glyph token in this {spotOption.id.split(":")[1]} slot?
-                {glyphChoices.map((c) => {
-                  const owned = (v.state.players[v.viewer ?? 0]?.glyphs ?? []).filter((g) => g === c.glyph).length;
-                  return (
-                    <button
-                      key={c.glyph}
-                      type="button"
-                      className={glyphChoice?.glyph === c.glyph ? "glyphchoice on" : "glyphchoice"}
-                      aria-pressed={glyphChoice?.glyph === c.glyph}
-                      title={`Place a ${c.glyph} glyph token (you have ${owned})`}
-                      onClick={() => setPickedGlyph({ spot: spotOption.id, glyph: c.glyph })}
-                    >
-                      <img src={glyphToken(c.glyph)} alt={`${c.glyph} glyph token`} width={34} height={39} />
-                      {owned > 1 ? <b>×{owned}</b> : null}
-                    </button>
-                  );
-                })}
-              </span>
-            ) : (
-              <SpotPrompt note={(v.notes[spotOption.move] ?? null) as Note} fallback={spotMove ? describeMove(spotMove) : undefined} />
-            )}
-            <button type="button" className="primary" disabled={!spotMove} onClick={() => spotMove && play(spotMove)}>
-              Confirm
-            </button>
-          </div>
-          <button type="button" className="secondary" onClick={() => setPickedSpot(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
-      {buyOptions.length > 0 && !rowMode ? (
-        <div className="confirmbar">
-          {buyOptions.map((m) => (
-            <div key={m.type} className="confirm">
-              <span>{rowMoveText(m, v.state.card_row)}</span>
-              <button type="button" className="primary" onClick={() => play(m)}>
-                Confirm
-              </button>
-            </div>
-          ))}
-          <button type="button" className="secondary" onClick={() => setPickedBuy(null)}>
             Cancel
           </button>
         </div>
@@ -942,7 +871,9 @@ export function GameClient({
         onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
         onConfirm: techOption ? () => play(techOption) : undefined,
       }}
-      context={techContext}
+      context={contextNode}
+      contextActions={contextActions}
+      hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
       spots={{ items: spots, selected: pickedSpot, onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id) }}
       row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
       interaction={
