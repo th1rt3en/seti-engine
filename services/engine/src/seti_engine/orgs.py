@@ -7,9 +7,10 @@ reward spaces, Xenolab's action tiles, Futurespan Institute's prepared card.
 
 from __future__ import annotations
 
+import itertools
 from typing import Any
 
-from . import effects, rewards, rng, solar, tables
+from . import effects, rewards, rng, solar, tables, trail
 from .models import Decision, GameState, PlayerState
 
 Events = list[dict[str, Any]]
@@ -77,14 +78,16 @@ def deal(s: GameState, order: list[int]) -> None:
     for pl in order:
         p = s.players[pl]
         s.pending.append(Decision(kind="choose_org", player=pl))
-        s.pending += [Decision(kind="choose_quick", player=pl) for _ in range(2)]
+        s.pending.append(Decision(kind="choose_quick", player=pl))  # EXP-ORG-04: the two cards are kept in one choice (owner, 2026-10-16)
 
 
 def choose_moves(s: GameState, d: Decision) -> list[Action]:
     p = s.players[d.player]
     if d.kind == "choose_org":
         return [{"type": "choose_org", "org": o} for o in p.offered_orgs]
-    return [{"type": "choose_quick", "card": c} for c in p.offered_quick]
+    cards = sorted(p.offered_quick)
+    keep = min(2, len(cards))
+    return [{"type": "choose_quick", "cards": list(pair)} for pair in itertools.combinations(cards, keep)]
 
 
 def resolve_choice(s: GameState, p: PlayerState, d: Decision, a: Action, events: Events) -> None:
@@ -96,11 +99,9 @@ def resolve_choice(s: GameState, p: PlayerState, d: Decision, a: Action, events:
         p.offered_orgs = []
         events.append({"type": "organization", "player": p.index, "org": a["org"]})
         return
-    p.quick_start.append(a["card"])
-    p.offered_quick.remove(a["card"])
-    if len(p.quick_start) == 2:
-        p.offered_quick = []
-        start(s, p, events)
+    p.quick_start = list(a["cards"])
+    p.offered_quick = []
+    start(s, p, events)
 
 
 def start(s: GameState, p: PlayerState, events: Events) -> None:
@@ -110,17 +111,19 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
     org = by_id(p.organization)
     for cid in p.quick_start:
         place_marks(s, p, cid)  # EXP-QS-01: no benefits
-    for _ in range(org["probes"]):  # EXP-ORDER-01: the launches are printed before the resources in the header of Orbital Dynamics
-        effects.launch_probe(s, p, events)
-    res = org["starting_resources"]
-    p.credits += res["credit"]
-    p.energy += res["energy"]
-    p.publicity += res["publicity"]
-    effects.gain_data(s, p, res["data"])
-    for _ in range(res["card"]):
-        effects.draw_random_card(s, p)
+    with trail.scope(s, {"kind": "organization", "org": p.organization}):  # the log shows the organization apart from each quick start card
+        for _ in range(org["probes"]):  # EXP-ORDER-01: the launches are printed before the resources in the header of Orbital Dynamics
+            effects.launch_probe(s, p, events)
+        res = org["starting_resources"]
+        p.credits += res["credit"]
+        p.energy += res["energy"]
+        p.publicity += res["publicity"]
+        effects.gain_data(s, p, res["data"])
+        for _ in range(res["card"]):
+            effects.draw_random_card(s, p)
     for cid in p.quick_start:  # EXP-QS-02: the bottom half
-        lower(s, p, cid)
+        with trail.scope(s, {"kind": "quick_start", "card": cid}):
+            lower(s, p, cid)
     if p.organization == "mission_relay":  # EXP-ORG-13: the lowest-scoring space of the Mission tile
         g = next(g for g in s.gold_tiles if g.tile == "Mission")
         g.low_markers.append(p.index)

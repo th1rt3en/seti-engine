@@ -12,16 +12,17 @@ export function SetupChoice({
   kind,
   offers,
   selected,
-  kept,
+  need,
   quickOffered = [],
   onSelect,
   onConfirm,
 }: {
   kind: "org" | "quick";
   offers: string[];
-  selected: string | null;
-  /** How many quick start cards the player has kept already (they keep 2). */
-  kept: number;
+  /** The cards that are picked now. */
+  selected: string[];
+  /** How many cards must be picked (the organization: 1; the quick start cards: 2). */
+  need: number;
   /** The quick start cards that were dealt to the player: shown under the organizations, so that the choice can take them into account. */
   quickOffered?: string[];
   onSelect: (id: string) => void;
@@ -33,7 +34,7 @@ export function SetupChoice({
   if (aside) {
     return (
       <div className="setupaside" role="region" aria-label="The choice is put aside">
-        <span>{org ? "Choosing your organization" : `Choosing quick start card ${kept + 1} of 2`}</span>
+        <span>{org ? "Choosing your organization" : `Choosing ${need} quick start cards`}</span>
         <button type="button" className="primary" onClick={() => setAside(false)}>
           Back to the choice
         </button>
@@ -48,11 +49,11 @@ export function SetupChoice({
       aria-label={org ? "Choose your organization" : "Choose a quick start card"}
     >
       <div className="setupinner">
-        <h2>{org ? "Choose your organization" : `Choose quick start card ${kept + 1} of 2`}</h2>
+        <h2>{org ? "Choose your organization" : `Choose ${need} quick start cards`}</h2>
         <p className="muted">
           {org
             ? "Your organization decides your powers, your starting resources and your income for the game."
-            : "Each quick start card puts markers on the board at no reward now and gives its bonus at the start. Keep two of the three."}
+            : "Each quick start card puts markers on the board at no reward now and gives its bonus at the start. Keep two of the three: pick both, then confirm."}
         </p>
         <div className={org ? "setupcards orgs" : "setupcards quick"}>
           {offers.map((id) => {
@@ -61,8 +62,8 @@ export function SetupChoice({
               <button
                 key={id}
                 type="button"
-                className={selected === id ? "setupcard chosen" : "setupcard"}
-                aria-pressed={selected === id}
+                className={selected.includes(id) ? "setupcard chosen" : "setupcard"}
+                aria-pressed={selected.includes(id)}
                 onClick={() => onSelect(id)}
               >
                 <img src={cardImage(id)} alt={ORG_NAMES[id] ?? id} />
@@ -92,8 +93,8 @@ export function SetupChoice({
           <button type="button" className="secondary big" onClick={() => setAside(true)} title="Hide the choice to look at the board">
             View the board
           </button>
-          <button type="button" className="primary big" disabled={selected === null} onClick={onConfirm}>
-            {org ? "Take this organization" : "Keep this card"}
+          <button type="button" className="primary big" disabled={selected.length !== need} onClick={onConfirm}>
+            {org ? "Take this organization" : `Keep these ${need} cards (${selected.length} of ${need} picked)`}
           </button>
         </div>
       </div>

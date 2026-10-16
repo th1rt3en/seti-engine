@@ -27,6 +27,8 @@ export interface TechPick {
   selectable: number[];
   selected: number | null;
   onSelect: (stack: number) => void;
+  /** The button that makes the move, lying on the selected tech (the context bar above asks the question). */
+  onConfirm?: () => void;
 }
 
 export function TechStacks({ view, pick }: { view: View; pick?: TechPick }) {
@@ -97,16 +99,22 @@ export function TechStacks({ view, pick }: { view: View; pick?: TechPick }) {
               );
               if (!pick?.selectable.includes(index)) return <span key={`${cat.key}-${glyph}`}>{art}</span>;
               return (
-                <button
-                  key={`${cat.key}-${glyph}`}
-                  type="button"
-                  className={pick.selected === index ? "stackbtn selected" : "stackbtn"}
-                  aria-pressed={pick.selected === index}
-                  title={`Take ${info?.name ?? "this tech"}`}
-                  onClick={() => pick.onSelect(index)}
-                >
-                  {art}
-                </button>
+                <span key={`${cat.key}-${glyph}`} className="stackwrap">
+                  <button
+                    type="button"
+                    className={pick.selected === index ? "stackbtn selected" : "stackbtn"}
+                    aria-pressed={pick.selected === index}
+                    title={`Take ${info?.name ?? "this tech"}`}
+                    onClick={() => pick.onSelect(index)}
+                  >
+                    {art}
+                  </button>
+                  {pick.selected === index && pick.onConfirm ? (
+                    <button type="button" className="primary stackconfirm" onClick={pick.onConfirm}>
+                      Confirm
+                    </button>
+                  ) : null}
+                </span>
               );
             })}
           </div>

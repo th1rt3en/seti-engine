@@ -3,7 +3,7 @@
 // The server sends every client the same log with the identity of hidden cards left out (apps/worker/src/core/publicLog.ts). A move is one line
 // with what it gave and took, one line for each source (the engine's `gains` events), as icons; in the solo game what the rival did after it is a block of its own.
 import type { GameEvent } from "@/lib/events";
-import { cardName, logText } from "@/lib/moves";
+import { ORG_NAMES, cardName, logText } from "@/lib/moves";
 import { techName } from "@/lib/techs";
 import { useBottomSpace, useDock } from "@/lib/useDock";
 import { type ReactNode, useEffect, useRef } from "react";
@@ -113,6 +113,10 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
       return src.what === "decipher" ? `Placing the ${String(src.glyph)} glyph` : `The ${String(src.glyph)} glyph (icon of a card)`;
     case "income":
       return "Income of the round";
+    case "organization":
+      return `Organization ${ORG_NAMES[String(src.org)] ?? String(src.org)}`;
+    case "quick_start":
+      return `Quick start card ${String(src.card)}`;
     case "rival_turn":
       return "The rival's turn";
     default:

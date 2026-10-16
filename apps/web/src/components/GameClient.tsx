@@ -27,6 +27,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import type { CardAction } from "./CardActions";
 import { GameView } from "./GameView";
+import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
 import { MoveGroup } from "./MoveGroupLabel";
@@ -85,6 +86,8 @@ export function GameClient({
   const [pickedBuy, setPickedBuy] = useState<string | null>(null);
   // the end-of-round card picked to keep (after passing)
   const [pickedOffer, setPickedOffer] = useState<string | null>(null);
+  // the quick start cards picked to keep (two at once)
+  const [pickedQuick, setPickedQuick] = useState<string[]>([]);
   // the place picked for a probe to move to, until the player confirms
   const [pendingMove, setPendingMove] = useState<{ to: [number, number]; cost: number; path: [number, number][] } | null>(null);
   const [rowMode, setRowMode] = useState<Move[] | null>(null);
@@ -173,6 +176,7 @@ export function GameClient({
           setPicked([]);
           setPickedBuy(null);
           setPickedOffer(null);
+          setPickedQuick([]);
           setPendingMove(null);
           setUnsure(null);
           setRowMode(null);
@@ -301,6 +305,7 @@ export function GameClient({
   // the cards that are offered to keep one of (end-of-round cards, organizations, quick start cards)
   const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
   const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
+  const quickCards = (m: Move): string[] => ((m.cards as string[] | undefined) ?? []).map(String);
   const rowMoves = mine.filter((m) => ROW_MOVES.includes(m.type) && m.source !== undefined);
   // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
   const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
@@ -414,11 +419,20 @@ export function GameClient({
   // the first choice of a game with organizations (organization, then quick start cards) has a screen of its own
   const setupMoves = mine.filter((m) => m.type === "choose_org" || m.type === "choose_quick");
   const setupKind = setupMoves[0]?.type === "choose_org" ? "org" : "quick";
-  const setupOffers = [...new Set(setupMoves.map(offerId))];
+  // the quick start cards are kept two at once: every legal move names a pair, and the page offers the cards that are in some pair
+  const setupOffers = [...new Set(setupMoves.flatMap((m) => (m.type === "choose_quick" ? quickCards(m) : [offerId(m)])))];
+  const quickNeed = setupMoves[0]?.type === "choose_quick" ? quickCards(setupMoves[0]).length : 1;
   const offers = [...new Set(mine.filter((m) => isOffer(m) && !setupMoves.includes(m)).map(offerId))];
   const offerMove =
     pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
-  const setupMove = pickedOffer === null ? undefined : setupMoves.find((m) => offerId(m) === pickedOffer);
+  const setupMove =
+    setupKind === "quick"
+      ? pickedQuick.length === quickNeed
+        ? setupMoves.find((m) => quickCards(m).length === quickNeed && quickCards(m).every((c) => pickedQuick.includes(c)))
+        : undefined
+      : pickedOffer === null
+        ? undefined
+        : setupMoves.find((m) => offerId(m) === pickedOffer);
   // a tech for the computer goes in a slot picked on the player board
   const slotMoves = mine.filter((m) => m.type === "place_computer_tech");
   const slotMove = pickedSlot === null ? undefined : slotMoves.find((m) => m.slot === pickedSlot);
@@ -432,6 +446,18 @@ export function GameClient({
   const ROW_SIGNAL_MOVES = ["scan_discard", "scan_token", "row_pick"];
   const pickedRowMoves = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
   // discarding a card of the display for a signal (during a scan) is confirmed by a button on the card itself; the other moves keep the bar
+  // the context bar asks the question of a tech that is picked; the confirm button lies on the tech itself
+  const techContext =
+    techOption && techStack ? (
+      <>
+        {techOption.type === "research"
+          ? `Confirm spending ${researchCost(techOption)} publicity to research ${techName(techStack.category, techStack.glyph)}?`
+          : `Confirm taking ${techName(techStack.category, techStack.glyph)}?`}{" "}
+        <button type="button" className="secondary small" onClick={() => setPickedTech(null)}>
+          Cancel
+        </button>
+      </>
+    ) : undefined;
   const buyOptions = pickedRowMoves.filter((m) => !ROW_SIGNAL_MOVES.includes(m.type));
   const rowCardId = pickedBuy === null || pickedBuy === "deck" ? undefined : v.state.card_row[Number(pickedBuy.slice(4))];
   const rowActions: CardAction[] = pickedRowMoves
@@ -599,67 +625,67 @@ export function GameClient({
                 </button>
                 <span className="muted small">({energy} available)</span>
               </span>
-              <span className="handhint">
+              <Hint>
                 {probe === null
                   ? "Select a probe on the board or here, then a highlighted space."
                   : targets.length === 0
                     ? "No space is in reach: add energy."
                     : "Click a highlighted space; its number is what the move costs."}
-              </span>
+              </Hint>
             </MoveGroup>
           ) : null}
           {pickable.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Cards in hand</span>
-              <span className="handhint">
+              <Hint>
                 {handHint(new Set(handMoves.map((m) => m.type)))}
                 {tradable.size > 0 ? " Select 2 cards to trade them for a credit, an energy or a card." : ""}
-              </span>
+              </Hint>
             </div>
           ) : null}
           {goldMoves.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Click the highlighted place of a gold scoring tile beside the board to mark it.</span>
+              <Hint>Click the highlighted place of a gold scoring tile beside the board to mark it.</Hint>
             </div>
           ) : null}
           {slotMoves.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Click the slot of the computer on your player board where the new tech goes.</span>
+              <Hint>Click the slot of the computer on your player board where the new tech goes.</Hint>
             </div>
           ) : null}
           {offers.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.</span>
+              <Hint>Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.</Hint>
             </div>
           ) : null}
           {spots.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Click a highlighted place on the board or on a panel beside it.</span>
+              <Hint>Click a highlighted place on the board or on a panel beside it.</Hint>
             </div>
           ) : null}
           {techMoves.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">{techMoves[0]?.type === "research" ? "Main action" : "Your choice"}</span>
-              <span className="handhint">
+              <Hint>
                 Click a tech stack to take that tech
                 {techMoves[0]?.type === "research" ? ` (${researchCost(techMoves[0])} publicity, and the solar system rotates)` : ""}.
-              </span>
+              </Hint>
             </div>
           ) : null}
           {rowMoves.length > 0 && buys.length === 0 && !rowMode ? (
             <div className="mgroup">
               <span className="glabel">Your choice</span>
-              <span className="handhint">Click a card of the display{rowSources.includes("deck") ? " or the deck" : ""}.</span>
+              <Hint>Click a card of the display{rowSources.includes("deck") ? " or the deck" : ""}.</Hint>
             </div>
           ) : null}
           {buys.length > 0 ? (
             <div className="mgroup">
               <span className="glabel">Free action</span>
-              <span className="handhint">Click a card of the display or the deck to buy it for 3 publicity.</span>
+              <Hint>Click a card of the display or the deck to buy it for 3 publicity.</Hint>
             </div>
           ) : null}
         </div>
@@ -782,22 +808,6 @@ export function GameClient({
           </button>
         </div>
       ) : null}
-      {techOption && techStack ? (
-        <div className="confirmbar">
-          <div className="confirm">
-            <span>
-              Confirm taking {techName(techStack.category, techStack.glyph)}?
-              {techOption.type === "research" ? ` It costs ${researchCost(techOption)} publicity and the solar system rotates.` : ""}
-            </span>
-            <button type="button" className="primary" onClick={() => play(techOption)}>
-              Confirm
-            </button>
-          </div>
-          <button type="button" className="secondary" onClick={() => setPickedTech(null)}>
-            Cancel
-          </button>
-        </div>
-      ) : null}
       {buyOptions.length > 0 && !rowMode ? (
         <div className="confirmbar">
           {buyOptions.map((m) => (
@@ -873,14 +883,19 @@ export function GameClient({
             <SetupChoice
               kind={setupKind}
               offers={setupOffers}
-              selected={pickedOffer}
-              kept={me?.quick_start.length ?? 0}
+              selected={setupKind === "quick" ? pickedQuick : pickedOffer === null ? [] : [pickedOffer]}
+              need={setupKind === "quick" ? quickNeed : 1}
               quickOffered={(me?.offered_quick ?? []).filter((q) => q !== "?")}
-              onSelect={(id) => setPickedOffer(pickedOffer === id ? null : id)}
+              onSelect={(id) =>
+                setupKind === "quick"
+                  ? setPickedQuick((old) => (old.includes(id) ? old.filter((c) => c !== id) : [...old, id].slice(-quickNeed)))
+                  : setPickedOffer(pickedOffer === id ? null : id)
+              }
               onConfirm={() => {
                 if (setupMove) {
                   setPickedOffer(null);
-                  play(setupMove);
+                  setPickedQuick([]);
+                  sendAction(setupMove); // the choice dialog is the confirmation: no second question about a move that cannot be undone
                 }
               }}
             />
@@ -925,7 +940,9 @@ export function GameClient({
         selectable: techMoves.map((m) => Number(m.stack)),
         selected: pickedTech,
         onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
+        onConfirm: techOption ? () => play(techOption) : undefined,
       }}
+      context={techContext}
       spots={{ items: spots, selected: pickedSpot, onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id) }}
       row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
       interaction={

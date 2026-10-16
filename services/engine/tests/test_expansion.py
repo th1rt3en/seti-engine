@@ -455,3 +455,30 @@ def test_exp_org_13_the_note_of_a_research_move_shows_the_cost_of_fenwick() -> N
     assert move_notes.note(s, move) == {"cost": {"publicity": 5}}
     s.players[s.current_player].organization = "stratus_core"
     assert move_notes.note(s, move) == {"cost": {"publicity": 6}}
+
+
+def test_exp_org_04_both_quick_start_cards_are_kept_in_one_choice() -> None:
+    """EXP-ORG-04 (owner, 2026-10-16): one choice, a move for every pair of the offered cards, and what each source gave is reported."""
+    from seti_engine.engine import apply, start
+    from seti_engine.models import Options
+
+    r = start(Options(players=2, seed=9, expansion=True, organizations=True))
+    r = apply(r.state, r.legal[0])  # the first player's organization
+    d = r.state.pending[0]
+    assert d.kind == "choose_quick"
+    offered = sorted(r.state.players[d.player].offered_quick)
+    assert len(offered) == 3
+    pairs = [m["cards"] for m in r.legal]
+    expected = [[offered[0], offered[1]], [offered[0], offered[2]], [offered[1], offered[2]]]
+    assert sorted(map(sorted, pairs)) == sorted(map(sorted, expected))
+    assert all(m["type"] == "choose_quick" for m in r.legal)
+    chosen = r.legal[0]
+    after = apply(r.state, chosen)
+    p = after.state.players[d.player]
+    assert sorted(p.quick_start) == sorted(chosen["cards"]) and p.offered_quick == []
+    gains = [e for e in after.events if e["type"] == "gains" and e["player"] == d.player]
+    kinds = [(e["source"]["kind"], e["source"].get("card")) for e in gains]
+    assert kinds[0][0] == "organization"  # the organization first, apart from the cards
+    assert {c for k, c in kinds if k == "quick_start"} <= set(chosen["cards"])  # a card that gives nothing has no line
+    for e in gains:
+        assert e["changes"] and all(v != 0 for v in e["changes"].values())

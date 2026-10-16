@@ -82,7 +82,7 @@ export const LABELS: Record<string, Label> = {
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
   choose_org: (m) =>
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
-  choose_quick: (m) => `Keep the quick start card ${quickText(m.card)}`,
+  choose_quick: (m) => `Keep the quick start cards ${((m.cards as string[]) ?? []).map(quickText).join(" and ")}`,
   org_free: (m) => orgFreeLabel(m),
   breach: () => "Breach your security card of that color (take it into your hand)",
   skip_breach: () => "Do not breach the security card",
@@ -335,7 +335,7 @@ export function handMoveText(m: Move, glyph?: { reward: { t: string; n: number }
     case "choose_org":
       return `Take the organization ${name}? The other one goes back to the box.`;
     case "choose_quick":
-      return `Keep the quick start card ${quickText(m.card)}?`;
+      return `Keep the quick start cards ${((m.cards as string[]) ?? []).map(quickText).join(" and ")}?`;
     default:
       return describeMove(m);
   }

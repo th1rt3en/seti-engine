@@ -2257,3 +2257,79 @@ button:disabled {
   font-size: 22px;
   font-weight: 700;
 }
+
+/* the ? button that holds the reminders of the move bar */
+.hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.hintbtn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.hinttext {
+  position: absolute;
+  z-index: 50;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: max-content;
+  max-width: min(420px, 70vw);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* the confirm button on the selected tech, and the question of the context bar */
+.stackwrap {
+  position: relative;
+  display: block;
+}
+.stackconfirm {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+.prompt.asking {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-weight: 700;
+}
+
+/* the choice put aside: one thin line */
+.setupaside {
+  padding: 3px 8px;
+  gap: 8px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.setupaside button {
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.setupaside span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 760px) {
+  .setupaside {
+    max-width: calc(100vw - 16px);
+  }
+}
