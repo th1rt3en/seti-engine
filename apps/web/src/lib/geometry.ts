@@ -23,6 +23,22 @@ export const RING_RADIUS = [0, 270, 485, 660, 870];
 
 /** The ring of nearby stars: four boards of two stars (a 1400 px picture cut into four 700 px quarters, drawn at this scale). */
 export const STAR = { scale: 2.02, quarter: 700, midRadius: 1193 };
+/**
+ * Where the marker of a sector's winners lies, as places on the 700 px picture of the star board (the one the star is on). A star whose first
+ * win gives a different reward than the later ones has two places: `first` (the reward the first winner's marker covers) and `later`; the others
+ * have one reward space, where the markers of all winners lie (FAQ-12, SECTOR-14). Measured on the pictures.
+ */
+export const WIN_SPOTS: Record<string, { board: number; first: [number, number]; later?: [number, number] }> = {
+  "Proxima Centauri": { board: 1, first: [205, 613] },
+  "Kepler 22": { board: 1, first: [568, 250], later: [538, 376] },
+  "Sirius A": { board: 2, first: [313, 128] },
+  "Barnard's Star": { board: 2, first: [565, 458], later: [640, 565] },
+  Vega: { board: 3, first: [455, 133], later: [565, 70] },
+  Procyon: { board: 3, first: [130, 450], later: [165, 325] },
+  "Beta Pictoris": { board: 4, first: [132, 240], later: [60, 135] },
+  "61 Virginis": { board: 4, first: [383, 567] },
+};
+
 /** Board id -> its position (0 to 3) in the assembled picture of the ring. */
 export const STAR_BOARD_HOME: Record<number, number> = { 2: 0, 3: 1, 4: 2, 1: 3 };
 

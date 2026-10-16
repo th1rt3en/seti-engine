@@ -28,6 +28,7 @@ import {
   RING_RADIUS,
   STAR,
   STAR_BOARD_HOME,
+  WIN_SPOTS,
   alienColumn,
   goldPlace,
   landSlot,
@@ -602,6 +603,39 @@ export function BoardView({
               );
             })()
           : null}
+
+        {/* the markers of the winners of each sector (SECTOR-14): the first on the space of the first win reward, the later ones on the later reward
+            (a star with one reward space holds them all); they stay for the rest of the game */}
+        {s.sectors.flatMap((sec, i) => {
+          const spots = WIN_SPOTS[sec.star];
+          if (!spots || sec.winners.length === 0) return [];
+          const position = s.sector_order.indexOf(spots.board);
+          const home = STAR_BOARD_HOME[spots.board] ?? position;
+          const base = quarterOffset[home] ?? { x: 0, y: 0 };
+          const k = quarter / STAR.quarter;
+          const turn = (-(position - home) * 90 * Math.PI) / 180;
+          const place = ([px, py]: [number, number]): { x: number; y: number } => {
+            const dx = base.x + px * k;
+            const dy = base.y + py * k;
+            return { x: CENTER.x + dx * Math.cos(turn) - dy * Math.sin(turn), y: CENTER.y + dx * Math.sin(turn) + dy * Math.cos(turn) };
+          };
+          return sec.winners.map((player, n) => {
+            const spot = n === 0 || !spots.later ? spots.first : spots.later;
+            const at = place(spot);
+            const stacked = spots.later ? (n === 0 ? 0 : n - 1) : n; // a marker beyond the first on the same space lies a little higher
+            return (
+              <Marker
+                // biome-ignore lint/suspicious/noArrayIndexKey: wins are recorded in order and never change
+                key={`win-${i}-${n}`}
+                x={at.x}
+                y={at.y - stacked * 26}
+                size={92}
+                color={color(player)}
+                title={`${who(player)}: won the sector of ${sec.star}${n === 0 ? " first" : ""}`}
+              />
+            );
+          });
+        })}
 
         {/* the glyph tokens that still lie on the board (EXP-GLY-03): beside each planet, on each sector, on the wells of the Glyphids board
             (the ones on tech stacks are drawn on the stacks) */}
