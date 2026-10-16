@@ -25,11 +25,11 @@ export const RING_RADIUS = [0, 270, 485, 660, 870];
 export const STAR = { scale: 2.02, quarter: 700, midRadius: 1193 };
 /**
  * Where the markers of a sector's winners lie, as places on the 700 px picture of the star board the star is on (measured on the pictures).
- * `first` is the space of the first win reward, where the first winner's marker lies and covers it (FAQ-12, SECTOR-14). From the second win on,
- * the markers follow the printed capsule beside the star, which has three small circles (`guide`, the one nearest the star first), like orbiters
+ * `first` is the space of the first win reward, where the first winner's marker lies and covers it (FAQ-12, SECTOR-14); a star whose first and later
+ * rewards are alike has none (Proxima Centauri, Sirius A, 61 Virginis): all its winners lie on the capsule. From the second win on, the markers follow the printed capsule beside the star, which has three small circles (`guide`, the one nearest the star first), like orbiters
  * and landers follow the guide line of a planet; more markers than circles go on in the same direction at the same distance.
  */
-export const WIN_SPOTS: Record<string, { board: number; first: [number, number]; guide: [number, number][] }> = {
+export const WIN_SPOTS: Record<string, { board: number; first?: [number, number]; guide: [number, number][] }> = {
   "Proxima Centauri": {
     board: 1,
     first: [205, 613],
@@ -79,9 +79,9 @@ export const WIN_SPOTS: Record<string, { board: number; first: [number, number];
     board: 3,
     first: [130, 450],
     guide: [
-      [210, 316],
-      [185, 351],
       [162, 386],
+      [185, 351],
+      [210, 316],
     ],
   },
   "Beta Pictoris": {

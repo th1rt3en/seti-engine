@@ -622,7 +622,12 @@ export function BoardView({
           };
           return sec.winners.map((player, n) => {
             // the first marker on the first win reward, the others along the dashed guide line of the star
-            const spot: [number, number] = n === 0 ? spots.first : winGuideSpot(spots.guide, n - 1);
+            // with a space of its own for the first win, that one lies there and the others take the capsule; else all take the capsule
+            const spot: [number, number] = spots.first
+              ? n === 0
+                ? spots.first
+                : winGuideSpot(spots.guide, n - 1)
+              : winGuideSpot(spots.guide, n);
             const at = place(spot);
             return (
               <Marker
@@ -630,7 +635,7 @@ export function BoardView({
                 key={`win-${i}-${n}`}
                 x={at.x}
                 y={at.y}
-                size={n === 0 ? 92 : 62}
+                size={92}
                 color={color(player)}
                 title={`${who(player)}: won the sector of ${sec.star}${n === 0 ? " first" : ""}`}
               />
