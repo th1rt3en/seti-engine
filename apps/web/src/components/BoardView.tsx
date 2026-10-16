@@ -29,7 +29,6 @@ import {
   STAR,
   STAR_BOARD_HOME,
   WIN_SPOTS,
-  WIN_STEP,
   alienColumn,
   goldPlace,
   landSlot,
@@ -37,6 +36,7 @@ import {
   polar,
   scoreDegrees,
   sectorDegrees,
+  winGuideSpot,
 } from "@/lib/geometry";
 import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
@@ -622,13 +622,7 @@ export function BoardView({
           };
           return sec.winners.map((player, n) => {
             // the first marker on the first win reward, the others along the dashed guide line of the star
-            const spot: [number, number] =
-              n === 0
-                ? spots.first
-                : [
-                    spots.guide.at[0] + spots.guide.dir[0] * (n - 1) * WIN_STEP,
-                    spots.guide.at[1] + spots.guide.dir[1] * (n - 1) * WIN_STEP,
-                  ];
+            const spot: [number, number] = n === 0 ? spots.first : winGuideSpot(spots.guide, n - 1);
             const at = place(spot);
             return (
               <Marker
@@ -636,7 +630,7 @@ export function BoardView({
                 key={`win-${i}-${n}`}
                 x={at.x}
                 y={at.y}
-                size={n === 0 ? 92 : 66}
+                size={n === 0 ? 92 : 62}
                 color={color(player)}
                 title={`${who(player)}: won the sector of ${sec.star}${n === 0 ? " first" : ""}`}
               />
