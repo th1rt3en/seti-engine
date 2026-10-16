@@ -2491,3 +2491,39 @@ button:disabled {
 .now .hint {
   margin-left: 6px;
 }
+
+/* the ? button is at the end of the context bar; its text opens towards the left */
+.now > .hint {
+  margin-left: auto;
+  flex: none;
+  align-self: center;
+}
+.now > .hint {
+  position: static;
+}
+.now {
+  position: relative;
+}
+.now > .hint .hinttext {
+  left: auto;
+  right: 0;
+  top: calc(100% + 6px);
+  transform: none;
+}
+
+/* the name in a score chip opens the board of the player; on a phone this replaces the floating button of the boards */
+.chipname {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .boardsfab {
+    display: none;
+  }
+}

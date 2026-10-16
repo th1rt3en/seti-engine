@@ -10,6 +10,7 @@ import { ArkhosPanel } from "./ArkhosPanel";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
 import { type BoardInteraction, type BoardSpots, BoardView, type GoldChoice } from "./BoardView";
+import { ChipName } from "./ChipName";
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { ExertianDock, HandDock, type HandSelection } from "./HandDock";
 import { Hint } from "./Hint";
@@ -146,19 +147,22 @@ export function GameView({
                 <b className="who">
                   {prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}${prompt.mine || context ? ":" : ""}` : " "}
                 </b>
-                <span className={context ? "prompt asking" : "prompt"}>
-                  {context ?? prompt.text}
-                  {hint ? <Hint>{hint}</Hint> : null}
-                </span>
+                <span className={context ? "prompt asking" : "prompt"}>{context ?? prompt.text}</span>
               </div>
               {contextActions ? <div className="contextactions">{contextActions}</div> : null}
             </div>
+            {hint ? <Hint>{hint}</Hint> : null}
           </div>
           <ul className="scorechips" aria-label="Scores">
             {s.players.map((p) => (
               <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
-                {s.rival && p.index === s.rival.index ? "Rival" : (names[p.index] ?? `Player ${p.index + 1}`)}
+                {s.rival && p.index === s.rival.index ? (
+                  "Rival"
+                ) : (
+                  // the name opens the board of the player (the computer and the techs)
+                  <ChipName player={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
+                )}
                 {p.organization ? <OrgName id={p.organization} className="orgname" /> : null}
                 <span className="res" title="Victory points">
                   <ScoreIcon size={20} />
