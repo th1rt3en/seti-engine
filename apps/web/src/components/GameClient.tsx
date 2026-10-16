@@ -512,7 +512,12 @@ export function GameClient({
     </div>
   );
   // what is asked now, if the player has picked something to confirm: the text goes to the context bar, the buttons to the move bar
-  type Ask = { text: ReactNode; buttons: { label: string; onClick: () => void; disabled?: boolean }[]; onCancel: () => void };
+  type Ask = {
+    inContext?: boolean;
+    text: ReactNode;
+    buttons: { label: string; onClick: () => void; disabled?: boolean }[];
+    onCancel: () => void;
+  };
   const confirm = (label: string, onClick: () => void, disabled = false) => ({ label, onClick, disabled });
   let ask: Ask | null = null;
   if (unsure) {
@@ -524,6 +529,7 @@ export function GameClient({
       ),
       buttons: [confirm("Continue", () => playConfirmed(unsure))],
       onCancel: () => setUnsure(null),
+      inContext: true, // the question that a move cannot be undone has its buttons in the context bar, where the eye is
     };
   } else if (pendingMove && probe) {
     ask = {
@@ -656,30 +662,40 @@ export function GameClient({
   if (buys.length > 0) hints.push("Click a card of the display or the deck to buy it for 3 publicity.");
   const contextNode: ReactNode = ask?.text ?? techContext ?? probeContext;
   // the answers that are not choices on the board are buttons in the context bar
-  const contextActions =
-    answerMoves.length > 0 && !ask && !ended ? (
-      <>
-        {answerMoves.map((m, i) => {
-          const idle = m.type === "move_energy" && noProbe;
-          return (
-            <button
-              // biome-ignore lint/suspicious/noArrayIndexKey: the answers come in the order of the engine
-              key={`${m.type}-${i}`}
-              type="button"
-              className="secondary small"
-              disabled={idle}
-              title={idle ? "You have no probe on the map to move" : undefined}
-              onClick={() => play(m)}
-            >
-              {describeMove(m)}
-              {m.type === "pick_sample" || m.type === "deliver_sample" ? (
-                <SampleReward note={v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))]} />
-              ) : null}
-            </button>
-          );
-        })}
-      </>
-    ) : undefined;
+  const contextActions = ask?.inContext ? (
+    <>
+      {ask.buttons.map((b) => (
+        <button key={b.label} type="button" className="primary small" disabled={b.disabled} onClick={b.onClick}>
+          {b.label}
+        </button>
+      ))}
+      <button type="button" className="secondary small" onClick={ask.onCancel}>
+        Cancel
+      </button>
+    </>
+  ) : answerMoves.length > 0 && !ask && !ended ? (
+    <>
+      {answerMoves.map((m, i) => {
+        const idle = m.type === "move_energy" && noProbe;
+        return (
+          <button
+            // biome-ignore lint/suspicious/noArrayIndexKey: the answers come in the order of the engine
+            key={`${m.type}-${i}`}
+            type="button"
+            className="secondary small"
+            disabled={idle}
+            title={idle ? "You have no probe on the map to move" : undefined}
+            onClick={() => play(m)}
+          >
+            {describeMove(m)}
+            {m.type === "pick_sample" || m.type === "deliver_sample" ? (
+              <SampleReward note={v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))]} />
+            ) : null}
+          </button>
+        );
+      })}
+    </>
+  ) : undefined;
   const moves = (
     <>
       {ended ? (
@@ -697,7 +713,7 @@ export function GameClient({
       ) : null}
       {error ? <p className="error">{error}</p> : null}
       {sandboxMarker && !ended ? <SandboxPanel marker={sandboxMarker as never} send={(a) => sendAction(a)} handCards={hand} /> : null}
-      {ask ? (
+      {ask && !ask.inContext ? (
         <div className="confirmbar">
           {ask.buttons.map((b) => (
             <button key={b.label} type="button" className="primary" disabled={b.disabled} onClick={b.onClick}>
