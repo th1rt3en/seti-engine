@@ -32,11 +32,10 @@ export const STAR = { scale: 2.02, quarter: 700, midRadius: 1193 };
 export const WIN_SPOTS: Record<string, { board: number; first?: [number, number]; guide: [number, number][] }> = {
   "Proxima Centauri": {
     board: 1,
-    first: [205, 613],
     guide: [
-      [161, 596],
-      [201, 581],
       [242, 565],
+      [201, 581],
+      [161, 596],
     ],
   },
   "Kepler 22": {
@@ -50,11 +49,10 @@ export const WIN_SPOTS: Record<string, { board: number; first?: [number, number]
   },
   "Sirius A": {
     board: 2,
-    first: [313, 128],
     guide: [
-      [325, 171],
-      [287, 152],
       [248, 133],
+      [287, 152],
+      [325, 171],
     ],
   },
   "Barnard's Star": {
@@ -95,11 +93,10 @@ export const WIN_SPOTS: Record<string, { board: number; first?: [number, number]
   },
   "61 Virginis": {
     board: 4,
-    first: [383, 567],
     guide: [
-      [371, 525],
-      [410, 546],
       [449, 565],
+      [410, 546],
+      [371, 525],
     ],
   },
 };
