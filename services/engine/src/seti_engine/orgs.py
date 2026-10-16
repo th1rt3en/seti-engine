@@ -357,7 +357,7 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
         return [{**base, "source": x} for x in _sources(s)]
     if o == "helion_assembly" and p.hand:
         techs = [t for t in p.techs if t.startswith(("probe-", "telescope-")) and t not in p.org_data.get("disabled", [])]
-        return [{**base, "tech": t, "card": c} for t in techs for c in dict.fromkeys(p.hand)]
+        return [{**base, "tech": t} for t in techs]  # the card to tuck is chosen next, like any tuck (owner, 2026-10-16)
     if o == "sentinel_probe_network" and p.org_data.get("corner"):
         return [base]
     if o == "orbital_dynamics" and any(pr.player == p.index and not pr.capsule for pr in s.probes):
@@ -412,8 +412,8 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         p.org_marks = []
     elif o == "helion_assembly":  # destroy a tech, tuck a card for income, clear the marked spaces
         p.org_data.setdefault("disabled", []).append(a["tech"])
-        effects.tuck_card(s, p, a["card"])
         p.org_marks = []
+        s.pending.append(Decision(kind="helion_tuck", player=p.index))  # then a card is tucked for its income, like any tuck
     elif o == "orbital_dynamics":  # EXP-ORG-13, A-039: the steps are taken with od_step moves until the end of the turn
         p.org_data["od_left"], p.org_data["od_used"] = 2, []
     elif o == "sentinel_probe_network":

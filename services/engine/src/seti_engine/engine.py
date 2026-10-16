@@ -181,7 +181,7 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
         return arkhos.breach_moves(state, d)  # EXP-ARK-06
     if d.kind == "org_mark":
         return orgs.mark_moves(state, d)  # EXP-ORG-11
-    if d.kind == "setup_tuck":
+    if d.kind in ("setup_tuck", "helion_tuck"):
         return [{"type": "tuck", "card": c} for c in dict.fromkeys(p.hand)]
     if d.kind == "income_tuck":
         return [{"type": "tuck", "card": c} for c in dict.fromkeys(p.hand)] + [{"type": "skip_tuck"}]

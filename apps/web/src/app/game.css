@@ -2532,3 +2532,32 @@ button:disabled {
 .tradehand .card-row {
   width: clamp(72px, 22vw, 120px);
 }
+
+/* a tech to pick, by its tile */
+.techpick {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+.techpick.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #04101a;
+}
+.techpick img {
+  display: block;
+  border-radius: 6px;
+}
+.techpick:not(.on) {
+  background: var(--panel);
+  border-color: var(--line);
+  color: var(--text);
+}
+.techpick.on {
+  outline: 3px solid var(--good);
+  outline-offset: 2px;
+}

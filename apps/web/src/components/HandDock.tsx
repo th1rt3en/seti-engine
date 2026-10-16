@@ -15,6 +15,8 @@ export interface HandSelection {
   selectable: string[];
   selected: number[];
   onSelect: (index: number) => void;
+  /** The game waits for a card of the hand (a tuck for income, a discard ...): the hand opens by itself, which matters on a phone where it starts folded. */
+  autoOpen?: boolean;
   /** What can be done with the card that is picked, when it is the only one: buttons laid over it. */
   actions?: CardAction[];
   /** Cards that are offered to the player to keep one of (the end-of-round cards after passing): they lie with the hand for the moment. */
@@ -65,7 +67,7 @@ export function ExertianTab({ view }: { view: View }) {
 
 export function HandDock({ view, selection }: { view: View; selection?: HandSelection }) {
   const [folded, toggle, set] = useDock("hand");
-  const wanted = (selection?.offered?.length ?? 0) > 0;
+  const wanted = (selection?.offered?.length ?? 0) > 0 || selection?.autoOpen === true;
   const wasWanted = useRefHook(false);
   // the hand opens by itself when cards are offered, so that the player sees them
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when cards become offered

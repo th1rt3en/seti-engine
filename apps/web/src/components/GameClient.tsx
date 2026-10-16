@@ -307,7 +307,7 @@ export function GameClient({
   // exchanges and buying a card are made by picking cards (of the hand, of the display) and not with buttons of their own
   const exchanges = mine.filter((m) => m.type === "exchange");
   // the free actions of an organization that name a card of the hand (Helion Assembly, Deep Sky Survey, Futurespan prepare)
-  const orgCardMoves = mine.filter((m) => m.type === "org_free" && typeof m.card === "string");
+  const orgCardMoves = mine.filter((m) => m.type === "org_free" && (typeof m.card === "string" || typeof m.tech === "string"));
   const buys = mine.filter((m) => m.type === "buy_card");
   // taking a card, and discarding a card of the display for a signal, are made by clicking the card of the display (or the deck) too
   const ROW_MOVES = ["buy_card", "take_card", "row_pick", "scan_discard", "scan_token"];
@@ -878,6 +878,7 @@ export function GameClient({
         selectable: pickable,
         selected: picked,
         onSelect: selectCard,
+        autoOpen: pending && handMoves.length > 0,
         actions: handActions,
         offered: offers,
         offeredSelected: pickedOffer,

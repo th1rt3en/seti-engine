@@ -171,7 +171,7 @@ function orgFreeLabel(m: Move): string {
       : `${name}: prepare ${cardName(m.card)} (the token goes 10 points per credit of cost + 5 ahead)`;
   if (org === "cosmos_strategy_group") return `${name}: gain ${source(m.source)} and clear your marked reward spaces`;
   if (org === "helion_assembly")
-    return `${name}: destroy your ${String(m.tech)} tech, tuck ${cardName(m.card)} for income and clear your marked reward spaces`;
+    return `${name}: destroy your ${String(m.tech)} tech, then tuck a card for income and clear your marked reward spaces`;
   if (org === "turing_systems") return `${name}: use the ${String(m.tech)} tech this turn`;
   return `${name}: use the once-per-round ability`;
 }
