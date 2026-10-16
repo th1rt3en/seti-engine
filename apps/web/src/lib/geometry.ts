@@ -23,6 +23,94 @@ export const RING_RADIUS = [0, 270, 485, 660, 870];
 
 /** The ring of nearby stars: four boards of two stars (a 1400 px picture cut into four 700 px quarters, drawn at this scale). */
 export const STAR = { scale: 2.02, quarter: 700, midRadius: 1193 };
+/**
+ * Where the markers of a sector's winners lie, as places on the 700 px picture of the star board the star is on (measured on the pictures).
+ * `first` is the space of the first win reward, where the first winner's marker lies and covers it (FAQ-12, SECTOR-14); a star whose first and later
+ * rewards are alike has none (Proxima Centauri, Sirius A, 61 Virginis): all its winners lie on the capsule. From the second win on, the markers follow the printed capsule beside the star, which has three small circles (`guide`, the one nearest the star first), like orbiters
+ * and landers follow the guide line of a planet; more markers than circles go on in the same direction at the same distance.
+ */
+export const WIN_SPOTS: Record<string, { board: number; first?: [number, number]; guide: [number, number][] }> = {
+  "Proxima Centauri": {
+    board: 1,
+    guide: [
+      [242, 565],
+      [201, 581],
+      [161, 596],
+    ],
+  },
+  "Kepler 22": {
+    board: 1,
+    first: [568, 250],
+    guide: [
+      [537, 312],
+      [514, 348],
+      [490, 382],
+    ],
+  },
+  "Sirius A": {
+    board: 2,
+    guide: [
+      [248, 133],
+      [287, 152],
+      [325, 171],
+    ],
+  },
+  "Barnard's Star": {
+    board: 2,
+    first: [565, 458],
+    guide: [
+      [596, 524],
+      [608, 566],
+      [618, 606],
+    ],
+  },
+  Vega: {
+    board: 3,
+    first: [455, 133],
+    guide: [
+      [522, 110],
+      [564, 100],
+      [606, 90],
+    ],
+  },
+  Procyon: {
+    board: 3,
+    first: [130, 450],
+    guide: [
+      [162, 386],
+      [185, 351],
+      [210, 316],
+    ],
+  },
+  "Beta Pictoris": {
+    board: 4,
+    first: [132, 240],
+    guide: [
+      [108, 178],
+      [95, 136],
+      [82, 105],
+    ],
+  },
+  "61 Virginis": {
+    board: 4,
+    guide: [
+      [449, 565],
+      [410, 546],
+      [371, 525],
+    ],
+  },
+};
+
+/** The `n`-th place (0 is the second win) of a star's capsule; beyond the third circle the line goes on at the same distance. */
+export function winGuideSpot(guide: [number, number][], n: number): [number, number] {
+  const last = guide.length - 1;
+  const a = guide[last - 1] ?? guide[0];
+  const b = guide[last];
+  if (!a || !b) return [0, 0];
+  if (n <= last) return guide[n] ?? b;
+  return [b[0] + (b[0] - a[0]) * (n - last), b[1] + (b[1] - a[1]) * (n - last)];
+}
+
 /** Board id -> its position (0 to 3) in the assembled picture of the ring. */
 export const STAR_BOARD_HOME: Record<number, number> = { 2: 0, 3: 1, 4: 2, 1: 3 };
 
