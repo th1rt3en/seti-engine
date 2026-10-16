@@ -53,7 +53,7 @@ export function SetupChoice({
         <p className="muted">
           {org
             ? "Your organization decides your powers, your starting resources and your income for the game."
-            : "Each quick start card puts markers on the board at no reward now and gives its bonus at the start. Keep two of the three: pick both, then confirm."}
+            : "Each quick start card puts markers on the board at no reward now and gives its bonus at the start. Keep two: pick both, then confirm."}
         </p>
         <div className={org ? "setupcards orgs" : "setupcards quick"}>
           {offers.map((id) => {
@@ -78,7 +78,7 @@ export function SetupChoice({
             );
           })}
         </div>
-        {org && quickOffered.length > 0 ? (
+        {org && quickOffered.length > 0 && quickOffered.length <= 3 ? (
           <section className="setupquick" aria-label="Your quick start cards">
             <h3>Your quick start cards</h3>
             <p className="muted small">You will keep two of these three after choosing your organization.</p>

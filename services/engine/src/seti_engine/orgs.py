@@ -71,8 +71,12 @@ def deal(s: GameState, order: list[int]) -> None:
     quick = rng.shuffled(s, quick)
     for k, pl in enumerate(order):
         p = s.players[pl]
-        p.offered_orgs = pool[k * per_org : (k + 1) * per_org]
-        p.offered_quick = quick[k * per_quick : (k + 1) * per_quick]
+        if opts.sandbox:  # D33: the sandbox player chooses freely among every organization and every quick start card
+            p.offered_orgs = sorted(orgs)
+            p.offered_quick = sorted(quick)
+        else:
+            p.offered_orgs = pool[k * per_org : (k + 1) * per_org]
+            p.offered_quick = quick[k * per_quick : (k + 1) * per_quick]
         p.hand = [s.deck.pop() for _ in range(4)]
         p.credits = p.energy = p.publicity = 0
     for pl in order:

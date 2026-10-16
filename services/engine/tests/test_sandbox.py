@@ -215,3 +215,17 @@ def test_sandbox_06_the_species_of_the_expansion_can_be_chosen_with_the_expansio
     assert mixed.species[0].species == "glyphids" and mixed.species[1].species != "glyphids"
     with pytest.raises(ValueError):  # not without the expansion
         Options(players=1, sandbox=True, sandbox_species=["arkhos", None])
+
+
+def test_the_sandbox_with_the_expansion_offers_every_organization_and_quick_start_card() -> None:  # D33, EXP-ORG-03
+    from seti_engine import tables
+
+    r = start(Options(players=1, sandbox=True, seed=3, expansion=True, organizations=True))
+    p = r.state.players[0]
+    assert p.offered_orgs == sorted(tables.organizations())
+    assert p.offered_quick == sorted(tables.quick_start_cards())
+    assert {m["org"] for m in r.legal if m["type"] == "choose_org"} == set(p.offered_orgs)
+    r = apply(r.state, {"type": "choose_org", "org": "helion_assembly"})
+    pair = next(m for m in r.legal if m["type"] == "choose_quick")
+    r = apply(r.state, pair)
+    assert r.state.players[0].quick_start == pair["cards"]
