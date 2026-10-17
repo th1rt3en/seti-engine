@@ -32,6 +32,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <Link href="/lobby">Lobby</Link>
             <Link href="/watch">Watch</Link>
             <Link href="/leaderboard">Leaderboard</Link>
+            <Link href="/cards">Cards</Link>
             <Link href="/players">Players</Link>
             {user ? (
               <>

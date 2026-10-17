@@ -1,0 +1,4478 @@
+[
+{
+"cost": 0,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "1",
+"income": "energy",
+"known": true,
+"name": "Pioneer 11 Mission",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "10",
+"income": "energy",
+"known": true,
+"name": "ODINUS Mission",
+"sector": "black",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "100",
+"income": "credit",
+"known": true,
+"name": "Exascale Supercomputer",
+"sector": "blue",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "101",
+"income": "energy",
+"known": true,
+"name": "Telescope Time Allocation",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "102",
+"income": "credit",
+"known": true,
+"name": "Linguistic Analysis",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "103",
+"income": "energy",
+"known": true,
+"name": "Westerbork Synthesis Radio Telescope",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "104",
+"income": "energy",
+"known": true,
+"name": "Rosetta Probe",
+"sector": "blue",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "105",
+"income": "credit",
+"known": true,
+"name": "Green Bank Telescope",
+"sector": "black",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "106",
+"income": "credit",
+"known": true,
+"name": "Strategic Planning",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "107",
+"income": "energy",
+"known": true,
+"name": "First Black Hole Photo",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "108",
+"income": "credit",
+"known": true,
+"name": "SETI@Home",
+"sector": "black",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "109",
+"income": "card",
+"known": true,
+"name": "Low-Power Microprocessors",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "11",
+"income": "energy",
+"known": true,
+"name": "Grant",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "110",
+"income": "credit",
+"known": true,
+"name": "Press Statement",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "111",
+"income": "energy",
+"known": true,
+"name": "Roman Space Telescope",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "112",
+"income": "energy",
+"known": true,
+"name": "Planetary Geologic Mapping",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "113",
+"income": "card",
+"known": true,
+"name": "Solvay Conference",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "114",
+"income": "energy",
+"known": true,
+"name": "Planet Hunters",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "115",
+"income": "card",
+"known": true,
+"name": "Canadian Hydrogen Telescope",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "116",
+"income": "card",
+"known": true,
+"name": "Control Center",
+"sector": "black",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "117",
+"income": "card",
+"known": true,
+"name": "Lunar Gateway",
+"sector": "red",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "118",
+"income": "credit",
+"known": true,
+"name": "PLATO",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "119",
+"income": "energy",
+"known": true,
+"name": "PIXL",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "12",
+"income": "credit",
+"known": true,
+"name": "Europa Clipper",
+"sector": "black",
+"species": null,
+"tags": [
+"land"
+],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "120",
+"income": "credit",
+"known": true,
+"name": "Orbiting Lagrange Point",
+"sector": "black",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 4,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "121",
+"income": "energy",
+"known": true,
+"name": "Future Circular Collider",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "122",
+"income": "energy",
+"known": true,
+"name": "Amateur Astronomers",
+"sector": "black",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "123",
+"income": "card",
+"known": true,
+"name": "Asteroids Flyby",
+"sector": "red",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "124",
+"income": "energy",
+"known": true,
+"name": "Cometary Encounter",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "125",
+"income": "card",
+"known": true,
+"name": "Trajectory Correction",
+"sector": "blue",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "126",
+"income": "card",
+"known": true,
+"name": "Euclid Telescope Construction",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_orange",
+"tech_pink"
+],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "127",
+"income": "credit",
+"known": true,
+"name": "NEAR Shoemaker",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "128",
+"income": "card",
+"known": true,
+"name": "Advanced Navigation System",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 0,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "129",
+"income": "energy",
+"known": true,
+"name": "Asteroids Research",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "13",
+"income": "card",
+"known": true,
+"name": "Perseverance Rover",
+"sector": "blue",
+"species": null,
+"tags": [
+"land"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "130",
+"income": "energy",
+"known": true,
+"name": "Low-Cost Space Launch",
+"sector": "yellow",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "131",
+"income": "credit",
+"known": true,
+"name": "Telescope Modernization",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "132",
+"income": "card",
+"known": true,
+"name": "Space Shuttle",
+"sector": "black",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "133",
+"income": "card",
+"known": true,
+"name": "Optimal Launch Window",
+"sector": "red",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "134",
+"income": "card",
+"known": true,
+"name": "Herschel Space Observatory",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "135",
+"income": "energy",
+"known": true,
+"name": "Noto Radio Observatory",
+"sector": "blue",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "136",
+"income": "energy",
+"known": true,
+"name": "Algonquin Radio Observatory",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "137",
+"income": "energy",
+"known": true,
+"name": "SETI Data Archive",
+"sector": "black",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "138",
+"income": "card",
+"known": true,
+"name": "Cornell University",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "14",
+"income": "credit",
+"known": true,
+"name": "Mars Science Laboratory",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "15",
+"income": "credit",
+"known": true,
+"name": "Atmospheric Entry",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "16",
+"income": "credit",
+"known": true,
+"name": "Dragonfly",
+"sector": "blue",
+"species": null,
+"tags": [
+"land"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "17",
+"income": "energy",
+"known": true,
+"name": "OSIRIS-REx",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "18",
+"income": "card",
+"known": true,
+"name": "Hayabusa",
+"sector": "black",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "19",
+"income": "credit",
+"known": true,
+"name": "Gravitational Slingshot",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "2",
+"income": "credit",
+"known": true,
+"name": "Mariner 10 Mission",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "20",
+"income": "energy",
+"known": true,
+"name": "Mercury Flyby",
+"sector": "red",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "21",
+"income": "credit",
+"known": true,
+"name": "Venus Flyby",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "22",
+"income": "energy",
+"known": true,
+"name": "Mars Flyby",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "23",
+"income": "energy",
+"known": true,
+"name": "Jupiter Flyby",
+"sector": "blue",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "24",
+"income": "card",
+"known": true,
+"name": "Saturn Flyby",
+"sector": "red",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "25",
+"income": "credit",
+"known": true,
+"name": "Lightsail",
+"sector": "red",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "26",
+"income": "card",
+"known": true,
+"name": "Through the Asteroid Belt",
+"sector": "blue",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "27",
+"income": "card",
+"known": true,
+"name": "Hubble Space Telescope",
+"sector": "red",
+"species": null,
+"tags": [
+"move",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "28",
+"income": "credit",
+"known": true,
+"name": "Kepler Space Telescope",
+"sector": "blue",
+"species": null,
+"tags": [
+"move",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "29",
+"income": "energy",
+"known": true,
+"name": "James Webb Space Telescope",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "3",
+"income": "card",
+"known": true,
+"name": "Voyager 2 Mission",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "30",
+"income": "card",
+"known": true,
+"name": "Great Observatories Project",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "31",
+"income": "card",
+"known": true,
+"name": "Space Launch System",
+"sector": "yellow",
+"species": null,
+"tags": [
+"launch",
+"move"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "32",
+"income": "credit",
+"known": true,
+"name": "Mercury Exploration Program",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "33",
+"income": "energy",
+"known": true,
+"name": "Venus Exploration Program",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "34",
+"income": "card",
+"known": true,
+"name": "Mars Exploration Program",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "35",
+"income": "credit",
+"known": true,
+"name": "Jupiter Exploration Program",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "36",
+"income": "card",
+"known": true,
+"name": "Saturn Exploration Program",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "37",
+"income": "credit",
+"known": true,
+"name": "Proxima Centauri Observation",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "38",
+"income": "energy",
+"known": true,
+"name": "Barnard's Star Observation",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "end"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "39",
+"income": "card",
+"known": true,
+"name": "61 Virginis Observation",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 0,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "4",
+"income": "card",
+"known": true,
+"name": "Galileo Mission",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "40",
+"income": "credit",
+"known": true,
+"name": "Kepler 22 Observation",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "end"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "41",
+"income": "energy",
+"known": true,
+"name": "Sirius A Observation",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "42",
+"income": "card",
+"known": true,
+"name": "Procyon Observation",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "43",
+"income": "energy",
+"known": true,
+"name": "Beta Pictoris Observation",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "44",
+"income": "credit",
+"known": true,
+"name": "Vega Observation",
+"sector": "red",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "end"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "45",
+"income": "card",
+"known": true,
+"name": "Allen Telescope Array",
+"sector": "red",
+"species": null,
+"tags": [
+"scan",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "46",
+"income": "credit",
+"known": true,
+"name": "ALMA Observatory",
+"sector": "yellow",
+"species": null,
+"tags": [
+"scan",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "47",
+"income": "energy",
+"known": true,
+"name": "Very Large Array",
+"sector": "yellow",
+"species": null,
+"tags": [
+"scan",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "48",
+"income": "credit",
+"known": true,
+"name": "Breakthrough Starshot",
+"sector": "blue",
+"species": null,
+"tags": [
+"move",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "49",
+"income": "credit",
+"known": true,
+"name": "Breakthrough Watch",
+"sector": "red",
+"species": null,
+"tags": [
+"move",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "5",
+"income": "credit",
+"known": true,
+"name": "Venera Probe",
+"sector": "blue",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "50",
+"income": "credit",
+"known": true,
+"name": "Square Kilometre Array",
+"sector": "blue",
+"species": null,
+"tags": [
+"scan",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "51",
+"income": "energy",
+"known": true,
+"name": "Lovell Telescope",
+"sector": "red",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "52",
+"income": "card",
+"known": true,
+"name": "Parkes Observatory",
+"sector": "yellow",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "53",
+"income": "energy",
+"known": true,
+"name": "Deep Synoptic Array",
+"sector": "blue",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "54",
+"income": "credit",
+"known": true,
+"name": "VERITAS Telescopes",
+"sector": "red",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "55",
+"income": "card",
+"known": true,
+"name": "Arecibo Observatory",
+"sector": "yellow",
+"species": null,
+"tags": [
+"scan",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "56",
+"income": "credit",
+"known": true,
+"name": "Breakthrough Listen",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "57",
+"income": "energy",
+"known": true,
+"name": "Effelsberg Telescope Construction",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "58",
+"income": "credit",
+"known": true,
+"name": "Uranus Orbiter and Probe",
+"sector": "red",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "59",
+"income": "card",
+"known": true,
+"name": "Ion Propulsion System",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "6",
+"income": "energy",
+"known": true,
+"name": "Juno Probe",
+"sector": "red",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "60",
+"income": "card",
+"known": true,
+"name": "Trident Probe",
+"sector": "blue",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "61",
+"income": "card",
+"known": true,
+"name": "Quantum Computer",
+"sector": "black",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "62",
+"income": "credit",
+"known": true,
+"name": "Onsala Telescope Construction",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "end"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "63",
+"income": "credit",
+"known": true,
+"name": "SHERLOC",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "end"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "64",
+"income": "credit",
+"known": true,
+"name": "ALICE",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "quick"
+},
+{
+"cost": 4,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "65",
+"income": "credit",
+"known": true,
+"name": "FAST Telescope Construction",
+"sector": "black",
+"species": null,
+"tags": [
+"scan",
+"signal",
+"tech",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "66",
+"income": "card",
+"known": true,
+"name": "GMRT Telescope Construction",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "67",
+"income": "card",
+"known": true,
+"name": "Yevpatoria Telescope Construction",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal",
+"tech",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "68",
+"income": "credit",
+"known": true,
+"name": "DUNE",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "end"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "69",
+"income": "energy",
+"known": true,
+"name": "Large Hadron Collider",
+"sector": "black",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "7",
+"income": "card",
+"known": true,
+"name": "MESSENGER Probe",
+"sector": "yellow",
+"species": null,
+"tags": [
+"launch",
+"move"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "70",
+"income": "credit",
+"known": true,
+"name": "ATLAS",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "71",
+"income": "credit",
+"known": true,
+"name": "Focused Research",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_blue",
+"tech_orange",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "72",
+"income": "energy",
+"known": true,
+"name": "Scientific Cooperation",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_blue",
+"tech_orange",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "73",
+"income": "credit",
+"known": true,
+"name": "Clean Space Initiative",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "74",
+"income": "card",
+"known": true,
+"name": "Pre-launch Testing",
+"sector": "yellow",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "75",
+"income": "credit",
+"known": true,
+"name": "Extremophiles Study",
+"sector": "black",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "76",
+"income": "card",
+"known": true,
+"name": "NASA Research Center",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "77",
+"income": "card",
+"known": true,
+"name": "NASA Astrobiology Institute",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "78",
+"income": "energy",
+"known": true,
+"name": "SETI Institute",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "79",
+"income": "credit",
+"known": true,
+"name": "ISS",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "8",
+"income": "energy",
+"known": true,
+"name": "Cassini Probe",
+"sector": "red",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "80",
+"income": "card",
+"known": true,
+"name": "Cape Canaveral SFS",
+"sector": "black",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "81",
+"income": "card",
+"known": true,
+"name": "International Collaboration",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_blue",
+"tech_orange",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "82",
+"income": "energy",
+"known": true,
+"name": "Johnson Space Center",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "83",
+"income": "energy",
+"known": true,
+"name": "Wow! Signal",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "84",
+"income": "energy",
+"known": true,
+"name": "Sample Return",
+"sector": "blue",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 4,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "85",
+"income": "credit",
+"known": true,
+"name": "Starship",
+"sector": "red",
+"species": null,
+"tags": [
+"launch",
+"tech",
+"tech_orange"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "86",
+"income": "energy",
+"known": true,
+"name": "Giant Magellan Telescope",
+"sector": "red",
+"species": null,
+"tags": [
+"scan",
+"signal"
+],
+"type": "end"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "87",
+"income": "card",
+"known": true,
+"name": "Project Longshot",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "88",
+"income": "energy",
+"known": true,
+"name": "Chandra Space Observatory",
+"sector": "blue",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "89",
+"income": "credit",
+"known": true,
+"name": "NIAC Program",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "9",
+"income": "credit",
+"known": true,
+"name": "Falcon Heavy",
+"sector": "yellow",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "90",
+"income": "card",
+"known": true,
+"name": "Fuel Tanks Construction",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "91",
+"income": "energy",
+"known": true,
+"name": "Fusion Reactor",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "92",
+"income": "card",
+"known": true,
+"name": "NASA Image of the Day",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"publicity"
+],
+"id": "93",
+"income": "credit",
+"known": true,
+"name": "Government Funding",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "94",
+"income": "credit",
+"known": true,
+"name": "Popularization of Science",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "95",
+"income": "energy",
+"known": true,
+"name": "Near-Earth Asteroids Survey",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "base",
+"free": [
+"move"
+],
+"id": "96",
+"income": "energy",
+"known": true,
+"name": "Tardigrades Study",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "97",
+"income": "energy",
+"known": true,
+"name": "Apollo 11 Mission",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "98",
+"income": "energy",
+"known": true,
+"name": "Coronal Spectrograph",
+"sector": "red",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "base",
+"free": [
+"data"
+],
+"id": "99",
+"income": "card",
+"known": true,
+"name": "Electron Microscope",
+"sector": "yellow",
+"species": null,
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.1",
+"income": "card",
+"known": true,
+"name": "First Contact",
+"sector": "blue",
+"species": "mascamites",
+"tags": [
+"land",
+"move"
+],
+"type": "mission"
+},
+{
+"cost": 3,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.10",
+"income": "card",
+"known": true,
+"name": "Computer Simulations",
+"sector": "yellow",
+"species": "mascamites",
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.11",
+"income": "card",
+"known": true,
+"name": "Signs of Life",
+"sector": "blue",
+"species": "anomalies",
+"tags": [
+"launch",
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.12",
+"income": "credit",
+"known": true,
+"name": "Close-up View",
+"sector": "red",
+"species": "anomalies",
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.13",
+"income": "credit",
+"known": true,
+"name": "Concerned People",
+"sector": "yellow",
+"species": "anomalies",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.14",
+"income": "card",
+"known": true,
+"name": "Listening Carefully",
+"sector": "red",
+"species": "anomalies",
+"tags": [
+"scan",
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.15",
+"income": "energy",
+"known": true,
+"name": "Part of Everyday Life",
+"sector": "blue",
+"species": "anomalies",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.16",
+"income": "credit",
+"known": true,
+"name": "Flooding the Media Space",
+"sector": "red",
+"species": "anomalies",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.17",
+"income": "card",
+"known": true,
+"name": "Are we Being Observed?",
+"sector": "yellow",
+"species": "anomalies",
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.18",
+"income": "credit",
+"known": true,
+"name": "Message Capsule",
+"sector": "blue",
+"species": "anomalies",
+"tags": [
+"tech",
+"tech_blue",
+"tech_orange",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.19",
+"income": "energy",
+"known": true,
+"name": "New Physics",
+"sector": "black",
+"species": "anomalies",
+"tags": [
+"trace"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.2",
+"income": "energy",
+"known": true,
+"name": "Rover Exploration",
+"sector": "black",
+"species": "mascamites",
+"tags": [
+"land"
+],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.20",
+"income": "energy",
+"known": true,
+"name": "Amazing Uncertainty",
+"sector": "yellow",
+"species": "anomalies",
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.21",
+"income": "card",
+"known": true,
+"name": "Visitor in the Sky",
+"sector": "blue",
+"species": "oumuamua",
+"tags": [
+"scan"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.22",
+"income": "energy",
+"known": true,
+"name": "Altered Trajectory",
+"sector": "red",
+"species": "oumuamua",
+"tags": [
+"scan"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.23",
+"income": "energy",
+"known": true,
+"name": "Exofossil Discovery",
+"sector": "yellow",
+"species": "oumuamua",
+"tags": [
+"signal"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.24",
+"income": "credit",
+"known": true,
+"name": "Terrain Mapping",
+"sector": "yellow",
+"species": "oumuamua",
+"tags": [
+"signal"
+],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.25",
+"income": "credit",
+"known": true,
+"name": "Probe Customisation",
+"sector": "blue",
+"species": "oumuamua",
+"tags": [
+"land",
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.26",
+"income": "energy",
+"known": true,
+"name": "Race Against Time",
+"sector": "red",
+"species": "oumuamua",
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.27",
+"income": "credit",
+"known": true,
+"name": "Perfect Timing",
+"sector": "yellow",
+"species": "oumuamua",
+"tags": [
+"move"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.28",
+"income": "card",
+"known": true,
+"name": "Exofossil Samples",
+"sector": "blue",
+"species": "oumuamua",
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.29",
+"income": "energy",
+"known": true,
+"name": "Comparative Analysis",
+"sector": "red",
+"species": "oumuamua",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.3",
+"income": "energy",
+"known": true,
+"name": "Mass Sample Collection",
+"sector": "yellow",
+"species": "mascamites",
+"tags": [
+"land"
+],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.30",
+"income": "card",
+"known": true,
+"name": "Excavation Rover",
+"sector": "black",
+"species": "oumuamua",
+"tags": [
+"land"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.31",
+"income": "publicity",
+"known": true,
+"name": "Vessel Designs",
+"sector": "blue",
+"species": "centaurians",
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.32",
+"income": "data",
+"known": true,
+"name": "Exocomputers",
+"sector": "red",
+"species": "centaurians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.33",
+"income": "publicity",
+"known": true,
+"name": "Infocluster",
+"sector": "yellow",
+"species": "centaurians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.34",
+"income": "energy",
+"known": true,
+"name": "A Message from Afar",
+"sector": "red",
+"species": "centaurians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.35",
+"income": "card",
+"known": true,
+"name": "Synthesis Instructions",
+"sector": "yellow",
+"species": "centaurians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.36",
+"income": "credit",
+"known": true,
+"name": "Alien Schematics",
+"sector": "blue",
+"species": "centaurians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.37",
+"income": "energy",
+"known": true,
+"name": "Music of the Spheres",
+"sector": "black",
+"species": "centaurians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.38",
+"income": "data",
+"known": true,
+"name": "Hivemind Concept",
+"sector": "blue",
+"species": "centaurians",
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.39",
+"income": "publicity",
+"known": true,
+"name": "Telescope Blueprints",
+"sector": "red",
+"species": "centaurians",
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "ET.4",
+"income": "credit",
+"known": true,
+"name": "Martian Quarantine Lab",
+"sector": "red",
+"species": "mascamites",
+"tags": [
+"land"
+],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.40",
+"income": "data",
+"known": true,
+"name": "Torrent-chain Signal",
+"sector": "yellow",
+"species": "centaurians",
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.41",
+"income": null,
+"known": false,
+"name": "Razor-edge Shuttle",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.42",
+"income": null,
+"known": false,
+"name": "Deflector",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.43",
+"income": null,
+"known": false,
+"name": "Expender Core",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.44",
+"income": null,
+"known": false,
+"name": "pierced Exoplanet",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.45",
+"income": null,
+"known": false,
+"name": "Core-breach Exoplanet",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.46",
+"income": null,
+"known": false,
+"name": "Vortex Exoplanet",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.47",
+"income": null,
+"known": false,
+"name": "Fission-sun Exoplanet",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.48",
+"income": null,
+"known": false,
+"name": "Oscillating Probes",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.49",
+"income": null,
+"known": false,
+"name": "Generative Infrastructure",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.5",
+"income": "card",
+"known": true,
+"name": "Ecosystem Study",
+"sector": "blue",
+"species": "mascamites",
+"tags": [],
+"type": "end"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.50",
+"income": null,
+"known": false,
+"name": "Casette Deployment",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.51",
+"income": null,
+"known": false,
+"name": "Extractor",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.52",
+"income": null,
+"known": false,
+"name": "Automated Lab",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.53",
+"income": null,
+"known": false,
+"name": "Neuralab",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.54",
+"income": null,
+"known": false,
+"name": "Nanowielder Node",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [],
+"id": "ET.55",
+"income": null,
+"known": false,
+"name": "Stratoelevator",
+"sector": null,
+"species": "exertians",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.6",
+"income": "credit",
+"known": true,
+"name": "The Queen",
+"sector": "red",
+"species": "mascamites",
+"tags": [
+"land"
+],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "ET.7",
+"income": "energy",
+"known": true,
+"name": "Breeding Sample",
+"sector": "red",
+"species": "mascamites",
+"tags": [
+"land"
+],
+"type": "mission"
+},
+{
+"cost": 3,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.8",
+"income": "energy",
+"known": true,
+"name": "Hive Sample",
+"sector": "blue",
+"species": "mascamites",
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "ET.9",
+"income": "credit",
+"known": true,
+"name": "Orbital Monitoring",
+"sector": "yellow",
+"species": "mascamites",
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "quick"
+},
+{
+"cost": 0,
+"deck": "promo",
+"free": [
+"move"
+],
+"id": "SE_EN_01",
+"income": "card",
+"known": true,
+"name": "Not a planet since 2006",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "promo",
+"free": [
+"data"
+],
+"id": "SE_EN_02",
+"income": "credit",
+"known": true,
+"name": "Gateway to Mars",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "promo2",
+"free": [
+"move"
+],
+"id": "SE_EN_03",
+"income": "card",
+"known": true,
+"name": "Space Agencies",
+"sector": "black",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "promo2",
+"free": [
+"publicity"
+],
+"id": "SE_DE_04",
+"income": "energy",
+"known": true,
+"name": "DLR",
+"sector": "black",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.1",
+"income": "credit",
+"known": true,
+"name": "Reusable Lander",
+"sector": "red",
+"species": null,
+"tags": [
+"land"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.2",
+"income": "card",
+"known": true,
+"name": "Tracking and Data Relay Satellite",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.3",
+"income": "energy",
+"known": true,
+"name": "NASA Deep Space Network",
+"sector": "black",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.4",
+"income": "credit",
+"known": true,
+"name": "Breakthrough Message",
+"sector": "black",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.5",
+"income": "credit",
+"known": true,
+"name": "Servicing Mission",
+"sector": "blue",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.6",
+"income": "card",
+"known": true,
+"name": "Live Landing Broadcast",
+"sector": "blue",
+"species": null,
+"tags": [
+"land",
+"move"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.7",
+"income": "energy",
+"known": true,
+"name": "Twin Probes",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_orange"
+],
+"type": "quick"
+},
+{
+"cost": 3,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.8",
+"income": "energy",
+"known": true,
+"name": "Quantum Data Storage",
+"sector": "yellow",
+"species": null,
+"tags": [
+"tech",
+"tech_blue"
+],
+"type": "end"
+},
+{
+"cost": 3,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.9",
+"income": "card",
+"known": true,
+"name": "Lunar Crater Radio Telescope",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_pink"
+],
+"type": "quick"
+},
+{
+"cost": 4,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.10",
+"income": "energy",
+"known": true,
+"name": "First Human in Space",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "end"
+},
+{
+"cost": 3,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.11",
+"income": "card",
+"known": true,
+"name": "Psyche Probe",
+"sector": "red",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.12",
+"income": "credit",
+"known": true,
+"name": "Two-planet Flyby Maneuver",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.13",
+"income": "card",
+"known": true,
+"name": "James Clerk Maxwell Telescope",
+"sector": "yellow",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.14",
+"income": "energy",
+"known": true,
+"name": "Reusable Rocket",
+"sector": "blue",
+"species": null,
+"tags": [
+"launch"
+],
+"type": "none"
+},
+{
+"cost": 3,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.15",
+"income": "credit",
+"known": true,
+"name": "Iterative Engineering",
+"sector": "blue",
+"species": null,
+"tags": [
+"tech",
+"tech_blue",
+"tech_orange",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.16",
+"income": "credit",
+"known": true,
+"name": "Astronaut Training Experience",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 0,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.17",
+"income": "credit",
+"known": true,
+"name": "Paid Media Coverage",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.18",
+"income": "credit",
+"known": true,
+"name": "Contracted Research",
+"sector": "red",
+"species": null,
+"tags": [
+"tech",
+"tech_blue",
+"tech_orange",
+"tech_pink"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.19",
+"income": "energy",
+"known": true,
+"name": "New Assignment",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.20",
+"income": "card",
+"known": true,
+"name": "Well Executed Project",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.21",
+"income": "card",
+"known": true,
+"name": "Orbital Refueling",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 0,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.22",
+"income": "credit",
+"known": true,
+"name": "TESS Satellite",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.23",
+"income": "energy",
+"known": true,
+"name": "Neutral Buoyancy Training",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.24",
+"income": "card",
+"known": true,
+"name": "Space Elevator",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.25",
+"income": "energy",
+"known": true,
+"name": "LIGO",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 0,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.26",
+"income": "credit",
+"known": true,
+"name": "New AI Models",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 0,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.27",
+"income": "card",
+"known": true,
+"name": "Better Solar Panels",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.28",
+"income": "credit",
+"known": true,
+"name": "Restructuring",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.29",
+"income": "energy",
+"known": true,
+"name": "Abandoned Mission",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.30",
+"income": "energy",
+"known": true,
+"name": "Akatsuki Orbiter",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.31",
+"income": "credit",
+"known": true,
+"name": "Ingenuity Helicopter",
+"sector": "yellow",
+"species": null,
+"tags": [
+"land"
+],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.32",
+"income": "credit",
+"known": true,
+"name": "MUREP Idea Competition",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.33",
+"income": "energy",
+"known": true,
+"name": "Delayed Launch",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.34",
+"income": "energy",
+"known": true,
+"name": "Private Sector Investment",
+"sector": "red",
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.35",
+"income": "card",
+"known": true,
+"name": "NASA Exoplanet Archive",
+"sector": "yellow",
+"species": null,
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.36",
+"income": "card",
+"known": true,
+"name": "Big Ear Radio Telescope",
+"sector": "black",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.37",
+"income": "card",
+"known": true,
+"name": "Pandora Satellite",
+"sector": "yellow",
+"species": null,
+"tags": [
+"signal"
+],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.38",
+"income": "energy",
+"known": true,
+"name": "Space Rendezvous",
+"sector": "yellow",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.39",
+"income": "credit",
+"known": true,
+"name": "Grand Tour Program",
+"sector": "red",
+"species": null,
+"tags": [
+"move"
+],
+"type": "end"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"data"
+],
+"id": "SA.40",
+"income": "credit",
+"known": true,
+"name": "Hall-effect Thruster",
+"sector": "blue",
+"species": null,
+"tags": [
+"move"
+],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"move"
+],
+"id": "SA.41",
+"income": "energy",
+"known": true,
+"name": "Exoplanet Survey",
+"sector": "blue",
+"species": null,
+"tags": [],
+"type": "end"
+},
+{
+"cost": 2,
+"deck": "expansion",
+"free": [
+"publicity"
+],
+"id": "SA.42",
+"income": "card",
+"known": true,
+"name": "LOFAR Array",
+"sector": "yellow",
+"species": null,
+"tags": [
+"scan"
+],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "AM.11",
+"income": "energy",
+"known": true,
+"name": "Amoeba ET.11",
+"sector": "red",
+"species": "amoeba",
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "AM.12",
+"income": "card",
+"known": true,
+"name": "Amoeba ET.12",
+"sector": "yellow",
+"species": "amoeba",
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "AM.13",
+"income": "credit",
+"known": true,
+"name": "Amoeba ET.13",
+"sector": "blue",
+"species": "amoeba",
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "AM.14",
+"income": "card",
+"known": true,
+"name": "Amoeba ET.14",
+"sector": "red",
+"species": "amoeba",
+"tags": [],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "AM.15",
+"income": "energy",
+"known": true,
+"name": "Amoeba ET.15",
+"sector": "yellow",
+"species": "amoeba",
+"tags": [
+"launch"
+],
+"type": "mission"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "AM.16",
+"income": "card",
+"known": true,
+"name": "Amoeba ET.16",
+"sector": "blue",
+"species": "amoeba",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "AM.17",
+"income": "credit",
+"known": true,
+"name": "Amoeba ET.17",
+"sector": "red",
+"species": "amoeba",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"data",
+"score"
+],
+"id": "AM.18",
+"income": "credit",
+"known": true,
+"name": "Amoeba ET.18",
+"sector": "blue",
+"species": "amoeba",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [
+"publicity"
+],
+"id": "AM.19",
+"income": "energy",
+"known": true,
+"name": "Amoeba ET.19",
+"sector": "black",
+"species": "amoeba",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"move",
+"score"
+],
+"id": "AM.20",
+"income": "energy",
+"known": true,
+"name": "Amoeba ET.20",
+"sector": "yellow",
+"species": "amoeba",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.1",
+"income": "card",
+"known": true,
+"name": "Glyphids ET.1",
+"sector": "black",
+"species": "glyphids",
+"tags": [],
+"type": "end"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.2",
+"income": "energy",
+"known": true,
+"name": "Glyphids ET.2",
+"sector": "blue",
+"species": "glyphids",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.3",
+"income": "credit",
+"known": true,
+"name": "Glyphids ET.3",
+"sector": "yellow",
+"species": "glyphids",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 0,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.4",
+"income": "card",
+"known": true,
+"name": "Glyphids ET.4",
+"sector": "red",
+"species": "glyphids",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.5",
+"income": "energy",
+"known": true,
+"name": "Glyphids ET.5",
+"sector": "yellow",
+"species": "glyphids",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.6",
+"income": "credit",
+"known": true,
+"name": "Glyphids ET.6",
+"sector": "red",
+"species": "glyphids",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.7",
+"income": "card",
+"known": true,
+"name": "Glyphids ET.7",
+"sector": "red",
+"species": "glyphids",
+"tags": [],
+"type": "mission"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.8",
+"income": "energy",
+"known": true,
+"name": "Glyphids ET.8",
+"sector": "blue",
+"species": "glyphids",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 1,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.9",
+"income": "credit",
+"known": true,
+"name": "Glyphids ET.9",
+"sector": "yellow",
+"species": "glyphids",
+"tags": [],
+"type": "end"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"glyph"
+],
+"id": "GL.10",
+"income": "card",
+"known": true,
+"name": "Glyphids ET.10",
+"sector": "blue",
+"species": "glyphids",
+"tags": [
+"launch"
+],
+"type": "quick"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.21",
+"income": "card",
+"known": true,
+"name": "Exterior Scan",
+"sector": "red",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.22",
+"income": "energy",
+"known": true,
+"name": "Exterior Scan",
+"sector": "blue",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.23",
+"income": "credit",
+"known": true,
+"name": "Exterior Scan",
+"sector": "yellow",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.24",
+"income": "energy",
+"known": true,
+"name": "Exterior Scan",
+"sector": "black",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.29",
+"income": "card",
+"known": true,
+"name": "Forced Entry",
+"sector": "yellow",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.30",
+"income": "energy",
+"known": true,
+"name": "Forced Entry",
+"sector": "red",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.31",
+"income": "credit",
+"known": true,
+"name": "Forced Entry",
+"sector": "blue",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.32",
+"income": "credit",
+"known": true,
+"name": "Forced Entry",
+"sector": "black",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.25",
+"income": "card",
+"known": true,
+"name": "Proximity Maneuvers",
+"sector": "blue",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.26",
+"income": "energy",
+"known": true,
+"name": "Proximity Maneuvers",
+"sector": "yellow",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.27",
+"income": "credit",
+"known": true,
+"name": "Proximity Maneuvers",
+"sector": "red",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 2,
+"deck": "alien",
+"free": [
+"explore_minor"
+],
+"id": "AK.28",
+"income": "card",
+"known": true,
+"name": "Proximity Maneuvers",
+"sector": "black",
+"species": "arkhos",
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "quick",
+"free": [],
+"id": "SR.15",
+"income": "card",
+"known": false,
+"name": "Quick start SR.15",
+"sector": null,
+"species": null,
+"tags": [],
+"type": "none"
+},
+{
+"cost": 0,
+"deck": "quick",
+"free": [],
+"id": "SR.16",
+"income": "data",
+"known": false,
+"name": "Quick start SR.16",
+"sector": null,
+"species": null,
+"tags": [],
+"type": "none"
+}
+]

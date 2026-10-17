@@ -2614,3 +2614,56 @@ button:disabled {
   align-items: center;
   gap: 4px;
 }
+
+/* the page of all the cards, with filters */
+.catfilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: end;
+}
+.catfilter {
+  display: grid;
+  gap: 3px;
+  font-size: 0.85rem;
+}
+.catfilter select,
+.catfilter input {
+  min-width: 150px;
+}
+.catname input {
+  min-width: min(260px, 100%);
+}
+.catadvanced {
+  margin: 10px 0;
+  padding: 6px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+.catadvanced summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.cateffects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 8px 0;
+}
+.catgrid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+.catgrid li {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  text-align: center;
+}
+.catname-text {
+  font-size: 0.85rem;
+}
