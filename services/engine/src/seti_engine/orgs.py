@@ -344,7 +344,8 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
     base: Action = {"type": "org_free", "org": o}
     if o == "futurespan_institute":
         if not p.org_data.get("fs_card"):  # EXP-ORG-12: one prepared card at a time
-            return [{**base, "card": c} for c in dict.fromkeys(p.hand) if 1 <= prepare_cost(c) <= 4]  # A-052: costs 1 to 4 only
+            # A-052: costs 1 to 4 only; "ahead" is how far in front of the score the token is put, for the button
+            return [{**base, "card": c, "ahead": 10 * prepare_cost(c) + 5} for c in dict.fromkeys(p.hand) if 1 <= prepare_cost(c) <= 4]
         if not p.org_used:  # once per round while the token is on the scoring track: 3 spaces farther, and a card
             return [{**base, "delay": True}]
         return []

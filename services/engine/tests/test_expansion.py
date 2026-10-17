@@ -351,7 +351,7 @@ def test_futurespan_prepares_a_card_waits_for_the_token_and_plays_it_free() -> N
     card = next(c for c in p.hand if tables.cards()[c]["cost"] >= 1)
     cost = int(tables.cards()[card]["cost"])
     score = p.score
-    s = act(s, type="org_free", org="futurespan_institute", card=card)
+    s = pick(s, "org_free", org="futurespan_institute", card=card, ahead=10 * cost + 5)  # the move says how far ahead the token goes
     p = cur(s)
     assert card not in p.hand and p.org_data["fs_token"] == score + 10 * cost + 5
     assert not can(s, "org_main", org="futurespan_institute")
@@ -367,8 +367,8 @@ def test_futurespan_prepares_a_card_waits_for_the_token_and_plays_it_free() -> N
 
 def test_futurespan_card_is_hidden_from_the_others() -> None:  # CLAUDE.md rule 6
     s = with_org("futurespan_institute")
-    card = cur(s).hand[0]
-    s = act(s, type="org_free", org="futurespan_institute", card=card)
+    card = next(m["card"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("card"))
+    s = pick(s, "org_free", org="futurespan_institute", card=card)
     other = 1 - s.current_player
     assert project(s, other).state.players[s.current_player].org_data["fs_card"] == "?"
     assert project(s, s.current_player).state.players[s.current_player].org_data["fs_card"] == card

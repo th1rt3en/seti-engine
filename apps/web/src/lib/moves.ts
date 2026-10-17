@@ -169,7 +169,7 @@ function orgFreeLabel(m: Move): string {
   if (org === "futurespan_institute")
     return m.delay
       ? `${name}: move the token 3 spaces farther and gain a card`
-      : `${name}: prepare ${cardName(m.card)} (the token goes 10 points per credit of cost + 5 ahead)`;
+      : `${name}: Prepare (+${String(m.ahead)})`;
   if (org === "cosmos_strategy_group") return `${name}: gain ${source(m.source)} and clear your marked reward spaces`;
   if (org === "helion_assembly")
     return `${name}: destroy your ${String(m.tech)} tech, then tuck a card for income and clear your marked reward spaces`;
