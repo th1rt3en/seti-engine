@@ -730,6 +730,16 @@ button.step {
 .target:focus .targetcell {
   fill: rgba(110, 240, 165, 0.55);
 }
+.targetcost {
+  fill: rgba(5, 20, 12, 0.85);
+  stroke: #6ef0a5;
+  stroke-width: 5;
+}
+.targettext {
+  fill: #fff;
+  font-size: 52px;
+  font-weight: 800;
+}
 .route {
   fill: none;
   stroke: #fff;

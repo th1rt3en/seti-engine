@@ -673,7 +673,7 @@ export function GameClient({
         ? "Click a probe on the board, then a highlighted space."
         : targets.length === 0
           ? "No space is in reach: add energy."
-          : "Click a highlighted space.",
+          : "Click a highlighted space; its number is what the move costs.",
     );
   if (pickable.length > 0) hints.push(`${handHint(new Set(handMoves.map((m) => m.type)))}`);
   if (goldMoves.length > 0) hints.push("Click the highlighted place of a gold scoring tile beside the board to mark it.");
