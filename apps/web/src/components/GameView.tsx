@@ -15,7 +15,7 @@ import { ChipName } from "./ChipName";
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { ExertianDock, HandDock, type HandSelection } from "./HandDock";
 import { Hint } from "./Hint";
-import { CreditIcon, EnergyIcon, ExofossilIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import { CreditIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { MissionsPanel } from "./MissionsPanel";
 import { OrgName } from "./OrgName";
 import { OrgPanel } from "./OrgPanel";
@@ -145,7 +145,6 @@ export function GameView({
     s.species.map((sp, i) => (sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`)),
   );
   const actor = view.to_act === null ? undefined : s.players[view.to_act];
-  const me = view.viewer === null ? undefined : s.players[view.viewer];
   return (
     <div className="game">
       <header className="topbar" aria-label="Round, turn, current player and moves">
@@ -162,12 +161,6 @@ export function GameView({
             <span className="label">Turn</span>
             <span className="big">{s.turn}</span>
           </div>
-          {me ? (
-            <div className="counter" title="Your publicity">
-              <span className="label">Publicity</span>
-              <span className="big">{me.publicity}</span>
-            </div>
-          ) : null}
           <div className={prompt.mine ? "now mine" : "now"} aria-live="polite">
             {actor ? <span className="dot big" style={{ background: PLAYER_COLOR[actor.color] ?? "#fff" }} /> : null}
             <div className="nowtext">
@@ -208,6 +201,10 @@ export function GameView({
                     <span className="res" title="Energy">
                       <EnergyIcon size={18} />
                       <b>{p.energy}</b>
+                    </span>
+                    <span className="res" title="Publicity">
+                      <PublicityIcon size={18} />
+                      <b>{p.publicity}</b>
                     </span>
                     {s.options.expansion ? (
                       <span className="res" title="Signal tokens">

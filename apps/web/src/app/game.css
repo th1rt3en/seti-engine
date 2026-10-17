@@ -1213,7 +1213,7 @@ button:disabled {
 @media (max-width: 760px) {
   .topbar .toprow {
     display: grid;
-    grid-template-columns: auto auto auto 1fr;
+    grid-template-columns: auto auto 1fr;
     align-items: center;
     gap: 4px 12px;
   }
@@ -1249,7 +1249,7 @@ button:disabled {
     grid-row: 3;
   }
   .toprow .extra {
-    grid-column: 4;
+    grid-column: 3;
     grid-row: 1;
     flex: none;
     justify-self: end;
