@@ -163,7 +163,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         fire(s, p, [{"e": "scan"}], events)
     elif t == "land_free":
         opts = {k: v for k, v in st.items() if k not in ("t", "n")}
-        if land_free_moves(s, p, opts):
+        if land_free_moves(s, p, opts) or can_move_to_land(s, p):  # the card's own movement, or energy, may bring a probe to a planet first
             s.pending.append(Decision(kind="land_free", player=p.index, data=opts))
     elif t == "sig_star":
         idx = next(i for i, sec in enumerate(s.sectors) if sec.star == st["star"])
@@ -296,6 +296,11 @@ def _research_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
         s.pending.append(
             Decision(kind="research_tech", player=p.index, data={"stacks": stacks, **{k: v for k, v in st.items() if k not in ("t", "n")}})
         )
+
+
+def can_move_to_land(s: GameState, p: PlayerState) -> bool:
+    """A probe is on the map and the player has movement or energy to spend: the player may move it (a free action) before the landing."""
+    return (p.movement > 0 or p.energy > 0) and any(pr.player == p.index and not pr.capsule for pr in s.probes)
 
 
 def land_free_moves(s: GameState, p: PlayerState, opts: dict[str, Any]) -> list[Action]:

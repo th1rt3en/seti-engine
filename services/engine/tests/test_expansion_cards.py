@@ -489,6 +489,25 @@ def test_effects_resolve_from_left_to_right() -> None:  # EXP-ORDER-01, A-053
     assert r.state.pending[0].kind == "income_tuck"
 
 
+def test_a_move_then_land_card_waits_for_a_probe_to_be_moved_to_a_planet() -> None:  # EXP-ORDER-01, SA.6
+    s = ready()
+    pr = put_probe(s, "EARTH")
+    me_ = s.players[s.current_player]
+    me_.energy = 3
+    r = go(s, 6, answer=False)  # movement 1, and no probe on a planet yet
+    assert r.state.pending[0].kind == "land_free"
+    assert {m["type"] for m in r.legal if m["type"] in ("land_free", "skip_land")} == {"skip_land"}
+    assert any(m["type"] == "move_probe" for m in r.legal)  # the probe can be moved first, with the movement and energy
+    st = r.state.model_copy(deep=True)  # a probe that has arrived on a planet can land
+    where = solar.find_cell(st, "PLANET:MARS")
+    assert where is not None
+    probe = next(x for x in st.probes if x.id == pr.id)
+    probe.ring, probe.sector = where
+    assert any(m["type"] == "land_free" for m in legal_moves(st))
+    r = apply(r.state, {"type": "skip_land"})
+    assert not any(d.kind == "land_free" for d in r.state.pending)
+
+
 def test_a_card_that_names_mars_triggers_gateway_to_mars() -> None:  # A-027 (owner), SA.31
     assert "SA.31" in card_defs.MARS_FLAVOR
     s = ready()

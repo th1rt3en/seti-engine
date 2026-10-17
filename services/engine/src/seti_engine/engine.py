@@ -207,7 +207,8 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
     if d.kind == "research_tech":
         return cards.research_moves(d)
     if d.kind == "land_free":
-        return cards.land_free_moves(state, p, d.data)
+        # when no probe is on a planet yet the player moves one first (a free action) and then lands; otherwise the landing is skipped
+        return cards.land_free_moves(state, p, d.data) or [{"type": "skip_land"}]
     if d.kind == "take_card":
         return [{"type": "take_card", "source": "deck"}] + [{"type": "take_card", "source": f"row:{i}"} for i in range(len(state.card_row))]
     if d.kind == "scan_step":
@@ -790,7 +791,7 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
         _orbit(s, p, a, events, free=True, opts=d.data)
     elif t == "play_exertian":
         species.play_exertian(s, p, a["card"], d.data["cost"])
-    elif t == "skip_exertian":
+    elif t == "skip_exertian" or t == "skip_land":
         pass
     elif t == "mark_objective":
         objectives.mark(s, a["objective"], a["task"])

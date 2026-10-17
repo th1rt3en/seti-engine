@@ -148,6 +148,7 @@ export const LABELS: Record<string, Label> = {
   choose_message: (m) => `Cover reward ${Number(m.hex) + 1} (${rewardList(m.reward)}) with your message tile`,
   play_exertian: () => "Play an Exertian card face down",
   skip_exertian: () => "Do not play an Exertian card",
+  skip_land: () => "Do not land",
   pol_pick: (m) => `Choose ${cardName(m.card)}`,
   opt_yes: () => "Yes, do it",
   opt_no: () => "No, skip it",
