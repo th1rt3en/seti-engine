@@ -3,6 +3,7 @@
 // (the `sandbox` entry of the legal moves) and checks every action; nothing here is a rule.
 import { cardName } from "@/lib/moves";
 import { useState } from "react";
+import { CreditIcon, DataIcon, EnergyIcon, ExofossilIcon, PublicityIcon } from "./Icons";
 
 type Marker = { type: "sandbox"; resources: string[]; discs: number[]; cards: string[] };
 type Send = (action: Record<string, unknown>) => void;
@@ -13,6 +14,13 @@ const RESOURCE_LABELS: Record<string, string> = {
   data: "Data",
   publicity: "Publicity",
   exofossil: "Exofossils",
+};
+const RESOURCE_ICONS: Record<string, React.ReactNode> = {
+  credit: <CreditIcon size={22} />,
+  energy: <EnergyIcon size={22} />,
+  data: <DataIcon size={22} />,
+  publicity: <PublicityIcon size={22} />,
+  exofossil: <ExofossilIcon size={22} />,
 };
 const MAX_SHOWN = 24;
 const MIN_CHARS = 2; // no card is listed before the search has this many characters
@@ -43,6 +51,7 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
   const [query, setQuery] = useState("");
   const [resource, setResource] = useState(marker.resources[0] ?? "credit");
   const [amount, setAmount] = useState(1);
+  const [listOpen, setListOpen] = useState(false);
   const typed = query.trim();
   const words = typed.toLowerCase().split(/\s+/).filter(Boolean);
   const matches =
@@ -95,18 +104,39 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
         <section aria-label="Resources">
           <h4>Resources</h4>
           <div className="sandboxform">
-            <select value={resource} onChange={(e) => setResource(e.target.value)} aria-label="Resource">
-              {marker.resources.map((r) => (
-                <option key={r} value={r}>
-                  {RESOURCE_LABELS[r] ?? r}
-                </option>
-              ))}
-            </select>
+            <div className="sandboxpick">
+              <button
+                type="button"
+                className="secondary"
+                aria-haspopup="listbox"
+                aria-expanded={listOpen}
+                onClick={() => setListOpen(!listOpen)}
+              >
+                {RESOURCE_ICONS[resource]} {RESOURCE_LABELS[resource] ?? resource} ▾
+              </button>
+              {listOpen ? (
+                <ul className="sandboxlist" aria-label="Resource">
+                  {marker.resources.map((r) => (
+                    <li key={r} aria-current={r === resource}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResource(r);
+                          setListOpen(false);
+                        }}
+                      >
+                        {RESOURCE_ICONS[r]} {RESOURCE_LABELS[r] ?? r}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
             <button type="button" className="secondary" aria-label="One less" onClick={() => step(-1)}>
               −
             </button>
             <output className="sandboxamount" aria-label="Amount">
-              {amount > 0 ? `+${amount}` : amount}
+              {amount > 0 ? `+${amount}` : amount} {RESOURCE_ICONS[resource]}
             </output>
             <button type="button" className="secondary" aria-label="One more" onClick={() => step(1)}>
               +
