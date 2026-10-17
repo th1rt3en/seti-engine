@@ -189,6 +189,8 @@ class Decision(BaseModel):
     kind: str
     player: int
     data: dict[str, Any] = Field(default_factory=dict)
+    # what caused the decision (a card, a planet, an organization ...), named like the sources of the `gains` events
+    source: dict[str, Any] | None = None
 
 
 class RivalState(BaseModel):

@@ -45,6 +45,9 @@ export type PassDiscardChecked = boolean;
 export type PassRotated = boolean;
 export type Kind = string;
 export type Player = number;
+export type Source = {
+  [k: string]: unknown;
+} | null;
 export type Pending = Decision[];
 export type Phase = "setup" | "play" | "finished";
 export type FirstLandDataTaken = boolean[];
@@ -346,6 +349,7 @@ export interface Decision {
   data: Data;
   kind: Kind;
   player: Player;
+  source: Source;
 }
 export interface Data {
   [k: string]: unknown;

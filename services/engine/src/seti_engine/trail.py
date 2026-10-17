@@ -2,8 +2,8 @@
 
 A scope names the cause of everything that changes inside it (a card, a sector, a mission, a milestone ...). When the scope ends,
 the change of each player's points and resources between its start and its end, less what scopes inside it have already accounted
-for, is recorded under its name. The records are turned into `gains` events at the end of the step (engine._step). Nothing here
-changes a rule: it only watches the numbers.
+for, is recorded under its name. Decisions that are put to a player inside the scope are named after it too (`Decision.source`).
+The records are turned into `gains` events at the end of the step (engine._step). Nothing here changes a rule: it only watches the numbers.
 """
 
 from __future__ import annotations
@@ -38,7 +38,11 @@ def scope(s: GameState, source: dict[str, Any], turn: str | None = None) -> Iter
     `turn` names the rival's turn (its action card) that everything inside belongs to, so that the log can show each turn on its own."""
     start = len(s.trail)
     before = _snapshot(s)
+    known = list(s.pending)  # held, so that no id is reused
     yield
+    for d in s.pending:  # a decision this block caused is named after the innermost scope that was open when it was made
+        if d.source is None and not any(d is k for k in known):
+            d.source = source
     after = _snapshot(s)
     claimed: list[dict[str, int]] = [dict.fromkeys(KINDS, 0) for _ in s.players]
     for rec in s.trail[start:]:

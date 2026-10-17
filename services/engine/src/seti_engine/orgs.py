@@ -135,7 +135,8 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
     if p.organization == "xenolab":
         p.org_data["tiles"] = {"launch": True, "scan": True, "research": True}
     tucks = min(org["tuck_income_cards"], len(p.hand))
-    s.pending[0:0] = [Decision(kind="setup_tuck", player=p.index) for _ in range(tucks)]  # EXP-ORG-07: one by one
+    source = {"kind": "organization", "org": p.organization}
+    s.pending[0:0] = [Decision(kind="setup_tuck", player=p.index, source=source) for _ in range(tucks)]  # EXP-ORG-07: one by one
 
 
 def place_marks(s: GameState, p: PlayerState | None, cid: str) -> None:
@@ -417,7 +418,8 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
     elif o == "helion_assembly":  # destroy a tech, tuck a card for income, clear the marked spaces
         p.org_data.setdefault("disabled", []).append(a["tech"])
         p.org_marks = []
-        s.pending.append(Decision(kind="helion_tuck", player=p.index))  # then a card is tucked for its income, like any tuck
+        # then a card is tucked for its income, like any tuck
+        s.pending.append(Decision(kind="helion_tuck", player=p.index, source={"kind": "organization", "org": o}))
     elif o == "orbital_dynamics":  # EXP-ORG-13, A-039: the steps are taken with od_step moves until the end of the turn
         p.org_data["od_left"], p.org_data["od_used"] = 2, []
     elif o == "sentinel_probe_network":

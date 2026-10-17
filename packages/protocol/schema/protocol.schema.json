@@ -119,12 +119,26 @@
         "player": {
           "title": "Player",
           "type": "integer"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source"
         }
       },
       "required": [
         "data",
         "kind",
-        "player"
+        "player",
+        "source"
       ],
       "title": "Decision",
       "type": "object"

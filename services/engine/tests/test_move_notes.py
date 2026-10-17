@@ -153,3 +153,18 @@ def test_a_signal_in_the_sector_of_oumuamua_names_the_sector_and_tells_the_tile_
     sector = species.oumuamua_sector(s)
     assert by_where["sector"] == {"sector": sector, "star": s.sectors[sector].star, "color": s.sectors[sector].color}  # type: ignore[index]
     assert by_where["tile"]["oumuamua_tile"] is True and by_where["tile"]["sector"] == sector
+
+
+def test_a_decision_is_named_after_the_innermost_scope_that_caused_it() -> None:  # the context bar says its source in parentheses
+    from seti_engine import trail
+    from seti_engine.engine import start
+    from seti_engine.models import Decision, Options
+
+    s = start(Options(players=2, seed=1)).state
+    s.pending.clear()
+    with trail.scope(s, {"kind": "move"}):
+        with trail.scope(s, {"kind": "card", "card": "17"}):
+            s.pending.append(Decision(kind="signal", player=0))
+        s.pending.append(Decision(kind="take_card", player=0))
+        s.pending.append(Decision(kind="trace", player=0, source={"kind": "organization", "org": "xenolab"}))
+    assert [d.source for d in s.pending] == [{"kind": "card", "card": "17"}, {"kind": "move"}, {"kind": "organization", "org": "xenolab"}]

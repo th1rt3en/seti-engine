@@ -3,6 +3,7 @@
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
 // everything comes from the engine's view.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { AmoebaPanel } from "./AmoebaPanel";
@@ -31,7 +32,7 @@ const ROUNDS = 5;
 /** What the engine waits for, in words. */
 const DECISION: Record<string, string> = {
   setup_tuck: "tuck a card for income",
-  helion_tuck: "tuck a card for income (Helion Assembly)",
+  helion_tuck: "tuck a card for income",
   income_tuck: "tuck a card for income, or skip",
   discard_to_four: "discard down to four cards",
   take_round_card: "take an end-of-round card",
@@ -124,6 +125,12 @@ export function GameView({
   // exofossils exist once 'Oumuamua is face up: they show with the other resources (ALIEN-OUM-02)
   const oumuamua = s.species.some((sp) => sp.discovered && sp.species === "oumuamua");
   const prompt = promptOf(view, names);
+  // what caused the decision that is asked now, at the end of the bar: "(Helion Assembly)"
+  const cause = sourceLabel(
+    s.pending[0]?.source as DecisionSource | null | undefined,
+    s.sectors.map((sec) => sec.star),
+    s.species.map((sp, i) => (sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`)),
+  );
   const actor = view.to_act === null ? undefined : s.players[view.to_act];
   return (
     <div className="game">
@@ -148,7 +155,10 @@ export function GameView({
                 <b className="who">
                   {prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}${prompt.mine || context ? ":" : ""}` : " "}
                 </b>
-                <span className={context ? "prompt asking" : "prompt"}>{context ?? prompt.text}</span>
+                <span className={context ? "prompt asking" : "prompt"}>
+                  {context ?? prompt.text}
+                  {cause && view.state.pending.length > 0 ? ` (${cause})` : ""}
+                </span>
               </div>
               {contextActions ? <div className="contextactions">{contextActions}</div> : null}
             </div>
