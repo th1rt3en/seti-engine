@@ -408,7 +408,12 @@ export function GameClient({
   const coverMove =
     pickedCover === null ? undefined : coverMoves.find((m) => m.card === pickedCover.card && m.circle === pickedCover.circle);
   const coverNode = coverOptions.length > 0 ? <MissionCover options={coverOptions} picked={pickedCover} onPick={setPickedCover} /> : null;
-  const answerMoves = otherMoves.filter((m) => !BAR_MOVES.has(m.type) && m.type !== "cover" && !(m.type === "move_energy" && noProbe));
+  // free actions that have their own place (energy for movement: the probe's move; data: the computer on the player board) are no buttons here,
+  // except placing data when the data overflows, which is the question itself
+  const overflow = v.state.pending[0]?.kind === "data_overflow";
+  const answerMoves = otherMoves.filter(
+    (m) => !BAR_MOVES.has(m.type) && m.type !== "cover" && m.type !== "move_energy" && !(m.type === "place_data" && !overflow),
+  );
   const moveGroups = groupMoves(barMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
