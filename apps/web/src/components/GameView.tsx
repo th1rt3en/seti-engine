@@ -31,6 +31,7 @@ const ROUNDS = 5;
 /** What the engine waits for, in words. */
 const DECISION: Record<string, string> = {
   setup_tuck: "tuck a card for income",
+  helion_tuck: "tuck a card for income (Helion Assembly)",
   income_tuck: "tuck a card for income, or skip",
   discard_to_four: "discard down to four cards",
   take_round_card: "take an end-of-round card",

@@ -145,7 +145,7 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                 </span>
               );
             })}
-            {wanted ? (
+            {(selection?.offered?.length ?? 0) > 0 ? (
               <>
                 <span className="handsep offersep" aria-hidden="true" />
                 <span className="offerbox">
