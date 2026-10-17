@@ -4,7 +4,7 @@ when `Options.sandbox` is set; the game is never rated.
 
 Actions are not listed one by one in the legal moves (there are too many); one `sandbox` entry says what is possible.
     sandbox_add_card {card}            put the card in the player's hand
-    sandbox_resource {resource, n}     add or (n < 0) remove credits, energy, data, publicity or exofossils
+    sandbox_resource {resource, n}     add or (n < 0) remove credits, energy, data, publicity, exofossils or signal tokens
     sandbox_rotate {disc 1..3, step}   turn one disc by one step (1 or -1), with no reward for pushed probes
 """
 
@@ -18,7 +18,7 @@ from .models import GameState, PlayerState
 Action = dict[str, Any]
 Events = list[dict[str, Any]]
 
-RESOURCES = ("credit", "energy", "data", "publicity", "exofossil")
+RESOURCES = ("credit", "energy", "data", "publicity", "exofossil", "signal_token")
 MAX_STEP = 50  # the most that one action changes a resource by
 DATA_POOL_MAX = 6
 PUBLICITY_MAX = 10
@@ -33,8 +33,12 @@ def discovered_species(s: GameState) -> set[str]:
 
 
 def resources_available(s: GameState) -> list[str]:
-    """SANDBOX-03: exofossils exist only when 'Oumuamua has been discovered."""
-    return [r for r in RESOURCES if r != "exofossil" or species.oumuamua_slot(s) is not None]
+    """SANDBOX-03: exofossils exist only when 'Oumuamua has been discovered, and signal tokens only with the expansion (EXP-SIG-01)."""
+    return [
+        r
+        for r in RESOURCES
+        if (r != "exofossil" or species.oumuamua_slot(s) is not None) and (r != "signal_token" or s.options.expansion)
+    ]
 
 
 def addable_cards(s: GameState) -> list[str]:
@@ -118,6 +122,8 @@ def apply_action(s: GameState, a: Action, events: Events) -> None:
             p.data_pool = min(DATA_POOL_MAX, max(0, p.data_pool + n))
         elif kind == "publicity":
             p.publicity = min(PUBLICITY_MAX, max(0, p.publicity + n))
+        elif kind == "signal_token":
+            p.signal_tokens = max(0, p.signal_tokens + n)
         else:
             p.exofossils = max(0, p.exofossils + n)
         events.append({"type": "sandbox", "what": "resource", "resource": kind, "n": n})

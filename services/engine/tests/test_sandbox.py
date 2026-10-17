@@ -229,3 +229,16 @@ def test_the_sandbox_with_the_expansion_offers_every_organization_and_quick_star
     pair = next(m for m in r.legal if m["type"] == "choose_quick")
     r = apply(r.state, pair)
     assert r.state.players[0].quick_start == pair["cards"]
+
+
+def test_the_sandbox_gives_signal_tokens_only_with_the_expansion_and_exofossils_with_oumuamua() -> None:  # SANDBOX-03, EXP-SIG-01
+    r = begin_sandbox()
+    assert "signal_token" not in sandbox_marker(r)["resources"] and "exofossil" not in sandbox_marker(r)["resources"]
+    r = start(Options(players=1, sandbox=True, seed=3, expansion=True))
+    while r.state.pending:
+        r = apply(r.state, r.legal[0])
+    assert "signal_token" in sandbox_marker(r)["resources"]
+    r = apply(r.state, {"type": "sandbox_resource", "resource": "signal_token", "n": 3})
+    assert r.state.players[0].signal_tokens == 3
+    r = apply(r.state, {"type": "sandbox_resource", "resource": "signal_token", "n": -5})
+    assert r.state.players[0].signal_tokens == 0

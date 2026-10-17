@@ -3,7 +3,7 @@
 // (the `sandbox` entry of the legal moves) and checks every action; nothing here is a rule.
 import { cardName } from "@/lib/moves";
 import { useState } from "react";
-import { CreditIcon, DataIcon, EnergyIcon, ExofossilIcon, PublicityIcon } from "./Icons";
+import { CreditIcon, DataIcon, EnergyIcon, ExofossilIcon, PublicityIcon, SignalTokenIcon } from "./Icons";
 
 type Marker = { type: "sandbox"; resources: string[]; discs: number[]; cards: string[] };
 type Send = (action: Record<string, unknown>) => void;
@@ -14,6 +14,7 @@ const RESOURCE_LABELS: Record<string, string> = {
   data: "Data",
   publicity: "Publicity",
   exofossil: "Exofossils",
+  signal_token: "Signal tokens",
 };
 const RESOURCE_ICONS: Record<string, React.ReactNode> = {
   credit: <CreditIcon size={22} />,
@@ -21,6 +22,7 @@ const RESOURCE_ICONS: Record<string, React.ReactNode> = {
   data: <DataIcon size={22} />,
   publicity: <PublicityIcon size={22} />,
   exofossil: <ExofossilIcon size={22} />,
+  signal_token: <SignalTokenIcon size={22} />,
 };
 const MAX_SHOWN = 24;
 const MIN_CHARS = 2; // no card is listed before the search has this many characters
