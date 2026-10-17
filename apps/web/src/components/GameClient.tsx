@@ -4,6 +4,7 @@ import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
 import {
   type Move,
   cardInfo,
+  cardName,
   cardSector,
   cornerGlyph,
   describeMove,
@@ -32,6 +33,7 @@ import { GameView } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
+import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { OrgFreePanel } from "./OrgFreePanel";
@@ -89,6 +91,7 @@ export function GameClient({
   const [pickedBuy, setPickedBuy] = useState<string | null>(null);
   // the end-of-round card picked to keep (after passing)
   const [pickedOffer, setPickedOffer] = useState<string | null>(null);
+  const [pickedCover, setPickedCover] = useState<CoverChoice | null>(null);
   // the quick start cards picked to keep (two at once)
   const [pickedQuick, setPickedQuick] = useState<string[]>([]);
   // the place picked for a probe to move to, until the player confirms
@@ -183,6 +186,7 @@ export function GameClient({
           setPicked([]);
           setPickedBuy(null);
           setPickedOffer(null);
+          setPickedCover(null);
           setPickedQuick([]);
           setPendingMove(null);
           setUnsure(null);
@@ -398,7 +402,13 @@ export function GameClient({
   const BAR_MOVES = new Set(["launch", "scan", "analyze", "pass", "end_turn"]);
   const barMoves = otherMoves.filter((m) => BAR_MOVES.has(m.type));
   // a free action that moves a probe is no answer for a player with no probe on the map
-  const answerMoves = otherMoves.filter((m) => !BAR_MOVES.has(m.type) && !(m.type === "move_energy" && noProbe));
+  // the circles of a mission that a trigger can cover are clicked on the mission card, shown in the context bar
+  const coverMoves = otherMoves.filter((m) => m.type === "cover");
+  const coverOptions: CoverChoice[] = coverMoves.map((m) => ({ card: String(m.card), circle: Number(m.circle) }));
+  const coverMove =
+    pickedCover === null ? undefined : coverMoves.find((m) => m.card === pickedCover.card && m.circle === pickedCover.circle);
+  const coverNode = coverOptions.length > 0 ? <MissionCover options={coverOptions} picked={pickedCover} onPick={setPickedCover} /> : null;
+  const answerMoves = otherMoves.filter((m) => !BAR_MOVES.has(m.type) && m.type !== "cover" && !(m.type === "move_energy" && noProbe));
   const moveGroups = groupMoves(barMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const selectCard = (i: number) =>
     setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : picked.length >= 2 ? [picked[1] as number, i] : [...picked, i]);
@@ -537,6 +547,17 @@ export function GameClient({
       onCancel: () => setUnsure(null),
       inContext: true, // the question that a move cannot be undone has its buttons in the context bar, where the eye is
     };
+  } else if (coverMove && coverNode) {
+    ask = {
+      text: (
+        <>
+          Cover circle {Number(coverMove.circle) + 1} of {cardName(coverMove.card)}? {coverNode}
+        </>
+      ),
+      buttons: [confirm("Confirm", () => play(coverMove))],
+      onCancel: () => setPickedCover(null),
+      inContext: true,
+    };
   } else if (pendingMove && probe) {
     ask = {
       text: moveText(pendingMove),
@@ -666,7 +687,9 @@ export function GameClient({
   if (rowMoves.length > 0 && buys.length === 0 && !rowMode)
     hints.push(`Click a card of the display${rowSources.includes("deck") ? " or the deck" : ""}.`);
   if (buys.length > 0) hints.push("Click a card of the display or the deck to buy it for 3 publicity.");
-  const contextNode: ReactNode = ask?.text ?? techContext ?? probeContext;
+  if (coverNode) hints.push("Click the circle of the mission card that you want to cover, or decline.");
+  const contextNode: ReactNode =
+    ask?.text ?? (coverNode ? <>Cover a circle of a mission? {coverNode}</> : null) ?? techContext ?? probeContext;
   // the answers that are not choices on the board are buttons in the context bar
   const contextActions = ask?.inContext ? (
     <>

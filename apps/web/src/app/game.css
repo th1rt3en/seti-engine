@@ -2667,3 +2667,62 @@ button:disabled {
 .catname-text {
   font-size: 0.85rem;
 }
+
+/* the mission cards of a trigger, with their circles to click, in the context bar */
+.coverbar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  vertical-align: middle;
+}
+.coverpic {
+  position: relative;
+  display: inline-block;
+  width: clamp(150px, 16vw, 230px);
+}
+.coverpic img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.coverspot {
+  position: absolute;
+  width: 23%;
+  aspect-ratio: 1;
+  padding: 0;
+  top: calc(var(--y) * 100%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 3px solid #5cf2a0;
+  background: rgba(92, 242, 160, 0.18);
+  cursor: pointer;
+  animation: coverpulse 1.4s ease-in-out infinite;
+}
+.coverspot.on {
+  background: rgba(92, 242, 160, 0.5);
+  animation: none;
+}
+@keyframes coverpulse {
+  50% {
+    box-shadow: 0 0 0 6px rgba(92, 242, 160, 0.35);
+  }
+}
+
+/* on a phone only the bottom half of the mission card is shown (the name and the circles), to keep the context bar short */
+@media (max-width: 760px) {
+  .coverpic {
+    width: min(300px, 78vw);
+    aspect-ratio: 440 / 343;
+    overflow: hidden;
+  }
+  .coverpic img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translateY(-44%);
+  }
+  .coverspot {
+    top: calc((var(--y) - 0.44) / 0.56 * 100%);
+  }
+}
