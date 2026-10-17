@@ -1,5 +1,6 @@
 """Scan steps, telescope techs, research, computer techs and analyze (SCAN, TECH, TECHACT, ANALYZE rules)."""
 
+from test_cards import put_probe
 from test_engine import begin, decisions, do, with_state
 
 from seti_engine import rewards, solar, tables
@@ -208,3 +209,16 @@ def test_analyze_clears_the_computer_and_marks_a_blue_trace() -> None:
     assert r2.state.pending[0].data == {"color": "blue"}
     r3 = do(r2, "place_trace", slot=0, space="discovery", color="blue")
     assert r3.state.species[0].discovery_spaces[2] == f"p{pl}"
+
+
+def test_a_probe_can_be_moved_in_the_middle_of_a_scan() -> None:  # FREE-00, FREE-01: movement from a mission
+    from seti_engine.projection import project
+
+    r = scan_ready()
+    s = r.state.model_copy(deep=True)
+    pl = s.current_player
+    s.players[pl].movement = 1
+    put_probe(s, "EARTH")
+    assert s.pending[0].kind == "scan_step"
+    v = project(s, pl)
+    assert v.reach and v.reach[0].cells  # the page offers the probes and the spaces they can reach, not one button for each space

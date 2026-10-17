@@ -180,7 +180,10 @@ def project(state: GameState, viewer: int | None) -> View:
     legal = engine.legal_moves(state) if viewer is not None and actor == viewer else []
     trackers = [tracker(state, p, viewer) for p in state.players]
     reach: list[ProbeReach] = []
-    if legal and viewer is not None and not state.pending and state.phase == "play":
+    # the probes can be moved with a click when nothing is asked, and also in the middle of a decision that a free action may interrupt
+    # (a mission that gives movement while a scan is going on): the legal moves say whether moving is allowed now
+    can_move = any(m["type"] == "move_probe" for m in legal)
+    if legal and viewer is not None and (not state.pending or can_move) and state.phase == "play":
         reach = [
             ProbeReach(
                 probe=pid,
