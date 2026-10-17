@@ -160,9 +160,20 @@ function rivalLine(ev: GameEvent): ReactNode {
 }
 
 /** The events of a move that say something the move itself does not (signals, traces, wins, rounds). */
-function eventLine(ev: GameEvent, ctx: LogContext): ReactNode {
+function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]): ReactNode {
   const who = typeof ev.player === "number" ? ctx.who(ev.player) : "";
   switch (ev.type) {
+    case "launch": {
+      // the Launch action and the actions of an organization say so themselves; any other launch is a free one, and the line says what gave it
+      if (action?.type === "launch" || action?.type === "org_main" || action?.type === "scan_probe") return null;
+      const by =
+        action?.type === "play_card"
+          ? ` (${cardName(action.card)})`
+          : action?.type === "choose_org"
+            ? ` (${ORG_NAMES[String(action.org)] ?? "organization"})`
+            : "";
+      return `${who} launches a probe for free${by}`;
+    }
     case "signal":
       return `${who} marks a signal in ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
     case "glyph_resource":
@@ -279,7 +290,7 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                   {mine && !itemised ? <Changes changes={mine.changes} size={16} /> : null}
                 </span>
                 {notes.map((ev) => {
-                  const line = eventLine(ev, ctx);
+                  const line = eventLine(ev, ctx, e.action);
                   return line ? (
                     <span key={JSON.stringify(ev)} className="logevent">
                       {typeof line === "string" ? <CardText text={line} /> : line}
@@ -304,7 +315,7 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                   <span key={`rt${n}`} className="logrival">
                     <b className="logrivalhead">{turns.length > 1 ? `Rival's turn ${n + 1} of ${turns.length}` : "Rival's turn"}</b>
                     {turn.map((ev, k) => {
-                      const line = ev.type.startsWith("rival_") ? rivalLine(ev) : eventLine(ev, ctx);
+                      const line = ev.type.startsWith("rival_") ? rivalLine(ev) : eventLine(ev, ctx, e.action);
                       // biome-ignore lint/suspicious/noArrayIndexKey: events of a turn are never reordered
                       return line ? <span key={k}>{line}</span> : null;
                     })}
