@@ -411,8 +411,15 @@ export function GameClient({
   // free actions that have their own place (energy for movement: the probe's move; data: the computer on the player board) are no buttons here,
   // except placing data when the data overflows, which is the question itself
   const overflow = v.state.pending[0]?.kind === "data_overflow";
+  // completing a quick mission is a free action: its buttons are in the move bar
+  const completeMoves = otherMoves.filter((m) => m.type === "complete_mission");
   const answerMoves = otherMoves.filter(
-    (m) => !BAR_MOVES.has(m.type) && m.type !== "cover" && m.type !== "move_energy" && !(m.type === "place_data" && !overflow),
+    (m) =>
+      !BAR_MOVES.has(m.type) &&
+      m.type !== "cover" &&
+      m.type !== "complete_mission" &&
+      m.type !== "move_energy" &&
+      !(m.type === "place_data" && !overflow),
   );
   const moveGroups = groupMoves(barMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const selectCard = (i: number) =>
@@ -774,7 +781,7 @@ export function GameClient({
               </div>
             </MoveGroup>
           ))}
-          {exchanges.length > 0 || orgCardMoves.length > 0 ? (
+          {exchanges.length > 0 || orgCardMoves.length > 0 || completeMoves.length > 0 ? (
             <MoveGroup title="Free action" foldable={false}>
               <div className="moves">
                 {exchanges.length > 0 ? (
@@ -787,6 +794,11 @@ export function GameClient({
                     {orgName(orgCardMoves[0]?.org)}: free action
                   </button>
                 ) : null}
+                {completeMoves.map((m) => (
+                  <button key={String(m.card)} type="button" onClick={() => play(m)}>
+                    {describeMove(m)}
+                  </button>
+                ))}
               </div>
             </MoveGroup>
           ) : null}
