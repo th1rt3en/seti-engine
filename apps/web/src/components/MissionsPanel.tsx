@@ -53,8 +53,13 @@ export function MissionsPanel({ view, names }: { view: View; names: string[] }) 
   const players = s.players.filter((p) => !(s.rival && p.index === s.rival.index));
   if (!players.some((p) => p.missions.length > 0 || p.completed_missions.length > 0)) return null;
   return (
-    <section className="card exppanel missionspanel" aria-label="Missions of all players">
-      <h3>Missions</h3>
+    // folded until the player opens it: the cards take a lot of room in the column
+    <details className="card exppanel missionspanel" aria-label="Missions of all players">
+      <summary>
+        <h3>
+          Missions <span className="muted small">({players.reduce((n, p) => n + p.missions.length, 0)} open)</span>
+        </h3>
+      </summary>
       {players.map((p) => (
         <div key={p.index} className="missionrow">
           <b className="small">
@@ -71,6 +76,6 @@ export function MissionsPanel({ view, names }: { view: View; names: string[] }) 
           </div>
         </div>
       ))}
-    </section>
+    </details>
   );
 }

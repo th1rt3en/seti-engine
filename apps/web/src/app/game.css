@@ -2763,10 +2763,12 @@ button:disabled {
 .missionpic {
   display: inline-block;
 }
-.covermarker {
+.covermarker,
+.col-aux svg.covermarker {
   position: absolute;
   top: calc(var(--y) * 100%);
   width: 23%;
+  height: auto;
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -2776,4 +2778,23 @@ button:disabled {
   .coverpic .covermarker {
     top: calc((var(--y) - 0.44) / 0.56 * 100%);
   }
+}
+
+/* the missions of everybody, folded until opened */
+.missionspanel > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.missionspanel > summary::-webkit-details-marker {
+  display: none;
+}
+.missionspanel > summary h3 {
+  display: inline;
+  margin: 0;
+}
+.missionspanel > summary::after {
+  content: " ▸";
+}
+.missionspanel[open] > summary::after {
+  content: " ▾";
 }
