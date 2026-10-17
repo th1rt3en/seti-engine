@@ -473,7 +473,6 @@ export function BoardView({
 
         {interaction?.targets.map((t) => {
           const key = `${t.to[0]}-${t.to[1]}`;
-          const centre = polar(RING_RADIUS[t.to[0]] ?? 270, sectorDegrees(t.to[1]));
           const route = hover === key || interaction.chosen === key ? t.path : [];
           return (
             <g
@@ -500,10 +499,6 @@ export function BoardView({
                   className="route"
                 />
               ) : null}
-              <circle cx={centre.x} cy={centre.y} r={38} className="targetcost" />
-              <text x={centre.x} y={centre.y + 17} className="targettext" textAnchor="middle">
-                {t.cost}
-              </text>
             </g>
           );
         })}
