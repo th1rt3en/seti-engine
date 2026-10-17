@@ -37,6 +37,7 @@ import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogEntry, MoveLog } from "./MoveLog";
 import { OrgFreePanel } from "./OrgFreePanel";
+import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
@@ -411,7 +412,15 @@ export function GameClient({
     (v.state.players[v.viewer ?? 0]?.missions ?? []).map((m) => [m.card, m.used]),
   );
   const coverNode =
-    coverOptions.length > 0 ? <MissionCover options={coverOptions} used={coverUsed} picked={pickedCover} onPick={setPickedCover} /> : null;
+    coverOptions.length > 0 ? (
+      <MissionCover
+        options={coverOptions}
+        used={coverUsed}
+        color={pieceColor(v.state.players[v.viewer ?? 0]?.color)}
+        picked={pickedCover}
+        onPick={setPickedCover}
+      />
+    ) : null;
   // free actions that have their own place (energy for movement: the probe's move; data: the computer on the player board) are no buttons here,
   // except placing data when the data overflows, which is the question itself
   const overflow = v.state.pending[0]?.kind === "data_overflow";

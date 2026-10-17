@@ -5,12 +5,15 @@ import { cardImage } from "@/lib/cardImages";
 import { MISSION_CIRCLES } from "@/lib/missionCircles";
 import { cardName } from "@/lib/moves";
 import type { CSSProperties } from "react";
+import { CoverMarker } from "./CoverMarker";
+import type { PieceColor } from "./Pieces";
 
 export type CoverChoice = { card: string; circle: number };
 
 export function MissionCover({
   options,
   used,
+  color,
   picked,
   onPick,
 }: {
@@ -18,6 +21,8 @@ export function MissionCover({
   options: CoverChoice[];
   /** For each mission card, which of its circles are already covered. */
   used: Record<string, boolean[]>;
+  /** The colour of the player's markers, which lie on the circles that are covered. */
+  color: PieceColor;
   picked: CoverChoice | null;
   onPick: (c: CoverChoice) => void;
 }) {
@@ -34,16 +39,19 @@ export function MissionCover({
               <span className="coverpic">
                 <img src={src} alt={cardName(card)} />
                 {places.map((at, i) => {
-                  const covered = used[card]?.[i] === true;
                   if (mine.some((o) => o.circle === i)) return null;
+                  if (used[card]?.[i] === true)
+                    return (
+                      <CoverMarker key={`covered-${at.x}`} x={at.x} y={at.y} color={color} title={`Circle ${i + 1} is already covered`} />
+                    );
                   return (
                     <span
-                      key={`blocked-${i}`}
-                      className={covered ? "coverblocked covered" : "coverblocked"}
+                      key={`blocked-${at.x}`}
+                      className="coverblocked"
                       style={{ left: `${at.x * 100}%`, "--y": at.y } as CSSProperties}
-                      title={covered ? `Circle ${i + 1} is already covered` : `Circle ${i + 1} is not triggered by this`}
+                      title={`Circle ${i + 1} is not triggered by this`}
                     >
-                      {covered ? "✓" : "×"}
+                      ×
                     </span>
                   );
                 })}

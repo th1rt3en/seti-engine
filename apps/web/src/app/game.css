@@ -2754,3 +2754,26 @@ button:disabled {
     top: calc((var(--y) - 0.44) / 0.56 * 100%);
   }
 }
+
+/* a marker lying on a covered circle of a mission card (the card is the reference: left and top are fractions of its picture) */
+.missionpic,
+.coverpic {
+  position: relative;
+}
+.missionpic {
+  display: inline-block;
+}
+.covermarker {
+  position: absolute;
+  top: calc(var(--y) * 100%);
+  width: 23%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  overflow: visible;
+}
+@media (max-width: 760px) {
+  .coverpic .covermarker {
+    top: calc((var(--y) - 0.44) / 0.56 * 100%);
+  }
+}
