@@ -2178,7 +2178,7 @@ button:disabled {
   position: absolute;
   left: 4px;
   right: 4px;
-  bottom: 6px;
+  top: 6px;
   z-index: 4;
   display: flex;
   flex-direction: column;
@@ -2297,7 +2297,7 @@ button:disabled {
 .stackconfirm {
   position: absolute;
   left: 50%;
-  bottom: 6%;
+  top: 8%;
   transform: translateX(-50%);
   z-index: 3;
   padding: 3px 8px;
