@@ -1693,6 +1693,23 @@ button:disabled {
   display: inline-flex;
   gap: 2px;
 }
+.sandboxres button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.sandboxform {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.sandboxamount {
+  min-width: 3ch;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 
 /* the computer space that takes the next data (free action) */
 .playerboard .pbspace.pickable {

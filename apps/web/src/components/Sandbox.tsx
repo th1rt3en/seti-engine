@@ -15,15 +15,49 @@ const RESOURCE_LABELS: Record<string, string> = {
   exofossil: "Exofossils",
 };
 const MAX_SHOWN = 24;
+const MIN_CHARS = 2; // no card is listed before the search has this many characters
+const MAX_AMOUNT = 50;
+
+/** A curved arrow turning counter-clockwise (`dir` -1) or clockwise (1), for the buttons that turn a disc. */
+function TurnIcon({ dir }: { dir: 1 | -1 }) {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      style={dir === -1 ? { transform: "scaleX(-1)" } : undefined}
+    >
+      <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+      <path d="M20 3.5v4.6h-4.6" />
+    </svg>
+  );
+}
 
 export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send: Send; handCards: string[] }) {
   const [query, setQuery] = useState("");
+  const [resource, setResource] = useState(marker.resources[0] ?? "credit");
   const [amount, setAmount] = useState(1);
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const matches = marker.cards.filter((id) => {
-    const text = `${id} ${cardName(id)}`.toLowerCase();
-    return words.every((w) => text.includes(w));
-  });
+  const typed = query.trim();
+  const words = typed.toLowerCase().split(/\s+/).filter(Boolean);
+  const matches =
+    typed.length < MIN_CHARS
+      ? []
+      : marker.cards.filter((id) => {
+          const text = `${id} ${cardName(id)}`.toLowerCase();
+          return words.every((w) => text.includes(w));
+        });
+  // the amount goes from -50 to 50 and is never 0: a negative amount takes resources away
+  const step = (by: number) =>
+    setAmount((old) => {
+      const next = old + by;
+      return next === 0 ? (by > 0 ? 1 : -1) : Math.min(MAX_AMOUNT, Math.max(-MAX_AMOUNT, next));
+    });
   return (
     <details className="sandbox">
       <summary>Sandbox (practice game: nothing here counts as a rule)</summary>
@@ -32,55 +66,54 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
           <h4>Add a card to your hand</h4>
           <input
             type="search"
-            placeholder="Search by name or number, for example “rover” or “ET.31”"
+            placeholder="Type at least 2 characters: a name or a number, for example “rover” or “ET.31”"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search cards"
           />
-          <ul className="sandboxcards">
-            {matches.slice(0, MAX_SHOWN).map((id) => (
-              <li key={id}>
-                <button type="button" onClick={() => send({ type: "sandbox_add_card", card: id })}>
-                  + {cardName(id)}
-                  {handCards.includes(id) ? " (in hand)" : ""}
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p className="muted small">
-            {matches.length > MAX_SHOWN
-              ? `${matches.length} cards match: type more to narrow them down. `
-              : `${matches.length} cards match. `}
-            Alien cards appear when their species is face up.
-          </p>
+          {typed.length >= MIN_CHARS ? (
+            <>
+              <ul className="sandboxcards">
+                {matches.slice(0, MAX_SHOWN).map((id) => (
+                  <li key={id}>
+                    <button type="button" onClick={() => send({ type: "sandbox_add_card", card: id })}>
+                      + {cardName(id)}
+                      {handCards.includes(id) ? " (in hand)" : ""}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <p className="muted small">
+                {matches.length > MAX_SHOWN
+                  ? `${matches.length} cards match: type more to narrow them down.`
+                  : `${matches.length} cards match.`}{" "}
+                Alien cards appear when their species is face up.
+              </p>
+            </>
+          ) : null}
         </section>
         <section aria-label="Resources">
           <h4>Resources</h4>
-          <label className="row">
-            Amount{" "}
-            <input
-              type="number"
-              min={1}
-              max={50}
-              value={amount}
-              onChange={(e) => setAmount(Math.min(50, Math.max(1, Number(e.target.value) || 1)))}
-            />
-          </label>
-          <div className="moves">
-            {marker.resources.map((r) => (
-              <span key={r} className="sandboxres">
-                <button type="button" onClick={() => send({ type: "sandbox_resource", resource: r, n: amount })}>
-                  + {amount} {RESOURCE_LABELS[r] ?? r}
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Remove ${amount} ${RESOURCE_LABELS[r] ?? r}`}
-                  onClick={() => send({ type: "sandbox_resource", resource: r, n: -amount })}
-                >
-                  −
-                </button>
-              </span>
-            ))}
+          <div className="sandboxform">
+            <select value={resource} onChange={(e) => setResource(e.target.value)} aria-label="Resource">
+              {marker.resources.map((r) => (
+                <option key={r} value={r}>
+                  {RESOURCE_LABELS[r] ?? r}
+                </option>
+              ))}
+            </select>
+            <button type="button" className="secondary" aria-label="One less" onClick={() => step(-1)}>
+              −
+            </button>
+            <output className="sandboxamount" aria-label="Amount">
+              {amount > 0 ? `+${amount}` : amount}
+            </output>
+            <button type="button" className="secondary" aria-label="One more" onClick={() => step(1)}>
+              +
+            </button>
+            <button type="button" className="primary" onClick={() => send({ type: "sandbox_resource", resource, n: amount })}>
+              Confirm
+            </button>
           </div>
         </section>
         <section aria-label="Rotate a disc">
@@ -88,11 +121,15 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
           <div className="moves">
             {marker.discs.map((d) => (
               <span key={d} className="sandboxres">
-                <button type="button" onClick={() => send({ type: "sandbox_rotate", disc: d, step: -1 })}>
-                  ⟲ Disc {d}
+                <button
+                  type="button"
+                  title={`Turn disc ${d} counter-clockwise`}
+                  onClick={() => send({ type: "sandbox_rotate", disc: d, step: -1 })}
+                >
+                  <TurnIcon dir={-1} /> Disc {d}
                 </button>
-                <button type="button" onClick={() => send({ type: "sandbox_rotate", disc: d, step: 1 })}>
-                  ⟳ Disc {d}
+                <button type="button" title={`Turn disc ${d} clockwise`} onClick={() => send({ type: "sandbox_rotate", disc: d, step: 1 })}>
+                  Disc {d} <TurnIcon dir={1} />
                 </button>
               </span>
             ))}
