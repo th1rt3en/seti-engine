@@ -10,11 +10,14 @@ export type CoverChoice = { card: string; circle: number };
 
 export function MissionCover({
   options,
+  used,
   picked,
   onPick,
 }: {
   /** The circles that can be covered now. */
   options: CoverChoice[];
+  /** For each mission card, which of its circles are already covered. */
+  used: Record<string, boolean[]>;
   picked: CoverChoice | null;
   onPick: (c: CoverChoice) => void;
 }) {
@@ -30,6 +33,20 @@ export function MissionCover({
             {src && places ? (
               <span className="coverpic">
                 <img src={src} alt={cardName(card)} />
+                {places.map((at, i) => {
+                  const covered = used[card]?.[i] === true;
+                  if (mine.some((o) => o.circle === i)) return null;
+                  return (
+                    <span
+                      key={`blocked-${i}`}
+                      className={covered ? "coverblocked covered" : "coverblocked"}
+                      style={{ left: `${at.x * 100}%`, "--y": at.y } as CSSProperties}
+                      title={covered ? `Circle ${i + 1} is already covered` : `Circle ${i + 1} is not triggered by this`}
+                    >
+                      {covered ? "✓" : "×"}
+                    </span>
+                  );
+                })}
                 {mine.map((o) => {
                   const at = places[o.circle];
                   if (!at) return null;

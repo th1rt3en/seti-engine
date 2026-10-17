@@ -2726,3 +2726,31 @@ button:disabled {
     top: calc((var(--y) - 0.44) / 0.56 * 100%);
   }
 }
+
+/* the circles of the mission card that cannot be covered now: already covered (a tick) or not set off by what was done (a cross) */
+.coverblocked {
+  position: absolute;
+  top: calc(var(--y) * 100%);
+  width: 23%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(10, 14, 26, 0.72);
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.3rem;
+  pointer-events: none;
+}
+.coverblocked.covered {
+  border-style: solid;
+  background: rgba(10, 14, 26, 0.82);
+  color: #5cf2a0;
+}
+@media (max-width: 760px) {
+  .coverblocked {
+    top: calc((var(--y) - 0.44) / 0.56 * 100%);
+  }
+}

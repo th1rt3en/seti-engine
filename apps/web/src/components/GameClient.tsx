@@ -407,7 +407,11 @@ export function GameClient({
   const coverOptions: CoverChoice[] = coverMoves.map((m) => ({ card: String(m.card), circle: Number(m.circle) }));
   const coverMove =
     pickedCover === null ? undefined : coverMoves.find((m) => m.card === pickedCover.card && m.circle === pickedCover.circle);
-  const coverNode = coverOptions.length > 0 ? <MissionCover options={coverOptions} picked={pickedCover} onPick={setPickedCover} /> : null;
+  const coverUsed: Record<string, boolean[]> = Object.fromEntries(
+    (v.state.players[v.viewer ?? 0]?.missions ?? []).map((m) => [m.card, m.used]),
+  );
+  const coverNode =
+    coverOptions.length > 0 ? <MissionCover options={coverOptions} used={coverUsed} picked={pickedCover} onPick={setPickedCover} /> : null;
   // free actions that have their own place (energy for movement: the probe's move; data: the computer on the player board) are no buttons here,
   // except placing data when the data overflows, which is the question itself
   const overflow = v.state.pending[0]?.kind === "data_overflow";
