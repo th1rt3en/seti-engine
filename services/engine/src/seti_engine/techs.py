@@ -135,44 +135,70 @@ def _active_techs(p: PlayerState) -> list[str]:
 
 
 def start_scan(s: GameState, p: PlayerState, free: bool = False, ctx: dict[str, Any] | None = None) -> None:
-    """SCAN-01 to SCAN-05: the steps can be done in any order; telescope techs add optional steps (SCAN-04, TECH-10).
-    `ctx` carries the extra points of cards such as #53 (FAQ-C051: only the base cost is skipped)."""
+    """SCAN-01 to SCAN-05: the steps are resolved from left to right (owner ruling, 2026-10-17): Earth's sector, a card of the row, the
+    signal tokens, then the telescope techs in the order of the board (Mercury, a card of the hand, the probe). `ctx` carries the extra
+    points of cards such as #53 (FAQ-C051: only the base cost is skipped)."""
     s.scan_ctx = ctx or {}
-    s.scan_steps = ["earth", "row"] + [
-        f"tt:{t.split('-')[1]}" for t in _active_techs(p) if t.startswith("telescope-") and t != "telescope-dot"
-    ]
+    techs = {t.split("-")[1] for t in _active_techs(p) if t.startswith("telescope-")}
+    s.scan_steps = ["earth", "row"]
+    if p.signal_tokens > 0:  # EXP-SIG-02
+        s.scan_steps.append("tok")
+    s.scan_steps += [f"tt:{t}" for t in SCAN_TECH_ORDER if t in techs]
     s.pending.append(Decision(kind="scan_step", player=p.index))
 
 
-def scan_moves(s: GameState, p: PlayerState) -> list[Action]:
-    out: list[Action] = []
-    steps = s.scan_steps
-    if "earth" in steps:
+SCAN_TECH_ORDER = ("link", "branch", "cross")  # TECH-TT03, TECH-TT02, TECH-TT04: Mercury, a card of the hand, the probe
+OPTIONAL_STEPS = frozenset({"tok", "tt:link", "tt:branch", "tt:cross"})  # Earth's sector and the card of the row are not optional
+
+
+def _step_moves(s: GameState, p: PlayerState, step: str) -> list[Action]:
+    """What the player can do in one step of the scan; nothing if the step cannot be done now."""
+    if step == "earth":
         earth = solar.earth(s)[1]
         sectors = [earth]
         if effects.tech_active(p, "telescope-dot"):  # TECH-TT01
             sectors += [(earth - 1) % 8, (earth + 1) % 8]
-        out += [{"type": "scan_earth", "sector": i} for i in sectors]
-    if "row" in steps:
-        out += [{"type": "scan_discard", "source": f"row:{i}"} for i in range(len(s.card_row))]
-    if p.signal_tokens > 0 and s.card_row:  # EXP-SIG-02: a signal token pays for one more row card and its signal, in any order
-        out += [{"type": "scan_token", "source": f"row:{i}"} for i in range(len(s.card_row))]
-    if "tt:branch" in steps:  # TECH-TT02
-        out += [{"type": "scan_hand_discard", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
-    if "tt:link" in steps and p.publicity >= 1 and solar.find_cell(s, "PLANET:MERCURY"):  # TECH-TT03
-        out.append({"type": "scan_mercury"})
-    if "tt:cross" in steps and p.energy >= 1:  # TECH-TT04, FAQ-22
-        out.append({"type": "scan_probe", "mode": "move"})
+        return [{"type": "scan_earth", "sector": i} for i in sectors]
+    if step == "row":
+        return [{"type": "scan_discard", "source": f"row:{i}"} for i in range(len(s.card_row))]
+    if step == "tok":  # EXP-SIG-02: a signal token pays for one more row card and its signal
+        return [{"type": "scan_token", "source": f"row:{i}"} for i in range(len(s.card_row))] if p.signal_tokens > 0 else []
+    if step == "tt:branch":  # TECH-TT02
+        return [{"type": "scan_hand_discard", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
+    if step == "tt:link":  # TECH-TT03
+        return [{"type": "scan_mercury"}] if p.publicity >= 1 and solar.find_cell(s, "PLANET:MERCURY") else []
+    if step == "tt:cross" and p.energy >= 1:  # TECH-TT04, FAQ-22
+        out: list[Action] = [{"type": "scan_probe", "mode": "move"}]
         if sum(1 for pr in s.probes if pr.player == p.index and not pr.capsule) < probe_limit(p):
             out.append({"type": "scan_probe", "mode": "launch"})
-    if "earth" not in steps and ("row" not in steps or not s.card_row):
-        out.append({"type": "scan_done"})
+        return out
+    return []
+
+
+def current_step(s: GameState, p: PlayerState) -> str | None:
+    """The step the scan is at: the first one that is left and can be done (a step that cannot be done is passed over)."""
+    return next((st for st in s.scan_steps if _step_moves(s, p, st)), None)
+
+
+def scan_moves(s: GameState, p: PlayerState) -> list[Action]:
+    step = current_step(s, p)
+    if step is None:
+        return [{"type": "scan_done"}]
+    out = _step_moves(s, p, step)
+    if step in OPTIONAL_STEPS:
+        out.append({"type": "scan_skip"})
     return out
 
 
 def resolve_scan(s: GameState, p: PlayerState, a: Action, events: Events) -> None:
     t = a["type"]
-    if t == "scan_earth":
+    step = current_step(s, p)
+    if step is not None and t != "scan_done":  # the steps before it could not be done: they are over
+        del s.scan_steps[: s.scan_steps.index(step)]
+    if t == "scan_skip":  # an optional step is not done (SCAN-04: the techs are optional)
+        assert step is not None
+        s.scan_steps.remove(step)
+    elif t == "scan_earth":
         s.scan_steps.remove("earth")
         rewards.mark_signal(s, p, a["sector"], events)
     elif t == "scan_discard":

@@ -40,7 +40,7 @@ Source: base rulebook pp. 7 to 19, 28. Costs are paid when the action is taken a
 
 ## Scan nearby stars
 
-- **SCAN-01** (p.12) Cost: 1 credit and 2 energy. Main action. The scan resolves the steps printed on the player board, in any order the player chooses.
+- **SCAN-01** (p.12) Cost: 1 credit and 2 energy. Main action. The scan resolves the steps printed on the player board. The rulebook allows any order; the owner ruled on 2026-10-17 that the site resolves them from left to right (`owner-confirmations.md`).
 - **SCAN-02** (p.12) Step 1: mark 1 signal in the sector of Earth (the sector the Earth space is currently in).
 - **SCAN-03** (p.12) Step 2: discard 1 card from the card row and mark 1 signal in a sector matching the discarded card's sector color (upper-right corner of the card): one of the two sectors of that color. The card row is refilled after the whole scan is finished (p.19, p.25).
 - **SCAN-04** (p.12, p.17) The player may activate any telescope techs they have, in any order, and must pay any additional cost to activate most of them (TECH-10).

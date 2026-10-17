@@ -32,3 +32,12 @@ The owner confirmed every row of the alien species, solo and scoring, and card d
 ## Anomaly token placement, 2026-10-14
 
 The owner re-checked ALIEN-ANO-01 against the rulebook: one token in Earth's sector, the others 3 sectors either side. The spec text was right and is unchanged. Placement (`anomalies_placed`) and each resolution (`anomaly`) are now written to the log.
+
+## Scan steps are resolved from left to right, 2026-10-17
+
+The rulebook (p.12) lets the player resolve the steps of a scan in any order (SCAN-01). The owner ruled that the site resolves them from left to right, one at a time:
+1. a signal in Earth's sector (or in a sector next to it with the telescope tech of TECH-TT01);
+2. discard a card of the row for a signal in a sector of its color (SCAN-03);
+3. (expansion, EXP-SIG-02) discard signal tokens for more cards of the row;
+4. with the telescope techs, in the order of the player board: spend 1 publicity for a signal in Mercury's sector (TECH-TT03), discard a card of the hand for a signal (TECH-TT02), spend 1 energy to launch a probe or to gain 1 movement (TECH-TT04).
+Steps 1 and 2 cannot be skipped; the others can. A step that cannot be done (no publicity, no energy, no matching card) is passed over. The engine offers only the moves of the current step (`techs.scan_moves`), and the context bar says which step it is.

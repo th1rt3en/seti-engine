@@ -335,7 +335,10 @@ def test_a_game_replays_exactly_from_its_seed_and_action_log() -> None:
     assert r.state.model_dump() == r1.state.model_dump()
 
 
-PROGRESS_TYPES = {"play_card", "orbit", "land", "land_free", "analyze", "place_data", "scan", "research", "complete_mission", "cover"}
+PROGRESS_TYPES = {
+    "play_card", "orbit", "land", "land_free", "analyze", "place_data", "scan", "research", "complete_mission", "cover",
+    "scan_earth", "scan_discard", "scan_hand_discard", "scan_mercury",
+}  # fmt: skip
 
 
 def play_towards_progress(players: int, seed: int) -> StepResult:

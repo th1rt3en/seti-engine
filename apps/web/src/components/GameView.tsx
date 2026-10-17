@@ -54,6 +54,18 @@ const DECISION: Record<string, string> = {
 
 const humanize = (kind: string): string => DECISION[kind] ?? kind.replace(/_/g, " ");
 
+/** Which step of the scan the player is at, from the moves the engine offers (the steps come from left to right, as on the player board). */
+function scanStepText(types: Set<string>): string {
+  if (types.has("scan_earth")) return "Scan, step 1: mark a signal in Earth's sector (or next to it, with the telescope tech)";
+  if (types.has("scan_discard")) return "Scan, step 2: discard a card of the card row to mark a signal in a sector of its color";
+  if (types.has("scan_token")) return "Scan, signal tokens: discard a token and another card of the card row for a signal, or skip";
+  if (types.has("scan_mercury")) return "Scan, step 3: spend 1 publicity to mark a signal in Mercury's sector, or skip";
+  if (types.has("scan_hand_discard"))
+    return "Scan, step 4: discard a card from your hand to mark a signal in a sector of its color, or skip";
+  if (types.has("scan_probe")) return "Scan, step 5: spend 1 energy to launch a probe or to gain 1 movement, or skip";
+  return "Scan: no step is left, finish the scan";
+}
+
 export function promptOf(view: View, names: string[]): { who: string; mine: boolean; text: string } {
   const s = view.state;
   const actor = view.to_act;
@@ -63,6 +75,7 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
   const who = s.rival && actor === s.rival.index ? "Rival" : (names[actor] ?? `Player ${actor + 1}`);
   const decision = s.pending[0];
   if (mine) {
+    if (decision?.kind === "scan_step") return { who, mine, text: scanStepText(new Set(view.legal.map((m) => String(m.type)))) };
     if (decision) return { who, mine, text: humanize(decision.kind) };
     return { who, mine, text: s.main_done ? "take free actions, or end the turn" : "choose a main action" };
   }

@@ -1,4 +1,8 @@
 {
+ "amoeba_remove": [
+  "color",
+  "index"
+ ],
  "analyze": [],
  "breach": [],
  "buy_card": [
@@ -6,6 +10,10 @@
  ],
  "choose_gold": [
   "tile"
+ ],
+ "choose_message": [
+  "hex",
+  "reward"
  ],
  "choose_org": [
   "org"
@@ -57,10 +65,14 @@
   "card"
  ],
  "hand_signal_done": [],
- "land_free": [
+ "land": [
   "probe"
  ],
  "launch": [],
+ "mark_objective": [
+  "objective",
+  "task"
+ ],
  "mark_signal": [
   "sector"
  ],
@@ -155,6 +167,7 @@
  "scan_probe": [
   "mode"
  ],
+ "scan_skip": [],
  "scan_token": [
   "source"
  ],

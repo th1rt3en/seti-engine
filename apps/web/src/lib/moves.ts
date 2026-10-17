@@ -122,6 +122,7 @@ export const LABELS: Record<string, Label> = {
   scan_hand_discard: (m) => `Discard ${cardName(m.card)} from your hand for a signal`,
   scan_mercury: () => "Pay 1 publicity for a signal in Mercury's sector",
   scan_probe: (m) => (m.mode === "launch" ? "Pay 1 energy to launch a probe" : "Pay 1 energy for 1 movement"),
+  scan_skip: () => "Skip this step",
   scan_done: () => "Finish the scan",
   research: (m) => `Research the tech in stack ${Number(m.stack) + 1}`,
   take_tech: (m) => `Take the tech in stack ${Number(m.stack) + 1}`,
@@ -167,9 +168,7 @@ function orgFreeLabel(m: Move): string {
   if (org === "deep_sky_survey") return `${name}: switch ${cardName(m.card)} with card ${Number(m.row) + 1} of the card row`;
   if (org === "sentinel_probe_network") return `${name}: gain the free-action corner of the card you played`;
   if (org === "futurespan_institute")
-    return m.delay
-      ? `${name}: move the token 3 spaces farther and gain a card`
-      : `${name}: Prepare (+${String(m.ahead)})`;
+    return m.delay ? `${name}: move the token 3 spaces farther and gain a card` : `${name}: Prepare (+${String(m.ahead)})`;
   if (org === "cosmos_strategy_group") return `${name}: gain ${source(m.source)} and clear your marked reward spaces`;
   if (org === "helion_assembly")
     return `${name}: destroy your ${String(m.tech)} tech, then tuck a card for income and clear your marked reward spaces`;
