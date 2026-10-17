@@ -928,7 +928,10 @@ export function GameClient({
                 setPendingMove(null);
                 setPickedProbe(id === pickedProbe ? null : id);
               },
-              targets: targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
+              // once the destination is confirmed the spaces and their costs go away while the move is carried out
+              targets: waiting
+                ? []
+                : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
               onTarget: (t) => setPendingMove(t),
               chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
             }
