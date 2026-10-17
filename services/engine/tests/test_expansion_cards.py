@@ -482,6 +482,8 @@ def test_effects_resolve_from_left_to_right() -> None:  # EXP-ORDER-01, A-053
     assert me(r).movement == 1 and r.state.pending[0].kind == "land_free"
     assert len(r.state.sectors[pr.sector].markers) == len(s.sectors[pr.sector].markers)  # the signal waits for the landing
     r = apply(r.state, next(m for m in r.legal if m["type"] == "land_free"))
+    landing = next(e for e in r.events if e["type"] == "land")
+    assert landing["free"] is True and landing["source"] == {"kind": "card", "card": "SA.6"}  # the log says what gave the landing
     r = settle(r)
     assert len(r.state.sectors[pr.sector].markers) >= len(s.sectors[pr.sector].markers) + 1
     s = ready()

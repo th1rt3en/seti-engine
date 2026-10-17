@@ -655,6 +655,15 @@ def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool =
         s.queue.insert(0, {"t": "collect_sample", "planet": planet})
 
 
+def _mark_free(new: Events, d: Decision) -> None:
+    """The orbit or the landing of a card effect says that it was free and what gave it (the log)."""
+    for ev in new:
+        if ev["type"] in ("orbit", "land"):
+            ev["free"] = True
+            if d.source is not None:
+                ev["source"] = d.source
+
+
 def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = False, opts: dict[str, Any] | None = None) -> None:
     """LAND-01 to LAND-06. A moon landing gives the moon's rewards only (ambiguity A-016). `free` is a landing from a card effect."""
     opts = opts or {}
@@ -781,14 +790,18 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif cards.resolve_decision(s, p, d, a, events):
         pass
     elif t == "land_free":
+        before = len(events)
         _land(s, p, a, events, free=True, opts=d.data)
+        _mark_free(events[before:], d)
     elif t == "signal_where":
         if a["where"] == "tile":
             species.mark_tile(s, p, events, data=not d.data.get("nodata"))
         else:
             rewards.mark_signal(s, p, d.data["sector"], events, data=not d.data.get("nodata"), allow_tile=False)
     elif t == "orbit_free":
+        before = len(events)
         _orbit(s, p, a, events, free=True, opts=d.data)
+        _mark_free(events[before:], d)
     elif t == "play_exertian":
         species.play_exertian(s, p, a["card"], d.data["cost"])
     elif t == "skip_exertian" or t == "skip_land":

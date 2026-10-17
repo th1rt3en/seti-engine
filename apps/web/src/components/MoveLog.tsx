@@ -4,6 +4,7 @@
 // with what it gave and took, one line for each source (the engine's `gains` events), as icons; in the solo game what the rival did after it is a block of its own.
 import type { GameEvent } from "@/lib/events";
 import { ORG_NAMES, cardName, logText } from "@/lib/moves";
+import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import { techName } from "@/lib/techs";
 import { useBottomSpace, useDock } from "@/lib/useDock";
 import { type ReactNode, useEffect, useRef } from "react";
@@ -173,6 +174,13 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
             ? ` (${ORG_NAMES[String(action.org)] ?? "organization"})`
             : "";
       return `${who} launches a probe for free${by}`;
+    }
+    case "land":
+    case "orbit": {
+      if (ev.free !== true) return null; // a landing or an orbit of the main action is the move itself
+      const cause = sourceLabel(ev.source as DecisionSource | undefined, ctx.stars, ctx.species);
+      const where = ev.moon ? `${cap(ev.moon)} (${cap(ev.planet)})` : cap(ev.planet);
+      return `${who} ${ev.type === "land" ? "lands a probe on" : "orbits"} ${where} for free${cause ? ` (${cause})` : ""}`;
     }
     case "signal":
       return `${who} marks a signal in ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
