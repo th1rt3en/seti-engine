@@ -75,10 +75,13 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const wanted = (selection?.offered?.length ?? 0) > 0 || selection?.autoOpen === true;
   const wasWanted = useRefHook(false);
   // the hand opens by itself when cards are offered, so that the player sees them
+  const firstLook = useRefHook(true);
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when cards become offered
   useEffect(() => {
-    if (wanted && !wasWanted.current) set(true);
+    // on a phone the page starts with the hand folded, whatever the game waits for: it opens by itself only when the wish comes later
+    if (wanted && !wasWanted.current && !(firstLook.current && isPhone())) set(true);
     wasWanted.current = wanted;
+    firstLook.current = false;
   }, [wanted]);
   const dock = useRef<HTMLElement>(null);
   useBottomSpace(dock, "hand");

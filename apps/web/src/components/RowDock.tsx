@@ -1,7 +1,7 @@
 "use client";
 // The card row (the display) and the deck as a panel floating at the left edge, so that the board can use the width. It can be folded to a tab; it
 // opens by itself when a card of the row can be clicked (to buy it, or to take it in a trade).
-import { useDock } from "@/lib/useDock";
+import { isPhone, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useEffect, useRef } from "react";
 import assets from "../generated/assets.json";
@@ -25,10 +25,13 @@ export function RowDock({ view, row, inline, flash }: { view: View; row?: RowSel
   const shut = inline ? false : folded;
   // the panel opens by itself when a card of it can be picked (to buy it, or to take it in a trade), and can be folded again at any time
   const wasWanted = useRef(false);
+  const firstLook = useRef(true);
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when a card of the row becomes pickable
   useEffect(() => {
-    if (wanted && !wasWanted.current) set(true);
+    // on a phone the page starts with the panels folded, whatever the game waits for
+    if (wanted && !wasWanted.current && !(firstLook.current && isPhone())) set(true);
     wasWanted.current = wanted;
+    firstLook.current = false;
   }, [wanted]);
   // when the row is to blink (a card is to be taken), bring it into view if it is out of it
   const box = useRef<HTMLElement>(null);

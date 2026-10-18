@@ -344,15 +344,49 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
             const rivalDelta = rival === null ? undefined : deltas.find((d) => d.player === rival);
             const others = deltas.filter((d) => d.player !== e.seat && d.player !== rival);
             const byRival = (ev: GameEvent): boolean => rival !== null && ev.player === rival;
-            const notes = e.events.filter((ev) => !ev.type.startsWith("rival_") && ev.type !== "delta" && !byRival(ev));
+            // the move can end the round (the last player to pass): what follows it, the income and the turns of the new round, comes after a line
+            // that says so, in the order it happened
+            const roundAt = e.events.findIndex((ev) => ev.type === "round");
+            const newRound = roundAt >= 0 ? Number(e.events[roundAt]?.round) : null;
+            const notes = e.events.filter(
+              (ev) => !ev.type.startsWith("rival_") && ev.type !== "delta" && ev.type !== "round" && !byRival(ev),
+            );
             // the rival can take several turns in one move (when the player has passed it plays on until it passes too): one block for each,
             // starting at the card it plays or at its pass, with what it caused (signals, wins) in the order the engine reported it
             const turns: GameEvent[][] = [];
-            for (const ev of e.events) {
-              if (ev.type === "rival_card" || ev.type === "rival_pass") turns.push([ev]);
-              else if (turns.length > 0 && ev.type !== "delta" && (ev.type.startsWith("rival_") || byRival(ev)))
+            const turnAt: number[] = []; // the place in the events where each turn starts
+            e.events.forEach((ev, at) => {
+              if (ev.type === "rival_card" || ev.type === "rival_pass") {
+                turns.push([ev]);
+                turnAt.push(at);
+              } else if (turns.length > 0 && ev.type !== "delta" && (ev.type.startsWith("rival_") || byRival(ev)))
                 turns[turns.length - 1]?.push(ev);
-            }
+            });
+            const after = (n: number): boolean => roundAt >= 0 && (turnAt[n] ?? 0) > roundAt;
+            const roundOf = (n: number): number | null => (newRound === null ? null : after(n) ? newRound : newRound - 1);
+            const income = (g: Gains): boolean => g.source.kind === "income";
+            const renderTurn = (turn: GameEvent[], n: number) => (
+              <span key={`rt${n}`} className="logrival">
+                <b className="logrivalhead">
+                  {turns.length > 1 ? `Rival's turn ${n + 1} of ${turns.length}` : "Rival's turn"}
+                  {roundOf(n) !== null ? ` (round ${roundOf(n)})` : ""}
+                </b>
+                {turn.map((ev, k) => {
+                  const line = ev.type.startsWith("rival_") ? rivalLine(ev) : eventLine(ev, ctx, e.action);
+                  // biome-ignore lint/suspicious/noArrayIndexKey: events of a turn are never reordered
+                  return line ? <span key={k}>{line}</span> : null;
+                })}
+                {rivalGains
+                  .filter((g) => (g.turn !== undefined ? g.turn === String(turn[0]?.card) : n === turns.length - 1))
+                  .map((g) => (
+                    <span key={`rg${n}-${JSON.stringify(g.source)}`} className="logsource">
+                      {g.source.kind === "rival_turn" ? "Gains" : <CardText text={`${sourceText(g.source, ctx, e.action)}:`} />}{" "}
+                      <Changes changes={g.changes} size={16} />
+                    </span>
+                  ))}
+                {!itemised && n === turns.length - 1 && rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+              </span>
+            );
             return (
               <li key={e.seq}>
                 <span className="lognum">{e.seq + 1}</span>
@@ -367,12 +401,14 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                     {line.count > 1 ? ` (×${line.count})` : ""}
                   </span>
                 ))}
-                {ownGains.map((g) => (
-                  <span key={`g${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
-                    {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
-                    <CardText text={`${sourceText(g.source, ctx, e.action)}:`} /> <Changes changes={g.changes} size={16} />
-                  </span>
-                ))}
+                {ownGains
+                  .filter((g) => !(roundAt >= 0 && income(g)))
+                  .map((g) => (
+                    <span key={`g${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
+                      {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
+                      <CardText text={`${sourceText(g.source, ctx, e.action)}:`} /> <Changes changes={g.changes} size={16} />
+                    </span>
+                  ))}
                 {itemised
                   ? null
                   : others.map((d) => (
@@ -380,26 +416,21 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                         {ctx.who(d.player)} <Changes changes={d.changes} size={16} />
                       </span>
                     ))}
-                {turns.map((turn, n) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the turns of a move come in a fixed order
-                  <span key={`rt${n}`} className="logrival">
-                    <b className="logrivalhead">{turns.length > 1 ? `Rival's turn ${n + 1} of ${turns.length}` : "Rival's turn"}</b>
-                    {turn.map((ev, k) => {
-                      const line = ev.type.startsWith("rival_") ? rivalLine(ev) : eventLine(ev, ctx, e.action);
-                      // biome-ignore lint/suspicious/noArrayIndexKey: events of a turn are never reordered
-                      return line ? <span key={k}>{line}</span> : null;
-                    })}
-                    {rivalGains
-                      .filter((g) => (g.turn !== undefined ? g.turn === String(turn[0]?.card) : n === turns.length - 1))
-                      .map((g) => (
-                        <span key={`rg${n}-${JSON.stringify(g.source)}`} className="logsource">
-                          {g.source.kind === "rival_turn" ? "Gains" : <CardText text={`${sourceText(g.source, ctx, e.action)}:`} />}{" "}
-                          <Changes changes={g.changes} size={16} />
-                        </span>
-                      ))}
-                    {!itemised && n === turns.length - 1 && rivalDelta ? <Changes changes={rivalDelta.changes} size={16} /> : null}
+                {turns.map((turn, n) => (after(n) ? null : renderTurn(turn, n)))}
+                {roundAt >= 0 ? (
+                  <span className="logevent logroundbegin">
+                    <b>Round {newRound} begins</b>
                   </span>
-                ))}
+                ) : null}
+                {roundAt >= 0
+                  ? ownGains.filter(income).map((g) => (
+                      <span key={`gi${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
+                        {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
+                        <CardText text={`${sourceText(g.source, ctx, e.action)}:`} /> <Changes changes={g.changes} size={16} />
+                      </span>
+                    ))
+                  : null}
+                {turns.map((turn, n) => (after(n) ? renderTurn(turn, n) : null))}
                 {turns.length === 0 && !itemised && rivalDelta ? (
                   <span className="logrival">
                     <b className="logrivalhead">Rival's turn</b>

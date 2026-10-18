@@ -2911,3 +2911,11 @@ input.switch:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* the line between the turns of two rounds in the log */
+.logroundbegin {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--line);
+  color: var(--text);
+}
