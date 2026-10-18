@@ -19,6 +19,7 @@ import {
   GOLD,
   GOLD_EXTRA,
   GOLD_SLOTS,
+  GOLD_WIDE,
   MOON,
   NEUTRAL_POCKETS,
   OUMUAMUA_TILE,
@@ -31,6 +32,7 @@ import {
   WIN_SPOTS,
   alienColumn,
   goldPlace,
+  goldSlot,
   landSlot,
   orbitSlot,
   polar,
@@ -302,7 +304,8 @@ export function BoardView({
             >
               <image href={info.src} x={0} y={0} width={GOLD.w} height={GOLD.h} />
               {g.markers.map((player, k) => {
-                const at = GOLD_SLOTS[k] ?? GOLD_SLOTS[GOLD_SLOTS.length - 1] ?? { x: 0, y: 0 };
+                // the third and later markers lie in the wide space, after the markers that Mission Relay put there
+                const at = GOLD_SLOTS[goldSlot(k, (g.low_markers ?? []).length)] ?? { x: 0, y: 0 };
                 return (
                   <Marker
                     key={`${player}-${at.x}`}
@@ -315,14 +318,14 @@ export function BoardView({
                 );
               })}
               {/* Mission Relay starts on the lowest-scoring space of the Mission tile (EXP-ORG-13) */}
-              {(g.low_markers ?? []).map((player) => {
-                const at = GOLD_SLOTS[GOLD_SLOTS.length - 1] ?? { x: 0, y: 0 };
+              {(g.low_markers ?? []).map((player, j) => {
+                const at = GOLD_SLOTS[goldSlot(GOLD_WIDE + j, 0)] ?? { x: 0, y: 0 };
                 return (
                   <Marker
                     key={`low-${player}`}
-                    x={at.x + 60}
-                    y={at.y - 70}
-                    size={70}
+                    x={at.x}
+                    y={at.y}
+                    size={84}
                     color={color(player)}
                     title={`${who(player)}: marker on the lowest-scoring space of the ${g.tile} tile`}
                   />
@@ -330,7 +333,7 @@ export function BoardView({
               })}
               {goldChoice?.tiles.includes(g.tile)
                 ? (() => {
-                    const at = GOLD_SLOTS[Math.min(g.markers.length, GOLD_SLOTS.length - 1)] ?? { x: 0, y: 0 };
+                    const at = GOLD_SLOTS[goldSlot(g.markers.length, (g.low_markers ?? []).length)] ?? { x: 0, y: 0 };
                     return (
                       <g
                         // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
@@ -958,6 +961,7 @@ export function BoardView({
         <GoldZoom
           tile={s.gold_tiles[goldZoom.i] as { tile: string; side: string }}
           markers={s.gold_tiles[goldZoom.i]?.markers ?? []}
+          low={s.gold_tiles[goldZoom.i]?.low_markers ?? []}
           at={goldZoom}
           onClose={() => setGoldZoom(null)}
           colorOf={color}
@@ -972,6 +976,7 @@ export function BoardView({
 function GoldZoom({
   tile,
   markers,
+  low,
   at,
   onClose,
   colorOf,
@@ -979,6 +984,8 @@ function GoldZoom({
 }: {
   tile: { tile: string; side: string };
   markers: number[];
+  /** The markers that Mission Relay put on the lowest-scoring space. */
+  low: number[];
   at: { x: number; y: number };
   onClose: () => void;
   colorOf: (i: number) => PieceColor;
@@ -1001,8 +1008,12 @@ function GoldZoom({
         <PieceDefs />
         <image href={info.src} x={0} y={0} width={GOLD.w} height={GOLD.h} />
         {markers.map((player, k) => {
-          const slot = GOLD_SLOTS[k] ?? GOLD_SLOTS[GOLD_SLOTS.length - 1] ?? { x: 0, y: 0 };
+          const slot = GOLD_SLOTS[goldSlot(k, low.length)] ?? { x: 0, y: 0 };
           return <Marker key={`${player}-${slot.x}`} x={slot.x} y={slot.y} size={84} color={colorOf(player)} title={whoOf(player)} />;
+        })}
+        {low.map((player, j) => {
+          const slot = GOLD_SLOTS[goldSlot(GOLD_WIDE + j, 0)] ?? { x: 0, y: 0 };
+          return <Marker key={`low-${player}`} x={slot.x} y={slot.y} size={84} color={colorOf(player)} title={whoOf(player)} />;
         })}
       </svg>
       <p>

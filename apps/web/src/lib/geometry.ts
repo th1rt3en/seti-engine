@@ -282,6 +282,15 @@ export const GOLD_SLOTS = [
   { x: 425, y: 248 },
 ];
 
+/** The place of the first marker in the wide space of a tile: the third chooser, and any marker that Mission Relay has put there (EXP-ORG-13). */
+export const GOLD_WIDE = 2;
+
+/**
+ * The place (an index of GOLD_SLOTS) of the `k`-th chooser of a tile when `low` markers of Mission Relay already lie in its wide space. The first two
+ * choosers have the round spaces; the others, and the markers of Mission Relay (counted from GOLD_WIDE), lie in the wide space one after the other.
+ */
+export const goldSlot = (k: number, low: number): number => Math.min(k < GOLD_WIDE ? k : k + low, GOLD_SLOTS.length - 1);
+
 /**
  * The deck of a discovered species lies in a column to the right of its board: the back of the deck on top (with the number of cards left over it)
  * and the card that lies face up below it. Sizes in board pixels; the column starts `gap` after the right edge of the board.
