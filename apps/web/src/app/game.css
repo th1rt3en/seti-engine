@@ -2938,3 +2938,53 @@ input.switch:focus-visible {
 .orgpanel[open] > summary::after {
   content: " ▾";
 }
+
+/* the Exertian cards: two groups, each with its heading above its cards, and the facts under them */
+.exertiantab {
+  display: grid;
+  gap: 14px;
+}
+.exgroup h4 {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.excards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+.exfacts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 80%, transparent);
+  font-size: 0.9rem;
+}
+.exfacts > div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+.exfacts dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+.exfacts dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.exmilestone.crossed {
+  color: var(--muted);
+  text-decoration: line-through;
+}

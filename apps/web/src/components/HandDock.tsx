@@ -38,34 +38,48 @@ export function ExertianTab({ view }: { view: View }) {
   if (!player || !slot) return null;
   const tracker = view.trackers?.[player.index];
   const milestones = (slot.extra.milestones ?? []) as { at: number; cost: number; done: number[] }[];
+  const danger = (tracker?.danger_cards ?? 0) + (tracker?.danger_board ?? 0);
   return (
     <div className="exertiantab">
-      <div className="cards">
-        <b className="offerlabel">Available ({player.exertian_hand.length})</b>
-        {player.exertian_hand.length === 0 ? <span className="muted">No Exertian cards left to play.</span> : null}
-        {player.exertian_hand.map((c, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: ids are unique, the index only guards a hidden card
-          <CardImage key={`${c}-${i}`} id={c} size="hand" />
-        ))}
-        <span className="handsep" aria-hidden="true" />
-        <b className="offerlabel">Played face down ({player.exertian_played.length})</b>
-        {player.exertian_played.length === 0 ? <span className="muted">None played yet.</span> : null}
-        {player.exertian_played.map((c, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: ids are unique, the index only guards a hidden card
-          <CardImage key={`${c}-${i}`} id={c} size="hand" />
-        ))}
-      </div>
-      <p className="muted">
-        Danger: {tracker?.danger_cards ?? 0} from played cards + {tracker?.danger_board ?? 0} from the species board ={" "}
-        <b>{(tracker?.danger_cards ?? 0) + (tracker?.danger_board ?? 0)}</b>. Milestones:{" "}
-        {milestones
-          .map(
-            (m, i) =>
-              `${i + 1}: ${m.at} points, ${m.cost > 0 ? `${m.cost} credit` : "free"}${m.done.includes(player.index) ? " (crossed)" : ""}`,
-          )
-          .join("; ")}
-        .
-      </p>
+      <section className="exgroup" aria-label="Exertian cards that can still be played">
+        <h4>Available ({player.exertian_hand.length})</h4>
+        <div className="excards">
+          {player.exertian_hand.length === 0 ? <span className="muted">No Exertian cards left to play.</span> : null}
+          {player.exertian_hand.map((c, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: ids are unique, the index only guards a hidden card
+            <CardImage key={`${c}-${i}`} id={c} size="hand" />
+          ))}
+        </div>
+      </section>
+      <section className="exgroup" aria-label="Exertian cards played face down">
+        <h4>Played face down ({player.exertian_played.length})</h4>
+        <div className="excards">
+          {player.exertian_played.length === 0 ? <span className="muted">None played yet.</span> : null}
+          {player.exertian_played.map((c, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: ids are unique, the index only guards a hidden card
+            <CardImage key={`${c}-${i}`} id={c} size="hand" />
+          ))}
+        </div>
+      </section>
+      <dl className="exfacts">
+        <div>
+          <dt>Danger</dt>
+          <dd>
+            <b>{danger}</b> ({tracker?.danger_cards ?? 0} from played cards + {tracker?.danger_board ?? 0} from the species board)
+          </dd>
+        </div>
+        <div>
+          <dt>Milestones</dt>
+          <dd>
+            {milestones.map((m, i) => (
+              <span key={m.at} className={m.done.includes(player.index) ? "exmilestone crossed" : "exmilestone"}>
+                {i + 1}: {m.at} points, {m.cost > 0 ? `${m.cost} credit` : "free"}
+                {m.done.includes(player.index) ? " (crossed)" : ""}
+              </span>
+            ))}
+          </dd>
+        </div>
+      </dl>
     </div>
   );
 }
