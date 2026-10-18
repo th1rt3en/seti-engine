@@ -802,14 +802,17 @@ export function BoardView({
                   const target = p.org_data.fs_token as number;
                   const at = polar(LANES[p.index] ?? 1500, scoreDegrees(target));
                   return (
-                    <Marker
-                      key={`fs-${p.index}`}
-                      x={at.x}
-                      y={at.y}
-                      size={68}
-                      color={color(p.index)}
-                      title={`${who(p.index)}: Futurespan Institute token at ${target} points (the prepared card can be played for free from there)`}
-                    />
+                    <g key={`fs-${p.index}`}>
+                      <title>{`${who(p.index)}: Futurespan Institute token at ${target} points (the prepared card can be played for free from there)`}</title>
+                      <image
+                        href={(expansionAssets as Record<string, string>)["tokens/token-futurespan"]}
+                        x={-40}
+                        y={-60}
+                        width={80}
+                        height={120}
+                        transform={`translate(${at.x} ${at.y}) rotate(${-scoreDegrees(target)})`}
+                      />
+                    </g>
                   );
                 })(),
               ]
