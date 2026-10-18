@@ -530,7 +530,9 @@ def test_centaurian_card_places_one_message_marker_from_the_reserve() -> None:
     assert st.species[0].discovered
     st.players[1].messages = []
     progress = st.rival.progress
-    assert rival._text(st, {"effect": "centaurians_countdown"}, []) and st.rival.messages_in_reserve == 1
+    placed: list[dict] = []
+    assert rival._text(st, {"effect": "centaurians_countdown"}, placed) and st.rival.messages_in_reserve == 1
+    assert placed[0] == {"type": "rival_message", "target": st.players[1].messages[-1]}  # its own log line, with the place on the track
     assert st.players[1].messages == [st.players[1].score + 15] and st.rival.progress == (progress + 1) % 12
     assert not rival._text(st, {"effect": "centaurians_countdown"}, [])  # a marker is already on the track
 

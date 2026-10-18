@@ -142,6 +142,8 @@ function rivalLine(ev: GameEvent): ReactNode {
           ) : null}
         </span>
       );
+    case "rival_message":
+      return `places a message marker on the scoring track at ${String(ev.target)} points`;
     case "rival_exertian":
       return "plays an Exertian card face down";
     case "rival_launch":

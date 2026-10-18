@@ -639,6 +639,7 @@ def _text(s: GameState, a: dict[str, Any], events: Events) -> bool:
         if r.messages_in_reserve > 0 and not p.messages:
             r.messages_in_reserve -= 1
             species.add_message(s, p)
+            events.append({"type": "rival_message", "target": p.messages[-1]})  # the log says where its marker lies on the scoring track
             advance(s, 1, events)
             return True
         return False
