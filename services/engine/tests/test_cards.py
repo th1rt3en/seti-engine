@@ -1075,3 +1075,13 @@ def test_a_trace_counts_for_the_colour_of_the_space_it_is_placed_on() -> None:
     rewards.place_trace(s, p, {"slot": 1, "space": "overflow", "color": "yellow"}, ev)
     assert p.trace_log == [(0, "blue"), (1, "yellow")] and s.species[1].overflow_kinds == ["yellow"]
     assert cards.cond_ok(s, p, card_defs.traces("blue", 1)) and cards.cond_ok(s, p, card_defs.traces("yellow", 1))
+
+
+def test_taking_a_card_of_the_display_is_logged_with_its_name_but_not_from_the_deck() -> None:  # RES-04, the log
+    s = ready()
+    named = s.card_row[0]
+    r = apply(s, {"type": "buy_card", "source": "row:0"})
+    ev = next(e for e in r.events if e["type"] == "take_display_card")
+    assert ev["card"] == named and ev["player"] == s.current_player
+    r = apply(s, {"type": "buy_card", "source": "deck"})
+    assert not any(e["type"] == "take_display_card" for e in r.events)  # a card of the deck is not named

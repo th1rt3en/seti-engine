@@ -398,12 +398,12 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
     events.append({"type": "org_free", "player": p.index, "org": o})
     if o == "fenwick_research_center":  # spend 1 publicity: a card, then its free-action corner
         p.publicity -= 1
-        cid = effects.take_from_row_or_deck(s, p, a["source"])
+        cid = effects.take_from_row_or_deck(s, p, a["source"], events)
         if cid is not None:
             cards.gain_corner(s, p, cid)
     elif o == "mission_relay":  # spend 2 publicity: a card, then the resource of its income corner
         p.publicity -= 2
-        cid = effects.take_from_row_or_deck(s, p, a["source"])
+        cid = effects.take_from_row_or_deck(s, p, a["source"], events)
         if cid is not None:
             effects.gain_income_resource(s, p, tables.cards()[cid]["income"])
     elif o == "stratus_core":  # the corners of all 3 cards of the row, in row order, without discarding them
@@ -415,7 +415,7 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         s.card_row[i], swapped = a["card"], s.card_row[i]
         p.hand.append(swapped)
     elif o == "cosmos_strategy_group":  # a card from the row or the deck, then every marked reward space is cleared
-        effects.take_from_row_or_deck(s, p, a["source"])
+        effects.take_from_row_or_deck(s, p, a["source"], events)
         p.org_marks = []
     elif o == "helion_assembly":  # destroy a tech, tuck a card for income, clear the marked spaces
         p.org_data.setdefault("disabled", []).append(a["tech"])

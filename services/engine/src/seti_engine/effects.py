@@ -5,6 +5,8 @@ Spec: setup.md, turn-structure.md (RES-01 to RES-06, INCOME-01 to INCOME-05), mi
 
 from __future__ import annotations
 
+from typing import Any
+
 from . import rng, solar, tables
 from .models import Decision, GameState, PlayerState, Probe
 
@@ -79,7 +81,7 @@ def refill_card_row(state: GameState) -> None:
         state.card_row.append(cid)
 
 
-def take_from_row_or_deck(state: GameState, p: PlayerState, source: str) -> str | None:
+def take_from_row_or_deck(state: GameState, p: PlayerState, source: str, events: list[dict[str, Any]] | None = None) -> str | None:
     """`source` is 'deck' or 'row:<index>'. A card taken from the row is replaced at once (RES-04, A-026): only that one, so a gap that a
     running scan has left in the row stays until the scan is finished (SCAN-03)."""
     if source == "deck":
@@ -87,6 +89,8 @@ def take_from_row_or_deck(state: GameState, p: PlayerState, source: str) -> str 
     idx = int(source.split(":")[1])
     cid = state.card_row.pop(idx)
     p.hand.append(cid)
+    if events is not None:  # a card of the display is face up: the log names it (a card from the deck stays hidden)
+        events.append({"type": "take_display_card", "player": p.index, "card": cid, "source": source})
     replacement = draw_from_deck(state)
     if replacement is not None:
         state.card_row.append(replacement)

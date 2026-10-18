@@ -557,7 +557,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         cards.on_move(s, p, old_ring, probe.ring, cell, events)
     elif t == "buy_card":
         effects.pay(p, publicity=3)
-        effects.take_from_row_or_deck(s, p, a["source"])
+        effects.take_from_row_or_deck(s, p, a["source"], events)
     elif t == "exchange":  # RES-06
         if a["give"] == "card":
             for cid in a["cards"]:
@@ -568,7 +568,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         else:
             p.energy -= 2
         if a["get"] == "card":
-            effects.take_from_row_or_deck(s, p, a["source"])
+            effects.take_from_row_or_deck(s, p, a["source"], events)
         elif a["get"] == "credit":
             p.credits += 1
         else:
@@ -813,7 +813,7 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif t == "choose_message":
         species.reach_message(s, p, a["hex"], events)
     elif t == "take_card":
-        cid = effects.take_from_row_or_deck(s, p, a["source"])
+        cid = effects.take_from_row_or_deck(s, p, a["source"], events)
         if d.data.get("reveal") and cid is not None:  # FAQ-C011: reveal the card and gain its free-action corner
             cards.gain_corner(s, p, cid)
     elif t == "mark_signal":
