@@ -249,6 +249,19 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
   }
 }
 
+/** The lines of the events of a move; the same line twice in a row (two signals in one sector) is one line with a count. */
+function noteLines(notes: GameEvent[], ctx: LogContext, action: LogEntry["action"]): { text: ReactNode; count: number }[] {
+  const out: { text: ReactNode; count: number }[] = [];
+  for (const ev of notes) {
+    const text = eventLine(ev, ctx, action);
+    if (!text) continue;
+    const last = out.at(-1);
+    if (last && typeof text === "string" && last.text === text) last.count += 1;
+    else out.push({ text, count: 1 });
+  }
+  return out;
+}
+
 export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext }) {
   const [folded, toggle] = useDock("log");
   const body = useRef<HTMLOListElement>(null);
@@ -297,14 +310,13 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                   <b>{ctx.who(e.seat)}</b> <CardText text={logText(e.action)} />{" "}
                   {mine && !itemised ? <Changes changes={mine.changes} size={16} /> : null}
                 </span>
-                {notes.map((ev) => {
-                  const line = eventLine(ev, ctx, e.action);
-                  return line ? (
-                    <span key={JSON.stringify(ev)} className="logevent">
-                      {typeof line === "string" ? <CardText text={line} /> : line}
-                    </span>
-                  ) : null;
-                })}
+                {noteLines(notes, ctx, e.action).map((line, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the same line can come twice in a row (two signals in the same sector)
+                  <span key={i} className="logevent">
+                    {typeof line.text === "string" ? <CardText text={line.text} /> : line.text}
+                    {line.count > 1 ? ` (×${line.count})` : ""}
+                  </span>
+                ))}
                 {ownGains.map((g) => (
                   <span key={`g${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
                     {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
