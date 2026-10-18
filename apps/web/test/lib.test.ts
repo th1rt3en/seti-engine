@@ -248,7 +248,7 @@ describe("lobby, leaderboard and profile", () => {
     const carl = await signup(db, "carl", "password1");
     const all = await allPlayers(db);
     expect(all.map((r) => r.name)).toEqual(["Ann", "Bob", "carl"]); // guests left out, any case sorted together
-    expect(all.find((r) => r.user_id === carl.id)).toMatchObject({ rating: 1500, rated_games: 0, games: 0 });
+    expect(all.find((r) => r.user_id === carl.id)).toMatchObject({ rating: 0, rated_games: 0, games: 0 });
     expect((await allPlayers(db, "AN")).map((r) => r.name)).toEqual(["Ann"]);
     expect(await allPlayers(db, "%")).toEqual([]); // a wildcard is not a wildcard
   });

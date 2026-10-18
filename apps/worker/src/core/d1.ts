@@ -96,14 +96,14 @@ export class D1Sink implements ResultSink {
   async recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void> {
     const q = (sql: string, ...v: unknown[]): Statement => this.db.prepare(sql).bind(...v);
     const ids = rec.meta.seats.flatMap((s) => (s === null ? [] : [s.id]));
-    const current = new Map<string, number>();
+    const current = new Map<string, { rating: number; games: number }>();
     if (rec.rated && ids.length > 0) {
       const marks = ids.map(() => "?").join(", ");
       const rows = await this.db
-        .prepare(`SELECT user_id, rating FROM ratings WHERE user_id IN (${marks})`)
+        .prepare(`SELECT user_id, rating, games FROM ratings WHERE user_id IN (${marks})`)
         .bind(...ids)
-        .all<{ user_id: string; rating: number }>();
-      for (const r of rows.results) current.set(r.user_id, r.rating);
+        .all<{ user_id: string; rating: number; games: number }>();
+      for (const r of rows.results) current.set(r.user_id, { rating: r.rating, games: r.games });
     }
     const updates = settle(rec, current);
     const at = rec.meta.endedAt ?? 0;

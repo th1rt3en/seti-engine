@@ -8,7 +8,7 @@ import { resignSoloAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
-const START_RATING = 1500;
+const START_RATING = 0;
 
 function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
   return (

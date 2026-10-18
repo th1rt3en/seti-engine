@@ -146,7 +146,7 @@ export interface LeaderRow {
 export interface PlayerRow {
   user_id: string;
   name: string;
-  /** 1500 until the first rated game */
+  /** 0 until the first rated game */
   rating: number;
   /** rated games that counted */
   rated_games: number;
@@ -159,7 +159,7 @@ export interface PlayerRow {
 export async function allPlayers(db: Db, q = "", limit = 500): Promise<PlayerRow[]> {
   const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
   return db.all<PlayerRow>(
-    `SELECT u.id AS user_id, u.name, COALESCE(r.rating, 1500) AS rating, COALESCE(r.games, 0) AS rated_games,
+    `SELECT u.id AS user_id, u.name, COALESCE(r.rating, 0) AS rating, COALESCE(r.games, 0) AS rated_games,
        (SELECT COUNT(*) FROM game_players gp JOIN games g ON g.id = gp.game_id
          WHERE gp.user_id = u.id AND g.status IN ('playing', 'finished')) AS games,
        u.created_at AS joined
@@ -336,6 +336,6 @@ export async function profile(db: Db, userId: string) {
     userId,
   );
   const ratings = history.map((h) => h.rating_after);
-  const peak = Math.max(rating?.rating ?? 1500, ...ratings);
+  const peak = Math.max(rating?.rating ?? 0, ...ratings);
   return { user, rating: rating ?? null, history, recent, stats: computeStats(finished), peak };
 }

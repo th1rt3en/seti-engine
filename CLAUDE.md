@@ -24,7 +24,7 @@ A fan-made, non-commercial website for the board game SETI (CGE). Players can si
 - Games are event-sourced: a seed plus an ordered action log.
 - Promo cards SE EN 01 and SE EN 02 are an optional game setting (D23), separate from the expansion; default off. Rules for them are pending ruling A-001.
 - Every started game is archived to GCS (D25) and replayable; the engine service signs-checks requests (D16a); lobbies and clocks follow D24 to D28 in `docs/PLAN.md`.
-- Rating: Elo, K = 20, pairwise for 3 to 4 players (`docs/PLAN.md` section 6). Only rated games with registered players count.
+- Rating: Elo, pairwise for 3 to 4 players, start 0, K 60/40/20 by rated games played, floor 100 with no loss below it (D37, `docs/PLAN.md` section 6). Only rated games with registered players count.
 
 ## Commands
 

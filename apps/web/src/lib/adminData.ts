@@ -42,7 +42,7 @@ export async function setRating(db: Db, userId: string, rating: number, now: num
   );
 }
 
-/** Back to the start: the account has no rating row, so it is unrated at 1500 again (the history of past games stays). */
+/** Back to the start: the account has no rating row, so it is unrated at 0 again (the history of past games stays). */
 export async function resetRating(db: Db, userId: string): Promise<void> {
   await db.run("DELETE FROM ratings WHERE user_id = ?", userId);
 }

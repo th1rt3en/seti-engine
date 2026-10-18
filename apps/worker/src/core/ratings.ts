@@ -11,13 +11,14 @@ export interface RatingUpdate {
 }
 
 /** The new ratings of the players of a game; empty when the game does not count (guests, solo, too short). */
-export function settle(rec: GameRecord, current: ReadonlyMap<string, number>): RatingUpdate[] {
+export function settle(rec: GameRecord, current: ReadonlyMap<string, { rating: number; games: number }>): RatingUpdate[] {
   if (!rec.rated) return [];
   const seats = rec.meta.seats;
   const players = rec.result.ranking.map((r) => {
     const who = seats[r.seat];
     if (who === null || who === undefined) throw new Error(`seat ${r.seat} is empty`);
-    return { id: who.id, seat: r.seat, rank: r.rank, rating: current.get(who.id) ?? START_RATING };
+    const known = current.get(who.id);
+    return { id: who.id, seat: r.seat, rank: r.rank, rating: known?.rating ?? START_RATING, games: known?.games ?? 0 };
   });
   const after = applyDeltas(players);
   return players.map((p) => ({ userId: p.id, seat: p.seat, rank: p.rank, before: p.rating, after: after.get(p.id) ?? p.rating }));

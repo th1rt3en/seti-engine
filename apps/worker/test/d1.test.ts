@@ -97,17 +97,18 @@ describe("D1 sink", () => {
           (r) => [r.user_id, [r.rating, r.games]],
         ),
       );
-    expect(ratings()).toEqual({ "u-alice": [1510, 1], "u-bob": [1490, 1] });
+    expect(ratings()).toEqual({ "u-alice": [30, 1], "u-bob": [0, 1] }); // new players: K = 60; below 100 nothing is lost
     const two = record("g2", [alice, bob], [2, 1], true);
     await sink.recordStart({ ...two.meta, status: "playing" });
     await sink.recordEnd(two, []);
     const r = ratings();
     expect(r["u-alice"]?.[1]).toBe(2);
-    expect(r["u-bob"]?.[0]).toBeGreaterThan(1490);
+    expect(r["u-bob"]?.[0]).toBeGreaterThan(0);
+    expect(r["u-alice"]?.[0]).toBe(30); // alice lost, but she is below 100
     expect(db.sql.prepare("SELECT COUNT(*) AS n FROM rating_history").get()).toEqual({ n: 4 });
     expect(db.sql.prepare("SELECT rated_counted FROM games WHERE id = 'g2'").get()).toEqual({ rated_counted: 1 });
     const gp = db.sql.prepare("SELECT rating_before, rating_after FROM game_players WHERE game_id = 'g1' AND seat = 0").get();
-    expect(gp).toEqual({ rating_before: 1500, rating_after: 1510 });
+    expect(gp).toEqual({ rating_before: 0, rating_after: 30 });
   });
 
   it("three players move by at most K and an unrated game leaves the ratings alone", async () => {
@@ -117,7 +118,7 @@ describe("D1 sink", () => {
     await sink.recordStart({ ...g.meta, status: "playing" });
     await sink.recordEnd(g, []);
     const rows = db.sql.prepare("SELECT rating FROM ratings ORDER BY rating").all() as { rating: number }[];
-    expect(rows.map((r) => r.rating)).toEqual([1490, 1500, 1510]);
+    expect(rows.map((r) => r.rating)).toEqual([0, 0, 30]);
     const solo = record("g2", [guest], [1], false);
     await sink.recordStart({ ...solo.meta, status: "playing" });
     await sink.recordEnd(solo, []);

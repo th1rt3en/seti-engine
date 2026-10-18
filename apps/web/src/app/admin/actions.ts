@@ -67,7 +67,7 @@ export async function setRatingAction(form: FormData): Promise<void> {
 export async function resetRatingAction(form: FormData): Promise<void> {
   await requireAdmin(form);
   await resetRating(getDb(), field(form, "user"));
-  back(form, `The rating of ${field(form, "name")} is reset (unrated, 1500).`);
+  back(form, `The rating of ${field(form, "name")} is reset (unrated, 0).`);
 }
 
 export async function cancelGameAction(form: FormData): Promise<void> {

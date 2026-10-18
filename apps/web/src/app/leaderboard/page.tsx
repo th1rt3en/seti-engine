@@ -9,7 +9,10 @@ export default async function Leaderboard() {
   return (
     <>
       <h1>Leaderboard</h1>
-      <p className="muted">Elo rating from rated games with 2 to 4 players. Everyone starts at 1500.</p>
+      <p className="muted">
+        Elo rating from rated games with 2 to 4 players. Everyone starts at 0: a new player gains fast, nobody drops below 100, and a player
+        below 100 loses nothing.
+      </p>
       {rows.length === 0 ? (
         <p>No rated game has been played yet.</p>
       ) : (

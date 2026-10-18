@@ -186,7 +186,7 @@ export default async function Admin({
                     {u.open_games > 0 ? <span className="pill">in a game</span> : null}
                     <div className="muted small">joined {when(u.created_at)}</div>
                   </td>
-                  <td>{u.rating ?? "unrated (1500)"}</td>
+                  <td>{u.rating ?? "unrated (0)"}</td>
                   <td>
                     <form action={setRatingAction} style={{ display: "flex", gap: 6 }}>
                       <input type="hidden" name="back" value={back} />
@@ -197,7 +197,7 @@ export default async function Admin({
                         name="rating"
                         min={0}
                         max={4000}
-                        defaultValue={u.rating ?? 1500}
+                        defaultValue={u.rating ?? 0}
                         style={{ width: 90 }}
                         aria-label={`Rating of ${u.name}`}
                       />
@@ -212,7 +212,7 @@ export default async function Admin({
                         <input type="hidden" name="back" value={back} />
                         <input type="hidden" name="user" value={u.id} />
                         <input type="hidden" name="name" value={u.name} />
-                        <ConfirmSubmit ask={`Reset the rating of ${u.name} to the start (1500, unrated)?`} className="secondary small">
+                        <ConfirmSubmit ask={`Reset the rating of ${u.name} to the start (0, unrated)?`} className="secondary small">
                           Reset
                         </ConfirmSubmit>
                       </form>

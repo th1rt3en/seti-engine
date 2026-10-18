@@ -17,7 +17,7 @@ export default async function Players({ searchParams }: { searchParams: Promise<
       </form>
       <p className="muted">
         {rows.length} registered player{rows.length === 1 ? "" : "s"}
-        {q ? ` with “${q}” in their name` : ""}. Players who have not played a rated game have the starting rating, 1500.
+        {q ? ` with “${q}” in their name` : ""}. Players who have not played a rated game have the starting rating, 0.
       </p>
       {rows.length === 0 ? (
         <p>No player found.</p>

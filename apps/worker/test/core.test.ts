@@ -2,10 +2,10 @@ import { SignJWT, exportSPKI, generateKeyPair } from "jose";
 import { describe, expect, it } from "vitest";
 import { AuthError, verifyToken } from "../src/core/auth.js";
 import * as clocks from "../src/core/clock.js";
-import { START_RATING, applyDeltas, deltas, expected } from "../src/core/elo.js";
+import { FLOOR, START_RATING, applyDeltas, deltas, expected, kFor } from "../src/core/elo.js";
 import { rank } from "../src/core/room.js";
 
-describe("Elo (K = 20, docs/PLAN.md section 6)", () => {
+describe("Elo (docs/PLAN.md section 6)", () => {
   it("2 players: standard Elo", () => {
     const d = deltas([
       { id: "a", rating: 1500, rank: 1 },
@@ -55,12 +55,45 @@ describe("Elo (K = 20, docs/PLAN.md section 6)", () => {
 
   it("rounds the new ratings", () => {
     const r = applyDeltas([
-      { id: "a", rating: START_RATING, rank: 1 },
-      { id: "b", rating: START_RATING, rank: 2 },
+      { id: "a", rating: START_RATING, rank: 1, games: 0 },
+      { id: "b", rating: START_RATING, rank: 2, games: 0 },
     ]);
-    expect(r.get("a")).toBe(1510);
-    expect(r.get("b")).toBe(1490);
+    expect(r.get("a")).toBe(30); // everybody starts at 0, and a new player has K = 60
+    expect(r.get("b")).toBe(0); // below 100: nothing is lost
     expect(expected(1500, 1500)).toBeCloseTo(0.5);
+  });
+
+  it("K is 60 for the first 10 rated games, 40 for the next 10, then 20", () => {
+    expect([0, 9, 10, 19, 20, 99].map(kFor)).toEqual([60, 60, 40, 40, 20, 20]);
+    const at = (games: number) =>
+      deltas([
+        { id: "a", rating: 1500, rank: 1, games },
+        { id: "b", rating: 1500, rank: 2, games: 30 },
+      ]).get("a");
+    expect(at(0)).toBeCloseTo(30);
+    expect(at(10)).toBeCloseTo(20);
+    expect(at(20)).toBeCloseTo(10);
+  });
+
+  it("nobody drops below 100, a player below 100 loses nothing, and the winner gains as usual", () => {
+    const r = applyDeltas([
+      { id: "high", rating: 1500, rank: 1, games: 30 },
+      { id: "low", rating: 50, rank: 2, games: 30 },
+    ]);
+    expect(r.get("low")).toBe(50); // below the floor: no loss
+    expect(r.get("high")).toBe(1500); // the favourite wins, so a small gain (rounded)
+    const upset = applyDeltas([
+      { id: "low", rating: 0, rank: 1, games: 0 },
+      { id: "high", rating: 1500, rank: 2, games: 30 },
+    ]);
+    expect(upset.get("low")).toBe(60); // a win over a strong player at K = 60
+    expect(upset.get("high")).toBe(1480); // and the strong player loses as usual (K = 20)
+    const near = applyDeltas([
+      { id: "a", rating: 105, rank: 2, games: 30 },
+      { id: "b", rating: 105, rank: 1, games: 30 },
+    ]);
+    expect(near.get("a")).toBe(FLOOR); // 105 - 10 would be 95: the floor holds it at 100
+    expect(near.get("b")).toBe(115);
   });
 });
 
