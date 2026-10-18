@@ -42,6 +42,13 @@ export function SpotPrompt({ note, fallback }: { note: Note; fallback?: string }
       </span>
     );
   }
+  if (note.resolve) {
+    return (
+      <span className="spotprompt">
+        Confirm resolving the <b>{note.star}</b> sector next?
+      </span>
+    );
+  }
   if (note.star) {
     return (
       <span className="spotprompt">

@@ -168,3 +168,4 @@ def test_a_decision_is_named_after_the_innermost_scope_that_caused_it() -> None:
         s.pending.append(Decision(kind="take_card", player=0))
         s.pending.append(Decision(kind="trace", player=0, source={"kind": "organization", "org": "xenolab"}))
     assert [d.source for d in s.pending] == [{"kind": "card", "card": "17"}, {"kind": "move"}, {"kind": "organization", "org": "xenolab"}]
+

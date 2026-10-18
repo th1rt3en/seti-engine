@@ -67,9 +67,12 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
             else:
                 cost = {"energy": engine.land_cost(state, owner, planet)}  # LAND-01
         return {"action": action, "planet": planet, "moon": move.get("moon"), "free": free, "cost": cost}
-    if kind in ("mark_signal", "scan_earth"):
+    if kind in ("mark_signal", "scan_earth", "resolve_sector"):
         sector = state.sectors[move["sector"]]
-        return {"sector": move["sector"], "star": sector.star, "color": sector.color}
+        found: dict[str, Any] = {"sector": move["sector"], "star": sector.star, "color": sector.color}
+        if kind == "resolve_sector":  # TURN-05: the sector that is resolved next, picked on the board
+            found["resolve"] = True
+        return found
     if kind == "signal_where":  # ALIEN-OUM-03: a signal in the sector with 'Oumuamua: in the sector, or on the tile
         at = species.oumuamua_sector(state)
         if at is None:

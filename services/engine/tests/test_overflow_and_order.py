@@ -75,6 +75,10 @@ def test_turn05_the_player_chooses_the_order_of_completed_sectors(monkeypatch: p
     _advance(s, [])
     assert s.pending[0].kind == "sector_order" and s.pending[0].player == pl
     assert legal_moves(s) == [{"type": "resolve_sector", "sector": i} for i in (2, 5, 7)]
+    from seti_engine.move_notes import note
+
+    picked = [note(s, m) for m in legal_moves(s)]  # the page shows each sector as a place on the board to click
+    assert [n["sector"] for n in picked if n] == [2, 5, 7] and all(n and n["resolve"] for n in picked)
     r = apply(s, {"type": "resolve_sector", "sector": 7})
     assert order == [7] and r.state.pending[0].kind == "sector_order"
     assert legal_moves(r.state) == [{"type": "resolve_sector", "sector": i} for i in (2, 5)]

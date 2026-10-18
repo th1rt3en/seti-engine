@@ -63,6 +63,8 @@ export type Note = {
   rewards?: { t: string; n: number }[];
   alien?: "deck" | "face_up";
   oumuamua_tile?: boolean;
+  /** The sector is the one to resolve next (the order of completed sectors, TURN-05). */
+  resolve?: boolean;
   card?: string | null;
 } | null;
 
