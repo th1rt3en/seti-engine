@@ -795,6 +795,25 @@ export function BoardView({
               </g>
             );
           }),
+          // Futurespan Institute: the token lies on the scoring track, ahead of the score, while a card is prepared
+          ...(typeof p.org_data?.fs_token === "number" && p.org_data.fs_card
+            ? [
+                (() => {
+                  const target = p.org_data.fs_token as number;
+                  const at = polar(LANES[p.index] ?? 1500, scoreDegrees(target));
+                  return (
+                    <Marker
+                      key={`fs-${p.index}`}
+                      x={at.x}
+                      y={at.y}
+                      size={68}
+                      color={color(p.index)}
+                      title={`${who(p.index)}: Futurespan Institute token at ${target} points (the prepared card can be played for free from there)`}
+                    />
+                  );
+                })(),
+              ]
+            : []),
           ...p.message_cards.map((m, n) => {
             const at = polar(LANES[p.index] ?? 1500, scoreDegrees(m.target));
             return (
