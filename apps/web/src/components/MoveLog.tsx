@@ -225,6 +225,12 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
                 : "the board";
       return `${who} takes the ${String(ev.glyph)} glyph token from ${from}`;
     }
+    case "endgame_card":
+      return `${who}: end-of-game scoring card ${cardName(ev.card)}: +${String(ev.points)} points`;
+    case "endgame_gold": {
+      const info = (assets.gold as Record<string, { per: string }>)[`${String(ev.tile)}-${String(ev.side)}`];
+      return `${who}: gold scoring tile ${String(ev.tile)}${info ? ` (${info.per})` : ""}: ${String(ev.sets)} × ${String(ev.per)} = +${String(ev.points)} points`;
+    }
     case "take_display_card":
       return `${who} takes ${cardName(ev.card)} from the display`;
     case "breach":

@@ -129,3 +129,16 @@ def test_a_finished_game_has_its_final_scores() -> None:
     for row, p in zip(st.final_scores, st.players, strict=True):
         assert row["total"] == p.score + row["cards"] + row["gold"] + row["exertian"] - row["loss"]
     assert start(Options(players=2, seed=1)).state.final_scores == [] and card_defs.CARDS["113"]["end"]["what"] == "solvay"
+
+
+def test_the_end_of_the_game_logs_each_end_card_and_each_gold_tile() -> None:  # END-02, END-10 to END-17, the log
+    s = ready(players=2)
+    tile(s, "Tech", "A", [1, 0])
+    s.players[0].techs = ["probe-dot", "telescope-dot", "computer-dot"]
+    s.players[0].end_cards = ["12"]  # an end-of-game scoring card
+    events = scoring.endgame_events(s)
+    gold = [e for e in events if e["type"] == "endgame_gold" and e["player"] == 0]
+    assert len(gold) == 1 and gold[0]["tile"] == "Tech" and gold[0]["sets"] == 1
+    assert gold[0]["points"] == gold[0]["per"] * gold[0]["sets"] == scoring.gold_points(s, s.players[0])
+    card = next(e for e in events if e["type"] == "endgame_card")
+    assert card["card"] == "12" and card["points"] == cards.end_card_points(s, s.players[0], "12")

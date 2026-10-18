@@ -689,9 +689,10 @@ def gain_corner(s: GameState, p: PlayerState, cid: str, events: Events | None = 
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
-def end_points(s: GameState, p: PlayerState) -> int:
+def end_card_points(s: GameState, p: PlayerState, cid: str) -> int:
+    """What one end-of-game scoring card scores for the player (CARD-20, CARD-21)."""
     total = 0
-    for cid in p.end_cards:
+    for _ in (cid,):
         e = card_defs.CARDS[cid]["end"]
         w, n = e["what"], e["n"]
         if w == "per_wins":
@@ -725,6 +726,10 @@ def end_points(s: GameState, p: PlayerState) -> int:
                 raise ValueError(w)
             total += points
     return total
+
+
+def end_points(s: GameState, p: PlayerState) -> int:
+    return sum(end_card_points(s, p, cid) for cid in p.end_cards)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

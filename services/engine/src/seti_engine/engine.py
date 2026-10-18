@@ -1024,4 +1024,5 @@ def _end_round(s: GameState, events: list[dict[str, Any]]) -> None:
         s.phase = "finished"
         s.final_scores = scoring.final_scores(s)  # END-01 to END-03
         s.winners = scoring.winners(s.final_scores, s.rival.index if s.rival else None)
+        events += scoring.endgame_events(s)  # the log itemises the end-of-game cards and the gold tiles
         events.append({"type": "game_over"})

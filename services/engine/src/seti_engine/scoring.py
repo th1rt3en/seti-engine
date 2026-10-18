@@ -86,6 +86,25 @@ def final_scores(s: GameState) -> list[dict[str, Any]]:
     return rows
 
 
+def endgame_events(s: GameState) -> list[dict[str, Any]]:
+    """What each end-of-game card and each gold tile gives each player, one event each, for the log (END-02, END-10 to END-17)."""
+    out: list[dict[str, Any]] = []
+    for p in s.players:
+        is_rival = s.rival is not None and p.index == s.rival.index
+        for cid in p.end_cards:
+            out.append({"type": "endgame_card", "player": p.index, "card": cid, "points": cards.end_card_points(s, p, cid)})
+        if is_rival:
+            continue  # the rival does not score gold tiles (SOLO-END-01)
+        for g in s.gold_tiles:
+            if p.index in g.markers or p.index in g.low_markers:
+                place = g.markers.index(p.index) if p.index in g.markers else 2
+                per = tile_values(g)[min(place, 2)]
+                sets = sets_for(s, p, g)
+                row = {"type": "endgame_gold", "player": p.index, "tile": g.tile, "side": g.side}
+                out.append({**row, "sets": sets, "per": per, "points": per * sets})
+    return out
+
+
 def winners(rows: list[dict[str, Any]], rival: int | None = None) -> list[int]:
     """END-01: the most points wins; equal scores tie. Solo: the player wins only with more points than the rival (SOLO-END-01)."""
     if rival is not None:
