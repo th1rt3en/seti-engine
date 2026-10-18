@@ -43,6 +43,8 @@ export function sourceLabel(src: DecisionSource | null | undefined, stars: strin
     }
     case "trace":
       return `${src.color} trace on ${species[Number(src.slot)] ?? "a species"}`;
+    case "explore":
+      return `exploration card ${String(src.card)}`;
     case "glyph":
       return `${String(src.glyph)} glyph`;
     default:

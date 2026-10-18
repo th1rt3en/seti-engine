@@ -168,7 +168,6 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
   };
   const mineOrg = (view.viewer === null ? null : s.players?.[view.viewer]?.organization) ?? "";
   const first = s.pending?.[0];
-  const breachColor = first?.kind === "breach" ? String(first.data?.color ?? "") : "";
   legal.forEach((m, i) => {
     if (m.type === "od_step") {
       // Orbital Dynamics: one step for a probe, to a space next to it
@@ -197,8 +196,6 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
           { ...none, x: at[0] * AMOEBA_SCALE, y: at[1] * AMOEBA_SCALE, r: 34 },
           { panel: "amoeba" },
         );
-    } else if (m.type === "breach") {
-      add(i, `breach:${breachColor}`, { ...none }, { panel: "arkhos", glyph: breachColor });
     } else if (m.type === "mark_objective") {
       add(i, `task:${String(m.objective)}:${String(m.task)}`, { ...none }, { panel: "objectives" });
     } else if (m.type === "org_mark" && ORG_SPACES[mineOrg]?.[String(m.space)]) {

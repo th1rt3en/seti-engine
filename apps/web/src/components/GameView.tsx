@@ -33,6 +33,7 @@ const ROUNDS = 5;
 const DECISION: Record<string, string> = {
   setup_tuck: "tuck a card for income",
   helion_tuck: "tuck a card for income",
+  breach: "breach a security card, or not",
   income_tuck: "tuck a card for income, or skip",
   discard_to_four: "discard down to four cards",
   take_round_card: "take an end-of-round card",

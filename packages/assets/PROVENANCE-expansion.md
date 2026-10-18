@@ -27,7 +27,7 @@ the repository; the original files are not. Do not edit by hand.
 | `space-agencies-long-term-objective-1.jpg` | `/assets/expansion/objectives/long-term-1.fc7e9bc1e5.webp` |
 | `space-agencies-long-term-objective-2.jpg` | `/assets/expansion/objectives/long-term-2.6dc3f00dec.webp` |
 | `space-agencies-long-term-objective-3.jpg` | `/assets/expansion/objectives/long-term-3.6c1bb84f55.webp` |
-| `alien-board-arkhos.png` | `/assets/expansion/boards/arkhos.f7d04706c2.webp` |
+| `alien-board-arkhos.png` (resized to 777 x 1415 and trimmed to the outline of the base species boards by `tools/web/trim_species_board.py arkhos`) | `/assets/expansion/boards/arkhos.e2528acb73.webp` |
 | `alien-board-glyphids.png` | `/assets/expansion/boards/glyphids.2d00ce5830.webp` |
 | `alien-board-amoeba.png` | `/assets/expansion/boards/amoeba.29c31caafc.webp` |
 | `alien-board-glyphids-track-variant-a.png` | `/assets/expansion/boards/glyphids-track-a.ee5b22fb7c.webp` |

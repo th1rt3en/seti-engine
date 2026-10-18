@@ -136,13 +136,13 @@ describe("the places of the Space Agencies expansion", () => {
     expect([...handled].sort()).toEqual([0, 1, 2, 3, 4, 5]);
   });
 
-  it("offers the security card of the decision's color for a breach", () => {
+  it("leaves the breach of a security card to the context bar (no place on the board)", () => {
     const v = {
       ...view([{ type: "breach" }, { type: "skip_breach" }], [null, null]),
     } as unknown as View;
     (v.state as unknown as { pending: unknown[] }).pending = [{ kind: "breach", player: 0, data: { color: "pink" } }];
     const { spots } = buildSpots(v);
-    expect(spots.map((s) => s.id)).toEqual(["breach:pink"]);
+    expect(spots).toEqual([]);
   });
 });
 

@@ -29,6 +29,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import type { CardAction } from "./CardActions";
+import { CardImage } from "./CardImage";
 import { GameView } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
@@ -713,8 +714,19 @@ export function GameClient({
     hints.push(`Click a card of the display${rowSources.includes("deck") ? " or the deck" : ""}.`);
   if (buys.length > 0) hints.push("Click a card of the display or the deck to buy it for 3 publicity.");
   if (coverNode) hints.push("Click the circle of the mission card that you want to cover, or decline.");
+  // Arkhos: the overflow space lets the player take the security card of that color into the hand
+  const breachDecision = v.state.pending[0]?.kind === "breach" && mine.some((m) => m.type === "breach");
+  const breachColor = breachDecision ? String(v.state.pending[0]?.data?.color ?? "") : "";
+  const breachCard = (v.state.players[v.viewer ?? 0]?.security as Record<string, string> | undefined)?.[breachColor];
+  const breachNode =
+    breachDecision && !ask ? (
+      <span className="breachbar">
+        Breach your {breachColor} security card? It goes to your hand and opens a deeper level of the Arkhos board.
+        {breachCard ? <CardImage id={breachCard} width={86} /> : null}
+      </span>
+    ) : null;
   const contextNode: ReactNode =
-    ask?.text ?? (coverNode ? <>Cover a circle of a mission? {coverNode}</> : null) ?? techContext ?? probeContext;
+    ask?.text ?? breachNode ?? (coverNode ? <>Cover a circle of a mission? {coverNode}</> : null) ?? techContext ?? probeContext;
   // the answers that are not choices on the board are buttons in the context bar
   const contextActions = ask?.inContext ? (
     <>

@@ -87,6 +87,8 @@ def test_marking_an_overflow_space_lets_the_player_breach_that_color() -> None: 
     s.phase, s.current_player = "play", 0
     r = apply(s, {"type": "breach"})
     assert card in r.state.players[0].hand and "yellow" not in r.state.players[0].security
+    breach_event = next(e for e in r.events if e["type"] == "breach")
+    assert breach_event["color"] == "yellow" and "card" not in breach_event  # the log names the color, not the card (rule 6)
     declined = apply(s, {"type": "skip_breach"}).state
     assert "yellow" in declined.players[0].security and card not in declined.players[0].hand
 
@@ -134,3 +136,15 @@ def test_random_games_with_arkhos_finish() -> None:  # EXP-ARK-01 to EXP-ARK-07,
             s = apply(s, rng.choice(moves)).state
         assert s.phase == "finished"
         assert s.species[0].discovered
+
+
+def test_the_gains_of_an_exploration_card_are_logged_under_that_card() -> None:  # EXP-ARK-02, the log
+    from seti_engine import trail
+
+    s = discovered()
+    p = s.players[0]
+    s.species[0].extra["explore_deck"] = ["ET 40"]
+    s.trail = []
+    arkhos.explore(s, p, "minor", [])
+    gains = trail.events_of(s)
+    assert gains and gains[0]["source"] == {"kind": "explore", "card": "ET 40", "level": "minor"}

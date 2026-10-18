@@ -2,6 +2,7 @@
 // The log of the moves made in the game, as a panel floating at the bottom right. It can be folded to a tab; the newest move is at the bottom.
 // The server sends every client the same log with the identity of hidden cards left out (apps/worker/src/core/publicLog.ts). A move is one line
 // with what it gave and took, one line for each source (the engine's `gains` events), as icons; in the solo game what the rival did after it is a block of its own.
+import { cardImage } from "@/lib/cardImages";
 import type { GameEvent } from "@/lib/events";
 import { ORG_NAMES, cardName, logText } from "@/lib/moves";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
@@ -112,6 +113,8 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
     }
     case "glyph":
       return src.what === "decipher" ? `Placing the ${String(src.glyph)} glyph` : `The ${String(src.glyph)} glyph (icon of a card)`;
+    case "explore":
+      return `Exploration card ${String(src.card)} (${String(src.level)} reward)`;
     case "income":
       return "Income of the round";
     case "organization":
@@ -175,6 +178,17 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
             : "";
       return `${who} launches a probe for free${by}`;
     }
+    case "explore": {
+      const pic = cardImage(String(ev.card));
+      return (
+        <>
+          {who} reveals an exploration card and takes its {String(ev.level)} reward
+          {pic ? <TapZoomImage src={pic} alt={`Exploration card ${String(ev.card)}`} width={44} height={31} className="logcard" /> : null}
+        </>
+      );
+    }
+    case "breach":
+      return `${who} breaches their ${String(ev.color)} security card (it goes to their hand)`;
     case "land":
     case "orbit": {
       if (ev.free !== true) return null; // a landing or an orbit of the main action is the move itself

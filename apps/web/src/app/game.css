@@ -2798,3 +2798,11 @@ button:disabled {
 .missionspanel[open] > summary::after {
   content: " ▾";
 }
+
+/* the security card that can be breached, in the context bar */
+.breachbar {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import rewards, rng, tables
+from . import rewards, rng, tables, trail
 from .models import Decision, GameState, PlayerState, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -54,7 +54,8 @@ def explore(s: GameState, p: PlayerState, level: str, events: Events) -> None:
     extra["explore_discard"].append(cid)
     card = next(c for c in tables.arkhos()["exploration"] if c["id"] == cid)
     events.append({"type": "explore", "player": p.index, "card": cid, "level": level})
-    rewards.grant(s, p, card[level], events)
+    with trail.scope(s, {"kind": "explore", "card": cid, "level": level}):  # the log says which card gave the reward
+        rewards.grant(s, p, card[level], events)
 
 
 def access(p: PlayerState) -> int:
@@ -82,6 +83,8 @@ def breach_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
     return [{"type": "breach"}, {"type": "skip_breach"}]
 
 
-def breach(s: GameState, p: PlayerState, d: Decision, a: dict[str, Any]) -> None:
+def breach(s: GameState, p: PlayerState, d: Decision, a: dict[str, Any], events: Events) -> None:
     if a["type"] == "breach":
-        p.hand.append(p.security.pop(d.data["color"]))  # EXP-ARK-07: in the hand it counts toward the hand limit
+        card = p.security.pop(d.data["color"])
+        events.append({"type": "breach", "player": p.index, "color": d.data["color"]})  # the card goes to the hand: it is not named
+        p.hand.append(card)  # EXP-ARK-07: in the hand it counts toward the hand limit

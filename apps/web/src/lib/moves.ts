@@ -267,8 +267,13 @@ export const sameMove = (a: Move, b: Move): boolean => {
 
 const cardTitle = (id: unknown): string => CARDS[String(id)]?.name ?? ORGS[String(id)]?.name ?? String(id);
 const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
+const FREE_WORDS: Record<string, string> = {
+  score: "points",
+  move: "movement",
+  explore_minor: "minor exploration reward (reveal the next exploration card)",
+};
 const freeText = (free: [string, number][] | undefined): string =>
-  free && free.length > 0 ? free.map(([k, n]) => `${n} ${k}`).join(", ") : "nothing";
+  free && free.length > 0 ? free.map(([k, n]) => `${n} ${FREE_WORDS[k] ?? k}`).join(", ") : "nothing";
 
 const REWARD_WORDS: Record<string, [string, string]> = {
   credit: ["credit", "credits"],

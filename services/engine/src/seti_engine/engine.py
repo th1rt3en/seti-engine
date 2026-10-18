@@ -764,7 +764,7 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif d.kind == "org_mark":
         orgs.resolve_mark(s, p, a)
     elif d.kind == "breach":
-        arkhos.breach(s, p, d, a)
+        arkhos.breach(s, p, d, a, events)
     elif d.kind == "organelle":
         amoeba.pick(s, p, a, events)
     elif d.kind == "amoeba_remove":
