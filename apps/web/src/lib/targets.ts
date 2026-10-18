@@ -7,6 +7,7 @@ import {
   ALIEN_COLUMN,
   ALIEN_TOP,
   DISCOVERY,
+  LAND_SPACES,
   MOON,
   OUMUAMUA_TILE,
   PLANET,
@@ -63,6 +64,8 @@ export type Note = {
   rewards?: { t: string; n: number }[];
   alien?: "deck" | "face_up";
   oumuamua_tile?: boolean;
+  /** A first-lander space of a planet and the data it gives (Mars has two, LAND-04). */
+  land_data?: { planet: string; slot: number; data: number };
   /** The sector is the one to resolve next (the order of completed sectors, TURN-05). */
   resolve?: boolean;
   card?: string | null;
@@ -134,6 +137,11 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const at = landSlot(n.planet, st.landers.length) ?? pos;
         spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y, r: 62 } };
       }
+    } else if (n.land_data) {
+      // Mars: the two first-lander spaces, each with its own amount of data, are clicked on the planet
+      const at = LAND_SPACES[n.land_data.planet]?.circles[n.land_data.slot];
+      if (!at) return;
+      spot = { id: `landdata:${n.land_data.planet}:${n.land_data.slot}`, shape: { kind: "circle", x: at.x, y: at.y, r: 50 } };
     } else if (n.oumuamua_tile) {
       // the data slot of the 'Oumuamua tile on disc 3: it turns with the disc (the turn of the disc is in `view.state.disc_angles`)
       const turn = 45 * (s.disc_angles[2] ?? 0);

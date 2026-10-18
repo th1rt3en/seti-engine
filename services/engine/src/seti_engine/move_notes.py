@@ -7,7 +7,7 @@ a move that needs no note). Nothing here changes the state or the moves.
 
 from typing import Any
 
-from . import engine, orgs, rewards, solar, species, techs
+from . import engine, orgs, rewards, solar, species, tables, techs
 from .models import GameState
 
 Note = dict[str, Any] | None
@@ -67,6 +67,9 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
             else:
                 cost = {"energy": engine.land_cost(state, owner, planet)}  # LAND-01
         return {"action": action, "planet": planet, "moon": move.get("moon"), "free": free, "cost": cost}
+    if kind == "choose_land_slot" and state.pending:  # LAND-04: Mars has two first-lander spaces with different amounts of data
+        planet = state.pending[0].data["planet"]
+        return {"land_data": {"planet": planet, "slot": move["slot"], "data": tables.planet_info(planet)["first_land_data"][move["slot"]]}}
     if kind in ("mark_signal", "scan_earth", "resolve_sector"):
         sector = state.sectors[move["sector"]]
         found: dict[str, Any] = {"sector": move["sector"], "star": sector.star, "color": sector.color}

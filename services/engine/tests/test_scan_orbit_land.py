@@ -120,6 +120,11 @@ def test_mars_first_two_landers_choose_a_data_space() -> None:
     r, pl = setup_at("mars", energy=3)
     r2 = do(r, "land", probe="t1")
     assert r2.state.pending[0].kind == "land_data_slot"
+    from seti_engine.move_notes import note
+
+    # the page shows the two spaces on the planet, each with its data: slot 0 gives 2, slot 1 gives 1
+    amounts = {m["slot"]: note(r2.state, m)["land_data"]["data"] for m in r2.legal if m["type"] == "choose_land_slot"}  # type: ignore[index]
+    assert amounts == {0: 2, 1: 1}
     r3 = settle(apply(r2.state, {"type": "choose_land_slot", "slot": 1}))
     assert r3.state.planets["mars"].first_land_data_taken == [False, True]
 

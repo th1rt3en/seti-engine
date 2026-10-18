@@ -42,6 +42,13 @@ export function SpotPrompt({ note, fallback }: { note: Note; fallback?: string }
       </span>
     );
   }
+  if (note.land_data) {
+    return (
+      <span className="spotprompt">
+        Confirm covering the first-lander space of <b>{cap(note.land_data.planet)}</b> with <b>{note.land_data.data} data</b>?
+      </span>
+    );
+  }
   if (note.resolve) {
     return (
       <span className="spotprompt">

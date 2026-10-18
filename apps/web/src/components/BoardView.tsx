@@ -587,15 +587,30 @@ export function BoardView({
                   </g>
                 );
               })}
-              {st.landers.map((player, k) => (
-                <g
-                  // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
-                  key={`l${k}`}
-                  transform={`translate(${(landSlot(name, k) ?? pos).x} ${(landSlot(name, k) ?? pos).y})`}
-                >
-                  <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander at ${name}`} />
-                </g>
-              ))}
+              {st.landers.map((player, k) => {
+                // a planet with several first-lander spaces (Mars): the lander lies on the space it covered, the later ones follow the gold line
+                const owners = st.first_land_owners ?? [];
+                let place = k;
+                if (k < owners.length) {
+                  const used = new Set<number>();
+                  for (let j = 0; j <= k; j++) {
+                    let slot = owners.findIndex((o, idx) => o === st.landers[j] && !used.has(idx));
+                    if (slot < 0) slot = owners.findIndex((_, idx) => !used.has(idx));
+                    used.add(slot);
+                    if (j === k) place = slot;
+                  }
+                }
+                const where = landSlot(name, place) ?? pos;
+                return (
+                  <g
+                    // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
+                    key={`l${k}`}
+                    transform={`translate(${where.x} ${where.y})`}
+                  >
+                    <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander at ${name}`} />
+                  </g>
+                );
+              })}
               {Object.entries(st.moon_landers ?? {}).map(([moon, player]) => {
                 const at = MOON[moon.toLowerCase().split(/[ _]/)[0] ?? ""];
                 return at ? (

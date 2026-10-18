@@ -144,7 +144,7 @@ export const LABELS: Record<string, Label> = {
   hand_signal: (m) => `Discard ${cardName(m.card)} for a signal`,
   hand_signal_done: () => "Stop discarding cards",
   slingshot_pick: (m) => (m.choice === "move" ? "Gain 1 movement instead of publicity" : "Gain the publicity"),
-  choose_land_slot: (m) => `Take first-lander space ${Number(m.slot) + 1}`,
+  choose_land_slot: (m) => `Cover the first-lander space number ${Number(m.slot) + 1} of the planet`,
   take_alien: (m) => `Take the ${m.source === "face_up" ? "face-up" : "top"} alien card`,
   choose_message: (m) => `Cover reward ${Number(m.hex) + 1} (${rewardList(m.reward)}) with your message tile`,
   play_exertian: () => "Play an Exertian card face down",
