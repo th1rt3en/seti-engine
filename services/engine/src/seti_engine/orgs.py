@@ -273,7 +273,8 @@ def resolve_mark(s: GameState, p: PlayerState, a: Action) -> None:
 def on_mission_played(s: GameState, p: PlayerState) -> None:
     """Mission Relay: when you play a card with a mission, gain 1 publicity."""
     if p.organization == "mission_relay":
-        effects.gain_publicity(s, p)
+        with trail.scope(s, {"kind": "organization", "org": "mission_relay", "what": "mission"}):  # the log shows it apart from the card
+            effects.gain_publicity(s, p)
 
 
 def on_card_played(s: GameState, p: PlayerState, cid: str, alien: bool) -> None:

@@ -118,7 +118,9 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
     case "income":
       return "Income of the round";
     case "organization":
-      return `Organization ${ORG_NAMES[String(src.org)] ?? String(src.org)}`;
+      return `Organization ${ORG_NAMES[String(src.org)] ?? String(src.org)}${src.what === "mission" ? " (a card with a mission is played)" : ""}`;
+    case "rival_computer":
+      return `The rival's computer, space ${String(src.space)}`;
     case "quick_start":
       return `Quick start card ${String(src.card)}`;
     case "rival_turn":

@@ -491,3 +491,16 @@ def test_exp_org_04_both_quick_start_cards_are_kept_in_one_choice() -> None:
     assert {c for k, c in kinds if k == "quick_start"} <= set(chosen["cards"])  # a card that gives nothing has no line
     for e in gains:
         assert e["changes"] and all(v != 0 for v in e["changes"].values())
+
+
+def test_mission_relay_publicity_for_a_mission_card_is_logged_apart() -> None:  # EXP-ORG-13, the log
+    from seti_engine import trail
+
+    s = with_org("mission_relay")
+    p = cur(s)
+    s.trail = []
+    before = p.publicity
+    orgs.on_mission_played(s, p)
+    assert p.publicity == before + 1
+    gains = trail.events_of(s)
+    assert gains and gains[0]["source"] == {"kind": "organization", "org": "mission_relay", "what": "mission"}

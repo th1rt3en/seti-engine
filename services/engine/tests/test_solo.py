@@ -778,3 +778,15 @@ def test_progress_seeking_solo_games_keep_the_invariants(difficulty: int) -> Non
             r = apply(r.state, move)
             check_invariants(r.state)
         assert r.state.phase == "finished"
+
+
+def test_the_publicity_of_the_second_computer_space_of_the_rival_is_logged_apart() -> None:  # SOLO-DATA-12, SOLO-17, the log
+    from seti_engine import trail
+
+    s = solo()
+    assert s.rival is not None
+    s.rival.computer = 1
+    s.trail = []
+    rival.gain_data(s)
+    gains = trail.events_of(s)
+    assert gains and gains[0]["source"] == {"kind": "rival_computer", "space": 2} and gains[0]["changes"]["publicity"] == 1

@@ -114,7 +114,8 @@ def gain_data(s: GameState, n: int = 1) -> None:
         if r.computer < COMPUTER_SPACES:
             r.computer += 1
             if r.computer == COMPUTER_PUBLICITY:
-                effects.gain_publicity(s, p)
+                with trail.scope(s, {"kind": "rival_computer", "space": r.computer}):  # the log says where the publicity comes from
+                    effects.gain_publicity(s, p)
             elif r.computer == 4:
                 advance(s, COMPUTER_PROGRESS)
         else:
