@@ -235,6 +235,19 @@ def test_research_is_ignored_when_the_player_has_all_techs_of_the_type() -> None
     s.players[s.current_player].techs = [f"computer-{g}" for g in ("dot", "link", "branch", "cross")]
     r = play(s, "121")
     assert r.state.rotations == 1 and not r.state.pending
+    why = next(e for e in r.events if e["type"] == "research_none")  # the log says why nothing was taken
+    assert why["reason"] == "owned" and why["cat"] == "computer"
+
+
+def test_research_with_the_missing_techs_out_of_tiles_is_logged() -> None:  # TECHACT-06, the log
+    s = ready()
+    s.players[s.current_player].techs = [f"computer-{g}" for g in ("dot", "link", "branch")]
+    for ts in s.tech_stacks:
+        if ts.category == "computer" and ts.glyph == "cross":
+            ts.tiles = []
+    r = play(s, "121")
+    assert not r.state.pending
+    assert next(e for e in r.events if e["type"] == "research_none")["reason"] == "empty"
 
 
 def test_euclid_chooses_a_probe_or_telescope_tech() -> None:

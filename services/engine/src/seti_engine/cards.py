@@ -147,7 +147,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         techs.rotate_solar_system(s, events)
         fire_pushed(s, events)
     elif t == "research":
-        _research_step(s, p, st)
+        _research_step(s, p, st, events)
     elif t == "scan_free":
         techs.start_scan(
             s,
@@ -278,7 +278,7 @@ def _trace_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
         s.pending.append(Decision(kind="trace", player=p.index, data=data))
 
 
-def _research_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
+def _research_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -> None:
     cat = st["cat"]
     cats = {"any": ("probe", "telescope", "computer"), "probe_telescope": ("probe", "telescope")}.get(cat, (cat,))
     stacks = [
@@ -296,6 +296,12 @@ def _research_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
         s.pending.append(
             Decision(kind="research_tech", player=p.index, data={"stacks": stacks, **{k: v for k, v in st.items() if k not in ("t", "n")}})
         )
+    else:
+        # the log says why nothing is taken: every tech of the type is owned, the stacks of the missing techs are empty, or (a card that
+        # copies a tech of another player) nobody has a tech that the player lacks
+        missing = [ts for ts in s.tech_stacks if ts.category in cats and techs.tech_name(ts.category, ts.glyph) not in p.techs]
+        reason = "owned" if not missing else "empty" if not any(ts.tiles for ts in missing) else "nobody_has"
+        events.append({"type": "research_none", "player": p.index, "cat": cat, "reason": reason})
 
 
 def can_move_to_land(s: GameState, p: PlayerState) -> bool:

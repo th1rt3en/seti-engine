@@ -192,6 +192,18 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
       return action?.type === "org_main" && ev.card
         ? `${who} plays the prepared card ${cardName(ev.card)} for free (Futurespan Institute)`
         : null;
+    case "research_none": {
+      const kind =
+        { probe: "orange", telescope: "pink", computer: "blue", any: "", probe_telescope: "orange or pink" }[String(ev.cat)] ?? "";
+      const what = kind ? `a ${kind} tech` : "a tech";
+      const why =
+        ev.reason === "owned"
+          ? "they already have every tech of that type"
+          : ev.reason === "empty"
+            ? "the stacks of the techs they are missing are empty"
+            : "no other player has a tech they are missing";
+      return `${who} cannot take ${what}: ${why}`;
+    }
     case "breach":
       return `${who} breaches their ${String(ev.color)} security card (it goes to their hand)`;
     case "land":
