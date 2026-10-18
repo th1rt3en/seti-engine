@@ -46,20 +46,30 @@ export function GameSettings() {
       </button>
       {open ? (
         <div className="settingspanel" role="dialog" aria-label="Game settings">
-          <label className="row">
+          <label className="switchrow">
+            <span>Play a ting when it is my turn</span>
             <input
               type="checkbox"
+              role="switch"
+              className="switch"
               checked={sound}
+              aria-checked={sound}
               onChange={(e) => {
                 setSound(e.target.checked);
                 if (e.target.checked) ting(); // a sample of the sound
               }}
-            />{" "}
-            Play a ting when it is my turn
+            />
           </label>
-          <label className="row">
-            <input type="checkbox" checked={confirmIrreversible} onChange={(e) => setConfirmIrreversible(e.target.checked)} /> Ask me to
-            confirm a move that cannot be undone
+          <label className="switchrow">
+            <span>Ask me to confirm a move that cannot be undone</span>
+            <input
+              type="checkbox"
+              role="switch"
+              className="switch"
+              checked={confirmIrreversible}
+              aria-checked={confirmIrreversible}
+              onChange={(e) => setConfirmIrreversible(e.target.checked)}
+            />
           </label>
           <label className="stack">
             <span>
