@@ -18,7 +18,7 @@ Source: base rulebook pp. 5, 16, 17. Researching a tech is TECHACT-01 to TECHACT
 - **TECH-TT01** (p.17) During a scan, mark a signal in a sector adjacent to Earth's sector instead of marking Earth's sector. Immediate bonus: 2 data.
 - **TECH-TT02** (p.17) During a scan, discard one card from hand to mark an extra signal in a matching sector (the sector color of the discarded card).
 - **TECH-TT03** (p.17) During a scan, pay 1 publicity to mark an extra signal in a sector with Mercury.
-- **TECH-TT04** (p.17) During a scan, pay 1 energy to launch a probe, or gain 1 movement. The launch costs only that 1 energy; the 2 credits of the Launch action are not paid (FAQ-22).
+- **TECH-TT04** (p.17) During a scan, pay 1 energy to launch a probe, or gain 1 movement for free (no energy is paid for the movement; owner, 2026-10-18). The launch costs only that 1 energy; the 2 credits of the Launch action are not paid (FAQ-22).
 
 ## Computer techs
 

@@ -86,7 +86,10 @@ def test_telescope_cross_launches_for_one_energy_or_moves() -> None:
     p = r2.state.players[pl]
     assert p.energy == 6 - 2 - 1 and p.credits == 2 and len(r2.state.probes) == 1
     r3 = do(r, "scan_probe", mode="move")
-    assert r3.state.players[pl].movement == 1
+    assert r3.state.players[pl].movement == 1 and r3.state.players[pl].energy == 6 - 2  # the movement costs no energy
+    s = r.state.model_copy(deep=True)
+    s.players[pl].energy = 0  # no energy: only the free movement is left
+    assert {m["mode"] for m in decisions(with_state(s).legal) if m["type"] == "scan_probe"} == {"move"}
 
 
 def test_the_telescope_steps_come_in_the_order_of_the_board_and_can_be_skipped() -> None:  # SCAN-01 (owner ruling, 2026-10-17), SCAN-04

@@ -63,7 +63,7 @@ function scanStepText(types: Set<string>): string {
   if (types.has("scan_mercury")) return "Scan, step 3: spend 1 publicity to mark a signal in Mercury's sector, or skip";
   if (types.has("scan_hand_discard"))
     return "Scan, step 4: discard a card from your hand to mark a signal in a sector of its color, or skip";
-  if (types.has("scan_probe")) return "Scan, step 5: spend 1 energy to launch a probe or to gain 1 movement, or skip";
+  if (types.has("scan_probe")) return "Scan, step 5: spend 1 energy to launch a probe, or gain 1 free movement, or skip";
   return "Scan: no step is left, finish the scan";
 }
 

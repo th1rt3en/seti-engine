@@ -167,9 +167,9 @@ def _step_moves(s: GameState, p: PlayerState, step: str) -> list[Action]:
         return [{"type": "scan_hand_discard", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
     if step == "tt:link":  # TECH-TT03
         return [{"type": "scan_mercury"}] if p.publicity >= 1 and solar.find_cell(s, "PLANET:MERCURY") else []
-    if step == "tt:cross" and p.energy >= 1:  # TECH-TT04, FAQ-22
+    if step == "tt:cross":  # TECH-TT04, FAQ-22: pay 1 energy to launch a probe, or gain 1 movement (which costs nothing)
         out: list[Action] = [{"type": "scan_probe", "mode": "move"}]
-        if sum(1 for pr in s.probes if pr.player == p.index and not pr.capsule) < probe_limit(p):
+        if p.energy >= 1 and sum(1 for pr in s.probes if pr.player == p.index and not pr.capsule) < probe_limit(p):
             out.append({"type": "scan_probe", "mode": "launch"})
         return out
     return []
@@ -224,11 +224,11 @@ def resolve_scan(s: GameState, p: PlayerState, a: Action, events: Events) -> Non
         rewards.mark_signal(s, p, pos[1], events)
     elif t == "scan_probe":
         s.scan_steps.remove("tt:cross")
-        effects.pay(p, energy=1)
         if a["mode"] == "launch":
+            effects.pay(p, energy=1)
             launch_probe(s, p, events)
         else:
-            p.movement += 1
+            p.movement += 1  # the movement is free
     elif t == "scan_done":
         s.scan_steps = []
         if s.scan_ctx and s.scan_ctx.get("exo_if_tile") and s.scan_ctx.get("tile"):  # #ET.22

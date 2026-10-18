@@ -39,7 +39,7 @@ The rulebook (p.12) lets the player resolve the steps of a scan in any order (SC
 1. a signal in Earth's sector (or in a sector next to it with the telescope tech of TECH-TT01);
 2. discard a card of the row for a signal in a sector of its color (SCAN-03);
 3. (expansion, EXP-SIG-02) discard signal tokens for more cards of the row;
-4. with the telescope techs, in the order of the player board: spend 1 publicity for a signal in Mercury's sector (TECH-TT03), discard a card of the hand for a signal (TECH-TT02), spend 1 energy to launch a probe or to gain 1 movement (TECH-TT04).
+4. with the telescope techs, in the order of the player board: spend 1 publicity for a signal in Mercury's sector (TECH-TT03), discard a card of the hand for a signal (TECH-TT02), spend 1 energy to launch a probe, or gain 1 movement for free (TECH-TT04).
 Steps 1 and 2 cannot be skipped; the others can. A step that cannot be done (no publicity, no energy, no matching card) is passed over. The engine offers only the moves of the current step (`techs.scan_moves`), and the context bar says which step it is.
 
 ## Futurespan Institute: the card of the free action, 2026-10-18

@@ -121,7 +121,7 @@ export const LABELS: Record<string, Label> = {
   scan_discard: (m) => `Discard ${source(m.source)} for a signal`,
   scan_hand_discard: (m) => `Discard ${cardName(m.card)} from your hand for a signal`,
   scan_mercury: () => "Pay 1 publicity for a signal in Mercury's sector",
-  scan_probe: (m) => (m.mode === "launch" ? "Pay 1 energy to launch a probe" : "Pay 1 energy for 1 movement"),
+  scan_probe: (m) => (m.mode === "launch" ? "Pay 1 energy to launch a probe" : "Gain 1 movement for free"),
   scan_skip: () => "Skip this step",
   scan_done: () => "Finish the scan",
   research: (m) => `Research the tech in stack ${Number(m.stack) + 1}`,
