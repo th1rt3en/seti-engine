@@ -321,3 +321,17 @@ def test_gains_of_a_move_are_listed_by_source() -> None:  # the log: what was ga
         for k, v in g["changes"].items():
             total[k] = total.get(k, 0) + v
     assert total == net
+
+
+def test_the_upper_spaces_of_the_glyphids_board_can_be_marked_again() -> None:  # EXP-GLY-04: the token there is replenished at once
+    from seti_engine import species
+
+    s = discovered()
+    p = s.players[0]
+    species.mark_board_space(s, p, 0, "pink", 0, [])
+    species.mark_board_space(s, s.players[1], 0, "pink", 0, [])
+    assert s.species[0].board["pink"][0] == [0, 1]
+    spaces = {m["index"] for m in species.board_moves(s, p, 0, ("pink",)) if m["space"] == "board"}
+    assert 0 in spaces  # still open
+    species.mark_board_space(s, p, 0, "pink", 3, [])
+    assert 3 not in {m["index"] for m in species.board_moves(s, p, 0, ("pink",)) if m["space"] == "board"}  # a lower space takes one marker

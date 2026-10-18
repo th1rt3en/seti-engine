@@ -45,3 +45,7 @@ Steps 1 and 2 cannot be skipped; the others can. A step that cannot be done (no 
 ## Futurespan Institute: the card of the free action, 2026-10-18
 
 Moving the Futurespan token 3 spaces farther (EXP-ORG-12) gains 1 card that the player takes from the card row or from the deck, like any card gained. This replaces the earlier reading (A-036) of a random card from the deck.
+
+## Glyphids: the top row of the board takes any number of markers, 2026-10-18
+
+The three top spaces of the Glyphids board (EXP-GLY-04) are replenished at once, so they take any number of markers, like the top capsule of the base species boards (`repeat` in `expansion-glyphids.json`); each marker takes the new token. The lower spaces take one marker.
