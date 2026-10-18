@@ -525,15 +525,6 @@ main:has(.game) {
   align-items: flex-end;
   gap: 8px;
 }
-.handtabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-.handtabs button[aria-selected="true"] {
-  font-weight: 700;
-  text-decoration: underline;
-}
 .exertiantab p {
   margin: 6px 0 0;
 }
@@ -2811,21 +2802,45 @@ button:disabled {
 .hand .cards[hidden] {
   display: none;
 }
-/* the other tabs of the hand lie in the row of the Hand button */
+/* the tabs of the hand (Hand, Security cards, Exertian cards ...): the open one is lit, the others are quiet; the button that folds the hand is in the corner */
+.handtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 6px;
+}
+.handtabs button {
+  padding: 6px 14px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  text-decoration: none;
+}
+.handtabs button:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.handtabs button[aria-selected="true"] {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-bottom-color: var(--accent);
+}
 @media (min-width: 761px) {
-  .hand.dock:not(.folded):has(> .handtabs) {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-  }
-  .hand > .handtab {
-    width: auto;
-  }
   .hand.dock:not(.folded) > .handtabs {
     margin: 0;
-    padding-right: 12px;
+    padding: 6px 56px 0 10px;
   }
-  .hand.dock:not(.folded) > .handbody {
-    grid-column: 1 / -1;
+  .hand .handtab.corner {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: auto;
+    padding: 4px 12px;
+    z-index: 2;
   }
 }

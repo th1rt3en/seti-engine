@@ -106,11 +106,9 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const onHandTab = !showExertian && !showMascamite && !showSecurity;
   const tabsStrip = (
     <div className="handtabs" role="tablist">
-      {inRow ? null : (
-        <button type="button" role="tab" aria-selected={onHandTab} onClick={() => setTab("hand")}>
-          Hand
-        </button>
-      )}
+      <button type="button" role="tab" aria-selected={onHandTab} onClick={() => setTab("hand")}>
+        {inRow ? `Hand (${player.hand.length + (selection?.offered?.length ?? 0)})` : "Hand"}
+      </button>
       {exertians ? (
         <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
           Exertian cards ({player.exertian_hand.length} held · {player.exertian_played.length} played)
@@ -130,17 +128,18 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   );
   return (
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
+      {/* on a wide screen the tabs are the header and the button that folds the hand is in its top right corner; folded, it is the tab with the count */}
       <button
         type="button"
-        className="handtab"
-        // the Hand button is also the Hand tab: on another tab it goes back to the hand, on the hand it folds the hand
-        onClick={() => (!folded && inRow && !onHandTab ? setTab("hand") : toggle())}
+        className={!folded && inRow ? "handtab corner" : "handtab"}
+        onClick={toggle}
         aria-expanded={!folded}
+        aria-label={!folded && inRow ? "Fold the hand" : undefined}
       >
-        <span>Hand ({player.hand.length + (selection?.offered?.length ?? 0)})</span>
+        {!folded && inRow ? null : <span>Hand ({player.hand.length + (selection?.offered?.length ?? 0)})</span>}
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
-      {!folded && extraTabs && inRow ? tabsStrip : null}
+      {!folded && inRow ? tabsStrip : null}
       {folded ? null : (
         <div className="handbody">
           {extraTabs && !inRow ? tabsStrip : null}
