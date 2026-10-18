@@ -796,3 +796,18 @@ def test_the_publicity_of_the_second_computer_space_of_the_rival_is_logged_apart
     rival.gain_data(s)
     gains = trail.events_of(s)
     assert gains and gains[0]["source"] == {"kind": "rival_computer", "space": 2} and gains[0]["changes"]["publicity"] == 1
+
+
+def test_the_same_action_card_played_twice_in_a_move_keeps_the_gains_of_each_turn_apart() -> None:  # SOLO-RIVAL-01, the log
+    from seti_engine import trail
+
+    s = solo()
+    assert s.rival is not None
+    s.rival.deck = ["S.1", "S.1"]
+    s.trail = []
+    events: list[dict] = []
+    rival.take_turn(s, events)
+    rival.take_turn(s, events)
+    ids = [e["turn"] for e in trail.events_of(s) if "turn" in e]
+    assert set(ids) <= {"S.1:0", "S.1:1"}  # one name for each turn, not "S.1" for both, so the log does not mix them
+    assert [e["card"] for e in events if e["type"] == "rival_card"] == ["S.1", "S.1"]

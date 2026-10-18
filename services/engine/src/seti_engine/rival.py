@@ -316,9 +316,12 @@ def take_turn(s: GameState, events: Events) -> None:
     cid = r.deck.pop(0)
     card = tables.rival_cards()[cid]
     r.arrow = card["dir"]
+    # the same card can be played twice in one move (the rival plays on after the player has passed, over the end of a round): the number of
+    # the card's turn in this move keeps what each turn gained apart in the log
+    turn_id = f"{cid}:{sum(1 for e in events if e['type'] == 'rival_card')}"
     events.append({"type": "rival_card", "card": cid})
     spent = cid
-    with trail.scope(s, {"kind": "rival_turn", "card": cid}, turn=cid):
+    with trail.scope(s, {"kind": "rival_turn", "card": cid}, turn=turn_id):
         for action in card["actions"]:
             if action["kind"] == "species_check":
                 slot = action["discoveredSpecies"] - 1

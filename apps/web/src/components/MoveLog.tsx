@@ -366,6 +366,9 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
               } else if (turns.length > 0 && ev.type !== "delta" && (ev.type.startsWith("rival_") || byRival(ev)))
                 turns[turns.length - 1]?.push(ev);
             });
+            // what the engine calls the turn of a card in a move: the card and how many cards the rival played before it in the move
+            const turnId = (n: number): string =>
+              `${String(turns[n]?.[0]?.card)}:${turns.slice(0, n).filter((t) => t[0]?.type === "rival_card").length}`;
             const after = (n: number): boolean => roundAt >= 0 && (turnAt[n] ?? 0) > roundAt;
             const roundOf = (n: number): number | null => (newRound === null ? null : after(n) ? newRound : newRound - 1);
             const income = (g: Gains): boolean => g.source.kind === "income";
@@ -381,7 +384,7 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
                   return line ? <span key={k}>{line}</span> : null;
                 })}
                 {rivalGains
-                  .filter((g) => (g.turn !== undefined ? g.turn === String(turn[0]?.card) : n === turns.length - 1))
+                  .filter((g) => (g.turn !== undefined ? g.turn === turnId(n) : n === turns.length - 1))
                   .map((g) => (
                     <span key={`rg${n}-${JSON.stringify(g.source)}`} className="logsource">
                       {g.source.kind === "rival_turn" ? "Gains" : <CardText text={`${sourceText(g.source, ctx, e.action)}:`} />}{" "}
