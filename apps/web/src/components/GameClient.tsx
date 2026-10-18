@@ -422,9 +422,8 @@ export function GameClient({
         onPick={setPickedCover}
       />
     ) : null;
-  // free actions that have their own place (energy for movement: the probe's move; data: the computer on the player board) are no buttons here,
-  // except placing data when the data overflows, which is the question itself
-  const overflow = v.state.pending[0]?.kind === "data_overflow";
+  // free actions that have their own place (energy for movement: the probe's move; data: the computer and the lower spaces of the player board) are no
+  // buttons here: placing data is done on the player board
   // completing a quick mission is a free action: its buttons are in the move bar
   const completeMoves = otherMoves.filter((m) => m.type === "complete_mission");
   const answerMoves = otherMoves.filter(
@@ -433,7 +432,8 @@ export function GameClient({
       m.type !== "cover" &&
       m.type !== "complete_mission" &&
       m.type !== "move_energy" &&
-      !(m.type === "place_data" && !overflow),
+      m.type !== "place_data" &&
+      m.type !== "place_lower",
   );
   const moveGroups = groupMoves(barMoves, pending, v.state.pending[0]?.kind === "data_overflow");
   const selectCard = (i: number) =>
@@ -704,6 +704,10 @@ export function GameClient({
   if (pickable.length > 0) hints.push(`${handHint(new Set(handMoves.map((m) => m.type)))}`);
   if (goldMoves.length > 0) hints.push("Click the highlighted place of a gold scoring tile beside the board to mark it.");
   if (slotMoves.length > 0) hints.push("Click the slot of the computer on your player board where the new tech goes.");
+  if (mine.some((m) => m.type === "place_data" || m.type === "place_lower"))
+    hints.push(
+      "Place data by clicking the computer or a lower space of a computer tech on your player board (the Player boards button opens it).",
+    );
   if (offers.length > 0) hints.push("Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.");
   if (spots.length > 0) hints.push("Click a highlighted place on the board or on a panel beside it.");
   if (techMoves.length > 0)
