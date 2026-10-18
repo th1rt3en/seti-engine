@@ -54,6 +54,36 @@ export function RandomCardIcon({ size = SIZE }: { size?: number }) {
   );
 }
 
+/** The danger of the Exertians: their symbol on the cross, cut from an Exertian card (tools/web/build_card_icons.py). */
+export function DangerIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <img
+      src={PRINTED.danger}
+      alt="Danger"
+      title="Exertian danger"
+      width={Math.round(size * 0.67)}
+      height={size}
+      className="resicon"
+      decoding="async"
+    />
+  );
+}
+
+/** The time capsule of the Centaurians with its "+15" (a message), cut from a Centaurian card (tools/web/build_card_icons.py). */
+export function CapsuleIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <img
+      src={PRINTED.capsule}
+      alt="Message"
+      title="Centaurian message"
+      width={Math.round(size * 0.76)}
+      height={size}
+      className="resicon"
+      decoding="async"
+    />
+  );
+}
+
 /** The globe of the scoring track: the icon of victory points, wherever a score is shown. */
 export function ScoreIcon({ size = SIZE }: { size?: number }) {
   return <Printed name="score" label="Victory points" size={size} />;

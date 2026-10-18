@@ -8,7 +8,9 @@ import { cardName } from "@/lib/moves";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import {
+  CapsuleIcon,
   CreditIcon,
+  DangerIcon,
   DataIcon,
   DeckCardIcon,
   EnergyIcon,
@@ -203,7 +205,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             <>
               {group("Exertian danger (the most danger loses a tenth of its points)")}
               {row(
-                labelled(<ScoreIcon size={18} />, "Species board"),
+                labelled(<DangerIcon size={20} />, "Species board"),
                 trackers.map((t) => t.danger_board),
               )}
               {row(
@@ -214,7 +216,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
                 ),
               )}
               {row(
-                labelled(<ScoreIcon size={18} />, "Danger"),
+                labelled(<DangerIcon size={20} />, "Danger"),
                 trackers.map((t) =>
                   t.danger_cards === null || t.danger_cards === undefined
                     ? `${t.danger_board} + ${t.exertian_played} card${t.exertian_played === 1 ? "" : "s"}`
@@ -228,7 +230,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             <>
               {group("Centaurian messages, resolved in the order sent")}
               <tr>
-                <th scope="row">{labelled(<ScoreIcon size={18} />, "Messages waiting (first on top)")}</th>
+                <th scope="row">{labelled(<CapsuleIcon size={20} />, "Messages waiting (first on top)")}</th>
                 {s.players.map((p) => {
                   // ALIEN-CEN-03: the message milestone comes first (placed at discovery), then the message cards in the order played
                   const queue = [
