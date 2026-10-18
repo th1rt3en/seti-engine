@@ -85,6 +85,9 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const me = view.viewer;
   const player = me === null ? undefined : view.state.players[me];
   const [tab, setTab] = useState<"hand" | "exertian" | "mascamite" | "security">("hand");
+  // decided after the first render (the server does not know the width of the window)
+  const [inRow, setInRow] = useState(false);
+  useEffect(() => setInRow(!isPhone()), []);
   if (!player) return null;
   // on a phone the Exertian cards have a tab of the bottom bar of their own (ExertianDock)
   const exertians = view.state.species.some((sp) => sp.discovered && sp.species === "exertians") && !isPhone();
@@ -97,41 +100,50 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const showMascamite = mascamites && tab === "mascamite";
   const who = (seat: number): string =>
     view.state.rival && seat === view.state.rival.index ? "Rival" : seat === view.viewer ? "You" : `Player ${seat + 1}`;
+  // the other tabs lie in the row of the header, beside the Hand button that folds the hand; on a phone that button is in the bottom bar, so the tabs stay in the body
+  const extraTabs = exertians || mascamites || arkhos;
+
+  const onHandTab = !showExertian && !showMascamite && !showSecurity;
+  const tabsStrip = (
+    <div className="handtabs" role="tablist">
+      {inRow ? null : (
+        <button type="button" role="tab" aria-selected={onHandTab} onClick={() => setTab("hand")}>
+          Hand
+        </button>
+      )}
+      {exertians ? (
+        <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
+          Exertian cards ({player.exertian_hand.length} held · {player.exertian_played.length} played)
+        </button>
+      ) : null}
+      {mascamites ? (
+        <button type="button" role="tab" aria-selected={showMascamite} onClick={() => setTab("mascamite")}>
+          Mascamite samples
+        </button>
+      ) : null}
+      {arkhos ? (
+        <button type="button" role="tab" aria-selected={showSecurity} onClick={() => setTab("security")}>
+          Security cards ({security.length})
+        </button>
+      ) : null}
+    </div>
+  );
   return (
     <aside ref={dock} className={folded ? "hand dock folded" : "hand dock"} aria-label="Your hand">
-      <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
+      <button
+        type="button"
+        className="handtab"
+        // the Hand button is also the Hand tab: on another tab it goes back to the hand, on the hand it folds the hand
+        onClick={() => (!folded && inRow && !onHandTab ? setTab("hand") : toggle())}
+        aria-expanded={!folded}
+      >
         <span>Hand ({player.hand.length + (selection?.offered?.length ?? 0)})</span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
+      {!folded && extraTabs && inRow ? tabsStrip : null}
       {folded ? null : (
         <div className="handbody">
-          {exertians || mascamites || arkhos ? (
-            <div className="handtabs" role="tablist">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={!showExertian && !showMascamite && !showSecurity}
-                onClick={() => setTab("hand")}
-              >
-                Hand
-              </button>
-              {exertians ? (
-                <button type="button" role="tab" aria-selected={showExertian} onClick={() => setTab("exertian")}>
-                  Exertian cards ({player.exertian_hand.length} held · {player.exertian_played.length} played)
-                </button>
-              ) : null}
-              {mascamites ? (
-                <button type="button" role="tab" aria-selected={showMascamite} onClick={() => setTab("mascamite")}>
-                  Mascamite samples
-                </button>
-              ) : null}
-              {arkhos ? (
-                <button type="button" role="tab" aria-selected={showSecurity} onClick={() => setTab("security")}>
-                  Security cards ({security.length})
-                </button>
-              ) : null}
-            </div>
-          ) : null}
+          {extraTabs && !inRow ? tabsStrip : null}
           {showExertian ? <ExertianTab view={view} /> : null}
           {showMascamite ? <MascamiteTab view={view} who={who} /> : null}
           {showSecurity ? (

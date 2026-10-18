@@ -2806,3 +2806,26 @@ button:disabled {
   flex-wrap: wrap;
   gap: 10px;
 }
+
+/* the cards that are not shown (another tab is open) */
+.hand .cards[hidden] {
+  display: none;
+}
+/* the other tabs of the hand lie in the row of the Hand button */
+@media (min-width: 761px) {
+  .hand.dock:not(.folded):has(> .handtabs) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+  }
+  .hand > .handtab {
+    width: auto;
+  }
+  .hand.dock:not(.folded) > .handtabs {
+    margin: 0;
+    padding-right: 12px;
+  }
+  .hand.dock:not(.folded) > .handbody {
+    grid-column: 1 / -1;
+  }
+}

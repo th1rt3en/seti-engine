@@ -187,6 +187,11 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
         </>
       );
     }
+    case "play_card":
+      // the prepared card of Futurespan Institute is played from where it lay face down: the log names it now
+      return action?.type === "org_main" && ev.card
+        ? `${who} plays the prepared card ${cardName(ev.card)} for free (Futurespan Institute)`
+        : null;
     case "breach":
       return `${who} breaches their ${String(ev.color)} security card (it goes to their hand)`;
     case "land":
