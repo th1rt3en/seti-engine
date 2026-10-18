@@ -336,6 +336,7 @@ export function GameClient({
       m.type !== "sandbox" &&
       !isOffer(m) &&
       !rowMoves.includes(m) &&
+      !orgCardMoves.includes(m) && // the free actions that name a card or a tech have their own button and panel
       m.type !== "place_computer_tech" &&
       m.type !== "choose_gold" &&
       !handMoves.includes(m) &&

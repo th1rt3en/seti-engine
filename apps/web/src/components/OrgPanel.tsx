@@ -1,3 +1,4 @@
+"use client";
 import { cardImage } from "@/lib/cardImages";
 // The organization module (EXP-ORG-*, EXP-QS-*): every player's organization and quick start cards, the neutral quick start cards, the tiles of
 // Xenolab, the reward spaces marked on Cosmos Strategy Group and Helion Assembly, and the card prepared by Futurespan. What the organization can
@@ -5,6 +6,7 @@ import { cardImage } from "@/lib/cardImages";
 import { type Move, describeMove } from "@/lib/moves";
 import { ORG_SPACES } from "@/lib/targets";
 import type { View } from "@seti/protocol";
+import { useEffect, useState } from "react";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
@@ -16,14 +18,27 @@ const TILES = ["launch", "scan", "research"] as const; // tile 1, 2, 3 of Xenola
 
 export function OrgPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
   const s = view.state;
-  if (!s.options.expansion) return null;
   const legal = view.legal as Move[];
   const mine = (spots?.items ?? []).filter((sp) => sp.panel === "org");
+  // folded until the player opens it; it opens by itself when something is to be done on it (a reward space to mark, an ability to use)
+  const [open, setOpen] = useState(false);
+  const needed = mine.length > 0;
+  useEffect(() => {
+    if (needed) setOpen(true);
+  }, [needed]);
+  if (!s.options.expansion) return null;
   const players = s.players.filter((p) => p.organization && !(s.rival && p.index === s.rival.index));
   if (players.length === 0 && s.neutral_quick.length === 0) return null;
   return (
-    <section className="card exppanel" aria-label="Organizations and quick start cards">
-      <h3>Organizations</h3>
+    <details
+      className="card exppanel orgpanel"
+      aria-label="Organizations and quick start cards"
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+    >
+      <summary>
+        <h3>Organizations and quick start cards</h3>
+      </summary>
       {players.map((p) => {
         const tiles = p.org_data?.tiles as Record<string, boolean> | undefined;
         const fsCard = p.org_data?.fs_card as string | undefined;
@@ -121,6 +136,6 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
           </div>
         </>
       ) : null}
-    </section>
+    </details>
   );
 }

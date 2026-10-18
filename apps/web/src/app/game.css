@@ -2919,3 +2919,22 @@ input.switch:focus-visible {
   border-top: 1px dashed var(--line);
   color: var(--text);
 }
+
+/* the panel of the organizations, folded until opened (like the missions) */
+.orgpanel > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.orgpanel > summary::-webkit-details-marker {
+  display: none;
+}
+.orgpanel > summary h3 {
+  display: inline;
+  margin: 0;
+}
+.orgpanel > summary::after {
+  content: " ▸";
+}
+.orgpanel[open] > summary::after {
+  content: " ▾";
+}
