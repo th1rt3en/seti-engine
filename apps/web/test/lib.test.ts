@@ -20,7 +20,17 @@ import { SqliteDb, migrationSql } from "@/lib/db";
 import { engineAuth } from "@/lib/engineAuth";
 import { glyphIconReward } from "@/lib/glyphids";
 import { LABELS, cardName, cornerGlyph, describeMove, groupMoves, handMoveText, irreversibleText } from "@/lib/moves";
-import { allPlayers, computeStats, leaderboard, lobbyGames, profile } from "@/lib/queries";
+import {
+  allPlayers,
+  computeStats,
+  countEndedGames,
+  countPlayingGames,
+  endedGames,
+  leaderboard,
+  lobbyGames,
+  playingGames,
+  profile,
+} from "@/lib/queries";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { createGame, gameMeta } from "@/lib/worker";
 import { importSPKI, jwtVerify } from "jose";
@@ -197,6 +207,38 @@ describe("lobby, leaderboard and profile", () => {
       host: "Ann",
       expansion: false,
     });
+  });
+
+  it("lists the games in progress and the games that are over (resigned ones too) in pages, and leaves sandbox games out", async () => {
+    const { db, ann, bob } = await seed();
+    const add = async (id: string, status: string, options: object, ended: number | null, reason: string | null, result: object | null) => {
+      await db.run(
+        "INSERT INTO games (id, status, options_json, clock_json, rated, created_at, started_at, ended_at, reason, result_json) VALUES (?, ?, ?, ?, 0, 1, 2, ?, ?, ?)",
+        id,
+        status,
+        JSON.stringify(options),
+        JSON.stringify({ kind: "per_turn", ms: 86_400_000 }),
+        ended,
+        reason,
+        result === null ? null : JSON.stringify(result),
+      );
+      await db.run("INSERT INTO game_players (game_id, seat, user_id, name, registered) VALUES (?, 0, ?, ?, 1)", id, ann.id, ann.name);
+      await db.run("INSERT INTO game_players (game_id, seat, user_id, name, registered) VALUES (?, 1, ?, ?, 1)", id, bob.id, bob.name);
+    };
+    await db.run("UPDATE games SET ended_at = 100 WHERE id = 'done'");
+    await add("quit", "finished", { players: 2 }, 200, "resigned", { forfeit: 1 });
+    await add("practice", "finished", { players: 1, sandbox: true }, 300, "completed", null);
+    await add("live", "playing", { players: 2 }, null, null, null);
+    await add("play-sandbox", "playing", { players: 1, sandbox: true }, null, null, null);
+    expect(await countEndedGames(db)).toBe(2);
+    expect(await countPlayingGames(db)).toBe(1);
+    const over = await endedGames(db, 1, 0); // the latest first, one on a page
+    expect(over).toHaveLength(1);
+    expect(over[0]).toMatchObject({ id: "quit", reason: "resigned", forfeit: "Bob" });
+    expect((await endedGames(db, 1, 1))[0]).toMatchObject({ id: "done", reason: "completed", forfeit: null });
+    expect(over[0]?.seats.map((x) => x.name)).toEqual(["Ann", "Bob"]);
+    expect((await playingGames(db, 10, 0)).map((g) => g.id)).toEqual(["live"]);
+    expect(await playingGames(db, 10, 1)).toEqual([]);
   });
 
   it("lists every registered player by name, with the starting rating when unrated, and finds by name", async () => {

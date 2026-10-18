@@ -2856,3 +2856,12 @@ button:disabled {
   stroke-linejoin: round;
   pointer-events: none;
 }
+
+/* the pages of the lists of games */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}

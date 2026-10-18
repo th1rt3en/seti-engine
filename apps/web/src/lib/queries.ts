@@ -28,8 +28,11 @@ export interface PlayingGame {
   solo: boolean;
 }
 
-/** The games that are being played now, newest first, for the page where anybody can watch. Sandbox games are not listed. */
-export async function playingGames(db: Db, limit = 100): Promise<PlayingGame[]> {
+/** The games of the page of watching are the real ones: a sandbox game is practice and is not listed. */
+const NOT_SANDBOX = `options_json NOT LIKE '%"sandbox":true%'`;
+
+/** The games that are being played now, newest first, for the page where anybody can watch (`offset` and `limit` make the page). */
+export async function playingGames(db: Db, limit = 100, offset = 0): Promise<PlayingGame[]> {
   const games = await db.all<{
     id: string;
     rated: number;
@@ -38,13 +41,14 @@ export async function playingGames(db: Db, limit = 100): Promise<PlayingGame[]> 
     started_at: number | null;
     actions: number;
   }>(
-    "SELECT id, rated, options_json, clock_json, started_at, actions FROM games WHERE status = 'playing' ORDER BY started_at DESC LIMIT ?",
+    `SELECT id, rated, options_json, clock_json, started_at, actions FROM games WHERE status = 'playing' AND ${NOT_SANDBOX}
+     ORDER BY started_at DESC LIMIT ? OFFSET ?`,
     limit,
+    offset,
   );
   const out: PlayingGame[] = [];
   for (const g of games) {
-    const options = JSON.parse(g.options_json) as { players: number; expansion?: boolean; organizations?: boolean; sandbox?: boolean };
-    if (options.sandbox) continue;
+    const options = JSON.parse(g.options_json) as { players: number; expansion?: boolean; organizations?: boolean };
     const seats = await db.all<{ name: string }>("SELECT name FROM game_players WHERE game_id = ? ORDER BY seat", g.id);
     out.push({
       id: g.id,
@@ -60,6 +64,76 @@ export async function playingGames(db: Db, limit = 100): Promise<PlayingGame[]> 
     });
   }
   return out;
+}
+
+export async function countPlayingGames(db: Db): Promise<number> {
+  const row = (await db.all<{ n: number }>(`SELECT COUNT(*) AS n FROM games WHERE status = 'playing' AND ${NOT_SANDBOX}`))[0];
+  return row?.n ?? 0;
+}
+
+export interface EndedGame {
+  id: string;
+  rated: boolean;
+  players: number;
+  seats: { name: string; rank: number | null; score: number | null }[];
+  /** completed, resigned, timeout or kicked */
+  reason: string;
+  /** the player who resigned or ran out of time */
+  forfeit: string | null;
+  ended_at: number | null;
+  expansion: boolean;
+  organizations: boolean;
+  solo: boolean;
+}
+
+/** The games that are over (resigned and timed-out ones too), the latest first. */
+export async function endedGames(db: Db, limit = 10, offset = 0): Promise<EndedGame[]> {
+  const games = await db.all<{
+    id: string;
+    rated: number;
+    options_json: string;
+    reason: string | null;
+    result_json: string | null;
+    ended_at: number | null;
+  }>(
+    `SELECT id, rated, options_json, reason, result_json, ended_at FROM games WHERE status = 'finished' AND ${NOT_SANDBOX}
+     ORDER BY ended_at DESC LIMIT ? OFFSET ?`,
+    limit,
+    offset,
+  );
+  const out: EndedGame[] = [];
+  for (const g of games) {
+    const options = JSON.parse(g.options_json) as { players: number; expansion?: boolean; organizations?: boolean };
+    const seats = await db.all<{ name: string; rank: number | null; score: number | null; seat: number }>(
+      "SELECT name, rank, score, seat FROM game_players WHERE game_id = ? ORDER BY seat",
+      g.id,
+    );
+    let forfeitSeat: number | null = null;
+    try {
+      const result = g.result_json ? (JSON.parse(g.result_json) as { forfeit?: number }) : null;
+      forfeitSeat = typeof result?.forfeit === "number" ? result.forfeit : null;
+    } catch {
+      forfeitSeat = null;
+    }
+    out.push({
+      id: g.id,
+      rated: g.rated === 1,
+      players: options.players,
+      seats: seats.map((x) => ({ name: x.name, rank: x.rank, score: x.score })),
+      reason: g.reason ?? "completed",
+      forfeit: forfeitSeat === null ? null : (seats.find((x) => x.seat === forfeitSeat)?.name ?? null),
+      ended_at: g.ended_at,
+      expansion: options.expansion === true,
+      organizations: options.organizations === true,
+      solo: options.players === 1,
+    });
+  }
+  return out;
+}
+
+export async function countEndedGames(db: Db): Promise<number> {
+  const row = (await db.all<{ n: number }>(`SELECT COUNT(*) AS n FROM games WHERE status = 'finished' AND ${NOT_SANDBOX}`))[0];
+  return row?.n ?? 0;
 }
 
 export interface LeaderRow {
