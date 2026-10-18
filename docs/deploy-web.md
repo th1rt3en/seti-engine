@@ -12,6 +12,7 @@ Settings that are not secret are in `apps/web/wrangler.toml`. The owner runs the
   - `AUTH_PRIVATE_KEY`: PKCS8 PEM of the ES256 key that signs the tokens for the game Worker (its public key is the game Worker's `AUTH_PUBLIC_KEY`).
   - `ENGINE_SIGNING_KEY`: PKCS8 PEM of the key that signs requests to the engine (its public key is the `web` entry of the engine's `ENGINE_TRUSTED_KEYS`, see `docs/deploy-engine.md`).
   - `TURNSTILE_SECRET_KEY`: the secret of the Turnstile widget (D29). Without it the site refuses signup, login and guest play. The widget's domain list must contain the site's address.
+  - `ADMIN_PASSPHRASE_HASH` and `ADMIN_WORKER_KEY` (D36): the scrypt hash of the passphrase of `/admin` (format of `hashPassword`, `scrypt$salt$hash`), and the key shared with the Worker, which holds it as `ADMIN_WORKER_KEY` too. Without the hash the page does not exist. Never write the passphrase down in the repository.
 - The database binding `DB` is the D1 database `seti`, migrations in `apps/worker/migrations`: `wrangler d1 migrations apply seti --remote` (from `apps/worker`).
 
 ## Build and deploy
