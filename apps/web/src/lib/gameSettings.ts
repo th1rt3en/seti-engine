@@ -5,6 +5,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 export const SOUND_KEY = "seti-turn-sound"; // "1" or "0" (it was already kept under this name)
+export const CONFIRM_KEY = "seti-confirm-irreversible"; // "1" (ask, the default) or "0": moves that cannot be undone are made at once
 export const HAND_SCALE_KEY = "seti-hand-scale"; // a number: 1 is the normal size
 export const HAND_SCALE = { min: 0.7, max: 1.6, step: 0.1 };
 const EVENT = "seti-settings";
@@ -46,6 +47,9 @@ export function useGameSettings(): {
   setSound: (on: boolean) => void;
   handScale: number;
   setHandScale: (scale: number) => void;
+  /** Ask for a confirmation before a move that cannot be taken back (UNDO-01). */
+  confirmIrreversible: boolean;
+  setConfirmIrreversible: (on: boolean) => void;
 } {
   const sound = useSyncExternalStore(
     subscribe,
@@ -57,7 +61,13 @@ export function useGameSettings(): {
     () => read(HAND_SCALE_KEY),
     () => null,
   );
+  const confirmIrreversible = useSyncExternalStore(
+    subscribe,
+    () => read(CONFIRM_KEY) !== "0",
+    () => true,
+  );
+  const setConfirmIrreversible = useCallback((on: boolean) => write(CONFIRM_KEY, on ? "1" : "0"), []);
   const setSound = useCallback((on: boolean) => write(SOUND_KEY, on ? "1" : "0"), []);
   const setHandScale = useCallback((scale: number) => write(HAND_SCALE_KEY, String(parseScale(String(scale)))), []);
-  return { sound, setSound, handScale: parseScale(handScaleRaw), setHandScale };
+  return { sound, setSound, handScale: parseScale(handScaleRaw), setHandScale, confirmIrreversible, setConfirmIrreversible };
 }

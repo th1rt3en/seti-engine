@@ -1,5 +1,6 @@
 "use client";
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
+import { useGameSettings } from "@/lib/gameSettings";
 import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
 import {
   type Move,
@@ -263,11 +264,12 @@ export function GameClient({
 
   // a move that shows something hidden cannot be taken back: the player confirms it first (UNDO-01)
   const [unsure, setUnsure] = useState<Move | null>(null);
+  const { confirmIrreversible } = useGameSettings(); // the player can turn the question off in the settings
   const play = (move: Move) => {
     const current = latest.current;
     const at = current ? (current.legal as Move[]).findIndex((l) => sameMove(l, move)) : -1;
     const note = at >= 0 ? (current?.notes[at] as Note | null | undefined) : null;
-    if (note?.irreversible) {
+    if (note?.irreversible && confirmIrreversible) {
       setUnsure(move);
       return;
     }

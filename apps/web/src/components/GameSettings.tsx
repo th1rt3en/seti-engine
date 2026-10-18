@@ -6,7 +6,7 @@ import { ting } from "@/lib/turnSound";
 import { useEffect, useRef, useState } from "react";
 
 export function GameSettings() {
-  const { sound, setSound, handScale, setHandScale } = useGameSettings();
+  const { sound, setSound, handScale, setHandScale, confirmIrreversible, setConfirmIrreversible } = useGameSettings();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
 
@@ -56,6 +56,10 @@ export function GameSettings() {
               }}
             />{" "}
             Play a ting when it is my turn
+          </label>
+          <label className="row">
+            <input type="checkbox" checked={confirmIrreversible} onChange={(e) => setConfirmIrreversible(e.target.checked)} /> Ask me to
+            confirm a move that cannot be undone
           </label>
           <label className="stack">
             <span>
