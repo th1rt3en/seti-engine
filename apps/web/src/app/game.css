@@ -2988,3 +2988,21 @@ input.switch:focus-visible {
   color: var(--muted);
   text-decoration: line-through;
 }
+
+/* the Confirm and Cancel buttons laid over a picked alien card on the board */
+.spotbtn {
+  fill: rgba(16, 24, 44, 0.92);
+  stroke: #cfe0ff;
+  stroke-width: 6;
+  cursor: pointer;
+}
+.spotbtn.primary {
+  fill: #1f6feb;
+  stroke: #fff;
+}
+.spotbtntext {
+  fill: #fff;
+  font-size: 64px;
+  font-weight: 800;
+  pointer-events: none;
+}

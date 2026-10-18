@@ -517,23 +517,27 @@ export function GameClient({
     ) : undefined;
   const buyOptions = pickedRowMoves.filter((m) => !ROW_SIGNAL_MOVES.includes(m.type));
   const rowCardId = pickedBuy === null || pickedBuy === "deck" ? undefined : v.state.card_row[Number(pickedBuy.slice(4))];
-  const rowActions: CardAction[] = pickedRowMoves
-    .filter((m) => ROW_SIGNAL_MOVES.includes(m.type))
-    .map((m) => {
-      const sector = rowCardId === undefined ? "a" : cardSector(rowCardId);
-      return {
-        key: m.type,
-        label:
-          m.type === "org_free"
-            ? (ORG_ROW_LABEL[String(m.org)] ?? `${orgName(m.org)}: free action`)
-            : m.type === "scan_token"
-              ? `Use a signal token: ${sector} signal`
-              : `Discard to mark a ${sector} signal`,
-        primary: true,
-        title: m.type === "org_free" ? describeMove(m) : rowMoveText(m, v.state.card_row),
-        onClick: () => play(m),
-      };
-    });
+  const rowActions: CardAction[] = pickedRowMoves.map((m) => {
+    const sector = rowCardId === undefined ? "a" : cardSector(rowCardId);
+    const signal = ROW_SIGNAL_MOVES.includes(m.type);
+    return {
+      key: `${m.type}-${String(m.org ?? "")}`,
+      label: signal
+        ? m.type === "org_free"
+          ? (ORG_ROW_LABEL[String(m.org)] ?? `${orgName(m.org)}: free action`)
+          : m.type === "scan_token"
+            ? `Use a signal token: ${sector} signal`
+            : `Discard to mark a ${sector} signal`
+        : buyOptions.length > 1
+          ? describeMove(m)
+          : "Confirm",
+      primary: true,
+      title: m.type === "org_free" ? describeMove(m) : rowMoveText(m, v.state.card_row),
+      onClick: () => play(m),
+    };
+  });
+  // taking a card that was picked is confirmed (or given up) on the card itself
+  if (rowActions.length > 0 && !rowMode) rowActions.push({ key: "cancel", label: "Cancel", onClick: () => setPickedBuy(null) });
   // the movement that the player has, and the budget with the energy they turn into movement
   const movement = me?.movement ?? 0;
   const energy = me?.energy ?? 0;
@@ -572,6 +576,8 @@ export function GameClient({
   // what is asked now, if the player has picked something to confirm: the text goes to the context bar, the buttons to the move bar
   type Ask = {
     inContext?: boolean;
+    /** The buttons are laid over the picked card itself (a card of the display, an alien card): the bars have none. */
+    onCard?: boolean;
     text: ReactNode;
     buttons: { label: string; onClick: () => void; disabled?: boolean }[];
     onCancel: () => void;
@@ -664,14 +670,16 @@ export function GameClient({
       ),
       buttons: [confirm("Confirm", () => spotMove && play(spotMove), !spotMove)],
       onCancel: () => setPickedSpot(null),
+      onCard: spotOption.id.startsWith("alien:"), // an alien card: its buttons lie on the card on the board
     };
   } else if (rowMode) {
     ask = { text: "Click the card of the display that you want.", buttons: [], onCancel: () => setRowMode(null) };
   } else if (buyOptions.length > 0 && !rowMode) {
     ask = {
       text: buyOptions.map((m) => rowMoveText(m, v.state.card_row)).join(" "),
-      buttons: buyOptions.map((m) => confirm(buyOptions.length > 1 ? describeMove(m) : "Confirm", () => play(m))),
+      buttons: [],
       onCancel: () => setPickedBuy(null),
+      onCard: true,
     };
   }
   // moving a probe: what the context bar says while a probe is picked (the budget and its energy are set there)
@@ -805,7 +813,7 @@ export function GameClient({
       ) : null}
       {error ? <p className="error">{error}</p> : null}
       {sandboxMarker && !ended ? <SandboxPanel marker={sandboxMarker as never} send={(a) => sendAction(a)} handCards={hand} /> : null}
-      {ask && !ask.inContext ? (
+      {ask && !ask.inContext && !ask.onCard ? (
         <div className="confirmbar">
           {ask.buttons.map((b) => (
             <button key={b.label} type="button" className="primary" disabled={b.disabled} onClick={b.onClick}>
@@ -984,7 +992,13 @@ export function GameClient({
       context={contextNode}
       contextActions={contextActions}
       hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
-      spots={{ items: spots, selected: pickedSpot, onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id) }}
+      spots={{
+        items: spots,
+        selected: pickedSpot,
+        onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id),
+        onConfirm: () => spotMove && play(spotMove),
+        onCancel: () => setPickedSpot(null),
+      }}
       rowFlash={rowMode !== null}
       row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
       interaction={

@@ -93,6 +93,9 @@ export interface BoardSpots {
   items: Spot[];
   selected: string | null;
   onSelect: (id: string) => void;
+  /** The picked place is confirmed or given up (the buttons that lie on a picked alien card). */
+  onConfirm?: () => void;
+  onCancel?: () => void;
 }
 
 /** One space of the solar system as a wedge: its ring between two radii, its sector between two angles. */
@@ -946,6 +949,43 @@ export function BoardView({
                   );
                 })
               : null}
+            {spots.selected === sp.id && sp.id.startsWith("alien:") && sp.shape.kind === "rect" && spots.onConfirm ? (
+              <g className="spotbuttons">
+                {[
+                  { label: "Confirm", dy: -150, primary: true, act: spots.onConfirm },
+                  { label: "Cancel", dy: 10, primary: false, act: spots.onCancel },
+                ].map((b) => (
+                  <g
+                    key={b.label}
+                    // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      b.act?.();
+                    }}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && b.act?.()}
+                  >
+                    <rect
+                      x={sp.shape.kind === "rect" ? sp.shape.x + sp.shape.w / 2 - 150 : 0}
+                      y={sp.shape.kind === "rect" ? sp.shape.y + sp.shape.h / 2 + b.dy : 0}
+                      width={300}
+                      height={120}
+                      rx={26}
+                      className={b.primary ? "spotbtn primary" : "spotbtn"}
+                    />
+                    <text
+                      x={sp.shape.kind === "rect" ? sp.shape.x + sp.shape.w / 2 : 0}
+                      y={sp.shape.kind === "rect" ? sp.shape.y + sp.shape.h / 2 + b.dy + 78 : 0}
+                      textAnchor="middle"
+                      className="spotbtntext"
+                    >
+                      {b.label}
+                    </text>
+                  </g>
+                ))}
+              </g>
+            ) : null}
             {sp.tag && sp.shape.kind === "circle" ? (
               <text x={sp.shape.x + sp.shape.r + 14} y={sp.shape.y + 16} className="spottag">
                 {sp.tag}
