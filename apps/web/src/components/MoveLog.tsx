@@ -142,6 +142,8 @@ function rivalLine(ev: GameEvent): ReactNode {
           ) : null}
         </span>
       );
+    case "rival_exertian":
+      return "plays an Exertian card face down";
     case "rival_launch":
       return "launches a probe";
     case "rival_telescope":

@@ -551,6 +551,10 @@ def test_exertians_the_rival_draws_no_cards_and_plays_one_while_below_five() -> 
     while len(st.players[1].exertian_played) < 5:
         assert rival._text(st, {"effect": "exertians_danger_card"}, [])
     assert not rival._text(st, {"effect": "exertians_danger_card"}, [])
+    played: list[dict] = []
+    st.players[1].exertian_played = []
+    assert rival._text(st, {"effect": "exertians_danger_card"}, played)
+    assert played == [{"type": "rival_exertian"}]  # the log says that the rival played one, not which (it lies face down)
     st.players[1].exertian_played = ["ET.51"]
     assert cards.exertian_points(st, st.players[1]) == 18  # counted as completed
 

@@ -651,5 +651,6 @@ def _text(s: GameState, a: dict[str, Any], events: Events) -> bool:
             return False
         deck = s.species[i].deck
         p.exertian_played.append(deck.pop(rng.below(s, len(deck))))
+        events.append({"type": "rival_exertian"})  # the log says it, without the card: it lies face down
         return True
     return False
