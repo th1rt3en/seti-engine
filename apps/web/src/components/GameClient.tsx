@@ -323,7 +323,9 @@ export function GameClient({
   const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
   const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
   const quickCards = (m: Move): string[] => ((m.cards as string[] | undefined) ?? []).map(String);
-  const rowMoves = mine.filter((m) => ROW_MOVES.includes(m.type) && m.source !== undefined);
+  // the free actions of an organization that take a card of the display or the deck (Fenwick Research Center, Mission Relay, Cosmos Strategy Group)
+  // are made like these: click the card, then the button over it
+  const rowMoves = mine.filter((m) => (ROW_MOVES.includes(m.type) || m.type === "org_free") && m.source !== undefined);
   // landing, orbiting, signals and traces are made by clicking the highlighted place on the board
   const { spots, handled } = ended ? { spots: [], handled: new Set<number>() } : buildSpots(v);
   const placed = new Set([...handled].map((i) => mine[i]));
@@ -491,7 +493,13 @@ export function GameClient({
   const goldMoves = mine.filter((m) => m.type === "choose_gold");
   const goldTile = pickedGold === null ? undefined : v.state.gold_tiles.find((g) => g.tile === pickedGold);
   const goldMove = goldTile === undefined ? undefined : goldMoves.find((m) => m.tile === goldTile.tile);
-  const ROW_SIGNAL_MOVES = ["scan_discard", "scan_token", "row_pick"];
+  const ROW_SIGNAL_MOVES = ["scan_discard", "scan_token", "row_pick", "org_free"];
+  // what the button over the card says for each organization
+  const ORG_ROW_LABEL: Record<string, string> = {
+    mission_relay: "Spend 2 publicity: take it and gain its income",
+    fenwick_research_center: "Spend 1 publicity: take it and use its free corner",
+    cosmos_strategy_group: "Take it and clear your marked spaces",
+  };
   const pickedRowMoves = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
   // discarding a card of the display for a signal (during a scan) is confirmed by a button on the card itself; the other moves keep the bar
   // the context bar asks the question of a tech that is picked; the confirm button lies on the tech itself
@@ -514,9 +522,14 @@ export function GameClient({
       const sector = rowCardId === undefined ? "a" : cardSector(rowCardId);
       return {
         key: m.type,
-        label: m.type === "scan_token" ? `Use a signal token: ${sector} signal` : `Discard to mark a ${sector} signal`,
+        label:
+          m.type === "org_free"
+            ? `${orgName(m.org)}: ${ORG_ROW_LABEL[String(m.org)] ?? "use the free action"}`
+            : m.type === "scan_token"
+              ? `Use a signal token: ${sector} signal`
+              : `Discard to mark a ${sector} signal`,
         primary: true,
-        title: rowMoveText(m, v.state.card_row),
+        title: m.type === "org_free" ? describeMove(m) : rowMoveText(m, v.state.card_row),
         onClick: () => play(m),
       };
     });
