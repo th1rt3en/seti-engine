@@ -497,9 +497,9 @@ export function GameClient({
   const ROW_SIGNAL_MOVES = ["scan_discard", "scan_token", "row_pick", "org_free"];
   // what the button over the card says for each organization
   const ORG_ROW_LABEL: Record<string, string> = {
-    mission_relay: "Spend 2 publicity: take it and gain its income",
-    fenwick_research_center: "Spend 1 publicity: take it and use its free corner",
-    cosmos_strategy_group: "Take it and clear your marked spaces",
+    mission_relay: "Mission Relay: 2 publicity",
+    fenwick_research_center: "Fenwick: 1 publicity",
+    cosmos_strategy_group: "Cosmos Strategy: take it",
   };
   const pickedRowMoves = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
   // discarding a card of the display for a signal (during a scan) is confirmed by a button on the card itself; the other moves keep the bar
@@ -525,7 +525,7 @@ export function GameClient({
         key: m.type,
         label:
           m.type === "org_free"
-            ? `${orgName(m.org)}: ${ORG_ROW_LABEL[String(m.org)] ?? "use the free action"}`
+            ? (ORG_ROW_LABEL[String(m.org)] ?? `${orgName(m.org)}: free action`)
             : m.type === "scan_token"
               ? `Use a signal token: ${sector} signal`
               : `Discard to mark a ${sector} signal`,
