@@ -95,6 +95,7 @@ export function GameClient({
   // the end-of-round card picked to keep (after passing)
   const [pickedOffer, setPickedOffer] = useState<string | null>(null);
   const [pickedCover, setPickedCover] = useState<CoverChoice | null>(null);
+  const [pickedExertian, setPickedExertian] = useState<string | null>(null);
   // the quick start cards picked to keep (two at once)
   const [pickedQuick, setPickedQuick] = useState<string[]>([]);
   // the place picked for a probe to move to, until the player confirms
@@ -190,6 +191,7 @@ export function GameClient({
           setPickedBuy(null);
           setPickedOffer(null);
           setPickedCover(null);
+          setPickedExertian(null);
           setPickedQuick([]);
           setPendingMove(null);
           setUnsure(null);
@@ -336,6 +338,7 @@ export function GameClient({
       m.type !== "sandbox" &&
       !isOffer(m) &&
       !rowMoves.includes(m) &&
+      m.type !== "play_exertian" && // an Exertian card is picked in its tab of the hand, and played with the buttons over it
       !orgCardMoves.includes(m) && // the free actions that name a card or a tech have their own button and panel
       m.type !== "place_computer_tech" &&
       m.type !== "choose_gold" &&
@@ -410,6 +413,21 @@ export function GameClient({
   const barMoves = otherMoves.filter((m) => BAR_MOVES.has(m.type));
   // a free action that moves a probe is no answer for a player with no probe on the map
   // the circles of a mission that a trigger can cover are clicked on the mission card, shown in the context bar
+  const exertianMoves = mine.filter((m) => m.type === "play_exertian");
+  const exertianMove = exertianMoves.find((m) => m.card === pickedExertian);
+  const exertianCost = Number(v.state.pending[0]?.data?.cost ?? 0);
+  const exertianActions: CardAction[] = exertianMove
+    ? [
+        {
+          key: "play",
+          label: exertianCost > 0 ? `Play face down (${exertianCost} credit)` : "Play face down",
+          primary: true,
+          title: describeMove(exertianMove),
+          onClick: () => play(exertianMove),
+        },
+        { key: "cancel", label: "Cancel", onClick: () => setPickedExertian(null) },
+      ]
+    : [];
   const coverMoves = otherMoves.filter((m) => m.type === "cover");
   const coverOptions: CoverChoice[] = coverMoves.map((m) => ({ card: String(m.card), circle: Number(m.circle) }));
   const coverMove =
@@ -978,6 +996,12 @@ export function GameClient({
         selected: picked,
         onSelect: selectCard,
         autoOpen: pending && handMoves.length > 0,
+        exertian: {
+          selectable: exertianMoves.map((m) => String(m.card)),
+          selected: pickedExertian,
+          onSelect: (c) => setPickedExertian(pickedExertian === c ? null : c),
+          actions: exertianActions,
+        },
         actions: handActions,
         offered: offers,
         offeredSelected: pickedOffer,

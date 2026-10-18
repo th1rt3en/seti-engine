@@ -264,7 +264,7 @@ export function GameView({
       </TrackerDock>
       <RowDock view={view} row={row} flash={rowFlash} />
       <HandDock view={view} selection={hand} />
-      <ExertianDock view={view} />
+      <ExertianDock view={view} selection={hand} />
       {log}
       {overlay}
     </div>
