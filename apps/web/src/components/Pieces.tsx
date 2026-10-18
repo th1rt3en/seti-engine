@@ -109,26 +109,31 @@ export function Figure({ x, y, size = 104, color, title }: { x: number; y: numbe
   );
 }
 
-/** A space probe: a round token (so that it fits the orbit and landing spaces) with a probe on it: a body, two solar panels and a dish. */
+/** A space probe: a round token (so that it fits the orbit and landing spaces) with a satellite on it: a body with two solar panels on the diagonal and a
+ * dish that sends out signals. */
 export function ProbePiece({ x, y, size = 104, color, title }: { x: number; y: number; size?: number; color: PieceColor; title?: string }) {
   const ink = "#fff";
+  const line = edge(color);
   return (
     <Piece x={x} y={y} size={size} title={title}>
-      <circle cy={7} r={45} fill={edge(color)} />
-      <circle r={45} fill={gradient(color, "top")} stroke={edge(color)} strokeWidth={4} />
-      <circle r={35} fill={gradient(color, "dimple")} stroke={edge(color)} strokeWidth={2} />
-      <g stroke={edge(color)} strokeWidth={2} strokeLinejoin="round">
-        <rect x={-31} y={-9} width={19} height={22} rx={2} fill={ink} fillOpacity={0.92} />
-        <rect x={12} y={-9} width={19} height={22} rx={2} fill={ink} fillOpacity={0.92} />
-        <path d="M-12 2 H12" strokeWidth={4} />
-        <path d="M-8 -12 L-4 -17 H4 L8 -12 V12 L4 17 H-4 L-8 12 Z" fill={ink} />
+      <circle cy={7} r={45} fill={line} />
+      <circle r={45} fill={gradient(color, "top")} stroke={line} strokeWidth={4} />
+      <circle r={37} fill={gradient(color, "dimple")} stroke={line} strokeWidth={2} />
+      <g transform="rotate(45)" stroke={line} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round">
+        {/* the two solar panels, with their cells */}
+        <rect x={-33} y={-8} width={21} height={16} rx={1.5} fill={ink} fillOpacity={0.95} />
+        <rect x={12} y={-8} width={21} height={16} rx={1.5} fill={ink} fillOpacity={0.95} />
+        <path d="M-26 -8 V8 M-19 -8 V8 M-33 0 H-12 M19 -8 V8 M26 -8 V8 M12 0 H33" strokeWidth={1.4} />
+        <path d="M-12 0 H12" strokeWidth={3} />
+        {/* the body with its round window */}
+        <rect x={-10} y={-7} width={20} height={14} rx={3} fill={ink} />
+        <circle r={3.2} fill={line} stroke="none" />
+        {/* the dish on top of the body, and the signal it sends */}
+        <path d="M-6 -8 L-4 -12" />
+        <path d="M-9 -13 Q0 -22 9 -13 Z" fill={ink} />
+        <path d="M-5 -24 Q0 -28 5 -24" fill="none" strokeWidth={1.8} />
+        <path d="M-9 -29 Q0 -35 9 -29" fill="none" strokeWidth={1.8} />
       </g>
-      <path d="M-21 -2 H-12 M-21 5 H-12 M12 -2 H21 M12 5 H21" stroke={edge(color)} strokeOpacity={0.6} strokeWidth={1.5} />
-      <g transform="rotate(-20 0 -23)">
-        <ellipse cy={-23} rx={13} ry={7} fill={ink} stroke={edge(color)} strokeWidth={2} />
-        <circle cy={-23} r={2.5} fill={edge(color)} />
-      </g>
-      <path d="M-30 -22 A38 38 0 0 1 -6 -36" fill="none" stroke="#fff" strokeOpacity={0.55} strokeWidth={4} strokeLinecap="round" />
     </Piece>
   );
 }
