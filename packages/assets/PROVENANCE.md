@@ -56,5 +56,5 @@ Cut by `tools/web/build_card_icons.py` from the card pictures that are already i
 
 | Source | Served as |
 |---|---|
-| the Exertian symbol on its cross, from the Exertian card ET.45 (`apps/web/public/assets/cards`) | `/assets/icons/danger.0619e141b5.webp` |
+| the Exertian symbol on its cross, from the banner of the Exertian species board (`apps/web/public/assets/species`) | `/assets/icons/danger.95720c0fc2.webp` |
 | the time capsule with its "+15", from the Centaurian card ET.31 | `/assets/icons/capsule.5b5847da3d.webp` |

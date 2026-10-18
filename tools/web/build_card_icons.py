@@ -1,5 +1,5 @@
-"""Cuts two small icons out of printed cards, for the player tracker: the Exertian danger symbol (from the Exertian card ET.45) and the Centaurian time
-capsule with its "+15" (from the Centaurian card ET.31). The page around each icon is made transparent; the results are WebP files in
+"""Cuts two small icons out of the printed pictures, for the player tracker: the Exertian danger symbol (from the banner of the Exertian species board,
+where it stands alone) and the Centaurian time capsule with its "+15" (from the Centaurian card ET.31). The page around each icon is made transparent; the results are WebP files in
 apps/web/public/assets/icons and the keys `danger` and `capsule` of `printedIcons` in apps/web/src/generated/assets.json.
 
 Usage (from the repository root, after tools/web/build_assets.py, which rewrites assets.json):  python tools/web/build_card_icons.py
@@ -18,10 +18,11 @@ GEN = ROOT / "apps" / "web" / "src" / "generated" / "assets.json"
 PUBLIC = ROOT / "apps" / "web" / "public"
 OUT = PUBLIC / "assets" / "icons"
 HEIGHT = 96  # the height of the icons, in pixels
-# name -> (card, box of the icon on the card picture of 440 x 613 px: left, top, right, bottom)
+# name -> (where the picture is, box of the icon on it: left, top, right, bottom, tolerance for the colour of the page around it)
+# "species/exertians" is the species board (777 x 1415 px), the others are cards (440 x 613 px)
 ICONS = {
-    "danger": ("ET.45", (224, 308, 288, 400)),  # the Exertian symbol on its cross, without the number of the card
-    "capsule": ("ET.31", (72, 326, 146, 414)),  # the green capsule with its "+15"
+    "danger": ("species/exertians", (297, 40, 359, 107), 80),  # the Exertian symbol on its cross, on the gold banner of its board
+    "capsule": ("ET.31", (72, 326, 146, 414), 40),  # the green capsule with its "+15"
 }
 
 
@@ -49,11 +50,13 @@ def clear_background(im: Image.Image, tolerance: int = 40) -> Image.Image:
 def main() -> None:
     assets = json.loads(GEN.read_text(encoding="utf-8"))
     cards = assets["cards"]
+    boards = assets["species"]
     printed = assets.setdefault("printedIcons", {})
     OUT.mkdir(parents=True, exist_ok=True)
-    for name, (card, box) in ICONS.items():
-        pic = Image.open(PUBLIC / cards[card].lstrip("/")).convert("RGB").crop(box)
-        icon = clear_background(pic)
+    for name, (where, box, tolerance) in ICONS.items():
+        path = boards[where.split("/")[1]] if where.startswith("species/") else cards[where]
+        pic = Image.open(PUBLIC / path.lstrip("/")).convert("RGB").crop(box)
+        icon = clear_background(pic, tolerance)
         icon = icon.crop(icon.getbbox())  # the transparent margin goes
         icon = icon.resize((round(HEIGHT * icon.width / icon.height), HEIGHT), Image.LANCZOS)
         tmp = OUT / f"{name}.tmp.webp"
