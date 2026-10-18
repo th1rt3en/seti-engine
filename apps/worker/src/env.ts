@@ -10,4 +10,6 @@ export interface Env {
   AUTH_PUBLIC_KEY: string;
   AUTH_ISSUER: string;
   AUTH_AUDIENCE: string;
+  /** Secret: the key with which the website's administrator page calls the admin routes (cancelling games). */
+  ADMIN_WORKER_KEY?: string;
 }

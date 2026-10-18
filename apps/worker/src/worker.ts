@@ -43,6 +43,10 @@ export default {
     const url = new URL(request.url);
     const parts = url.pathname.split("/").filter(Boolean);
     if (url.pathname === "/health") return json({ status: "ok" });
+    // The administrator's routes (the website's admin page calls them with the key that only the site and this Worker hold):
+    //   GET  /admin/games/:id          state and last activity of a game
+    //   POST /admin/games/:id/cancel   cancel a lobby or a game that is being played (no rating changes)
+    if (parts[0] === "admin") return admin(request, env, parts);
     if (parts[0] !== "games") return json({ ok: false, code: "not_found", message: "no such route" }, 404);
 
     let who: Identity | null;
@@ -91,11 +95,37 @@ export default {
     }
     if (action === "" && request.method === "GET") return forward(stub, "/meta", headers);
     if ((action === "log" || action === "replay") && request.method === "GET") return forward(stub, `/${action}`, headers);
-    if ((action === "join" || action === "leave" || action === "resign") && request.method === "POST") return forward(stub, `/${action}`, headers, "POST");
+    if ((action === "join" || action === "leave" || action === "resign") && request.method === "POST")
+      return forward(stub, `/${action}`, headers, "POST");
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
   },
 } satisfies ExportedHandler<Env>;
 
 function forward(stub: DurableObjectStub, path: string, headers: Record<string, string>, method = "GET"): Promise<Response> {
   return stub.fetch(`https://room${path}`, { method, headers });
+}
+
+/** A comparison that takes the same time wherever the strings differ. */
+function sameKey(a: string, b: string): boolean {
+  const x = new TextEncoder().encode(a);
+  const y = new TextEncoder().encode(b);
+  let diff = x.length ^ y.length;
+  for (let i = 0; i < Math.max(x.length, y.length); i++) diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return diff === 0;
+}
+
+async function admin(request: Request, env: Env, parts: string[]): Promise<Response> {
+  const key = request.headers.get("x-admin-key") ?? "";
+  if (!env.ADMIN_WORKER_KEY || !sameKey(key, env.ADMIN_WORKER_KEY)) return json({ ok: false, code: "unauthorized", message: "no" }, 401);
+  const [, kind, gameId, action] = parts;
+  if (kind !== "games" || gameId === undefined) return json({ ok: false, code: "not_found", message: "no such route" }, 404);
+  let stub: DurableObjectStub;
+  try {
+    stub = env.GAME_ROOM.get(env.GAME_ROOM.idFromString(gameId));
+  } catch {
+    return json({ ok: false, code: "unknown_game", message: "no such game" }, 404);
+  }
+  if (request.method === "GET" && action === undefined) return forward(stub, "/admin-info", {});
+  if (request.method === "POST" && action === "cancel") return forward(stub, "/admin-cancel", {}, "POST");
+  return json({ ok: false, code: "not_found", message: "no such route" }, 404);
 }

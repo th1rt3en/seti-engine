@@ -83,6 +83,8 @@ export interface ResultSink {
   removeLobby(id: string): Promise<void>;
   recordStart(meta: Meta): Promise<void>;
   recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void>;
+  /** An administrator cancelled a game that was being played: it ends without a result, and no rating changes. */
+  recordCancelled(meta: Meta): Promise<void>;
 }
 
 export interface Deps {
@@ -107,7 +109,9 @@ export type ServerMessage =
   | { t: "error"; code: string; message: string; legal?: Action[] }
   /** The moves made so far, for the log beside the board: all of them on connecting (`from` is 0), then each new one. */
   | { t: "log"; from: number; entries: PublicEntry[] }
-  | { t: "ended"; result: Result };
+  | { t: "ended"; result: Result }
+  /** An administrator cancelled the game (no result, no rating changes). */
+  | { t: "cancelled" };
 
 export interface Connection {
   id: string;
@@ -253,6 +257,55 @@ export class GameRoom {
     const seen = (await this.d.store.get<Record<string, number>>("seen")) ?? {};
     seen[id] = this.d.now();
     await this.d.store.put("seen", seen);
+  }
+
+  /** What the administrator's page needs to know of a game: its state and when something last happened in it (a move, or a player in the lobby). */
+  async adminInfo(): Promise<{
+    status: Status;
+    rated: boolean;
+    players: string[];
+    createdAt: number;
+    lastActivity: number;
+    actions: number;
+  } | null> {
+    const meta = await this.meta();
+    if (meta === undefined) return null;
+    const log = await this.d.store.list<LogEntry>("log:");
+    const seen = Object.values((await this.d.store.get<Record<string, number>>("seen")) ?? {});
+    const last = Math.max(meta.createdAt, meta.startedAt ?? 0, ...seen, ...log.map((e) => e.at));
+    return {
+      status: meta.status,
+      rated: meta.rated,
+      players: meta.seats.flatMap((s) => (s === null ? [] : [s.name])),
+      createdAt: meta.createdAt,
+      lastActivity: last,
+      actions: log.length,
+    };
+  }
+
+  /**
+   * An administrator cancels a lobby or a game that is being played. A lobby is destroyed like an emptied one. A game that was started ends without a
+   * result: nobody wins or loses, and nobody's rating changes, whether the game was rated or not (the ratings are only settled by `finish`).
+   */
+  adminCancel(): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || (meta.status !== "lobby" && meta.status !== "playing")) return fail("not_open", "the game is not open");
+      if (meta.status === "lobby") {
+        meta.status = "cancelled";
+        await this.broadcastLobby(meta);
+        await this.d.sink.removeLobby(meta.id);
+        await this.d.store.clear();
+      } else {
+        meta.status = "cancelled";
+        meta.endedAt = this.d.now();
+        await this.d.store.put("meta", meta);
+        await this.d.sink.recordCancelled(meta);
+        for (const c of this.d.connections()) c.send({ t: "cancelled" });
+      }
+      await this.d.setAlarm(null);
+      return { ok: true };
+    });
   }
 
   /** A ping or a new connection of a player in the lobby: they are still there. */

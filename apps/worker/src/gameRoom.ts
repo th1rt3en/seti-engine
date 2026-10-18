@@ -72,6 +72,9 @@ export class GameRoomDO implements DurableObject {
       if (file === null) return json({ ok: false, code: "not_finished", message: "the game is not over" }, 403);
       return json(url.pathname === "/log" ? file.actions : publicReplay(file));
     }
+    // the administrator's routes: the Worker has checked the key, and only the Worker can reach this object
+    if (url.pathname === "/admin-info") return json((await this.room.adminInfo()) ?? null);
+    if (url.pathname === "/admin-cancel") return json(await this.room.adminCancel());
     if (identity === null) return json({ ok: false, code: "unauthorized", message: "sign in first" }, 401);
     if (url.pathname === "/init") {
       const b = (await request.json()) as { id: string; options: Options; clock: ClockSettings; rated: boolean };

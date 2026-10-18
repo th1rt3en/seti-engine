@@ -154,4 +154,20 @@ describe("D1 sink", () => {
     await sink.removeLobby("kept");
     expect(db.sql.prepare("SELECT id FROM games WHERE id = 'kept'").all()).toHaveLength(1);
   });
+
+  it("a game cancelled by an administrator is marked cancelled, with no rating and no history", async () => {
+    const db = new SqliteDb();
+    const sink = new D1Sink(db);
+    const rec = record("quit", [alice, bob], [1, 2], true);
+    await sink.recordStart({ ...rec.meta, status: "playing" });
+    await sink.recordCancelled({ ...rec.meta, status: "cancelled", endedAt: 77 });
+    expect(db.sql.prepare("SELECT status, reason, ended_at, rated_counted FROM games WHERE id = 'quit'").get()).toEqual({
+      status: "cancelled",
+      reason: "cancelled",
+      ended_at: 77,
+      rated_counted: 0,
+    });
+    expect(db.sql.prepare("SELECT COUNT(*) AS n FROM ratings").get()).toEqual({ n: 0 });
+    expect(db.sql.prepare("SELECT COUNT(*) AS n FROM rating_history").get()).toEqual({ n: 0 });
+  });
 });

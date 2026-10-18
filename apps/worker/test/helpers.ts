@@ -90,6 +90,10 @@ export class RecordingSink implements ResultSink {
   async recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void> {
     this.ends.push({ rec: structuredClone(rec), log });
   }
+  cancelled: Meta[] = [];
+  async recordCancelled(meta: Meta): Promise<void> {
+    this.cancelled.push(structuredClone(meta));
+  }
 }
 
 export class RecordingArchive implements Archive {

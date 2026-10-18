@@ -2,6 +2,8 @@ import { createHash, generateKeyPairSync } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import moveTypes from "@/generated/move-types.json";
+import { adminToken, checkPassphrase, lockedOut, noteFailure, validAdminToken } from "@/lib/admin";
+import { countAccounts, deleteAccount, listAccounts, resetRating, setRating } from "@/lib/adminData";
 import {
   AuthFailure,
   checkPassword,
@@ -433,5 +435,51 @@ describe("the prompts of the hand", () => {
     expect(irreversibleText({ type: "pass" })).toBe("Pass now? You will see the end-of-round cards.");
     expect(irreversibleText({ type: "take_card", source: "deck" })).toBe("Draw from the deck? You will see the card.");
     expect(irreversibleText({ type: "end_turn" }).length).toBeLessThan(60);
+  });
+});
+
+describe("the administrator's page", () => {
+  const hash = "scrypt$stand-in$hash";
+
+  it("accepts a signed cookie until it expires, and nothing else", () => {
+    const t = adminToken(1_000, hash);
+    expect(validAdminToken(t, 2_000, hash)).toBe(true);
+    expect(validAdminToken(t, 1_000 + 3 * 3_600_000, hash)).toBe(false); // two hours
+    expect(validAdminToken(`${t}x`, 2_000, hash)).toBe(false);
+    expect(validAdminToken(t, 2_000, "another key")).toBe(false);
+    expect(validAdminToken(undefined, 2_000, hash)).toBe(false);
+    expect(validAdminToken(t, 2_000, "")).toBe(false); // no passphrase set: the page is closed
+  });
+
+  it("checks the passphrase against its hash, and locks an address out after five failures in a quarter of an hour", async () => {
+    const stored = await hashPassword("brave#otter!472");
+    expect(await checkPassphrase("brave#otter!472", stored)).toBe(true);
+    expect(await checkPassphrase("brave#otter!473", stored)).toBe(false);
+    expect(await checkPassphrase("anything", "")).toBe(false);
+    const db = memory();
+    for (let i = 0; i < 5; i++) {
+      expect(await lockedOut(db, "1.2.3.4", 1_000 + i)).toBe(false);
+      await noteFailure(db, "1.2.3.4", 1_000 + i);
+    }
+    expect(await lockedOut(db, "1.2.3.4", 2_000)).toBe(true);
+    expect(await lockedOut(db, "5.6.7.8", 2_000)).toBe(false);
+    expect(await lockedOut(db, "1.2.3.4", 1_000 + 16 * 60_000)).toBe(false);
+  });
+
+  it("sets and resets a rating and deletes an account that is in no open game", async () => {
+    const db = memory();
+    const ann = await signup(db, "Ann", "password1");
+    const bob = await signup(db, "Bob", "password1");
+    await setRating(db, ann.id, 1777, 5);
+    expect((await listAccounts(db, "", 10, 0)).find((u) => u.name === "Ann")).toMatchObject({ rating: 1777 });
+    await setRating(db, ann.id, 1600, 6);
+    expect((await listAccounts(db, "ann", 10, 0))[0]).toMatchObject({ rating: 1600 });
+    await resetRating(db, ann.id);
+    expect((await listAccounts(db, "Ann", 10, 0))[0]?.rating).toBeNull();
+    await db.run("INSERT INTO games (id, status, options_json, clock_json, rated, created_at) VALUES ('g', 'playing', '{}', '{}', 1, 1)");
+    await db.run("INSERT INTO game_players (game_id, seat, user_id, name, registered) VALUES ('g', 0, ?, 'Bob', 1)", bob.id);
+    expect(await deleteAccount(db, bob.id)).toBe(false); // in a game that is being played
+    expect(await deleteAccount(db, ann.id)).toBe(true);
+    expect(await countAccounts(db, "")).toBe(1);
   });
 });

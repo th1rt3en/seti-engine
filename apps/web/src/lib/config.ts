@@ -21,6 +21,10 @@ export interface Config {
   /** Cloudflare Turnstile (the challenge on signup and login). Without a secret the check is skipped in development and refuses in production. */
   turnstileSiteKey: string;
   turnstileSecret: string;
+  /** Secret: the scrypt hash (as made by `hashPassword`) of the passphrase of the administrator's page. Empty: the page is closed. */
+  adminPassphraseHash: string;
+  /** Secret: the key that the site presents to the Worker for the administrator's routes (cancelling games). */
+  adminWorkerKey: string;
 }
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): Config {
@@ -39,5 +43,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     cfApiToken: env.CF_API_TOKEN ?? env.CLOUDFLARE_API_TOKEN ?? "",
     turnstileSiteKey: env.TURNSTILE_SITE_KEY ?? "",
     turnstileSecret: env.TURNSTILE_SECRET_KEY ?? "",
+    adminPassphraseHash: env.ADMIN_PASSPHRASE_HASH ?? "",
+    adminWorkerKey: env.ADMIN_WORKER_KEY ?? "",
   };
 }

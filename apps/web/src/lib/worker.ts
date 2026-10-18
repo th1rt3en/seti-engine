@@ -121,3 +121,30 @@ export async function gameReplay(id: string, cfg = loadConfig(), fetcher: typeof
   const res = await fetcher(`${cfg.workerUrl}/games/${id}/replay`);
   return res.ok ? ((await res.json()) as ReplayData) : null;
 }
+
+// --- the administrator (the key is the one that the Worker holds as ADMIN_WORKER_KEY) ---------------------------------------------
+
+export interface AdminGameInfo {
+  status: string;
+  rated: boolean;
+  players: string[];
+  createdAt: number;
+  /** When something last happened in the game (a move; in a lobby, a player's ping), in ms. */
+  lastActivity: number;
+  actions: number;
+}
+
+async function adminCall(path: string, method: string, cfg: Config, fetcher: typeof fetch): Promise<unknown> {
+  const res = await fetcher(`${cfg.workerUrl}/admin${path}`, { method, headers: { "x-admin-key": cfg.adminWorkerKey } });
+  return res.json();
+}
+
+/** State and last activity of a game, or null when the game is not known to the Worker any more. */
+export async function adminGameInfo(id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch): Promise<AdminGameInfo | null> {
+  return (await adminCall(`/games/${id}`, "GET", cfg, fetcher)) as AdminGameInfo | null;
+}
+
+/** Cancels a lobby or a game that is being played: nobody wins or loses and no rating changes. */
+export async function adminCancelGame(id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch): Promise<WorkerReply> {
+  return (await adminCall(`/games/${id}/cancel`, "POST", cfg, fetcher)) as WorkerReply;
+}

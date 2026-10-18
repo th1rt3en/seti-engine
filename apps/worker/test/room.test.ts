@@ -254,3 +254,27 @@ describe("a failing engine", () => {
     expect((await t.room.meta())?.status).toBe("playing");
   });
 });
+
+describe("an administrator cancels a game", () => {
+  it("a rated game that is being played ends without a result, and no rating is settled", async () => {
+    const t = await started(true);
+    const info = await t.room.adminInfo();
+    expect(info).toMatchObject({ status: "playing", rated: true, players: ["Alice", "Bob"] });
+    expect(await t.room.adminCancel()).toEqual({ ok: true });
+    expect((await t.room.meta())?.status).toBe("cancelled");
+    expect(t.sink.cancelled).toHaveLength(1);
+    expect(t.sink.ends).toHaveLength(0); // nobody wins or loses: no rating changes (the ratings are only settled by the end of a game)
+    expect(await t.room.adminCancel()).toMatchObject({ ok: false, code: "not_open" });
+  });
+
+  it("a lobby is destroyed, and a finished game cannot be cancelled", async () => {
+    const t = makeRoom();
+    await t.room.init("g1", two, none, true, alice);
+    expect((await t.room.adminInfo())?.status).toBe("lobby");
+    expect(await t.room.adminCancel()).toEqual({ ok: true });
+    expect(t.sink.removed).toEqual(["g1"]);
+    const done = await started(false, 1);
+    await done.room.resign(alice);
+    expect(await done.room.adminCancel()).toMatchObject({ ok: false, code: "not_open" });
+  });
+});

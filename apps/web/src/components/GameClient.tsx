@@ -51,7 +51,8 @@ type Server =
   | { t: "view"; seq: number; status: string; view: View; names: string[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Move[] }
   | { t: "log"; from: number; entries: LogEntry[] }
-  | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } };
+  | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } }
+  | { t: "cancelled" };
 
 const GOLD_INFO = assets.gold as Record<string, { per: string; values: number[] }>;
 
@@ -226,6 +227,8 @@ export function GameClient({
           setError(m.message);
         }
         if (m.t === "ended") setEnded(m.result);
+        // an administrator cancelled the game: it is over for everybody, with no winner and no rating change
+        if (m.t === "cancelled") setEnded({ reason: "cancelled", winners: [], ranking: [] });
       };
       ws.onclose = () => {
         if (pinger) clearInterval(pinger);
@@ -818,9 +821,13 @@ export function GameClient({
     <>
       {ended ? (
         <section className="gameover">
-          <h2>Game over ({ended.reason})</h2>
+          <h2>{ended.reason === "cancelled" ? "This game was cancelled" : `Game over (${ended.reason})`}</h2>
           <p>
-            {ended.winners.length > 0 ? `Winner: ${ended.winners.map((w) => names[w] ?? w + 1).join(", ")}.` : "The rival won."}{" "}
+            {ended.reason === "cancelled"
+              ? "An administrator cancelled it. Nobody wins or loses, and no rating changes."
+              : ended.winners.length > 0
+                ? `Winner: ${ended.winners.map((w) => names[w] ?? w + 1).join(", ")}.`
+                : "The rival won."}{" "}
             {ended.ranking.map((r) => (
               <span key={r.seat} className="res">
                 {names[r.seat] ?? r.seat + 1}: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}

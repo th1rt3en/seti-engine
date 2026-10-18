@@ -54,6 +54,14 @@ export class D1Sink implements ResultSink {
     ]);
   }
 
+  async recordCancelled(meta: Meta): Promise<void> {
+    // no result and no rating: the game is only marked as cancelled (rated_counted stays 0)
+    await this.db
+      .prepare("UPDATE games SET status = 'cancelled', reason = 'cancelled', ended_at = ? WHERE id = ? AND status IN ('lobby', 'playing')")
+      .bind(meta.endedAt ?? 0, meta.id)
+      .all();
+  }
+
   async recordStart(meta: Meta): Promise<void> {
     const q = (sql: string, ...v: unknown[]): Statement => this.db.prepare(sql).bind(...v);
     await this.db.batch([
