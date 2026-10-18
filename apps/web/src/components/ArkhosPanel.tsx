@@ -21,12 +21,12 @@ export function ArkhosPanel({ view, names, spots }: { view: View; names: string[
     <section className="card exppanel" aria-label="Arkhos">
       <h3>Arkhos</h3>
       <p className="small muted">
-        Exploration deck: {extra.explore_deck?.length ?? 0} cards · set aside: {extra.explore_aside?.length ?? 0} · revealed:{" "}
-        {extra.explore_discard?.length ?? 0}
+        Exploration deck (beside the species board): {extra.explore_deck?.length ?? 0} cards · set aside: {extra.explore_aside?.length ?? 0}{" "}
+        · revealed: {extra.explore_discard?.length ?? 0}
       </p>
-      {last && cardImage(last) ? <CardImage id={last} width={150} title={`Last exploration card: ${last}`} /> : null}
       {s.players.map((p) => {
         if (s.rival && p.index === s.rival.index) return null;
+        if (p.index === view.viewer) return null; // your own security cards are in the Security tab of your hand
         const entries = COLORS.filter((c) => p.security?.[c] !== undefined);
         const open = Object.keys(p.security ?? {}).length === 0;
         return (

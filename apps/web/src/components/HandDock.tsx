@@ -6,9 +6,14 @@ import { isPhone, useBottomSpace, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
+import expansionAssets from "../generated/expansion-assets.json";
 import { type CardAction, CardActions } from "./CardActions";
 import { CardImage } from "./CardImage";
 import { MascamiteTab } from "./Mascamites";
+
+const SECURITY_BACKS: Record<string, string> = Object.fromEntries(
+  ["pink", "yellow", "blue"].map((c) => [c, (expansionAssets as Record<string, string>)[`arkhos/security-back-${c}`] ?? ""]),
+);
 
 /** The cards of the hand that a move can be made with, the places (in the hand) of those that are picked, and what happens when one is clicked. */
 export interface HandSelection {
@@ -79,11 +84,15 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   useBottomSpace(dock, "hand");
   const me = view.viewer;
   const player = me === null ? undefined : view.state.players[me];
-  const [tab, setTab] = useState<"hand" | "exertian" | "mascamite">("hand");
+  const [tab, setTab] = useState<"hand" | "exertian" | "mascamite" | "security">("hand");
   if (!player) return null;
   // on a phone the Exertian cards have a tab of the bottom bar of their own (ExertianDock)
   const exertians = view.state.species.some((sp) => sp.discovered && sp.species === "exertians") && !isPhone();
   const mascamites = view.state.species.some((sp) => sp.discovered && sp.species === "mascamites");
+  // Arkhos: the security cards lie in front of the player, apart from the hand; a breached card goes from this tab into the hand
+  const arkhos = view.state.species.some((sp) => sp.discovered && sp.species === "arkhos");
+  const security = Object.entries((player.security ?? {}) as Record<string, string>);
+  const showSecurity = arkhos && tab === "security";
   const showExertian = exertians && tab === "exertian";
   const showMascamite = mascamites && tab === "mascamite";
   const who = (seat: number): string =>
@@ -96,9 +105,14 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
       </button>
       {folded ? null : (
         <div className="handbody">
-          {exertians || mascamites ? (
+          {exertians || mascamites || arkhos ? (
             <div className="handtabs" role="tablist">
-              <button type="button" role="tab" aria-selected={!showExertian && !showMascamite} onClick={() => setTab("hand")}>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!showExertian && !showMascamite && !showSecurity}
+                onClick={() => setTab("hand")}
+              >
                 Hand
               </button>
               {exertians ? (
@@ -111,11 +125,35 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                   Mascamite samples
                 </button>
               ) : null}
+              {arkhos ? (
+                <button type="button" role="tab" aria-selected={showSecurity} onClick={() => setTab("security")}>
+                  Security cards ({security.length})
+                </button>
+              ) : null}
             </div>
           ) : null}
           {showExertian ? <ExertianTab view={view} /> : null}
           {showMascamite ? <MascamiteTab view={view} who={who} /> : null}
-          <div className="cards" hidden={showExertian || showMascamite}>
+          {showSecurity ? (
+            <div className="cards">
+              {security.length === 0 ? <span className="muted">All your security cards are breached: they are in your hand.</span> : null}
+              {security.map(([color]) => (
+                // only the back is shown until the card is breached: it shows the color of the trace that breaches it
+                <span
+                  key={color}
+                  className="cardslot"
+                  title={`${color} security card: breach it by marking the overflow space of that color`}
+                >
+                  <img
+                    className="cardimg card-hand"
+                    src={SECURITY_BACKS[color]}
+                    alt={`${color} security card (face down until it is breached)`}
+                  />
+                </span>
+              ))}
+            </div>
+          ) : null}
+          <div className="cards" hidden={showExertian || showMascamite || showSecurity}>
             {player.hand.length === 0 ? <span className="muted">No cards in hand.</span> : null}
             {player.hand.map((c, i) => {
               const picked = selection?.selected.includes(i) ?? false;

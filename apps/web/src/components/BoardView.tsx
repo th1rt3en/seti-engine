@@ -218,6 +218,56 @@ export function BoardView({
           );
         })}
 
+        {s.species.map((sp, i) => {
+          // Arkhos: the exploration deck and the card revealed last lie in the column beside its board (EXP-ARK-01, EXP-ARK-02); the cards are landscape
+          if (!sp.discovered || sp.species !== "arkhos") return null;
+          const at = alienColumn(i);
+          const extra = sp.extra as { explore_deck?: string[]; explore_aside?: string[]; explore_discard?: string[] };
+          const back = EXPANSION_BOARDS["arkhos/exploration-back"];
+          const last = extra.explore_discard?.at(-1);
+          const shown = last ? cardImage(last) : undefined;
+          const h = Math.round((ALIEN_COLUMN.w * 744) / 1040);
+          const dy = (ALIEN_COLUMN.h - h) / 2;
+          return (
+            <g key="arkhos-exploration">
+              {back ? (
+                <g>
+                  <image href={back} x={at.deck.x} y={at.deck.y + dy} width={ALIEN_COLUMN.w} height={h} />
+                  <circle cx={at.deck.x + ALIEN_COLUMN.w / 2} cy={at.deck.y + ALIEN_COLUMN.h / 2} r={70} className="deckcount" />
+                  <text
+                    x={at.deck.x + ALIEN_COLUMN.w / 2}
+                    y={at.deck.y + ALIEN_COLUMN.h / 2 + 32}
+                    textAnchor="middle"
+                    className="deckcounttext"
+                  >
+                    {extra.explore_deck?.length ?? 0}
+                  </text>
+                  <title>{`Exploration deck: ${extra.explore_deck?.length ?? 0} cards left, ${extra.explore_aside?.length ?? 0} set aside`}</title>
+                </g>
+              ) : null}
+              {shown ? (
+                <g>
+                  <image href={shown} x={at.faceUp.x} y={at.faceUp.y + dy} width={ALIEN_COLUMN.w} height={h} />
+                  <title>{`Exploration card revealed last (${extra.explore_discard?.length ?? 0} revealed)`}</title>
+                </g>
+              ) : (
+                <rect
+                  x={at.faceUp.x}
+                  y={at.faceUp.y + dy}
+                  width={ALIEN_COLUMN.w}
+                  height={h}
+                  rx={24}
+                  className="emptypile"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.35)"
+                  strokeWidth={5}
+                  strokeDasharray="22 16"
+                />
+              )}
+            </g>
+          );
+        })}
+
         {s.gold_tiles.map((g, i) => {
           const info = GOLD_TILES[`${g.tile}-${g.side}`];
           if (!info) return null;

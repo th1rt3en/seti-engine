@@ -28,8 +28,8 @@ import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
+import expansionAssets from "../generated/expansion-assets.json";
 import type { CardAction } from "./CardActions";
-import { CardImage } from "./CardImage";
 import { GameView } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
@@ -722,7 +722,13 @@ export function GameClient({
     breachDecision && !ask ? (
       <span className="breachbar">
         Breach your {breachColor} security card? It goes to your hand and opens a deeper level of the Arkhos board.
-        {breachCard ? <CardImage id={breachCard} width={86} /> : null}
+        {breachCard ? (
+          <img
+            src={(expansionAssets as Record<string, string>)[`arkhos/security-back-${breachColor}`]}
+            alt={`${breachColor} security card, face down until it is breached`}
+            width={86}
+          />
+        ) : null}
       </span>
     ) : null;
   const contextNode: ReactNode =
