@@ -41,3 +41,7 @@ The rulebook (p.12) lets the player resolve the steps of a scan in any order (SC
 3. (expansion, EXP-SIG-02) discard signal tokens for more cards of the row;
 4. with the telescope techs, in the order of the player board: spend 1 publicity for a signal in Mercury's sector (TECH-TT03), discard a card of the hand for a signal (TECH-TT02), spend 1 energy to launch a probe or to gain 1 movement (TECH-TT04).
 Steps 1 and 2 cannot be skipped; the others can. A step that cannot be done (no publicity, no energy, no matching card) is passed over. The engine offers only the moves of the current step (`techs.scan_moves`), and the context bar says which step it is.
+
+## Futurespan Institute: the card of the free action, 2026-10-18
+
+Moving the Futurespan token 3 spaces farther (EXP-ORG-12) gains 1 card that the player takes from the card row or from the deck, like any card gained. This replaces the earlier reading (A-036) of a random card from the deck.

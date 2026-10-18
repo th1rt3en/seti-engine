@@ -386,7 +386,8 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         if a.get("delay"):  # EXP-ORG-12
             p.org_used = True
             p.org_data["fs_token"] += 3
-            effects.draw_random_card(s, p)  # A-036 (e): a random card of the deck
+            # owner ruling, 2026-10-18: the card is taken from the card row or from the deck, like any card gained
+            s.pending.append(Decision(kind="take_card", player=p.index, source={"kind": "organization", "org": o}))
         else:
             p.hand.remove(a["card"])
             p.org_data["fs_card"] = a["card"]
