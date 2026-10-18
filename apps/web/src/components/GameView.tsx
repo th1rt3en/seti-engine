@@ -46,7 +46,7 @@ const DECISION: Record<string, string> = {
   take_card: "take a card",
   land_free: "land for free",
   orbit_land_free: "orbit or land for free",
-  land_data_slot: "take a first-lander space",
+  land_data_slot: "cover a first-lander space: the one with 2 data or the one with 1 data",
   message_reward: "cover a message reward",
   exertian_play: "play an Exertian card, or not",
   research_tech: "take a tech",

@@ -2844,3 +2844,15 @@ button:disabled {
     z-index: 2;
   }
 }
+
+/* a short text beside a place that can be clicked on the board (the data of a first-lander space) */
+.spottag {
+  fill: #fff;
+  font-size: 46px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #0a1020;
+  stroke-width: 10px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}

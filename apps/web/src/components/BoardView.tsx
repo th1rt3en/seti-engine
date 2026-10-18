@@ -943,6 +943,11 @@ export function BoardView({
                   );
                 })
               : null}
+            {sp.tag && sp.shape.kind === "circle" ? (
+              <text x={sp.shape.x + sp.shape.r + 14} y={sp.shape.y + 16} className="spottag">
+                {sp.tag}
+              </text>
+            ) : null}
             {sp.glyph && sp.shape.kind === "circle" && glyphToken(sp.glyph) ? (
               <image href={glyphToken(sp.glyph)} x={sp.shape.x - 40} y={sp.shape.y - 46} width={80} height={92} opacity={0.85} />
             ) : null}

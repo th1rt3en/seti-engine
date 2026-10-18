@@ -81,6 +81,8 @@ export type Spot = {
   /** The move of the engine that this place stands for, as its place in `view.legal`. */
   move: number;
   label: string;
+  /** A short text drawn beside the place (the data that a first-lander space of Mars gives). */
+  tag?: string;
   /** The place lies on a panel beside the board, in the picture of that panel (not on the board itself). */
   panel?: "glyphids" | "amoeba" | "arkhos" | "org" | "objectives";
   /** What the place holds, for panels that draw it (a glyph token, a chip). */
@@ -141,7 +143,11 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       // Mars: the two first-lander spaces, each with its own amount of data, are clicked on the planet
       const at = LAND_SPACES[n.land_data.planet]?.circles[n.land_data.slot];
       if (!at) return;
-      spot = { id: `landdata:${n.land_data.planet}:${n.land_data.slot}`, shape: { kind: "circle", x: at.x, y: at.y, r: 50 } };
+      spot = {
+        id: `landdata:${n.land_data.planet}:${n.land_data.slot}`,
+        shape: { kind: "circle", x: at.x, y: at.y, r: 50 },
+        tag: `${n.land_data.data} data`,
+      };
     } else if (n.oumuamua_tile) {
       // the data slot of the 'Oumuamua tile on disc 3: it turns with the disc (the turn of the disc is in `view.state.disc_angles`)
       const turn = 45 * (s.disc_angles[2] ?? 0);
