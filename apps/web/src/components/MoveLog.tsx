@@ -204,6 +204,21 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
             : "no other player has a tech they are missing";
       return `${who} cannot take ${what}: ${why}`;
     }
+    case "glyph": {
+      // a Glyphids token taken from the place it lay at: a planet, a sector that was won, a tech stack or a well of the Glyphids board
+      const [kind = "", first = "", second = ""] = String(ev.where).split(":");
+      const from =
+        kind === "planet"
+          ? `the space of ${cap(first)}`
+          : kind === "sector"
+            ? `the space of the ${String(ev.star ?? sectorName(ctx, Number(first)))} sector`
+            : kind === "tech"
+              ? `the space of the tech ${String(ev.tech ?? "stack")}`
+              : kind === "board"
+                ? `the ${first} well of the Glyphids board${Number(second) === 0 ? "" : ` (space ${Number(second) + 1})`}`
+                : "the board";
+      return `${who} takes the ${String(ev.glyph)} glyph token from ${from}`;
+    }
     case "breach":
       return `${who} breaches their ${String(ev.color)} security card (it goes to their hand)`;
     case "land":

@@ -52,8 +52,14 @@ def test_winning_a_sector_and_developing_a_tech_take_their_tokens() -> None:  # 
     assert "sector:0" not in tokens and len(s.players[0].glyphs) >= 1
     from seti_engine import techs
 
-    techs.take_tech(s, s.players[1], 0, [])
+    events: list[dict] = []
+    techs.take_tech(s, s.players[1], 0, events)
     assert "tech:0" not in tokens and len(s.players[1].glyphs) == 1
+    taken = next(e for e in events if e["type"] == "glyph")  # the log says where the token lay
+    assert taken["where"] == "tech:0" and taken["tech"] == techs.tech_name(s.tech_stacks[0].category, s.tech_stacks[0].glyph)
+    events = []
+    glyphids.take(s, s.players[0], "sector:3", events)
+    assert events and events[0]["star"] == s.sectors[3].star
 
 
 def test_the_upper_wells_are_replenished_and_the_lower_ones_are_not() -> None:  # EXP-GLY-04

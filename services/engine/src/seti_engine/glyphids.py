@@ -51,7 +51,16 @@ def take(s: GameState, p: PlayerState, where: str, events: Events) -> None:
     if g is None:
         return
     p.glyphs.append(g)
-    events.append({"type": "glyph", "player": p.index, "glyph": g, "where": where})
+    event: dict[str, Any] = {"type": "glyph", "player": p.index, "glyph": g, "where": where}
+    kind, _, rest = where.partition(":")
+    if kind == "sector":  # the log names the place the token lay at
+        event["star"] = s.sectors[int(rest)].star
+    elif kind == "tech":
+        from . import techs  # noqa: PLC0415 - techs imports this module
+
+        stack = s.tech_stacks[int(rest)]
+        event["tech"] = techs.tech_name(stack.category, stack.glyph)
+    events.append(event)
     from . import rival  # noqa: PLC0415 - rival imports this module
 
     if rival.is_rival(s, p.index):
