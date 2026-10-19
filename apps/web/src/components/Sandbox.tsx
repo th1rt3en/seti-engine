@@ -87,7 +87,7 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
               <ul className="sandboxcards">
                 {matches.slice(0, MAX_SHOWN).map((id) => (
                   <li key={id}>
-                    <button type="button" onClick={() => send({ type: "sandbox_add_card", card: id })}>
+                    <button type="button" className="secondary small" onClick={() => send({ type: "sandbox_add_card", card: id })}>
                       + {cardName(id)}
                       {handCards.includes(id) ? " (in hand)" : ""}
                     </button>
@@ -122,6 +122,7 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
                     <li key={r} aria-current={r === resource}>
                       <button
                         type="button"
+                        className="secondary small"
                         onClick={() => {
                           setResource(r);
                           setListOpen(false);
@@ -155,12 +156,18 @@ export function SandboxPanel({ marker, send, handCards }: { marker: Marker; send
               <span key={d} className="sandboxres">
                 <button
                   type="button"
+                  className="secondary small"
                   title={`Turn disc ${d} counter-clockwise`}
                   onClick={() => send({ type: "sandbox_rotate", disc: d, step: -1 })}
                 >
                   <TurnIcon dir={-1} /> Disc {d}
                 </button>
-                <button type="button" title={`Turn disc ${d} clockwise`} onClick={() => send({ type: "sandbox_rotate", disc: d, step: 1 })}>
+                <button
+                  type="button"
+                  className="secondary small"
+                  title={`Turn disc ${d} clockwise`}
+                  onClick={() => send({ type: "sandbox_rotate", disc: d, step: 1 })}
+                >
                   Disc {d} <TurnIcon dir={1} />
                 </button>
               </span>

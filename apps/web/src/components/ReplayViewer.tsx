@@ -108,7 +108,7 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
           <button type="button" className="secondary" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
             Previous
           </button>
-          <button type="button" onClick={() => setPlaying(!playing)} disabled={step >= last && !playing}>
+          <button type="button" className="secondary" onClick={() => setPlaying(!playing)} disabled={step >= last && !playing}>
             {playing ? "Pause" : "Play"}
           </button>
           <button type="button" className="secondary" onClick={() => setStep(Math.min(last, step + 1))} disabled={step >= last}>

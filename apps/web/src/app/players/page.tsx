@@ -13,7 +13,9 @@ export default async function Players({ searchParams }: { searchParams: Promise<
       <h1>Players</h1>
       <form action="/players" method="get" className="inline">
         <input type="search" name="q" defaultValue={q} placeholder="Find a player" aria-label="Find a player" maxLength={40} />{" "}
-        <button type="submit">Search</button>
+        <button type="submit" className="primary small">
+          Search
+        </button>
       </form>
       <p className="muted">
         {rows.length} registered player{rows.length === 1 ? "" : "s"}

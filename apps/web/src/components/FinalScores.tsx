@@ -110,7 +110,9 @@ export function FinalScores({ view, names, gameId, winners }: { view: View; name
       {view.viewer !== null ? (
         <form action={playAgainAction} className="small">
           <input type="hidden" name="id" value={gameId} />
-          <button type="submit">Play again: a new table with the same settings</button>
+          <button type="submit" className="primary">
+            Play again: a new table with the same settings
+          </button>
         </form>
       ) : null}
       <p className="small">

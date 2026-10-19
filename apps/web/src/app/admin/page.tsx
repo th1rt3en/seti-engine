@@ -146,7 +146,7 @@ export default async function Admin({
               <form action={cancelGameAction} className="actions">
                 <input type="hidden" name="back" value={back} />
                 <input type="hidden" name="game" value={g.id} />
-                <ConfirmSubmit ask="Cancel this game for everybody? No rating changes." className="btn small">
+                <ConfirmSubmit ask="Cancel this game for everybody? No rating changes." className="btn danger small">
                   Cancel
                 </ConfirmSubmit>
                 <Link href={`/games/${g.id}`} className="btn small ghost">

@@ -15,7 +15,7 @@ export function BarFold() {
     return () => document.querySelector(".topbar")?.classList.remove("collapsed");
   }, [collapsed]);
   return (
-    <button type="button" className="barfold" aria-expanded={!collapsed} onClick={() => setCollapsed(!collapsed)}>
+    <button type="button" className="barfold ghost small" aria-expanded={!collapsed} onClick={() => setCollapsed(!collapsed)}>
       {collapsed ? "▾ Moves" : "▴ Hide"}
     </button>
   );

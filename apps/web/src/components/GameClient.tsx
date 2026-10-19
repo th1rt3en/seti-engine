@@ -304,6 +304,16 @@ export function GameClient({
   const myTurn = view !== null && view.view.viewer !== null && view.view.to_act === view.view.viewer && !ended;
   useTurnSound(myTurn); // the sound and the size of the cards are set with the gear in the heading (GameSettings)
 
+  // the keyboard shortcuts: the handler is set on every render (below, where the moves are known), the listener once; both are above the first return
+  // so that the hooks are called in the same order before and after the first view arrives
+  const foldedAll = useRef(false);
+  const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => keyHandler.current(e);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   if (view === null) {
     return (
       <section className="card">
@@ -912,37 +922,32 @@ export function GameClient({
   const lastEntry = log.at(-1);
   const undoText = lastEntry ? `Undo: take back "${logText(lastEntry.action as Move)}"` : "Undo the last move";
   // keyboard shortcuts: Enter confirms, Escape cancels, e ends the turn, u takes the last move back, f folds or unfolds every panel, ? opens the list
-  const foldedAll = useRef(false);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (e.ctrlKey || e.metaKey || e.altKey || (t && ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(t.tagName) && e.key !== "Escape"))
-        return;
-      if (ended) return;
-      if (e.key === "Enter" && ask && ask.buttons.length > 0) {
-        const b = ask.buttons.find((x) => !x.disabled);
-        if (b) {
-          e.preventDefault();
-          b.onClick();
-        }
-      } else if (e.key === "Escape" && ask) {
-        ask.onCancel();
-      } else if (e.key === "e" && !ask) {
-        const m = mine.find((x) => x.type === "end_turn");
-        if (m) play(m);
-      } else if (e.key === "u" && !ask) {
-        const m = mine.find((x) => x.type === "undo");
-        if (m) play(m);
-      } else if (e.key === "f") {
-        foldedAll.current = !foldedAll.current;
-        window.dispatchEvent(new CustomEvent(ALL_EVENT, { detail: !foldedAll.current }));
-      } else if (e.key === "?") {
-        window.dispatchEvent(new Event("seti-open-settings"));
+  keyHandler.current = (e: KeyboardEvent) => {
+    const t = e.target as HTMLElement | null;
+    if (e.ctrlKey || e.metaKey || e.altKey || (t && ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(t.tagName) && e.key !== "Escape"))
+      return;
+    if (ended) return;
+    if (e.key === "Enter" && ask && ask.buttons.length > 0) {
+      const b = ask.buttons.find((x) => !x.disabled);
+      if (b) {
+        e.preventDefault();
+        b.onClick();
       }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
+    } else if (e.key === "Escape" && ask) {
+      ask.onCancel();
+    } else if (e.key === "e" && !ask) {
+      const m = mine.find((x) => x.type === "end_turn");
+      if (m) play(m);
+    } else if (e.key === "u" && !ask) {
+      const m = mine.find((x) => x.type === "undo");
+      if (m) play(m);
+    } else if (e.key === "f") {
+      foldedAll.current = !foldedAll.current;
+      window.dispatchEvent(new CustomEvent(ALL_EVENT, { detail: !foldedAll.current }));
+    } else if (e.key === "?") {
+      window.dispatchEvent(new Event("seti-open-settings"));
+    }
+  };
   const moves = (
     <>
       {ended ? (
@@ -1018,12 +1023,12 @@ export function GameClient({
             <MoveGroup title="Free action" foldable={false}>
               <div className="moves">
                 {exchanges.length > 0 ? (
-                  <button type="button" onClick={() => setTradeOpen(true)}>
+                  <button type="button" className="secondary" onClick={() => setTradeOpen(true)}>
                     Trade resources
                   </button>
                 ) : null}
                 {orgCardMoves.length > 0 ? (
-                  <button type="button" onClick={() => setOrgFreeOpen(true)}>
+                  <button type="button" className="secondary" onClick={() => setOrgFreeOpen(true)}>
                     {orgName(orgCardMoves[0]?.org)}: free action
                   </button>
                 ) : null}
@@ -1044,6 +1049,7 @@ export function GameClient({
                 {names[i] ?? `Player ${i + 1}`} is out of time ({minutes(r)}).{" "}
                 <button
                   type="button"
+                  className="danger small"
                   onClick={() =>
                     window.confirm(`Kick ${names[i] ?? "this player"}? The game ends and the other players share first place.`) &&
                     send({ t: "kick", seat: i })
