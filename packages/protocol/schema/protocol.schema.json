@@ -1306,9 +1306,19 @@
           "title": "End Cards",
           "type": "integer"
         },
+        "end_estimate": {
+          "default": 0,
+          "title": "End Estimate",
+          "type": "integer"
+        },
         "exertian_played": {
           "default": 0,
           "title": "Exertian Played",
+          "type": "integer"
+        },
+        "gold_estimate": {
+          "default": 0,
+          "title": "Gold Estimate",
           "type": "integer"
         },
         "income": {
@@ -1338,7 +1348,9 @@
         "danger_board",
         "danger_cards",
         "end_cards",
+        "end_estimate",
         "exertian_played",
+        "gold_estimate",
         "income",
         "missions_done",
         "score",

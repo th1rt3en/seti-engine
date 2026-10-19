@@ -13,7 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from . import engine, move_notes, orgs, species, tables
+from . import cards, engine, move_notes, orgs, scoring, species, tables
 from .models import GameState, PlayerState
 
 HIDDEN = "?"  # a hidden card, tile or token
@@ -46,6 +46,9 @@ class PlayerTracker(BaseModel):
     tucked: dict[str, int]  # how many cards are tucked for each kind of income
     missions_done: int  # completed missions (CARD-16)
     end_cards: int  # end-of-game scoring cards in front of the player (CARD-20)
+    # what the gold scoring tiles and the end-of-game cards would give if the game ended now (END-10 to END-17); the sets can still grow
+    gold_estimate: int = 0
+    end_estimate: int = 0
     score: int
     # Exertian danger (ALIEN-EXE-06). The board part and the number of cards played are public; the danger of the played cards
     # is None unless the viewer is this player, because the cards lie face down until the end of the game.
@@ -69,6 +72,8 @@ def tracker(state: GameState, p: PlayerState, viewer: int | None = None) -> Play
         tucked=tucked,
         missions_done=len(p.completed_missions),
         end_cards=len(p.end_cards),
+        gold_estimate=0 if rival_player else scoring.gold_points(state, p),  # the rival does not score gold tiles (SOLO-END-01)
+        end_estimate=cards.end_points(state, p),
         score=p.score,
         danger_board=species.board_danger(state, p),
         exertian_played=len(p.exertian_played),

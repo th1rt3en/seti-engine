@@ -41,6 +41,10 @@ const INCOME_ROWS = [
 const HINTS: Record<string, string> = {
   "Missions done": "Completed missions: they count for the gold scoring tiles.",
   "End-game cards": "End-of-game scoring cards in front of the player: they score when the game ends.",
+  "Gold tiles now (estimate)":
+    "What the gold scoring tiles each player has marked would give if the game ended now. The sets can still grow.",
+  "End cards now (estimate)":
+    "What the end-of-game scoring cards in front of each player would give if the game ended now (Exertian cards are not included).",
   Credits: "Credits: spent on actions and cards. Income gives more each round.",
   Energy: "Energy: spent to move probes, scan and orbit. Income gives more each round.",
   Publicity: "Publicity: from 0 to 10. Spent to buy cards (3) and to research a tech (6).",
@@ -159,6 +163,14 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             metal("gold", "End-game cards"),
             trackers.map((t) => t.end_cards),
             "metalrow goldrow",
+          )}
+          {row(
+            labelled(<ScoreIcon size={18} />, "Gold tiles now (estimate)"),
+            trackers.map((t) => t.gold_estimate ?? 0),
+          )}
+          {row(
+            labelled(<ScoreIcon size={18} />, "End cards now (estimate)"),
+            trackers.map((t) => t.end_estimate ?? 0),
           )}
           {group("Now")}
           {row(

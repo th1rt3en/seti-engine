@@ -1,8 +1,9 @@
 """The tracker of a view (INCOME-01, INCOME-03, ROUND-02, CARD-16, CARD-20) and the turn counter."""
 
+from test_cards import ready
 from test_engine import begin
 
-from seti_engine import projection, tables
+from seti_engine import cards, projection, scoring, tables
 from seti_engine.engine import apply
 
 
@@ -21,7 +22,7 @@ def test_income_is_the_income_card_plus_each_tucked_card() -> None:
 def test_the_tracker_counts_missions_and_end_cards_and_is_public() -> None:
     s = begin(3).state.model_copy(deep=True)
     s.players[1].completed_missions = ["1", "2", "3"]
-    s.players[1].end_cards = ["95"]
+    s.players[1].end_cards = ["12"]  # a card with an end-of-game scoring (the tracker also estimates what it gives)
     view = projection.project(s, viewer=0)  # another player's hand is hidden, their tracker is not
     assert len(view.trackers) == 3
     assert view.trackers[1].missions_done == 3 and view.trackers[1].end_cards == 1
@@ -72,3 +73,17 @@ def test_exertian_danger_is_public_for_the_board_and_private_for_the_cards() -> 
     assert (mine.danger_board, mine.exertian_played, mine.danger_cards) == (3, 2, 9)
     assert (other.danger_board, other.exertian_played, other.danger_cards) == (3, 2, None)
     assert species.danger(s, s.players[1]) == 12
+
+
+def test_the_tracker_gives_an_estimate_of_the_gold_tiles_and_the_end_cards() -> None:  # END-10 to END-17
+    from test_scoring import tile
+
+    s = ready()
+    p = s.players[0]
+    p.techs = ["probe-dot", "telescope-dot", "computer-dot"]
+    tile(s, "Tech", "A", [0])  # one set of three techs, first marker
+    t = projection.tracker(s, p)
+    assert t.gold_estimate == scoring.gold_points(s, p) > 0
+    assert t.end_estimate == cards.end_points(s, p)
+    assert projection.tracker(s, s.players[1]).gold_estimate == 0  # the other player has not marked the tile
+
