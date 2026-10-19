@@ -2,15 +2,14 @@
 // columns below it, and the places a move can be made at (the organelle that gives its bonus, the marker that is removed).
 import { PLAYER_COLOR } from "@/lib/geometry";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
-import { AMOEBA_SCALE, ORGANELLE_SPACES } from "@/lib/targets";
+import { AMOEBA_SCALE, ORGANELLE_SPACES, ORGANELLE_TOKENS } from "@/lib/targets";
 import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { PanelSpots } from "./PanelSpots";
 
 const ASSET = expansionAssets as Record<string, string>;
-// the organelle tokens in the order of the engine's data: a random card, 1 data, 1 publicity, 2 points, 4 points
-const TOKENS = ["1-card", "1-data", "1-pub", "2-score", "4-score"];
+const TOKENS = ORGANELLE_TOKENS;
 const W = 573;
 const H = 1044;
 

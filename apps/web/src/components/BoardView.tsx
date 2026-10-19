@@ -43,7 +43,7 @@ import {
 import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
-import { type Spot, onAlienBoard } from "@/lib/targets";
+import { AMOEBA_SCALE, ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
 import { type ReactNode, useRef, useState } from "react";
@@ -742,6 +742,28 @@ export function BoardView({
               );
             })
           : null}
+
+        {/* Amoeba: the five organelle tokens lie on the spaces of the cell (EXP-AMO-02); the places are measured on the picture of 573 px, the board is 777 */}
+        {s.species.map((sp, i) => {
+          if (!sp.discovered || sp.species !== "amoeba") return null;
+          const organelles = (sp.extra?.organelles ?? {}) as Record<string, number>;
+          return (
+            <g key="amoeba-organelles">
+              {Object.entries(organelles).map(([space, kind]) => {
+                const at = ORGANELLE_SPACES[space];
+                const href = EXPANSION_BOARDS[`tokens/organelle-token-${ORGANELLE_TOKENS[kind] ?? "back"}`];
+                if (!at || !href) return null;
+                const p = onAlienBoard(i, at[0] / AMOEBA_SCALE, at[1] / AMOEBA_SCALE);
+                const size = 72 / AMOEBA_SCALE;
+                return (
+                  <image key={space} href={href} x={p.x - size / 2} y={p.y - size / 2} width={size} height={size}>
+                    <title>{`Organelle on ${space}`}</title>
+                  </image>
+                );
+              })}
+            </g>
+          );
+        })}
 
         {/* the markers on the spaces of a species board that have been taken, and on its overflow spaces (under the discovery spaces) */}
         {s.species.map((sp, i) => {

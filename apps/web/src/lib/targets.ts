@@ -43,6 +43,8 @@ export const ORGANELLE_SPACES: Record<string, [number, number]> = {
   IP: [230, 350],
   IB: [350, 335],
 };
+/** The organelle tokens in the order of the engine's data: a random card, 1 data, 1 publicity, 2 points, 4 points. */
+export const ORGANELLE_TOKENS = ["1-card", "1-data", "1-pub", "2-score", "4-score"];
 /** The picture of the Amoeba board is 573 wide; the places of the markers are measured on the species boards of the base board (777 wide). */
 export const AMOEBA_SCALE = 573 / 777;
 
