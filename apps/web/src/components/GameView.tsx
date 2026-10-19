@@ -76,6 +76,17 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
   const decision = s.pending[0];
   if (mine) {
     if (decision?.kind === "scan_step") return { who, mine, text: scanStepText(new Set(view.legal.map((m) => String(m.type)))) };
+    if (decision?.kind === "organelle") {
+      const color = String(decision.data?.color);
+      const none = view.legal.some((m) => m.type === "skip_organelle");
+      return {
+        who,
+        mine,
+        text: none
+          ? `no organelle of the ${color} section is available: skip`
+          : `choose one organelle of the ${color} section on the Amoeba board and confirm`,
+      };
+    }
     if (decision) return { who, mine, text: humanize(decision.kind) };
     return { who, mine, text: s.main_done ? "take free actions, or end the turn" : "choose a main action" };
   }

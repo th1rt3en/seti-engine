@@ -1,8 +1,4 @@
 {
- "amoeba_remove": [
-  "color",
-  "index"
- ],
  "analyze": [],
  "breach": [],
  "buy_card": [
@@ -10,6 +6,9 @@
  ],
  "choose_gold": [
   "tile"
+ ],
+ "choose_land_slot": [
+  "slot"
  ],
  "choose_message": [
   "hex",
@@ -66,6 +65,9 @@
  ],
  "hand_signal_done": [],
  "land": [
+  "probe"
+ ],
+ "land_free": [
   "probe"
  ],
  "launch": [],
@@ -179,6 +181,7 @@
   "where"
  ],
  "skip_breach": [],
+ "skip_exertian": [],
  "skip_land": [],
  "skip_tuck": [],
  "slingshot_pick": [

@@ -193,6 +193,8 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
         </>
       );
     }
+    case "organelle_skipped":
+      return `${who} has no ${String(ev.color)} organelle to trigger`;
     case "draw_card":
       // the player who drew it sees the card; the others (and the spectators) are only told that a card was drawn
       return ev.card ? `${who} draws ${cardName(ev.card)}` : `${who} draws a card from the deck`;

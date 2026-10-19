@@ -77,13 +77,19 @@ def gain_section(s: GameState, p: PlayerState, color: str, events: Events) -> No
 def pick_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
     i = slot_index(s)
     assert i is not None
-    return [{"type": "pick_organelle", "space": sp} for sp in in_section(s.species[i].extra, d.data["color"])]
+    spaces = in_section(s.species[i].extra, d.data["color"])
+    if not spaces:  # no organelle of that color: the player says so with a skip (the effect is lost)
+        return [{"type": "skip_organelle", "color": d.data["color"]}]
+    return [{"type": "pick_organelle", "space": sp} for sp in spaces]
 
 
 def pick(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
     """EXP-AMO-04: a card's single organelle icon: the bonus of one organelle in the section of the icon's color, then it mutates."""
     i = slot_index(s)
     assert i is not None
+    if a["type"] == "skip_organelle":
+        events.append({"type": "organelle_skipped", "player": p.index, "color": a["color"]})
+        return
     extra = s.species[i].extra
     rewards.grant(s, p, data()["organelles"][extra["organelles"][a["space"]]], events)
     events.append({"type": "organelle", "player": p.index, "space": a["space"]})
@@ -92,7 +98,7 @@ def pick(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> Non
 
 def request_pick(s: GameState, p: PlayerState, color: str) -> None:
     i = slot_index(s)
-    if i is not None and in_section(s.species[i].extra, color):
+    if i is not None:
         s.pending.append(Decision(kind="organelle", player=p.index, data={"color": color}))
 
 

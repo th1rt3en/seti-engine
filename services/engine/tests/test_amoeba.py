@@ -142,3 +142,16 @@ def test_a_mission_circle_can_give_an_organelle() -> None:  # AM.17, EXP-AMO-04
     cards.fire(s, p, [{"e": "tech", "cat": "probe"}], [])
     r = apply(s, {"type": "cover", "card": "AM.17", "circle": 0})
     assert r.state.pending[0].kind == "organelle" and r.state.pending[0].data["color"] == "yellow"
+
+
+def test_an_organelle_icon_with_no_organelle_of_its_color_asks_the_player_to_skip() -> None:  # EXP-AMO-04
+    s = discovered()
+    p = s.players[0]
+    s.current_player = 0
+    s.species[0].extra["organelles"] = {"P1": 4, "P2": 2, "IB": 0, "IP": 1, "B1": 3}
+    cards.run_step(s, p, {"t": "organelle", "color": "yellow"}, [])
+    assert s.pending[0].kind == "organelle"
+    moves = legal_moves(s)
+    assert {"type": "skip_organelle", "color": "yellow"} in moves and not any(m["type"] == "pick_organelle" for m in moves)
+    r = apply(s, {"type": "skip_organelle", "color": "yellow"})
+    assert not r.state.pending and r.state.species[0].extra["organelles"] == {"P1": 4, "P2": 2, "IB": 0, "IP": 1, "B1": 3}

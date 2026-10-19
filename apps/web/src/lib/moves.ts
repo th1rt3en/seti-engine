@@ -90,6 +90,7 @@ export const LABELS: Record<string, Label> = {
   decipher: (m) =>
     `Place the ${String(m.glyph)} glyph token in the ${String(m.row)} row, slot ${Number(m.index) + 1}, and gain its resource`,
   glyph_group: (m) => `Gain the resources of glyph group ${Number(m.group) + 1}`,
+  skip_organelle: (m) => `Skip: no ${String(m.color)} organelle is available`,
   pick_organelle: (m) => `Gain the bonus of the organelle on space ${String(m.space)}`,
   amoeba_remove: (m) => `Remove your marker from the ${String(m.color)} space ${Number(m.index) + 1} of the Amoeba board`,
   spend_credit: () => "Spend 1 credit for 2 VP and 2 publicity",
