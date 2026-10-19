@@ -6,6 +6,7 @@ import {
   ALIEN,
   ALIEN_COLUMN,
   ALIEN_TOP,
+  CENTAURIAN_HEXES,
   DISCOVERY,
   LAND_SPACES,
   MOON,
@@ -199,6 +200,14 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         add(i, id, { ...none, x: at.x, y: at.y, r: 62 });
         const spot = spots.get(id);
         if (spot) spot.choices = [...(spot.choices ?? []), { glyph: String(m.glyph), move: i }];
+      }
+    } else if (m.type === "choose_message") {
+      // the special marker of the Centaurians: the reward hex to cover is clicked on the species board
+      const slot = s.species.findIndex((sp) => sp.discovered && sp.species === "centaurians");
+      const x = CENTAURIAN_HEXES.xs[Number(m.hex)];
+      if (slot >= 0 && x !== undefined) {
+        const p = onAlienBoard(slot, x, CENTAURIAN_HEXES.y);
+        add(i, `message:${String(m.hex)}`, { kind: "circle", x: p.x, y: p.y, r: 62 });
       }
     } else if (m.type === "remove_orbiter") {
       // an effect that removes one of the player's own orbiters (new assignment): click the orbiter on its planet; the one on the first

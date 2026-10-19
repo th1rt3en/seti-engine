@@ -119,7 +119,10 @@ describe("the places of the Space Agencies expansion", () => {
       ],
       [null, null, null, null, null, null, null],
     );
-    (v.state as unknown as { species: unknown[] }).species = [{ species: "glyphids", discovered: true }, { species: "amoeba", discovered: true }];
+    (v.state as unknown as { species: unknown[] }).species = [
+      { species: "glyphids", discovered: true },
+      { species: "amoeba", discovered: true },
+    ];
     const { spots, handled } = buildSpots(v);
     // two kinds for one hole: one place, with a choice of the two tokens (each with its own move)
     const holes = spots.filter((s) => s.id.startsWith("glyph:"));
@@ -143,6 +146,22 @@ describe("the places of the Space Agencies expansion", () => {
     (v.state as unknown as { pending: unknown[] }).pending = [{ kind: "breach", player: 0, data: { color: "pink" } }];
     const { spots } = buildSpots(v);
     expect(spots).toEqual([]);
+  });
+});
+
+describe("the special marker of the Centaurians", () => {
+  it("covers a reward hex that is clicked on the species board", () => {
+    const v = view(
+      [
+        { type: "choose_message", hex: 1, reward: [] },
+        { type: "choose_message", hex: 3, reward: [] },
+      ],
+      [null, null],
+    );
+    (v.state as unknown as { species: unknown[] }).species = [{ species: "centaurians", discovered: true }];
+    const { spots, handled } = buildSpots(v);
+    expect(spots.map((x) => x.id)).toEqual(["message:1", "message:3"]);
+    expect([...handled]).toEqual([0, 1]);
   });
 });
 
