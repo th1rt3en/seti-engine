@@ -33,6 +33,7 @@ export function SetupChoice({
   const [aside, setAside] = useState(false);
   if (aside) {
     return (
+      // biome-ignore lint/a11y/useSemanticElements: a bar, not a section of the page
       <div className="setupaside" role="region" aria-label="The choice is put aside">
         <span>{org ? "Choosing your organization" : `Choosing ${need} quick start cards`}</span>
         <button type="button" className="primary" onClick={() => setAside(false)}>
@@ -44,6 +45,7 @@ export function SetupChoice({
   return (
     <div
       className="setupchoice"
+      // biome-ignore lint/a11y/useSemanticElements: a layer over the board that the page controls itself, not a native <dialog>
       role="dialog"
       aria-modal="true"
       aria-label={org ? "Choose your organization" : "Choose a quick start card"}

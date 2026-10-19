@@ -332,8 +332,8 @@ function Board({
             {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}
             {m.kind === "trigger" ? (
               m.used.map((u, k) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: the circles of a card are fixed
                 <circle
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the circles of a card are fixed
                   key={k}
                   cx={x + 20 + k * 30}
                   cy={y + MISSIONS.h + 20}

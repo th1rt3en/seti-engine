@@ -606,6 +606,7 @@ export function GameClient({
   const left = (view.remaining ?? []).map((r, i) => (r === null ? null : i === v.to_act ? r - (now - receivedAt) : r));
   const canKick = v.viewer !== null && !ended && v.state.players.length >= 3;
   const sendingPrompt = (
+    // biome-ignore lint/a11y/useSemanticElements: a small notice with a spinner, not an <output> of a form
     <div className="sendingmove" role="status" aria-live="polite">
       <span className="spinner" aria-hidden="true" />
       <span>Sending your move...</span>
@@ -817,7 +818,6 @@ export function GameClient({
         const idle = m.type === "move_energy" && noProbe;
         return (
           <button
-            // biome-ignore lint/suspicious/noArrayIndexKey: the answers come in the order of the engine
             key={`${m.type}-${i}`}
             type="button"
             className="secondary small"
@@ -901,7 +901,6 @@ export function GameClient({
             <MoveGroup key={g.title} title={g.title} foldable={false}>
               <div className="moves">
                 {g.moves.map((m, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the moves come in the order of the engine
                   <button key={`${m.type}-${i}`} type="button" onClick={() => play(m)}>
                     {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? <ActionIcon name={m.type} /> : null}
                     {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? (

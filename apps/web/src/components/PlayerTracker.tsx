@@ -184,7 +184,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
           {s.options.organizations
             ? row(
                 labelled(<span className="muted small">Org</span>, "Organization"),
-                s.players.map((p) => (p.organization ? <OrgName id={p.organization} /> : "—")),
+                s.players.map((p) => (p.organization ? <OrgName key={p.index} id={p.organization} /> : "—")),
               )
             : null}
           {row(

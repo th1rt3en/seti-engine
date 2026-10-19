@@ -45,6 +45,7 @@ export function GameSettings() {
         ⚙
       </button>
       {open ? (
+        // biome-ignore lint/a11y/useSemanticElements: a panel that opens beside its button, not a modal <dialog>
         <div className="settingspanel" role="dialog" aria-label="Game settings">
           <label className="switchrow">
             <span>Play a ting when it is my turn</span>
