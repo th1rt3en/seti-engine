@@ -13,6 +13,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import secrets
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -23,6 +25,10 @@ ROOT = "seti-engine/games/"  # the bucket is shared, so everything of this proje
 _PATH = re.compile(
     r"^seti-engine/games/\d{4}/\d{2}/\d{2}/[A-Za-z0-9_-]{1,80}/(header\.json|result\.json|replay\.json|actions/\d{7}\.json)$"
 )
+ERROR_ROOT = "seti-engine/errors/"  # error reports of the engine, the Worker and the website: one object each, a folder for each day (UTC)
+_ERROR_PATH = re.compile(r"^seti-engine/errors/\d{4}-\d{2}-\d{2}/[A-Za-z0-9_.-]{1,160}\.json$")
+_SOURCE = re.compile(r"^[a-z0-9_-]{1,30}$")
+MAX_REPORT_BYTES = 40_000
 _METADATA_TOKEN = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
 
 
@@ -35,6 +41,20 @@ def valid_path(path: str) -> bool:
     return _PATH.match(path) is not None
 
 
+def valid_error_path(path: str) -> bool:
+    return _ERROR_PATH.match(path) is not None
+
+
+def valid_source(source: str) -> bool:
+    return _SOURCE.match(source) is not None
+
+
+def error_path(source: str, now: float | None = None) -> str:
+    """`seti-engine/errors/2026-10-19/083015-worker-a1b2c3d4.json`: the day, the time (UTC), the source and a random id (no overwrite)."""
+    t = time.gmtime(time.time() if now is None else now)
+    return f"{ERROR_ROOT}{time.strftime('%Y-%m-%d', t)}/{time.strftime('%H%M%S', t)}-{source}-{secrets.token_hex(4)}.json"
+
+
 def _access_token() -> str:
     req = urllib.request.Request(_METADATA_TOKEN, headers={"Metadata-Flavor": "Google"})
     with urllib.request.urlopen(req, timeout=5) as res:  # noqa: S310 (a fixed https-less metadata address)
@@ -43,7 +63,7 @@ def _access_token() -> str:
 
 def write(path: str, body: Any) -> None:
     """Write one JSON document, overwriting an earlier one at the same path."""
-    if not valid_path(path):
+    if not valid_path(path) and not valid_error_path(path):
         raise ArchiveError(f"not an archive path: {path!r}")
     data = json.dumps(body, separators=(",", ":")).encode("utf-8")
     folder = os.environ.get("ARCHIVE_DIR")

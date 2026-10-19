@@ -7,6 +7,7 @@ import { D1Sink } from "./core/d1.js";
 import { HttpEngine } from "./core/engine.js";
 import { EngineArchive } from "./core/engineArchive.js";
 import { makeSigner } from "./core/engineAuth.js";
+import { type ErrorReporter, makeErrorReporter } from "./core/errorReport.js";
 import { type Connection, GameRoom, type ServerMessage, type Store, type SubmitResult } from "./core/room.js";
 import type { Env } from "./env.js";
 
@@ -35,12 +36,14 @@ class DoStore implements Store {
 
 export class GameRoomDO implements DurableObject {
   private readonly room: GameRoom;
+  private readonly errors: ErrorReporter;
 
   constructor(
     private readonly ctx: DurableObjectState,
     env: Env,
   ) {
     const sign = env.ENGINE_SIGNING_KEY ? makeSigner(env.ENGINE_SIGNING_KEY, "worker") : undefined;
+    this.errors = makeErrorReporter(env.ENGINE_URL, sign);
     this.room = new GameRoom({
       store: new DoStore(ctx.storage),
       engine: new HttpEngine(env.ENGINE_URL, undefined, sign),
@@ -62,6 +65,15 @@ export class GameRoomDO implements DurableObject {
 
   /** The Worker has already checked the token; it passes the identity in a header (only the Worker can reach this object). */
   async fetch(request: Request): Promise<Response> {
+    try {
+      return await this.handle(request);
+    } catch (e) {
+      this.ctx.waitUntil(this.errors.report("game-room", e, { route: new URL(request.url).pathname }));
+      return json({ ok: false, code: "internal", message: "internal error" }, 500);
+    }
+  }
+
+  private async handle(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const identity = JSON.parse(request.headers.get("x-identity") ?? "null") as Identity | null;
     if (url.pathname === "/ws") return this.upgrade(request, identity);
@@ -104,6 +116,15 @@ export class GameRoomDO implements DurableObject {
   }
 
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    try {
+      await this.onMessage(ws, message);
+    } catch (e) {
+      this.ctx.waitUntil(this.errors.report("game-room", e, { where: "websocket message" }));
+      this.connection(ws).send({ t: "error", code: "internal", message: "internal error" });
+    }
+  }
+
+  private async onMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     const conn = this.connection(ws);
     const att = ws.deserializeAttachment() as Attachment;
     let msg: { t?: string; seq?: number; seat?: number; action?: Record<string, unknown> };
@@ -137,7 +158,12 @@ export class GameRoomDO implements DurableObject {
   }
 
   async alarm(): Promise<void> {
-    await this.room.onAlarm();
+    try {
+      await this.room.onAlarm();
+    } catch (e) {
+      this.ctx.waitUntil(this.errors.report("game-room", e, { where: "alarm" }));
+      throw e; // the runtime retries an alarm that failed
+    }
   }
 }
 

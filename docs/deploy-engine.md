@@ -42,3 +42,10 @@ form `seti-engine/games/YYYY/MM/DD/<id>/{header,result,replay}.json` or `.../act
 - Keep the game state and the action log; call `POST /apply` with the stored state and the player's action.
 - Send each client only `POST /project` output for that player, never the raw state (rule 6).
 - Send a player only the `legal` moves of their own view.
+
+## Error reports (2026-10-19)
+Unexpected errors of the engine, the game Worker (and its Durable Objects) and the website are stored as one JSON object each in the same bucket as the game archive (`temp-common-storage`, or `ARCHIVE_BUCKET`):
+
+`gs://temp-common-storage/seti-engine/errors/<YYYY-MM-DD>/<HHMMSS>-<source>-<id>.json` (the day and the time are UTC; `source` is `engine`, `worker`, `game-room` or `web`)
+
+Each object has `source`, `at`, `message` and `detail` (the route, and the stack). The Worker and the website send their reports with `PUT /errors` (signed like every request); the engine writes its own. The paths are made by the engine, so a caller cannot choose where to write, and long text is cut. Each process sends at most 20 reports a minute. Reading them: `gcloud storage ls gs://temp-common-storage/seti-engine/errors/2026-10-19/` and `gcloud storage cat <object>`. Nobody is alerted: look at the folder. A report that fails to be stored is dropped.

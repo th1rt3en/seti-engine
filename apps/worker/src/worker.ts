@@ -11,6 +11,8 @@
 import type { Options } from "@seti/protocol";
 import { AuthError, type Identity, verifyToken } from "./core/auth.js";
 import type { ClockSettings } from "./core/clock.js";
+import { makeSigner } from "./core/engineAuth.js";
+import { makeErrorReporter } from "./core/errorReport.js";
 import type { Env } from "./env.js";
 
 export { GameRoomDO as GameRoom } from "./gameRoom.js";
@@ -39,7 +41,21 @@ function validClock(c: unknown): c is ClockSettings {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    try {
+      return await handle(request, env);
+    } catch (e) {
+      // an unexpected error: it is stored as an object in the bucket (core/errorReport.ts) and the caller gets a plain 500
+      const sign = env.ENGINE_SIGNING_KEY ? makeSigner(env.ENGINE_SIGNING_KEY, "worker") : undefined;
+      const url = new URL(request.url);
+      ctx.waitUntil(makeErrorReporter(env.ENGINE_URL, sign).report("worker", e, { method: request.method, route: url.pathname }));
+      return json({ ok: false, code: "internal", message: "internal error" }, 500);
+    }
+  },
+} satisfies ExportedHandler<Env>;
+
+async function handle(request: Request, env: Env): Promise<Response> {
+  {
     const url = new URL(request.url);
     const parts = url.pathname.split("/").filter(Boolean);
     if (url.pathname === "/health") return json({ status: "ok" });
@@ -98,8 +114,8 @@ export default {
     if ((action === "join" || action === "leave" || action === "resign") && request.method === "POST")
       return forward(stub, `/${action}`, headers, "POST");
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
-  },
-} satisfies ExportedHandler<Env>;
+  }
+}
 
 function forward(stub: DurableObjectStub, path: string, headers: Record<string, string>, method = "GET"): Promise<Response> {
   return stub.fetch(`https://room${path}`, { method, headers });

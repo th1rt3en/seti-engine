@@ -107,3 +107,29 @@ describe("the recovery code, the password change and the administrator's reset",
     expect(await authLockedOut(db, "1.2.3.4", now + 16 * 60_000)).toBe(false);
   });
 });
+
+describe("the error report of the website", () => {
+  it("sends the error to /errors, and at most 20 a minute", async () => {
+    const { reportError, resetReportLimit } = await import("@/lib/errorReport");
+    resetReportLimit();
+    const urls: string[] = [];
+    const bodies: string[] = [];
+    const fetcher = (async (url: string, init: RequestInit) => {
+      urls.push(url);
+      bodies.push(String(init.body));
+      return new Response("{}");
+    }) as unknown as typeof fetch;
+    const cfg = { engineUrl: "https://engine", engineSigningKey: "" };
+    for (let i = 0; i < 30; i++) await reportError(cfg, new Error("boom"), { route: "/lobby" }, fetcher, () => 1000);
+    expect(urls).toHaveLength(20);
+    expect(urls[0]).toBe("https://engine/errors");
+    const body = JSON.parse(bodies[0] ?? "{}");
+    expect(body.source).toBe("web");
+    expect(body.message).toBe("Error: boom");
+    expect(body.detail.route).toBe("/lobby");
+    resetReportLimit();
+    await reportError(cfg, "plain text", {}, (async () => {
+      throw new Error("engine down");
+    }) as unknown as typeof fetch);
+  });
+});

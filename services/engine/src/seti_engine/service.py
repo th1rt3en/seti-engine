@@ -1,13 +1,16 @@
 """The stateless HTTP service around the engine (run it with `uvicorn seti_engine.service:app`).
 
 Every request carries the whole game state; nothing is kept between requests, so any number of instances can serve one game (decision D5).
-Endpoints: POST /new, POST /apply, POST /legal, POST /project, PUT /archive, GET /schema, GET /health.
+Endpoints: POST /new, POST /apply, POST /legal, POST /project, PUT /archive, PUT /errors, GET /schema, GET /health.
 Callers sign their requests (request_auth.py, decision D16); deploy the service private as well (Cloud Run IAM).
 See docs/deploy-engine.md.
 """
 
 from __future__ import annotations
 
+import json
+import time
+import traceback
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -95,3 +98,56 @@ def archive(req: ArchiveRequest) -> JSONResponse:
     except archive_store.ArchiveError as e:
         return JSONResponse(status_code=503, content={"error": "archive_failed", "message": str(e)[:300]})
     return JSONResponse(content={"ok": True})
+
+
+class ErrorReport(BaseModel):
+    source: str  # "worker", "web" or "engine"
+    message: str
+    detail: Any = None  # the stack, the route, the game id ...
+
+
+def _clip(value: Any, limit: int) -> Any:
+    """Strings are cut so that one report cannot fill the bucket; other values are kept as they are when small."""
+    if isinstance(value, str):
+        return value[:limit]
+    if isinstance(value, dict):
+        return {str(k)[:60]: _clip(v, limit) for k, v in list(value.items())[:40]}
+    if isinstance(value, list):
+        return [_clip(v, limit) for v in value[:40]]
+    return value
+
+
+def save_error(source: str, message: str, detail: Any = None) -> str | None:
+    """Write one error report to the bucket (archive_store.py). Never raises: reporting an error must not cause another one."""
+    try:
+        if not archive_store.valid_source(source):
+            source = "unknown"
+        body = {
+            "source": source,
+            "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "message": message[:2000],
+            "detail": _clip(detail, 6000),
+        }
+        if len(json.dumps(body)) > archive_store.MAX_REPORT_BYTES:
+            body["detail"] = None
+        path = archive_store.error_path(source)
+        archive_store.write(path, body)
+        return path
+    except Exception:  # noqa: BLE001 - see the docstring
+        return None
+
+
+@app.put("/errors")
+def errors(report: ErrorReport) -> JSONResponse:
+    """Store one error report of the Worker or the website as an object in the bucket (signed like every request)."""
+    path = save_error(report.source, report.message, report.detail)
+    if path is None:
+        return JSONResponse(status_code=503, content={"error": "report_failed", "message": "the report could not be stored"})
+    return JSONResponse(content={"ok": True, "path": path})
+
+
+@app.exception_handler(Exception)
+async def unhandled(request: Request, exc: Exception) -> JSONResponse:
+    """An unexpected error of the engine itself is stored too; the caller gets a plain 500."""
+    save_error("engine", f"{type(exc).__name__}: {exc}", {"route": request.url.path, "trace": traceback.format_exc()})
+    return JSONResponse(status_code=500, content={"error": "internal", "message": "internal error"})
