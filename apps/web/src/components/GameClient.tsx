@@ -528,6 +528,7 @@ export function GameClient({
     mission_relay: "Mission Relay: 2 publicity",
     fenwick_research_center: "Fenwick: 1 publicity",
     cosmos_strategy_group: "Cosmos Strategy: take it",
+    futurespan_institute: "Futurespan: token +3 and take it",
   };
   const pickedRowMoves = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
   // discarding a card of the display for a signal (during a scan) is confirmed by a button on the card itself; the other moves keep the bar

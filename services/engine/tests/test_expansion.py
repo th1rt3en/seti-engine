@@ -361,11 +361,9 @@ def test_futurespan_prepares_a_card_waits_for_the_token_and_plays_it_free() -> N
     assert not can(s, "org_main", org="futurespan_institute")
     assert not any(m.get("card") for m in legal_moves(s) if m["type"] == "org_free")  # only one card at a time
     hand = len(cur(s).hand)
-    s = act(s, type="org_free", org="futurespan_institute", delay=True)
+    assert {m["source"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("delay")} >= {"deck", "row:0"}
+    s = pick(s, "org_free", org="futurespan_institute", delay=True, source="row:0")  # the card is clicked in the same move
     assert cur(s).org_data["fs_token"] == score + 10 * cost + 8
-    assert s.pending[0].kind == "take_card" and len(cur(s).hand) == hand  # the card comes from the card row or the deck (owner, 2026-10-18)
-    assert {m["source"] for m in legal_moves(s) if m["type"] == "take_card"} >= {"deck", "row:0"}
-    s = pick(s, "take_card", source="row:0")
     assert len(cur(s).hand) == hand + 1 and not s.pending
     assert not any(m["type"] == "org_free" for m in legal_moves(s))  # once per round
     cur(s).score = cur(s).org_data["fs_token"]

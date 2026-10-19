@@ -348,7 +348,7 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
             # A-052: costs 1 to 4 only; "ahead" is how far in front of the score the token is put, for the button
             return [{**base, "card": c, "ahead": 10 * prepare_cost(c) + 5} for c in dict.fromkeys(p.hand) if 1 <= prepare_cost(c) <= 4]
         if not p.org_used:  # once per round while the token is on the scoring track: 3 spaces farther, and a card
-            return [{**base, "delay": True}]
+            return [{**base, "delay": True, "source": x} for x in _sources(s)]  # the card is picked in the same move: the row or the deck
         return []
     if p.org_used:
         return []
@@ -387,8 +387,8 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         if a.get("delay"):  # EXP-ORG-12
             p.org_used = True
             p.org_data["fs_token"] += 3
-            # owner ruling, 2026-10-18: the card is taken from the card row or from the deck, like any card gained
-            s.pending.append(Decision(kind="take_card", player=p.index, source={"kind": "organization", "org": o}))
+            # owner ruling, 2026-10-18: the card is taken from the card row or from the deck, like any card gained; the move names it
+            effects.take_from_row_or_deck(s, p, a["source"], events)
         else:
             p.hand.remove(a["card"])
             p.org_data["fs_card"] = a["card"]
