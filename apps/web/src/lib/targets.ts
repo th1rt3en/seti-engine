@@ -31,22 +31,20 @@ export const ORG_SPACES: Record<string, Record<string, [number, number]>> = {
   helion_assembly: { energy: [40, 130], signal_token: [120, 130], data: [200, 130] },
 };
 
-/** The nine organelle spaces of the Amoeba board in its picture (573 x 1044): 6 outer spaces clockwise, 3 inner ones counter-clockwise. */
+/** The nine organelle spaces of the Amoeba board in its picture (777 x 1415, like the base species boards): 6 outer spaces clockwise, 3 inner ones counter-clockwise. */
 export const ORGANELLE_SPACES: Record<string, [number, number]> = {
-  Y1: [228, 148],
-  Y2: [340, 138],
-  B1: [478, 355],
-  B2: [418, 460],
-  P1: [172, 465],
-  P2: [112, 353],
-  IY: [292, 242],
-  IP: [230, 350],
-  IB: [350, 335],
+  Y1: [310, 191],
+  Y2: [462, 178],
+  B1: [649, 474],
+  B2: [568, 617],
+  P1: [234, 624],
+  P2: [152, 471],
+  IY: [397, 320],
+  IP: [312, 467],
+  IB: [475, 447],
 };
 /** The organelle tokens in the order of the engine's data: a random card, 1 data, 1 publicity, 2 points, 4 points. */
 export const ORGANELLE_TOKENS = ["1-card", "1-data", "1-pub", "2-score", "4-score"];
-/** The picture of the Amoeba board is 573 wide; the places of the markers are measured on the species boards of the base board (777 wide). */
-export const AMOEBA_SCALE = 573 / 777;
 
 /** What the engine says about a move (see move_notes.py). */
 export type Note = {
@@ -204,14 +202,14 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       }
     } else if (m.type === "pick_organelle") {
       const at = ORGANELLE_SPACES[String(m.space)];
-      if (at) add(i, `organelle:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 40 }, { panel: "amoeba" });
+      if (at) add(i, `organelle:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 56 }, { panel: "amoeba" });
     } else if (m.type === "amoeba_remove") {
       const at = SPECIES_SPACES.amoeba?.[String(m.color)]?.[Number(m.index)];
       if (at)
         add(
           i,
           `amoeba:${String(m.color)}:${String(m.index)}`,
-          { ...none, x: at[0] * AMOEBA_SCALE, y: at[1] * AMOEBA_SCALE, r: 34 },
+          { ...none, x: at[0], y: at[1], r: 46 },
           { panel: "amoeba" },
         );
     } else if (m.type === "mark_objective") {

@@ -2,7 +2,7 @@
 // columns below it, and the places a move can be made at (the organelle that gives its bonus, the marker that is removed).
 import { PLAYER_COLOR } from "@/lib/geometry";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
-import { AMOEBA_SCALE, ORGANELLE_SPACES, ORGANELLE_TOKENS } from "@/lib/targets";
+import { ORGANELLE_SPACES, ORGANELLE_TOKENS } from "@/lib/targets";
 import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
@@ -10,8 +10,9 @@ import { PanelSpots } from "./PanelSpots";
 
 const ASSET = expansionAssets as Record<string, string>;
 const TOKENS = ORGANELLE_TOKENS;
-const W = 573;
-const H = 1044;
+const W = 777;
+const H = 1415;
+const TOKEN = 114;
 
 export function AmoebaPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
   const slot = view.state.species.find((sp) => sp.discovered && sp.species === "amoeba");
@@ -35,7 +36,7 @@ export function AmoebaPanel({ view, names, spots }: { view: View; names: string[
           const href = ASSET[`tokens/organelle-token-${TOKENS[kind] ?? "back"}`];
           if (!at || !href) return null;
           return (
-            <image key={space} href={href} x={at[0] - 36} y={at[1] - 36} width={72} height={72}>
+            <image key={space} href={href} x={at[0] - TOKEN / 2} y={at[1] - TOKEN / 2} width={TOKEN} height={TOKEN}>
               <title>{`Organelle on ${space}`}</title>
             </image>
           );
@@ -47,9 +48,9 @@ export function AmoebaPanel({ view, names, spots }: { view: View; names: string[
             return owners.map((o, j) => (
               <circle
                 key={`${c}-${k}-${j}-${o}`}
-                cx={at[0] * AMOEBA_SCALE + (j - (owners.length - 1) / 2) * 26}
-                cy={at[1] * AMOEBA_SCALE}
-                r={14}
+                cx={at[0] + (j - (owners.length - 1) / 2) * 36}
+                cy={at[1]}
+                r={19}
                 fill={PLAYER_COLOR[view.state.players[o]?.color ?? ""] ?? "#fff"}
                 stroke="#000"
                 strokeWidth={3}

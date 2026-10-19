@@ -27,9 +27,9 @@ the repository; the original files are not. Do not edit by hand.
 | `space-agencies-long-term-objective-1.jpg` | `/assets/expansion/objectives/long-term-1.fc7e9bc1e5.webp` |
 | `space-agencies-long-term-objective-2.jpg` | `/assets/expansion/objectives/long-term-2.6dc3f00dec.webp` |
 | `space-agencies-long-term-objective-3.jpg` | `/assets/expansion/objectives/long-term-3.6c1bb84f55.webp` |
-| `alien-board-arkhos.png` (resized to 777 x 1415 and trimmed to the outline of the base species boards by `tools/web/trim_species_board.py arkhos`) | `/assets/expansion/boards/arkhos.e2528acb73.webp` |
+| `alien-board-arkhos.png` (cropped to its art, resized to 777 x 1415 and trimmed to the outline of the base species boards by `tools/web/trim_species_board.py arkhos`) | `/assets/expansion/boards/arkhos.e2528acb73.webp` |
 | `alien-board-glyphids.png` | `/assets/expansion/boards/glyphids.2d00ce5830.webp` |
-| `alien-board-amoeba.png` (resized to 777 x 1415 and trimmed to the outline of the base species boards by `tools/web/trim_species_board.py amoeba`) | `/assets/expansion/boards/amoeba.0d883b4067.webp` |
+| `alien-board-amoeba.png` (cropped to its art, resized to 777 x 1415 and trimmed to the outline of the base species boards by `tools/web/trim_species_board.py amoeba`) | `/assets/expansion/boards/amoeba.054798c0a4.webp` |
 | `alien-board-glyphids-track-variant-a.png` | `/assets/expansion/boards/glyphids-track-a.ee5b22fb7c.webp` |
 | `alien-board-glyphids-track-variant-b.png` | `/assets/expansion/boards/glyphids-track-b.39b4fca99e.webp` |
 | `alien-board-glyphids-track-variant-c.png` | `/assets/expansion/boards/glyphids-track-c.fc91998d76.webp` |

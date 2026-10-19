@@ -43,7 +43,7 @@ import {
 import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { SPECIES_SPACES } from "@/lib/speciesSpaces";
-import { AMOEBA_SCALE, ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard } from "@/lib/targets";
+import { ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
 import { type ReactNode, useRef, useState } from "react";
@@ -753,8 +753,8 @@ export function BoardView({
                 const at = ORGANELLE_SPACES[space];
                 const href = EXPANSION_BOARDS[`tokens/organelle-token-${ORGANELLE_TOKENS[kind] ?? "back"}`];
                 if (!at || !href) return null;
-                const p = onAlienBoard(i, at[0] / AMOEBA_SCALE, at[1] / AMOEBA_SCALE);
-                const size = 72 / AMOEBA_SCALE;
+                const p = onAlienBoard(i, at[0], at[1]);
+                const size = 114;
                 return (
                   <image key={space} href={href} x={p.x - size / 2} y={p.y - size / 2} width={size} height={size}>
                     <title>{`Organelle on ${space}`}</title>
