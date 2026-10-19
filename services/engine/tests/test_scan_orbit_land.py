@@ -142,7 +142,7 @@ def test_second_signal_position_scores_two() -> None:
 
 
 def test_excess_markers_get_no_data_but_count() -> None:
-    """SECTOR-05."""
+    """SECTOR-05, FAQ-13: marking a signal always works; with the slot full it is an excess signal."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     pl = s.current_player
@@ -186,7 +186,7 @@ def test_sector_winner_second_place_and_reset() -> None:
 
 
 def test_sector_tie_goes_to_the_later_marker() -> None:
-    """SECTOR-11."""
+    """SECTOR-11, FAQ-16."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     r2 = complete(s, 3, [0, 1, 0, 1])
@@ -203,7 +203,7 @@ def test_single_player_sector_has_no_second_place() -> None:
 
 
 def test_sector_can_be_won_again_with_later_reward() -> None:
-    """SECTOR-14, SECTOR-15: the winner's marker beside the star does not count; rewards differ by order of winning."""
+    """SECTOR-14, SECTOR-15, FAQ-12: the winner's marker beside the star does not count; rewards differ by order of winning."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     r2 = complete(s, 1, [0, 0, 0])
@@ -255,3 +255,17 @@ def test_three_discovery_spaces_complete_the_species() -> None:
         rewards.place_trace(s, s.players[0], {"slot": 1, "space": "discovery", "color": c}, ev)
     assert s.species[1].complete and not s.species[1].discovered
     assert effects.PUBLICITY_CAP == 10
+
+
+def test_excess_data_is_discarded_but_the_marker_is_placed() -> None:  # SECTOR-02, RES-01
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    p = s.players[pl]
+    p.data_pool = 6
+    p.computer = [True] * len(p.computer)  # nothing can be placed first, so the gain is simply cut at 6
+    ev: list[dict[str, Any]] = []
+    markers = len(s.sectors[0].markers)
+    remaining = s.sectors[0].data_remaining
+    rewards.mark_signal(s, p, 0, ev)
+    assert p.data_pool == 6 and not s.pending
+    assert len(s.sectors[0].markers) == markers + 1 and s.sectors[0].data_remaining == remaining - 1

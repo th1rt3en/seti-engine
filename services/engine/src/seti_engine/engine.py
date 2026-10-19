@@ -550,7 +550,7 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
             s.pending.append(Decision(kind="slingshot", player=p.index))
         elif cards.fx_active(s, "no_pub_move"):  # #ET.12: no publicity for moving probes this turn
             pass
-        elif solar.has_publicity_icon(cell) or (cell == "ASTEROID" and effects.tech_active(p, "probe-link")):  # MOVE-05, TECH-PT03
+        elif solar.has_publicity_icon(cell) or (cell == "ASTEROID" and effects.tech_active(p, "probe-link")):  # MOVE-05, MOVE-07, TECH-PT03
             effects.gain_publicity(s, p)
             events.append({"type": "publicity", "player": p.index, "reason": "visit"})
         events.append({"type": "move", "player": p.index, "probe": probe.id, "to": a["to"]})

@@ -47,6 +47,7 @@ def with_state(s: GameState) -> StepResult:
 
 
 def test_setup_tuck_gives_the_income_resource_and_starts_play() -> None:
+    """INCOME-05: the tucked card leaves the hand and its resource is gained at once."""
     r = start(Options(players=2, seed=1))
     p0 = r.state.pending[0].player
     card = r.legal[0]["card"]
@@ -256,7 +257,7 @@ def test_round_end_gives_income_and_moves_the_starting_player() -> None:
 
 
 def test_the_game_ends_after_five_rounds() -> None:
-    """GAME-01, ROUND-03, PASS-05: five rounds, no income after the fifth, no end-of-round card in round 5."""
+    """GAME-01, GAME-03, ROUND-03, PASS-05: five rounds, no income after the fifth, no end-of-round card in round 5."""
     r = begin(2)
     for expected in range(1, 6):
         assert r.state.round == expected

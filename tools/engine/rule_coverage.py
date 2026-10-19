@@ -1,7 +1,7 @@
 """Report which spec rule IDs are cited in the engine code and in the tests (CLAUDE.md rule 2).
 
 Run from the repo root: python tools/engine/rule_coverage.py
-A rule counts as implemented when its ID appears in services/engine/src, and as tested when it appears in services/engine/tests.
+A rule counts as implemented when its ID appears in services/engine/src, and as tested when it appears in services/engine/tests. A range such as "ORBIT-01 to ORBIT-04" (or "ORBIT-01 to 04") cites every rule in it.
 IDs are read from the generated docs/spec/rules-index.md; data tasks (BOARD-xx, ALIEN-DATA-xx and so on) are listed separately.
 """
 import glob
@@ -22,10 +22,19 @@ for line in idx.splitlines():
         by_file[current].append(m.group(1))
 
 
+# "ORBIT-01 to ORBIT-04" and "ORBIT-01 to 04" cite every rule of the range
+RANGE = re.compile(r'\b([A-Z]+(?:-[A-Z0-9]+)*)-(\d+) to (?:\1-)?(\d+)\b')
+
+
 def cited(pattern):
     found = set()
     for f in glob.glob(os.path.join(ROOT, 'services', 'engine', pattern), recursive=True):
-        found |= set(ID.findall(open(f, encoding='utf-8').read()))
+        text = open(f, encoding='utf-8').read()
+        found |= set(ID.findall(text))
+        for prefix, lo, hi in RANGE.findall(text):
+            width = len(lo)
+            for n in range(int(lo), int(hi) + 1):
+                found.add('%s-%0*d' % (prefix, width, n))
     return found
 
 
