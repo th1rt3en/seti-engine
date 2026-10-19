@@ -14,12 +14,15 @@ const TECH_TITLE: Record<string, string> = { helion_assembly: "Tech to destroy",
 export function OrgFreePanel({
   moves,
   hand,
+  display,
   onPlay,
   onClose,
 }: {
   /** The legal `org_free` moves that name a tech or a card of the hand. */
   moves: Move[];
   hand: string[];
+  /** The cards of the display, face up: the card to switch with is picked among them. */
+  display: string[];
   onPlay: (m: Move) => void;
   onClose: () => void;
 }) {
@@ -69,18 +72,20 @@ export function OrgFreePanel({
       {rows.length > 0 ? (
         <>
           <h3>Card of the display to switch with</h3>
-          <div className="tradechoices">
-            {rows.map((r) => (
-              <button
-                key={r}
-                type="button"
-                className={row === r ? "tradeopt on" : "tradeopt"}
-                aria-pressed={row === r}
-                onClick={() => setRow(r)}
-              >
-                Card {r + 1} of the display
-              </button>
-            ))}
+          <div className="tradehand">
+            {rows.map((r) =>
+              display[r] ? (
+                <button
+                  key={r}
+                  type="button"
+                  className={row === r ? "cardbtn selectable selected" : "cardbtn selectable"}
+                  aria-pressed={row === r}
+                  onClick={() => setRow(r)}
+                >
+                  <CardImage id={display[r] as string} size="row" />
+                </button>
+              ) : null,
+            )}
           </div>
         </>
       ) : null}

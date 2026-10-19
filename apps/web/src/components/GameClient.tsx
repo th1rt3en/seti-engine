@@ -1021,7 +1021,7 @@ export function GameClient({
             <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
           ) : null}
           {orgFreeOpen && !ended && orgCardMoves.length > 0 ? (
-            <OrgFreePanel moves={orgCardMoves} hand={hand} onPlay={play} onClose={() => setOrgFreeOpen(false)} />
+            <OrgFreePanel moves={orgCardMoves} hand={hand} display={v.state.card_row} onPlay={play} onClose={() => setOrgFreeOpen(false)} />
           ) : null}
           <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
             {boardOpen ? "Close player boards" : "Player boards"}
