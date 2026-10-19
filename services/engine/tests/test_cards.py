@@ -136,7 +136,7 @@ def test_launch_cards_respect_the_probe_limit() -> None:
 
 
 def test_falcon_heavy_launches_twice_ignoring_the_limit() -> None:
-    """#9, FAQ-C009."""
+    """#9, FAQ-C009, LAUNCH-04: a card that says to ignore the probe limit ignores it for that launch."""
     s = ready()
     put_probe(s, "EARTH")
     r = play(s, "9")
@@ -409,7 +409,7 @@ def test_deck_signals_discard_the_top_card_three_times() -> None:
 
 
 def test_free_scan_card_runs_a_scan_without_its_base_cost() -> None:
-    """#55 Arecibo, #135 Noto, FAQ-C051."""
+    """#55 Arecibo, #135 Noto, FAQ-C051, CARD-02: the scan of a card is made without paying the standard cost."""
     s = ready()
     credits, energy = s.players[s.current_player].credits, s.players[s.current_player].energy
     r = play(s, "55")
@@ -524,7 +524,7 @@ def test_flyby_gives_points_once_per_turn_for_a_later_visit() -> None:
 
 
 def test_flyby_ignores_the_probe_already_on_the_planet() -> None:
-    """FAQ-C020: only visits after the card is played count."""
+    """FAQ-C020, FAQ-18, MOVE-08, CARD-17, CARD-48: only a move onto the planet is a visit; a probe already there does not count."""
     s = ready()
     put_probe(s, "jupiter")
     r = play(s, "23")
@@ -587,7 +587,7 @@ def test_through_the_asteroid_belt_removes_the_asteroid_penalty() -> None:
 
 
 def test_trajectory_correction_rewards_a_move_within_the_same_ring() -> None:
-    """#125, FAQ-C125."""
+    """#125, FAQ-C125, CARD-45: a move that does not change the ring."""
     s = ready()
     pr = put_probe(s, "EARTH")
     r = play(s, "125")

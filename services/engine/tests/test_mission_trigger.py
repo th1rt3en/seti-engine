@@ -8,6 +8,7 @@ from seti_engine.models import Decision, MissionState, Options
 
 
 def test_a_circle_covered_by_one_decision_is_not_offered_by_the_next() -> None:
+    """CARD-14: one circle at a time; the effect must trigger again to cover another."""
     s = begin(2).state.model_copy(deep=True)
     pl = s.current_player
     cid = next(c for c, d in card_defs.CARDS.items() if d.get("mission", {}).get("kind") == "trigger" and len(d["mission"]["circles"]) == 2)

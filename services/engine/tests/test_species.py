@@ -363,7 +363,7 @@ def exert_game(owners: tuple[str, str, str] = ("p0", "p0", "p1")) -> StepResult:
 
 
 def test_exertian_cards_are_dealt_three_each_plus_one_per_marker() -> None:
-    """ALIEN-EXE-01, ALIEN-EXE-05, ALIEN-EXE-02: not in hand, the rest of the deck leaves the game."""
+    """ALIEN-EXE-01, ALIEN-EXE-05, ALIEN-EXE-02, CARD-32: not in hand, the rest of the deck leaves the game."""
     s = game("exertians", "anomalies")
     hands = [len(p.hand) for p in s.players]
     r = exert_game()

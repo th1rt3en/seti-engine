@@ -47,7 +47,7 @@ def with_state(s: GameState) -> StepResult:
 
 
 def test_setup_tuck_gives_the_income_resource_and_starts_play() -> None:
-    """INCOME-05: the tucked card leaves the hand and its resource is gained at once."""
+    """INCOME-05, CARD-33, FREE-10: the tucked card leaves the hand (it lies under the income card) and its resource is gained at once."""
     r = start(Options(players=2, seed=1))
     p0 = r.state.pending[0].player
     card = r.legal[0]["card"]
