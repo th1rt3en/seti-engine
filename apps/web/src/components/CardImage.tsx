@@ -41,7 +41,15 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
     [],
   );
   const longPress = useLongPress(() => touchScreen() && showOnTouch());
-  const height = Math.round(width * RATIO);
+  // the picture's own proportions (an organization is a landscape card, not a portrait one): known once it has loaded
+  const [ratio, setRatio] = useState(RATIO);
+  // a picture that has loaded before the page woke up does not tell its onLoad: read its size here too
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only when the picture changes
+  useEffect(() => {
+    const el = img.current;
+    if (el?.complete && el.naturalWidth > 0) setRatio(el.naturalHeight / el.naturalWidth);
+  }, [id]);
+  const height = Math.round(width * ratio);
   const src = cardImage(id);
 
   if (id === "?" || src === undefined) {
@@ -59,8 +67,9 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
   const show = () => {
     const r = img.current?.getBoundingClientRect();
     if (!r) return;
-    const zw = zoomWidth();
-    const zoomHeight = Math.round(zw * RATIO);
+    // a landscape card is enlarged wider, so that it is as big on the screen as a portrait one
+    const zw = Math.min(window.innerWidth - 16, ratio < 1 ? Math.round(zoomWidth() * 1.45) : zoomWidth());
+    const zoomHeight = Math.round(zw * ratio);
     // beside the card, on the side with room; kept inside the window
     let x = r.right + 14;
     if (x + zw > window.innerWidth - 8) x = Math.max(8, r.left - zw - 14);
@@ -81,6 +90,10 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
         height={size ? undefined : height}
         loading="lazy"
         decoding="async"
+        onLoad={(e) => {
+          const { naturalWidth, naturalHeight } = e.currentTarget;
+          if (naturalWidth > 0) setRatio(naturalHeight / naturalWidth);
+        }}
         onMouseEnter={() => {
           if (touchScreen()) return; // a tap makes the browser fake a hover that would stay: touch has its own way (onClick)
           cancel();
@@ -97,7 +110,7 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
               src={src}
               alt=""
               width={zoom.w}
-              height={Math.round(zoom.w * RATIO)}
+              height={Math.round(zoom.w * ratio)}
               style={{ left: zoom.x, top: zoom.y, pointerEvents: touchScreen() ? "auto" : undefined }}
               onClick={() => Date.now() - opened.current > RELEASE_GUARD_MS && cancel()}
             />,

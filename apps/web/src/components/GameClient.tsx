@@ -41,6 +41,7 @@ import { type LogEntry, MoveLog } from "./MoveLog";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
+import { Cost } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
@@ -97,6 +98,7 @@ export function GameClient({
   const [pickedOffer, setPickedOffer] = useState<string | null>(null);
   const [pickedCover, setPickedCover] = useState<CoverChoice | null>(null);
   const [pickedExertian, setPickedExertian] = useState<string | null>(null);
+  const [xenoResearch, setXenoResearch] = useState(false);
   // the quick start cards picked to keep (two at once)
   const [pickedQuick, setPickedQuick] = useState<string[]>([]);
   // the place picked for a probe to move to, until the player confirms
@@ -193,6 +195,7 @@ export function GameClient({
           setPickedOffer(null);
           setPickedCover(null);
           setPickedExertian(null);
+          setXenoResearch(false);
           setPickedQuick([]);
           setPendingMove(null);
           setUnsure(null);
@@ -341,6 +344,7 @@ export function GameClient({
       m.type !== "sandbox" &&
       !isOffer(m) &&
       !rowMoves.includes(m) &&
+      !(m.type === "org_main" && typeof m.tile === "string") && // the tiles of Xenolab are buttons of the main actions
       m.type !== "play_exertian" && // an Exertian card is picked in its tab of the hand, and played with the buttons over it
       !orgCardMoves.includes(m) && // the free actions that name a card or a tech have their own button and panel
       m.type !== "place_computer_tech" &&
@@ -473,7 +477,10 @@ export function GameClient({
     } else setPickedBuy(pickedBuy === source ? null : source);
   };
   // techs are taken by clicking the stack
-  const techMoves = mine.filter((m) => m.type === "research" || m.type === "take_tech");
+  // Xenolab: its three tiles are main actions with their own buttons; the research tile then asks for a tech stack like any research
+  const xenoMoves = mine.filter((m) => m.type === "org_main" && typeof m.tile === "string");
+  const xenoResearchMoves = xenoMoves.filter((m) => m.tile === "research");
+  const techMoves = mine.filter((m) => m.type === "research" || m.type === "take_tech" || (xenoResearch && xenoResearchMoves.includes(m)));
   const techOption = pickedTech === null ? undefined : techMoves.find((m) => m.stack === pickedTech);
   const techStack = pickedTech === null ? undefined : v.state.tech_stacks[pickedTech];
   const spotOption = spots.find((sp) => sp.id === pickedSpot);
@@ -528,10 +535,19 @@ export function GameClient({
   const techContext =
     techOption && techStack ? (
       <>
-        {techOption.type === "research"
-          ? `Confirm spending ${researchCost(techOption)} publicity to research ${techName(techStack.category, techStack.glyph)}?`
-          : `Confirm taking ${techName(techStack.category, techStack.glyph)}?`}{" "}
+        {techOption.type === "org_main"
+          ? `Confirm researching ${techName(techStack.category, techStack.glyph)} with the Xenolab research tile (4 publicity)?`
+          : techOption.type === "research"
+            ? `Confirm spending ${researchCost(techOption)} publicity to research ${techName(techStack.category, techStack.glyph)}?`
+            : `Confirm taking ${techName(techStack.category, techStack.glyph)}?`}{" "}
         <button type="button" className="secondary small" onClick={() => setPickedTech(null)}>
+          Cancel
+        </button>
+      </>
+    ) : xenoResearch && xenoResearchMoves.length > 0 ? (
+      <>
+        Xenolab research tile: click the tech stack that you want (4 publicity).{" "}
+        <button type="button" className="secondary small" onClick={() => setXenoResearch(false)}>
           Cancel
         </button>
       </>
@@ -817,6 +833,29 @@ export function GameClient({
       })}
     </>
   ) : undefined;
+  // Xenolab: its three tiles (launch, scan, research) are main actions, each with the picture of its tile at the size of the other action icons and its cost
+  const xenoTiles = [
+    { tile: "launch", name: "Launch", cost: { credit: 1 } },
+    { tile: "scan", name: "Scan", cost: { energy: 2 } },
+    { tile: "research", name: "Research", cost: { publicity: 4 } },
+  ] as const;
+  const xenoButtons = xenoTiles.flatMap((t, i) => {
+    const move = xenoMoves.find((m) => m.tile === t.tile);
+    if (move === undefined) return [];
+    const src = (expansionAssets as Record<string, string>)[`tokens/xenolab-tile-${i + 1}`];
+    return [
+      <button
+        key={`xeno-${t.tile}`}
+        type="button"
+        className={t.tile === "research" && xenoResearch ? "xenotile on" : "xenotile"}
+        title={describeMove(move)}
+        onClick={() => (t.tile === "research" ? setXenoResearch(!xenoResearch) : play(move))}
+      >
+        {src ? <img src={src} alt="" width={28} height={30} className="xenoicon" /> : null}
+        {t.name} (Xenolab) <Cost cost={t.cost} />
+      </button>,
+    ];
+  });
   const moves = (
     <>
       {ended ? (
@@ -862,6 +901,7 @@ export function GameClient({
                     {describeMove(m)}
                   </button>
                 ))}
+                {g.title === "Main action" ? xenoButtons : null}
               </div>
             </MoveGroup>
           ))}

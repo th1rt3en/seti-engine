@@ -3006,3 +3006,19 @@ input.switch:focus-visible {
   font-weight: 800;
   pointer-events: none;
 }
+
+/* the tiles of Xenolab among the main actions: the picture of the tile at the size of the action icons, and its cost */
+.xenotile {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.xenotile.on {
+  outline: 2px solid var(--accent);
+}
+.xenoicon {
+  display: block;
+  width: 28px;
+  height: 30px;
+  object-fit: contain;
+}

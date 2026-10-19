@@ -114,7 +114,7 @@ describe("the places of the Space Agencies expansion", () => {
         { type: "pick_organelle", space: "IB" },
         { type: "amoeba_remove", color: "pink", index: 0 },
         { type: "od_step", probe: "p1", to: [2, 3] },
-        { type: "org_main", org: "xenolab", tile: "scan" },
+        { type: "org_main", org: "futurespan_institute" },
         { type: "pass" },
       ],
       [null, null, null, null, null, null, null],
@@ -154,5 +154,14 @@ describe("the reward spaces on an organization board", () => {
     const { spots, handled } = buildSpots(v);
     expect(spots.map((s) => s.id)).toEqual(["orgspace:data", "org:1"]); // "do not mark" is a chip on the organization panel
     expect(handled.has(0)).toBe(true);
+  });
+});
+
+describe("the tiles of Xenolab", () => {
+  it("are buttons of the main actions, not places on the organization card", () => {
+    const v = view([{ type: "org_main", org: "xenolab", tile: "scan" }, { type: "pass" }], [null, null]);
+    const { spots, handled } = buildSpots(v);
+    expect(spots).toEqual([]);
+    expect(handled.size).toBe(0);
   });
 });

@@ -219,7 +219,7 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       add(i, `orgspace:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 34 }, { panel: "org" });
     } else if (
       (m.type === "org_free" && m.card === undefined && m.source === undefined && m.tech === undefined) ||
-      m.type === "org_main" ||
+      (m.type === "org_main" && m.tile === undefined) || // the tiles of Xenolab are buttons of the main actions
       m.type === "org_mark" ||
       m.type === "org_skip"
     ) {
