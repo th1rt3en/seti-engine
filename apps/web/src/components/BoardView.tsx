@@ -974,8 +974,8 @@ export function BoardView({
             {spots.selected === sp.id && sp.id.startsWith("alien:") && sp.shape.kind === "rect" && spots.onConfirm ? (
               <g className="spotbuttons">
                 {[
-                  { label: "Confirm", dy: -150, primary: true, act: spots.onConfirm },
-                  { label: "Cancel", dy: 10, primary: false, act: spots.onCancel },
+                  { label: "Confirm", dy: 30, primary: true, act: spots.onConfirm },
+                  { label: "Cancel", dy: 142, primary: false, act: spots.onCancel },
                 ].map((b) => (
                   <g
                     key={b.label}
@@ -989,16 +989,16 @@ export function BoardView({
                     onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && b.act?.()}
                   >
                     <rect
-                      x={sp.shape.kind === "rect" ? sp.shape.x + sp.shape.w / 2 - 150 : 0}
-                      y={sp.shape.kind === "rect" ? sp.shape.y + sp.shape.h / 2 + b.dy : 0}
-                      width={300}
-                      height={120}
-                      rx={26}
+                      x={sp.shape.kind === "rect" ? sp.shape.x + 16 : 0}
+                      y={sp.shape.kind === "rect" ? sp.shape.y + b.dy : 0}
+                      width={sp.shape.kind === "rect" ? sp.shape.w - 32 : 0}
+                      height={96}
+                      rx={18}
                       className={b.primary ? "spotbtn primary" : "spotbtn"}
                     />
                     <text
                       x={sp.shape.kind === "rect" ? sp.shape.x + sp.shape.w / 2 : 0}
-                      y={sp.shape.kind === "rect" ? sp.shape.y + sp.shape.h / 2 + b.dy + 78 : 0}
+                      y={sp.shape.kind === "rect" ? sp.shape.y + b.dy + 65 : 0}
                       textAnchor="middle"
                       className="spotbtntext"
                     >

@@ -2991,19 +2991,20 @@ input.switch:focus-visible {
 
 /* the Confirm and Cancel buttons laid over a picked alien card on the board */
 .spotbtn {
-  fill: rgba(16, 24, 44, 0.92);
-  stroke: #cfe0ff;
-  stroke-width: 6;
+  /* like the buttons over the cards of the display: the cancel button is dark blue, the confirm button green */
+  fill: #16213f;
+  stroke: #6f86c8;
+  stroke-width: 4;
   cursor: pointer;
 }
 .spotbtn.primary {
-  fill: #1f6feb;
-  stroke: #fff;
+  fill: #1f9d55;
+  stroke: #8fe6b5;
 }
 .spotbtntext {
   fill: #fff;
-  font-size: 64px;
-  font-weight: 800;
+  font-size: 52px;
+  font-weight: 600;
   pointer-events: none;
 }
 
