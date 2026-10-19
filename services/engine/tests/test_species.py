@@ -4,7 +4,7 @@ from typing import Any
 
 from test_engine import begin, decisions, do, with_state
 
-from seti_engine import effects, rewards, solar, species, tables
+from seti_engine import effects, rewards, solar, species, tables, trail
 from seti_engine.engine import StepResult, apply, legal_moves
 from seti_engine.models import Decision, GameState, SpeciesSlot
 
@@ -169,6 +169,8 @@ def test_rotation_into_an_anomaly_pays_the_highest_marker_of_its_column() -> Non
     logged = next(x for x in ev if x["type"] == "anomaly")  # the log says which token, where, and what it paid
     assert (logged["sector"], logged["color"], logged["side"], logged["reward"]) == (e, "yellow", 1, [{"n": 2, "t": "publicity"}])
     assert s.players[0].publicity == pub + 2  # the yellow token's other face: 2 publicity
+    gain = next(g for g in trail.events_of(s) if g["type"] == "gains")  # the gain has its own source, so its own line in the log
+    assert gain["source"] == {"kind": "anomaly", "color": "yellow", "sector": e} and gain["changes"] == {"publicity": 2}
 
 
 def test_anomaly_with_an_empty_column_pays_nobody() -> None:

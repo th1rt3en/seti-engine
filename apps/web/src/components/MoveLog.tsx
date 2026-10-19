@@ -90,6 +90,8 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
       return `Sector ${sectorName(ctx, Number(src.sector))} completed`;
     case "mission":
       return `Mission ${cardName(src.card)}`;
+    case "anomaly":
+      return `Earth reaches the ${String(src.color)} anomaly in ${sectorName(ctx, Number(src.sector))}`;
     case "planet":
       switch (src.what) {
         case "first_orbit":

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import amoeba, arkhos, effects, glyphids, rewards, rival, rng, tables
+from . import amoeba, arkhos, effects, glyphids, rewards, rival, rng, tables, trail
 from .models import Decision, GameState, PlayerState, Probe, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -219,7 +219,8 @@ def after_rotation(s: GameState, events: Events) -> None:
                 {"type": "anomaly", "sector": tok["sector"], "color": tok["color"], "side": tok["side"], "reward": reward, "player": winner}
             )
             if winner is not None:
-                rewards.grant(s, s.players[winner], reward, events)
+                with trail.scope(s, {"kind": "anomaly", "color": tok["color"], "sector": tok["sector"]}):  # its own line in the log
+                    rewards.grant(s, s.players[winner], reward, events)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
