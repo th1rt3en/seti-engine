@@ -170,3 +170,17 @@ export const SPECIES_SPACES: Record<string, Record<string, ([number, number] | n
     ],
   },
 };
+
+/**
+ * The seven sample spaces of the Mascamites board on its picture (777 x 1415): the k-th is the k-th space of `extra.sample_spaces`. Space 0 is the printed
+ * space where the first face-up token starts; 1 to 6 are the six dedicated blue spaces in the order the owner confirmed (A-056, zig-zag from the top right).
+ */
+export const MASCAMITE_SAMPLE_SPACES: [number, number][] = [
+  [628, 872],
+  [628, 390],
+  [488, 465],
+  [347, 542],
+  [628, 555],
+  [488, 628],
+  [628, 713],
+];

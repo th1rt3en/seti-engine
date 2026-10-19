@@ -58,10 +58,10 @@ describe("the places on the board that moves can be made at", () => {
       ],
     );
     const { spots, handled } = buildSpots(v);
-    expect(spots.map((s) => s.id)).toEqual(["sector:3", "trace:0:discovery:pink", "trace:1:overflow:blue", "trace:0:board:yellow:2"]);
+    expect(spots.map((s) => s.id)).toEqual(["sector:3", "trace:0:discovery:pink", "trace:1:overflow:blue", "trace:0:board:yellow:2", "trace:0:sample:0"]);
     expect(spots[0]?.shape.kind).toBe("path");
     expect(spots[1]?.shape.kind).toBe("circle");
-    expect(handled.has(4)).toBe(false); // a sample space of the Mascamites has no place: it stays a button
+    expect(handled.has(4)).toBe(true); // a sample space of the Mascamites is a place on its board (A-056)
   });
 });
 
@@ -182,5 +182,24 @@ describe("the tiles of Xenolab", () => {
     const { spots, handled } = buildSpots(v);
     expect(spots).toEqual([]);
     expect(handled.size).toBe(0);
+  });
+});
+
+describe("the sample spaces of the Mascamites board", () => {
+  it("are places on the species board: the starting space and the dedicated ones, by their index", () => {
+    const v = view(
+      [
+        { type: "place_trace", slot: 0, space: "sample", color: "blue", index: 0 },
+        { type: "place_trace", slot: 0, space: "sample", color: "blue", index: 2 },
+      ],
+      [
+        { slot: 0, species: "mascamites", color: "blue", space: "sample", rewards: [] },
+        { slot: 0, species: "mascamites", color: "blue", space: "sample", rewards: [] },
+      ],
+    );
+    (v.state as unknown as { species: unknown[] }).species = [{ species: "mascamites", discovered: true }];
+    const { spots, handled } = buildSpots(v);
+    expect(spots.map((s) => s.id)).toEqual(["trace:0:sample:0", "trace:0:sample:2"]);
+    expect([...handled]).toEqual([0, 1]);
   });
 });

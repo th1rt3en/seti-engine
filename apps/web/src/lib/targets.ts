@@ -22,7 +22,7 @@ import {
 } from "./geometry";
 import { holeAt } from "./glyphids";
 import type { Move } from "./moves";
-import { SPECIES_SPACES } from "./speciesSpaces";
+import { MASCAMITE_SAMPLE_SPACES, SPECIES_SPACES } from "./speciesSpaces";
 
 const TRACE_COLORS = ["pink", "yellow", "blue"];
 
@@ -170,6 +170,13 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         if (at) {
           const p = onAlienBoard(n.slot, at[0], at[1]);
           spot = { id: `trace:${n.slot}:board:${n.color}:${String(m.index)}`, shape: { kind: "circle", x: p.x, y: p.y, r: 56 } };
+        }
+      } else if (kind === "sample") {
+        // a dedicated sample space of the Mascamites board (ALIEN-MASC-05)
+        const at = MASCAMITE_SAMPLE_SPACES[Number(m.index)];
+        if (at) {
+          const p = onAlienBoard(n.slot, at[0], at[1]);
+          spot = { id: `trace:${n.slot}:sample:${String(m.index)}`, shape: { kind: "circle", x: p.x, y: p.y, r: 62 } };
         }
       }
     }

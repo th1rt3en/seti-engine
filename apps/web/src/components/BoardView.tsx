@@ -42,7 +42,7 @@ import {
 } from "@/lib/geometry";
 import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
-import { SPECIES_SPACES } from "@/lib/speciesSpaces";
+import { MASCAMITE_SAMPLE_SPACES, SPECIES_SPACES } from "@/lib/speciesSpaces";
 import { ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
@@ -742,6 +742,40 @@ export function BoardView({
               );
             })
           : null}
+
+        {/* Mascamites: the sample tokens lie face up on the sample spaces of the board (ALIEN-MASC-04, ALIEN-MASC-05); the marker of the player who marked one lies on it */}
+        {s.species.map((sp, i) => {
+          if (!sp.discovered || sp.species !== "mascamites") return null;
+          const spaces = (sp.extra?.sample_spaces ?? []) as { token: number; marker: number | null }[];
+          return (
+            <g key="mascamite-samples">
+              {spaces.map((space, j) => {
+                const at = MASCAMITE_SAMPLE_SPACES[j];
+                const href = SAMPLES[String(space.token)];
+                if (!at || !href) return null;
+                const p = onAlienBoard(i, at[0], at[1]);
+                const size = 112;
+                return (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: the spaces fill in order
+                  <g key={j}>
+                    <image href={href} x={p.x - size / 2} y={p.y - size / 2} width={size} height={size}>
+                      <title>{`Sample space ${j + 1}`}</title>
+                    </image>
+                    {space.marker !== null && space.marker !== undefined ? (
+                      <Marker
+                        x={p.x + 42}
+                        y={p.y - 42}
+                        size={52}
+                        color={color(space.marker)}
+                        title={`${who(space.marker)}: marker on the sample space`}
+                      />
+                    ) : null}
+                  </g>
+                );
+              })}
+            </g>
+          );
+        })}
 
         {/* Amoeba: the five organelle tokens lie on the spaces of the cell (EXP-AMO-02); the places are measured on the picture of 573 px, the board is 777 */}
         {s.species.map((sp, i) => {

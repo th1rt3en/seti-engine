@@ -72,6 +72,9 @@ def test_the_planetary_board_lists_each_planet_with_its_rewards() -> None:  # BO
     assert planets["MARS"]["first_land_data"] == [2, 1]  # Mars has two first-lander spaces
     assert all(len(planets[n]["first_land_data"]) == 1 for n in ("MERCURY", "VENUS", "JUPITER", "SATURN"))
     assert len(planets["MARS"]["moons"]) == 1  # Phobos and Deimos share one moon space
+    assert {"n": 2, "t": "signal_planet"} in planets["MERCURY"][
+        "orbit"
+    ]  # orbiting Mercury marks 2 signals in its sector (owner check, 2026-10-19)
 
 
 def test_twelve_tech_stacks_of_four_tiles_with_the_four_bonuses() -> None:  # BOARD-50, BOARD-51, BOARD-72, BOARD-74, TECH-01
@@ -143,3 +146,17 @@ def test_there_are_24_solo_objective_tiles_of_three_levels() -> None:  # SOLO-DA
     tiles = tables.objectives()["objectives"]
     assert Counter(t["level"] for t in tiles) == {"I": 4, "II": 11, "III": 9}
     assert all(1 <= len(t["tasks"]) <= 3 for t in tiles)
+
+
+def test_when_the_mascamites_are_revealed_three_of_the_nine_blue_spaces_can_be_marked() -> None:  # ALIEN-MASC-04, ALIEN-MASC-05
+    from test_species import discover, game
+
+    st = discover(game("mascamites", "anomalies"), 0).state
+    p = st.players[st.current_player]
+    blue = species.board_moves(st, p, 0, ("blue",))
+    assert [(m["space"], m["index"]) for m in blue] == [
+        ("board", 2),
+        ("board", 3),
+        ("sample", 0),
+    ]  # the two printed blue spaces and the starting sample
+    assert len(st.species[0].extra["sample_spaces"]) == 1  # the six dedicated spaces do not exist until a sample is delivered

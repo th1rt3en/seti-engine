@@ -523,11 +523,12 @@ Entry format:
 
 
 ## A-056: The order of the six dedicated sample spaces of the Mascamites board
-- Status: open
+- Status: ruled (owner, 2026-10-19)
 - Rule IDs affected: ALIEN-MASC-04, ALIEN-MASC-05, ALIEN-UI-01 (the species board in the page)
 - Rulebook page and text: ALIEN-MASC-04 (sheet 2): after a delivery the used token is placed face up "in the next dedicated space on the species board, where it becomes a new blue space". The board has six empty blue spaces with a check mark and a sample picture, in a staggered arrangement (three on the right edge, two in the middle, one on the left), and one blue space at the bottom of the blue column that holds the face-up token from the start.
 - Readings: the engine only counts the spaces in the order the tokens arrive (space 1 is the first delivered), so the rules are not affected. The page shows these spaces as a list; to draw them on the board picture it must know which circle is "next". The picture has no numbers. (1) a zig-zag from the top, as numbered in the data check page; (2) the right column from the top, then the middle column, then the left one; (3) another order that the physical board shows (for example arrows or a printed numbering that the picture lacks).
 - Consequence: only where the used tokens are drawn on the species board. No rule or score changes.
 - Proposed ruling: reading (1): 1 top right, 2 upper middle, 3 left, 4 right middle, 5 lower middle, 6 bottom right, as numbered in the data check page (section G).
 - Questions for the owner: in which order are the six dedicated spaces filled?
-
+- Ruling (owner), 2026-10-19: reading (1), confirmed on the data check page: the dedicated spaces are filled in the order 1 top right, 2 upper middle, 3 left, 4 right middle, 5 lower middle, 6 bottom right. Space D (the printed blue space with the starting token) is sample space 0. The page draws the tokens there (`MASCAMITE_SAMPLE_SPACES` in `apps/web/src/lib/speciesSpaces.ts`).
+- Note (owner, 2026-10-19): when the species is revealed only 3 of the 9 blue spaces can be marked (the two printed blue spaces and the starting sample space); the six dedicated spaces appear as tokens are delivered. The engine does this (test in `tests/test_data_rules.py`).
