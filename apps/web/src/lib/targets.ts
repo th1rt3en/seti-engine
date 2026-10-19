@@ -200,6 +200,18 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const spot = spots.get(id);
         if (spot) spot.choices = [...(spot.choices ?? []), { glyph: String(m.glyph), move: i }];
       }
+    } else if (m.type === "remove_orbiter") {
+      // an effect that removes one of the player's own orbiters (new assignment): click the orbiter on its planet; the one on the first
+      // space is a choice of its own
+      const planet = String(m.planet);
+      const st = s.planets[planet];
+      const me = view.viewer;
+      if (st && me !== null) {
+        const from = m.first ? 0 : st.first_orbiter === me ? 1 : 0;
+        const k = m.first ? 0 : st.orbiters.findIndex((o, j) => j >= from && o === me);
+        const at = k < 0 ? null : orbitSlot(planet, k);
+        if (at) add(i, `orbiter:${planet}:${m.first ? "first" : "later"}`, { kind: "circle", x: at.x, y: at.y, r: 62 });
+      }
     } else if (m.type === "pick_organelle") {
       const at = ORGANELLE_SPACES[String(m.space)];
       if (at) add(i, `organelle:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 56 }, { panel: "amoeba" });
