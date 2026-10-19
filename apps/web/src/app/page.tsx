@@ -51,7 +51,7 @@ export default async function Home() {
         <p className="cta">
           {user ? (
             <>
-              <Link className="btn big" href="/lobby">
+              <Link className="btn primary big" href="/lobby">
                 Go to the lobby
               </Link>
               <Link className="btn big ghost" href={`/players/${user.id}`}>
@@ -60,7 +60,7 @@ export default async function Home() {
             </>
           ) : (
             <>
-              <Link className="btn big" href="/signup">
+              <Link className="btn primary big" href="/signup">
                 Sign up to play rated
               </Link>
               <Link className="btn big ghost" href="/login">
@@ -93,7 +93,9 @@ export default async function Home() {
               <input name="name" maxLength={32} placeholder="Guest" />
             </label>
             <TurnstileWidget />
-            <button type="submit">Play as a guest</button>
+            <button type="submit" className="primary">
+              Play as a guest
+            </button>
           </form>
         </section>
       )}

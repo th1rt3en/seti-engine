@@ -53,7 +53,7 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
       {user && !seated && open ? (
         <form action={joinAction}>
           <input type="hidden" name="id" value={id} />
-          <button type="submit">Take a seat</button>
+          <button type="submit" className="primary">Take a seat</button>
         </form>
       ) : null}
       {user && seated && meta.status === "lobby" ? (

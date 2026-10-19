@@ -20,7 +20,7 @@ export default async function Signup({ searchParams }: { searchParams: Promise<{
         <p className="muted small">
           After this you get a one-time recovery code. Keep it: it is the only way to set a new password if you forget yours.
         </p>
-        <button type="submit">Create the account</button>
+        <button type="submit" className="primary">Create the account</button>
       </form>
     </>
   );

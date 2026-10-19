@@ -37,7 +37,7 @@ export default async function Lobby({
                 isGuest={user.isGuest}
                 clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label, mode: p.mode }))}
               />
-              <SubmitOnce className="big" busy="Creating the game...">
+              <SubmitOnce className="primary big" busy="Creating the game...">
                 Create the game
               </SubmitOnce>
             </form>
@@ -112,7 +112,9 @@ export default async function Lobby({
                   {user ? (
                     <form action={joinAction}>
                       <input type="hidden" name="id" value={g.id} />
-                      <button type="submit">Join</button>
+                      <button type="submit" className="primary small">
+                        Join
+                      </button>
                     </form>
                   ) : null}
                   <Link href={`/games/${g.id}`} className="small">

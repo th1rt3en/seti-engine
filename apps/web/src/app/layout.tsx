@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { logoutAction } from "./actions";
 import "./game.css";
 import "./globals.css";
+import "./ui.css";
 
 export const metadata: Metadata = {
   title: "SETI online",

@@ -29,7 +29,7 @@ export default async function Account({ searchParams }: { searchParams: Promise<
             New password again
             <input name="again" type="password" required minLength={8} autoComplete="new-password" />
           </label>
-          <button type="submit">Change the password</button>
+          <button type="submit" className="primary">Change the password</button>
         </form>
         <h2>Recovery code</h2>
         <p className="muted">
@@ -63,7 +63,7 @@ export default async function Account({ searchParams }: { searchParams: Promise<
           <input name="password" type="password" required minLength={8} autoComplete="new-password" />
         </label>
         <TurnstileWidget />
-        <button type="submit">Create the account</button>
+        <button type="submit" className="primary">Create the account</button>
       </form>
     </>
   );
