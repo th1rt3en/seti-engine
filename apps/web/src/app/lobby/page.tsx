@@ -1,7 +1,7 @@
 import { NewGameFields } from "@/components/NewGameFields";
 import { SubmitOnce } from "@/components/SubmitOnce";
 import { getDb } from "@/lib/db";
-import { lobbyGames } from "@/lib/queries";
+import { filterLobby, lobbyGames } from "@/lib/queries";
 import { currentUser } from "@/lib/session";
 import { CLOCK_PRESETS } from "@/lib/worker";
 import Link from "next/link";
@@ -9,10 +9,14 @@ import { createGameAction, joinAction } from "../actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function Lobby({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function Lobby({
+  searchParams,
+}: { searchParams: Promise<{ error?: string; players?: string; rated?: string; expansion?: string; mode?: string }> }) {
   const user = await currentUser();
-  const { error } = await searchParams;
-  const games = await lobbyGames(getDb());
+  const { error, ...filter } = await searchParams;
+  const all = await lobbyGames(getDb());
+  const games = filterLobby(all, filter);
+  const filtered = games.length !== all.length;
   return (
     <>
       <header className="pagehead">
@@ -43,8 +47,43 @@ export default async function Lobby({ searchParams }: { searchParams: Promise<{ 
           <h2>
             Open games <span className="count">{games.length}</span>
           </h2>
+          <form method="get" action="/lobby" className="lobbyfilter" aria-label="Filter the open games">
+            <select name="players" defaultValue={filter.players ?? "any"} aria-label="Players">
+              <option value="any">Any number of players</option>
+              <option value="1">Solo</option>
+              <option value="2">2 players</option>
+              <option value="3">3 players</option>
+              <option value="4">4 players</option>
+            </select>
+            <select name="rated" defaultValue={filter.rated ?? "any"} aria-label="Rated or casual">
+              <option value="any">Rated or casual</option>
+              <option value="rated">Rated</option>
+              <option value="casual">Casual</option>
+            </select>
+            <select name="expansion" defaultValue={filter.expansion ?? "any"} aria-label="Expansion">
+              <option value="any">With or without the expansion</option>
+              <option value="yes">With Space Agencies</option>
+              <option value="no">Base game</option>
+            </select>
+            <select name="mode" defaultValue={filter.mode ?? "any"} aria-label="Time">
+              <option value="any">Any clock</option>
+              <option value="realtime">Real time</option>
+              <option value="turnbased">Turn-based</option>
+              <option value="none">No clock</option>
+            </select>
+            <button type="submit" className="secondary small">
+              Filter
+            </button>
+            {filtered ? (
+              <Link href="/lobby" className="small">
+                Show all {all.length}
+              </Link>
+            ) : null}
+          </form>
           {games.length === 0 ? (
-            <p className="card muted empty">No game is waiting for players. Create one and others can join it.</p>
+            <p className="card muted empty">
+              {filtered ? "No open game matches this filter." : "No game is waiting for players. Create one and others can join it."}
+            </p>
           ) : null}
           <div className="gamelist">
             {games.map((g) => (

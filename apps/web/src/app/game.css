@@ -3077,3 +3077,18 @@ input.switch:focus-visible {
 .loglegend li {
   margin-bottom: 3px;
 }
+
+/* the filter of the open games in the lobby */
+.lobbyfilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.lobbyfilter select {
+  font: inherit;
+  font-size: 0.85rem;
+  min-width: 0;
+  max-width: 100%;
+}

@@ -501,3 +501,64 @@ describe("creating a game twice by accident", () => {
     expect(await createdRecently(db, ann.id, 120_000)).toBe(false);
   });
 });
+
+describe("the lobby filter and the leaderboard search", () => {
+  const game = (over: Record<string, unknown>) =>
+    ({
+      id: "g",
+      rated: false,
+      players: 2,
+      seats: ["a"],
+      clock: "",
+      host: "a",
+      promo: false,
+      expansion: false,
+      organizations: false,
+      solo: false,
+      mode: "realtime",
+      ...over,
+    }) as never;
+
+  it("tells real time from turn-based and no clock", async () => {
+    const { clockMode } = await import("@/lib/queries");
+    expect(clockMode(JSON.stringify({ kind: "none" }))).toBe("none");
+    expect(clockMode(JSON.stringify({ kind: "bank", initialMs: 450_000, incrementMs: 150_000 }))).toBe("realtime");
+    expect(clockMode(JSON.stringify({ kind: "bank", initialMs: 3 * 86_400_000, incrementMs: 9 * 3_600_000 }))).toBe("turnbased");
+  });
+
+  it("keeps the games that match every point of the filter", async () => {
+    const { filterLobby } = await import("@/lib/queries");
+    const games = [
+      game({ id: "1", players: 2, rated: true, mode: "realtime" }),
+      game({ id: "2", players: 3, rated: false, expansion: true, mode: "turnbased" }),
+      game({ id: "3", players: 4, rated: true, mode: "none" }),
+    ];
+    const ids = (f: object) => filterLobby(games, f).map((g) => g.id);
+    expect(ids({})).toEqual(["1", "2", "3"]);
+    expect(ids({ players: "any", rated: "" })).toEqual(["1", "2", "3"]);
+    expect(ids({ rated: "rated" })).toEqual(["1", "3"]);
+    expect(ids({ rated: "casual" })).toEqual(["2"]);
+    expect(ids({ expansion: "yes" })).toEqual(["2"]);
+    expect(ids({ expansion: "no", mode: "none" })).toEqual(["3"]);
+    expect(ids({ players: "3", mode: "turnbased" })).toEqual(["2"]);
+    expect(ids({ players: "4", mode: "realtime" })).toEqual([]);
+  });
+
+  it("finds a player by a part of the name and by the number of rated games", async () => {
+    const { leaderboard } = await import("@/lib/queries");
+    const db = memory();
+    for (const [id, name, rating, games] of [
+      ["u1", "Ann_2", 300, 12],
+      ["u2", "Annabel", 250, 3],
+      ["u3", "Bob", 400, 30],
+    ] as const) {
+      await db.run("INSERT INTO users (id, name, email, password_hash, is_guest, created_at) VALUES (?, ?, NULL, 'x', 0, 0)", id, name);
+      await db.run("INSERT INTO ratings (user_id, rating, games, updated_at) VALUES (?, ?, ?, 0)", id, rating, games);
+    }
+    expect((await leaderboard(db)).map((r) => r.name)).toEqual(["Bob", "Ann_2", "Annabel"]);
+    expect((await leaderboard(db, 100, "ann")).map((r) => r.name)).toEqual(["Ann_2", "Annabel"]);
+    expect((await leaderboard(db, 100, "ann", 10)).map((r) => r.name)).toEqual(["Ann_2"]);
+    expect((await leaderboard(db, 100, "_")).map((r) => r.name)).toEqual(["Ann_2"]);
+    expect(await leaderboard(db, 100, "nobody")).toEqual([]);
+  });
+});

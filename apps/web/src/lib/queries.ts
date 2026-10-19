@@ -13,6 +13,8 @@ export interface LobbyGame {
   expansion: boolean;
   organizations: boolean;
   solo: boolean;
+  /** "realtime" (minutes), "turnbased" (a day or more) or "none" (no clock), for the filter of the lobby */
+  mode: "realtime" | "turnbased" | "none";
 }
 
 export interface PlayingGame {
@@ -209,6 +211,7 @@ export async function lobbyGames(db: Db, limit = 50): Promise<LobbyGame[]> {
       expansion: options.expansion === true,
       organizations: options.organizations === true,
       solo: options.players === 1,
+      mode: clockMode(g.clock_json),
     });
   }
   return out.filter((g) => g.seats.length < g.players);
@@ -229,6 +232,33 @@ export function spanText(ms: number): string {
   return parts.join(" ") || "0 s";
 }
 
+/** Real time (minutes), turn-based (a day or more for the start time) or no clock. */
+export function clockMode(json: string): "realtime" | "turnbased" | "none" {
+  const c = JSON.parse(json) as { kind: string; ms?: number; initialMs?: number };
+  if (c.kind === "per_turn") return (c.ms ?? 0) >= 86_400_000 ? "turnbased" : "realtime";
+  if (c.kind === "bank") return (c.initialMs ?? 0) >= 86_400_000 ? "turnbased" : "realtime";
+  return "none";
+}
+
+export interface LobbyFilter {
+  players?: string;
+  rated?: string;
+  expansion?: string;
+  mode?: string;
+}
+
+/** The open games that match the lobby's filter ("" or "any" is no filter on that point). */
+export function filterLobby(games: LobbyGame[], f: LobbyFilter): LobbyGame[] {
+  const on = (v: string | undefined): v is string => v !== undefined && v !== "" && v !== "any";
+  return games.filter(
+    (g) =>
+      (!on(f.players) || String(g.players) === f.players) &&
+      (!on(f.rated) || (f.rated === "rated") === g.rated) &&
+      (!on(f.expansion) || (f.expansion === "yes") === g.expansion) &&
+      (!on(f.mode) || g.mode === f.mode),
+  );
+}
+
 export function describeClock(json: string): string {
   const c = JSON.parse(json) as { kind: string; ms?: number; initialMs?: number; incrementMs?: number };
   if (c.kind === "per_turn") return `${Math.round((c.ms ?? 0) / 3_600_000)} h per turn`;
@@ -236,10 +266,14 @@ export function describeClock(json: string): string {
   return "no clock";
 }
 
-export function leaderboard(db: Db, limit = 100): Promise<LeaderRow[]> {
+/** The rated players, best first. `name` keeps the names that contain it (any case); `minGames` keeps those with that many rated games or more. */
+export function leaderboard(db: Db, limit = 100, name = "", minGames = 0): Promise<LeaderRow[]> {
+  const like = `%${name.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
   return db.all<LeaderRow>(
     `SELECT r.user_id, u.name, r.rating, r.games FROM ratings r JOIN users u ON u.id = r.user_id
-     WHERE u.is_guest = 0 ORDER BY r.rating DESC, r.games DESC LIMIT ?`,
+     WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' AND r.games >= ? ORDER BY r.rating DESC, r.games DESC LIMIT ?`,
+    like,
+    Math.max(0, Math.floor(minGames)),
     limit,
   );
 }
