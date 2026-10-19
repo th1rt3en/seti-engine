@@ -208,10 +208,14 @@ def test_deep_sky_survey_analyzes_without_energy() -> None:  # EXP-ORG-09, EXP-O
     s = with_org("deep_sky_survey", energy=0)
     cur(s).computer = [True] * 6
     assert can(s, "analyze")
+    from seti_engine import move_notes
+
+    assert move_notes.note(s, {"type": "analyze"}) == {"cost": {}}  # the button shows it as free
     s2 = act(s, type="analyze")
     assert cur(s2).energy == 0 and not any(cur(s2).computer)
     cur(s).organization = None
     assert not can(s, "analyze")
+    assert move_notes.note(s, {"type": "analyze"}) == {"cost": {"energy": 1}}
 
 
 def test_deep_sky_survey_switches_a_card_once_per_round() -> None:  # EXP-ORG-10, EXP-ORG-13

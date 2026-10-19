@@ -74,6 +74,8 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
         planet = state.pending[0].data["planet"]
         return {"land_data": {"planet": planet, "slot": move["slot"], "data": tables.planet_info(planet)["first_land_data"][move["slot"]]}}
     if kind in MAIN_ACTION_COSTS:  # the cost of the plain main actions, for the icons on their buttons (LAUNCH-01, SCAN-01, ANALYZE-01)
+        if kind == "analyze" and orgs.analyze_free(state.players[state.current_player]):  # EXP-ORG-13: Deep Sky Survey analyzes for free
+            return {"cost": {}}
         return {"cost": dict(MAIN_ACTION_COSTS[kind])}
     if kind in ("mark_signal", "scan_earth", "resolve_sector"):
         sector = state.sectors[move["sector"]]
