@@ -906,7 +906,13 @@ export function GameClient({
                     {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? (
                       // the name, then the cost as icons (the engine's note of the move says what it costs)
                       <>
-                        {MAIN_NAMES[m.type]} <Cost cost={costOf(m)} />
+                        {Object.keys(costOf(m)).length === 0 ? (
+                          `${MAIN_NAMES[m.type]} (free)`
+                        ) : (
+                          <>
+                            {MAIN_NAMES[m.type]} <Cost cost={costOf(m)} />
+                          </>
+                        )}
                       </>
                     ) : (
                       describeMove(m)
