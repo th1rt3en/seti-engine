@@ -155,7 +155,7 @@ def test_resource_exchange() -> None:
 
 
 def test_place_data_and_the_computer_spaces() -> None:
-    """FREE-03, FREE-04: space 2 gives 1 publicity, space 4 lets the player tuck a card; data goes left to right."""
+    """FREE-03, FREE-04, INCOME-02: space 2 gives 1 publicity, space 4 lets the player tuck a card; data goes left to right."""
     s = begin(2).state.model_copy(deep=True)
     pl = s.current_player
     s.players[pl].data_pool = 4

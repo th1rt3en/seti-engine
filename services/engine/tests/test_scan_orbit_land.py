@@ -33,7 +33,7 @@ def settle(r: StepResult) -> StepResult:
 
 
 def test_orbit_costs_and_first_orbiter_bonus() -> None:
-    """ORBIT-01 to ORBIT-04, BOARD-30, FAQ-10: the probe leaves the board and never comes back; an orbiter is not a probe."""
+    """ORBIT-01 to ORBIT-04, ORBIT-05, INCOME-02, BOARD-30, FAQ-10: the probe leaves the board for good."""
     r, pl = setup_at("venus")
     before = r.state.players[pl].score
     r1 = do(r, "orbit", probe="t1")
@@ -130,7 +130,7 @@ def test_mars_first_two_landers_choose_a_data_space() -> None:
 
 
 def test_second_signal_position_scores_two() -> None:
-    """SECTOR-03, BOARD-22: the second position of the data slot scores 2."""
+    """SECTOR-03, SECTOR-04, BOARD-22: markers replace the data from left to right; the second position of the data slot scores 2."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     ev: list[dict[str, Any]] = []

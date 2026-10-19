@@ -56,7 +56,7 @@ def test_the_expansion_alone_changes_nothing_else() -> None:  # EXP-01, EXP-03
     assert {sl.species for sl in with_exp.species} <= {*SPECIES_BASE, *SPECIES_EXPANSION}
 
 
-def test_setup_deals_two_organizations_and_three_quick_start_cards() -> None:  # EXP-ORG-03, EXP-ORG-04
+def test_setup_deals_two_organizations_and_three_quick_start_cards() -> None:  # EXP-ORG-01, EXP-ORG-03, EXP-ORG-04
     s = new(3)
     assert s.round == 2 and s.end_of_round_stacks[0] == []  # EXP-ORG-02
     for p in s.players:
@@ -506,3 +506,34 @@ def test_mission_relay_publicity_for_a_mission_card_is_logged_apart() -> None:  
     assert p.publicity == before + 1
     gains = trail.events_of(s)
     assert gains and gains[0]["source"] == {"kind": "organization", "org": "mission_relay", "what": "mission"}
+
+
+def test_an_organization_whose_income_has_a_signal_token_gives_it_each_round() -> None:  # EXP-SIG-03, EXP-ORG-13
+    with_token = [o for o, d in tables.organizations().items() if d["income"]["signalToken"] > 0]
+    assert with_token
+    s = setup_with()
+    p = s.players[0]
+    p.organization = with_token[0]
+    before = p.signal_tokens
+    orgs.gain_income(s, p)
+    assert p.signal_tokens - before == tables.organizations()[with_token[0]]["income"]["signalToken"]
+
+
+def test_signal_tokens_are_used_during_a_scan_to_discard_another_card_of_the_row() -> None:  # EXP-SIG-02
+    from seti_engine import solar
+
+    s = setup_with()
+    p = s.players[s.current_player]
+    p.credits, p.energy, p.signal_tokens = 9, 9, 1
+    r = apply(s, {"type": "scan"})
+    r = apply(r.state, {"type": "scan_earth", "sector": solar.earth(r.state)[1]})
+    assert not any(m["type"] == "scan_token" for m in legal_moves(r.state))  # the normal row step comes first
+    r = apply(r.state, {"type": "scan_discard", "source": "row:0"})
+    while r.state.pending and r.state.pending[0].kind == "signal":
+        r = apply(r.state, next(m for m in r.legal if m["type"] == "mark_signal"))
+    token_moves = [m for m in legal_moves(r.state) if m["type"] == "scan_token"]
+    assert token_moves  # now a signal token can be spent on one more card of the row
+    row = len(r.state.card_row)
+    r = apply(r.state, token_moves[0])
+    assert r.state.players[r.state.current_player].signal_tokens == 0
+    assert len(r.state.card_row) <= row  # the card left the row (the row is refilled after the whole scan)

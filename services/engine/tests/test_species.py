@@ -103,7 +103,7 @@ def test_top_capsule_can_be_marked_again_and_later_markers_are_higher() -> None:
 
 
 def test_alien_card_reward_lets_the_player_draw_from_the_deck_or_the_face_up_card() -> None:
-    """ALIEN-05: Anomalies pink space 4: 2 points and an alien card."""
+    """ALIEN-05, ALIEN-DATA-12: Anomalies pink space 4: 2 points and an alien card."""
     s = discover(game(), 0).state.model_copy(deep=True)
     pl = s.current_player
     face_up, hand = s.species[0].face_up, len(s.players[pl].hand)

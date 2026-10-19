@@ -253,3 +253,80 @@ def test_a_probe_is_only_a_figure_on_the_solar_system_board() -> None:  # FAQ-10
     r = settle(do(r, "orbit", probe="t1"))
     assert not r.state.probes and r.state.players[pl].orbiters == {"venus": 1}
     assert not any(m["type"] in ("land", "orbit", "move_probe") for m in r.legal)  # an orbiter cannot land or move: it is not a probe
+
+
+def test_movement_comes_from_energy_and_from_the_corner_of_a_discarded_card() -> None:  # MOVE-04, FREE-01, FREE-02
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    p = s.players[pl]
+    p.energy = 2
+    corner = next(c for c, v in tables.cards().items() if v["deck"] == "base" and v["free"] == [["move", 1]])
+    p.hand.append(corner)
+    r = do(with_state(s), "move_energy")
+    assert r.state.players[pl].movement == 1 and r.state.players[pl].energy == 1  # 1 energy: 1 movement
+    r = do(r, "discard_free", card=corner)
+    assert r.state.players[pl].movement == 2  # the corner of the card: 1 movement
+
+
+def test_the_sector_with_earth_is_the_star_system_aligned_with_earth() -> None:  # FAQ-14, SCAN-02
+    s = ready()
+    r = do(with_state(s), "scan")
+    earth = solar.earth(r.state)[1]
+    assert [m["sector"] for m in r.legal if m["type"] == "scan_earth"] == [earth]
+    assert r.state.sectors[earth].star in {
+        "Kepler 22",
+        "Proxima Centauri",
+        "Sirius A",
+        "Barnard's Star",
+        "Procyon",
+        "Vega",
+        "61 Virginis",
+        "Beta Pictoris",
+    }
+
+
+def test_telescope_techs_are_used_only_during_a_scan() -> None:  # TECH-10
+    s = ready()
+    s.players[s.current_player].techs += ["telescope-dot", "telescope-link", "telescope-branch", "telescope-cross"]
+    outside = {m["type"] for m in legal_moves(s)}
+    assert not {t for t in outside if t.startswith("scan_") and t != "scan"}  # no telescope step before a scan
+    r = do(with_state(s), "scan")
+    inside = {m["type"] for m in r.legal}
+    assert "scan_earth" in inside
+
+
+def test_resolving_income_early_is_only_bookkeeping_a_passed_player_gets_nothing_to_spend() -> None:  # PASS-06, INCOME-04, A-006
+    r = begin(2)
+    first = r.state.current_player
+    r = do(r, "pass")
+    while r.state.pending:
+        r = apply(r.state, r.legal[0])
+    credits = r.state.players[first].credits
+    r = do(do(r, "launch"), "end_turn")  # the other player takes a turn: the one who passed gets nothing meanwhile
+    assert r.state.players[first].passed and r.state.players[first].credits == credits
+    assert r.state.current_player != first  # it is not their turn: no free action after the pass (PASS-01)
+    r = do(r, "pass")
+    while r.state.pending:
+        r = apply(r.state, r.legal[0])
+    assert r.state.round == 2 and r.state.players[first].credits > credits  # the income comes at the end of the round only
+
+
+def test_a_space_with_a_cost_can_only_be_marked_by_a_player_who_pays_it_and_a_top_capsule_again_and_again() -> None:  # ALIEN-DATA-11
+    from seti_engine import species
+
+    st = discover(game("anomalies", "centaurians"), 1).state
+    p = st.players[st.current_player]
+    costly = next(sp for sp in tables.alien_boards()["centaurians"]["columns"][0]["spaces"] if sp.get("cost") and not sp.get("repeat"))
+    k = tables.alien_boards()["centaurians"]["columns"][0]["spaces"].index(costly)
+    color = tables.alien_boards()["centaurians"]["columns"][0]["color"]
+    cost = costly["cost"][0]["n"]
+    p.data_pool = cost - 1
+    assert not any(m["index"] == k for m in species.board_moves(st, p, 1, (color,)))  # cannot pay: not offered
+    p.data_pool = cost + 2
+    assert any(m["index"] == k for m in species.board_moves(st, p, 1, (color,)))
+    species.mark_board_space(st, p, 1, color, k, [])
+    assert p.data_pool == 2  # the cost was paid from the pool
+    top = next(i for i, sp in enumerate(tables.alien_boards()["centaurians"]["columns"][0]["spaces"]) if sp.get("repeat"))
+    for _ in range(2):  # a top capsule can be marked again, paying each time
+        species.mark_board_space(st, p, 1, color, top, [])
+    assert st.species[1].board[color][top].count(p.index) == 2 and p.data_pool == 0

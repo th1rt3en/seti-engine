@@ -158,7 +158,7 @@ def test_second_taker_does_not_score_the_two_point_tile() -> None:
 
 
 def test_computer_tech_goes_in_a_slot_and_lower_space_pays() -> None:
-    """TECHACT-05, TECH-20, TECH-21, TECH-23, BOARD-72: the computer tech slots."""
+    """TECHACT-05, TECH-20, TECH-21, TECH-23, BOARD-72, FAQ-20: any slot, also one that holds data (the tech goes under the token)."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     pl = s.current_player
