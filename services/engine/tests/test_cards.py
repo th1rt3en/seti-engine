@@ -795,7 +795,7 @@ def test_declining_a_circle_keeps_it_for_later() -> None:
 
 
 def test_a_mission_cannot_be_triggered_by_things_done_before_it_was_played() -> None:
-    """CARD-12, FAQ-C001: a probe already on the planet does not count."""
+    """CARD-12, FAQ-C001, FAQ-30: a triggerable mission does not trigger for what was done before the card was played."""
     s = ready()
     put_probe(s, "jupiter")
     r = played_mission(s, "1")

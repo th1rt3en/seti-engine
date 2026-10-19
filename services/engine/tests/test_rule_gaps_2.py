@@ -330,3 +330,45 @@ def test_a_space_with_a_cost_can_only_be_marked_by_a_player_who_pays_it_and_a_to
     for _ in range(2):  # a top capsule can be marked again, paying each time
         species.mark_board_space(st, p, 1, color, top, [])
     assert st.species[1].board[color][top].count(p.index) == 2 and p.data_pool == 0
+
+
+def test_a_triggerable_mission_can_be_triggered_outside_the_owners_turn() -> None:  # CARD-13, FAQ-31
+    from seti_engine import card_defs, cards
+    from seti_engine.models import MissionState
+
+    s = ready()
+    other = 1 - s.current_player
+    n = len(card_defs.CARDS["128"]["mission"]["circles"])  # a visit to any planet but Earth covers a circle
+    s.players[other].missions = [MissionState(card="128", kind="trigger", used=[False] * n)]
+    s.pushed = [(other, "PLANET:MARS")]  # the solar system pushed the other player's probe onto Mars
+    cards.fire_pushed(s, [])
+    assert s.pending and s.pending[0].kind == "mission_trigger" and s.pending[0].player == other
+    assert s.current_player != other
+
+
+def test_visiting_asteroids_is_an_event_that_triggers_missions() -> None:  # MOVE-09, CARD-20
+    from seti_engine import card_defs, cards
+    from seti_engine.models import MissionState
+
+    s = ready()
+    p = s.players[s.current_player]
+    n = len(card_defs.CARDS["129"]["mission"]["circles"])  # a mission that asks for visits to asteroids
+    p.missions = [MissionState(card="129", kind="trigger", used=[False] * n)]
+    cards.on_move(s, p, 3, 3, "ASTEROID", [])
+    assert s.pending and s.pending[0].kind == "mission_trigger" and s.pending[0].player == s.current_player
+
+
+def test_an_effect_that_cannot_be_resolved_is_skipped_and_a_trace_is_never_impossible() -> None:  # FAQ-01, FAQ-02
+    s = ready()
+    p = s.players[s.current_player]
+    p.hand = []
+    rewards.grant(s, p, [{"t": "tuck", "n": 1}, {"t": "vp", "n": 2}], [])
+    assert p.score >= 2  # the other effect of the card is resolved
+    answers = [m["type"] for m in legal_moves(s) if m["type"] in ("tuck", "skip_tuck")]
+    assert answers == ["skip_tuck"]  # nothing to tuck: the effect can only be skipped (A-013), and it may be declined anyway (FAQ-01)
+    s.pending = []
+    from seti_engine.models import Decision
+
+    s.pending = [Decision(kind="trace", player=s.current_player, data={"color": "pink"})]
+    moves = [m for m in legal_moves(s) if m["type"] == "place_trace"]
+    assert any(m["space"] == "overflow" for m in moves)  # the 3-point overflow space is always available

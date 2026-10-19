@@ -56,16 +56,15 @@ Written 2026-10-19 for the 1.0 checklist (section A and the owner's decision lis
 | TECH-01 | 12 technologies, 4 tiles each; one per technology | Write a data or behaviour test | Count test plus: a player cannot take the same technology twice. |
 | TECH-02 | Immediate bonus on each tile | Exempt (needs the owner's approval) | Tile data verified by the owner; the bonuses are tested one by one (TECH-PTxx, TECH-TTxx, TECH-CTxx). |
 
-## The behaviour rules that still have no test
+## The behaviour rules
 
-About 80 more rules describe behaviour. They are written as tests in batches (done on 2026-10-19: 24 rules). The remaining ones, by area:
+Written as tests on 2026-10-19 (`tests/test_rule_gaps.py`, `tests/test_rule_gaps_2.py`, `tests/test_data_rules.py`, and rule IDs added to the tests that already checked them): about 110 rules. Coverage went from 248 to 401 of 418 rules with a test.
 
-| Area | Rules | Test needed |
+Still without a test, besides the exempt rules above:
+
+| Rule | What it says | Why it is not written yet |
 |---|---|---|
-| Movement and launch | LAUNCH-04, MOVE-04, MOVE-08, MOVE-09, FREE-10 | A card that ignores the probe limit; movement sources; "visit" fires only on moving onto the space; visits trigger missions and objectives; tuck as a free-action effect. |
-| Scan, sectors, traces | SCAN-06, SCAN-07, SECTOR-04, SECTOR-16, SECTOR-20 to 22, LIFE-02, LIFE-05, ALIEN-02, ALIEN-03, MILE-06, MILE-10, MILE-11 | Marking a signal follows the sector rules; winner reward with a trace; "win a sector" and "signal in a sector of a color" card terms; overflow markers count for alien traces; nonplayer markers only on discovery spaces; milestone order and discovery after milestones. |
-| Cards and missions | CARD-02, CARD-03, CARD-13, CARD-14, CARD-17, CARD-31 to 33, CARD-41 to 48 | One benefit per card; triggers outside the owner's turn; several rewards from one effect; the card terms (signal in a sector, move within the same ring, visit a planet, discard for a signal). |
-| Income and hand | INCOME-02, INCOME-04, PASS-06, RES-05, TURN-04 | Tuck sources; income resolved after passing; the two draw effects; turn end order. |
-| FAQ rules | FAQ-01 to 03, 05 to 07, 10, 11, 14, 15, 17, 19, 20, 30, 32, 35, 36, 44, 50 to 56 | One test each, from the FAQ text (effects that cannot be resolved, rotation once per research, orbiters never return, landing discount, a tie in a sector, analyze needs all six spaces, gold tile counts, the rival's FAQ cases). |
-| Solo | SOLO-02, SOLO-06, SOLO-13, SOLO-16, SOLO-21, SOLO-ALIEN-04, SOLO-RIVAL-02, -03, -10, EXP-SOLO-04, EXP-SOLO-05 | Rival setup, progress icon, publicity, shuffle on pass, decision arrow, deck tiers, passing, expansion solo objectives. |
-| Expansion | EXP-SIG-02, EXP-SIG-03, EXP-ORG-01, EXP-GLY-02, EXP-PROMO-01 | Signal tokens in a scan; income signal tokens; organizations; Glyphids translation board; the promo card (see the decision on EXP-PROMO-01). |
+| CARD-41 | "signal in a sector": the card names where | Needs a card with a named sector in the test setup |
+| FAQ-32 | One action can mark both an objective task and a triggerable mission circle (solo) | Needs a solo state with both set up |
+| FAQ-55 | The rival's 'Oumuamua card: move to 'Oumuamua within 4 moves, then land or orbit | Needs a rival state with 'Oumuamua discovered and a probe in range |
+| EXP-PROMO-01 | The promo card "Space Agencies" | Not implemented; the owner decided on 2026-10-19 to leave it as it is |
