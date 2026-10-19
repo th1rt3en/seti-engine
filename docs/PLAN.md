@@ -28,7 +28,7 @@ A website for the board game SETI (Czech Games Edition) where users can sign up 
 | D12 | Solo mode is in scope for 1.0. | The bot follows the rulebook. Solo is also the main rule test bench before alpha. |
 | D13 | Both real-time and turn-based play. | Each game has a clock setting. The DO alarm drives the timers. Async play has email notifications through a queue. |
 | D14 | Rulebook ambiguities go to `docs/spec/ambiguities.md`, and the owner rules on them. | An agent that hits an ambiguity records it and stops. It does not guess. |
-| D15 | Rated play (2 to 4 players) ships at 1.0 with Elo, K = 20. | The multiplayer formula is in section 6. Guests and solo games are never rated. |
+| D15 | Rated play (2 to 4 players) ships at 1.0 with Elo (start 0, K 60/40/20 by games played, floor 100: see D37). | The multiplayer formula is in section 6. Guests and solo games are never rated. |
 | D16 | Auth is self-hosted sessions with anonymous guest tokens. | A guest can upgrade to an account and keep their history. The website issues short-lived signed JWTs, which the Worker and the engine verify with a public key. |
 | D17 | Claude agents do the work, under the owner's supervision. | Conventions are in `CLAUDE.md`. Review gates are in section 5. |
 | D18 | Agents don't deploy, touch secrets or change DNS. | They write the infrastructure code, and the owner runs the deploys. |
