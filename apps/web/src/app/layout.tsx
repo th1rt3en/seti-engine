@@ -37,7 +37,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             {user ? (
               <>
                 <Link href={`/players/${user.id}`}>{user.name}</Link>
-                {user.isGuest ? <Link href="/account">Create an account</Link> : null}
+                <Link href="/account">{user.isGuest ? "Create an account" : "Account"}</Link>
                 <form action={logoutAction}>
                   <button type="submit" className="link">
                     Log out

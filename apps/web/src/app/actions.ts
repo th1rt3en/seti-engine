@@ -1,9 +1,23 @@
 "use server";
-import { AuthFailure, SESSION_COOKIE, createGuest, endSession, login, signup, upgradeGuest } from "@/lib/auth";
+import {
+  AuthFailure,
+  SESSION_COOKIE,
+  authLockedOut,
+  changePassword,
+  createGuest,
+  endSession,
+  issueRecoveryCode,
+  login,
+  noteAuthFailure,
+  recoverAccount,
+  renewRecoveryCode,
+  signup,
+  upgradeGuest,
+} from "@/lib/auth";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { createdRecently } from "@/lib/queries";
-import { currentUser, startSession } from "@/lib/session";
+import { RECOVERY_COOKIE, currentUser, showRecoveryCode, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
 import { TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
 import { CLOCK_PRESETS, createGame, gameMeta, joinGame, leaveGame, resignGame } from "@/lib/worker";
@@ -28,11 +42,12 @@ export async function signupAction(form: FormData): Promise<void> {
   try {
     const user = await signup(getDb(), field(form, "name"), field(form, "password"));
     await startSession(user.id);
+    await showRecoveryCode(await issueRecoveryCode(getDb(), user.id));
   } catch (e) {
     if (e instanceof AuthFailure) back("/signup", e.message);
     throw e;
   }
-  redirect("/lobby");
+  redirect("/recovery-code");
 }
 
 export async function loginAction(form: FormData): Promise<void> {
@@ -59,12 +74,84 @@ export async function upgradeAction(form: FormData): Promise<void> {
   if (me === null) redirect("/login");
   await challenge(form, "/account");
   try {
-    await upgradeGuest(getDb(), (me as NonNullable<typeof me>).id, field(form, "name"), field(form, "password"));
+    const user = await upgradeGuest(getDb(), (me as NonNullable<typeof me>).id, field(form, "name"), field(form, "password"));
+    await showRecoveryCode(await issueRecoveryCode(getDb(), user.id));
   } catch (e) {
     if (e instanceof AuthFailure) back("/account", e.message);
     throw e;
   }
+  redirect("/recovery-code");
+}
+
+const clientIp = async (): Promise<string> => {
+  const h = await headers();
+  return h.get("cf-connecting-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+};
+
+/** A lost password: the username, the recovery code and a new password. The player is logged in and shown the new recovery code. */
+export async function recoverAction(form: FormData): Promise<void> {
+  await challenge(form, "/recover");
+  const db = getDb();
+  const ip = await clientIp();
+  if (await authLockedOut(db, ip)) back("/recover", "Too many tries. Wait a quarter of an hour.");
+  try {
+    const { user, code } = await recoverAccount(db, field(form, "name"), field(form, "code"), field(form, "password"));
+    await startSession(user.id);
+    await showRecoveryCode(code);
+  } catch (e) {
+    if (e instanceof AuthFailure) {
+      await noteAuthFailure(db, ip);
+      back("/recover", e.message);
+    }
+    throw e;
+  }
+  redirect("/recovery-code");
+}
+
+/** The player has written the code down: the page that showed it goes away. */
+export async function recoverySavedAction(): Promise<void> {
+  (await cookies()).delete(RECOVERY_COOKIE);
   redirect("/lobby");
+}
+
+export async function changePasswordAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const user = me as NonNullable<typeof me>;
+  const db = getDb();
+  const ip = await clientIp();
+  if (await authLockedOut(db, ip)) back("/account", "Too many tries. Wait a quarter of an hour.");
+  if (field(form, "password") !== field(form, "again")) back("/account", "The new password and its repetition are not the same.");
+  try {
+    await changePassword(db, user.id, field(form, "current"), field(form, "password"));
+    await startSession(user.id); // the other sessions ended; this device keeps its own
+  } catch (e) {
+    if (e instanceof AuthFailure) {
+      await noteAuthFailure(db, ip);
+      back("/account", e.message);
+    }
+    throw e;
+  }
+  redirect("/account?notice=Your+password+is+changed.+Your+other+devices+are+logged+out.");
+}
+
+/** A new recovery code (the old one stops working), for the player who has lost it or has an account from before the codes. */
+export async function newRecoveryCodeAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const db = getDb();
+  const ip = await clientIp();
+  if (await authLockedOut(db, ip)) back("/account", "Too many tries. Wait a quarter of an hour.");
+  try {
+    await showRecoveryCode(await renewRecoveryCode(db, (me as NonNullable<typeof me>).id, field(form, "password")));
+  } catch (e) {
+    if (e instanceof AuthFailure) {
+      await noteAuthFailure(db, ip);
+      back("/account", e.message);
+    }
+    throw e;
+  }
+  redirect("/recovery-code");
 }
 
 export async function logoutAction(): Promise<void> {
@@ -80,7 +167,8 @@ export async function createGameAction(form: FormData): Promise<void> {
   if (me === null) redirect("/login");
   const user = me as NonNullable<typeof me>;
   // a second press, or a second tab, a moment after the first made a second game by accident: one new game per player every 15 seconds
-  if (await createdRecently(getDb(), user.id, Date.now())) back("/lobby", "You have just created a game. Open it from the list, or wait a few seconds before creating another.");
+  if (await createdRecently(getDb(), user.id, Date.now()))
+    back("/lobby", "You have just created a game. Open it from the list, or wait a few seconds before creating another.");
   const players = Math.min(4, Math.max(1, Number(field(form, "players")) || 2));
   const difficulty = Math.min(5, Math.max(1, Number(field(form, "difficulty")) || 3));
   const rated = form.get("rated") === "on" && players >= 2;

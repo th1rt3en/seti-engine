@@ -13,6 +13,7 @@ import {
   cancelStaleAction,
   deleteAccountAction,
   resetRatingAction,
+  setPasswordAction,
   setRatingAction,
 } from "./actions";
 
@@ -175,6 +176,7 @@ export default async function Admin({
                 <th>Name</th>
                 <th>Rating</th>
                 <th>Set the rating</th>
+                <th>Set the password</th>
                 <th />
               </tr>
             </thead>
@@ -205,6 +207,31 @@ export default async function Admin({
                         Set
                       </button>
                     </form>
+                  </td>
+                  <td>
+                    {u.is_guest ? (
+                      <span className="muted small">guest</span>
+                    ) : (
+                      <form action={setPasswordAction} style={{ display: "flex", gap: 6 }}>
+                        <input type="hidden" name="back" value={back} />
+                        <input type="hidden" name="user" value={u.id} />
+                        <input type="hidden" name="name" value={u.name} />
+                        <input
+                          type="text"
+                          name="password"
+                          minLength={8}
+                          maxLength={200}
+                          required
+                          autoComplete="off"
+                          placeholder="new password"
+                          style={{ width: 150 }}
+                          aria-label={`New password of ${u.name}`}
+                        />
+                        <ConfirmSubmit ask={`Set a new password for ${u.name}? Their sessions end.`} className="secondary small">
+                          Set
+                        </ConfirmSubmit>
+                      </form>
+                    )}
                   </td>
                   <td>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>

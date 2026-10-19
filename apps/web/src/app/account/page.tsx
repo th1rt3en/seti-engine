@@ -1,18 +1,50 @@
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { currentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { upgradeAction } from "../actions";
+import { changePasswordAction, newRecoveryCodeAction, upgradeAction } from "../actions";
 
-export default async function Account({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function Account({ searchParams }: { searchParams: Promise<{ error?: string; notice?: string }> }) {
   const user = await currentUser();
   if (user === null) redirect("/login");
   const me = user as NonNullable<typeof user>;
-  const { error } = await searchParams;
+  const { error, notice } = await searchParams;
   if (!me.isGuest) {
     return (
       <>
         <h1>Your account</h1>
         <p>{me.name}</p>
+        {notice ? <p className="card">{notice}</p> : null}
+        {error ? <p className="error">{error}</p> : null}
+        <h2>Change your password</h2>
+        <form action={changePasswordAction} className="stack">
+          <label>
+            Current password
+            <input name="current" type="password" required autoComplete="current-password" />
+          </label>
+          <label>
+            New password (at least 8 characters)
+            <input name="password" type="password" required minLength={8} autoComplete="new-password" />
+          </label>
+          <label>
+            New password again
+            <input name="again" type="password" required minLength={8} autoComplete="new-password" />
+          </label>
+          <button type="submit">Change the password</button>
+        </form>
+        <h2>Recovery code</h2>
+        <p className="muted">
+          The code lets you set a new password if you forget it. Only its hash is stored, so it cannot be shown again. If you have lost it,
+          or your account is older than the codes, make a new one (the old one stops working).
+        </p>
+        <form action={newRecoveryCodeAction} className="stack">
+          <label>
+            Your password
+            <input name="password" type="password" required autoComplete="current-password" />
+          </label>
+          <button type="submit" className="secondary">
+            Make a new recovery code
+          </button>
+        </form>
       </>
     );
   }

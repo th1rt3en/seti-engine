@@ -17,6 +17,9 @@ export default async function Signup({ searchParams }: { searchParams: Promise<{
           <input name="password" type="password" required minLength={8} autoComplete="new-password" />
         </label>
         <TurnstileWidget />
+        <p className="muted small">
+          After this you get a one-time recovery code. Keep it: it is the only way to set a new password if you forget yours.
+        </p>
         <button type="submit">Create the account</button>
       </form>
     </>

@@ -2,6 +2,7 @@
 // The actions of the administrator's page. Every action checks the administrator's cookie again: a form that is posted without it does nothing.
 import { ADMIN_COOKIE, ADMIN_HOURS, adminToken, checkPassphrase, isAdmin, lockedOut, noteFailure } from "@/lib/admin";
 import { allOpenGameIds, deleteAccount, resetRating, setRating } from "@/lib/adminData";
+import { AuthFailure, setPasswordByAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { adminCancelGame, adminGameInfo } from "@/lib/worker";
 import { cookies, headers } from "next/headers";
@@ -62,6 +63,22 @@ export async function setRatingAction(form: FormData): Promise<void> {
   if (!Number.isFinite(rating) || rating < 0 || rating > 4000) back(form, "The rating must be a number from 0 to 4000.", true);
   await setRating(getDb(), field(form, "user"), rating, Date.now());
   back(form, `${field(form, "name")} is rated ${Math.round(rating)} now.`);
+}
+
+/** The administrator sets a password for a player who lost both the password and the recovery code. The player's sessions end. */
+export async function setPasswordAction(form: FormData): Promise<void> {
+  await requireAdmin(form);
+  try {
+    const done = await setPasswordByAdmin(getDb(), field(form, "user"), field(form, "password"));
+    if (!done) back(form, "That account does not exist, or it is a guest.", true);
+  } catch (e) {
+    if (e instanceof AuthFailure) back(form, e.message, true);
+    throw e;
+  }
+  back(
+    form,
+    `The password of ${field(form, "name")} is changed and their sessions are ended. Tell them the new password; they can change it on their account page.`,
+  );
 }
 
 export async function resetRatingAction(form: FormData): Promise<void> {

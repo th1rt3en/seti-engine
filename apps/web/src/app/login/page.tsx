@@ -1,4 +1,5 @@
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import Link from "next/link";
 import { loginAction } from "../actions";
 
 export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
@@ -19,6 +20,9 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
         <TurnstileWidget />
         <button type="submit">Log in</button>
       </form>
+      <p className="muted small">
+        <Link href="/recover">Forgot your password?</Link>
+      </p>
     </>
   );
 }

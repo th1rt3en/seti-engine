@@ -18,3 +18,16 @@ export async function startSession(userId: string): Promise<void> {
     maxAge: SESSION_DAYS * 86_400,
   });
 }
+
+/** The recovery code that is to be shown once to the player (after signup, after a recovery or a new code). It lives in a cookie for ten minutes. */
+export const RECOVERY_COOKIE = "seti_recovery";
+
+export async function showRecoveryCode(code: string): Promise<void> {
+  (await cookies()).set(RECOVERY_COOKIE, code, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 600,
+  });
+}
