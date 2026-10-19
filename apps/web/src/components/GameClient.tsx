@@ -2,6 +2,7 @@
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 import { useGameSettings } from "@/lib/gameSettings";
 import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
+import { helpFor } from "@/lib/helpText";
 import { lastMoveOf } from "@/lib/lastMove";
 import {
   type Move,
@@ -42,6 +43,7 @@ import { SampleReward } from "./Mascamites";
 import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogContext, type LogEntry, MoveLog, plainEntry } from "./MoveLog";
+import { MovePreview } from "./MovePreview";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
@@ -56,6 +58,7 @@ type Server =
   | { t: "view"; seq: number; status: string; view: View; names: string[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Move[] }
   | { t: "log"; from: number; entries: LogEntry[] }
+  | { t: "preview"; id: number; changes: Record<string, number> | null }
   | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } }
   | { t: "cancelled" };
 
@@ -91,6 +94,8 @@ export function GameClient({
   const [log, setLog] = useState<LogEntry[]>([]);
   const logRef = useRef<LogEntry[]>([]); // the same log, to check that a new entry follows the ones that were received
   const [online, setOnline] = useState(false);
+  // what a move would change for the player, by the number of the move (MovePreview); forgotten when the game moves on
+  const [previews, setPreviews] = useState<Record<number, Record<string, number> | null>>({});
   const [seenUpTo, setSeenUpTo] = useState(0); // the length of the log when the player last closed the summary of what happened since their turn
   const socket = useRef<WebSocket | null>(null);
   const seq = useRef(0);
@@ -189,6 +194,7 @@ export function GameClient({
         if (m.t === "lobby") setLobby(m);
         else if (m.t === "view") {
           seq.current = m.seq;
+          setPreviews({}); // an answer belongs to the position it was asked in
           endWait();
           setPrevious(latest.current);
           latest.current = m.view;
@@ -234,6 +240,7 @@ export function GameClient({
           endWait();
           setError(m.message);
         }
+        if (m.t === "preview") setPreviews((p) => ({ ...p, [m.id]: m.changes }));
         if (m.t === "ended") setEnded(m.result);
         // an administrator cancelled the game: it is over for everybody, with no winner and no rating change
         if (m.t === "cancelled") setEnded({ reason: "cancelled", winners: [], ranking: [] });
@@ -710,7 +717,12 @@ export function GameClient({
           })}
         </span>
       ) : (
-        <SpotPrompt note={(v.notes[spotOption.move] ?? null) as Note} fallback={spotMove ? describeMove(spotMove) : undefined} />
+        <>
+          <SpotPrompt note={(v.notes[spotOption.move] ?? null) as Note} fallback={spotMove ? describeMove(spotMove) : undefined} />
+          {spotMove && !(v.notes[spotOption.move] as Note)?.irreversible ? (
+            <MovePreview move={spotMove} previews={previews} send={send} />
+          ) : null}
+        </>
       ),
       buttons: [confirm("Confirm", () => spotMove && play(spotMove), !spotMove)],
       onCancel: () => setPickedSpot(null),
@@ -761,6 +773,7 @@ export function GameClient({
     ) : undefined;
   // the reminders of what can be done now: one ? button in the context bar
   const hints: string[] = [];
+  if (mine.length > 0 && !ended) hints.push(helpFor(v.state.pending[0]?.kind));
   if (reach.length > 0)
     hints.push(
       probe === null
@@ -875,6 +888,7 @@ export function GameClient({
     ),
     rival: v.state.rival ? v.state.rival.index : null,
     me: v.viewer,
+    replayAt: ended ? (step: number) => `/replay/${gameId}#step=${step}` : undefined,
   };
   // what the others did since this player's last move, for the player whose turn it is
   const lastMine = myTurn ? log.map((e) => e.seat).lastIndexOf(v.viewer as number) : -1;

@@ -32,6 +32,8 @@ export interface LogContext {
   rival: number | null;
   /** The seat of the player who looks at the log (null for a spectator). */
   me?: number | null;
+  /** After the game: the address of the replay at the step of a move (the number of the move), so that a line of the log opens the board as it was then. */
+  replayAt?: (seq: number) => string;
 }
 
 type Delta = GameEvent & { player: number; changes: Record<string, number> };
@@ -578,7 +580,15 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
             );
             return (
               <li key={e.seq}>
-                <span className="lognum">{e.seq + 1}</span>
+                <span className="lognum">
+                  {ctx.replayAt ? (
+                    <a href={ctx.replayAt(e.seq + 1)} target="_blank" rel="noreferrer" title="See the board after this move (replay)">
+                      {e.seq + 1}
+                    </a>
+                  ) : (
+                    e.seq + 1
+                  )}
+                </span>
                 <span className="logmove">
                   <b>{ctx.who(e.seat)}</b> <CardText text={logText(e.action)} />{" "}
                   {mine && !itemised ? <Changes changes={mine.changes} size={16} /> : null}

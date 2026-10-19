@@ -127,7 +127,7 @@ export class GameRoomDO implements DurableObject {
   private async onMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     const conn = this.connection(ws);
     const att = ws.deserializeAttachment() as Attachment;
-    let msg: { t?: string; seq?: number; seat?: number; action?: Record<string, unknown> };
+    let msg: { t?: string; id?: number; seq?: number; seat?: number; action?: Record<string, unknown> };
     try {
       msg = JSON.parse(typeof message === "string" ? message : new TextDecoder().decode(message));
     } catch {
@@ -140,6 +140,11 @@ export class GameRoomDO implements DurableObject {
     }
     if (att.identity === null) {
       conn.send({ t: "error", code: "spectator", message: "spectators cannot act" });
+      return;
+    }
+    if (msg.t === "preview") {
+      const changes = msg.action ? await this.room.preview(att.identity, msg.action) : null;
+      conn.send({ t: "preview", id: typeof msg.id === "number" ? msg.id : 0, changes });
       return;
     }
     const res: SubmitResult =

@@ -110,6 +110,8 @@ export type ServerMessage =
   /** The moves made so far, for the log beside the board: all of them on connecting (`from` is 0), then each new one. */
   | { t: "log"; from: number; entries: PublicEntry[] }
   | { t: "ended"; result: Result }
+  /** The answer to a preview request: what the move would change for the player (null when it cannot be told). */
+  | { t: "preview"; id: number; changes: Record<string, number> | null }
   /** An administrator cancelled the game (no result, no rating changes). */
   | { t: "cancelled" };
 
@@ -334,6 +336,27 @@ export class GameRoom {
   }
 
   // --- play ----------------------------------------------------------------------------------------------------------------
+
+  /**
+   * What a move would change for the player who is to act (points and resources, as the net change that the log shows), without making it, so that
+   * the page can show the result before the player confirms. Nothing is stored. Only the player to act may ask, and only the change of that player's
+   * own numbers is returned.
+   */
+  async preview(who: Identity, action: Action): Promise<Record<string, number> | null> {
+    const meta = await this.meta();
+    if (meta === undefined || meta.status !== "playing") return null;
+    const seat = meta.seats.findIndex((s) => s?.id === who.id);
+    if (seat < 0) return null;
+    const state = await this.state();
+    if (toAct(state) !== seat) return null;
+    try {
+      const res = await this.d.engine.apply(state, action);
+      const delta = res.events.find((e) => e.type === "delta" && e.player === seat) as { changes?: Record<string, number> } | undefined;
+      return delta?.changes ?? {};
+    } catch {
+      return null; // an illegal move, or the engine is not reachable: no preview
+    }
+  }
 
   /** `seq` is the number of actions the client has seen; it makes a repeated or late message harmless. */
   submit(who: Identity, seq: number, action: Action): Promise<SubmitResult> {

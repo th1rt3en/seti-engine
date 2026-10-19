@@ -227,3 +227,13 @@ describe("the place of the last move", () => {
     ).toEqual({ sectors: [3, 5], cells: [[2, 4]], planets: ["mars"] });
   });
 });
+
+import { helpFor } from "@/lib/helpText";
+
+describe("the help of the context bar", () => {
+  it("has a text for a pending decision, for a turn without one, and a general one for an unknown kind", () => {
+    expect(helpFor(undefined)).toContain("exactly one main action");
+    expect(helpFor("income_tuck")).toContain("Tuck a card for income");
+    expect(helpFor("something_new")).toContain("highlighted choices");
+  });
+});

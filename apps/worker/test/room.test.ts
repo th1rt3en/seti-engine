@@ -124,6 +124,16 @@ describe("play", () => {
     expect(await t.room.log()).toHaveLength(0);
   });
 
+  it("previews a move for the player to act without making it", async () => {
+    const t = await started();
+    expect(await t.room.preview(alice, { type: "score" })).toEqual({}); // the fake engine reports no change
+    expect(await t.room.preview(bob, { type: "score" })).toBeNull(); // not Bob's turn
+    expect(await t.room.preview(cy, { type: "score" })).toBeNull(); // not a player
+    expect(await t.room.preview(alice, { type: "launch" })).toBeNull(); // an illegal move
+    expect(await t.room.log()).toHaveLength(0); // nothing was played
+    expect(await t.room.submit(alice, 0, { type: "score" })).toEqual({ ok: true });
+  });
+
   it("a repeated message does not act twice", async () => {
     const t = await started();
     await t.room.submit(alice, 0, { type: "score" });
