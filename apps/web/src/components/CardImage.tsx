@@ -6,6 +6,8 @@ import { cardName } from "@/lib/moves";
 import { ZOOM_SECONDS, touchScreen, useLongPress } from "@/lib/touch";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+/** Sent on the window when the pointer is on a card (the id) and when it leaves (null): the board outlines the planets and sectors the card names. */
+export const CARD_HOVER_EVENT = "seti-card-hover";
 /** The enlarged card is a quarter of the window wide, between these. */
 const zoomWidth = (): number => Math.round(Math.min(500, Math.max(320, window.innerWidth * 0.26)));
 const RATIO = 1040 / 747;
@@ -98,8 +100,13 @@ export function CardImage({ id, width = 120, size, title }: { id: string; width?
           if (touchScreen()) return; // a tap makes the browser fake a hover that would stay: touch has its own way (onClick)
           cancel();
           timer.current = setTimeout(show, HOVER_DELAY_MS);
+          window.dispatchEvent(new CustomEvent(CARD_HOVER_EVENT, { detail: id })); // the board outlines the places the card names
         }}
-        onMouseLeave={() => !touchScreen() && cancel()}
+        onMouseLeave={() => {
+          if (touchScreen()) return;
+          cancel();
+          window.dispatchEvent(new CustomEvent(CARD_HOVER_EVENT, { detail: null }));
+        }}
       />
       {zoom
         ? // in the page itself, so that no transform of the card or its panel moves it

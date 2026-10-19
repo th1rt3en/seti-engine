@@ -118,6 +118,33 @@ QUICK_PICTURES = {
 }  # the picture of each quick start card (the Q.n of the picture is not the id SR.n)
 
 
+def card_places() -> dict[str, dict[str, list[str]]]:
+    """The planets and the sector colors that the effects and the missions of a card name (for the highlight when a card is hovered). A card that names none is left out."""
+    from seti_engine import card_defs
+
+    def walk(x: object, out: dict[str, set[str]]) -> None:
+        if isinstance(x, dict):
+            for k, v in x.items():
+                if k in ("planet", "planets"):
+                    for pl in v if isinstance(v, list) else [v]:
+                        if isinstance(pl, str) and pl not in ("*", "any", ""):
+                            out["planets"].add(pl.lower())
+                elif k == "color" and isinstance(v, str) and v in ("red", "yellow", "blue", "black"):
+                    out["colors"].add(v)
+                walk(v, out)
+        elif isinstance(x, (list, tuple)):
+            for v in x:
+                walk(v, out)
+
+    res: dict[str, dict[str, list[str]]] = {}
+    for cid, d in card_defs.CARDS.items():
+        out: dict[str, set[str]] = {"planets": set(), "colors": set()}
+        walk(d, out)
+        if out["planets"] or out["colors"]:
+            res[cid] = {"planets": sorted(out["planets"]), "colors": sorted(out["colors"])}
+    return res
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     cards = {cid: {k: c[k] for k in ("name", "cost", "income", "sector", "species", "deck", "free")} for cid, c in tables.cards().items()}
@@ -154,5 +181,6 @@ if __name__ == "__main__":
     # quick start cards: the pictures carry their own numbers (Q.n), the engine ids (SR.n) are in another order; matched by what they show
     images.update(QUICK_PICTURES)
     (OUT / "expansion-card-images.json").write_text(json.dumps(images, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    (OUT / "card-places.json").write_text(json.dumps(card_places(), indent=0, sort_keys=True) + "\n", encoding="utf-8")
     (OUT / "move-types.json").write_text(json.dumps(move_types(), indent=1) + "\n", encoding="utf-8")
     print("wrote", OUT)

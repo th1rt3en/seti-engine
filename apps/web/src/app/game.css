@@ -3155,3 +3155,30 @@ input.switch:focus-visible {
   margin: 4px 0;
   padding-left: 18px;
 }
+
+/* a disc turns when the solar system rotates; every animation of the board is off when the player switched them off in the settings (data-anim) */
+.disc {
+  transition: transform 0.9s ease-in-out;
+}
+:root[data-anim="off"] .disc,
+:root[data-anim="off"] .pop,
+:root[data-anim="off"] .lift,
+:root[data-anim="off"] .flash,
+:root[data-anim="off"] .lastshape {
+  transition: none;
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .disc {
+    transition: none;
+  }
+}
+
+/* the places that the card under the pointer names */
+.refshape {
+  fill: rgba(111, 208, 255, 0.12);
+  stroke: #6fd0ff;
+  stroke-width: 9;
+  stroke-dasharray: 26 14;
+  stroke-linejoin: round;
+}

@@ -47,12 +47,14 @@ import { MASCAMITE_SAMPLE_SPACES, SPECIES_SPACES } from "@/lib/speciesSpaces";
 import { ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard, sectorPath } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import assets from "../generated/assets.json";
+import cardPlaces from "../generated/card-places.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
+import { CARD_HOVER_EVENT } from "./CardImage";
 import { DataToken, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
 import { TranslationBoard } from "./TranslationBoard";
 
@@ -130,6 +132,15 @@ export function BoardView({
   spots?: BoardSpots;
   goldChoice?: GoldChoice;
 }) {
+  // the planets and sector colors that the card under the pointer names are outlined (the places come from the card's definition in the engine)
+  const [hoverCard, setHoverCard] = useState<string | null>(null);
+  useEffect(() => {
+    const on = (e: Event) => setHoverCard((e as CustomEvent<string | null>).detail);
+    window.addEventListener(CARD_HOVER_EVENT, on);
+    return () => window.removeEventListener(CARD_HOVER_EVENT, on);
+  }, []);
+  const hoverPlaces = hoverCard ? ((cardPlaces as Record<string, { planets: string[]; colors: string[] }>)[hoverCard] ?? null) : null;
+  const refSectors = view.state.sectors.flatMap((sec, i) => (hoverPlaces?.colors.includes(sec.color) ? [i] : []));
   const s = view.state;
   const [hover, setHover] = useState<string | null>(null);
   // a gold scoring tile is shown larger, upright and with its markers when the pointer rests on it for a second (or when it is tapped)
@@ -375,7 +386,12 @@ export function BoardView({
               y={CENTER.y - size / 2}
               width={size}
               height={size}
-              transform={`rotate(${-45 * (s.disc_angles[n - 1] ?? 0)} ${CENTER.x} ${CENTER.y})`}
+              className="disc"
+              style={{
+                transformBox: "view-box",
+                transformOrigin: `${CENTER.x}px ${CENTER.y}px`,
+                transform: `rotate(${-45 * (s.disc_angles[n - 1] ?? 0)}deg)`,
+              }}
             />
           );
         })}
@@ -974,6 +990,17 @@ export function BoardView({
           <image href={assets.moon} x={-DIAL_POCKET / 2} y={-DIAL_POCKET / 2} width={DIAL_POCKET} height={DIAL_POCKET} />
           <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
         </g>
+        {hoverPlaces ? (
+          <g className="refmark" pointerEvents="none">
+            {refSectors.map((i) => (
+              <path key={`rs${i}`} d={sectorPath(i)} className="refshape" />
+            ))}
+            {hoverPlaces.planets.map((name) => {
+              const pos = PLANET[name];
+              return pos ? <circle key={`rp${name}`} cx={pos.x} cy={pos.y} r={pos.r + 22} className="refshape" /> : null;
+            })}
+          </g>
+        ) : null}
         {lastMove ? (
           <g className="lastmove" pointerEvents="none">
             {lastMove.sectors.map((i) => (

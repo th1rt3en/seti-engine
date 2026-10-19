@@ -3,7 +3,7 @@
 // nothing is saved yet, this browser's settings are saved), and a change made here is saved a moment later. Without an account nothing happens.
 import { useEffect } from "react";
 
-const KEYS = ["seti-turn-sound", "seti-confirm-irreversible", "seti-turn-notify", "seti-hand-scale"];
+const KEYS = ["seti-turn-sound", "seti-confirm-irreversible", "seti-turn-notify", "seti-animations", "seti-hand-scale"];
 const EVENT = "seti-settings";
 
 function local(): Record<string, string> {

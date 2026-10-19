@@ -6,9 +6,25 @@ import { ting } from "@/lib/turnSound";
 import { useEffect, useRef, useState } from "react";
 
 export function GameSettings() {
-  const { sound, setSound, handScale, setHandScale, confirmIrreversible, setConfirmIrreversible, notify, setNotify } = useGameSettings();
+  const {
+    sound,
+    setSound,
+    handScale,
+    setHandScale,
+    confirmIrreversible,
+    setConfirmIrreversible,
+    notify,
+    setNotify,
+    animations,
+    setAnimations,
+  } = useGameSettings();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
+
+  // the animations of the board are switched off for the whole page with an attribute that the CSS looks at
+  useEffect(() => {
+    document.documentElement.dataset.anim = animations ? "on" : "off";
+  }, [animations]);
 
   // the size of the cards in the hand, for the whole page
   useEffect(() => {
@@ -66,6 +82,17 @@ export function GameSettings() {
                 setSound(e.target.checked);
                 if (e.target.checked) ting(); // a sample of the sound
               }}
+            />
+          </label>
+          <label className="switchrow">
+            <span>Short animations on the board (they are off anyway if your device asks for less motion)</span>
+            <input
+              type="checkbox"
+              role="switch"
+              className="switch"
+              checked={animations}
+              aria-checked={animations}
+              onChange={(e) => setAnimations(e.target.checked)}
             />
           </label>
           <label className="switchrow">

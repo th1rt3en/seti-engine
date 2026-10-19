@@ -1,0 +1,292 @@
+{
+"1": {
+"colors": [],
+"planets": [
+"jupiter",
+"saturn"
+]
+},
+"10": {
+"colors": [],
+"planets": [
+"neptune",
+"uranus"
+]
+},
+"101": {
+"colors": [
+"blue",
+"red",
+"yellow"
+],
+"planets": []
+},
+"116": {
+"colors": [
+"blue",
+"red",
+"yellow"
+],
+"planets": []
+},
+"12": {
+"colors": [],
+"planets": [
+"jupiter"
+]
+},
+"14": {
+"colors": [],
+"planets": [
+"mars"
+]
+},
+"2": {
+"colors": [],
+"planets": [
+"mercury",
+"venus"
+]
+},
+"20": {
+"colors": [],
+"planets": [
+"mercury"
+]
+},
+"21": {
+"colors": [],
+"planets": [
+"venus"
+]
+},
+"22": {
+"colors": [],
+"planets": [
+"mars"
+]
+},
+"23": {
+"colors": [],
+"planets": [
+"jupiter"
+]
+},
+"24": {
+"colors": [],
+"planets": [
+"saturn"
+]
+},
+"3": {
+"colors": [],
+"planets": [
+"neptune",
+"uranus"
+]
+},
+"32": {
+"colors": [],
+"planets": [
+"mercury"
+]
+},
+"33": {
+"colors": [],
+"planets": [
+"venus"
+]
+},
+"34": {
+"colors": [],
+"planets": [
+"mars"
+]
+},
+"35": {
+"colors": [],
+"planets": [
+"jupiter"
+]
+},
+"36": {
+"colors": [],
+"planets": [
+"saturn"
+]
+},
+"37": {
+"colors": [
+"red"
+],
+"planets": []
+},
+"38": {
+"colors": [
+"red"
+],
+"planets": []
+},
+"39": {
+"colors": [
+"yellow"
+],
+"planets": []
+},
+"4": {
+"colors": [],
+"planets": [
+"jupiter",
+"venus"
+]
+},
+"40": {
+"colors": [
+"yellow"
+],
+"planets": []
+},
+"41": {
+"colors": [
+"blue"
+],
+"planets": []
+},
+"42": {
+"colors": [
+"blue"
+],
+"planets": []
+},
+"43": {
+"colors": [
+"black"
+],
+"planets": []
+},
+"44": {
+"colors": [
+"black"
+],
+"planets": []
+},
+"48": {
+"colors": [
+"red"
+],
+"planets": []
+},
+"49": {
+"colors": [
+"yellow"
+],
+"planets": []
+},
+"5": {
+"colors": [],
+"planets": [
+"venus"
+]
+},
+"56": {
+"colors": [
+"blue"
+],
+"planets": []
+},
+"58": {
+"colors": [],
+"planets": [
+"uranus"
+]
+},
+"6": {
+"colors": [],
+"planets": [
+"jupiter"
+]
+},
+"60": {
+"colors": [],
+"planets": [
+"neptune"
+]
+},
+"7": {
+"colors": [],
+"planets": [
+"mercury"
+]
+},
+"8": {
+"colors": [],
+"planets": [
+"saturn"
+]
+},
+"AM.12": {
+"colors": [
+"yellow"
+],
+"planets": []
+},
+"AM.13": {
+"colors": [
+"blue"
+],
+"planets": []
+},
+"AM.15": {
+"colors": [
+"yellow"
+],
+"planets": []
+},
+"AM.16": {
+"colors": [
+"blue"
+],
+"planets": []
+},
+"AM.17": {
+"colors": [
+"blue",
+"yellow"
+],
+"planets": []
+},
+"ET.22": {
+"colors": [],
+"planets": [
+"oumuamua"
+]
+},
+"ET.24": {
+"colors": [
+"blue",
+"red",
+"yellow"
+],
+"planets": []
+},
+"ET.27": {
+"colors": [],
+"planets": [
+"oumuamua"
+]
+},
+"SA.36": {
+"colors": [
+"blue",
+"red",
+"yellow"
+],
+"planets": []
+},
+"SE_EN_02": {
+"colors": [],
+"planets": [
+"mars"
+]
+}
+}

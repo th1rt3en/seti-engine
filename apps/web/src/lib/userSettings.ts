@@ -6,6 +6,7 @@ export const SETTING_KEYS: Record<string, (v: string) => boolean> = {
   "seti-turn-sound": (v) => v === "0" || v === "1",
   "seti-confirm-irreversible": (v) => v === "0" || v === "1",
   "seti-turn-notify": (v) => v === "0" || v === "1",
+  "seti-animations": (v) => v === "0" || v === "1",
   "seti-hand-scale": (v) => Number.isFinite(Number(v)) && Number(v) >= 0.5 && Number(v) <= 2,
 };
 
