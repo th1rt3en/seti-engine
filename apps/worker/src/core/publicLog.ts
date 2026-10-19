@@ -20,10 +20,13 @@ const without = <T extends Record<string, unknown>>(o: T, key: string): T => {
   return rest as T;
 };
 
-export function publicEntry(e: LogEntry): PublicEntry {
+/** The card drawn from the deck is told to the player who drew it only. */
+export function publicEntry(e: LogEntry, viewer: number | null = null): PublicEntry {
   const action = HIDDEN_CARD_ACTIONS.has(String((e.action as Record<string, unknown>).type))
     ? without(e.action as Record<string, unknown>, "card")
     : e.action;
-  const events = e.events.map((ev) => (HIDDEN_CARD_EVENTS.has(String(ev.type)) ? without(ev, "card") : ev));
+  const events = e.events.map((ev) =>
+    HIDDEN_CARD_EVENTS.has(String(ev.type)) || (ev.type === "draw_card" && ev.player !== viewer) ? without(ev, "card") : ev,
+  );
   return { seq: e.seq, seat: e.seat, action: action as Record<string, unknown>, events };
 }

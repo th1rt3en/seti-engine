@@ -63,6 +63,9 @@ def events_of(s: GameState) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     index: dict[tuple[int, str], int] = {}
     for rec in s.trail:
+        if "draw" in rec:  # a card drawn from the deck: the log names it for the player who drew it (the others are not told which)
+            out.append({"type": "draw_card", "player": rec["player"], "card": rec["draw"], "changes": {}})
+            continue
         key = (rec["player"], repr(sorted(rec["source"].items())) + str(rec.get("turn")))
         if key in index:
             merged = out[index[key]]["changes"]
@@ -74,4 +77,5 @@ def events_of(s: GameState) -> list[dict[str, Any]]:
             if "turn" in rec:
                 out[-1]["turn"] = rec["turn"]
     s.trail = []
-    return [e for e in out if any(v != 0 for v in e["changes"].values())]
+    kept = [e for e in out if e["type"] == "draw_card" or any(v != 0 for v in e["changes"].values())]
+    return [{k: v for k, v in e.items() if k != "changes"} if e["type"] == "draw_card" else e for e in kept]

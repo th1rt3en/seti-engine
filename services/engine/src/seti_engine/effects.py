@@ -70,6 +70,7 @@ def draw_random_card(state: GameState, p: PlayerState) -> str | None:
     cid = draw_from_deck(state)
     if cid is not None:
         p.hand.append(cid)
+        state.trail.append({"player": p.index, "draw": cid, "source": {}, "changes": {}})  # `draw_card` event (trail.events_of)
     return cid
 
 

@@ -856,7 +856,7 @@ export function GameClient({
       </button>,
     ];
   });
-  const MAIN_NAMES = { launch: "Launch a probe", scan: "Scan", analyze: "Analyze data" } as const;
+  const MAIN_NAMES = { launch: "Launch a probe", scan: "Scan", analyze: "Analyze" } as const;
   const costOf = (m: Move): Record<string, number> => {
     const at = v.legal.findIndex((x) => sameMove(x as Move, m));
     return ((v.notes[at] as Note)?.cost ?? {}) as Record<string, number>;

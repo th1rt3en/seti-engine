@@ -24,3 +24,12 @@ describe("the log that every client sees (rule 6)", () => {
     expect({ seq: played.seq, seat: played.seat }).toEqual({ seq: 3, seat: 1 });
   });
 });
+
+describe("a card drawn from the deck", () => {
+  it("is named for the player who drew it and hidden from the others", () => {
+    const e = entry({ type: "end_turn" }, [{ type: "draw_card", player: 1, card: "17" }]);
+    expect(publicEntry(e, 1).events[0]).toEqual({ type: "draw_card", player: 1, card: "17" });
+    expect(publicEntry(e, 0).events[0]).toEqual({ type: "draw_card", player: 1 });
+    expect(publicEntry(e, null).events[0]).toEqual({ type: "draw_card", player: 1 });
+  });
+});

@@ -193,6 +193,9 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
         </>
       );
     }
+    case "draw_card":
+      // the player who drew it sees the card; the others (and the spectators) are only told that a card was drawn
+      return ev.card ? `${who} draws ${cardName(ev.card)}` : `${who} draws a card from the deck`;
     case "play_card":
       // the prepared card of Futurespan Institute is played from where it lay face down: the log names it now
       return action?.type === "org_main" && ev.card
@@ -345,8 +348,22 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
           {entries.map((e) => {
             const deltas = e.events.filter((ev) => ev.type === "delta") as Delta[];
             // newer entries list each gain or loss under its source; older ones only have the net change of the move
-            const gains = e.events.filter((ev) => ev.type === "gains") as Gains[];
-            const itemised = gains.length > 0;
+            // a card drawn from the deck has its own line ("draws ..."): it is taken out of the count of the gains
+            const drawn = new Map<number, number>();
+            for (const ev of e.events) if (ev.type === "draw_card") drawn.set(Number(ev.player), (drawn.get(Number(ev.player)) ?? 0) + 1);
+            const rawGains = e.events.filter((ev) => ev.type === "gains") as Gains[];
+            const gains = rawGains
+              .map((g) => {
+                const left = drawn.get(g.player) ?? 0;
+                const cards = g.changes.card ?? 0;
+                if (left <= 0 || cards <= 0) return g;
+                const take = Math.min(left, cards);
+                drawn.set(g.player, left - take);
+                const { card: _cards, ...rest } = g.changes;
+                return { ...g, changes: cards - take > 0 ? { ...rest, card: cards - take } : rest };
+              })
+              .filter((g) => Object.keys(g.changes).length > 0);
+            const itemised = rawGains.length > 0;
             const ownGains = gains.filter((g) => g.source.kind !== "rival_turn" && !(ctx.rival !== null && g.player === ctx.rival));
             const rivalGains = gains.filter((g) => ctx.rival !== null && g.player === ctx.rival);
             const mine = deltas.find((d) => d.player === e.seat);

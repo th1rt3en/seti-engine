@@ -1085,3 +1085,13 @@ def test_taking_a_card_of_the_display_is_logged_with_its_name_but_not_from_the_d
     assert ev["card"] == named and ev["player"] == s.current_player
     r = apply(s, {"type": "buy_card", "source": "deck"})
     assert not any(e["type"] == "take_display_card" for e in r.events)  # a card of the deck is not named
+
+
+def test_a_card_drawn_from_the_deck_has_its_own_event() -> None:
+    from seti_engine import effects, trail
+
+    s = begin(2).state
+    top = s.deck[-1]
+    effects.draw_random_card(s, s.players[0])
+    ev = trail.events_of(s)
+    assert ev == [{"type": "draw_card", "player": 0, "card": top}]

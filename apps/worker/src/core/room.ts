@@ -361,7 +361,7 @@ export class GameRoom {
     await this.d.store.put(logKey(count), entry);
     await this.d.store.put("logcount", count + 1);
     await this.d.store.put("state", res.state);
-    for (const c of this.d.connections()) c.send({ t: "log", from: count, entries: [publicEntry(entry)] });
+    for (const c of this.d.connections()) c.send({ t: "log", from: count, entries: [publicEntry(entry, this.connSeat(meta, c))] });
     const clock = (await this.d.store.get<clocks.ClockState>("clock")) ?? clocks.initialClock(meta.clock, meta.seats.length);
     await this.d.store.put("clock", clocks.stop(meta.clock, clock, now));
     if (res.state.phase === "finished") {
@@ -539,10 +539,17 @@ export class GameRoom {
     else {
       await this.sendView(conn, meta);
       // the log goes in pieces of LOG_CHUNK moves: a long game (a solo rival can play several turns in one move) would make one very large message
-      const log = (await this.d.store.list<LogEntry>("log:")).map(publicEntry);
+      const seat = this.connSeat(meta, conn);
+      const log = (await this.d.store.list<LogEntry>("log:")).map((e) => publicEntry(e, seat));
       for (let from = 0; from === 0 || from < log.length; from += LOG_CHUNK)
         conn.send({ t: "log", from, entries: log.slice(from, from + LOG_CHUNK) });
     }
+  }
+
+  /** The seat of a connection (null for a spectator). */
+  private connSeat(meta: Meta, conn: Connection): number | null {
+    const seat = conn.who === null ? -1 : meta.seats.findIndex((s) => s?.id === conn.who);
+    return seat >= 0 ? seat : null;
   }
 
   /** What the clients are told: the view of each seat, or the spectator view. */
