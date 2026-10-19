@@ -6,7 +6,7 @@ import { ting } from "@/lib/turnSound";
 import { useEffect, useRef, useState } from "react";
 
 export function GameSettings() {
-  const { sound, setSound, handScale, setHandScale, confirmIrreversible, setConfirmIrreversible } = useGameSettings();
+  const { sound, setSound, handScale, setHandScale, confirmIrreversible, setConfirmIrreversible, notify, setNotify } = useGameSettings();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
 
@@ -58,6 +58,27 @@ export function GameSettings() {
               onChange={(e) => {
                 setSound(e.target.checked);
                 if (e.target.checked) ting(); // a sample of the sound
+              }}
+            />
+          </label>
+          <label className="switchrow">
+            <span>Notify me when it is my turn and this tab is in the background</span>
+            <input
+              type="checkbox"
+              role="switch"
+              className="switch"
+              checked={notify}
+              aria-checked={notify}
+              onChange={async (e) => {
+                const on = e.target.checked;
+                if (on && typeof Notification !== "undefined" && Notification.permission === "default") {
+                  try {
+                    await Notification.requestPermission(); // the browser asks once; without it nothing is shown
+                  } catch {
+                    // not available
+                  }
+                }
+                setNotify(on);
               }}
             />
           </label>

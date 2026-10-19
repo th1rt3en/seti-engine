@@ -30,6 +30,8 @@ export interface LogContext {
   species: string[];
   /** The seat of the solo rival, if there is one. */
   rival: number | null;
+  /** The seat of the player who looks at the log (null for a spectator). */
+  me?: number | null;
 }
 
 type Delta = GameEvent & { player: number; changes: Record<string, number> };
@@ -331,6 +333,57 @@ function noteLines(notes: GameEvent[], ctx: LogContext, action: LogEntry["action
   return out;
 }
 
+type LogFilter = "all" | "mine" | "opponents" | "rival" | "gains";
+const FILTERS: [LogFilter, string][] = [
+  ["all", "All moves"],
+  ["mine", "Mine"],
+  ["opponents", "Opponents"],
+  ["rival", "The rival"],
+  ["gains", "With gains"],
+];
+
+/** An entry of the log as plain lines of text, for the search, the copy and the download. */
+export function plainEntry(e: LogEntry, ctx: LogContext): string[] {
+  const lines = [`${e.seq + 1}. ${ctx.who(e.seat)} ${logText(e.action)}`];
+  for (const ev of e.events) {
+    if (ev.type === "gains") {
+      const g = ev as unknown as Gains;
+      const what = Object.entries(g.changes)
+        .map(([k, n]) => `${n > 0 ? "+" : ""}${n} ${k}`)
+        .join(", ");
+      lines.push(`   ${g.player !== e.seat ? `${ctx.who(g.player)}: ` : ""}${sourceText(g.source, ctx, e.action)}: ${what}`);
+      continue;
+    }
+    if (ev.type === "delta" || ev.type.startsWith("rival_")) {
+      if (ev.type.startsWith("rival_"))
+        lines.push(`   Rival: ${ev.type.replace("rival_", "").replace(/_/g, " ")}${ev.card ? ` ${String(ev.card)}` : ""}`);
+      continue;
+    }
+    const text = eventLine(ev, ctx, e.action);
+    if (typeof text === "string") lines.push(`   ${text}`);
+  }
+  return lines;
+}
+
+function matches(e: LogEntry, filter: LogFilter, ctx: LogContext): boolean {
+  const me = ctx.me ?? null;
+  if (filter === "mine") return me !== null && e.seat === me;
+  if (filter === "opponents") return e.seat !== me && e.seat !== ctx.rival;
+  if (filter === "rival") return e.seat === ctx.rival || e.events.some((ev) => ev.type.startsWith("rival_"));
+  if (filter === "gains") return e.events.some((ev) => ev.type === "gains" || ev.type === "delta");
+  return true;
+}
+
+const LEGEND: [string, string][] = [
+  ["vp", "victory points"],
+  ["credit", "credits"],
+  ["energy", "energy"],
+  ["publicity", "publicity"],
+  ["data", "data"],
+  ["card", "cards (a card to the hand)"],
+  ["move", "movement"],
+];
+
 export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext }) {
   const [folded, toggle] = useDock("log");
   const body = useRef<HTMLOListElement>(null);
@@ -366,6 +419,32 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
     window.addEventListener("pointerup", stop);
     e.preventDefault();
   };
+  const [filter, setFilter] = useState<LogFilter>("all");
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const shown = entries.filter((e) => matches(e, filter, ctx) && (q === "" || plainEntry(e, ctx).join(" ").toLowerCase().includes(q)));
+  const asText = (): string => entries.flatMap((e) => plainEntry(e, ctx)).join("\n");
+  const [note, setNote] = useState("");
+  const say = (t: string) => {
+    setNote(t);
+    setTimeout(() => setNote(""), 1800);
+  };
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(asText());
+      say("Copied");
+    } catch {
+      say("Could not copy: use Download");
+    }
+  };
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([asText()], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "seti-game-log.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   const last = entries.at(-1)?.seq;
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to the newest move when one is added
   useEffect(() => {
@@ -380,9 +459,52 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
       {folded ? null : (
+        <div className="logtools">
+          <select value={filter} onChange={(e) => setFilter(e.target.value as LogFilter)} aria-label="Show these moves">
+            {FILTERS.filter(([k]) => k !== "rival" || ctx.rival !== null).map(([k, label]) => (
+              <option key={k} value={k}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search the log"
+            aria-label="Search the log"
+          />
+          <button type="button" className="secondary small" onClick={copy}>
+            Copy
+          </button>
+          <button type="button" className="secondary small" onClick={download}>
+            Download
+          </button>
+          {note ? <span className="muted small">{note}</span> : null}
+          <details className="loglegend">
+            <summary>Legend</summary>
+            <ul>
+              {LEGEND.map(([kind, word]) => (
+                <li key={kind}>
+                  <Changes changes={{ [kind]: 1 }} size={16} /> {word}
+                </li>
+              ))}
+              <li>
+                <b>Name:</b> + or − before an amount is what the player gained or lost; the name before it says what caused it (a card, a
+                planet, a sector, a tech).
+              </li>
+              <li>
+                <b>(×2)</b> the same line twice in a row. <b>Rival's turn</b> the moves of the solo rival after the player's move.
+              </li>
+            </ul>
+          </details>
+        </div>
+      )}
+      {folded ? null : (
         <ol ref={body} className="logbody" style={height === null ? undefined : { maxHeight: `${height}px`, height: `${height}px` }}>
           {entries.length === 0 ? <li className="muted">No move yet.</li> : null}
-          {entries.map((e) => {
+          {entries.length > 0 && shown.length === 0 ? <li className="muted">No move matches.</li> : null}
+          {shown.map((e) => {
             const deltas = e.events.filter((ev) => ev.type === "delta") as Delta[];
             // newer entries list each gain or loss under its source; older ones only have the net change of the move
             // a card drawn from the deck has its own line ("draws ..."): it is taken out of the count of the gains

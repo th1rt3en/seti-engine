@@ -3046,3 +3046,34 @@ input.switch:focus-visible {
   height: 30px;
   object-fit: contain;
 }
+
+/* the tools of the log: a filter, a search, copy and download, and the legend */
+.logtools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.logtools select,
+.logtools input[type="search"] {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 3px 6px;
+  min-width: 0;
+}
+.logtools input[type="search"] {
+  flex: 1 1 110px;
+}
+.loglegend {
+  flex-basis: 100%;
+  font-size: 0.82rem;
+}
+.loglegend ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+.loglegend li {
+  margin-bottom: 3px;
+}

@@ -992,6 +992,7 @@ export function GameClient({
               sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`,
             ),
             rival: v.state.rival ? v.state.rival.index : null,
+            me: v.viewer,
           }}
         />
       }

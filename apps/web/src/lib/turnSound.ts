@@ -55,16 +55,33 @@ export function ting(): void {
 /**
  * Plays the ting when `myTurn` turns from false to true, and puts "Your turn" in front of the tab title while it is the player's turn.
  */
+/** A browser notification that it is the player's turn, when they allowed it and the tab is in the background. Nothing happens without the permission. */
+export function showTurnNotification(): void {
+  try {
+    if (typeof Notification === "undefined" || Notification.permission !== "granted" || !document.hidden) return;
+    const n = new Notification("Your turn in SETI", { body: "It is your turn to act.", tag: "seti-turn" });
+    n.onclick = () => {
+      window.focus();
+      n.close();
+    };
+  } catch {
+    // notifications are not available here
+  }
+}
+
 export function useTurnSound(myTurn: boolean): void {
-  const { sound } = useGameSettings();
+  const { sound, notify } = useGameSettings();
   const onRef = useRef(true);
   onRef.current = sound;
+  const notifyRef = useRef(false);
+  notifyRef.current = notify;
   const previous = useRef<boolean | null>(null);
 
   useEffect(() => unlockOnFirstTouch(), []);
 
   useEffect(() => {
     if (previous.current === false && myTurn && onRef.current) ting();
+    if (previous.current === false && myTurn && notifyRef.current) showTurnNotification();
     previous.current = myTurn;
   }, [myTurn]);
 
