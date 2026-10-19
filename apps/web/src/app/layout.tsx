@@ -1,3 +1,4 @@
+import { SettingsSync } from "@/components/SettingsSync";
 import assets from "@/generated/assets.json";
 import { currentUser } from "@/lib/session";
 import type { Metadata } from "next";
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             )}
           </nav>
         </header>
+        {user ? <SettingsSync /> : null}
         <main>{children}</main>
         <footer className="foot">
           <p>

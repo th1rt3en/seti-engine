@@ -107,6 +107,30 @@ export default async function Player({ params }: { params: Promise<{ id: string 
         </section>
       ) : null}
 
+      {stats.expansionGames > 0 ? (
+        <section className="card">
+          <h2>With or without the expansion</h2>
+          <div className="bars">
+            {(["without", "with"] as const).map((k) => {
+              const b = stats.byExpansion[k];
+              if (!b) return null;
+              const pct = Math.round((b.wins / b.games) * 100);
+              return (
+                <div className="barrow" key={k}>
+                  <span className="barlabel">{k === "with" ? "Space Agencies" : "Base game"}</span>
+                  <span className="bartrack">
+                    <span className="barfill" style={{ width: `${pct}%` }} />
+                  </span>
+                  <span className="barvalue">
+                    {b.wins}/{b.games} · {pct}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
       <h2>Game history</h2>
       {data.recent.length === 0 ? <p className="muted">No games yet.</p> : null}
       {data.recent.length > 0 ? (

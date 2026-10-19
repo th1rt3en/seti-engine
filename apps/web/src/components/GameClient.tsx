@@ -41,7 +41,7 @@ import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
 import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
-import { type LogEntry, MoveLog } from "./MoveLog";
+import { type LogContext, type LogEntry, MoveLog, plainEntry } from "./MoveLog";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
@@ -91,6 +91,7 @@ export function GameClient({
   const [log, setLog] = useState<LogEntry[]>([]);
   const logRef = useRef<LogEntry[]>([]); // the same log, to check that a new entry follows the ones that were received
   const [online, setOnline] = useState(false);
+  const [seenUpTo, setSeenUpTo] = useState(0); // the length of the log when the player last closed the summary of what happened since their turn
   const socket = useRef<WebSocket | null>(null);
   const seq = useRef(0);
   // what the player has picked for the move being made: a card of the hand, a probe and how much energy to turn into movement for it
@@ -866,6 +867,33 @@ export function GameClient({
     const at = v.legal.findIndex((x) => sameMove(x as Move, m));
     return ((v.notes[at] as Note)?.cost ?? {}) as Record<string, number>;
   };
+  const logCtx: LogContext = {
+    who: (i: number) => (v.state.rival && i === v.state.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`)),
+    stars: v.state.sectors.map((sec) => sec.star),
+    species: v.state.species.map((sp, i) =>
+      sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`,
+    ),
+    rival: v.state.rival ? v.state.rival.index : null,
+    me: v.viewer,
+  };
+  // what the others did since this player's last move, for the player whose turn it is
+  const lastMine = myTurn ? log.map((e) => e.seat).lastIndexOf(v.viewer as number) : -1;
+  const since = myTurn ? log.slice(lastMine + 1) : [];
+  const sinceBar =
+    myTurn && since.length > 0 && seenUpTo < log.length ? (
+      <section className="sincebar" aria-label="What happened since your last turn">
+        <b>Since your last turn:</b>
+        <ul>
+          {since.slice(-8).map((e) => (
+            <li key={e.seq}>{plainEntry(e, logCtx).join(" · ").replace(/ {2,}/g, " ")}</li>
+          ))}
+        </ul>
+        {since.length > 8 ? <span className="muted small">and {since.length - 8} earlier moves (see the log)</span> : null}
+        <button type="button" className="secondary small" onClick={() => setSeenUpTo(log.length)}>
+          Got it
+        </button>
+      </section>
+    ) : null;
   // the undo button says what it takes back: the last move in the log
   const lastEntry = log.at(-1);
   const undoText = lastEntry ? `Undo: take back "${logText(lastEntry.action as Move)}"` : "Undo the last move";
@@ -922,6 +950,7 @@ export function GameClient({
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
+      {sinceBar}
       {!online && !ended ? (
         // biome-ignore lint/a11y/useSemanticElements: a plain message line, not an <output> of a form
         <p className="error" role="status">
@@ -1043,20 +1072,7 @@ export function GameClient({
       moves={waiting && !ended ? sendingPrompt : moves}
       previous={previous}
       lastMove={lastMoveOf(log.at(-1)?.events as never)}
-      log={
-        <MoveLog
-          entries={log}
-          ctx={{
-            who: (i) => (v.state.rival && i === v.state.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`)),
-            stars: v.state.sectors.map((sec) => sec.star),
-            species: v.state.species.map((sp, i) =>
-              sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`,
-            ),
-            rival: v.state.rival ? v.state.rival.index : null,
-            me: v.viewer,
-          }}
-        />
-      }
+      log={<MoveLog entries={log} ctx={logCtx} />}
       goldChoice={
         goldMoves.length > 0
           ? { tiles: goldMoves.map((m) => String(m.tile)), selected: pickedGold, onPick: (t) => setPickedGold(pickedGold === t ? null : t) }

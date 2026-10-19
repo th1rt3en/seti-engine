@@ -37,8 +37,26 @@ const INCOME_ROWS = [
 ];
 
 /** A label with its icon in front of it. */
+/** What each row of the tracker means, shown when the pointer rests on its label (a long press on a touch screen). */
+const HINTS: Record<string, string> = {
+  "Missions done": "Completed missions: they count for the gold scoring tiles.",
+  "End-game cards": "End-of-game scoring cards in front of the player: they score when the game ends.",
+  Credits: "Credits: spent on actions and cards. Income gives more each round.",
+  Energy: "Energy: spent to move probes, scan and orbit. Income gives more each round.",
+  Publicity: "Publicity: from 0 to 10. Spent to buy cards (3) and to research a tech (6).",
+  "Data pile": "Data in the pool, at most 6. It is placed in the computer or spent by analyzing.",
+  "Cards in hand": "The number of cards in the hand. There is no limit until a player passes (then down to 4).",
+  Exofossils: "Exofossils from the 'Oumuamua species: spent on its costly spaces, worth nothing at the end.",
+  "Signal tokens": "Signal tokens: spent during a scan to discard an extra card of the row for a signal.",
+  Organization: "The organization of the player (Space Agencies expansion).",
+  "Species board": "Danger on the Exertian board: the markers on its lower spaces are the most dangerous.",
+  Danger: "Exertian danger: the most dangerous player loses a tenth of their points at the end.",
+  "Played cards": "Exertian cards played face down; only their owner knows their danger.",
+  "Messages waiting (first on top)": "Centaurian message markers on the score track that have not been reached yet.",
+};
+
 const labelled = (icon: ReactNode, text: string): ReactNode => (
-  <span className="rowlabel">
+  <span className="rowlabel" title={HINTS[text]}>
     {icon}
     {text}
   </span>
@@ -46,7 +64,7 @@ const labelled = (icon: ReactNode, text: string): ReactNode => (
 
 /** The square that stands for completed missions (silver) and end-of-game scoring cards (gold). */
 const metal = (kind: "silver" | "gold", text: string): ReactNode => (
-  <span className="rowlabel">
+  <span className="rowlabel" title={HINTS[text]}>
     <span className={`metal ${kind}`} aria-hidden="true" />
     {text}
   </span>

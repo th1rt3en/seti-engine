@@ -302,6 +302,8 @@ export interface ProfileStats {
   /** by the number of players: "solo", "2", "3", "4" */
   byPlayers: Record<string, BucketStats>;
   expansionGames: number;
+  /** with and without the Space Agencies expansion */
+  byExpansion: Record<string, BucketStats>;
 }
 
 /** The numbers of the profile page from a player's finished games. Sandbox games are practice and do not count. */
@@ -312,6 +314,7 @@ export function computeStats(rows: FinishedGame[]): ProfileStats {
   let ratedGames = 0;
   let ratedWins = 0;
   let expansionGames = 0;
+  const byExpansion: Record<string, BucketStats> = {};
   const scores: number[] = [];
   for (const r of rows) {
     const o = JSON.parse(r.options_json) as { players: number; sandbox?: boolean; expansion?: boolean };
@@ -324,6 +327,11 @@ export function computeStats(rows: FinishedGame[]): ProfileStats {
       if (won) ratedWins += 1;
     }
     if (o.expansion === true) expansionGames += 1;
+    const eKey = o.expansion === true ? "with" : "without";
+    const eBucket = byExpansion[eKey] ?? { games: 0, wins: 0 };
+    eBucket.games += 1;
+    if (won) eBucket.wins += 1;
+    byExpansion[eKey] = eBucket;
     if (r.score !== null) scores.push(r.score);
     const key = o.players === 1 ? "solo" : String(o.players);
     const bucket = byPlayers[key] ?? { games: 0, wins: 0 };
@@ -341,6 +349,7 @@ export function computeStats(rows: FinishedGame[]): ProfileStats {
     bestScore: scores.length === 0 ? null : Math.max(...scores),
     byPlayers,
     expansionGames,
+    byExpansion,
   };
 }
 

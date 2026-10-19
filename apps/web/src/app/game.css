@@ -3141,3 +3141,17 @@ input.switch:focus-visible {
     animation: none;
   }
 }
+
+/* what happened since the player's last turn */
+.sincebar {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+}
+.sincebar ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}

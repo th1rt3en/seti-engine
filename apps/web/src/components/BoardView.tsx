@@ -975,7 +975,7 @@ export function BoardView({
           <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
         </g>
         {lastMove ? (
-          <g className="lastmove" pointerEvents="none" aria-hidden="true">
+          <g className="lastmove" pointerEvents="none">
             {lastMove.sectors.map((i) => (
               <path key={`ls${i}`} d={sectorPath(i)} className="lastshape" />
             ))}

@@ -409,6 +409,7 @@ describe("profile statistics", () => {
       expansionGames: 1,
     });
     expect(s.byPlayers).toEqual({ "2": { games: 1, wins: 1 }, "3": { games: 1, wins: 0 }, solo: { games: 1, wins: 1 } });
+    expect(s.byExpansion).toEqual({ without: { games: 2, wins: 2 }, with: { games: 1, wins: 0 } });
   });
 
   it("has no win rate without a game", () => {

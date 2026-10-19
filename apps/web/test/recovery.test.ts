@@ -133,3 +133,29 @@ describe("the error report of the website", () => {
     }) as unknown as typeof fetch);
   });
 });
+
+describe("the settings kept with the account", () => {
+  it("keeps only the known keys with a valid value, and gives them back", async () => {
+    const { cleanSettings, getSettings, saveSettings } = await import("@/lib/userSettings");
+    expect(
+      cleanSettings({
+        "seti-turn-sound": "0",
+        "seti-hand-scale": "1.3",
+        "seti-turn-notify": "yes",
+        other: "1",
+        "seti-confirm-irreversible": 1,
+      }),
+    ).toEqual({
+      "seti-turn-sound": "0",
+      "seti-hand-scale": "1.3",
+    });
+    expect(cleanSettings(null)).toEqual({});
+    expect(cleanSettings({ "seti-hand-scale": "9" })).toEqual({});
+    const db = memory();
+    const u = await signup(db, "Hal", "password1");
+    expect(await getSettings(db, u.id)).toEqual({});
+    await saveSettings(db, u.id, { "seti-turn-sound": "0" });
+    await saveSettings(db, u.id, { "seti-turn-sound": "1", "seti-hand-scale": "0.8" });
+    expect(await getSettings(db, u.id)).toEqual({ "seti-turn-sound": "1", "seti-hand-scale": "0.8" });
+  });
+});
