@@ -856,6 +856,11 @@ export function GameClient({
       </button>,
     ];
   });
+  const MAIN_NAMES = { launch: "Launch a probe", scan: "Scan", analyze: "Analyze data" } as const;
+  const costOf = (m: Move): Record<string, number> => {
+    const at = v.legal.findIndex((x) => sameMove(x as Move, m));
+    return ((v.notes[at] as Note)?.cost ?? {}) as Record<string, number>;
+  };
   const moves = (
     <>
       {ended ? (
@@ -898,7 +903,14 @@ export function GameClient({
                   // biome-ignore lint/suspicious/noArrayIndexKey: the moves come in the order of the engine
                   <button key={`${m.type}-${i}`} type="button" onClick={() => play(m)}>
                     {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? <ActionIcon name={m.type} /> : null}
-                    {describeMove(m)}
+                    {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? (
+                      // the name, then the cost as icons (the engine's note of the move says what it costs)
+                      <>
+                        {MAIN_NAMES[m.type]} <Cost cost={costOf(m)} />
+                      </>
+                    ) : (
+                      describeMove(m)
+                    )}
                   </button>
                 ))}
                 {g.title === "Main action" ? xenoButtons : null}

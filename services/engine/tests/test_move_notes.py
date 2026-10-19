@@ -169,3 +169,14 @@ def test_a_decision_is_named_after_the_innermost_scope_that_caused_it() -> None:
         s.pending.append(Decision(kind="trace", player=0, source={"kind": "organization", "org": "xenolab"}))
     assert [d.source for d in s.pending] == [{"kind": "card", "card": "17"}, {"kind": "move"}, {"kind": "organization", "org": "xenolab"}]
 
+
+
+def test_the_plain_main_actions_carry_their_cost_for_the_icons() -> None:  # LAUNCH-01, SCAN-01, ANALYZE-01
+    from seti_engine.engine import start
+    from seti_engine.models import Options
+    from seti_engine.move_notes import note
+
+    s = start(Options(players=2, seed=1)).state
+    assert note(s, {"type": "launch"}) == {"cost": {"credit": 2}}
+    assert note(s, {"type": "scan"}) == {"cost": {"credit": 1, "energy": 2}}
+    assert note(s, {"type": "analyze"}) == {"cost": {"energy": 1}}

@@ -51,6 +51,9 @@ def _trace_rewards(state: GameState, move: dict[str, Any]) -> list[dict[str, Any
     return []
 
 
+MAIN_ACTION_COSTS = {"launch": {"credit": 2}, "scan": {"credit": 1, "energy": 2}, "analyze": {"energy": 1}}
+
+
 def note(state: GameState, move: dict[str, Any]) -> Note:
     kind = move["type"]
     if kind in ("orbit", "orbit_free", "land", "land_free"):
@@ -70,6 +73,8 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
     if kind == "choose_land_slot" and state.pending:  # LAND-04: Mars has two first-lander spaces with different amounts of data
         planet = state.pending[0].data["planet"]
         return {"land_data": {"planet": planet, "slot": move["slot"], "data": tables.planet_info(planet)["first_land_data"][move["slot"]]}}
+    if kind in MAIN_ACTION_COSTS:  # the cost of the plain main actions, for the icons on their buttons (LAUNCH-01, SCAN-01, ANALYZE-01)
+        return {"cost": dict(MAIN_ACTION_COSTS[kind])}
     if kind in ("mark_signal", "scan_earth", "resolve_sector"):
         sector = state.sectors[move["sector"]]
         found: dict[str, Any] = {"sector": move["sector"], "star": sector.star, "color": sector.color}
