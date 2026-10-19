@@ -212,18 +212,16 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const at = k < 0 ? null : orbitSlot(planet, k);
         if (at) add(i, `orbiter:${planet}:${m.first ? "first" : "later"}`, { kind: "circle", x: at.x, y: at.y, r: 62 });
       }
-    } else if (m.type === "pick_organelle") {
-      const at = ORGANELLE_SPACES[String(m.space)];
-      if (at) add(i, `organelle:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 56 }, { panel: "amoeba" });
-    } else if (m.type === "amoeba_remove") {
-      const at = SPECIES_SPACES.amoeba?.[String(m.color)]?.[Number(m.index)];
-      if (at)
-        add(
-          i,
-          `amoeba:${String(m.color)}:${String(m.index)}`,
-          { ...none, x: at[0], y: at[1], r: 46 },
-          { panel: "amoeba" },
-        );
+    } else if (m.type === "pick_organelle" || m.type === "amoeba_remove") {
+      // the spaces of the Amoeba board lie on its picture on the game board
+      const slot = s.species.findIndex((sp) => sp.discovered && sp.species === "amoeba");
+      const at =
+        m.type === "pick_organelle" ? ORGANELLE_SPACES[String(m.space)] : SPECIES_SPACES.amoeba?.[String(m.color)]?.[Number(m.index)];
+      if (at && slot >= 0) {
+        const p = onAlienBoard(slot, at[0], at[1]);
+        const id = m.type === "pick_organelle" ? `organelle:${String(m.space)}` : `amoeba:${String(m.color)}:${String(m.index)}`;
+        add(i, id, { kind: "circle", x: p.x, y: p.y, r: m.type === "pick_organelle" ? 56 : 46 });
+      }
     } else if (m.type === "mark_objective") {
       add(i, `task:${String(m.objective)}:${String(m.task)}`, { ...none }, { panel: "objectives" });
     } else if (m.type === "org_mark" && ORG_SPACES[mineOrg]?.[String(m.space)]) {

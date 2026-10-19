@@ -6,7 +6,6 @@ import { PLAYER_COLOR } from "@/lib/geometry";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
-import { AmoebaPanel } from "./AmoebaPanel";
 import { ArkhosPanel } from "./ArkhosPanel";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
@@ -252,7 +251,6 @@ export function GameView({
           <OrgPanel view={view} names={names} spots={spots} />
           <ArkhosPanel view={view} names={names} spots={spots} />
           <GlyphidsPanel view={view} names={names} spots={spots} />
-          <AmoebaPanel view={view} names={names} spots={spots} />
         </aside>
       </div>
 
