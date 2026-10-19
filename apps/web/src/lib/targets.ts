@@ -94,7 +94,7 @@ export type Spot = {
 };
 
 /** The wedge of the star ring that is sector `i`: between the outer ring of the solar system and the outer edge of the stars. */
-function sectorPath(i: number): string {
+export function sectorPath(i: number): string {
   const [inner, outer] = [(RING_BOUNDS[4] ?? 975) + 12, 1390];
   const a0 = 45 * i;
   const a1 = a0 + 45;

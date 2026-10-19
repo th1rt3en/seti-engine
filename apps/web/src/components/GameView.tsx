@@ -3,6 +3,7 @@
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
 // everything comes from the engine's view.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import type { LastMove } from "@/lib/lastMove";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
@@ -109,6 +110,7 @@ export function GameView({
   contextActions,
   hint,
   interaction,
+  lastMove,
   spots,
   goldChoice,
 }: {
@@ -136,6 +138,8 @@ export function GameView({
   hint?: ReactNode;
   /** Picking a probe and a space to move it to. */
   interaction?: BoardInteraction;
+  /** Where the last move left its mark on the board. */
+  lastMove?: LastMove | null;
   /** Places on the board that a move can be made at (landing, orbiting, signals, traces). */
   spots?: BoardSpots;
   /** Marking a gold scoring tile. */
@@ -246,6 +250,7 @@ export function GameView({
               view={view}
               names={names}
               previous={previous}
+              lastMove={lastMove}
               interaction={interaction}
               spots={spots && { ...spots, items: spots.items.filter((sp) => !sp.panel) }}
               goldChoice={goldChoice}

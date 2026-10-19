@@ -41,9 +41,10 @@ import {
   winGuideSpot,
 } from "@/lib/geometry";
 import { WELL_SLOTS, glyphToken, holeAt, trackBox } from "@/lib/glyphids";
+import type { LastMove } from "@/lib/lastMove";
 import { cardName } from "@/lib/moves";
 import { MASCAMITE_SAMPLE_SPACES, SPECIES_SPACES } from "@/lib/speciesSpaces";
-import { ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard } from "@/lib/targets";
+import { ORGANELLE_SPACES, ORGANELLE_TOKENS, type Spot, onAlienBoard, sectorPath } from "@/lib/targets";
 import { ZOOM_SECONDS, touchScreen } from "@/lib/touch";
 import type { View } from "@seti/protocol";
 import { type ReactNode, useRef, useState } from "react";
@@ -118,9 +119,12 @@ export function BoardView({
   interaction,
   spots,
   goldChoice,
+  lastMove,
 }: {
   view: View;
   names: string[];
+  /** Where the last move left its mark: drawn as a pulsing outline. */
+  lastMove?: LastMove | null;
   previous?: View | null;
   interaction?: BoardInteraction;
   spots?: BoardSpots;
@@ -970,6 +974,21 @@ export function BoardView({
           <image href={assets.moon} x={-DIAL_POCKET / 2} y={-DIAL_POCKET / 2} width={DIAL_POCKET} height={DIAL_POCKET} />
           <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
         </g>
+        {lastMove ? (
+          <g className="lastmove" pointerEvents="none" aria-hidden="true">
+            {lastMove.sectors.map((i) => (
+              <path key={`ls${i}`} d={sectorPath(i)} className="lastshape" />
+            ))}
+            {lastMove.cells.map(([ring, sector]) => {
+              const at = polar(RING_RADIUS[ring] ?? 270, sectorDegrees(sector));
+              return <circle key={`lc${ring}-${sector}`} cx={at.x} cy={at.y} r={52} className="lastshape" />;
+            })}
+            {lastMove.planets.map((name) => {
+              const pos = PLANET[name];
+              return pos ? <circle key={`lp${name}`} cx={pos.x} cy={pos.y} r={pos.r + 14} className="lastshape" /> : null;
+            })}
+          </g>
+        ) : null}
         {spots?.items.map((sp) => (
           <g
             key={sp.id}

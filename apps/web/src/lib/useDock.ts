@@ -5,6 +5,7 @@ import { type RefObject, useEffect, useState } from "react";
 
 const PHONE = 760;
 const EVENT = "seti-dock-open";
+export const ALL_EVENT = "seti-dock-all";
 
 export const isPhone = (): boolean => typeof window !== "undefined" && window.innerWidth <= PHONE;
 
@@ -29,6 +30,22 @@ export function useDock(name: string, startFolded: () => boolean = () => false):
     };
     window.addEventListener(EVENT, onOpen);
     return () => window.removeEventListener(EVENT, onOpen);
+  }, [name]);
+  // the key "f" folds or unfolds every panel at once (components/GameClient.tsx)
+  useEffect(() => {
+    const onAll = (e: Event) => {
+      const open = (e as CustomEvent<boolean>).detail;
+      setFolded(!open);
+      if (!isPhone()) {
+        try {
+          localStorage.setItem(`seti-dock-${name}`, open ? "0" : "1");
+        } catch {
+          // not remembered
+        }
+      }
+    };
+    window.addEventListener(ALL_EVENT, onAll);
+    return () => window.removeEventListener(ALL_EVENT, onAll);
   }, [name]);
   const set = (open: boolean) => {
     setFolded(!open);

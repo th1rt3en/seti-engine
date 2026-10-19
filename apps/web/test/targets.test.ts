@@ -58,7 +58,13 @@ describe("the places on the board that moves can be made at", () => {
       ],
     );
     const { spots, handled } = buildSpots(v);
-    expect(spots.map((s) => s.id)).toEqual(["sector:3", "trace:0:discovery:pink", "trace:1:overflow:blue", "trace:0:board:yellow:2", "trace:0:sample:0"]);
+    expect(spots.map((s) => s.id)).toEqual([
+      "sector:3",
+      "trace:0:discovery:pink",
+      "trace:1:overflow:blue",
+      "trace:0:board:yellow:2",
+      "trace:0:sample:0",
+    ]);
     expect(spots[0]?.shape.kind).toBe("path");
     expect(spots[1]?.shape.kind).toBe("circle");
     expect(handled.has(4)).toBe(true); // a sample space of the Mascamites is a place on its board (A-056)
@@ -201,5 +207,23 @@ describe("the sample spaces of the Mascamites board", () => {
     const { spots, handled } = buildSpots(v);
     expect(spots.map((s) => s.id)).toEqual(["trace:0:sample:0", "trace:0:sample:2"]);
     expect([...handled]).toEqual([0, 1]);
+  });
+});
+
+import { lastMoveOf } from "@/lib/lastMove";
+
+describe("the place of the last move", () => {
+  it("is read from the events: sectors of signals and wins, the space a probe moved to, the planet orbited or landed on", () => {
+    expect(lastMoveOf(undefined)).toBeNull();
+    expect(lastMoveOf([{ type: "delta" }])).toBeNull();
+    expect(
+      lastMoveOf([
+        { type: "signal", sector: 3 },
+        { type: "signal", sector: 3 },
+        { type: "sector_won", sector: 5 },
+        { type: "move", to: [2, 4] },
+        { type: "orbit", planet: "mars" },
+      ]),
+    ).toEqual({ sectors: [3, 5], cells: [[2, 4]], planets: ["mars"] });
   });
 });

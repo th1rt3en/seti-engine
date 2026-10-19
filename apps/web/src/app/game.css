@@ -3117,3 +3117,27 @@ input.switch:focus-visible {
   color: var(--bad, #ff6b4a);
   font-weight: 700;
 }
+
+/* the outline of the place where the last move happened */
+.lastshape {
+  fill: none;
+  stroke: #ffd447;
+  stroke-width: 10;
+  stroke-linejoin: round;
+  opacity: 0.85;
+  animation: lastpulse 1.6s ease-in-out 3;
+}
+@keyframes lastpulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lastshape {
+    animation: none;
+  }
+}

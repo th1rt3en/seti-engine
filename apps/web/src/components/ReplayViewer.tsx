@@ -20,7 +20,15 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
   const names = replay.header.seats.map((s) => s.name);
   const who = (i: number): string => names[i] ?? `Player ${i + 1}`;
   const last = replay.actions.length;
+  // a link to one move: #step=12 in the address (the page opens at that step)
   const [step, setStep] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [opened, setOpened] = useState(false);
+  useEffect(() => {
+    const m = /step=(\d+)/.exec(window.location.hash);
+    if (m) setStep(Math.min(replay.actions.length, Number(m[1])));
+    setOpened(true);
+  }, [replay.actions.length]);
   const [viewer, setViewer] = useState("spectator");
   const [view, setView] = useState<View | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -41,6 +49,42 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
       current = false;
     };
   }, [id, step, viewer]);
+
+  // the address follows the step, so that it can be shared
+  useEffect(() => {
+    if (!opened) return;
+    try {
+      window.history.replaceState(null, "", step === 0 ? window.location.pathname : `#step=${step}`);
+    } catch {
+      // the address cannot be changed here
+    }
+  }, [step, opened]);
+  // the first step of each round, for the "jump to round" list: a round starts with the move whose events say so
+  const roundStarts: { round: number; step: number }[] = [{ round: 1, step: 0 }];
+  replay.actions.forEach((a, i) => {
+    for (const e of a.events as { type: string; round?: number }[])
+      if (e.type === "round" && typeof e.round === "number") roundStarts.push({ round: e.round, step: i + 1 });
+  });
+  // the arrow keys step through the game
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA")) return;
+      if (e.key === "ArrowRight") setStep((s) => Math.min(last, s + 1));
+      else if (e.key === "ArrowLeft") setStep((s) => Math.max(0, s - 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [last]);
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#step=${step}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // the address bar has the link
+    }
+  };
 
   useEffect(() => {
     if (!playing) return;
@@ -88,7 +132,25 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
             }}
           />
           <span className="small muted">
-            Step {step} of {last} · Seen as{" "}
+            Step {step} of {last} ·{" "}
+            <select
+              value={roundStarts.filter((r) => r.step <= step).at(-1)?.round ?? 1}
+              onChange={(e) => {
+                setPlaying(false);
+                setStep(roundStarts.find((r) => r.round === Number(e.target.value))?.step ?? 0);
+              }}
+              aria-label="Jump to a round"
+            >
+              {roundStarts.map((r) => (
+                <option key={r.round} value={r.round}>
+                  Round {r.round}
+                </option>
+              ))}
+            </select>{" "}
+            <button type="button" className="secondary small" onClick={copyLink}>
+              {copied ? "Link copied" : "Copy link to this move"}
+            </button>{" "}
+            · Seen as{" "}
             <select value={viewer} onChange={(e) => setViewer(e.target.value)} aria-label="Seen as">
               <option value="spectator">a spectator</option>
               {names.map((n, i) => (

@@ -2,6 +2,7 @@
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 import { useGameSettings } from "@/lib/gameSettings";
 import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
+import { lastMoveOf } from "@/lib/lastMove";
 import {
   type Move,
   cardInfo,
@@ -15,6 +16,7 @@ import {
   handMoveText,
   irreversibleText,
   isHandMove,
+  logText,
   orgName,
   rewardWords,
   rowMoveText,
@@ -23,6 +25,7 @@ import {
 import { type Note, buildSpots } from "@/lib/targets";
 import { TECH_INFO, techName } from "@/lib/techs";
 import { useTurnSound } from "@/lib/turnSound";
+import { ALL_EVENT } from "@/lib/useDock";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
@@ -863,6 +866,41 @@ export function GameClient({
     const at = v.legal.findIndex((x) => sameMove(x as Move, m));
     return ((v.notes[at] as Note)?.cost ?? {}) as Record<string, number>;
   };
+  // the undo button says what it takes back: the last move in the log
+  const lastEntry = log.at(-1);
+  const undoText = lastEntry ? `Undo: take back "${logText(lastEntry.action as Move)}"` : "Undo the last move";
+  // keyboard shortcuts: Enter confirms, Escape cancels, e ends the turn, u takes the last move back, f folds or unfolds every panel, ? opens the list
+  const foldedAll = useRef(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.ctrlKey || e.metaKey || e.altKey || (t && ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(t.tagName) && e.key !== "Escape"))
+        return;
+      if (ended) return;
+      if (e.key === "Enter" && ask && ask.buttons.length > 0) {
+        const b = ask.buttons.find((x) => !x.disabled);
+        if (b) {
+          e.preventDefault();
+          b.onClick();
+        }
+      } else if (e.key === "Escape" && ask) {
+        ask.onCancel();
+      } else if (e.key === "e" && !ask) {
+        const m = mine.find((x) => x.type === "end_turn");
+        if (m) play(m);
+      } else if (e.key === "u" && !ask) {
+        const m = mine.find((x) => x.type === "undo");
+        if (m) play(m);
+      } else if (e.key === "f") {
+        foldedAll.current = !foldedAll.current;
+        window.dispatchEvent(new CustomEvent(ALL_EVENT, { detail: !foldedAll.current }));
+      } else if (e.key === "?") {
+        window.dispatchEvent(new Event("seti-open-settings"));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
   const moves = (
     <>
       {ended ? (
@@ -885,6 +923,7 @@ export function GameClient({
       ) : null}
       {error ? <p className="error">{error}</p> : null}
       {!online && !ended ? (
+        // biome-ignore lint/a11y/useSemanticElements: a plain message line, not an <output> of a form
         <p className="error" role="status">
           The connection was lost. Reconnecting... a move you make now waits until it is back.
         </p>
@@ -921,6 +960,8 @@ export function GameClient({
                           </>
                         )}
                       </>
+                    ) : m.type === "undo" ? (
+                      undoText
                     ) : (
                       describeMove(m)
                     )}
@@ -976,8 +1017,8 @@ export function GameClient({
   const clocks = view.remaining ? (
     <span className="clocks">
       {left.map((r, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: seat order
         <span
+          // biome-ignore lint/suspicious/noArrayIndexKey: seat order
           key={i}
           className={
             r !== null && r < 0
@@ -1001,6 +1042,7 @@ export function GameClient({
       names={names}
       moves={waiting && !ended ? sendingPrompt : moves}
       previous={previous}
+      lastMove={lastMoveOf(log.at(-1)?.events as never)}
       log={
         <MoveLog
           entries={log}
