@@ -3092,3 +3092,28 @@ input.switch:focus-visible {
   min-width: 0;
   max-width: 100%;
 }
+
+/* the final scores at the end of a game */
+.finalscores table {
+  width: 100%;
+  margin-top: 8px;
+}
+.finalscores th,
+.finalscores td {
+  text-align: right;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.finalscores th:first-child,
+.finalscores td:first-child {
+  text-align: left;
+}
+.finalscores tr.winner td {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* the clock of the player to act turns red in its last minute */
+.clock.low {
+  color: var(--bad, #ff6b4a);
+  font-weight: 700;
+}

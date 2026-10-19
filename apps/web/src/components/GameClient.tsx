@@ -31,6 +31,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { CardAction } from "./CardActions";
+import { FinalScores } from "./FinalScores";
 import { GameView } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
@@ -879,9 +880,15 @@ export function GameClient({
               </span>
             ))}
           </p>
+          {ended.reason !== "cancelled" ? <FinalScores view={v} names={names} gameId={gameId} winners={ended.winners} /> : null}
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
+      {!online && !ended ? (
+        <p className="error" role="status">
+          The connection was lost. Reconnecting... a move you make now waits until it is back.
+        </p>
+      ) : null}
       {sandboxMarker && !ended ? <SandboxPanel marker={sandboxMarker as never} send={(a) => sendAction(a)} handCards={hand} /> : null}
       {ask && !ask.inContext && !ask.onCard ? (
         <div className="confirmbar">
@@ -970,7 +977,19 @@ export function GameClient({
     <span className="clocks">
       {left.map((r, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: seat order
-        <span key={i} className={r !== null && r < 0 ? "clock over" : i === v.to_act ? "clock running" : "clock"}>
+        <span
+          key={i}
+          className={
+            r !== null && r < 0
+              ? "clock over"
+              : r !== null && r < 60_000 && i === v.to_act
+                ? "clock running low"
+                : i === v.to_act
+                  ? "clock running"
+                  : "clock"
+          }
+          title={r !== null && r >= 0 && r < 60_000 ? "Less than a minute left" : undefined}
+        >
           {names[i] ?? i + 1} {minutes(r) || "-"}
         </span>
       ))}

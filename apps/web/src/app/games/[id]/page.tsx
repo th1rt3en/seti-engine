@@ -25,6 +25,7 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
     return (
       <>
         <h1>Game not found</h1>
+        <p>The address may be wrong, or the table was deleted: a table that everybody left is removed.</p>
         <p>
           <Link href="/lobby">Back to the lobby</Link>
         </p>
@@ -66,6 +67,11 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
       {!user && meta.status === "lobby" ? (
         <p>
           <Link href="/login">Log in</Link> or <Link href="/">play as a guest</Link> to take a seat.
+        </p>
+      ) : null}
+      {meta.status === "cancelled" ? (
+        <p className="card">
+          This game was cancelled. Nobody won or lost and no rating changed. <Link href="/lobby">Back to the lobby</Link>
         </p>
       ) : null}
       <GameClient gameId={id} wsBase={loadConfig().workerWsUrl} names={names} signedIn={user !== null} />

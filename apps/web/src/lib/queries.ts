@@ -386,3 +386,20 @@ export async function createdRecently(db: Db, userId: string, now: number): Prom
   );
   return (rows[0]?.n ?? 0) > 0;
 }
+
+export interface GameRatingChange {
+  user_id: string;
+  name: string;
+  rating_before: number;
+  rating_after: number;
+  rank: number;
+}
+
+/** The rating change of each player of a game that was rated (empty when it was not, or when the ratings are not written yet). */
+export function gameRatingChanges(db: Db, gameId: string): Promise<GameRatingChange[]> {
+  return db.all<GameRatingChange>(
+    `SELECT h.user_id, u.name, h.rating_before, h.rating_after, h.rank FROM rating_history h JOIN users u ON u.id = h.user_id
+     WHERE h.game_id = ? ORDER BY h.rank, u.name`,
+    gameId,
+  );
+}

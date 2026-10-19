@@ -562,3 +562,23 @@ describe("the lobby filter and the leaderboard search", () => {
     expect(await leaderboard(db, 100, "nobody")).toEqual([]);
   });
 });
+
+describe("the rating changes of a game", () => {
+  it("lists them by rank, and nothing for a game that was not rated", async () => {
+    const { gameRatingChanges } = await import("@/lib/queries");
+    const db = memory();
+    await db.run("INSERT INTO games (id, status, options_json, clock_json, rated, created_at) VALUES ('g1', 'finished', '{}', '{}', 1, 0)");
+    for (const [id, name] of [
+      ["a", "Ann"],
+      ["b", "Bob"],
+    ] as const)
+      await db.run("INSERT INTO users (id, name, email, password_hash, is_guest, created_at) VALUES (?, ?, NULL, 'x', 0, 0)", id, name);
+    await db.run("INSERT INTO rating_history (game_id, user_id, rating_before, rating_after, rank, at) VALUES ('g1', 'b', 100, 90, 2, 0)");
+    await db.run("INSERT INTO rating_history (game_id, user_id, rating_before, rating_after, rank, at) VALUES ('g1', 'a', 100, 140, 1, 0)");
+    expect((await gameRatingChanges(db, "g1")).map((r) => [r.name, r.rating_before, r.rating_after])).toEqual([
+      ["Ann", 100, 140],
+      ["Bob", 100, 90],
+    ]);
+    expect(await gameRatingChanges(db, "g2")).toEqual([]);
+  });
+});
