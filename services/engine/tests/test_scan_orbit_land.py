@@ -33,7 +33,7 @@ def settle(r: StepResult) -> StepResult:
 
 
 def test_orbit_costs_and_first_orbiter_bonus() -> None:
-    """ORBIT-01 to ORBIT-04."""
+    """ORBIT-01 to ORBIT-04, FAQ-10: the probe leaves the board and never comes back; an orbiter is not a probe."""
     r, pl = setup_at("venus")
     before = r.state.players[pl].score
     r1 = do(r, "orbit", probe="t1")

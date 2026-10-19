@@ -43,7 +43,7 @@ def force_arrow(s: GameState, arrow: str) -> None:
 
 
 def test_solo_is_set_up_as_a_two_player_game_with_a_rival() -> None:
-    """SOLO-01 to SOLO-03."""
+    """SOLO-01 to SOLO-03: one color for the rival (SOLO-02); no starting income card, credits or cards (FAQ-50)."""
     r = start(Options(players=1, seed=3, difficulty=3))
     s = r.state
     assert len(s.players) == 2 and s.rival is not None and s.rival.index == 1
@@ -66,7 +66,7 @@ def test_solo_is_set_up_as_a_two_player_game_with_a_rival() -> None:
 def test_difficulty_sets_the_deck_the_progress_start_and_the_objectives(
     difficulty: int, deck: int, advanced: int, start_space: str, stack: tuple[int, int, int] | None
 ) -> None:
-    """SOLO-04, SOLO-05, SOLO-OBJ-01 to SOLO-OBJ-03, SOLO-OBJ-08, SOLO-DATA-10."""
+    """SOLO-04, SOLO-05, SOLO-06, SOLO-RIVAL-03, SOLO-OBJ-01 to SOLO-OBJ-03, SOLO-OBJ-08, SOLO-DATA-10."""
     s = solo(difficulty)
     r = s.rival
     assert r is not None and len(r.deck) == deck and len(r.advanced) == advanced and rival.TRACK[r.progress] == start_space
@@ -111,7 +111,7 @@ def test_the_rival_takes_its_turn_by_itself_after_the_players() -> None:
 
 
 def test_credits_energy_and_cards_become_progress() -> None:
-    """SOLO-10, SOLO-11."""
+    """SOLO-10, SOLO-11, SOLO-13, FAQ-50: progress icons move the rival clockwise; a tuck is 4 spaces."""
     s = solo()
     ev: list[dict[str, Any]] = []
     before = rv(s).progress
@@ -151,7 +151,7 @@ def test_crossing_the_growth_icon_adds_an_advanced_card_to_the_top_of_the_deck()
 
 
 def test_rival_victory_points_trigger_milestones_like_a_player() -> None:
-    """SOLO-14, SOLO-15: only the first slot of a gold tile; the arrow picks the leftmost or rightmost tile with a free first slot."""
+    """SOLO-14, SOLO-15, SOLO-RIVAL-02, FAQ-51: only the first slot of a gold tile; the arrow picks the tile."""
     s = solo()
     s.gold_tiles[0].markers = [0]  # the leftmost tile's first slot is taken
     force_arrow(s, "left")
@@ -222,7 +222,7 @@ def test_launch_skips_when_a_probe_waits_on_earth() -> None:
 
 
 def test_tech_costs_six_publicity_and_rotates_first() -> None:
-    """SOLO-RIVAL-06."""
+    """SOLO-RIVAL-06, SOLO-16: the rival spends publicity to research."""
     s = solo()
     ev: list[dict[str, Any]] = []
     assert not rival._tech(s, action("S.1", 2), ev)  # publicity 4 is not enough
@@ -451,7 +451,7 @@ def test_the_rival_pays_for_a_costly_space_only_with_a_full_computer_and_enough_
 
 
 def test_the_rival_passes_when_its_deck_is_empty() -> None:
-    """SOLO-19: takes the top end-of-round card (1 progress); the first to pass rotates the solar system."""
+    """SOLO-19, SOLO-RIVAL-10: takes the top end-of-round card (1 progress); the first to pass rotates the solar system."""
     s = solo()
     rv(s).deck = []
     stack = len(s.end_of_round_stacks[0])
@@ -472,7 +472,7 @@ def test_the_second_to_pass_does_not_rotate() -> None:
 
 
 def test_the_used_action_cards_are_shuffled_back_when_the_rival_passes() -> None:
-    """A-023 (ruled): after the rival passes, its used cards form its deck again."""
+    """A-023 (ruled), SOLO-21: after the rival passes, its used cards form its deck again."""
     s = solo()
     rv(s).used, rv(s).deck = ["S.1", "S.2"], []
     s.current_player = 1
@@ -502,7 +502,7 @@ def test_a_species_check_is_skipped_when_the_species_is_hidden() -> None:
 
 
 def test_species_actions() -> None:
-    """S.16 Anomalies: a trace of the next anomaly's color and 3 points; skipped when the rival is winning that anomaly."""
+    """S.16 Anomalies, SOLO-ALIEN-04: a trace of the next anomaly's color and 3 points; skipped when the rival is winning that anomaly."""
     from seti_engine import alien_steps
 
     s = solo()
@@ -518,7 +518,7 @@ def test_species_actions() -> None:
 
 
 def test_centaurian_card_places_one_message_marker_from_the_reserve() -> None:
-    """S.18, SOLO-ALIEN-02."""
+    """S.18, SOLO-ALIEN-02, FAQ-56."""
     s = solo()
     s.species[0] = SpeciesSlot(species="centaurians", board=species.new_board("centaurians"))
     s.species[0].discovery_spaces = ["p0", "p0", "p1"]
@@ -562,7 +562,7 @@ def test_exertians_the_rival_draws_no_cards_and_plays_one_while_below_five() -> 
 
 
 def test_mascamites_the_rival_takes_a_sample_from_the_planet_it_targeted() -> None:
-    """S.15, A-024: the sample comes from the planet of the rival's landing, not from Jupiter and Saturn together."""
+    """S.15, A-024, FAQ-53, SOLO-ALIEN-04: the sample comes from the planet of the rival's landing, not from Jupiter and Saturn together."""
     s = solo()
     s.species[0] = SpeciesSlot(species="mascamites", board=species.new_board("mascamites"))
     s.species[0].discovery_spaces = ["p0", "p0", "p0"]
@@ -588,7 +588,7 @@ def test_mascamites_the_rival_takes_a_sample_from_the_planet_it_targeted() -> No
 
 
 def test_the_rival_marks_signals_on_the_oumuamua_tile() -> None:
-    """SOLO-ALIEN-01, S.17."""
+    """SOLO-ALIEN-01, S.17, FAQ-52."""
     s = solo()
     s.species[0] = SpeciesSlot(species="oumuamua", board=species.new_board("oumuamua"))
     s.species[0].discovery_spaces = ["p0", "p0", "p0"]

@@ -46,7 +46,7 @@ def test_mission_tiles_count_completed_missions_and_end_cards() -> None:
 
 
 def test_income_tiles_ignore_publicity_and_data_incomes() -> None:
-    """END-14, END-15, FAQ-C231."""
+    """END-14, END-15, FAQ-35, FAQ-C231: only the cards tucked under the income card count."""
     s = ready()
     p = s.players[0]
     by = {}
@@ -61,7 +61,7 @@ def test_income_tiles_ignore_publicity_and_data_incomes() -> None:
 
 
 def test_other_tiles() -> None:
-    """END-16, END-17, A-022: overflow markers count by the color of their space."""
+    """END-16, END-17, FAQ-36, A-022: overflow markers count by the color of their space."""
     s = ready()
     p = s.players[0]
     p.trace_log = [(0, "pink"), (0, "pink"), (1, "yellow"), (1, "blue"), (0, "blue")]

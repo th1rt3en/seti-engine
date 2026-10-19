@@ -34,7 +34,7 @@ def test_publicity_starts_on_4_and_is_capped_at_10() -> None:  # SETUP-34, SETUP
     assert p.publicity == 10
 
 
-def test_the_hand_is_limited_only_when_passing() -> None:  # RES-03
+def test_the_hand_is_limited_only_when_passing() -> None:  # RES-03, FAQ-06
     s = begin(2).state.model_copy(deep=True)
     pl = s.current_player
     s.players[pl].hand = [*s.players[pl].hand, *s.deck[-6:]]

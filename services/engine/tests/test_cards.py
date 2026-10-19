@@ -440,7 +440,7 @@ def test_scan_card_with_points_per_signal_of_a_colour() -> None:
 
 
 def test_row_scan_discards_row_cards_then_refills() -> None:
-    """#46 ALMA, FAQ-C045: all row cards are discarded for signals first, then the row is refilled."""
+    """#46 ALMA, FAQ-C045, FAQ-15: all row cards are discarded for signals first, then the row is refilled."""
     s = ready()
     row = list(s.card_row)
     r = play(s, "46")

@@ -186,3 +186,70 @@ def test_a_trace_of_a_kind_counts_the_markers_by_the_color_of_their_space() -> N
     for color in ("pink", "pink", "blue"):
         rewards.place_trace(s, p, {"slot": 0, "space": "overflow", "color": color}, [])
     assert sum(1 for _, kind in p.trace_log if kind == "pink") == 2 and sum(1 for _, kind in p.trace_log if kind == "blue") == 1
+
+
+def test_the_landing_discount_of_an_orbiter_applies_to_any_players_orbiter_and_the_tech_stacks() -> None:  # FAQ-11, LAND-02
+    from seti_engine.engine import land_cost
+
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    p = s.players[pl]
+    assert land_cost(s, p, "mars") == 3
+    s.planets["mars"].orbiters = [1 - pl]  # an orbiter of the other player
+    assert land_cost(s, p, "mars") == 2
+    p.techs.append("probe-branch")  # the landing-cost tech: one less
+    assert land_cost(s, p, "mars") == 1
+
+
+def test_visiting_the_same_planet_again_in_the_same_turn_gives_its_publicity_again() -> None:  # FAQ-19, MOVE-05
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    ring, sector = solar.find_cell(s, "PLANET:MERCURY")  # type: ignore[misc]
+    off = next(
+        n
+        for n in solar.adjacent(ring, sector)
+        if solar.visible(s, *n)[1] not in ("ASTEROID", "SUN") and not solar.planet_of(solar.visible(s, *n)[1])
+    )
+    from seti_engine.models import Probe
+
+    s.probes.append(Probe(id="x", player=pl, ring=off[0], sector=off[1]))
+    s.players[pl].movement = 4
+    s.players[pl].publicity = 3
+    r = do(with_state(s), "move_probe", probe="x", to=[ring, sector])
+    r = do(r, "move_probe", probe="x", to=list(off))
+    r = do(r, "move_probe", probe="x", to=[ring, sector])
+    assert r.state.players[pl].publicity == 5  # once for each visit
+
+
+def test_no_free_action_is_offered_while_milestones_are_resolved() -> None:  # FAQ-07, MILE-01
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    s.players[pl].score = 24
+    effects.gain_score(s, s.players[pl], 3)  # reaches 25
+    s.players[pl].energy = 5
+    s.main_done = True
+    r = do(with_state(s), "end_turn")
+    assert r.state.pending and r.state.pending[0].kind == "gold_choice"
+    assert {m["type"] for m in r.legal} <= {"choose_gold", "undo"}  # nothing else: no free action during the milestone
+
+
+def test_exertian_cards_do_not_count_for_the_mission_tile() -> None:  # FAQ-44
+    from seti_engine import scoring
+    from seti_engine.models import GoldTile
+
+    s = ready()
+    p = s.players[0]
+    p.completed_missions = ["1", "2"]
+    before = scoring.sets_for(s, p, GoldTile(tile="Mission", side="A", markers=[0]))
+    p.exertian_played = ["ET.41", "ET.42"]
+    p.exertian_hand = ["ET.43"]
+    assert scoring.sets_for(s, p, GoldTile(tile="Mission", side="A", markers=[0])) == before == 2
+
+
+def test_a_probe_is_only_a_figure_on_the_solar_system_board() -> None:  # FAQ-10
+    from test_scan_orbit_land import setup_at
+
+    r, pl = setup_at("venus")
+    r = settle(do(r, "orbit", probe="t1"))
+    assert not r.state.probes and r.state.players[pl].orbiters == {"venus": 1}
+    assert not any(m["type"] in ("land", "orbit", "move_probe") for m in r.legal)  # an orbiter cannot land or move: it is not a probe
