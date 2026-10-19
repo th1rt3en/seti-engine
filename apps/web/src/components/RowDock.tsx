@@ -90,16 +90,19 @@ export function RowDock({ view, row, inline, flash }: { view: View; row?: RowSel
               );
             })}
             {row?.selectable.includes("deck") ? (
-              <button
-                type="button"
-                className={row.selected === "deck" ? "cardbtn selectable selected deckbtn" : "cardbtn selectable deckbtn"}
-                aria-pressed={row.selected === "deck"}
-                onClick={() => row.onSelect("deck")}
-                title="The top card of the deck"
-              >
-                <img src={assets.cardBack} alt="Top of the deck" width={300} height={418} className="cardimg decktile" />
-                <span className="decklabel">Deck {view.counts.deck}</span>
-              </button>
+              <span className="cardwrap deckwrap">
+                <button
+                  type="button"
+                  className={row.selected === "deck" ? "cardbtn selectable selected deckbtn" : "cardbtn selectable deckbtn"}
+                  aria-pressed={row.selected === "deck"}
+                  onClick={() => row.onSelect("deck")}
+                  title="The top card of the deck"
+                >
+                  <img src={assets.cardBack} alt="Top of the deck" width={300} height={418} className="cardimg decktile" />
+                  <span className="decklabel">Deck {view.counts.deck}</span>
+                </button>
+                {row.selected === "deck" && row.actions ? <CardActions actions={row.actions} /> : null}
+              </span>
             ) : null}
           </div>
         </div>

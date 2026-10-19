@@ -845,6 +845,12 @@ button.step {
 .deckbtn {
   position: relative;
 }
+.deckwrap {
+  display: block;
+}
+.deckwrap > .deckbtn {
+  width: 100%;
+}
 .decktile {
   display: block;
   width: 100%;
