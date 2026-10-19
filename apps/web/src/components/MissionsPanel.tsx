@@ -51,13 +51,13 @@ export function MissionCard({
 export function MissionsPanel({ view, names }: { view: View; names: string[] }) {
   const s = view.state;
   const players = s.players.filter((p) => !(s.rival && p.index === s.rival.index));
-  if (!players.some((p) => p.missions.length > 0 || p.completed_missions.length > 0)) return null;
+  if (!players.some((p) => p.missions.length > 0 || p.completed_missions.length > 0 || p.end_cards.length > 0)) return null;
   return (
     // folded until the player opens it: the cards take a lot of room in the column
     <details className="card exppanel missionspanel" aria-label="Missions of all players">
       <summary>
         <h3>
-          Missions <span className="muted small">({players.reduce((n, p) => n + p.missions.length, 0)} open)</span>
+          Missions and end-of-game cards <span className="muted small">({players.reduce((n, p) => n + p.missions.length, 0)} open)</span>
         </h3>
       </summary>
       {players.map((p) => (
@@ -74,6 +74,16 @@ export function MissionsPanel({ view, names }: { view: View; names: string[] }) 
               <MissionCard key={m.card} mission={m} color={pieceColor(p.color)} />
             ))}
           </div>
+          {p.end_cards.length > 0 ? (
+            <div className="missioncards" aria-label="End-of-game scoring cards">
+              <span className="muted small">End-of-game scoring:</span>
+              {p.end_cards.map((c) => (
+                <figure key={c} className="missioncard" title={`${cardName(c)}: scores at the end of the game`}>
+                  <CardImage id={c} size="mission" />
+                </figure>
+              ))}
+            </div>
+          ) : null}
         </div>
       ))}
     </details>
