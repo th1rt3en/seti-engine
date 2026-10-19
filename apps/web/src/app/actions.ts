@@ -207,6 +207,32 @@ export async function createGameAction(form: FormData): Promise<void> {
   redirect(`/games/${(reply as unknown as { id: string }).id}`);
 }
 
+/** From the end of a game: a new table with the same options, the same clock and the same rating, for the same players to join (they get the link of the table). */
+export async function playAgainAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const user = me as NonNullable<typeof me>;
+  const id = field(form, "id");
+  const meta = (await gameMeta(id)) as {
+    status?: string;
+    rated?: boolean;
+    clock?: Parameters<typeof createGame>[1]["clock"];
+    options?: Record<string, unknown> & { players?: number };
+    seats?: ({ id: string } | null)[];
+  } | null;
+  if (meta === null || meta.status !== "finished" || !meta.options || !meta.seats?.some((s) => s?.id === user.id)) redirect(`/games/${id}`);
+  if (await createdRecently(getDb(), user.id, Date.now()))
+    back("/lobby", "You have just created a game. Open it from the list, or wait a few seconds before creating another.");
+  const { seed: _seed, ...options } = (meta as NonNullable<typeof meta>).options as Record<string, unknown>;
+  const reply = await createGame(user, {
+    options: options as never,
+    clock: (meta as NonNullable<typeof meta>).clock ?? { kind: "none" },
+    rated: (meta as NonNullable<typeof meta>).rated === true && (options.players as number) >= 2,
+  } as never);
+  if (!reply.ok) back("/lobby", reply.message);
+  redirect(`/games/${(reply as unknown as { id: string }).id}`);
+}
+
 export async function joinAction(form: FormData): Promise<void> {
   const me = await currentUser();
   if (me === null) redirect("/login");

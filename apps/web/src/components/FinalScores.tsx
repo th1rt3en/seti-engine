@@ -5,6 +5,7 @@ import { ScoreIcon } from "@/components/Icons";
 import type { View } from "@seti/protocol";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { playAgainAction } from "../app/actions";
 
 interface RatingChange {
   user_id: string;
@@ -106,6 +107,12 @@ export function FinalScores({ view, names, gameId, winners }: { view: View; name
           </tbody>
         </table>
       </div>
+      {view.viewer !== null ? (
+        <form action={playAgainAction} className="small">
+          <input type="hidden" name="id" value={gameId} />
+          <button type="submit">Play again: a new table with the same settings</button>
+        </form>
+      ) : null}
       <p className="small">
         <Link href={`/replay/${gameId}`}>Replay the game</Link> · <Link href="/lobby">Back to the lobby</Link> ·{" "}
         <Link href="/leaderboard">Leaderboard</Link>
