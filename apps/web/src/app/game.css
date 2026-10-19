@@ -906,6 +906,23 @@ button:disabled {
 .movelog.folded {
   width: auto;
 }
+/* the edge that is dragged to make the log taller or shorter (desktop only) */
+.loggrip {
+  display: none;
+}
+@media (min-width: 761px) {
+  .loggrip {
+    display: block;
+    height: 10px;
+    cursor: ns-resize;
+    touch-action: none;
+    border-radius: 12px 12px 0 0;
+    background: color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .loggrip:hover {
+    background: var(--accent);
+  }
+}
 .logbody {
   list-style: none;
   margin: 0;

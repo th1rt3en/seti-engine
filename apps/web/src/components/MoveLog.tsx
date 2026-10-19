@@ -8,7 +8,7 @@ import { ORG_NAMES, cardName, logText } from "@/lib/moves";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import { techName } from "@/lib/techs";
 import { useBottomSpace, useDock } from "@/lib/useDock";
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import { CardText } from "./CardText";
 import { Changes } from "./Reward";
@@ -232,6 +232,8 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
                 : "the board";
       return `${who} takes the ${String(ev.glyph)} glyph token from ${from}`;
     }
+    case "exertian_loss":
+      return `${who} has the most danger (${String(ev.danger)}) and loses a tenth of their ${String(ev.before)} points: -${String(ev.loss)}`;
     case "endgame_card":
       return `${who}: end-of-game scoring card ${cardName(ev.card)}: +${String(ev.points)} points`;
     case "endgame_gold": {
@@ -334,6 +336,36 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
   const body = useRef<HTMLOListElement>(null);
   const dock = useRef<HTMLElement>(null);
   useBottomSpace(dock, "log");
+  // on a desktop the log is made taller or shorter by dragging its top edge; the height is remembered
+  const [height, setHeight] = useState<number | null>(null);
+  useEffect(() => {
+    try {
+      const saved = Number(localStorage.getItem("seti.logHeight"));
+      if (saved >= 120 && window.matchMedia("(min-width: 761px)").matches) setHeight(saved); // not on a phone
+    } catch {
+      // storage is not available: the log keeps its usual height
+    }
+  }, []);
+  const startResize = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const startY = e.clientY;
+    const startH = body.current?.getBoundingClientRect().height ?? 300;
+    const move = (m: PointerEvent) => setHeight(Math.max(120, Math.min(window.innerHeight - 140, startH + startY - m.clientY)));
+    const stop = (m: PointerEvent) => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      try {
+        localStorage.setItem(
+          "seti.logHeight",
+          String(Math.round(Math.max(120, Math.min(window.innerHeight - 140, startH + startY - m.clientY)))),
+        );
+      } catch {
+        // not remembered
+      }
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+    e.preventDefault();
+  };
   const last = entries.at(-1)?.seq;
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to the newest move when one is added
   useEffect(() => {
@@ -342,12 +374,13 @@ export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext
   }, [last, folded]);
   return (
     <aside ref={dock} className={folded ? "movelog dock folded" : "movelog dock"} aria-label="Log of the moves">
+      {folded ? null : <div className="loggrip" aria-hidden="true" title="Drag to resize the log" onPointerDown={startResize} />}
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
         <span>Log ({entries.length})</span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>
       {folded ? null : (
-        <ol ref={body} className="logbody">
+        <ol ref={body} className="logbody" style={height === null ? undefined : { maxHeight: `${height}px`, height: `${height}px` }}>
           {entries.length === 0 ? <li className="muted">No move yet.</li> : null}
           {entries.map((e) => {
             const deltas = e.events.filter((ev) => ev.type === "delta") as Delta[];

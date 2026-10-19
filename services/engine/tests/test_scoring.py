@@ -142,3 +142,16 @@ def test_the_end_of_the_game_logs_each_end_card_and_each_gold_tile() -> None:  #
     assert gold[0]["points"] == gold[0]["per"] * gold[0]["sets"] == scoring.gold_points(s, s.players[0])
     card = next(e for e in events if e["type"] == "endgame_card")
     assert card["card"] == "12" and card["points"] == cards.end_card_points(s, s.players[0], "12")
+
+
+def test_the_end_of_the_game_logs_the_exertian_danger_loss() -> None:  # ALIEN-EXE-07, the log
+    s = ready(players=2)
+    s.species[0].species, s.species[0].discovered = "exertians", True
+    s.players[0].score = 120
+    s.players[1].score = 60
+    s.players[0].exertian_played = ["ET.41"]  # the danger of a played card: player 0 has the most
+    rows = scoring.final_scores(s)
+    loss = rows[0]["loss"]
+    assert loss == (rows[0]["total"] + loss) // 10 > 0 and rows[1]["loss"] == 0
+    events = [e for e in scoring.endgame_events(s) if e["type"] == "exertian_loss"]
+    assert events == [{"type": "exertian_loss", "player": 0, "danger": rows[0]["danger"], "loss": loss, "before": rows[0]["total"] + loss}]

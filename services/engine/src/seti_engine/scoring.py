@@ -102,6 +102,11 @@ def endgame_events(s: GameState) -> list[dict[str, Any]]:
                 sets = sets_for(s, p, g)
                 row = {"type": "endgame_gold", "player": p.index, "tile": g.tile, "side": g.side}
                 out.append({**row, "sets": sets, "per": per, "points": per * sets})
+    for r in final_scores(s):  # ALIEN-EXE-07: the most dangerous player(s) lose a tenth of their total, after everything else
+        if r["loss"] > 0:
+            out.append(
+                {"type": "exertian_loss", "player": r["player"], "danger": r["danger"], "loss": r["loss"], "before": r["total"] + r["loss"]}
+            )
     return out
 
 
