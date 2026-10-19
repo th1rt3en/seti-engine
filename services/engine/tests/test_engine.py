@@ -266,7 +266,7 @@ def test_the_game_ends_after_five_rounds() -> None:
 
 
 def test_milestone_choice_of_a_gold_tile_at_25() -> None:
-    """MILE-02, MILE-03: a player cannot choose the same tile twice."""
+    """MILE-02, MILE-03, BOARD-07, BOARD-61: the gold milestones of the score track; a player cannot choose the same tile twice."""
     s = begin(2).state.model_copy(deep=True)
     pl = s.current_player
     s.players[pl].score = 24

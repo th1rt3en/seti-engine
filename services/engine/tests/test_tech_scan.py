@@ -113,7 +113,7 @@ def test_a_step_that_cannot_be_paid_is_passed_over() -> None:  # SCAN-04
 
 
 def test_research_rotates_then_takes_the_top_tile() -> None:
-    """TECHACT-01 to TECHACT-04, TECHACT-07, ROTATE-01, TECH-PT01, FAQ-03, FAQ-05."""
+    """TECHACT-01 to TECHACT-04, TECHACT-07, ROTATE-01, TECH-PT01, BOARD-52, FAQ-03, FAQ-05."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     pl = s.current_player
@@ -158,7 +158,7 @@ def test_second_taker_does_not_score_the_two_point_tile() -> None:
 
 
 def test_computer_tech_goes_in_a_slot_and_lower_space_pays() -> None:
-    """TECHACT-05, TECH-20, TECH-21, TECH-23."""
+    """TECHACT-05, TECH-20, TECH-21, TECH-23, BOARD-72: the computer tech slots."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     pl = s.current_player
@@ -195,7 +195,7 @@ def test_lower_space_needs_the_upper_filled() -> None:
 
 
 def test_analyze_clears_the_computer_and_marks_a_blue_trace() -> None:
-    """ANALYZE-01 to ANALYZE-03, TECH-22, FAQ-17: all six top spaces are needed; the computer is cleared, the data pool is not."""
+    """ANALYZE-01 to ANALYZE-03, TECH-22, BOARD-73, FAQ-17: all six top spaces are needed; the computer is cleared, the data pool is not."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     pl = s.current_player

@@ -33,7 +33,7 @@ def settle(r: StepResult) -> StepResult:
 
 
 def test_orbit_costs_and_first_orbiter_bonus() -> None:
-    """ORBIT-01 to ORBIT-04, FAQ-10: the probe leaves the board and never comes back; an orbiter is not a probe."""
+    """ORBIT-01 to ORBIT-04, BOARD-30, FAQ-10: the probe leaves the board and never comes back; an orbiter is not a probe."""
     r, pl = setup_at("venus")
     before = r.state.players[pl].score
     r1 = do(r, "orbit", probe="t1")
@@ -75,7 +75,7 @@ def test_no_orbit_or_land_on_earth_or_empty_space() -> None:
 
 
 def test_land_cost_and_first_lander_data() -> None:
-    """LAND-01, LAND-03, LAND-04, LAND-06."""
+    """LAND-01, LAND-03, LAND-04, LAND-06, BOARD-31."""
     r, pl = setup_at("mercury", energy=3)
     r2 = settle(do(r, "land", probe="t1"))
     p = r2.state.players[pl]
@@ -97,7 +97,7 @@ def test_land_costs_less_with_an_orbiter_and_with_tech() -> None:
 
 
 def test_moon_landing_needs_tech_and_one_lander_per_moon() -> None:
-    """LAND-05, TECH-PT04."""
+    """LAND-05, BOARD-32, TECH-PT04."""
     r, pl = setup_at("jupiter", energy=9)
     assert not [m for m in legal_moves(r.state) if m["type"] == "land" and "moon" in m]
     r.state.players[pl].techs.append("probe-cross")
@@ -130,7 +130,7 @@ def test_mars_first_two_landers_choose_a_data_space() -> None:
 
 
 def test_second_signal_position_scores_two() -> None:
-    """SECTOR-03."""
+    """SECTOR-03, BOARD-22: the second position of the data slot scores 2."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     ev: list[dict[str, Any]] = []
@@ -171,7 +171,7 @@ def complete(s: GameState, index: int, markers: list[int]) -> StepResult:
 
 
 def test_sector_winner_second_place_and_reset() -> None:
-    """SECTOR-10 to SECTOR-15."""
+    """SECTOR-10 to SECTOR-15, BOARD-22: every contributor gains 1 publicity."""
     r = begin(3)
     s = r.state.model_copy(deep=True)
     pubs = [p.publicity for p in s.players]
@@ -215,7 +215,7 @@ def test_sector_can_be_won_again_with_later_reward() -> None:
 
 
 def test_trace_goes_to_a_discovery_space_or_overflow() -> None:
-    """LIFE-01, LIFE-03."""
+    """LIFE-01, LIFE-03, ALIEN-DATA-13: the discovery and overflow spaces are on the planetary board."""
     r = begin(2)
     s = r.state.model_copy(deep=True)
     pl = s.current_player
@@ -257,7 +257,7 @@ def test_three_discovery_spaces_complete_the_species() -> None:
     assert effects.PUBLICITY_CAP == 10
 
 
-def test_excess_data_is_discarded_but_the_marker_is_placed() -> None:  # SECTOR-02, RES-01
+def test_excess_data_is_discarded_but_the_marker_is_placed() -> None:  # SECTOR-02, RES-01, BOARD-70
     s = begin(2).state.model_copy(deep=True)
     pl = s.current_player
     p = s.players[pl]

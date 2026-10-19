@@ -22,7 +22,7 @@ def test_the_sun_is_not_a_space() -> None:  # MOVE-03
     assert all(m["to"][0] >= 1 for m in legal_moves(s) if m["type"] == "move_probe")
 
 
-def test_publicity_starts_on_4_and_is_capped_at_10() -> None:  # SETUP-34, SETUP-37, RES-02
+def test_publicity_starts_on_4_and_is_capped_at_10() -> None:  # SETUP-34, SETUP-37, RES-02, BOARD-60
     r = start(Options(players=2, seed=4))
     assert [p.publicity for p in r.state.players] == [4, 4]
     p = r.state.players[0]
@@ -94,7 +94,7 @@ def test_exofossils_cannot_be_traded_and_score_nothing() -> None:  # FAQ-42
     assert [r["total"] for r in rows] == [r["total"] for r in scoring.final_scores(s)]
 
 
-def test_no_milestone_is_reached_again_on_the_second_lap() -> None:  # MILE-04
+def test_no_milestone_is_reached_again_on_the_second_lap() -> None:  # MILE-04, BOARD-07, BOARD-61
     s = begin(2).state.model_copy(deep=True)
     p = s.players[s.current_player]
     p.score = 110

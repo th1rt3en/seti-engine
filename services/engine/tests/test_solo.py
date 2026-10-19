@@ -673,7 +673,7 @@ def test_completed_objectives_move_to_the_pile_and_are_replaced() -> None:
 
 
 def test_rounds_spend_completed_objectives_or_advance_the_rival() -> None:
-    """SOLO-OBJ-06."""
+    """SOLO-OBJ-06, SOLO-DATA-13: after rounds 1 to 4 the objectives are spent."""
     s = solo(3)
     ob = s.objectives
     assert ob is not None
@@ -689,7 +689,7 @@ def test_rounds_spend_completed_objectives_or_advance_the_rival() -> None:
 
 
 def test_the_rival_scores_five_for_each_uncompleted_objective_after_round_five() -> None:
-    """SOLO-OBJ-07."""
+    """SOLO-OBJ-07, SOLO-DATA-13: 5 points for each uncompleted objective after round 5."""
     s = solo(3)
     ob = s.objectives
     assert ob is not None

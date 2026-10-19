@@ -14,7 +14,7 @@ def tile(s: GameState, name: str, side: str, markers: list[int]) -> GoldTile:
 
 
 def test_tile_values_follow_the_order_the_markers_were_placed() -> None:
-    """MILE-03: the first chooser gets the top value, the second the next, later choosers the last."""
+    """MILE-03, SOLO-DATA-30: the first chooser gets the top value, the second the next, later choosers the last."""
     s = ready(players=3)
     g = tile(s, "Tech", "A", [2, 0, 1])
     assert scoring.tile_values(g) == [11, 8, 5]

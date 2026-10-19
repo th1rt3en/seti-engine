@@ -509,7 +509,7 @@ def test_end_scoring_counts_the_traces_for_a_species() -> None:
 
 
 def test_a_collected_sample_is_hidden_from_everyone_but_its_owner() -> None:
-    """ALIEN-MASC-02, ALIEN-MASC-04: the token under a capsule stays face down until it is delivered."""
+    """ALIEN-MASC-02, ALIEN-MASC-04, ALIEN-MASC-06: the token under a capsule stays face down until it is delivered."""
     from seti_engine import projection
     from seti_engine.models import Probe
 
