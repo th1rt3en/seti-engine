@@ -58,7 +58,7 @@ Written 2026-10-19 for the 1.0 checklist (section A and the owner's decision lis
 
 ## The behaviour rules
 
-Written as tests on 2026-10-19 (`tests/test_rule_gaps.py`, `tests/test_rule_gaps_2.py`, `tests/test_data_rules.py`, and rule IDs added to the tests that already checked them): about 110 rules. Coverage went from 248 to 401 of 418 rules with a test.
+Written as tests on 2026-10-19 (`tests/test_rule_gaps.py`, `tests/test_rule_gaps_2.py`, `tests/test_data_rules.py`, and rule IDs added to the tests that already checked them): about 110 rules. Coverage went from 248 to 403 of 418 rules with a test.
 
 Still without a test, besides the exempt rules above:
 
