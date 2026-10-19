@@ -339,3 +339,16 @@ export async function profile(db: Db, userId: string) {
   const peak = Math.max(rating?.rating ?? 0, ...ratings);
   return { user, rating: rating ?? null, history, recent, stats: computeStats(finished), peak };
 }
+
+/** The time that must pass between two games that the same player creates (a second press of the button must not make a second game). */
+export const CREATE_GAP_MS = 15_000;
+
+/** Did this player create a game (sit in seat 0 of a new game) in the last moments? */
+export async function createdRecently(db: Db, userId: string, now: number): Promise<boolean> {
+  const rows = await db.all<{ n: number }>(
+    "SELECT COUNT(*) AS n FROM games g JOIN game_players p ON p.game_id = g.id WHERE p.user_id = ? AND p.seat = 0 AND g.created_at > ?",
+    userId,
+    now - CREATE_GAP_MS,
+  );
+  return (rows[0]?.n ?? 0) > 0;
+}

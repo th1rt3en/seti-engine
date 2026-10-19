@@ -1,4 +1,5 @@
 import { NewGameFields } from "@/components/NewGameFields";
+import { SubmitOnce } from "@/components/SubmitOnce";
 import { getDb } from "@/lib/db";
 import { lobbyGames } from "@/lib/queries";
 import { currentUser } from "@/lib/session";
@@ -32,9 +33,9 @@ export default async function Lobby({ searchParams }: { searchParams: Promise<{ 
                 isGuest={user.isGuest}
                 clocks={Object.entries(CLOCK_PRESETS).map(([key, p]) => ({ key, label: p.label, mode: p.mode }))}
               />
-              <button type="submit" className="big">
+              <SubmitOnce className="big" busy="Creating the game...">
                 Create the game
-              </button>
+              </SubmitOnce>
             </form>
           )}
         </section>

@@ -27,6 +27,7 @@ import {
   computeStats,
   countEndedGames,
   countPlayingGames,
+  createdRecently,
   endedGames,
   leaderboard,
   lobbyGames,
@@ -481,5 +482,22 @@ describe("the administrator's page", () => {
     expect(await deleteAccount(db, bob.id)).toBe(false); // in a game that is being played
     expect(await deleteAccount(db, ann.id)).toBe(true);
     expect(await countAccounts(db, "")).toBe(1);
+  });
+});
+
+describe("creating a game twice by accident", () => {
+  it("is refused for fifteen seconds after the player created a game", async () => {
+    const db = memory();
+    const ann = await signup(db, "Ann", "password1");
+    const bob = await signup(db, "Bob", "password1");
+    expect(await createdRecently(db, ann.id, 100_000)).toBe(false);
+    await db.run(
+      "INSERT INTO games (id, status, options_json, clock_json, rated, created_at) VALUES ('g', 'playing', '{}', '{}', 0, 100_000)",
+    );
+    await db.run("INSERT INTO game_players (game_id, seat, user_id, name, registered) VALUES ('g', 0, ?, 'Ann', 1)", ann.id);
+    await db.run("INSERT INTO game_players (game_id, seat, user_id, name, registered) VALUES ('g', 1, ?, 'Bob', 1)", bob.id);
+    expect(await createdRecently(db, ann.id, 105_000)).toBe(true);
+    expect(await createdRecently(db, bob.id, 105_000)).toBe(false); // Bob only joined: a seat that is not the first is no creation
+    expect(await createdRecently(db, ann.id, 120_000)).toBe(false);
   });
 });

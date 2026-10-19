@@ -2,6 +2,7 @@
 import { AuthFailure, SESSION_COOKIE, createGuest, endSession, login, signup, upgradeGuest } from "@/lib/auth";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
+import { createdRecently } from "@/lib/queries";
 import { currentUser, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
 import { TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
@@ -78,6 +79,8 @@ export async function createGameAction(form: FormData): Promise<void> {
   const me = await currentUser();
   if (me === null) redirect("/login");
   const user = me as NonNullable<typeof me>;
+  // a second press, or a second tab, a moment after the first made a second game by accident: one new game per player every 15 seconds
+  if (await createdRecently(getDb(), user.id, Date.now())) back("/lobby", "You have just created a game. Open it from the list, or wait a few seconds before creating another.");
   const players = Math.min(4, Math.max(1, Number(field(form, "players")) || 2));
   const difficulty = Math.min(5, Math.max(1, Number(field(form, "difficulty")) || 3));
   const rated = form.get("rated") === "on" && players >= 2;
