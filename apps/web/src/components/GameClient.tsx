@@ -81,6 +81,11 @@ const minutes = (ms: number | null | undefined): string => {
   return `${ms < 0 ? "-" : ""}${h > 0 ? `${h}:` : ""}${mm}:${ss}`;
 };
 
+/** The label of the tuck button over a card: the kind of income it gives, as its icon. */
+function TuckLabel({ income }: { income?: string | null }) {
+  return <>Tuck: {income ? <KindIcon kind={income} /> : "no"} income</>;
+}
+
 export function GameClient({
   gameId,
   wsBase,
@@ -427,8 +432,7 @@ export function GameClient({
         onClick: () => play(m),
       };
     }
-    const label: ReactNode =
-      m.type === "tuck" ? <>Tuck: {info?.income ? <KindIcon kind={info.income} /> : "no"} income</> : handMoveText(m).replace(/\?$/, "");
+    const label: ReactNode = m.type === "tuck" ? <TuckLabel income={info?.income} /> : handMoveText(m).replace(/\?$/, "");
     return { key: `${m.type}-${i}`, label, primary: m.type === "tuck", title: handMoveText(m), onClick: () => play(m) };
   });
   // the main action is taken (or the card cannot be afforded): Play stays in sight, greyed out
