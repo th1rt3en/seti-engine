@@ -840,3 +840,24 @@ table.shortcuts td:first-child {
   transition: none;
   transform: translateX(-50%);
 }
+/* the statistics of the game that has just ended */
+.gamestats summary {
+  cursor: pointer;
+  font-weight: 700;
+  margin: 8px 0;
+}
+.gamestats table {
+  width: 100%;
+}
+.gamestats td:not(:first-child),
+.gamestats th:not(:first-child) {
+  text-align: right;
+}
+.gamestats tr.statgroup th {
+  text-align: left;
+  padding-top: 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

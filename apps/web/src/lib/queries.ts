@@ -469,3 +469,12 @@ export async function statRows(db: Db, filter: StatFilter): Promise<StatRow[]> {
     eloDelta: r.rated === 1 ? r.elo : null,
   }));
 }
+
+/** The statistics of the players of one finished game (empty until the Worker has stored them, and for a game that was not played to its end). */
+export async function gameStatRows(db: Db, gameId: string): Promise<{ seat: number; counters: Record<string, number> }[]> {
+  const rows = await db.all<{ seat: number; counters_json: string }>(
+    "SELECT seat, counters_json FROM game_stats WHERE game_id = ? ORDER BY seat",
+    gameId,
+  );
+  return rows.map((r) => ({ seat: r.seat, counters: JSON.parse(r.counters_json) as Record<string, number> }));
+}

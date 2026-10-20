@@ -1,6 +1,7 @@
 "use client";
 // The end of a game: the final scores itemised (the board, the end-of-game cards, the gold tiles, the Exertian cards, the glyphs, the Exertian danger loss),
 // who won, the rating change of each rated player, and where to go next. The numbers are those of the engine (`state.final_scores`); this adds nothing.
+import { GameStatsPanel } from "@/components/GameStatsPanel";
 import { ScoreIcon } from "@/components/Icons";
 import type { View } from "@seti/protocol";
 import Link from "next/link";
@@ -107,6 +108,7 @@ export function FinalScores({ view, names, gameId, winners }: { view: View; name
           </tbody>
         </table>
       </div>
+      <GameStatsPanel gameId={gameId} who={who} />
       {view.viewer !== null ? (
         <form action={playAgainAction} className="small">
           <input type="hidden" name="id" value={gameId} />
