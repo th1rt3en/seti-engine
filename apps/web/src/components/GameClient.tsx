@@ -48,7 +48,7 @@ import { MovePreview } from "./MovePreview";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
-import { Amount, Cost } from "./Reward";
+import { Amount, Cost, KindIcon } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
@@ -427,7 +427,8 @@ export function GameClient({
         onClick: () => play(m),
       };
     }
-    const label = m.type === "tuck" ? `Tuck: ${info?.income ?? "no"} income` : handMoveText(m).replace(/\?$/, "");
+    const label: ReactNode =
+      m.type === "tuck" ? <>Tuck: {info?.income ? <KindIcon kind={info.income} /> : "no"} income</> : handMoveText(m).replace(/\?$/, "");
     return { key: `${m.type}-${i}`, label, primary: m.type === "tuck", title: handMoveText(m), onClick: () => play(m) };
   });
   // the main action is taken (or the card cannot be afforded): Play stays in sight, greyed out

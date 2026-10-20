@@ -51,6 +51,12 @@ const NAMES: Record<string, string> = {
   move: "movement",
 };
 
+/** Only the icon of a kind of resource (credit, energy, card ...), or its name when it has none. */
+export function KindIcon({ kind, size = 18 }: { kind: string; size?: number }) {
+  const icon = ICONS[kind];
+  return icon ? <span title={NAMES[kind] ?? kind}>{icon(size)}</span> : <span>{NAMES[kind] ?? kind}</span>;
+}
+
 /** One amount with its icon: "+2" with the globe, "−1" with a credit. `signed` shows a plus sign for a gain. */
 export function Amount({ kind, n, signed = false, size = 18 }: { kind: string; n: number; signed?: boolean; size?: number }) {
   const icon = ICONS[kind];

@@ -255,6 +255,12 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
       const where = ev.moon ? `${cap(ev.moon)} (${cap(ev.planet)})` : cap(ev.planet);
       return `${who} ${ev.type === "land" ? "lands a probe on" : "orbits"} ${where} for free${cause ? ` (${cause})` : ""}`;
     }
+    case "capped": {
+      // RES-01, RES-02: a gain that did not fit
+      const kind = String(ev.kind);
+      const cause = ev.source ? sourceText(ev.source as Source, ctx, action as LogEntry["action"]) : "";
+      return `${who} can't gain ${String(ev.n)} ${kind} because already at the maximum (${kind === "data" ? "6 in the pool" : "10"})${cause ? `: ${cause}` : ""}`;
+    }
     case "signal":
       return `${who} marks a signal in ${ctx.stars[Number(ev.sector)] ?? `sector ${ev.sector}`}`;
     case "glyph_resource":

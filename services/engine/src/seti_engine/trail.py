@@ -43,6 +43,9 @@ def scope(s: GameState, source: dict[str, Any], turn: str | None = None) -> Iter
     for d in s.pending:  # a decision this block caused is named after the innermost scope that was open when it was made
         if d.source is None and not any(d is k for k in known):
             d.source = source
+    for rec in s.trail[start:]:  # a gain that did not fit is named after the innermost scope it happened in
+        if "lost" in rec and "source" not in rec:
+            rec["source"] = source
     after = _snapshot(s)
     claimed: list[dict[str, int]] = [dict.fromkeys(KINDS, 0) for _ in s.players]
     for rec in s.trail[start:]:
@@ -63,6 +66,13 @@ def events_of(s: GameState) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     index: dict[tuple[int, str], int] = {}
     for rec in s.trail:
+        if "lost" in rec:  # a gain that did not fit (RES-01, RES-02): "can't gain 2 publicity, already at the maximum"
+            for kind, n in rec["lost"].items():
+                ev: dict[str, Any] = {"type": "capped", "player": rec["player"], "kind": kind, "n": n}
+                if rec.get("source") is not None:
+                    ev["source"] = rec["source"]
+                out.append(ev)
+            continue
         if "draw" in rec:  # a card drawn from the deck: the log names it for the player who drew it (the others are not told which)
             out.append({"type": "draw_card", "player": rec["player"], "card": rec["draw"], "changes": {}})
             continue
@@ -77,5 +87,5 @@ def events_of(s: GameState) -> list[dict[str, Any]]:
             if "turn" in rec:
                 out[-1]["turn"] = rec["turn"]
     s.trail = []
-    kept = [e for e in out if e["type"] == "draw_card" or any(v != 0 for v in e["changes"].values())]
+    kept = [e for e in out if e["type"] in ("draw_card", "capped") or any(v != 0 for v in e["changes"].values())]
     return [{k: v for k, v in e.items() if k != "changes"} if e["type"] == "draw_card" else e for e in kept]

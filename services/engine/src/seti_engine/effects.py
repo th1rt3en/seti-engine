@@ -15,7 +15,17 @@ DATA_POOL_CAP = 6  # RES-01
 MILESTONES = (20, 25, 30, 50, 70)  # MILE-02, MILE-05; only the first lap of the score track counts (MILE-04)
 
 
+def record_lost(state: GameState, p: PlayerState, kind: str, n: int, source: dict[str, Any] | None = None) -> None:
+    """A gain that did not fit (publicity at 10, data pool at 6): the log says so (trail.py names the cause). Changes no rule."""
+    if n > 0:
+        rec: dict[str, Any] = {"player": p.index, "lost": {kind: n}, "changes": {}}
+        if source is not None:
+            rec["source"] = source
+        state.trail.append(rec)
+
+
 def gain_publicity(state: GameState, p: PlayerState, n: int = 1) -> None:
+    record_lost(state, p, "publicity", p.publicity + n - PUBLICITY_CAP)  # RES-02
     p.publicity = min(PUBLICITY_CAP, p.publicity + n)
 
 
@@ -34,6 +44,7 @@ def gain_data(state: GameState, p: PlayerState, n: int = 1) -> None:
         else:
             state.pending.append(Decision(kind="data_overflow", player=p.index, data={"n": n}))
         return
+    record_lost(state, p, "data", p.data_pool + n - DATA_POOL_CAP)  # RES-01
     p.data_pool = min(DATA_POOL_CAP, p.data_pool + n)
 
 

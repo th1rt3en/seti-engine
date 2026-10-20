@@ -745,6 +745,7 @@ def _resolve_data_overflow(s: GameState, p: PlayerState, d: Decision, a: Action,
     if t != "data_done" and p.data_pool + n > effects.DATA_POOL_CAP and effects.can_place_data(p):
         s.pending.append(Decision(kind="data_overflow", player=p.index, data={"n": n}))
         return
+    effects.record_lost(s, p, "data", p.data_pool + n - effects.DATA_POOL_CAP, d.source)  # RES-01
     p.data_pool = min(effects.DATA_POOL_CAP, p.data_pool + n)
 
 
