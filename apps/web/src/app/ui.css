@@ -823,3 +823,12 @@ table.shortcuts td:first-child {
 .solarbuttons button {
   justify-self: auto;
 }
+/* the circles of a trigger mission that can be covered: no pulse, and no movement when one is pressed */
+.coverspot,
+.coverspot:hover,
+.coverspot:active,
+.coverspot.on {
+  animation: none;
+  transition: none;
+  transform: translate(-50%, -50%);
+}
