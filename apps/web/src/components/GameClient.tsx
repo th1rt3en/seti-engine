@@ -674,6 +674,7 @@ export function GameClient({
         confirm("Confirm", () => {
           const t = pendingMove;
           setPendingMove(null);
+          setPickedProbe(null); // the probe is unselected after a confirmed movement
           moveTo(t);
         }),
       ],
