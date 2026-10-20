@@ -2,7 +2,7 @@
 // A preview of the solar system: the discs, the Sun, the sector boards and the probes, with two buttons: one turns the discs as the next rotation would
 // (the engine worked out where everything is afterwards: View.rotation_preview), and one to the left of it puts them back where they are now.
 // It only shows; nothing is played and nothing is sent to the game.
-import { CENTER, DISC, RING_RADIUS, STAR, STAR_BOARD_HOME, SUN_SIZE, polar, sectorDegrees } from "@/lib/geometry";
+import { BOARD, CENTER, DISC, RING_RADIUS, STAR, STAR_BOARD_HOME, SUN_SIZE, TRACK, polar, sectorDegrees } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -19,7 +19,8 @@ const QUARTER_AT = [
   { x: -QUARTER, y: 0 },
   { x: 0, y: 0 },
 ];
-const VIEW = Math.round(QUARTER);
+// the part of the base board that is shown: a square around the solar system, as far as the score track (a crop of the board picture)
+const VIEW = Math.round(TRACK.radius + 70);
 
 export function SolarPreview({ view, names, onClose }: { view: View; names: string[]; onClose: () => void }) {
   const [rotated, setRotated] = useState(false);
@@ -64,6 +65,11 @@ export function SolarPreview({ view, names, onClose }: { view: View; names: stri
           preserveAspectRatio="xMidYMid meet"
         >
           <PieceDefs />
+          <clipPath id="solarclip">
+            <circle cx={CENTER.x} cy={CENTER.y} r={TRACK.radius + 36} />
+          </clipPath>
+          {/* the base board, cropped to the circle of the solar system and its score track */}
+          <image href={assets.board} x={0} y={0} width={BOARD.w} height={BOARD.h} clipPath="url(#solarclip)" />
           {([3, 2, 1] as const).map((n) => {
             const size = DISC[n].size * DISC[n].scale;
             const href = DISCS[n === 3 && s.oumuamua_placed ? "disc-3-oumuamua" : `disc-${n}`];
