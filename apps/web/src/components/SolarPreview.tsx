@@ -1,6 +1,6 @@
 "use client";
 // A preview of the solar system: the discs, the Sun, the sector boards and the probes, with two buttons: one turns the discs as the next rotation would
-// (the engine worked out where everything is afterwards: View.rotation_preview), and one to the left of it puts them back where they are now.
+// (the engine worked out where everything is afterwards: View.rotation_previews, one for each of the next rotations), and one to the left of it puts them back where they are now.
 // It only shows; nothing is played and nothing is sent to the game.
 import { BOARD, CENTER, DISC, RING_RADIUS, STAR, STAR_BOARD_HOME, SUN_SIZE, TRACK, polar, sectorDegrees } from "@/lib/geometry";
 import type { View } from "@seti/protocol";
@@ -23,38 +23,38 @@ const QUARTER_AT = [
 const VIEW = Math.round(TRACK.radius + 70);
 
 export function SolarPreview({ view, names, onClose }: { view: View; names: string[]; onClose: () => void }) {
-  const [rotated, setRotated] = useState(false);
+  // how many rotations are shown from now (0 is the solar system as it is)
+  const [count, setCount] = useState(0);
   const s = view.state;
-  const pv = view.rotation_preview ?? null;
+  const previews = view.rotation_previews ?? [];
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
   if (typeof document === "undefined") return null;
-  const showing = rotated && pv !== null;
+  const pv = count > 0 ? (previews[count - 1] ?? null) : null;
   const color = (i: number): PieceColor => pieceColor(s.players[i]?.color);
   const who = (i: number): string => (s.rival && i === s.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`));
-  const probes = showing ? pv.probes : s.probes;
-  const angle = (n: number): number => {
-    const now = s.disc_angles[n - 1] ?? 0;
-    // the next rotation turns one step (a disc that does not turn keeps its angle): added to the angle, so the disc turns the short way
-    return showing ? now + (((((pv.disc_angles[n - 1] ?? now) - now) % 8) + 8) % 8) : now;
-  };
-  const turning = pv === null ? [] : [1, 2, 3].filter((n) => (pv.disc_angles[n - 1] ?? 0) !== (s.disc_angles[n - 1] ?? 0));
+  const probes = pv ? pv.probes : s.probes;
+  // the angle of a disc, counted without the wrap from 7 to 0 so that it always turns forward: its angle now plus a step for each rotation shown
+  // that turned it (a rotation turns the disc it is its turn for, and every disc inside it)
+  const angle = (n: number): number => (s.disc_angles[n - 1] ?? 0) + previews.slice(0, count).filter((q) => n <= q.disc).length;
+  const turned = pv === null ? [] : [1, 2, 3].filter((n) => n <= pv.disc);
+  const pushed = previews.slice(0, count).reduce((a, q) => a + q.pushed, 0);
   return createPortal(
     <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()} role="presentation">
       {/* biome-ignore lint/a11y/useSemanticElements: an overlay with its own backdrop, not a native <dialog> */}
       <div className="overlaybox solarpreview" role="dialog" aria-modal="true" aria-label="Solar system preview">
         <h2>Solar system preview</h2>
         <p className="muted small">
-          {pv === null
-            ? "The preview is available while the game is being played."
-            : showing
-              ? `After the next rotation: ${turning.length > 1 ? `discs 1 to ${turning.length}` : "disc 1"} turn${turning.length > 1 ? "" : "s"} one step.${
-                  pv.pushed > 0 ? ` ${pv.pushed} probe${pv.pushed === 1 ? " is" : "s are"} pushed.` : ""
-                }`
-              : "The solar system as it is now."}{" "}
+          {previews.length === 0
+            ? "The preview is not available."
+            : count === 0
+              ? "The solar system as it is now."
+              : `After ${count} rotation${count === 1 ? "" : "s"}. The last one turns ${turned.length > 1 ? `discs 1 to ${turned.length}` : "disc 1"}.${
+                  pushed > 0 ? ` Probes are pushed ${pushed} time${pushed === 1 ? "" : "s"} on the way.` : ""
+                }`}{" "}
           This is only a preview: nothing is played.
         </p>
         <svg
@@ -123,11 +123,11 @@ export function SolarPreview({ view, names, onClose }: { view: View; names: stri
           })}
         </svg>
         <div className="solarbuttons">
-          <button type="button" className="secondary" onClick={() => setRotated(false)} disabled={!rotated}>
+          <button type="button" className="secondary" onClick={() => setCount(0)} disabled={count === 0}>
             Reset to now
           </button>
-          <button type="button" className="primary" onClick={() => setRotated(true)} disabled={pv === null || rotated}>
-            Rotate: show the next rotation
+          <button type="button" className="primary" onClick={() => setCount(count + 1)} disabled={count >= previews.length}>
+            Rotate{count > 0 ? ` again (${count} so far)` : ": show the next rotation"}
           </button>
           <button type="button" className="secondary" onClick={onClose}>
             Close

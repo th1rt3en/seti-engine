@@ -108,19 +108,27 @@ class RotationPreview(BaseModel):
     pushed: int = 0
 
 
-def rotation_preview(state: GameState) -> RotationPreview | None:
-    if state.phase != "play":
-        return None
+ROTATION_PERIOD = 24  # 3 discs: after 24 rotations every disc is back at its angle (8 steps each)
+
+
+def rotation_previews(state: GameState) -> list[RotationPreview]:
+    """The solar system after each of the next rotations, one after the other, for as many as it takes to come round.
+    It is made on a copy and in any phase of the game: nothing is played."""
     copy = state.model_copy(deep=True)
-    disc = copy.rotations % 3 + 1
-    solar.rotate(copy)
-    return RotationPreview(
-        disc=disc,
-        disc_angles=list(copy.disc_angles),
-        probes=[{"id": p.id, "player": p.player, "ring": p.ring, "sector": p.sector, "capsule": p.capsule} for p in copy.probes],
-        planet_cells=_planet_cells(copy),
-        pushed=len(copy.pushed),
-    )
+    out: list[RotationPreview] = []
+    for _ in range(ROTATION_PERIOD):
+        disc = copy.rotations % 3 + 1
+        solar.rotate(copy)
+        out.append(
+            RotationPreview(
+                disc=disc,
+                disc_angles=list(copy.disc_angles),
+                probes=[{"id": p.id, "player": p.player, "ring": p.ring, "sector": p.sector, "capsule": p.capsule} for p in copy.probes],
+                planet_cells=_planet_cells(copy),
+                pushed=len(copy.pushed),
+            )
+        )
+    return out
 
 
 class View(BaseModel):
@@ -138,16 +146,17 @@ class View(BaseModel):
     notes: list[dict[str, Any] | None] = Field(default_factory=list)
     # where each planet lies on the solar system now (ring, sector); the discs turn, so it changes (a visit is a move onto it, FAQ-18)
     planet_cells: dict[str, list[int]] = Field(default_factory=dict)
-    # the solar system after the next rotation, for the preview panel (nothing is played)
-    rotation_preview: RotationPreview | None = None
+    # the solar system after each of the next rotations (the first one is the next rotation), for the preview panel (nothing is played)
+    rotation_previews: list[RotationPreview] = Field(default_factory=list)
 
 
 def _planet_cells(state: GameState) -> dict[str, list[int]]:
     out: dict[str, list[int]] = {}
-    for name in state.planets:
-        at = solar.find_cell(state, f"PLANET:{name.upper()}")
-        if at is not None:
-            out[name] = [at[0], at[1]]
+    for ring in range(1, 5):
+        for sector in range(8):
+            name = solar.planet_of(solar.visible(state, ring, sector)[1])
+            if name is not None and name in state.planets and name not in out:
+                out[name] = [ring, sector]
     return out
 
 
@@ -165,7 +174,7 @@ def to_act(state: GameState) -> int | None:
     return state.current_player if state.phase == "play" else None
 
 
-def project(state: GameState, viewer: int | None) -> View:
+def project(state: GameState, viewer: int | None, previews: bool = True) -> View:
     s = state.model_copy(deep=True)
     counts = Counts(
         deck=len(s.deck),
@@ -248,7 +257,7 @@ def project(state: GameState, viewer: int | None) -> View:
         reach=reach,
         notes=notes,
         planet_cells=_planet_cells(state),
-        rotation_preview=rotation_preview(state),
+        rotation_previews=rotation_previews(state) if previews else [],  # the offline training does not need them
     )
 
 

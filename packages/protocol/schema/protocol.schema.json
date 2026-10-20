@@ -1886,16 +1886,12 @@
           "title": "Reach",
           "type": "array"
         },
-        "rotation_preview": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/RotationPreview"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null
+        "rotation_previews": {
+          "items": {
+            "$ref": "#/$defs/RotationPreview"
+          },
+          "title": "Rotation Previews",
+          "type": "array"
         },
         "state": {
           "$ref": "#/$defs/GameState"
@@ -1936,7 +1932,7 @@
         "notes",
         "planet_cells",
         "reach",
-        "rotation_preview",
+        "rotation_previews",
         "state",
         "to_act",
         "trackers",

@@ -42,7 +42,7 @@ def play_game(players: list[Any], seed: int, rng: random.Random | None = None, o
     while r.legal and steps < MAX_STEPS:
         seat = to_act(r.state)
         assert seat is not None
-        view: View = project(r.state, seat)
+        view: View = project(r.state, seat, previews=False)
         i = players[seat].act(r.state, view, rng)
         r = engine.apply(r.state, view.legal[i])
         steps += 1

@@ -220,6 +220,7 @@ export type Probes1 = {
   [k: string]: unknown;
 }[];
 export type Pushed1 = number;
+export type RotationPreviews = RotationPreview[];
 export type ToAct = number | null;
 export type DangerBoard = number;
 export type DangerCards = number | null;
@@ -539,7 +540,7 @@ export interface View {
   notes: Notes;
   planet_cells: PlanetCells;
   reach: Reach;
-  rotation_preview: RotationPreview | null;
+  rotation_previews: RotationPreviews;
   state: GameState;
   to_act: ToAct;
   trackers: Trackers;
