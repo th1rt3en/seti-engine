@@ -832,3 +832,11 @@ table.shortcuts td:first-child {
   transition: none;
   transform: translate(-50%, -50%);
 }
+/* the Confirm on a tech stack: no transition and no movement when it is pointed at or pressed */
+.stackconfirm,
+.stackconfirm:hover,
+.stackconfirm:active {
+  animation: none;
+  transition: none;
+  transform: translateX(-50%);
+}
