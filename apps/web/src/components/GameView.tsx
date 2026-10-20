@@ -51,6 +51,7 @@ const DECISION: Record<string, string> = {
   exertian_play: "play an Exertian card, or not",
   research_tech: "take a tech",
   computer_slot: "choose a computer slot",
+  objective_task: "mark a task of an objective: click one of the highlighted tasks in the objectives panel",
 };
 
 const humanize = (kind: string): string => DECISION[kind] ?? kind.replace(/_/g, " ");

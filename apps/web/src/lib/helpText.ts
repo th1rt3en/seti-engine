@@ -3,6 +3,8 @@
 const DECISION_HELP: Record<string, string> = {
   setup_tuck:
     "Tuck one card from your hand under your income card. It gives its income resource now and again every round (SETUP-36, INCOME-01).",
+  objective_task:
+    "What you just did fits a task on more than one objective. A trigger marks only one task: click the one to mark in the objectives panel (SOLO-OBJ-04). When only one task fits, it is marked without a question.",
   helion_tuck: "Tuck a card from your hand for income, as the organization says (INCOME-01).",
   income_tuck:
     "Tuck a card for income: it goes under your income card and gives its resource now and every round. You may also skip it (FAQ-01).",

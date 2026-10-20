@@ -206,13 +206,13 @@ button.secondary,
 .btn.secondary,
 .btn.ghost,
 button.ghost {
-  background: transparent;
+  background: var(--surface-2); /* dark by default: a clear background is hard to read over the board */
   color: var(--text);
   border: 1px solid var(--btn-line);
 }
 button.secondary:hover:not(:disabled),
 .btn.ghost:hover {
-  background: var(--surface-2);
+  background: var(--surface-3);
 }
 /* something that cannot be undone */
 button.danger,
@@ -290,7 +290,7 @@ button.link:hover:not(:disabled) {
 .cardactions button.secondary,
 .settingspanel button.secondary,
 .sincebar button.secondary {
-  background: transparent;
+  background: var(--surface-2);
   border: 1px solid var(--btn-line);
   color: var(--text);
 }

@@ -122,8 +122,8 @@ def candidates(s: GameState, evs: list[dict[str, Any]]) -> list[list[Any]]:
         seen: list[Any] = []
         for i, task in enumerate(tile(oid)["tasks"]):
             if not ob.marks[oid][i] and any(_matches(alt, ev) for alt in task for ev in evs):
-                if oid in ob.long_term and task in seen:
-                    continue  # three alike tasks of one tile are one choice
+                if task in seen:
+                    continue  # alike tasks of one tile (two scans, three alike long-term tasks) are one choice
                 seen.append(task)
                 out.append([oid, i])
     return out

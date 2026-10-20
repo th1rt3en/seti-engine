@@ -630,11 +630,21 @@ def test_a_trigger_marks_one_task_and_the_player_chooses_among_several() -> None
     set_row(s, ["L3-two-scans", "L3-trace-launch-scan", "L1-16-vp"])
     p = s.players[0]
     objectives.on_event(s, p, [{"e": "scan"}])
-    assert s.pending[0].kind == "objective_task" and len(s.pending[0].data["options"]) == 3  # two scan tasks and the scan of the other tile
+    assert s.pending[0].kind == "objective_task" and len(s.pending[0].data["options"]) == 2  # alike scans are one choice
     r = with_state(s)
     r = apply(r.state, r.legal[0])
     marked = sum(sum(v) for v in r.state.objectives.marks.values())  # type: ignore[union-attr]
     assert marked == 1
+
+
+def test_alike_tasks_of_one_tile_are_no_choice() -> None:
+    """SOLO-OBJ-04: a tile with two alike tasks is no choice: the first is marked at once, the next scan marks the second."""
+    s = solo(3)
+    set_row(s, ["L3-two-scans", "L1-16-vp", "L1-5-data"])
+    objectives.on_event(s, s.players[0], [{"e": "scan"}])
+    assert s.objectives.marks["L3-two-scans"] == [True, False] and not s.pending  # type: ignore[union-attr]
+    objectives.on_event(s, s.players[0], [{"e": "scan"}])
+    assert s.objectives.marks["L3-two-scans"] == [True, True] and not s.pending  # type: ignore[union-attr]
 
 
 def test_a_single_candidate_is_marked_without_a_question() -> None:
