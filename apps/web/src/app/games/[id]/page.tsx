@@ -1,5 +1,6 @@
 import { GameClient } from "@/components/GameClient";
 import { GameSettings } from "@/components/GameSettings";
+import { ShortcutsHelp } from "@/components/ShortcutsHelp";
 import { loadConfig } from "@/lib/config";
 import { currentUser } from "@/lib/session";
 import { gameMeta } from "@/lib/worker";
@@ -42,7 +43,8 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
     <>
       <h1>
         Game {id.slice(0, 8)} <span className="pill">{meta.rated ? "rated" : "casual"}</span>{" "}
-        <span className="pill">{meta.options.players === 1 ? "solo" : `${meta.options.players} players`}</span> <GameSettings />
+        <span className="pill">{meta.options.players === 1 ? "solo" : `${meta.options.players} players`}</span> <GameSettings />{" "}
+        <ShortcutsHelp />
       </h1>
       {meta.status === "lobby" ? (
         <p className="small">
@@ -53,7 +55,9 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
       {user && !seated && open ? (
         <form action={joinAction}>
           <input type="hidden" name="id" value={id} />
-          <button type="submit" className="primary">Take a seat</button>
+          <button type="submit" className="primary">
+            Take a seat
+          </button>
         </form>
       ) : null}
       {user && seated && meta.status === "lobby" ? (

@@ -1,4 +1,5 @@
 "use client";
+import { OPEN_SHORTCUTS_EVENT } from "@/components/ShortcutsHelp";
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 import { useGameSettings } from "@/lib/gameSettings";
 import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
@@ -946,7 +947,7 @@ export function GameClient({
       foldedAll.current = !foldedAll.current;
       window.dispatchEvent(new CustomEvent(ALL_EVENT, { detail: !foldedAll.current }));
     } else if (e.key === "?") {
-      window.dispatchEvent(new Event("seti-open-settings"));
+      window.dispatchEvent(new Event(OPEN_SHORTCUTS_EVENT));
     }
   };
   const moves = (

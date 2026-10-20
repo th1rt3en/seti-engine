@@ -647,3 +647,41 @@ tbody tr:hover td {
     flex: none;
   }
 }
+/* the overlay of the keyboard shortcuts */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+}
+.overlaybox {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.7);
+}
+.overlaybox h2 {
+  margin: 0;
+}
+.overlaybox button {
+  justify-self: end;
+}
+table.shortcuts td {
+  padding: 6px 10px 6px 0;
+  vertical-align: top;
+  border: 0;
+}
+table.shortcuts td:first-child {
+  white-space: nowrap;
+}
+.kbdbtn {
+  margin-left: 6px;
+}

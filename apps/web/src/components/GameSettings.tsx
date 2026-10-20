@@ -31,13 +31,6 @@ export function GameSettings() {
     document.documentElement.style.setProperty("--hand-scale", String(handScale));
   }, [handScale]);
 
-  // the key "?" opens the panel (it has the list of keyboard shortcuts)
-  useEffect(() => {
-    const onOpen = () => setOpen(true);
-    window.addEventListener("seti-open-settings", onOpen);
-    return () => window.removeEventListener("seti-open-settings", onOpen);
-  }, []);
-
   // the panel closes with a click outside it or with Escape
   useEffect(() => {
     if (!open) return;
@@ -144,29 +137,6 @@ export function GameSettings() {
           <button type="button" className="secondary small" onClick={() => setHandScale(1)} disabled={handScale === 1}>
             Reset the size
           </button>
-          <details>
-            <summary>Keyboard shortcuts</summary>
-            <ul className="small">
-              <li>
-                <kbd>Enter</kbd> confirm the question in the context bar
-              </li>
-              <li>
-                <kbd>Esc</kbd> cancel it
-              </li>
-              <li>
-                <kbd>E</kbd> end the turn
-              </li>
-              <li>
-                <kbd>U</kbd> take the last move back
-              </li>
-              <li>
-                <kbd>F</kbd> fold or unfold all the panels
-              </li>
-              <li>
-                <kbd>?</kbd> open this panel
-              </li>
-            </ul>
-          </details>
         </div>
       ) : null}
     </span>
