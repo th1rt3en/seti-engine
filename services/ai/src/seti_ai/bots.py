@@ -12,7 +12,7 @@ from typing import Any, Protocol
 
 from seti_engine import engine
 from seti_engine.models import GameState, PlayerState
-from seti_engine.projection import View
+from seti_engine.projection import View, to_act
 
 NEVER = ("undo",)  # a move that only takes back: a bot does not use it
 
@@ -144,6 +144,25 @@ class LookaheadBot:
         r = max(1, min(state.round, 5)) - 1
         return _board_value(state, p, self.weights, self.res_by_round[r], self.struct_by_round[r], self.tech_values)
 
+    def _gain(self, state: GameState, seat: int, m: dict[str, Any], base: float, nxt: GameState, rng: random.Random) -> float:
+        """What a move is worth to a seat: the change in the value of its position, and the preferences of the bot for kinds of move."""
+        gain = self._value(nxt, nxt.players[seat]) - base
+        # ending the turn or passing is the last choice while something else gives value, so that a turn is used before it is given up
+        if m["type"] in TURN_ENDERS:
+            gain -= (0.5 if m["type"] == "end_turn" else 1.0) * self.scale  # something that gives value is done first
+        elif gain <= 0:
+            gain -= 0.001 * (1 + rng.random())  # a move that does nothing is worse than ending the turn only when nothing else gives value
+        gain += self.bias.get(m["type"], 0.0)
+        if m["type"] == "choose_org":
+            gain += self.org_bias.get(str(m.get("org")), 0.0)
+        elif m["type"] == "choose_quick":
+            gain += sum(self.quick_bias.get(c, 0.0) for c in m.get("cards", []))
+        if m["type"] == "pass" and not state.main_done:
+            gain -= self.use_the_turn
+        if self.no_scan_in_round_1 and m["type"] == "scan" and state.round == 1:
+            gain -= 5.0  # the model: starting round 1 with a scan loses about a credit
+        return gain
+
     def act(self, state: GameState, view: View, rng: random.Random) -> int:
         seat = view.viewer
         assert seat is not None
@@ -155,24 +174,61 @@ class LookaheadBot:
                 nxt = engine.apply(state, m).state
             except Exception:  # a move that cannot be tried is not chosen
                 continue
-            gain = self._value(nxt, nxt.players[seat]) - base
-            # ending the turn or passing is the last choice while something else gives value, so that a turn is used before it is given up
-            if m["type"] in TURN_ENDERS:
-                gain -= (0.5 if m["type"] == "end_turn" else 1.0) * self.scale  # something that gives value is done first
-            elif gain <= 0:
-                gain -= 0.001 * (1 + rng.random())  # a move that does nothing is worse than ending the turn only when nothing else gives value
-            gain += self.bias.get(m["type"], 0.0)
-            if m["type"] == "choose_org":
-                gain += self.org_bias.get(str(m.get("org")), 0.0)
-            elif m["type"] == "choose_quick":
-                gain += sum(self.quick_bias.get(c, 0.0) for c in m.get("cards", []))
-            if m["type"] == "pass" and not state.main_done:
-                gain -= self.use_the_turn
-            if self.no_scan_in_round_1 and m["type"] == "scan" and state.round == 1:
-                gain -= 5.0  # the model: starting round 1 with a scan loses about a credit
-            value = gain + self.noise * self.scale * rng.random()
+            value = self._gain(state, seat, m, base, nxt, rng) + self.noise * self.scale * rng.random()
             if value > best_value:
                 best, best_value = i, value
+        return best
+
+
+class SearchBot(LookaheadBot):
+    """A lookahead bot that looks at the next moves of its own turn as well: the free actions and the main action are a plan, and a move that only pays off
+    two or three moves later (moving a probe, then orbiting) is seen. It tries every legal move; for the best `width` of them it goes on, and for the best moves
+    of those, down to `depth` moves of the turn, and takes the first move of the plan that has the most value in all."""
+
+    def __init__(self, *args: Any, depth: int = 3, width: int = 3, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.depth, self.width = depth, width
+
+    def _children(self, state: GameState, seat: int, rng: random.Random, only: list[int] | None = None) -> list[tuple[float, GameState, int]]:
+        legal = engine.legal_moves(state)
+        base = self._value(state, state.players[seat])
+        out: list[tuple[float, GameState, int]] = []
+        for i, m in enumerate(legal):
+            if m["type"] in NEVER or (only is not None and i not in only):
+                continue
+            try:
+                nxt = engine.apply(state, m).state
+            except Exception:
+                continue
+            out.append((self._gain(state, seat, m, base, nxt, rng), nxt, i))
+        return out
+
+    def _plan(self, state: GameState, seat: int, depth: int, rng: random.Random) -> float:
+        """The most value that the rest of the turn can add, looking `depth` moves ahead (0 when it is not the seat's move any more)."""
+        if depth <= 0 or state.phase == "finished" or to_act(state) != seat:
+            return 0.0
+        kids = sorted(self._children(state, seat, rng), key=lambda c: c[0], reverse=True)[: self.width]
+        return max((g + self._plan(nxt, seat, depth - 1, rng) for g, nxt, _ in kids), default=0.0)
+
+    def act(self, state: GameState, view: View, rng: random.Random) -> int:
+        seat = view.viewer
+        assert seat is not None
+        legal = view.legal
+        scored: list[tuple[float, int, GameState]] = []
+        base = self._value(state, state.players[seat])
+        for i in _options(view):
+            try:
+                nxt = engine.apply(state, legal[i]).state
+            except Exception:
+                continue
+            scored.append((self._gain(state, seat, legal[i], base, nxt, rng), i, nxt))
+        scored.sort(key=lambda c: c[0], reverse=True)
+        best, best_value = scored[0][1], -1e9
+        for rank, (g, i, nxt) in enumerate(scored):
+            total = g + (self._plan(nxt, seat, self.depth - 1, rng) if rank < self.width + 1 and legal[i]["type"] not in TURN_ENDERS else 0.0)
+            total += self.noise * self.scale * rng.random()
+            if total > best_value:
+                best, best_value = i, total
         return best
 
 
@@ -205,9 +261,12 @@ def from_spec(spec: dict[str, Any]) -> LookaheadBot:
     "struct": [5 numbers], "tech": {tech id: value}, "no_scan_r1": bool, "noise": number}. Used to try variants of the heuristic bot."""
     weights = dict({"greedy": GREEDY, "model": MODEL}.get(spec.get("base", "heuristic_v1"), HEURISTIC_V1))
     weights.update(spec.get("weights", {}))
-    return LookaheadBot(
+    cls: type[LookaheadBot] = SearchBot if spec.get("depth", 1) > 1 else LookaheadBot
+    extra = {"depth": spec["depth"], "width": spec.get("width", 3)} if cls is SearchBot else {}
+    return cls(
         spec.get("name", "variant"),
         weights,
+        **extra,
         noise=spec.get("noise", 0.05),
         bias=spec.get("bias"),
         no_scan_in_round_1=spec.get("no_scan_r1", False),
