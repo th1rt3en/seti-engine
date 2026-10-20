@@ -432,7 +432,7 @@ export function GameClient({
         onClick: () => play(m),
       };
     }
-    const label: ReactNode = m.type === "tuck" ? <TuckLabel income={info?.income} /> : handMoveText(m).replace(/\?$/, "");
+    const label: ReactNode = m.type === "tuck" ? <TuckLabel key="tuck" income={info?.income} /> : handMoveText(m).replace(/\?$/, "");
     return { key: `${m.type}-${i}`, label, primary: m.type === "tuck", title: handMoveText(m), onClick: () => play(m) };
   });
   // the main action is taken (or the card cannot be afforded): Play stays in sight, greyed out
