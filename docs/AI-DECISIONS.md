@@ -259,3 +259,14 @@ The training can be paused whenever the owner needs the PC, and resumed later fr
 - **The search and the replay buffer (when they are built):** the games are saved in files as they are finished and the buffer is part of the checkpoint, so a pause costs
   no game. The warm start (copying the bots, about 5 minutes) is not paused: it is started again.
 - The tuning of the heuristic bot (`seti_ai.tune`) saves its best setting every 4 generations and can start again from it with `--resume`.
+
+## 16. The heuristic bots to come, and the opponent pool (owner, 2026-10-20)
+
+- **Version 4** must score at least **100 points on average** (own score, over base and expansion games with organizations and quick start cards, against the earlier
+  heuristic bot) before it is used. It is being made by tuning (section 12): more terms in the value function and a search over its weights.
+- **Version 5** must then score at least **150 points on average** on the same measure. A one-step bot with tuned numbers is unlikely to reach that; the plan for it is a
+  bot that looks at a whole turn (a search over the moves of one turn, free actions and the main action, with the same value function at the end of the turn) and then
+  tunes its numbers the same way. If a deeper look is not enough, I will report where it stalls and what the options are before spending more on it.
+- **Both are in the opponent pool of the model's training**, together with the greedy bot, version 3, and the past versions of the model itself (a pool of past versions
+  avoids forgetting and cycling). The share of each in the games of a round is a training setting that the owner approves with the plan.
+- Order of work: version 4, then version 5, then the owner approves the plan, then (and only then) training starts. Nothing is trained before.
