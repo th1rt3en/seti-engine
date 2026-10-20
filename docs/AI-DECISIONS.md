@@ -26,8 +26,11 @@ runs so far and are marked as measured or estimated.
 
 ## 2. The scope of the first training
 
-Built: 2 players, base game, no expansion, no solo, no promo cards, any species (random). Other scopes need their own features (organizations, new species) and
-their own runs: the expansion and 3 to 4 players change the game a lot. Recommendation: finish 2 players first, as you asked.
+**Changed by the owner (2026-10-20): the scope includes the Space Agencies expansion, with organizations and quick start cards.** 2 players first; 3 and 4 players later,
+each with its own model. No solo, no promo cards. The agent is trained on both kinds of game: the base game and the expansion game with organizations and quick start
+cards (the choice of the organization and of the two quick start cards are decisions it learns to make). The features do not need a change: they are made from the
+whole view, so the organizations, the signal tokens, the new species (Arkhos, Glyphids, Amoeba) and the state of the expansion are seen as they are; the options of
+the game are in the view, so the agent knows which kind of game it plays. The heuristic bot and the tuning of it play both kinds of game.
 
 ## 3. What the agent sees (decided with you: everything a player sees)
 
@@ -237,5 +240,6 @@ Requirements, to build with the bot seat (after the owner approves a version for
    and the final score of each seat.
 4. Human moves in those games are also training data (what the people chose), and a game against a person is a test of the bot (its score, its win rate by
    version, shown on the page of the AI).
-5. Consent and privacy: the site says that games may be used to train the bot; players are named by a hash in the data; guests' games are included unless the owner
-   decides otherwise. This needs the owner's answer.
+5. Consent (decided by the owner, 2026-10-20): when a player adds a model to their lobby, the site warns them that the game data will be collected to train
+   the models, and adding the model counts as agreeing to it. The warning is shown before the model is added, the agreement is recorded with the game (who agreed
+   and when), and a game without a model is not collected for this. Players are named by a hash in the data.
