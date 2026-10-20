@@ -270,3 +270,7 @@ The training can be paused whenever the owner needs the PC, and resumed later fr
 - **Both are in the opponent pool of the model's training**, together with the greedy bot, version 3, and the past versions of the model itself (a pool of past versions
   avoids forgetting and cycling). The share of each in the games of a round is a training setting that the owner approves with the plan.
 - Order of work: version 4, then version 5, then the owner approves the plan, then (and only then) training starts. Nothing is trained before.
+
+### Opponent pool (owner's answer: C)
+
+Self-play opponents are drawn from a pool (`models/pool.json`, code in `seti_ai/pool.py`): the network being trained, frozen snapshots of the network (v008 at about 100 points first, a version at about 150 points later, and the last six saved versions), and the heuristic bots (greedy, v3, and v4/v5 once they exist). Weights are in the file and can be changed by the owner. Snapshots that predate the memory features run without history. No training has been started; it waits for the owner's approval of the plan.

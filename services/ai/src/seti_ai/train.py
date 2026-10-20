@@ -26,6 +26,7 @@ import torch
 from torch import nn
 
 from . import arena, bots, checkpoint, features, registry
+from . import pool as pool_mod
 from .agent import PRESETS, VALUE_SCALE, NNAgent, PolicyNet, Step, collate, net_from, new_net, save_net
 from .server import Client, start_server
 
@@ -103,7 +104,10 @@ def play_job(job: dict[str, Any]) -> dict[str, Any]:
             agent_seats = [0, 1]
         else:
             seat = job["seat"]
-            opp = bots.BOTS[job["opp"]]()
+            if kind == "snap":  # a frozen network of the pool plays the other seat
+                opp: Any = NNAgent(_STATE["client"].with_model(job["opp"]), explore=True, record=False, memory=job.get("memory", True))
+            else:
+                opp = bots.BOTS[job["opp"]]()
             res = arena.play_game([agent, opp] if seat == 0 else [opp, agent], seed, rng)
             agent_seats = [seat]
         helper = agent
@@ -238,8 +242,8 @@ def evaluate(pool: Any, games: int, opponents: tuple[str, ...] = ("random", "gre
     return out
 
 
-def load_into_server(req_q: Any, ctl_q: Any, path: str) -> None:
-    req_q.put(("load", path))
+def load_into_server(req_q: Any, ctl_q: Any, path: str, name: str = "main") -> None:
+    req_q.put(("load", name, path))
     ctl_q.get()  # "loaded"
 
 
@@ -315,18 +319,25 @@ def main() -> None:
                     parent = Path(a.start).name if a.start else None
                     best, first = -1e9, 1
                 paused = False
+                loaded: set[str] = set()
                 for it in range(first, a.iters + 1):
                     t0 = time.time()
                     save_net(net, weights)
                     load_into_server(req_q, ctl_q, weights)
+                    entries = pool_mod.load(root / "pool.json")
+                    for e in entries:
+                        if e["kind"] == "snapshot" and e["name"] not in loaded:
+                            load_into_server(req_q, ctl_q, e["path"], e["name"])
+                            loaded.add(e["name"])
                     jobs = []
-                    for k in range(a.games):
+                    for k, e in enumerate(pool_mod.share(entries, a.games)):
                         seed = a.seed * 1_000_000 + it * 1000 + k
-                        r = k % 4
-                        if r < 2:
+                        if e["kind"] == "self":
                             jobs.append({"kind": "self", "seed": seed})
+                        elif e["kind"] == "snapshot":
+                            jobs.append({"kind": "snap", "opp": e["name"], "memory": e.get("memory", True), "seat": k % 2, "seed": seed})
                         else:
-                            jobs.append({"kind": "bot", "opp": "heuristic" if r == 2 else "greedy", "seat": k % 2, "seed": seed})
+                            jobs.append({"kind": "bot", "opp": e["bot"], "seat": k % 2, "seed": seed})
                     results = []
                     for c in range(0, len(jobs), 12):  # small batches, so that a pause is heard within a few seconds
                         if checkpoint.pause_requested(root):
@@ -371,6 +382,7 @@ def main() -> None:
                                 ev,
                             )
                             print(f"  saved as {v}", flush=True)
+                            pool_mod.save(root / "pool.json", pool_mod.remember(entries, str(v), str(root / str(v) / "model.pt")))
                     checkpoint.save(root, net, opt, {"iteration": it, "best": best, "parent": parent, "args": {k: v for k, v in vars(a).items()}})
                 if paused or checkpoint.pause_requested(root):
                     print("paused: the checkpoint is saved; the processor and the graphics card are free (ppo --resume to go on)", flush=True)

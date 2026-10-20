@@ -184,12 +184,13 @@ class NNAgent:
 
     name = "agent"
 
-    def __init__(self, net: Any, explore: bool = True, record: bool = False, temperature: float = 1.0) -> None:
+    def __init__(self, net: Any, explore: bool = True, record: bool = False, temperature: float = 1.0, memory: bool = True) -> None:
         self.net = net
         self.explore = explore
         self.record = record
         self.temperature = temperature
         self.steps: list[Step] = []
+        self.memory = memory  # False: a network from before the memory features; it does not get the history or the known cards
         self.history: list[tuple[int, dict[str, Any]]] | None = None  # set by the arena: the actions of both seats so far
         self.knowledge: Any = None  # set by the arena: the cards that the other seats are known to hold
 
@@ -198,7 +199,7 @@ class NNAgent:
         assert seat is not None
         # a move that only takes back (undo) is not offered: the agent would use it to stall
         keep = [i for i, m in enumerate(view.legal) if m["type"] != "undo"] or list(range(len(view.legal)))
-        tokens = features.encode_view(view, self.history, self.knowledge)
+        tokens = features.encode_view(view, self.history if self.memory else None, self.knowledge if self.memory else None)
         toks, nums = features.encode_moves(view, keep)
         logits, value = self.net.evaluate(tokens, toks, nums)
         lg = torch.from_numpy(np.asarray(logits, dtype=np.float32)) / self.temperature
