@@ -141,9 +141,18 @@ export function BoardView({
     return () => window.removeEventListener(CARD_HOVER_EVENT, on);
   }, []);
   const hoverPlaces = hoverCard
-    ? ((cardPlaces as Record<string, { planets: string[]; visits: string[]; colors: string[] }>)[hoverCard] ?? null)
+    ? ((cardPlaces as Record<string, { planets: string[]; visits: string[]; signals: string[]; colors: string[] }>)[hoverCard] ?? null)
     : null;
-  const refSectors = view.state.sectors.flatMap((sec, i) => (hoverPlaces?.colors.includes(sec.color) ? [i] : []));
+  // the sectors named by color, and the sector where a planet lies now (a signal "in the sector of Mars": the discs turn, so the planet moves)
+  const refSectors = [
+    ...new Set([
+      ...view.state.sectors.flatMap((sec, i) => (hoverPlaces?.colors.includes(sec.color) ? [i] : [])),
+      ...(hoverPlaces?.signals ?? []).flatMap((name) => {
+        const cell = view.planet_cells?.[name];
+        return cell ? [cell[1] as number] : [];
+      }),
+    ]),
+  ];
   const s = view.state;
   // the angle of a disc runs from 0 to 7 steps and starts again at 0; drawn as it is, the disc would spin back the whole way when it passes 7 -> 0.
   // The drawn angle is the turns counted without the wrap (the step that was made is the shortest way from the last angle that was seen).

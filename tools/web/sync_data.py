@@ -120,7 +120,8 @@ QUICK_PICTURES = {
 
 def card_places() -> dict[str, dict[str, list[str]]]:
     """The places that the effects and the missions of a card name (for the highlight when a card is hovered): `planets` are planets to orbit or land on
-    (the planet board), `visits` are planets to move a probe onto (the space of the solar system, where the planet lies now), `colors` are sector colors.
+    (the planet board), `visits` are planets to move a probe onto (the space of the solar system, where the planet lies now), `signals` are planets whose sector gets a signal
+    (the sector where the planet lies now), `colors` are sector colors.
     A card that names none is left out."""
     from seti_engine import card_defs
 
@@ -132,9 +133,10 @@ def card_places() -> dict[str, dict[str, list[str]]]:
     def walk(x: object, out: dict[str, set[str]]) -> None:
         if isinstance(x, dict):
             is_visit = x.get("k") == "visit" or x.get("e") == "visit"  # a visit is a move onto the planet's space (FAQ-18)
+            kind = "signals" if x.get("t") == "sig_planet" else "visits" if is_visit else "planets"
             for k, v in x.items():
                 if k in ("planet", "planets"):
-                    add_planet(out, v, "visits" if is_visit else "planets")
+                    add_planet(out, v, kind)
                 elif k == "color" and isinstance(v, str) and v in ("red", "yellow", "blue", "black"):
                     out["colors"].add(v)
                 walk(v, out)
@@ -144,9 +146,9 @@ def card_places() -> dict[str, dict[str, list[str]]]:
 
     res: dict[str, dict[str, list[str]]] = {}
     for cid, d in card_defs.CARDS.items():
-        out: dict[str, set[str]] = {"planets": set(), "visits": set(), "colors": set()}
+        out: dict[str, set[str]] = {"planets": set(), "visits": set(), "signals": set(), "colors": set()}
         walk(d, out)
-        if out["planets"] or out["visits"] or out["colors"]:
+        if any(out.values()):
             res[cid] = {k: sorted(v) for k, v in out.items()}
     return res
 

@@ -2,6 +2,7 @@
 "1": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "jupiter",
 "saturn"
@@ -13,6 +14,7 @@
 "neptune",
 "uranus"
 ],
+"signals": [],
 "visits": []
 },
 "101": {
@@ -22,6 +24,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "116": {
@@ -31,6 +34,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "12": {
@@ -38,6 +42,7 @@
 "planets": [
 "jupiter"
 ],
+"signals": [],
 "visits": []
 },
 "14": {
@@ -45,11 +50,13 @@
 "planets": [
 "mars"
 ],
+"signals": [],
 "visits": []
 },
 "2": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "mercury",
 "venus"
@@ -58,6 +65,7 @@
 "20": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "mercury"
 ]
@@ -65,6 +73,7 @@
 "21": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "venus"
 ]
@@ -72,6 +81,7 @@
 "22": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "mars"
 ]
@@ -79,6 +89,7 @@
 "23": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "jupiter"
 ]
@@ -86,6 +97,7 @@
 "24": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "saturn"
 ]
@@ -93,6 +105,7 @@
 "3": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "neptune",
 "uranus"
@@ -103,11 +116,17 @@
 "planets": [
 "mercury"
 ],
+"signals": [
+"mercury"
+],
 "visits": []
 },
 "33": {
 "colors": [],
 "planets": [
+"venus"
+],
+"signals": [
 "venus"
 ],
 "visits": []
@@ -117,11 +136,17 @@
 "planets": [
 "mars"
 ],
+"signals": [
+"mars"
+],
 "visits": []
 },
 "35": {
 "colors": [],
 "planets": [
+"jupiter"
+],
+"signals": [
 "jupiter"
 ],
 "visits": []
@@ -131,6 +156,9 @@
 "planets": [
 "saturn"
 ],
+"signals": [
+"saturn"
+],
 "visits": []
 },
 "37": {
@@ -138,6 +166,7 @@
 "red"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "38": {
@@ -145,6 +174,7 @@
 "red"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "39": {
@@ -152,11 +182,13 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "4": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "jupiter",
 "venus"
@@ -167,6 +199,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "41": {
@@ -174,6 +207,7 @@
 "blue"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "42": {
@@ -181,6 +215,7 @@
 "blue"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "43": {
@@ -188,6 +223,7 @@
 "black"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "44": {
@@ -195,6 +231,7 @@
 "black"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "48": {
@@ -202,6 +239,7 @@
 "red"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "49": {
@@ -209,6 +247,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "5": {
@@ -216,6 +255,7 @@
 "planets": [
 "venus"
 ],
+"signals": [],
 "visits": []
 },
 "56": {
@@ -223,6 +263,7 @@
 "blue"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "58": {
@@ -230,6 +271,7 @@
 "planets": [
 "uranus"
 ],
+"signals": [],
 "visits": []
 },
 "6": {
@@ -237,6 +279,7 @@
 "planets": [
 "jupiter"
 ],
+"signals": [],
 "visits": []
 },
 "60": {
@@ -244,6 +287,7 @@
 "planets": [
 "neptune"
 ],
+"signals": [],
 "visits": []
 },
 "7": {
@@ -251,6 +295,7 @@
 "planets": [
 "mercury"
 ],
+"signals": [],
 "visits": []
 },
 "8": {
@@ -258,6 +303,7 @@
 "planets": [
 "saturn"
 ],
+"signals": [],
 "visits": []
 },
 "AM.12": {
@@ -265,6 +311,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "AM.13": {
@@ -272,6 +319,7 @@
 "blue"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "AM.15": {
@@ -279,6 +327,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "AM.16": {
@@ -286,6 +335,7 @@
 "blue"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "AM.17": {
@@ -294,6 +344,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "ET.22": {
@@ -301,6 +352,7 @@
 "planets": [
 "oumuamua"
 ],
+"signals": [],
 "visits": []
 },
 "ET.24": {
@@ -310,11 +362,13 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "ET.27": {
 "colors": [],
 "planets": [],
+"signals": [],
 "visits": [
 "oumuamua"
 ]
@@ -326,6 +380,7 @@
 "yellow"
 ],
 "planets": [],
+"signals": [],
 "visits": []
 },
 "SE_EN_02": {
@@ -333,6 +388,7 @@
 "planets": [
 "mars"
 ],
+"signals": [],
 "visits": []
 }
 }
