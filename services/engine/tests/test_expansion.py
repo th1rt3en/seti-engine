@@ -114,6 +114,19 @@ def test_quick_start_marks_give_no_benefit() -> None:  # EXP-QS-01
     assert s.completed == []
 
 
+def test_the_trace_quick_start_cards_mark_the_discovery_space_of_the_right_species() -> None:  # EXP-QS-01, SR.1, SR.2
+    """The printed cards say "the right species": the second species slot. SR.1 marks a yellow trace, SR.2 a pink one, with no benefit."""
+    for cid, i in (("SR.1", 1), ("SR.2", 0)):  # the discovery spaces of a species: pink, yellow, blue
+        s = new(2)
+        p = s.players[0]
+        before = (p.score, p.data_pool, p.publicity)
+        orgs.place_marks(s, p, cid)
+        assert s.species[1].discovery_spaces[i] == "p0", cid  # the right species
+        assert s.species[0].discovery_spaces == [None, None, None], cid  # nothing on the left one
+        assert p.trace_log == [(1, "yellow" if cid == "SR.1" else "pink")]
+        assert (p.score, p.data_pool, p.publicity) == before
+
+
 def test_quick_start_lower_half() -> None:  # EXP-QS-02
     s = new(2)
     p = s.players[0]

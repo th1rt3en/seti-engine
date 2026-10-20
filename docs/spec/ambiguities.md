@@ -541,3 +541,10 @@ Entry format:
 - Consequence: with reading (2), a pink trace marked on another species gave no prompt to cover the circle of AM.16.
 - Ruling: reading (1). The owner marked a pink trace with AM.16 in play and got no prompt (2026-10-20). The cards are changed: AM.15 and AM.16 trigger on a trace of the color on any species board; AM.18 keeps 'for this species'. Tests in `tests/test_amoeba.py`.
 - Questions for the owner: please confirm this reading against the printed cards.
+
+## A-058: Which species do the trace quick start cards SR.1 and SR.2 mark?
+- Status: ruled by the owner's report (2026-10-20)
+- Rule IDs affected: EXP-QS-01 (SR.1, SR.2)
+- Rulebook page and text: the printed cards say 'a life trace in the discovery space of the right species' (verified transcription, Q.14 and Q.15).
+- Readings: the community data had the first species slot (the left one) for both cards (alienIndex 1); the text says the right one.
+- Ruling: the right species, the second slot. The owner reported SR.2 marking the left species (2026-10-20). `docs/spec/data/expansion-quick-start.json` has alienIndex 2 for both cards. Test in `tests/test_expansion.py`. The other 19 quick start cards were checked against the transcription (stars, planets, bottom halves, the income of SR.15 and SR.16): they agree.
