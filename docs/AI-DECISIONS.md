@@ -154,3 +154,59 @@ yardstick we need a stronger opponent (the search of section 6, or human games).
 7. Serving: where, and whether a version needs to beat a threshold before it is shown to you (section 7)?
 8. May I deploy the engine fix (the undiscovered species board), which is committed but not deployed?
 9. When training may start again.
+
+## 11. The owner's answers (2026-10-20) and what follows from them
+
+| # | Answer | What follows |
+|---|---|---|
+| 1 | Own score is the metric: it also scales to 3 and 4 players, where a margin does not | keep the reward as built; no margin term |
+| 2 | Start with 2 players; separate models for 3 and 4 players later | the features and the code are written for any number of players; one model for each player count |
+| 3 | The large network, larger if it can be afforded | preset `large` (144M); a larger preset `xlarge` is measured (below) before it is chosen |
+| 4 | Largely agree; an opponent pool of past versions; **improve the heuristic bot first**: it must beat the random bot and the greedy bot at least 70% of the time before the real model is trained against it; search the internet for improvements | the heuristic bot is being improved and measured (section 12); the opponent pool is a part of the training code; no training until the owner approves the plan |
+| 5 | AlphaZero-style training, no determinization | see the open question below |
+| 6 | Implement memory | the agent is given the history of the actions of both seats (section 13) |
+| 7 | A model version needs the owner's manual and explicit approval before it is available to users | a version is only ever "testing" until `seti_ai.publish --approve vNNN` (and `--live`) is run by the owner's order; the site shows no version as playing otherwise |
+| 8 | Deploy the engine fix | done (revision seti-engine-00054-6l8) |
+| 9 | No training until the owner approves the plan | nothing is trained; only bots play each other (no learning) to measure the heuristic bot |
+| 10 | Every game that the deployed model plays against a human must be available for training later | section 14 |
+
+**Open question on 5 (a search with no determinization).** A search over the real state would see the deck order and the other player's hand, so it would
+choose moves with information that the network (which only sees the view) does not have, and the network would be trained to copy that. Two readings that
+avoid this: (a) ZeusAI's way: chance events (a card turned up, a reveal) are sampled at the nodes of the tree (afterstates), and the opponent's hidden hand is
+not modelled, only what the seat has seen is used to evaluate; (b) each search is made from the seat's view with the opponent's moves chosen by the network
+on the opponent's own view. Which one do you mean, or do you want the search to use the true state anyway (it is simpler and is a known source of a wrong
+policy)? I will not build the search until you say. Training of any kind waits for your approval of the whole plan.
+
+## 12. The heuristic bot: what the internet says and what was measured
+
+Sources read: the quantified model (seti.ender-wiggin.com/posts/model), its tech article (/posts/tech), a beginner's guide (thetablepriest.com), a review with
+advice (Meeple Mountain). The BoardGameGeek threads on opening moves and strategy could not be read by the tool (they are behind a challenge page); if you paste
+one I will use it. What the sources say that can be played by a bot: income and one early tech in rounds 1 and 2 (energy more than credits); 2 or 3 cards tucked
+for income early; orbit before landing, Mercury and Mars first; discarding a card for its free action is often better than playing it, so play cards for
+missions, free moves and end-of-game goals; do not start round 1 with a scan; the late game is scanning with the purple techs; the best techs are Mercury scan
+and the launch/move tech (S), the asteroid tech (A+), the landing tech (A); blue techs (computer) are A to S, energy first.
+
+Measured (60 to 80 games a match, same seeds, seats swapped): heuristic bot version 2 against random 100%, against greedy 71% (not a safe margin over 70%).
+Variants tried so far (each against greedy and against version 2): fading the value of resources and structures in the last rounds made the bot worse (46% against
+greedy: it spent resources on things that do not score); more income and orbit weights helped a little (53%); the results of the rest are in the next update.
+
+## 13. Memory of the moves
+
+The agent is given the last 48 actions of both seats as tokens (who, in turn order relative to the agent; the type; the parameters that are public: a card named
+when it was played or discarded face up, not when it was tucked face down; the age of the action). It is part of the view features; the arena and the training
+keep the history, and a served bot gets it from the game's action log.
+
+## 14. Games between the deployed model and humans, kept for training
+
+Requirements, to build with the bot seat (after the owner approves a version for serving):
+1. The archive of every game (already written to the Google Cloud Storage bucket) says which seats are bots and which model version played them, and the rules
+   version (the engine's commit) of the game: in the header of the archive and in the games table of the database.
+2. The bot's own decisions are logged in the archive (the policy it chose from, its value estimate, the number of search simulations), because those are the
+   targets for AlphaZero-style training; a human's moves are logged as usual.
+3. A tool on this PC (`seti_ai.dataset`) copies the new bot games from the bucket, replays each with the engine of its rules version (a copy of the repository
+   at that commit, because old games cannot be replayed by newer rules), and turns them into training examples: the positions, the legal moves, the move chosen,
+   and the final score of each seat.
+4. Human moves in those games are also training data (what the people chose), and a game against a person is a test of the bot (its score, its win rate by
+   version, shown on the page of the AI).
+5. Consent and privacy: the site says that games may be used to train the bot; players are named by a hash in the data; guests' games are included unless the owner
+   decides otherwise. This needs the owner's answer.
