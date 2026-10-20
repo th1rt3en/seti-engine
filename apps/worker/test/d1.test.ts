@@ -14,6 +14,7 @@ class SqliteDb implements Db {
   readonly sql = new DatabaseSync(":memory:");
   constructor() {
     this.sql.exec(readFileSync(new URL("../migrations/0001_init.sql", import.meta.url), "utf8"));
+    this.sql.exec(readFileSync(new URL("../migrations/0006_game_stats.sql", import.meta.url), "utf8"));
   }
   prepare(query: string): Statement {
     const run = (values: unknown[]): Statement => {
@@ -83,6 +84,34 @@ describe("D1 sink", () => {
     const log = db.sql.prepare("SELECT log_json FROM game_logs WHERE game_id = 'g1'").get() as { log_json: string };
     expect(JSON.parse(log.log_json)).toHaveLength(1);
     expect(db.sql.prepare("SELECT COUNT(*) AS n FROM ratings").get()).toEqual({ n: 0 });
+  });
+
+  it("the statistics of a game are written for each player", async () => {
+    const db = new SqliteDb();
+    const sink = new D1Sink(db);
+    const rec = record("g1", [alice, bob], [1, 2], false);
+    await sink.recordStart({ ...rec.meta, status: "playing" });
+    await sink.recordEnd(rec, []);
+    const stats = {
+      version: 1,
+      expansion: true,
+      species: ["anomalies", "centaurians"],
+      rounds: 5,
+      players: [
+        { seat: 0, org: "stratus_core", org_offered: ["stratus_core", "turing_systems"], counters: { "action.launch": 3 } },
+        { seat: 1, org: null, org_offered: [], counters: { "action.launch": 1 } },
+      ],
+    };
+    await sink.recordStats(rec.meta, rec.result, stats);
+    await sink.recordStats(rec.meta, rec.result, stats); // the same game again replaces its rows
+    const rows = db.sql
+      .prepare("SELECT seat, user_id, players, expansion, rank, won, score, org, counters_json FROM game_stats ORDER BY seat")
+      .all();
+    expect(rows).toEqual([
+      expect.objectContaining({ seat: 0, user_id: "u-alice", players: 2, expansion: 1, rank: 1, won: 1, score: 90, org: "stratus_core" }),
+      expect.objectContaining({ seat: 1, user_id: "u-bob", rank: 2, won: 0, org: null }),
+    ]);
+    expect(JSON.parse((rows[0] as { counters_json: string }).counters_json)).toEqual({ "action.launch": 3 });
   });
 
   it("a rated game updates the ratings and the history, and the next game builds on them", async () => {

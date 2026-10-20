@@ -1,7 +1,7 @@
 """The stateless HTTP service around the engine (run it with `uvicorn seti_engine.service:app`).
 
 Every request carries the whole game state; nothing is kept between requests, so any number of instances can serve one game (decision D5).
-Endpoints: POST /new, POST /apply, POST /legal, POST /project, PUT /archive, PUT /errors, GET /schema, GET /health.
+Endpoints: POST /new, POST /apply, POST /legal, POST /project, POST /stats, PUT /archive, PUT /errors, GET /schema, GET /health.
 Callers sign their requests (request_auth.py, decision D16); deploy the service private as well (Cloud Run IAM).
 See docs/deploy-engine.md.
 """
@@ -17,7 +17,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from . import archive_store, engine, request_auth
+from . import archive_store, engine, replay, request_auth, stats
+from .models import Options
 from .projection import View, project
 from .protocol import (
     PROTOCOL_VERSION,
@@ -81,6 +82,22 @@ def legal(req: LegalRequest) -> LegalResponse:
 @app.post("/project", response_model=View)
 def project_view(req: ProjectRequest) -> View:
     return project(req.state, req.viewer)
+
+
+class StatsRequest(BaseModel):
+    options: Options
+    actions: list[dict[str, Any]]
+
+
+@app.post("/stats")
+def game_stats(req: StatsRequest) -> dict[str, Any]:
+    """The statistics of a game that was played to its end (stats.py), from its options and its actions: the engine replays it."""
+    file = {
+        "format": replay.FORMAT,
+        "header": {"options": req.options.model_dump()},
+        "actions": [{"seq": i, "action": a} for i, a in enumerate(req.actions)],
+    }
+    return stats.game_stats(file)
 
 
 class ArchiveRequest(BaseModel):

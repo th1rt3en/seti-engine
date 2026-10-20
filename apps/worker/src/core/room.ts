@@ -5,7 +5,7 @@ import type { GameState, Options, View } from "@seti/protocol";
 import { type Archive, type ReplayFile, actionPath, headerOf, headerPath, replayOf, replayPath, resultPath } from "./archive.js";
 import type { Identity } from "./auth.js";
 import * as clocks from "./clock.js";
-import type { Action, Engine } from "./engine.js";
+import type { Action, Engine, GameStats } from "./engine.js";
 import { IllegalAction } from "./engine.js";
 import { type PublicEntry, publicEntry } from "./publicLog.js";
 import { shuffledSeats } from "./seating.js";
@@ -85,6 +85,8 @@ export interface ResultSink {
   recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void>;
   /** An administrator cancelled a game that was being played: it ends without a result, and no rating changes. */
   recordCancelled(meta: Meta): Promise<void>;
+  /** The statistics of a game that was played to its end (the sink may leave them out). */
+  recordStats?(meta: Meta, result: Result, stats: GameStats): Promise<void>;
 }
 
 export interface Deps {
@@ -489,6 +491,21 @@ export class GameRoom {
     await this.broadcastViews();
     for (const c of this.d.connections()) c.send({ t: "ended", result });
     this.archiveSoon();
+    if (reason === "completed") this.recordStatsSoon(meta, result, log);
+  }
+
+  /** The statistics of a game that was played to its end are made by the engine and stored in the background; a failure only leaves the game out of them. */
+  private recordStatsSoon(meta: Meta, result: Result, log: LogEntry[]): void {
+    const { engine, sink } = this.d;
+    if (!engine.stats || !sink.recordStats) return;
+    const work = engine
+      .stats(
+        meta.options,
+        log.map((e) => e.action),
+      )
+      .then((stats) => sink.recordStats?.(meta, result, stats))
+      .catch(() => undefined);
+    this.d.defer?.(work);
   }
 
   // --- the archive (decision D25) --------------------------------------------------------------------------------------------

@@ -193,6 +193,20 @@ describe("the end of a game", () => {
     expect(await t.room.submit(alice, 4, { type: "score" })).toMatchObject({ ok: false, code: "not_playing" });
   });
 
+  it("the statistics of a completed game are made by the engine and recorded; a game that was cancelled or resigned has none", async () => {
+    const t = await started(true, 4);
+    for (let i = 0; i < 4; i++) await t.room.submit(i % 2 === 0 ? alice : bob, i, { type: "score" });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(t.sink.statsRecorded).toHaveLength(1);
+    expect(t.sink.statsRecorded[0]?.stats.players).toHaveLength(2);
+    expect(t.sink.statsRecorded[0]?.stats.players[0]?.counters).toEqual({ "action.score": 4 });
+    const u = await started(true, 4);
+    await u.room.submit(alice, 0, { type: "score" });
+    await u.room.resign(alice);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(u.sink.statsRecorded).toHaveLength(0);
+  });
+
   it("an unrated game is never rated", async () => {
     const t = await started(false, 2);
     await t.room.submit(alice, 0, { type: "score" });

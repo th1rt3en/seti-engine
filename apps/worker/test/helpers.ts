@@ -2,7 +2,7 @@
 import type { GameState, Options, StepResult, View } from "@seti/protocol";
 import type { Archive } from "../src/core/archive.js";
 import type { Identity } from "../src/core/auth.js";
-import { type Action, type Engine, IllegalAction } from "../src/core/engine.js";
+import { type Action, type Engine, type GameStats, IllegalAction } from "../src/core/engine.js";
 import {
   type Connection,
   type Deps,
@@ -10,6 +10,7 @@ import {
   GameRoom,
   type LogEntry,
   type Meta,
+  type Result,
   type ResultSink,
   type ServerMessage,
   type Store,
@@ -62,6 +63,20 @@ export class FakeEngine implements Engine {
     const next = this.make(s.players.length, s.played + 1, (s.current_player + 1) % s.players.length, scores);
     return { state: next, events: [], legal: [{ type: "score" }] } as unknown as StepResult;
   }
+  async stats(options: Options, actions: Action[]): Promise<GameStats> {
+    return {
+      version: 1,
+      expansion: false,
+      species: ["anomalies", "mascamites"],
+      rounds: 5,
+      players: Array.from({ length: Math.max(options.players, 1) }, (_, seat) => ({
+        seat,
+        org: null,
+        org_offered: [],
+        counters: { "action.score": actions.filter((a) => a.type === "score").length },
+      })),
+    };
+  }
   async project(state: GameState, viewer: number | null): Promise<View> {
     return {
       viewer,
@@ -89,6 +104,10 @@ export class RecordingSink implements ResultSink {
   }
   async recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void> {
     this.ends.push({ rec: structuredClone(rec), log });
+  }
+  statsRecorded: { meta: Meta; stats: GameStats }[] = [];
+  async recordStats(meta: Meta, _result: Result, stats: GameStats): Promise<void> {
+    this.statsRecorded.push({ meta: structuredClone(meta), stats });
   }
   cancelled: Meta[] = [];
   async recordCancelled(meta: Meta): Promise<void> {

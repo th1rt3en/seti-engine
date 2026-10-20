@@ -1,5 +1,6 @@
 // Reads for the lobby, the leaderboard and the profiles.
 import type { Db } from "./db";
+import type { StatFilter, StatRow } from "./stats";
 
 export interface LobbyGame {
   id: string;
@@ -411,4 +412,60 @@ export function gameRatingChanges(db: Db, gameId: string): Promise<GameRatingCha
      WHERE h.game_id = ? ORDER BY h.rank, u.name`,
     gameId,
   );
+}
+
+/** The players of the finished games that match a filter, with the counters of the engine (lib/stats.ts averages them). Only games played to their end are stored. */
+export async function statRows(db: Db, filter: StatFilter): Promise<StatRow[]> {
+  const where: string[] = [];
+  const values: unknown[] = [];
+  if (filter.players !== null) {
+    where.push("s.players = ?");
+    values.push(filter.players);
+  }
+  if (filter.expansion !== null) {
+    where.push("s.expansion = ?");
+    values.push(filter.expansion ? 1 : 0);
+  }
+  if (filter.rated !== null) {
+    where.push("s.rated = ?");
+    values.push(filter.rated ? 1 : 0);
+  }
+  const rows = await db.all<{
+    game_id: string;
+    seat: number;
+    user_id: string;
+    players: number;
+    rated: number;
+    expansion: number;
+    rank: number;
+    won: number;
+    score: number;
+    org: string | null;
+    org_offered_json: string;
+    species_json: string;
+    counters_json: string;
+    elo: number | null;
+  }>(
+    `SELECT s.game_id, s.seat, s.user_id, s.players, s.rated, s.expansion, s.rank, s.won, s.score, s.org, s.org_offered_json, s.species_json,
+            s.counters_json, h.rating_after - h.rating_before AS elo
+       FROM game_stats s LEFT JOIN rating_history h ON h.game_id = s.game_id AND h.user_id = s.user_id
+      ${where.length > 0 ? `WHERE ${where.join(" AND ")}` : ""}`,
+    ...values,
+  );
+  return rows.map((r) => ({
+    gameId: r.game_id,
+    seat: r.seat,
+    userId: r.user_id,
+    players: r.players,
+    rated: r.rated === 1,
+    expansion: r.expansion === 1,
+    rank: r.rank,
+    won: r.won === 1,
+    score: r.score,
+    org: r.org,
+    orgOffered: JSON.parse(r.org_offered_json) as string[],
+    species: JSON.parse(r.species_json) as string[],
+    counters: JSON.parse(r.counters_json) as Record<string, number>,
+    eloDelta: r.rated === 1 ? r.elo : null,
+  }));
 }

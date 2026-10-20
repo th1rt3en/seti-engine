@@ -1,6 +1,7 @@
+import type { GameStats } from "./engine.js";
 // The D1 result sink: games, players, logs and ratings (checkpoint writes only: the start and the end of a game, decision D6).
 import { settle } from "./ratings.js";
-import type { GameRecord, LogEntry, Meta, ResultSink } from "./room.js";
+import type { GameRecord, LogEntry, Meta, Result, ResultSink } from "./room.js";
 
 /** The part of the D1 API that is used (so a test can run it against SQLite). */
 export interface Db {
@@ -91,6 +92,39 @@ export class D1Sink implements ResultSink {
             ],
       ),
     ]);
+  }
+
+  /** The statistics of a game that was played to its end: a row for each player (migrations/0006_game_stats.sql). */
+  async recordStats(meta: Meta, result: Result, stats: GameStats): Promise<void> {
+    const rows = stats.players.flatMap((p) => {
+      const who = meta.seats[p.seat];
+      const ranked = result.ranking.find((r) => r.seat === p.seat);
+      if (!who || !ranked) return [];
+      return [
+        this.db
+          .prepare(
+            `INSERT OR REPLACE INTO game_stats (game_id, seat, user_id, players, rated, expansion, rank, won, score, org, org_offered_json, species_json, counters_json, ended_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          )
+          .bind(
+            meta.id,
+            p.seat,
+            who.id,
+            meta.seats.length,
+            meta.rated ? 1 : 0,
+            stats.expansion ? 1 : 0,
+            ranked.rank,
+            result.winners.includes(p.seat) ? 1 : 0,
+            ranked.score,
+            p.org,
+            JSON.stringify(p.org_offered),
+            JSON.stringify(stats.species),
+            JSON.stringify(p.counters),
+            meta.endedAt ?? 0,
+          ),
+      ];
+    });
+    if (rows.length > 0) await this.db.batch(rows);
   }
 
   async recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void> {

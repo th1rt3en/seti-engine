@@ -14,12 +14,23 @@ export class IllegalAction extends Error {
   }
 }
 
+/** The statistics of a game that was played to its end (the engine's stats.py): the counters of each player. */
+export interface GameStats {
+  version: number;
+  expansion: boolean;
+  species: string[];
+  rounds: number;
+  players: { seat: number; org: string | null; org_offered: string[]; counters: Record<string, number> }[];
+}
+
 export interface Engine {
   newGame(options: Options): Promise<StepResult>;
   /** Throws `IllegalAction` for a move that is not legal. */
   apply(state: GameState, action: Action): Promise<StepResult>;
   /** What `viewer` may see of the state (null for a spectator). */
   project(state: GameState, viewer: number | null): Promise<View>;
+  /** The statistics of a finished game, from its options and its actions (the engine replays it). */
+  stats?(options: Options, actions: Action[]): Promise<GameStats>;
 }
 
 export class HttpEngine implements Engine {
@@ -60,6 +71,12 @@ export class HttpEngine implements Engine {
   async project(state: GameState, viewer: number | null): Promise<View> {
     const { status, json } = await this.post<View>("/project", { state, viewer });
     if (status !== 200) throw new Error(`engine /project failed with ${status}`);
+    return json;
+  }
+
+  async stats(options: Options, actions: Action[]): Promise<GameStats> {
+    const { status, json } = await this.post<GameStats>("/stats", { options, actions });
+    if (status !== 200) throw new Error(`engine /stats failed with ${status}`);
     return json;
   }
 }
