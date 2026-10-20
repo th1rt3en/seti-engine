@@ -39,6 +39,16 @@ class RandomBot:
         return rng.choice(_options(view))
 
 
+def _sectors_led(state: GameState, me: int) -> int:
+    """The number of sectors in which the seat has more markers than any other player."""
+    n = 0
+    for sec in state.sectors:
+        mine = sec.markers.count(me)
+        if mine and all(mine > sec.markers.count(o) for o in range(len(state.players)) if o != me):
+            n += 1
+    return n
+
+
 def _board_value(state: GameState, p: PlayerState, w: dict[str, float], rm: float = 1.0, sm: float = 1.0, tech_values: dict[str, float] | None = None) -> float:
     """The value of a position for a seat: its score plus weights for what turns into score later. `rm` scales the resources and `sm` the structures
     (probes, techs, orbiters ...): at the end of a game a resource that is not spent is worth nothing."""
@@ -64,6 +74,8 @@ def _board_value(state: GameState, p: PlayerState, w: dict[str, float], rm: floa
         + w["trace"] * len(p.trace_log)
         + w["win"] * p.sector_wins
         + w["marker"] * markers
+        + w.get("lead", 0.0) * _sectors_led(state, p.index)
+        + w.get("token", 0.0) * p.signal_tokens
     )
     total: float = p.score + rm * resources + sm * structures
     return total
@@ -112,6 +124,8 @@ class LookaheadBot:
         res_by_round: list[float] | None = None,
         struct_by_round: list[float] | None = None,
         tech_values: dict[str, float] | None = None,
+        org_bias: dict[str, float] | None = None,
+        quick_bias: dict[str, float] | None = None,
     ) -> None:
         self.name = name
         self.weights = weights
@@ -123,6 +137,8 @@ class LookaheadBot:
         self.res_by_round = res_by_round or [1.0] * 5  # how much the resources count in each round (they are worth less as the game ends)
         self.struct_by_round = struct_by_round or [1.0] * 5
         self.tech_values = tech_values
+        self.org_bias = org_bias or {}  # the expansion: how much each organization is liked when it is chosen
+        self.quick_bias = quick_bias or {}  # and each quick start card
 
     def _value(self, state: GameState, p: PlayerState) -> float:
         r = max(1, min(state.round, 5)) - 1
@@ -146,6 +162,10 @@ class LookaheadBot:
             elif gain <= 0:
                 gain -= 0.001 * (1 + rng.random())  # a move that does nothing is worse than ending the turn only when nothing else gives value
             gain += self.bias.get(m["type"], 0.0)
+            if m["type"] == "choose_org":
+                gain += self.org_bias.get(str(m.get("org")), 0.0)
+            elif m["type"] == "choose_quick":
+                gain += sum(self.quick_bias.get(c, 0.0) for c in m.get("cards", []))
             if m["type"] == "pass" and not state.main_done:
                 gain -= self.use_the_turn
             if self.no_scan_in_round_1 and m["type"] == "scan" and state.round == 1:
@@ -191,9 +211,12 @@ def from_spec(spec: dict[str, Any]) -> LookaheadBot:
         noise=spec.get("noise", 0.05),
         bias=spec.get("bias"),
         no_scan_in_round_1=spec.get("no_scan_r1", False),
+        use_the_turn=spec.get("use_the_turn", 0.0),
         res_by_round=spec.get("res"),
         struct_by_round=spec.get("struct"),
         tech_values=spec.get("tech"),
+        org_bias=spec.get("org_bias"),
+        quick_bias=spec.get("quick_bias"),
     )
 
 

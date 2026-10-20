@@ -211,3 +211,10 @@ way to handle the hidden cards (determinization: sample the cards the seat canno
 (the score gained at each decision), and the end-of-game points are added to the last decision. Stalling must not pay: games have a step limit and an
 unfinished game is penalised (our first run learned to play longer and longer games, up to 244,000 decisions in 96 games, with the score falling). The
 move that only takes back (undo) is not offered to the agent.
+
+## 12. Pause and resume (owner, 2026-10-20)
+
+The training must be able to be paused and resumed at will, so that the owner can use the PC for something else: a checkpoint at the end of every round, a pause
+command that frees the processor and the graphics card within seconds, and a resume that goes on exactly from the checkpoint. Details and the commands are in
+`docs/AI-DECISIONS.md`, section 15. The plan includes the expansion (organizations and quick start cards) and a consent warning when a model is added to a lobby
+(sections 2 and 14 there).

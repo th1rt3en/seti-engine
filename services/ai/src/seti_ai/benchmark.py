@@ -49,7 +49,7 @@ def main() -> None:
                         logits, value = net(batch)
                     loss = logits.float().logsumexp(dim=1).mean() + value.float().mean()
                     opt.zero_grad()
-                    loss.backward()  # type: ignore[no-untyped-call]
+                    loss.backward()
                     opt.step()
                 else:
                     with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):

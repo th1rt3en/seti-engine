@@ -25,7 +25,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from . import arena, bots, features, registry
+from . import arena, bots, checkpoint, features, registry
 from .agent import PRESETS, VALUE_SCALE, NNAgent, PolicyNet, Step, collate, net_from, new_net, save_net
 from .server import Client, start_server
 
@@ -245,7 +245,9 @@ def load_into_server(req_q: Any, ctl_q: Any, path: str) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["bc", "ppo", "eval"])
+    ap.add_argument("cmd", choices=["bc", "ppo", "eval", "pause", "status"])
+    ap.add_argument("--resume", action="store_true", help="ppo: go on from the checkpoint of the last full round")
+    ap.add_argument("--fresh", action="store_true", help="ppo: start over and forget the checkpoint")
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 4) - 2))
     ap.add_argument("--games", type=int, default=96, help="games per iteration (ppo) or for the copy (bc)")
     ap.add_argument("--epochs", type=int, default=6)
@@ -262,6 +264,20 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     root = Path(a.models)
     root.mkdir(parents=True, exist_ok=True)
+    if a.cmd == "pause":
+        checkpoint.request_pause(root)
+        print("a pause is requested: the run finishes the games in progress, then stops")
+        return
+    if a.cmd == "status":
+        print(checkpoint.status(root))
+        return
+    if a.cmd == "ppo":
+        if checkpoint.exists(root) and not (a.resume or a.fresh):
+            raise SystemExit(f"there is a checkpoint ({checkpoint.status(root)}): use --resume to go on or --fresh to start over")
+        if a.fresh:
+            checkpoint.path(root).unlink(missing_ok=True)
+        checkpoint.clear_pause(root)
+        checkpoint.install_signal_handler()
     server, req_q, resp_qs, ctl_q, ctx = start_server(a.workers, device.type)
     counter = ctx.Value("i", 0)
     try:
@@ -285,12 +301,21 @@ def main() -> None:
                 load_into_server(req_q, ctl_q, str(Path(a.model) / "model.pt"))
                 print(evaluate(pool, a.eval_games))
             else:
-                net = net_from(str(Path(a.start) / "model.pt"), device) if a.start else new_net(a.preset).to(device)
-                opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=0.01)
                 weights = str(root / "_current.pt")
-                parent = Path(a.start).name if a.start else None
-                best = -1e9
-                for it in range(1, a.iters + 1):
+                if a.resume and checkpoint.exists(root):
+                    net, opt_state, meta, rng_state = checkpoint.load(root, device)
+                    opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=0.01)
+                    opt.load_state_dict(opt_state)
+                    checkpoint.restore_rng(rng_state)
+                    first, best, parent = int(meta["iteration"]) + 1, float(meta["best"]), meta.get("parent")
+                    print(f"resuming after round {meta['iteration']} (best score against the heuristic bot {best})", flush=True)
+                else:
+                    net = net_from(str(Path(a.start) / "model.pt"), device) if a.start else new_net(a.preset).to(device)
+                    opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=0.01)
+                    parent = Path(a.start).name if a.start else None
+                    best, first = -1e9, 1
+                paused = False
+                for it in range(first, a.iters + 1):
                     t0 = time.time()
                     save_net(net, weights)
                     load_into_server(req_q, ctl_q, weights)
@@ -302,7 +327,15 @@ def main() -> None:
                             jobs.append({"kind": "self", "seed": seed})
                         else:
                             jobs.append({"kind": "bot", "opp": "heuristic" if r == 2 else "greedy", "seat": k % 2, "seed": seed})
-                    results = run_games(pool, jobs)
+                    results = []
+                    for c in range(0, len(jobs), 12):  # small batches, so that a pause is heard within a few seconds
+                        if checkpoint.pause_requested(root):
+                            paused = True
+                            break
+                        results += run_games(pool, jobs[c : c + 12])
+                    if paused:
+                        print(f"paused during round {it}: the checkpoint of round {it - 1} is the state to go on from (ppo --resume)", flush=True)
+                        break
                     trajs = [t for res in results for t in res["trajs"]]
                     finals = [t["final"] for t in trajs]
                     unfinished = sum(1 for res in results if not res["finished"])
@@ -338,6 +371,10 @@ def main() -> None:
                                 ev,
                             )
                             print(f"  saved as {v}", flush=True)
+                    checkpoint.save(root, net, opt, {"iteration": it, "best": best, "parent": parent, "args": {k: v for k, v in vars(a).items()}})
+                if paused or checkpoint.pause_requested(root):
+                    print("paused: the checkpoint is saved; the processor and the graphics card are free (ppo --resume to go on)", flush=True)
+                    checkpoint.clear_pause(root)
     finally:
         req_q.put(("stop",))
         server.join(timeout=10)

@@ -243,3 +243,19 @@ Requirements, to build with the bot seat (after the owner approves a version for
 5. Consent (decided by the owner, 2026-10-20): when a player adds a model to their lobby, the site warns them that the game data will be collected to train
    the models, and adding the model counts as agreeing to it. The warning is shown before the model is added, the agreement is recorded with the game (who agreed
    and when), and a game without a model is not collected for this. Players are named by a hash in the data.
+
+## 15. Pause and resume at will (owner, 2026-10-20)
+
+The training can be paused whenever the owner needs the PC, and resumed later from where it was. Built (`checkpoint.py`, `train.py`), not yet used on a real run:
+- **A checkpoint at the end of every round** with everything needed to go on: the network, the optimizer, the round number, the best score, the settings and the random
+  generators, so that the games after a pause are the same as if there had been none. It is written to a temporary file and moved into place, so a power cut cannot
+  leave a broken file.
+- **Pause:** `python -m seti_ai.train pause` (or Ctrl+C in the window, or a file `PAUSE` in the models folder). The run finishes the small batch of games being played
+  (a few seconds; the games are played 12 at a time for this), does not keep a half round, and exits, so the processor, the graphics card and the memory are free at once.
+- **Resume:** `python -m seti_ai.train ppo --resume` goes on from the checkpoint of the last full round (the loss is at most the round in progress, about two minutes).
+  Without `--resume` or `--fresh` a run refuses to start when a checkpoint exists, so that a checkpoint is never overwritten by mistake. `python -m seti_ai.train status`
+  says where the run is.
+- **If the machine is switched off or the process is killed:** the same checkpoint is there.
+- **The search and the replay buffer (when they are built):** the games are saved in files as they are finished and the buffer is part of the checkpoint, so a pause costs
+  no game. The warm start (copying the bots, about 5 minutes) is not paused: it is started again.
+- The tuning of the heuristic bot (`seti_ai.tune`) saves its best setting every 4 generations and can start again from it with `--resume`.
