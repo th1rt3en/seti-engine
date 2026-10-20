@@ -612,7 +612,7 @@ export function GameClient({
           : "Confirm",
       primary: true,
       title: m.type === "org_free" ? describeMove(m) : rowMoveText(m, v.state.card_row),
-      onClick: () => play(m),
+      onClick: () => playConfirmed(m), // the button on the card is the confirmation: no second question
     };
   });
   // taking a card that was picked is confirmed (or given up) on the card itself
@@ -1194,7 +1194,8 @@ export function GameClient({
         selectable: techMoves.map((m) => Number(m.stack)),
         selected: pickedTech,
         onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
-        onConfirm: techOption ? () => play(techOption) : undefined,
+        // the Confirm on the tech is the confirmation: the move shows the next tile of the stack, but no second question is asked
+        onConfirm: techOption ? () => playConfirmed(techOption) : undefined,
       }}
       context={contextNode}
       contextActions={contextActions}
