@@ -421,7 +421,7 @@ export function GameClient({
       };
     }
     const label = m.type === "tuck" ? `Tuck: ${info?.income ?? "no"} income` : handMoveText(m).replace(/\?$/, "");
-    return { key: `${m.type}-${i}`, label, title: handMoveText(m), onClick: () => play(m) };
+    return { key: `${m.type}-${i}`, label, primary: m.type === "tuck", title: handMoveText(m), onClick: () => play(m) };
   });
   // the main action is taken (or the card cannot be afforded): Play stays in sight, greyed out
   if (
