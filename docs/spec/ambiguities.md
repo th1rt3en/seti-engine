@@ -532,3 +532,12 @@ Entry format:
 - Questions for the owner: in which order are the six dedicated spaces filled?
 - Ruling (owner), 2026-10-19: reading (1), confirmed on the data check page: the dedicated spaces are filled in the order 1 top right, 2 upper middle, 3 left, 4 right middle, 5 lower middle, 6 bottom right. Space D (the printed blue space with the starting token) is sample space 0. The page draws the tokens there (`MASCAMITE_SAMPLE_SPACES` in `apps/web/src/lib/speciesSpaces.ts`).
 - Note (owner, 2026-10-19): when the species is revealed only 3 of the 9 blue spaces can be marked (the two printed blue spaces and the starting sample space); the six dedicated spaces appear as tokens are delivered. The engine does this (test in `tests/test_data_rules.py`).
+
+## A-057: Do the trace triggers of the Amoeba cards ET.15 and ET.16 count a trace for any species?
+- Status: ruled by the owner's report (2026-10-20), to be confirmed
+- Rule IDs affected: EXP-AMO-04, cards AM.15 (ET.15 Low-gravity Research) and AM.16 (ET.16 Automated Analysis)
+- Rulebook page and text: the triggered missions of these two cards show a trace of a color (blue on AM.15; pink and yellow on AM.16). Unlike AM.18 (ET.18 Scientific Papers), whose trigger carries the 'for this species' icon, they show no such icon (the verified transcription of the pictures says so: `docs/spec/data/expansion-transcription.json`, amo-03 and amo-04).
+- Readings: (1) a trace of that color on any species board, as the base cards without 'single species' (card-defs lines for the base missions); (2) only a trace for the Amoeba.
+- Consequence: with reading (2), a pink trace marked on another species gave no prompt to cover the circle of AM.16.
+- Ruling: reading (1). The owner marked a pink trace with AM.16 in play and got no prompt (2026-10-20). The cards are changed: AM.15 and AM.16 trigger on a trace of the color on any species board; AM.18 keeps 'for this species'. Tests in `tests/test_amoeba.py`.
+- Questions for the owner: please confirm this reading against the printed cards.

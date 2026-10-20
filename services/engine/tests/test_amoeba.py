@@ -155,3 +155,32 @@ def test_an_organelle_icon_with_no_organelle_of_its_color_asks_the_player_to_ski
     assert {"type": "skip_organelle", "color": "yellow"} in moves and not any(m["type"] == "pick_organelle" for m in moves)
     r = apply(s, {"type": "skip_organelle", "color": "yellow"})
     assert not r.state.pending and r.state.species[0].extra["organelles"] == {"P1": 4, "P2": 2, "IB": 0, "IP": 1, "B1": 3}
+
+
+def _mission_trigger_after_trace(card: str, slot: int, color: str) -> list[dict[str, object]]:
+    from seti_engine.models import MissionState
+
+    s = discovered()
+    s.species[1].species = "centaurians"
+    s.species[1].board = species.new_board("centaurians")
+    p = s.players[0]
+    s.current_player = 0
+    cards.play(s, p, p.hand[0], [])  # any card, to have the machinery in a play
+    s.pending, s.queue, s.playing = [], [], None
+    p.missions = [MissionState(card=card, kind="trigger", used=[False, False])]
+    rewards.place_trace(s, p, {"slot": slot, "space": "overflow", "color": color}, [])
+    return [d.data for d in s.pending if d.kind == "mission_trigger"]
+
+
+def test_automated_analysis_and_low_gravity_research_trigger_on_a_trace_of_any_species() -> None:  # AM.15, AM.16, A-057
+    for slot in (0, 1):  # the Amoeba board and another species' board
+        assert _mission_trigger_after_trace("AM.16", slot, "pink"), slot  # circle 1: a pink trace
+        assert _mission_trigger_after_trace("AM.16", slot, "yellow"), slot  # circle 2: a yellow trace
+        assert not _mission_trigger_after_trace("AM.16", slot, "blue"), slot
+        assert _mission_trigger_after_trace("AM.15", slot, "blue"), slot
+        assert not _mission_trigger_after_trace("AM.15", slot, "pink"), slot
+
+
+def test_scientific_papers_triggers_only_on_a_trace_for_the_amoeba() -> None:  # AM.18: "for this species" is printed
+    assert _mission_trigger_after_trace("AM.18", 0, "pink")
+    assert not _mission_trigger_after_trace("AM.18", 1, "pink")

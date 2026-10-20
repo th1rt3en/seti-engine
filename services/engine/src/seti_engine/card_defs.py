@@ -544,13 +544,13 @@ CARDS.update(
         },
         "AM.15": {
             "fx": [LAUNCH, _AM("yellow")],
-            "mission": trig(*(circle({"e": "trace", "kind": "blue", "species": "amoeba"}, data(1)) for _ in range(2))),
+            "mission": trig(*(circle({"e": "trace", "kind": "blue"}, data(1)) for _ in range(2))),  # A-057: no "for this species" printed
         },
         "AM.16": {
             "fx": [data(3), _AM("blue")],
             "mission": trig(
-                circle({"e": "trace", "kind": "pink", "species": "amoeba"}, data(1)),
-                circle({"e": "trace", "kind": "yellow", "species": "amoeba"}, data(1)),
+                circle({"e": "trace", "kind": "pink"}, data(1)),  # A-057: no "for this species" printed
+                circle({"e": "trace", "kind": "yellow"}, data(1)),
             ),
         },
         "AM.17": {
