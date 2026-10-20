@@ -685,3 +685,8 @@ table.shortcuts td:first-child {
 .kbdbtn {
   margin-left: 6px;
 }
+/* the organization card of the player has no dashed outline when its free action can be used: the action has its own button */
+.exppanel .orgcard.selectable {
+  outline: none;
+  animation: none;
+}
