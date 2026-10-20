@@ -51,6 +51,7 @@ const DECISION: Record<string, string> = {
   exertian_play: "play an Exertian card, or not",
   research_tech: "take a tech",
   computer_slot: "choose a computer slot",
+  pick_probe: "click one of your probes on the board",
   objective_task: "mark a task of an objective: click one of the highlighted tasks in the objectives panel",
 };
 

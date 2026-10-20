@@ -137,6 +137,8 @@ export function GameClient({
   // the glyph token picked for a hole of the translation board that takes several (with the hole it was picked for)
   const [pickedGlyph, setPickedGlyph] = useState<{ spot: string; glyph: string } | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
+  // a probe picked by a click on the board when a card asks for one (OSIRIS-REx and the like), waiting to be confirmed
+  const [chosenProbe, setChosenProbe] = useState<string | null>(null);
   const [extraEnergy, setExtraEnergy] = useState(0);
   // The moves still to send of a plan (a probe's whole way, with the energy it needs): each goes out when the view of the one before arrives.
   const plan = useRef<Move[]>([]);
@@ -219,6 +221,7 @@ export function GameClient({
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
+          setChosenProbe(null);
           setPickedSlot(null);
           setPickedGold(null);
           setExtraEnergy(0);
@@ -382,6 +385,7 @@ export function GameClient({
       m.type !== "buy_card" &&
       m.type !== "research" &&
       m.type !== "take_tech" &&
+      m.type !== "pick_probe" && // a probe is clicked on the board
       !(reach.length > 0 && (m.type === "move_energy" || m.type === "move_probe")),
   );
   // a free action that gives movement does nothing without a probe on the map
@@ -533,6 +537,8 @@ export function GameClient({
       : glyphChoices.length === 1
         ? glyphChoices[0]
         : glyphChoices.find((c) => pickedGlyph !== null && pickedGlyph.spot === spotOption?.id && pickedGlyph.glyph === c.glyph);
+  const probeMoves = mine.filter((m) => m.type === "pick_probe");
+  const probeMove = probeMoves.find((m) => m.probe === chosenProbe);
   const spotMove = spotOption === undefined ? undefined : mine[glyphChoice ? glyphChoice.move : glyphChoices ? -1 : spotOption.move];
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
@@ -698,6 +704,13 @@ export function GameClient({
         }),
       ],
       onCancel: () => setPendingMove(null),
+    };
+  } else if (probeMove) {
+    const at = v.state.probes.find((x) => x.id === probeMove.probe);
+    ask = {
+      text: `Confirm choosing this probe${at ? ` (ring ${at.ring}, sector ${at.sector})` : ""}?`,
+      buttons: [confirm("Confirm", () => play(probeMove))],
+      onCancel: () => setChosenProbe(null),
     };
   } else if (slotMove && slotTech) {
     ask = {
@@ -1210,22 +1223,30 @@ export function GameClient({
       rowFlash={rowMode !== null}
       row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
       interaction={
-        reach.length > 0
+        reach.length === 0 && probeMoves.length > 0
           ? {
-              probes: reach.map((r) => r.probe),
-              selected: probe?.probe ?? null,
-              onSelectProbe: (id) => {
-                setPendingMove(null);
-                setPickedProbe(id === pickedProbe ? null : id);
-              },
-              // once the destination is confirmed the spaces and their costs go away while the move is carried out
-              targets: waiting
-                ? []
-                : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
-              onTarget: (t) => setPendingMove(t),
-              chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
+              probes: probeMoves.map((m) => String(m.probe)),
+              selected: chosenProbe,
+              onSelectProbe: (id) => setChosenProbe(chosenProbe === id ? null : id),
+              targets: [],
+              onTarget: () => undefined,
             }
-          : undefined
+          : reach.length > 0
+            ? {
+                probes: reach.map((r) => r.probe),
+                selected: probe?.probe ?? null,
+                onSelectProbe: (id) => {
+                  setPendingMove(null);
+                  setPickedProbe(id === pickedProbe ? null : id);
+                },
+                // once the destination is confirmed the spaces and their costs go away while the move is carried out
+                targets: waiting
+                  ? []
+                  : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
+                onTarget: (t) => setPendingMove(t),
+                chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
+              }
+            : undefined
       }
       topExtra={
         <>
