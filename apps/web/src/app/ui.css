@@ -152,7 +152,7 @@ a.btn {
   line-height: 1.2;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s, transform 0.08s;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
 }
 button:hover:not(:disabled),
 .btn:hover,
@@ -162,10 +162,8 @@ a.btn:hover {
   border-color: var(--accent);
   text-decoration: none;
 }
-button:active:not(:disabled),
-.btn:active {
-  transform: translateY(1px);
-}
+/* a pressed button does not move (no rule for :active here): the old rule moved it by a pixel and, on a button that is placed with a transform
+   (the circles of a mission, the Confirm on a tech), replaced that transform, so the button jumped aside and the click was lost */
 button:focus-visible,
 .btn:focus-visible,
 a:focus-visible,
@@ -620,9 +618,6 @@ tbody tr:hover td {
   .segopt,
   .gamelist .game {
     transition: none;
-  }
-  button:active:not(:disabled) {
-    transform: none;
   }
 }
 
