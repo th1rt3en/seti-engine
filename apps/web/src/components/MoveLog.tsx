@@ -319,6 +319,12 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
       return `Round ${String(ev.round)} begins`;
     case "rotate":
       return `the solar system rotates (disc ${String(ev.disc)})`;
+    case "objectives_uncompleted":
+      // SOLO-OBJ-07: at the end of round 5 the rival scores 5 points for each objective that was not completed
+      return `${String(ev.count)} objective${Number(ev.count) === 1 ? " is" : "s are"} not completed: the rival scores 5 points for each (${Number(ev.count) * 5})`;
+    case "long_term_penalty":
+      return `${String(ev.tasks)} task${Number(ev.tasks) === 1 ? "" : "s"} of the long-term objectives not done: the rival advances ${String(ev.tasks)}`;
+
     case "objectives_spent":
       return `objectives spent: ${String(ev.spent)}${Number(ev.short) > 0 ? `, ${String(ev.short)} short: the rival advances` : ""}`;
     case "game_over":
