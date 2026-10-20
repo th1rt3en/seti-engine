@@ -170,7 +170,7 @@ def project(state: GameState, viewer: int | None) -> View:
             slot.species = HIDDEN
             slot.extra = {}
         else:
-            _hide_tokens(slot.extra)
+            _hide_tokens(slot.extra, viewer)
             if "supply" in slot.extra and slot.species == "glyphids":
                 slot.extra["supply"] = [HIDDEN] * len(slot.extra["supply"])  # EXP-GLY-03: the face-down stack of glyph tokens
             for key in ("explore_deck", "explore_aside"):  # EXP-ARK-01: the order and the cards set aside are secret
@@ -222,8 +222,11 @@ def project(state: GameState, viewer: int | None) -> View:
     )
 
 
-def _hide_tokens(extra: dict[str, Any]) -> None:
-    """Mascamite samples lie face down on Jupiter and Saturn: show how many, not which."""
+def _hide_tokens(extra: dict[str, Any], viewer: int | None) -> None:
+    """Mascamite samples lie face down on Jupiter and Saturn: everyone sees how many, and a player also sees the tokens they have looked at
+    (ALIEN-MASC-02); the others stay -1. What each player has seen is theirs alone."""
+    seen = extra.pop("seen", {})
+    known = set(seen.get(str(viewer), [])) if viewer is not None else set()
     samples = extra.get("samples")
     if isinstance(samples, dict):
-        extra["samples"] = {planet: [-1] * len(tokens) for planet, tokens in samples.items()}
+        extra["samples"] = {planet: [t if t in known else -1 for t in tokens] for planet, tokens in samples.items()}

@@ -576,3 +576,18 @@ def test_mascamite_setup_is_logged_without_revealing_the_face_down_samples() -> 
     placed = next(e for e in r.events if e["type"] == "samples_placed")
     assert placed["planets"] == {"jupiter": 3, "saturn": 3}
     assert placed["face_up"]["reward"] == species.sample_faces()[placed["face_up"]["token"]]
+
+
+def test_a_player_sees_the_samples_they_looked_at_and_the_others_stay_face_down() -> None:
+    """ALIEN-MASC-02: looking at the samples on a planet shows their faces to that player only (the projection, not a rule)."""
+    from seti_engine.projection import project
+
+    s = masc_game()
+    jup = list(s.species[0].extra["samples"]["jupiter"])
+    assert project(s, 0).state.species[0].extra["samples"]["jupiter"] == [-1, -1, -1]  # nobody has looked
+    p = s.players[0]
+    species.record_seen(s, p.index, ["jupiter"])
+    assert project(s, 0).state.species[0].extra["samples"]["jupiter"] == jup  # the player who looked
+    assert project(s, 1).state.species[0].extra["samples"]["jupiter"] == [-1, -1, -1]  # the other player
+    assert project(s, None).state.species[0].extra["samples"]["saturn"] == [-1, -1, -1]  # a spectator; Saturn was not looked at
+    assert "seen" not in project(s, 0).state.species[0].extra

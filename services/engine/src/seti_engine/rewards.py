@@ -85,6 +85,7 @@ def grant(
         elif t == "sample_peek":  # a Mascamite mission reward: look at Jupiter's or Saturn's samples and gain one's reward
             planets = [pl for pl in species.SAMPLE_PLANETS if species.samples_on(s, pl)]
             if planets:
+                species.record_seen(s, p.index, planets)
                 s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "peek", "planets": planets}))
         elif t == "signal_any":
             s.pending += [Decision(kind="signal", player=p.index, data={"color": "any"}) for _ in range(n)]

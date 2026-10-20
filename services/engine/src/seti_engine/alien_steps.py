@@ -90,10 +90,12 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
     elif t == "collect_sample":
         options = species.samples_on(s, st["planet"])
         if options:
+            species.record_seen(s, p.index, [st["planet"]])
             s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "collect", "planets": [st["planet"]]}))
     elif t == "sample_peek":
         planets = _peek_planets(s, p, st.get("probe", False))
         if planets:
+            species.record_seen(s, p.index, planets)
             s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "peek", "planets": planets}))
     elif t == "sig_next_anomaly":
         tok = next_anomaly(s)

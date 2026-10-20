@@ -268,6 +268,20 @@ def samples_on(s: GameState, planet: str) -> list[int]:
     return list(samples.get(planet, []))
 
 
+def record_seen(s: GameState, player: int, planets: list[str]) -> None:
+    """ALIEN-MASC-02: a player who looks at the samples on a planet has seen every token there. The page shows them their faces from then on
+    (the projection hides the tokens of the others); the memory is no rule: nothing in the game reads it."""
+    i = mascamite_slot(s)
+    if i is None:
+        return
+    seen: dict[str, list[int]] = s.species[i].extra.setdefault("seen", {})
+    mine = seen.setdefault(str(player), [])
+    for planet in planets:
+        for token in samples_on(s, planet):
+            if token not in mine:
+                mine.append(token)
+
+
 def return_exofossils(s: GameState, n: int) -> None:
     i = oumuamua_slot(s)
     if i is not None and n:

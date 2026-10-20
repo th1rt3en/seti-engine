@@ -62,6 +62,7 @@ import { TranslationBoard } from "./TranslationBoard";
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
+const cap = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
 /** The picture of a species board: the five of the base game and the three of the Space Agencies expansion. */
@@ -170,6 +171,8 @@ export function BoardView({
     discSeen.current[i] = angle;
     return turns;
   });
+  // the overlay of sample tokens: the stack on a planet (the faces that this player has seen, the others face down), or the sample of a capsule
+  const [sampleView, setSampleView] = useState<{ title: string; tokens: number[] } | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   // a gold scoring tile is shown larger, upright and with its markers when the pointer rests on it for a second (or when it is tapped)
   const [goldZoom, setGoldZoom] = useState<{ i: number; x: number; y: number } | null>(null);
@@ -540,16 +543,27 @@ export function BoardView({
             const piece = p.capsule ? (
               <g key={p.id}>
                 <Marker x={at.x + dx} y={at.y + dy} size={78} color={color(p.player)} title={title} />
-                {/* the sample token that the capsule carries: its face for its owner (who may look), its back for the others (ALIEN-MASC-04) */}
-                <image
-                  href={SAMPLES[p.sample !== null && p.sample !== undefined && p.sample >= 0 ? String(p.sample) : "back"] ?? SAMPLES.back}
-                  x={at.x + dx + 6}
-                  y={at.y + dy - 66}
-                  width={60}
-                  height={60}
+                {/* the sample token that the capsule carries moves with it: its back for everyone; its owner clicks it to look at the other side (ALIEN-MASC-04) */}
+                <g
+                  transform={`translate(${at.x + dx + 6} ${at.y + dy - 66})`}
+                  className={p.player === view.viewer ? "samplestack clickable" : "samplestack"}
+                  // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+                  role={p.player === view.viewer ? "button" : undefined}
+                  tabIndex={p.player === view.viewer ? 0 : undefined}
+                  aria-label={p.player === view.viewer ? "Look at the other side of the sample" : undefined}
+                  onClick={(e) => {
+                    if (p.player !== view.viewer || p.sample == null || p.sample < 0) return;
+                    e.stopPropagation();
+                    setSampleView({ title: "The sample that your capsule carries", tokens: [p.sample] });
+                  }}
+                  onKeyDown={(e) => {
+                    if (p.player === view.viewer && (e.key === "Enter" || e.key === " ") && p.sample != null && p.sample >= 0)
+                      setSampleView({ title: "The sample that your capsule carries", tokens: [p.sample] });
+                  }}
                 >
-                  <title>{p.player === view.viewer ? "The sample that this capsule carries" : "A sample, face down"}</title>
-                </image>
+                  <image href={SAMPLES.back} width={60} height={60} />
+                  <title>{p.player === view.viewer ? "Your sample: click to look at its other side" : "A sample, face down"}</title>
+                </g>
               </g>
             ) : (
               <ProbePiece key={p.id} x={at.x + dx} y={at.y + dy} size={100} color={color(p.player)} title={title} />
@@ -615,18 +629,8 @@ export function BoardView({
         {Object.entries(PLANET).map(([name, pos]) => {
           const st = s.planets[name];
           if (!st) return null;
-          const mascamites = s.species.find((sp) => sp.discovered && sp.species === "mascamites");
-          const samples = ((mascamites?.extra.samples ?? {}) as Record<string, number[]>)[name]?.length ?? 0;
           return (
             <g key={name}>
-              {/* the sample tokens lying face down on Jupiter and Saturn */}
-              {Array.from({ length: samples }, (_, k) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: identical face-down tokens, only their count matters
-                <g key={`sample-${name}-${k}`} transform={`translate(${pos.x + pos.r * 0.45 + k * 30} ${pos.y - pos.r * 0.75 - k * 14})`}>
-                  <title>{`${samples} sample${samples === 1 ? "" : "s"} face down on ${name}`}</title>
-                  <image href={SAMPLES.back} x={-38} y={-38} width={76} height={76} />
-                </g>
-              ))}
               {/* the orbiters lie on the ring around the planet, the first on the bonus space */}
               {st.orbiters.map((player, k) => {
                 const at = orbitSlot(name, k) ?? { x: pos.x, y: pos.y };
@@ -761,6 +765,39 @@ export function BoardView({
             );
           });
         })}
+
+        {/* Mascamites: the samples that still lie on Jupiter and Saturn are one stack beside the planet on the solar system, with how many are left
+            (ALIEN-MASC-01); a click shows the tokens: the faces this player has looked at, the others face down (ALIEN-MASC-02) */}
+        {(() => {
+          const masc = s.species.find((sp) => sp.discovered && sp.species === "mascamites");
+          const lying = (masc?.extra.samples ?? {}) as Record<string, number[]>;
+          return Object.entries(lying).map(([name, tokens]) => {
+            const cell = view.planet_cells?.[name];
+            if (!cell || tokens.length === 0) return null;
+            const at = polar(RING_RADIUS[cell[0] as number] ?? 485, sectorDegrees(cell[1] as number) + 10);
+            const title = `${tokens.length} sample${tokens.length === 1 ? "" : "s"} on ${cap(name)}: click to look`;
+            return (
+              <g
+                key={`stack-${name}`}
+                className="samplestack clickable"
+                transform={`translate(${at.x} ${at.y})`}
+                // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+                role="button"
+                tabIndex={0}
+                aria-label={title}
+                onClick={() => setSampleView({ title: `Samples on ${cap(name)}`, tokens })}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setSampleView({ title: `Samples on ${cap(name)}`, tokens })}
+              >
+                <title>{title}</title>
+                <image href={SAMPLES.back} x={-56} y={-56} width={112} height={112} />
+                <circle cx={44} cy={-44} r={27} className="stackcount" />
+                <text x={44} y={-33} textAnchor="middle" className="stackcounttext">
+                  {tokens.length}
+                </text>
+              </g>
+            );
+          });
+        })()}
 
         {/* the glyph tokens that still lie on the board (EXP-GLY-03): beside each planet, on each sector, on the wells of the Glyphids board
             (the ones on tech stacks are drawn on the stacks) */}
@@ -1134,6 +1171,7 @@ export function BoardView({
           </g>
         ))}
       </svg>
+      {sampleView ? <SampleOverlay title={sampleView.title} tokens={sampleView.tokens} onClose={() => setSampleView(null)} /> : null}
       {goldZoom && s.gold_tiles[goldZoom.i] ? (
         <GoldZoom
           tile={s.gold_tiles[goldZoom.i] as { tile: string; side: string }}
@@ -1146,6 +1184,36 @@ export function BoardView({
         />
       ) : null}
     </>
+  );
+}
+
+/** The tokens of a stack of samples, or the one a capsule carries, as they are for this player: a face where they have looked at it, the back where not. */
+function SampleOverlay({ title, tokens, onClose }: { title: string; tokens: number[]; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()} role="presentation">
+      {/* biome-ignore lint/a11y/useSemanticElements: an overlay with its own backdrop, not a native <dialog> */}
+      <div className="overlaybox" role="dialog" aria-modal="true" aria-label={title}>
+        <h2>{title}</h2>
+        <div className="sampleview">
+          {tokens.map((t, k) => (
+            <figure key={`${k}-${t}`}>
+              <img src={SAMPLES[t >= 0 ? String(t) : "back"] ?? SAMPLES.back} alt={t >= 0 ? "A sample, face up" : "A sample, face down"} />
+              <figcaption className="muted small">{t >= 0 ? "you have seen this side" : "face down: you have not looked at it"}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <button type="button" className="primary" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
