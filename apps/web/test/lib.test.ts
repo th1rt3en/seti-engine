@@ -563,6 +563,29 @@ describe("the lobby filter and the leaderboard search", () => {
     expect(await leaderboard(db, 100, "nobody")).toEqual([]);
   });
 
+  it("the versions of the AI model are listed newest first with their numbers, and one can be live", async () => {
+    const { botVersions } = await import("@/lib/queries");
+    const db = memory();
+    const row = (v: string, parent: string | null, live: number, approved: number, score: number) =>
+      db.run(
+        "INSERT INTO bot_versions (version, created, rules_version, parent, players, training_json, evaluation_json, approved, live) VALUES (?, '2026-10-20T10:00:00Z', 'abc1234', ?, 2, ?, ?, ?, ?)",
+        v,
+        parent,
+        JSON.stringify({ iterations: 10, games_per_iteration: 96 }),
+        JSON.stringify({ heuristic: { games: 20, agent_score: score, bot_score: 40, win_rate: 0.5 } }),
+        approved,
+        live,
+      );
+    await row("v001", null, 0, 0, 20);
+    await row("v002", "v001", 1, 1, 45);
+    const list = await botVersions(db);
+    expect(list.map((v) => v.version)).toEqual(["v002", "v001"]);
+    expect(list[0]).toMatchObject({ parent: "v001", live: true, approved: true, players: 2 });
+    expect(list[0]?.evaluation.heuristic?.agent_score).toBe(45);
+    expect(list[1]).toMatchObject({ live: false, approved: false });
+    expect(await botVersions(memory())).toEqual([]);
+  });
+
   it("the solo high scores: only finished solo games that were played to their end, best first, filtered by the rival difficulty", async () => {
     const { soloScores } = await import("@/lib/queries");
     const db = memory();

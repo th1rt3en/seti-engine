@@ -146,3 +146,17 @@ game needs the whole of step 4 and a lot of compute, and may not be reached. The
 2. Write the observation and action encoding with its tests.
 3. Build Bot 0 and Bot 1 and a small tool that plays N games between two bots and reports wins, scores and time.
 4. Report the numbers to the owner. They decide whether steps 2 to 4 are affordable.
+
+## 10. Decisions of the owner so far (2026-10-20) and where the work stands
+
+- **Offline bots for training only.** Random, greedy and heuristic bots exist in `services/ai/src/seti_ai/bots.py`. They are not part of the website.
+- **The objective is the agent's own final score**, starting with 2-player games (base game). The reward of a decision is the score its seat gains until
+  its next decision; the sum is the seat's own final score (`train.py`).
+- **Training happens on the owner's computer** (Windows, 12 cores, an RTX 3060). Nothing is trained in the cloud. `services/ai/run_training.sh` starts a run:
+  first a copy of the heuristic bot (behaviour cloning), then self-play with PPO, saving a numbered version when it improves.
+- **Only a versioned model is deployed**, and only after the owner approves it. Each version is a folder `models/vNNN/` with the weights and a manifest
+  (`registry.py`). `models/` is not in git.
+- **The statistics of every version are public.** `seti_ai.publish` writes the manifests of the versions to the table `bot_versions` of the site's database
+  (migration 0007) and the page `/bots` ("AI" in the menu) shows them to everybody: the final scores and the win rate against each training bot, how
+  the version was trained, which rules version, and which version (if any) is served to players.
+- Not built yet: the service that serves a version to a bot seat at a table, the data pipeline from human games, the search (step 4 of the plan).

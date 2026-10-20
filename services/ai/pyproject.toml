@@ -1,0 +1,45 @@
+[project]
+name = "seti-ai"
+version = "0.0.1"
+description = "Offline bots and self-play training for the SETI engine (fan project); not part of the website"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "seti-engine",
+  "numpy>=2.0",
+]
+
+[project.optional-dependencies]
+train = ["torch"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+  "mypy>=1.11",
+]
+
+[tool.uv.sources]
+seti-engine = { path = "../engine", editable = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/seti_ai"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 160
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+strict = true
+files = ["src"]
+ignore_missing_imports = true

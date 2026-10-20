@@ -550,3 +550,53 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
     ended_at: r.ended_at ?? 0,
   }));
 }
+
+export interface BotMatch {
+  games: number;
+  agent_score: number;
+  bot_score: number;
+  win_rate: number;
+}
+
+export interface BotVersion {
+  version: string;
+  created: string;
+  rules_version: string;
+  parent: string | null;
+  players: number;
+  training: Record<string, number | string>;
+  evaluation: Record<string, BotMatch>;
+  approved: boolean;
+  live: boolean;
+  note: string | null;
+}
+
+/** The versions of the AI model, newest first: what each is and how it played in the offline matches (services/ai, published by its publish tool). */
+export async function botVersions(db: Db): Promise<BotVersion[]> {
+  const rows = await db.all<{
+    version: string;
+    created: string;
+    rules_version: string;
+    parent: string | null;
+    players: number;
+    training_json: string;
+    evaluation_json: string;
+    approved: number;
+    live: number;
+    note: string | null;
+  }>(
+    "SELECT version, created, rules_version, parent, players, training_json, evaluation_json, approved, live, note FROM bot_versions ORDER BY version DESC",
+  );
+  return rows.map((r) => ({
+    version: r.version,
+    created: r.created,
+    rules_version: r.rules_version,
+    parent: r.parent,
+    players: r.players,
+    training: JSON.parse(r.training_json) as Record<string, number | string>,
+    evaluation: JSON.parse(r.evaluation_json) as Record<string, BotMatch>,
+    approved: r.approved === 1,
+    live: r.live === 1,
+    note: r.note,
+  }));
+}
