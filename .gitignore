@@ -61,3 +61,6 @@ scratch/
 # The web-sized images the site serves are generated from them by tools/web/build_assets.py and are tracked in apps/web/public/assets.
 /assets/
 /docs/rules/
+
+# a saved copy of a web page for reading (third-party content, not part of the project)
+docs/A Quantified Guide*

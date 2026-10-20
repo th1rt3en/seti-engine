@@ -13,12 +13,11 @@ from __future__ import annotations
 import json
 import subprocess
 import time
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-import torch
-
-from .agent import PolicyNet
+from .agent import PolicyNet, save_net
 from .bots import BOT_VERSIONS
 
 
@@ -42,13 +41,15 @@ def save_version(root: Path, net: PolicyNet, parent: str | None, training: dict[
     version = next_version(root)
     folder = root / version
     folder.mkdir(parents=True, exist_ok=True)
-    torch.save({k: v.detach().cpu() for k, v in net.state_dict().items()}, folder / "model.pt")
+    save_net(net, str(folder / "model.pt"))
     manifest = {
         "version": version,
         "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "rules_version": rules_version(),
         "parent": parent,
         "players": training.get("players", 2),
+        "features": "v2: every entity of the view as a token (features.py)",
+        "network": {"config": asdict(net.cfg), "parameters": sum(p.numel() for p in net.parameters())},
         "opponent_bots": BOT_VERSIONS,  # the evaluation numbers are against these versions of the training bots
         "training": training,
         "evaluation": evaluation,

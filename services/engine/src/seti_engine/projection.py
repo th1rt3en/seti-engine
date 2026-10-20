@@ -207,6 +207,8 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
         if not slot.discovered:
             slot.species = HIDDEN
             slot.extra = {}
+            if not any(sp for spaces in slot.board.values() for sp in spaces):  # the number of spaces of a board tells which species it is
+                slot.board = {c: [[] for _ in range(5)] for c in ("pink", "yellow", "blue")}
         else:
             _hide_tokens(slot.extra, viewer)
             if "supply" in slot.extra and slot.species == "glyphids":

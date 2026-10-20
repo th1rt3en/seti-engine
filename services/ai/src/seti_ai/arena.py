@@ -15,7 +15,7 @@ from seti_engine import engine
 from seti_engine.models import GameState, Options
 from seti_engine.projection import View, project, to_act
 
-MAX_STEPS = 6000
+MAX_STEPS = 3000  # a game that is not over after this many decisions is stopped (the learner is penalised)
 
 
 @dataclass

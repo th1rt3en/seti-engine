@@ -47,3 +47,16 @@ def test_the_view_has_the_solar_system_after_each_of_the_next_rotations_and_the_
     solar.rotate(copy)
     assert pv[0].planet_cells == {k: list(solar.find_cell(copy, f"PLANET:{k.upper()}") or ()) for k in pv[0].planet_cells}
     assert [p["id"] for p in pv[0].probes] == [p.id for p in s.probes]
+
+
+def test_an_undiscovered_species_board_does_not_show_which_species_it_is() -> None:
+    """CLAUDE.md rule 6: the boards of the species have different numbers of spaces, so a face-down board is shown with the same blank shape."""
+    from seti_engine import species
+
+    shapes = []
+    for first in ("anomalies", "mascamites", "exertians"):
+        s = new_game(Options(players=2, seed=3))
+        s.species[0].species = first
+        s.species[0].board = species.new_board(first)
+        shapes.append(project(s, 0).state.species[0].board)
+    assert shapes[0] == shapes[1] == shapes[2]
