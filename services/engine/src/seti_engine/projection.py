@@ -96,6 +96,33 @@ class ProbeReach(BaseModel):
     label: str = ""  # what lies on the space the probe is on now, in words
 
 
+class RotationPreview(BaseModel):
+    """What the solar system would look like after the next rotation (ROTATE-01 to ROTATE-03), for the preview panel.
+    Nothing changes in the game. `disc` is the disc that turns (with every disc above it), `probes` the places of all probes afterwards,
+    and `pushed` how many probes were pushed by a disc that arrived over them."""
+
+    disc: int
+    disc_angles: list[int]
+    probes: list[dict[str, Any]]
+    planet_cells: dict[str, list[int]]
+    pushed: int = 0
+
+
+def rotation_preview(state: GameState) -> RotationPreview | None:
+    if state.phase != "play":
+        return None
+    copy = state.model_copy(deep=True)
+    disc = copy.rotations % 3 + 1
+    solar.rotate(copy)
+    return RotationPreview(
+        disc=disc,
+        disc_angles=list(copy.disc_angles),
+        probes=[{"id": p.id, "player": p.player, "ring": p.ring, "sector": p.sector, "capsule": p.capsule} for p in copy.probes],
+        planet_cells=_planet_cells(copy),
+        pushed=len(copy.pushed),
+    )
+
+
 class View(BaseModel):
     """The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act."""
 
@@ -111,6 +138,8 @@ class View(BaseModel):
     notes: list[dict[str, Any] | None] = Field(default_factory=list)
     # where each planet lies on the solar system now (ring, sector); the discs turn, so it changes (a visit is a move onto it, FAQ-18)
     planet_cells: dict[str, list[int]] = Field(default_factory=dict)
+    # the solar system after the next rotation, for the preview panel (nothing is played)
+    rotation_preview: RotationPreview | None = None
 
 
 def _planet_cells(state: GameState) -> dict[str, list[int]]:
@@ -219,6 +248,7 @@ def project(state: GameState, viewer: int | None) -> View:
         reach=reach,
         notes=notes,
         planet_cells=_planet_cells(state),
+        rotation_preview=rotation_preview(state),
     )
 
 

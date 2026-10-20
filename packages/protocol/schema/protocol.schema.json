@@ -1589,6 +1589,54 @@
       "title": "RivalState",
       "type": "object"
     },
+    "RotationPreview": {
+      "description": "What the solar system would look like after the next rotation (ROTATE-01 to ROTATE-03), for the preview panel.\nNothing changes in the game. `disc` is the disc that turns (with every disc above it), `probes` the places of all probes afterwards,\nand `pushed` how many probes were pushed by a disc that arrived over them.",
+      "properties": {
+        "disc": {
+          "title": "Disc",
+          "type": "integer"
+        },
+        "disc_angles": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Disc Angles",
+          "type": "array"
+        },
+        "planet_cells": {
+          "additionalProperties": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": "Planet Cells",
+          "type": "object"
+        },
+        "probes": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Probes",
+          "type": "array"
+        },
+        "pushed": {
+          "default": 0,
+          "title": "Pushed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "disc",
+        "disc_angles",
+        "planet_cells",
+        "probes",
+        "pushed"
+      ],
+      "title": "RotationPreview",
+      "type": "object"
+    },
     "SectorState": {
       "properties": {
         "capacity": {
@@ -1838,6 +1886,17 @@
           "title": "Reach",
           "type": "array"
         },
+        "rotation_preview": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RotationPreview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "state": {
           "$ref": "#/$defs/GameState"
         },
@@ -1877,6 +1936,7 @@
         "notes",
         "planet_cells",
         "reach",
+        "rotation_preview",
         "state",
         "to_act",
         "trackers",

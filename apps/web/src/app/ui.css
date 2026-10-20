@@ -776,3 +776,50 @@ table.shortcuts td:first-child {
   display: grid;
   gap: 4px;
 }
+/* the preview of the solar system */
+.solarbtn {
+  cursor: pointer;
+}
+.solarbtncircle {
+  fill: rgba(11, 15, 21, 0.85);
+  stroke: #fff;
+  stroke-width: 4;
+}
+.solarbtnsun {
+  fill: #ffb320;
+}
+.solarbtnarc {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.solarbtnhead {
+  fill: #fff;
+}
+.solarbtn:hover .solarbtncircle,
+.solarbtn:focus .solarbtncircle {
+  stroke: var(--accent);
+  fill: rgba(30, 40, 56, 0.95);
+}
+.overlaybox.solarpreview {
+  width: min(900px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+.solarsvg {
+  width: 100%;
+  height: auto;
+  max-height: 68vh;
+  background: #05080d;
+  border-radius: 10px;
+}
+.solarbuttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-start;
+}
+.solarbuttons button {
+  justify-self: auto;
+}

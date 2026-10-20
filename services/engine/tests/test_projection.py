@@ -29,3 +29,20 @@ def test_a_gain_that_does_not_fit_is_in_the_log() -> None:
     caps = [e for e in trail.events_of(s) if e["type"] == "capped"]
     assert [(e["kind"], e["n"]) for e in caps] == [("publicity", 2), ("data", 3)]
     assert all(e["player"] == 0 and e["source"] == {"kind": "card", "card": "1"} for e in caps)
+
+
+def test_the_view_has_the_solar_system_after_the_next_rotation_and_the_game_is_not_changed() -> None:
+    """ROTATE-02: the preview turns the discs on a copy; the probes of the discs that turn ride along."""
+    from seti_engine import solar
+
+    s = new_game(Options(players=2, seed=3))
+    s.phase = "play"  # the preview is made while the game is being played
+    before = s.model_dump()
+    v = project(s, 0)
+    assert s.model_dump() == before  # the game itself is not turned
+    pv = v.rotation_preview
+    assert pv is not None and pv.disc == 1 and pv.disc_angles == [(a + (1 if i < 1 else 0)) % 8 for i, a in enumerate(s.disc_angles)]
+    copy = s.model_copy(deep=True)
+    solar.rotate(copy)
+    assert pv.planet_cells == {k: list(solar.find_cell(copy, f"PLANET:{k.upper()}") or ()) for k in pv.planet_cells}
+    assert [p["id"] for p in pv.probes] == [p.id for p in s.probes]

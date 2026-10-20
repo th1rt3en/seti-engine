@@ -30,6 +30,7 @@ import {
   RING_RADIUS,
   STAR,
   STAR_BOARD_HOME,
+  SUN_SIZE,
   WIN_SPOTS,
   alienColumn,
   goldPlace,
@@ -57,13 +58,14 @@ import slotData from "../generated/slots.json";
 import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
 import { CARD_HOVER_EVENT } from "./CardImage";
 import { DataToken, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
+import { SolarPreview } from "./SolarPreview";
 import { TranslationBoard } from "./TranslationBoard";
 
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
-/** The Sun token fills the hole of the discs (the hole is about 215 board pixels wide, its glowing ring a little more). */
-const SUN_SIZE = 228;
+/** The radius of the button of the preview: just outside the last ring, between the sectors at 3 o'clock. */
+const SOLAR_BUTTON_RADIUS = 1030;
 const cap = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
@@ -174,6 +176,8 @@ export function BoardView({
     return turns;
   });
   // the overlay of sample tokens: the stack on a planet (the faces that this player has seen, the others face down), or the sample of a capsule
+  // the preview of the solar system and of its next rotation (a button between two sectors, at 3 o'clock)
+  const [solarOpen, setSolarOpen] = useState(false);
   const [sampleView, setSampleView] = useState<{ title: string; tokens: number[] } | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   // a gold scoring tile is shown larger, upright and with its markers when the pointer rests on it for a second (or when it is tapped)
@@ -561,7 +565,6 @@ export function BoardView({
                 <g
                   transform={`translate(${at.x + dx + 6} ${at.y + dy - 66})`}
                   className={p.player === view.viewer ? "samplestack clickable" : "samplestack"}
-                  // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
                   role={p.player === view.viewer ? "button" : undefined}
                   tabIndex={p.player === view.viewer ? 0 : undefined}
                   aria-label={p.player === view.viewer ? "Look at the other side of the sample" : undefined}
@@ -1087,6 +1090,27 @@ export function BoardView({
             })}
           </g>
         ) : null}
+        {(() => {
+          const at = polar(SOLAR_BUTTON_RADIUS, 0);
+          return (
+            <g
+              className="solarbtn"
+              transform={`translate(${at.x} ${at.y}) scale(1.3)`}
+              // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+              role="button"
+              tabIndex={0}
+              aria-label="Preview the solar system and its next rotation"
+              onClick={() => setSolarOpen(true)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setSolarOpen(true)}
+            >
+              <title>Preview the solar system and its next rotation</title>
+              <circle r={44} className="solarbtncircle" />
+              <circle r={18} className="solarbtnsun" />
+              <path d="M-30 0 A30 30 0 0 1 22 -22" className="solarbtnarc" />
+              <path d="M22 -34 L22 -14 L4 -22 Z" className="solarbtnhead" />
+            </g>
+          );
+        })()}
         {lastMove ? (
           <g className="lastmove" pointerEvents="none">
             {lastMove.sectors.map((i) => (
@@ -1185,6 +1209,7 @@ export function BoardView({
           </g>
         ))}
       </svg>
+      {solarOpen ? <SolarPreview view={view} names={names} onClose={() => setSolarOpen(false)} /> : null}
       {sampleView ? <SampleOverlay title={sampleView.title} tokens={sampleView.tokens} onClose={() => setSampleView(null)} /> : null}
       {goldZoom && s.gold_tiles[goldZoom.i] ? (
         <GoldZoom

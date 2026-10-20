@@ -214,6 +214,12 @@ export type Cells = ReachCell[];
 export type Label1 = string;
 export type Probe1 = string;
 export type Reach = ProbeReach[];
+export type Disc = number;
+export type DiscAngles1 = number[];
+export type Probes1 = {
+  [k: string]: unknown;
+}[];
+export type Pushed1 = number;
 export type ToAct = number | null;
 export type DangerBoard = number;
 export type DangerCards = number | null;
@@ -533,6 +539,7 @@ export interface View {
   notes: Notes;
   planet_cells: PlanetCells;
   reach: Reach;
+  rotation_preview: RotationPreview | null;
   state: GameState;
   to_act: ToAct;
   trackers: Trackers;
@@ -567,6 +574,21 @@ export interface ReachCell {
   label: Label;
   path: Path;
   to: To;
+}
+/**
+ * What the solar system would look like after the next rotation (ROTATE-01 to ROTATE-03), for the preview panel.
+ * Nothing changes in the game. `disc` is the disc that turns (with every disc above it), `probes` the places of all probes afterwards,
+ * and `pushed` how many probes were pushed by a disc that arrived over them.
+ */
+export interface RotationPreview {
+  disc: Disc;
+  disc_angles: DiscAngles1;
+  planet_cells: PlanetCells1;
+  probes: Probes1;
+  pushed: Pushed1;
+}
+export interface PlanetCells1 {
+  [k: string]: number[];
 }
 /**
  * What the tracker beside the board shows for one player. Everything here is public information.
