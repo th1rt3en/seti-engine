@@ -123,7 +123,16 @@ def relative_view(view: View) -> dict[str, Any]:
             "reach": True,
             "rotation_previews": True,
             "planet_cells": True,
-            "state": {"undo": True, "undo_log": True, "trail": True, "log": True, "rng_state": True, "final_scores": True, "winners": True, "options": {"seed": True}},
+            "state": {
+                "undo": True,
+                "undo_log": True,
+                "trail": True,
+                "log": True,
+                "rng_state": True,
+                "final_scores": True,
+                "winners": True,
+                "options": {"seed": True},
+            },
         },
     )
     n = len(d["state"]["players"])
@@ -137,7 +146,7 @@ def relative_view(view: View) -> dict[str, Any]:
         if counts.get(key):
             counts[key] = _reorder(counts[key], me)
     # the board markers of the species are lists of lists of players: renumber them with the rest
-    rel = relative({"state": st, "counts": counts, "trackers": d["trackers"], "to_act": d.get("to_act")}, me, n)
+    rel: dict[str, Any] = relative({"state": st, "counts": counts, "trackers": d["trackers"], "to_act": d.get("to_act")}, me, n)
     rel["state"]["players"] = [dict(p, index=(i)) for i, p in enumerate(rel["state"]["players"])]
     return rel
 
@@ -229,9 +238,38 @@ class Tokens:
         return int(self.kinds.shape[0])
 
 
-def encode_view(view: View) -> Tokens:
+HISTORY_LEN = 48  # how many of the last actions of both seats the agent remembers
+CARD_PUBLIC = {"play_card", "discard_free", "discard", "cover", "complete_mission", "decline_cover", "discard_corner", "show_card", "choose_org"}
+
+
+def public_action(action: dict[str, Any]) -> dict[str, Any]:
+    """An action as the other seat saw it happen: a card is named when it was played or discarded face up, and not when it went into the hand or under
+    the income card (the identity of those is not seen)."""
+    t = action.get("type")
+    return {k: ("?" if k == "card" and t not in CARD_PUBLIC else v) for k, v in action.items()}
+
+
+def history_tokens(history: list[tuple[int, dict[str, Any]]], me: int, n: int) -> list[tuple[str, dict[int, float]]]:
+    """The memory: one token for each of the last actions of both seats, newest first (who, in turn order from the seat to act; the type; the parameters)."""
+    out: list[tuple[str, dict[int, float]]] = []
+    for age, (seat, action) in enumerate(reversed(history[-HISTORY_LEN:])):
+        a = public_action(action)
+        t = str(a.get("type"))
+        who = (seat - me) % n
+        names = [f"hist|who={who}", f"hist|type={t}", f"hist|who={who}|type={t}", f"hist|age={min(age, 15)}", f"hist|age={min(age, 15)}|who={who}"]
+        for k, v in a.items():
+            if k == "type":
+                continue
+            s = ",".join(map(str, v)) if isinstance(v, (list, tuple)) else str(v)
+            names += [f"hist|{t}:{k}={s}", f"hist|{k}={s}"]
+        out.append((f"hist:{age}", {_slot(f): 1.0 for f in names}))
+    return out
+
+
+def encode_view(view: View, history: list[tuple[int, dict[str, Any]]] | None = None) -> Tokens:
     """The tokens of a view: one for each player, sector, planet, probe, tech stack, gold tile, species, pending decision, tracker, one for each card
-    in front of a seat or in the row, and one for the rest of the game. The same view always gives the same tokens."""
+    in front of a seat or in the row, one for each of the last actions of both seats (the memory) and one for the rest of the game.
+    The same view and history always give the same tokens."""
     data = relative_view(view)
     ents: dict[str, tuple[str, dict[int, float]]] = {}
 
@@ -260,6 +298,10 @@ def encode_view(view: View) -> Tokens:
                 _walk(f"state.{k}", v, add, add_card)
         else:
             _walk(top, sub, add, add_card)
+    if history:
+        me = view.viewer if view.viewer is not None else 0
+        for key, acc in history_tokens(history, me, len(view.state.players)):
+            ents[key] = ("hist", acc)
     kinds = np.empty(len(ents), dtype=np.int32)
     offsets = np.zeros(len(ents) + 1, dtype=np.int32)
     idx_parts: list[int] = []

@@ -39,11 +39,15 @@ def play_game(players: list[Any], seed: int, rng: random.Random | None = None, o
     opts = Options(players=len(players), seed=seed, **(options or {}))
     r = engine.start(opts)
     steps = 0
+    history: list[tuple[int, dict[str, Any]]] = []  # the actions of both seats so far: the memory of the agent
+    for p in players:
+        p.history = history
     while r.legal and steps < MAX_STEPS:
         seat = to_act(r.state)
         assert seat is not None
         view: View = project(r.state, seat, previews=False)
         i = players[seat].act(r.state, view, rng)
+        history.append((seat, dict(view.legal[i])))
         r = engine.apply(r.state, view.legal[i])
         steps += 1
     done = r.state.phase == "finished"

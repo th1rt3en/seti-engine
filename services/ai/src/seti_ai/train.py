@@ -67,11 +67,12 @@ class _Recorder:
 
     def __init__(self, bot: Any, helper: NNAgent) -> None:
         self.bot, self.helper, self.name = bot, helper, bot.name
+        self.history: list[tuple[int, dict[str, Any]]] | None = None
 
     def act(self, state: Any, view: Any, rng: random.Random) -> int:
         a: int = self.bot.act(state, view, rng)
         keep = [i for i, m in enumerate(view.legal) if m["type"] != "undo"] or list(range(len(view.legal)))
-        tokens = features.encode_view(view)
+        tokens = features.encode_view(view, self.history)
         toks, nums = features.encode_moves(view, keep)
         self.helper.steps.append(Step(tokens, toks, nums, keep.index(a) if a in keep else 0, 0.0, 0.0, state.players[view.viewer].score, view.viewer))
         return a
@@ -163,7 +164,9 @@ def bc_train(net: PolicyNet, trajs: list[dict[str, Any]], epochs: int, device: t
         print(f"  bc epoch {ep + 1}/{epochs}: loss {tot / cnt:.3f}, picks the bot's move {acc / cnt:.1%} ({cnt} decisions)", flush=True)
 
 
-def ppo_update(net: PolicyNet, opt: torch.optim.Optimizer, trajs: list[dict[str, Any]], device: torch.device, epochs: int = 2, batch: int = 64) -> dict[str, float]:
+def ppo_update(
+    net: PolicyNet, opt: torch.optim.Optimizer, trajs: list[dict[str, Any]], device: torch.device, epochs: int = 2, batch: int = 64
+) -> dict[str, float]:
     steps: list[Step] = []
     adv_all: list[float] = []
     ret_all: list[float] = []
@@ -224,7 +227,12 @@ def evaluate(pool: Any, games: int, opponents: tuple[str, ...] = ("random", "gre
             mine.append(a)
             theirs.append(b)
             wins += 1.0 if a > b else 0.5 if a == b else 0.0
-        out[opp] = {"games": games, "agent_score": round(float(np.mean(mine)), 1), "bot_score": round(float(np.mean(theirs)), 1), "win_rate": round(wins / games, 3)}
+        out[opp] = {
+            "games": games,
+            "agent_score": round(float(np.mean(mine)), 1),
+            "bot_score": round(float(np.mean(theirs)), 1),
+            "win_rate": round(wins / games, 3),
+        }
         print(f"  vs {opp}: agent {out[opp]['agent_score']} against {out[opp]['bot_score']} (wins {out[opp]['win_rate']:.0%}, {games} games)", flush=True)
     return out
 
@@ -300,7 +308,8 @@ def main() -> None:
                     t1 = time.time()
                     stats = ppo_update(net, opt, trajs, device)
                     print(
-                        f"iter {it}: {len(results)} games ({unfinished} not finished), {sum(len(t['steps']) for t in trajs)} decisions, own score {np.mean(finals):.1f}, "
+                        f"iter {it}: {len(results)} games ({unfinished} not finished), "
+                        f"{sum(len(t['steps']) for t in trajs)} decisions, own score {np.mean(finals):.1f}, "
                         f"policy {stats['policy']:.3f} value {stats['value']:.3f} entropy {stats['entropy']:.2f} clipped {stats['clip']:.2f}, "
                         f"play {t1 - t0:.0f}s update {time.time() - t1:.0f}s",
                         flush=True,
@@ -312,7 +321,21 @@ def main() -> None:
                         key = ev["heuristic"]["agent_score"]
                         if key > best:
                             best = key
-                            v = registry.save_version(root, net, parent, {"iterations": it, "games_per_iteration": a.games, "lr": a.lr, "players": 2, "network": f"transformer {net.cfg.layers} layers, {net.cfg.d_model} wide, {sum(p.numel() for p in net.parameters()) / 1e6:.0f}M parameters", "features": "v2"}, ev)
+                            v = registry.save_version(
+                                root,
+                                net,
+                                parent,
+                                {
+                                    "iterations": it,
+                                    "games_per_iteration": a.games,
+                                    "lr": a.lr,
+                                    "players": 2,
+                                    "network": f"transformer {net.cfg.layers} layers, {net.cfg.d_model} wide, "
+                                    f"{sum(p.numel() for p in net.parameters()) / 1e6:.0f}M parameters",
+                                    "features": "v2",
+                                },
+                                ev,
+                            )
                             print(f"  saved as {v}", flush=True)
     finally:
         req_q.put(("stop",))

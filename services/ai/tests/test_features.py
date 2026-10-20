@@ -15,9 +15,7 @@ sys.path.insert(0, str(Path(__file__).parents[2] / "engine" / "tests"))
 
 
 def tokens_equal(a: features.Tokens, b: features.Tokens) -> bool:
-    return (
-        np.array_equal(a.kinds, b.kinds) and np.array_equal(a.offsets, b.offsets) and np.array_equal(a.idx, b.idx) and np.array_equal(a.val, b.val)
-    )
+    return np.array_equal(a.kinds, b.kinds) and np.array_equal(a.offsets, b.offsets) and np.array_equal(a.idx, b.idx) and np.array_equal(a.val, b.val)
 
 
 def play(seed: int, steps: int, **opts: object) -> GameState:
@@ -109,3 +107,34 @@ def test_a_discovered_species_and_its_own_state_are_seen() -> None:
     b = features.encode_view(project(plain, seat, previews=False))
     assert not np.array_equal(a.idx, b.idx)
     assert any(features._entity(p)[0] == "species.extra" for p in ("state.species[0].extra.tokens",))
+
+
+def test_the_memory_gives_a_token_for_each_of_the_last_actions_and_hides_a_card_that_went_unseen() -> None:
+    s = play(4, 60)
+    seat = to_act(s)
+    assert seat is not None
+    view = project(s, seat, previews=False)
+    history = [(0, {"type": "play_card", "card": "27"}), (1, {"type": "tuck", "card": "76"}), (0, {"type": "launch"})]
+    plain = features.encode_view(view)
+    with_memory = features.encode_view(view, history)
+    assert with_memory.count == plain.count + 3
+    other = [(0, {"type": "play_card", "card": "27"}), (1, {"type": "tuck", "card": "99"}), (0, {"type": "launch"})]
+    assert tokens_equal(with_memory, features.encode_view(view, other))  # which card was tucked is not seen
+    changed = [(0, {"type": "play_card", "card": "28"}), (1, {"type": "tuck", "card": "76"}), (0, {"type": "launch"})]
+    assert not tokens_equal(with_memory, features.encode_view(view, changed))  # a card that was played is seen
+    long = [(i % 2, {"type": "launch"}) for i in range(200)]
+    assert features.encode_view(view, long).count == plain.count + features.HISTORY_LEN
+
+
+def test_the_arena_keeps_the_history_of_both_seats() -> None:
+    from seti_ai import arena, bots
+
+    class Spy(bots.RandomBot):
+        seen = 0
+
+        def act(self, state, view, rng):  # type: ignore[no-untyped-def]
+            Spy.seen = max(Spy.seen, len(self.history))
+            return super().act(state, view, rng)
+
+    res = arena.play_game([Spy(), bots.RandomBot()], 3)
+    assert Spy.seen > 20 and res.finished

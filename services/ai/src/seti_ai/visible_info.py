@@ -41,7 +41,7 @@ def leaves(path: str, x: Any, out: dict[str, set[str]]) -> None:
 
 def species_states() -> list[GameState]:
     """Games with each species discovered (the helpers of the engine tests make the discovery)."""
-    from test_species import discover, game  # type: ignore[import-not-found]
+    from test_species import discover, game
 
     states: list[GameState] = []
     for first, second in (("anomalies", "centaurians"), ("exertians", "mascamites"), ("oumuamua", "anomalies")):
@@ -103,9 +103,9 @@ def main() -> None:
     for head, paths in groups.items():
         lines += [f"### {head}", ""]
         for p in paths:
-            vals = sorted(norm[p])
-            hidden = " (hidden: only the count)" if vals == ["'?'"] else ""
-            lines.append(f"- `{p}`: {', '.join(vals[:6])}{'...' if len(vals) > 6 else ''}{hidden}")
+            shown = sorted(norm[p])
+            hidden = " (hidden: only the count)" if shown == ["'?'"] else ""
+            lines.append(f"- `{p}`: {', '.join(shown[:6])}{'...' if len(shown) > 6 else ''}{hidden}")
         lines.append("")
     Path(a.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(norm)} paths from {len(states)} positions written to {a.out}")

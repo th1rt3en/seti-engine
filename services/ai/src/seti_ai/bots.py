@@ -8,7 +8,7 @@ computer and the board, never the identity of cards that were drawn (the hidden 
 from __future__ import annotations
 
 import random
-from typing import Protocol
+from typing import Any, Protocol
 
 from seti_engine import engine
 from seti_engine.models import GameState, PlayerState
@@ -39,21 +39,25 @@ class RandomBot:
         return rng.choice(_options(view))
 
 
-def _board_value(state: GameState, p: PlayerState, w: dict[str, float]) -> float:
+def _board_value(state: GameState, p: PlayerState, w: dict[str, float], rm: float = 1.0, sm: float = 1.0, tech_values: dict[str, float] | None = None) -> float:
+    """The value of a position for a seat: its score plus weights for what turns into score later. `rm` scales the resources and `sm` the structures
+    (probes, techs, orbiters ...): at the end of a game a resource that is not spent is worth nothing."""
     markers = sum(sec.markers.count(p.index) for sec in state.sectors)
     in_play = len([pr for pr in state.probes if pr.player == p.index and not pr.capsule])
-    total: float = (
-        p.score
-        + w["credit"] * p.credits
+    techs = sum((tech_values or {}).get(t, w["tech"]) for t in p.techs)
+    resources = (
+        w["credit"] * p.credits
         + w["energy"] * p.energy
         + w["data"] * p.data_pool
         + w["publicity"] * p.publicity
         + w["move"] * p.movement
         + w["card"] * len(p.hand)
-        + w["computer"] * sum(p.computer)
         + w["tuck"] * len(p.tucked)
+    )
+    structures = (
+        w["computer"] * sum(p.computer)
         + w["probe"] * in_play
-        + w["tech"] * len(p.techs)
+        + techs
         + w["orbit"] * sum(p.orbiters.values())
         + w["land"] * sum(p.landers.values())
         + w["mission"] * (len(p.completed_missions) + 0.5 * len(p.missions) + len(p.end_cards))
@@ -61,6 +65,7 @@ def _board_value(state: GameState, p: PlayerState, w: dict[str, float]) -> float
         + w["win"] * p.sector_wins
         + w["marker"] * markers
     )
+    total: float = p.score + rm * resources + sm * structures
     return total
 
 
@@ -103,6 +108,9 @@ class LookaheadBot:
         bias: dict[str, float] | None = None,
         no_scan_in_round_1: bool = False,
         use_the_turn: float = 0.0,
+        res_by_round: list[float] | None = None,
+        struct_by_round: list[float] | None = None,
+        tech_values: dict[str, float] | None = None,
     ) -> None:
         self.name = name
         self.weights = weights
@@ -111,11 +119,18 @@ class LookaheadBot:
         self.bias = bias or {}
         self.no_scan_in_round_1 = no_scan_in_round_1
         self.use_the_turn = use_the_turn  # passing before the main action of the turn is taken costs this much
+        self.res_by_round = res_by_round or [1.0] * 5  # how much the resources count in each round (they are worth less as the game ends)
+        self.struct_by_round = struct_by_round or [1.0] * 5
+        self.tech_values = tech_values
+
+    def _value(self, state: GameState, p: PlayerState) -> float:
+        r = max(1, min(state.round, 5)) - 1
+        return _board_value(state, p, self.weights, self.res_by_round[r], self.struct_by_round[r], self.tech_values)
 
     def act(self, state: GameState, view: View, rng: random.Random) -> int:
         seat = view.viewer
         assert seat is not None
-        base = _board_value(state, state.players[seat], self.weights)
+        base = self._value(state, state.players[seat])
         best, best_value = 0, -1e9
         for i in _options(view):
             m = view.legal[i]
@@ -123,7 +138,7 @@ class LookaheadBot:
                 nxt = engine.apply(state, m).state
             except Exception:  # a move that cannot be tried is not chosen
                 continue
-            gain = _board_value(nxt, nxt.players[seat], self.weights) - base
+            gain = self._value(nxt, nxt.players[seat]) - base
             # ending the turn or passing is the last choice while something else gives value, so that a turn is used before it is given up
             if m["type"] in TURN_ENDERS:
                 gain -= (0.5 if m["type"] == "end_turn" else 1.0) * self.scale  # something that gives value is done first
@@ -157,6 +172,23 @@ def heuristic() -> LookaheadBot:
 def model() -> LookaheadBot:
     """The values of the quantified model taken as they are (see MODEL); weaker than the heuristic bot."""
     return LookaheadBot("model", MODEL, scale=5.0, bias=MODEL_BIAS, no_scan_in_round_1=True, use_the_turn=USE_THE_TURN)
+
+
+def from_spec(spec: dict[str, Any]) -> LookaheadBot:
+    """A lookahead bot from a description: {"name", "base": "heuristic_v1" | "greedy" | "model", "weights": {overrides}, "bias": {...}, "res": [5 numbers],
+    "struct": [5 numbers], "tech": {tech id: value}, "no_scan_r1": bool, "noise": number}. Used to try variants of the heuristic bot."""
+    weights = dict({"greedy": GREEDY, "model": MODEL}.get(spec.get("base", "heuristic_v1"), HEURISTIC_V1))
+    weights.update(spec.get("weights", {}))
+    return LookaheadBot(
+        spec.get("name", "variant"),
+        weights,
+        noise=spec.get("noise", 0.05),
+        bias=spec.get("bias"),
+        no_scan_in_round_1=spec.get("no_scan_r1", False),
+        res_by_round=spec.get("res"),
+        struct_by_round=spec.get("struct"),
+        tech_values=spec.get("tech"),
+    )
 
 
 BOTS = {"random": RandomBot, "greedy": greedy, "heuristic_v1": heuristic_v1, "heuristic": heuristic, "model": model}

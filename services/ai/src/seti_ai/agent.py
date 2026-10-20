@@ -78,7 +78,7 @@ class PolicyNet(nn.Module):
         nn.init.normal_(self.cls, std=0.02)
         nn.init.normal_(self.feat.weight, std=0.02)
 
-    def encode(self, batch: Batch) -> torch.Tensor:
+    def encode(self, batch: Batch) -> tuple[torch.Tensor, torch.Tensor]:
         """The entities of a batch of positions: [B, 1 + T, d] (the first is the summary token)."""
         bag = self.feat(batch.idx, batch.offsets, per_sample_weights=batch.val)  # [N, d]
         tok = self.norm_in(bag + self.kind(batch.kinds))
@@ -87,11 +87,11 @@ class PolicyNet(nn.Module):
         x[batch.sample, batch.pos] = tok
         x = torch.cat([self.cls.expand(b, -1, -1), x], dim=1)
         pad = torch.cat([torch.zeros(b, 1, dtype=torch.bool, device=x.device), ~batch.mask], dim=1)
-        return self.norm_out(self.encoder(x, src_key_padding_mask=pad)), pad  # type: ignore[no-any-return,return-value]
+        return self.norm_out(self.encoder(x, src_key_padding_mask=pad)), pad
 
     def forward(self, batch: Batch) -> tuple[torch.Tensor, torch.Tensor]:
         """The logits of the moves [B, M] (-1e9 where there is no move) and the values [B]."""
-        memory, pad = self.encode(batch)  # type: ignore[misc]
+        memory, pad = self.encode(batch)
         e = self.tok(batch.toks).sum(dim=2)
         q = self.move_in(e + self.num(batch.nums))
         out = self.decoder(q, memory, tgt_key_padding_mask=~batch.move_mask, memory_key_padding_mask=pad)
@@ -155,9 +155,9 @@ def collate(steps: list[tuple[features.Tokens, NDArray[np.int32], NDArray[np.flo
     toks = np.zeros((b, m_max, steps[0][1].shape[1]), dtype=np.int64)
     nums = np.zeros((b, m_max, steps[0][2].shape[1]), dtype=np.float32)
     move_mask = np.zeros((b, m_max), dtype=bool)
-    for i, (_, tk, nm) in enumerate(steps):
-        m = tk.shape[0]
-        toks[i, :m], nums[i, :m], move_mask[i, :m] = tk, nm, True
+    for i, (_, mt, nm) in enumerate(steps):
+        m = mt.shape[0]
+        toks[i, :m], nums[i, :m], move_mask[i, :m] = mt, nm, True
 
     def t(a: NDArray[Any]) -> torch.Tensor:
         return torch.from_numpy(a).to(device)
@@ -189,13 +189,14 @@ class NNAgent:
         self.record = record
         self.temperature = temperature
         self.steps: list[Step] = []
+        self.history: list[tuple[int, dict[str, Any]]] | None = None  # set by the arena: the actions of both seats so far
 
     def act(self, state: GameState, view: View, rng: random.Random) -> int:
         seat = view.viewer
         assert seat is not None
         # a move that only takes back (undo) is not offered: the agent would use it to stall
         keep = [i for i, m in enumerate(view.legal) if m["type"] != "undo"] or list(range(len(view.legal)))
-        tokens = features.encode_view(view)
+        tokens = features.encode_view(view, self.history)
         toks, nums = features.encode_moves(view, keep)
         logits, value = self.net.evaluate(tokens, toks, nums)
         lg = torch.from_numpy(np.asarray(logits, dtype=np.float32)) / self.temperature
