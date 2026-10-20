@@ -145,6 +145,22 @@ export function BoardView({
     : null;
   const refSectors = view.state.sectors.flatMap((sec, i) => (hoverPlaces?.colors.includes(sec.color) ? [i] : []));
   const s = view.state;
+  // the angle of a disc runs from 0 to 7 steps and starts again at 0; drawn as it is, the disc would spin back the whole way when it passes 7 -> 0.
+  // The drawn angle is the turns counted without the wrap (the step that was made is the shortest way from the last angle that was seen).
+  const discTurns = useRef<number[]>([]);
+  const discSeen = useRef<number[]>([]);
+  const discDrawn = s.disc_angles.map((angle, i) => {
+    let turns = discTurns.current[i] ?? angle;
+    const before = discSeen.current[i];
+    if (before !== undefined) {
+      let step = (((angle - before) % 8) + 8) % 8;
+      if (step > 4) step -= 8;
+      turns += step;
+    }
+    discTurns.current[i] = turns;
+    discSeen.current[i] = angle;
+    return turns;
+  });
   const [hover, setHover] = useState<string | null>(null);
   // a gold scoring tile is shown larger, upright and with its markers when the pointer rests on it for a second (or when it is tapped)
   const [goldZoom, setGoldZoom] = useState<{ i: number; x: number; y: number } | null>(null);
@@ -393,7 +409,7 @@ export function BoardView({
               style={{
                 transformBox: "view-box",
                 transformOrigin: `${CENTER.x}px ${CENTER.y}px`,
-                transform: `rotate(${-45 * (s.disc_angles[n - 1] ?? 0)}deg)`,
+                transform: `rotate(${-45 * (discDrawn[n - 1] ?? 0)}deg)`,
               }}
             />
           );
