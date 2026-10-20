@@ -151,6 +151,9 @@ export function GameView({
   topExtra?: ReactNode;
 }) {
   const s = view.state;
+  // when the game is over the score is the final one (the board, the end-of-game cards, the gold tiles, the Exertian cards, the danger loss)
+  const finalTotal = (player: number): number | undefined =>
+    s.phase === "finished" ? (s.final_scores as { player?: number; total?: number }[]).find((f) => f.player === player)?.total : undefined;
   // exofossils exist once 'Oumuamua is face up: they show with the other resources (ALIEN-OUM-02)
   const oumuamua = s.species.some((sp) => sp.discovered && sp.species === "oumuamua");
   const prompt = promptOf(view, names);
@@ -204,9 +207,12 @@ export function GameView({
                   <ChipName player={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
                 )}
                 {p.organization ? <OrgName id={p.organization} className="orgname" /> : null}
-                <span className="res" title="Victory points">
+                <span
+                  className="res"
+                  title={finalTotal(p.index) === undefined ? "Victory points" : `Final score (the board scored ${p.score})`}
+                >
                   <ScoreIcon size={20} />
-                  <b>{p.score}</b>
+                  <b>{finalTotal(p.index) ?? p.score}</b>
                 </span>
                 {s.rival && p.index === s.rival.index ? null : (
                   <>

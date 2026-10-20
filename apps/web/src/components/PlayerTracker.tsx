@@ -78,6 +78,9 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
   const s = view.state;
   const who = (i: number): string => (s.rival && i === s.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`));
   const trackers = view.trackers ?? []; // an older engine does not send them
+  // when the game is over the score is the final one
+  const finalOf = (player: number): number | undefined =>
+    s.phase === "finished" ? (s.final_scores as { player?: number; total?: number }[]).find((f) => f.player === player)?.total : undefined;
   if (trackers.length === 0) return null;
   const columns = s.players.length + 1;
 
@@ -132,7 +135,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             <>
               <ScoreIcon size={18} /> Score
             </>,
-            trackers.map((t) => t.score),
+            trackers.map((t, i) => finalOf(i) ?? t.score),
             "score",
           )}
           {group("Income each round")}
