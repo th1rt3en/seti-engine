@@ -274,3 +274,9 @@ The training can be paused whenever the owner needs the PC, and resumed later fr
 ### Opponent pool (owner's answer: C)
 
 Self-play opponents are drawn from a pool (`models/pool.json`, code in `seti_ai/pool.py`): the network being trained, frozen snapshots of the network (v008 at about 100 points first, a version at about 150 points later, and the last six saved versions), and the heuristic bots (greedy, v3, and v4/v5 once they exist). Weights are in the file and can be changed by the owner. Snapshots that predate the memory features run without history. No training has been started; it waits for the owner's approval of the plan.
+
+### Heuristic v4: what was tried (2026-10-21)
+
+- Learned value function (`seti_ai/learned.py`, ridge regression of the final score on position counts per round, policy iteration, also with v3's value as a free feature): 9 to 22 points against v3, worse than v3 (41). The fit is confounded (positions with more resources come from players who acted less), so the marginal values it learns are wrong.
+- Bias terms for the actions that v008 plays more than v3 (place data 14.4 against 6.0 per game, research 4.6 against 2.0, traces 5.2 against 1.5, gold 18.7 points against 2.2): v3 40.6 to 57.3 points. Doubling or quadrupling them, or adding landing/tech weights: 54 to 56. Evolution strategy tuning of 71 parameters: also about 58 to 60.
+- Conclusion: a one-step lookahead bot tops out near 55 to 60. The plans that pay off over several moves (data to computer to analyze to traces, research for techs, gold tiles) are not visible to it.
