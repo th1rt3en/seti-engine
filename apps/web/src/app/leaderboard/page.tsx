@@ -10,6 +10,12 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
   return (
     <>
       <h1>Leaderboard</h1>
+      <nav className="libtabs" aria-label="Leaderboards">
+        <Link href="/leaderboard" aria-current="page">
+          Rated ranking
+        </Link>
+        <Link href="/leaderboard/solo">Solo high scores</Link>
+      </nav>
       <p className="muted">
         Elo rating from rated games with 2 to 4 players. Everyone starts at 0: a new player gains fast, nobody drops below 100, and a player
         below 100 loses nothing.

@@ -562,6 +562,46 @@ describe("the lobby filter and the leaderboard search", () => {
     expect((await leaderboard(db, 100, "_")).map((r) => r.name)).toEqual(["Ann_2"]);
     expect(await leaderboard(db, 100, "nobody")).toEqual([]);
   });
+
+  it("the solo high scores: only finished solo games that were played to their end, best first, filtered by the rival difficulty", async () => {
+    const { soloScores } = await import("@/lib/queries");
+    const db = memory();
+    const game = async (id: string, status: string, reason: string, options: object, name: string, score: number, rival: number) => {
+      await db.run(
+        "INSERT INTO games (id, status, reason, options_json, clock_json, rated, created_at, ended_at, result_json) VALUES (?, ?, ?, ?, '{}', 0, 1, 5, ?)",
+        id,
+        status,
+        reason,
+        JSON.stringify(options),
+        JSON.stringify({
+          finalScores: [
+            { player: 0, total: score },
+            { player: 1, total: rival },
+          ],
+        }),
+      );
+      await db.run(
+        "INSERT INTO game_players (game_id, seat, user_id, name, registered, rank, score) VALUES (?, 0, ?, ?, 1, 1, ?)",
+        id,
+        `u-${name}`,
+        name,
+        score,
+      );
+    };
+    await game("a", "finished", "completed", { players: 1, difficulty: 3 }, "Ann", 250, 200);
+    await game("b", "finished", "completed", { players: 1, difficulty: 5, expansion: true }, "Bob", 300, 320);
+    await game("c", "finished", "resigned", { players: 1, difficulty: 3 }, "Cy", 999, 0);
+    await game("d", "finished", "completed", { players: 1, difficulty: 3, sandbox: true }, "Dee", 998, 0);
+    await game("e", "finished", "completed", { players: 2 }, "Eve", 997, 0);
+    const any = { difficulty: null, expansion: null };
+    expect((await soloScores(db, any)).map((r) => [r.name, r.score, r.rival, r.difficulty])).toEqual([
+      ["Bob", 300, 320, 5],
+      ["Ann", 250, 200, 3],
+    ]);
+    expect((await soloScores(db, { ...any, difficulty: 3 })).map((r) => r.name)).toEqual(["Ann"]);
+    expect((await soloScores(db, { ...any, expansion: true })).map((r) => r.name)).toEqual(["Bob"]);
+    expect((await soloScores(db, { difficulty: 4, expansion: null })).length).toBe(0);
+  });
 });
 
 describe("the rating changes of a game", () => {

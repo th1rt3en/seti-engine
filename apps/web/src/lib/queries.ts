@@ -478,3 +478,75 @@ export async function gameStatRows(db: Db, gameId: string): Promise<{ seat: numb
   );
   return rows.map((r) => ({ seat: r.seat, counters: JSON.parse(r.counters_json) as Record<string, number> }));
 }
+
+export interface SoloScore {
+  game_id: string;
+  user_id: string;
+  name: string;
+  registered: boolean;
+  score: number;
+  /** the final score of the rival in that game */
+  rival: number | null;
+  difficulty: number;
+  expansion: boolean;
+  ended_at: number;
+}
+
+export interface SoloFilter {
+  /** the rival difficulty (gold stars, 1 to 5), or null for any */
+  difficulty: number | null;
+  expansion: boolean | null;
+}
+
+/** The best final scores of solo games that were played to their end (no sandbox game), highest first. */
+export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promise<SoloScore[]> {
+  const where = [
+    "g.status = 'finished'",
+    "g.reason = 'completed'",
+    "json_extract(g.options_json, '$.players') = 1",
+    "COALESCE(json_extract(g.options_json, '$.sandbox'), 0) = 0",
+  ];
+  const values: unknown[] = [];
+  if (filter.difficulty !== null) {
+    where.push("COALESCE(json_extract(g.options_json, '$.difficulty'), 3) = ?");
+    values.push(filter.difficulty);
+  }
+  if (filter.expansion !== null) {
+    where.push("COALESCE(json_extract(g.options_json, '$.expansion'), 0) = ?");
+    values.push(filter.expansion ? 1 : 0);
+  }
+  const rows = await db.all<{
+    game_id: string;
+    user_id: string;
+    name: string;
+    registered: number;
+    score: number;
+    rival: number | null;
+    difficulty: number;
+    expansion: number;
+    ended_at: number | null;
+  }>(
+    `SELECT g.id AS game_id, p.user_id, p.name, p.registered, p.score,
+            json_extract(g.result_json, '$.finalScores[1].total') AS rival,
+            COALESCE(json_extract(g.options_json, '$.difficulty'), 3) AS difficulty,
+            COALESCE(json_extract(g.options_json, '$.expansion'), 0) AS expansion,
+            g.ended_at
+       FROM games g JOIN game_players p ON p.game_id = g.id AND p.seat = 0
+      WHERE ${where.join(" AND ")} AND p.score IS NOT NULL
+      ORDER BY p.score DESC, g.ended_at ASC
+      LIMIT ?`,
+    ...values,
+    limit,
+  );
+  return rows.map((r) => ({
+    game_id: r.game_id,
+    user_id: r.user_id,
+    name: r.name,
+    registered: r.registered === 1,
+    score: r.score,
+    rival: r.rival,
+    difficulty: Number(r.difficulty),
+    expansion: Number(r.expansion) === 1,
+    ended_at: r.ended_at ?? 0,
+  }));
+}
