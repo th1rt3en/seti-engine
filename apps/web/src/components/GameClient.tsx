@@ -48,7 +48,7 @@ import { MovePreview } from "./MovePreview";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
-import { Cost } from "./Reward";
+import { Amount, Cost } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
@@ -399,7 +399,13 @@ export function GameClient({
       return {
         key: `${m.type}-${i}`,
         label:
-          info && info.cost > 0 ? `Play: ${info.cost} ${info.pays_energy ? "energy" : "credit"}${info.cost > 1 ? "s" : ""}` : "Play (free)",
+          info && info.cost > 0 ? (
+            <>
+              Play: <Amount kind={info.pays_energy ? "energy" : "credit"} n={info.cost} />
+            </>
+          ) : (
+            "Play (free)"
+          ),
         primary: true,
         title: handMoveText(m),
         onClick: () => play(m),
@@ -450,7 +456,14 @@ export function GameClient({
     ? [
         {
           key: "play",
-          label: exertianCost > 0 ? `Play face down (${exertianCost} credit)` : "Play face down",
+          label:
+            exertianCost > 0 ? (
+              <>
+                Play face down: <Amount kind="credit" n={exertianCost} />
+              </>
+            ) : (
+              "Play face down"
+            ),
           primary: true,
           title: describeMove(exertianMove),
           onClick: () => play(exertianMove),

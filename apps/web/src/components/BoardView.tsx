@@ -18,6 +18,7 @@ import {
   DISCOVERY,
   GOLD,
   GOLD_EXTRA,
+  GOLD_MARKER,
   GOLD_SLOTS,
   GOLD_WIDE,
   MOON,
@@ -139,7 +140,9 @@ export function BoardView({
     window.addEventListener(CARD_HOVER_EVENT, on);
     return () => window.removeEventListener(CARD_HOVER_EVENT, on);
   }, []);
-  const hoverPlaces = hoverCard ? ((cardPlaces as Record<string, { planets: string[]; colors: string[] }>)[hoverCard] ?? null) : null;
+  const hoverPlaces = hoverCard
+    ? ((cardPlaces as Record<string, { planets: string[]; visits: string[]; colors: string[] }>)[hoverCard] ?? null)
+    : null;
   const refSectors = view.state.sectors.flatMap((sec, i) => (hoverPlaces?.colors.includes(sec.color) ? [i] : []));
   const s = view.state;
   const [hover, setHover] = useState<string | null>(null);
@@ -329,7 +332,7 @@ export function BoardView({
                     key={`${player}-${at.x}`}
                     x={at.x}
                     y={at.y}
-                    size={84}
+                    size={GOLD_MARKER}
                     color={color(player)}
                     title={`${who(player)}: marker on the ${g.tile} tile`}
                   />
@@ -343,7 +346,7 @@ export function BoardView({
                     key={`low-${player}`}
                     x={at.x}
                     y={at.y}
-                    size={84}
+                    size={GOLD_MARKER}
                     color={color(player)}
                     title={`${who(player)}: marker on the lowest-scoring space of the ${g.tile} tile`}
                   />
@@ -999,6 +1002,13 @@ export function BoardView({
               const pos = PLANET[name];
               return pos ? <circle key={`rp${name}`} cx={pos.x} cy={pos.y} r={pos.r + 22} className="refshape" /> : null;
             })}
+            {/* a visit is a move onto the planet's space of the solar system, where the planet lies now (the discs turn) */}
+            {hoverPlaces.visits.map((name) => {
+              const cell = view.planet_cells?.[name];
+              if (!cell) return null;
+              const at = polar(RING_RADIUS[cell[0] as number] ?? 270, sectorDegrees(cell[1] as number));
+              return <circle key={`rv${name}`} cx={at.x} cy={at.y} r={52} className="refshape" />;
+            })}
           </g>
         ) : null}
         {lastMove ? (
@@ -1151,11 +1161,13 @@ function GoldZoom({
         <image href={info.src} x={0} y={0} width={GOLD.w} height={GOLD.h} />
         {markers.map((player, k) => {
           const slot = GOLD_SLOTS[goldSlot(k, low.length)] ?? { x: 0, y: 0 };
-          return <Marker key={`${player}-${slot.x}`} x={slot.x} y={slot.y} size={84} color={colorOf(player)} title={whoOf(player)} />;
+          return (
+            <Marker key={`${player}-${slot.x}`} x={slot.x} y={slot.y} size={GOLD_MARKER} color={colorOf(player)} title={whoOf(player)} />
+          );
         })}
         {low.map((player, j) => {
           const slot = GOLD_SLOTS[goldSlot(GOLD_WIDE + j, 0)] ?? { x: 0, y: 0 };
-          return <Marker key={`low-${player}`} x={slot.x} y={slot.y} size={84} color={colorOf(player)} title={whoOf(player)} />;
+          return <Marker key={`low-${player}`} x={slot.x} y={slot.y} size={GOLD_MARKER} color={colorOf(player)} title={whoOf(player)} />;
         })}
       </svg>
       <p>

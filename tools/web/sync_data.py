@@ -119,16 +119,22 @@ QUICK_PICTURES = {
 
 
 def card_places() -> dict[str, dict[str, list[str]]]:
-    """The planets and the sector colors that the effects and the missions of a card name (for the highlight when a card is hovered). A card that names none is left out."""
+    """The places that the effects and the missions of a card name (for the highlight when a card is hovered): `planets` are planets to orbit or land on
+    (the planet board), `visits` are planets to move a probe onto (the space of the solar system, where the planet lies now), `colors` are sector colors.
+    A card that names none is left out."""
     from seti_engine import card_defs
+
+    def add_planet(out: dict[str, set[str]], v: object, kind: str) -> None:
+        for pl in v if isinstance(v, list) else [v]:
+            if isinstance(pl, str) and pl not in ("*", "any", ""):
+                out[kind].add(pl.lower())
 
     def walk(x: object, out: dict[str, set[str]]) -> None:
         if isinstance(x, dict):
+            is_visit = x.get("k") == "visit" or x.get("e") == "visit"  # a visit is a move onto the planet's space (FAQ-18)
             for k, v in x.items():
                 if k in ("planet", "planets"):
-                    for pl in v if isinstance(v, list) else [v]:
-                        if isinstance(pl, str) and pl not in ("*", "any", ""):
-                            out["planets"].add(pl.lower())
+                    add_planet(out, v, "visits" if is_visit else "planets")
                 elif k == "color" and isinstance(v, str) and v in ("red", "yellow", "blue", "black"):
                     out["colors"].add(v)
                 walk(v, out)
@@ -138,10 +144,10 @@ def card_places() -> dict[str, dict[str, list[str]]]:
 
     res: dict[str, dict[str, list[str]]] = {}
     for cid, d in card_defs.CARDS.items():
-        out: dict[str, set[str]] = {"planets": set(), "colors": set()}
+        out: dict[str, set[str]] = {"planets": set(), "visits": set(), "colors": set()}
         walk(d, out)
-        if out["planets"] or out["colors"]:
-            res[cid] = {"planets": sorted(out["planets"]), "colors": sorted(out["colors"])}
+        if out["planets"] or out["visits"] or out["colors"]:
+            res[cid] = {k: sorted(v) for k, v in out.items()}
     return res
 
 

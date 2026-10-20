@@ -1,7 +1,8 @@
 {
 "1": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "jupiter",
 "saturn"
 ]
@@ -11,7 +12,8 @@
 "planets": [
 "neptune",
 "uranus"
-]
+],
+"visits": []
 },
 "101": {
 "colors": [
@@ -19,7 +21,8 @@
 "red",
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "116": {
 "colors": [
@@ -27,60 +30,70 @@
 "red",
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "12": {
 "colors": [],
 "planets": [
 "jupiter"
-]
+],
+"visits": []
 },
 "14": {
 "colors": [],
 "planets": [
 "mars"
-]
+],
+"visits": []
 },
 "2": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "mercury",
 "venus"
 ]
 },
 "20": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "mercury"
 ]
 },
 "21": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "venus"
 ]
 },
 "22": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "mars"
 ]
 },
 "23": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "jupiter"
 ]
 },
 "24": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "saturn"
 ]
 },
 "3": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "neptune",
 "uranus"
 ]
@@ -89,53 +102,62 @@
 "colors": [],
 "planets": [
 "mercury"
-]
+],
+"visits": []
 },
 "33": {
 "colors": [],
 "planets": [
 "venus"
-]
+],
+"visits": []
 },
 "34": {
 "colors": [],
 "planets": [
 "mars"
-]
+],
+"visits": []
 },
 "35": {
 "colors": [],
 "planets": [
 "jupiter"
-]
+],
+"visits": []
 },
 "36": {
 "colors": [],
 "planets": [
 "saturn"
-]
+],
+"visits": []
 },
 "37": {
 "colors": [
 "red"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "38": {
 "colors": [
 "red"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "39": {
 "colors": [
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "4": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "jupiter",
 "venus"
 ]
@@ -144,122 +166,142 @@
 "colors": [
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "41": {
 "colors": [
 "blue"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "42": {
 "colors": [
 "blue"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "43": {
 "colors": [
 "black"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "44": {
 "colors": [
 "black"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "48": {
 "colors": [
 "red"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "49": {
 "colors": [
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "5": {
 "colors": [],
 "planets": [
 "venus"
-]
+],
+"visits": []
 },
 "56": {
 "colors": [
 "blue"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "58": {
 "colors": [],
 "planets": [
 "uranus"
-]
+],
+"visits": []
 },
 "6": {
 "colors": [],
 "planets": [
 "jupiter"
-]
+],
+"visits": []
 },
 "60": {
 "colors": [],
 "planets": [
 "neptune"
-]
+],
+"visits": []
 },
 "7": {
 "colors": [],
 "planets": [
 "mercury"
-]
+],
+"visits": []
 },
 "8": {
 "colors": [],
 "planets": [
 "saturn"
-]
+],
+"visits": []
 },
 "AM.12": {
 "colors": [
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "AM.13": {
 "colors": [
 "blue"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "AM.15": {
 "colors": [
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "AM.16": {
 "colors": [
 "blue"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "AM.17": {
 "colors": [
 "blue",
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "ET.22": {
 "colors": [],
 "planets": [
 "oumuamua"
-]
+],
+"visits": []
 },
 "ET.24": {
 "colors": [
@@ -267,11 +309,13 @@
 "red",
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "ET.27": {
 "colors": [],
-"planets": [
+"planets": [],
+"visits": [
 "oumuamua"
 ]
 },
@@ -281,12 +325,14 @@
 "red",
 "yellow"
 ],
-"planets": []
+"planets": [],
+"visits": []
 },
 "SE_EN_02": {
 "colors": [],
 "planets": [
 "mars"
-]
+],
+"visits": []
 }
 }

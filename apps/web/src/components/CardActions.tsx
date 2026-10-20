@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 // Buttons laid over a card that the player has picked (a card of the hand, a card of the display): what can be done with it, each as a button on the
 // card itself. A button can be greyed out with the reason as its tooltip, or carry a warning (the move is allowed but gives nothing).
 export interface CardAction {
   key: string;
-  label: string;
+  label: ReactNode;
   onClick: () => void;
   primary?: boolean;
   disabled?: boolean;

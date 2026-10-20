@@ -531,6 +531,7 @@ export interface View {
   counts: Counts;
   legal: Legal3;
   notes: Notes;
+  planet_cells: PlanetCells;
   reach: Reach;
   state: GameState;
   to_act: ToAct;
@@ -549,6 +550,9 @@ export interface Counts {
   objective_stack: ObjectiveStack;
   rival_deck: RivalDeck;
   species_decks: SpeciesDecks;
+}
+export interface PlanetCells {
+  [k: string]: number[];
 }
 export interface ProbeReach {
   cells: Cells;

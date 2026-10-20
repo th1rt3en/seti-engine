@@ -13,7 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from . import cards, engine, move_notes, orgs, scoring, species, tables
+from . import cards, engine, move_notes, orgs, scoring, solar, species, tables
 from .models import GameState, PlayerState
 
 HIDDEN = "?"  # a hidden card, tile or token
@@ -109,6 +109,17 @@ class View(BaseModel):
     reach: list[ProbeReach] = Field(default_factory=list)
     # what each legal move means (where, cost, rewards), in the order of `legal`, for the confirmation on the page (move_notes.py)
     notes: list[dict[str, Any] | None] = Field(default_factory=list)
+    # where each planet lies on the solar system now (ring, sector); the discs turn, so it changes (a visit is a move onto it, FAQ-18)
+    planet_cells: dict[str, list[int]] = Field(default_factory=dict)
+
+
+def _planet_cells(state: GameState) -> dict[str, list[int]]:
+    out: dict[str, list[int]] = {}
+    for name in state.planets:
+        at = solar.find_cell(state, f"PLANET:{name.upper()}")
+        if at is not None:
+            out[name] = [at[0], at[1]]
+    return out
 
 
 def _label_of(state: GameState, probe_id: str) -> str:
@@ -198,7 +209,17 @@ def project(state: GameState, viewer: int | None) -> View:
             for pid, cells in engine.move_reach(state, state.players[viewer])
         ]
     notes = move_notes.notes(state, legal) if legal else []
-    return View(viewer=viewer, state=s, counts=counts, trackers=trackers, to_act=actor, legal=legal, reach=reach, notes=notes)
+    return View(
+        viewer=viewer,
+        state=s,
+        counts=counts,
+        trackers=trackers,
+        to_act=actor,
+        legal=legal,
+        reach=reach,
+        notes=notes,
+        planet_cells=_planet_cells(state),
+    )
 
 
 def _hide_tokens(extra: dict[str, Any]) -> None:

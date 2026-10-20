@@ -1821,6 +1821,16 @@
           "title": "Notes",
           "type": "array"
         },
+        "planet_cells": {
+          "additionalProperties": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": "Planet Cells",
+          "type": "object"
+        },
         "reach": {
           "items": {
             "$ref": "#/$defs/ProbeReach"
@@ -1865,6 +1875,7 @@
         "counts",
         "legal",
         "notes",
+        "planet_cells",
         "reach",
         "state",
         "to_act",

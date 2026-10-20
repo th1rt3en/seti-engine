@@ -276,11 +276,14 @@ export const GOLD_EXTRA = 350;
 
 /** Where the markers of the choosers sit on a tile (picture of 550 x 488): the first and the second chooser, then the wide space for the others. */
 export const GOLD_SLOTS = [
-  { x: 105, y: 248 },
-  { x: 228, y: 248 },
-  { x: 350, y: 248 },
-  { x: 425, y: 248 },
+  { x: 96, y: 255 },
+  { x: 217, y: 248 },
+  { x: 350, y: 250 },
+  { x: 452, y: 250 },
 ];
+/** The size of a marker on a tile: the disc of a marker is 0.88 of its size wide, and the round spaces are about 94 wide in the picture (the slots
+ * above are the middle of the space, moved up a little for the thickness of the marker); the wide space holds two markers side by side. */
+export const GOLD_MARKER = 106;
 
 /** The place of the first marker in the wide space of a tile: the third chooser, and any marker that Mission Relay has put there (EXP-ORG-13). */
 export const GOLD_WIDE = 2;
