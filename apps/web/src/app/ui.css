@@ -724,3 +724,55 @@ table.shortcuts td:first-child {
   height: 120px;
   object-fit: contain;
 }
+/* the tabs of the library and its grids of pictures */
+.libtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+.libtabs a {
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+.libtabs a:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.libtabs a[aria-current="page"] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.libgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+}
+.libgrid.wide {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+}
+.libgrid.aliens {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+.libgrid figure {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  min-width: 0;
+}
+.libgrid img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.libgrid figcaption {
+  display: grid;
+  gap: 4px;
+}

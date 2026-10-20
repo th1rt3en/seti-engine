@@ -276,6 +276,7 @@
     "white": "/assets/tiles/marker-plus15-white.2a91522f20.webp"
   },
   "moon": "/assets/discs/moon.42ba127546.webp",
+  "sun": "/assets/discs/sun.da983c8efd.webp",
   "objectives": {
     "L1-16-vp": "/assets/solo/objective-L1-16-vp.e1cbd1fb62.webp",
     "L1-5-data": "/assets/solo/objective-L1-5-data.99a66eba92.webp",

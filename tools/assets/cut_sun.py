@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 import pymupdf
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 pdf, out = sys.argv[1], sys.argv[2]
 doc = pymupdf.open(pdf)
@@ -24,5 +24,11 @@ rgba = im.copy()
 rgba.putalpha(al)
 box = al.point(lambda v: 255 if v > 20 else 0).getbbox()
 assert box is not None
-rgba.crop(box).save(out)
-print(rgba.crop(box).size)
+# the board has a round hole for the Sun: only the round top of the token is kept, as a disc (found on the 338 x 338 cut-out: middle and radius)
+cut = rgba.crop(box)
+cx, cy, r = 170, 135, 125
+disc = Image.new("L", cut.size, 0)
+ImageDraw.Draw(disc).ellipse([cx - r, cy - r, cx + r, cy + r], fill=255)
+cut.putalpha(Image.fromarray(np.minimum(np.asarray(cut.getchannel("A")), np.asarray(disc.filter(ImageFilter.GaussianBlur(1.5))))))
+cut.crop((cx - r, cy - r, cx + r, cy + r)).save(out)
+print(cut.size, "-> disc", 2 * r)

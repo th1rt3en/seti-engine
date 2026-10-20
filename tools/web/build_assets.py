@@ -94,6 +94,7 @@ BONUSES = {"vp3": "3vp", "card": "card", "energy": "energy", "publicity": "publi
 TILE_WIDTH = 175
 MOON_SOURCE = "texture-moon-disc.png"  # the moon token that marks the next disc to rotate
 MOON_SIZE = 160
+SUN_SOURCE = ROOT / "packages" / "assets" / "source" / "sun-rulebook.png"  # the Sun token, cut from the base rulebook (tools/assets/cut_sun.py)
 TWO_POINT_SOURCE = "tab-green-2vp-first-taker-tile.png"  # the +2 tile on top of each tech stack (turned half a turn like the stacks it lies on)
 RIVAL_BOARDS = ["1-2-star", "3-star", "4-star", "5-star"]
 RIVAL_BOARD_WIDTH = 1500  # shown at most about 900 CSS px wide
@@ -299,6 +300,9 @@ def main() -> None:
     moon = save(moon_img, "discs", "moon", quality=90, alpha_quality=95)
     provenance.append((MOON_SOURCE, moon, "the moon token that marks the next disc to rotate"))
 
+    sun = save(Image.open(SUN_SOURCE).convert("RGBA"), "discs", "sun", quality=92, alpha_quality=100)
+    provenance.append(("SETI-rulebook-EN-2024-09-17.pdf, page 2, item 5 (packages/assets/source/sun-rulebook.png)", sun, "the Sun token, its round top, cut from the rulebook picture"))
+
     back_img = Image.open(SRC / CARD_BACK_SOURCE).convert("RGBA")
     back_img = back_img.resize((300, round(300 * back_img.height / back_img.width)), Image.LANCZOS)
     card_back = save(back_img, "cards", "back", quality=82)
@@ -395,7 +399,7 @@ def main() -> None:
     (GEN / "assets.json").write_text(
         json.dumps(
             {"cards": cards, "discs": discs, "board": board, "starBoards": star_boards, "species": species, "stacks": stacks,
-             "publicity": publicity, "tiles": tiles, "moon": moon, "twoPoint": two_point, "cardBack": card_back, "background": background,
+             "publicity": publicity, "tiles": tiles, "moon": moon, "sun": sun, "twoPoint": two_point, "cardBack": card_back, "background": background,
              "rivalBoards": rival_boards, "objectives": objectives, "actionIcons": action_icons, "scoreIcon": score_icon, "rivalCards": rival_cards, "gold": gold, "alienBacks": alien_backs, "techFronts": tech_fronts, "samples": samples, "milestoneTiles": milestone_tiles},
             indent=1,
             sort_keys=True,

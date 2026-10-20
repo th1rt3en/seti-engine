@@ -62,6 +62,8 @@ import { TranslationBoard } from "./TranslationBoard";
 const DISCS = assets.discs as Record<string, string>;
 const TILES = assets.milestoneTiles as Record<string, string> & { white: string };
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
+/** The Sun token fills the hole of the discs (the hole is about 215 board pixels wide, its glowing ring a little more). */
+const SUN_SIZE = 228;
 const cap = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
@@ -426,6 +428,18 @@ export function BoardView({
             />
           );
         })}
+
+        {/* the Sun: the round top of its token (rulebook, page 2) stands in the round hole in the middle of the discs, which do not turn it */}
+        <image
+          href={assets.sun}
+          x={CENTER.x - SUN_SIZE / 2}
+          y={CENTER.y - SUN_SIZE / 2}
+          width={SUN_SIZE}
+          height={SUN_SIZE}
+          pointerEvents="none"
+        >
+          <title>The Sun</title>
+        </image>
 
         {s.sector_order.map((boardId, position) => {
           const home = STAR_BOARD_HOME[boardId] ?? position;
