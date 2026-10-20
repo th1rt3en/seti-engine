@@ -19,6 +19,7 @@ from typing import Any
 import torch
 
 from .agent import PolicyNet
+from .bots import BOT_VERSIONS
 
 
 def rules_version() -> str:
@@ -48,6 +49,7 @@ def save_version(root: Path, net: PolicyNet, parent: str | None, training: dict[
         "rules_version": rules_version(),
         "parent": parent,
         "players": training.get("players", 2),
+        "opponent_bots": BOT_VERSIONS,  # the evaluation numbers are against these versions of the training bots
         "training": training,
         "evaluation": evaluation,
         "approved": False,
