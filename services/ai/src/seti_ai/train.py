@@ -68,11 +68,12 @@ class _Recorder:
     def __init__(self, bot: Any, helper: NNAgent) -> None:
         self.bot, self.helper, self.name = bot, helper, bot.name
         self.history: list[tuple[int, dict[str, Any]]] | None = None
+        self.knowledge: Any = None
 
     def act(self, state: Any, view: Any, rng: random.Random) -> int:
         a: int = self.bot.act(state, view, rng)
         keep = [i for i, m in enumerate(view.legal) if m["type"] != "undo"] or list(range(len(view.legal)))
-        tokens = features.encode_view(view, self.history)
+        tokens = features.encode_view(view, self.history, self.knowledge)
         toks, nums = features.encode_moves(view, keep)
         self.helper.steps.append(Step(tokens, toks, nums, keep.index(a) if a in keep else 0, 0.0, 0.0, state.players[view.viewer].score, view.viewer))
         return a

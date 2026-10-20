@@ -50,7 +50,8 @@ class NetConfig:
 PRESETS = {
     "small": NetConfig(d_model=256, layers=4, heads=4, ffn=1024, move_layers=1),  # about 12M parameters: tests and quick experiments
     "base": NetConfig(d_model=512, layers=8, heads=8, ffn=2048, move_layers=2),  # about 45M: where training starts
-    "large": NetConfig(d_model=768, layers=12, heads=12, ffn=3072, move_layers=3),  # about 120M: the size of ZeusAI's network
+    "large": NetConfig(d_model=768, layers=12, heads=12, ffn=3072, move_layers=3),  # about 144M: the size of ZeusAI's network and more
+    "xlarge": NetConfig(d_model=1024, layers=16, heads=16, ffn=4096, move_layers=4),  # about 300M: larger than ZeusAI's; measured before it is chosen
 }
 
 
@@ -190,13 +191,14 @@ class NNAgent:
         self.temperature = temperature
         self.steps: list[Step] = []
         self.history: list[tuple[int, dict[str, Any]]] | None = None  # set by the arena: the actions of both seats so far
+        self.knowledge: Any = None  # set by the arena: the cards that the other seats are known to hold
 
     def act(self, state: GameState, view: View, rng: random.Random) -> int:
         seat = view.viewer
         assert seat is not None
         # a move that only takes back (undo) is not offered: the agent would use it to stall
         keep = [i for i, m in enumerate(view.legal) if m["type"] != "undo"] or list(range(len(view.legal)))
-        tokens = features.encode_view(view, self.history)
+        tokens = features.encode_view(view, self.history, self.knowledge)
         toks, nums = features.encode_moves(view, keep)
         logits, value = self.net.evaluate(tokens, toks, nums)
         lg = torch.from_numpy(np.asarray(logits, dtype=np.float32)) / self.temperature

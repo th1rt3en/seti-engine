@@ -266,10 +266,10 @@ def history_tokens(history: list[tuple[int, dict[str, Any]]], me: int, n: int) -
     return out
 
 
-def encode_view(view: View, history: list[tuple[int, dict[str, Any]]] | None = None) -> Tokens:
+def encode_view(view: View, history: list[tuple[int, dict[str, Any]]] | None = None, knowledge: Any = None) -> Tokens:
     """The tokens of a view: one for each player, sector, planet, probe, tech stack, gold tile, species, pending decision, tracker, one for each card
     in front of a seat or in the row, one for each of the last actions of both seats (the memory) and one for the rest of the game.
-    The same view and history always give the same tokens."""
+    one for each card that the other seats are known to hold. The same view, history and knowledge always give the same tokens."""
     data = relative_view(view)
     ents: dict[str, tuple[str, dict[int, float]]] = {}
 
@@ -298,6 +298,17 @@ def encode_view(view: View, history: list[tuple[int, dict[str, Any]]] | None = N
                 _walk(f"state.{k}", v, add, add_card)
         else:
             _walk(top, sub, add, add_card)
+    if knowledge is not None:  # the cards that the other seats took from the display or showed: known to be in their hands
+        me = view.viewer if view.viewer is not None else 0
+        n = len(view.state.players)
+        for seat in range(n):
+            if seat == me:
+                continue
+            for i, card in enumerate(knowledge.of(seat)):
+                rel = (seat - me) % n
+                acc = bucket_of(f"known:{rel}:{card}:{i}", "card:known_hand")
+                for f in (f"card={card}", f"known_hand:{rel}|card={card}", f"known_hand:{rel}|pos={min(i, 8)}"):
+                    acc[_slot(f)] = acc.get(_slot(f), 0.0) + 1.0
     if history:
         me = view.viewer if view.viewer is not None else 0
         for key, acc in history_tokens(history, me, len(view.state.players)):

@@ -90,7 +90,8 @@ MODEL = {
 }  # fmt: skip
 MODEL_BIAS = {"play_card": 5.0, "complete_mission": 5.0}
 USE_THE_TURN = 25.0  # passing before the main action of the turn is taken costs this much (model bot only)
-HEURISTIC = HEURISTIC_V1  # the weights of the first heuristic
+HEURISTIC_V2 = HEURISTIC_V1  # version 2: the weights of the first heuristic
+HEURISTIC = {**HEURISTIC_V1, "energy": 0.9}  # version 3: energy is worth more than credits (the guides: movement and landing use it up)
 HEURISTIC_BIAS = {"play_card": 1.0, "complete_mission": 1.0}  # the model's advice: cards are the core, and missions the best use of them
 TURN_ENDERS = ("pass", "end_turn")
 
@@ -164,8 +165,13 @@ def heuristic_v1() -> LookaheadBot:
     return LookaheadBot("heuristic_v1", HEURISTIC_V1)
 
 
-def heuristic() -> LookaheadBot:
+def heuristic_v2() -> LookaheadBot:
     """The heuristic bot, version 2: the first heuristic's weights plus the model's advice for play (cards and missions first, no scan in round 1)."""
+    return LookaheadBot("heuristic_v2", HEURISTIC_V2, bias=HEURISTIC_BIAS, no_scan_in_round_1=True)
+
+
+def heuristic() -> LookaheadBot:
+    """The heuristic bot, version 3: version 2 with energy worth 0.9 and credits 0.7 (found by trying variants; 85% against the greedy bot over 200 games)."""
     return LookaheadBot("heuristic", HEURISTIC, bias=HEURISTIC_BIAS, no_scan_in_round_1=True)
 
 
@@ -191,5 +197,5 @@ def from_spec(spec: dict[str, Any]) -> LookaheadBot:
     )
 
 
-BOTS = {"random": RandomBot, "greedy": greedy, "heuristic_v1": heuristic_v1, "heuristic": heuristic, "model": model}
-BOT_VERSIONS = {"random": 1, "greedy": 1, "heuristic": 2}  # recorded in the manifest of a model version: its numbers are against these bots
+BOTS = {"random": RandomBot, "greedy": greedy, "heuristic_v1": heuristic_v1, "heuristic_v2": heuristic_v2, "heuristic": heuristic, "model": model}
+BOT_VERSIONS = {"random": 1, "greedy": 1, "heuristic": 3}  # recorded in the manifest of a model version: its numbers are against these bots

@@ -138,3 +138,28 @@ def test_the_arena_keeps_the_history_of_both_seats() -> None:
 
     res = arena.play_game([Spy(), bots.RandomBot()], 3)
     assert Spy.seen > 20 and res.finished
+
+
+def test_the_cards_taken_from_the_display_or_shown_are_known_and_the_rest_of_the_other_hand_is_a_count() -> None:
+    from seti_ai.knowledge import Knowledge
+
+    s = play(4, 60)
+    seat = to_act(s)
+    assert seat is not None
+    view = project(s, seat, previews=False)
+    other = 1 - seat
+    know = Knowledge()
+    know.update(other, {"type": "buy_card", "source": "row:0"}, [{"type": "take_display_card", "player": other, "card": "27", "source": "row:0"}])
+    know.update(other, {"type": "show_move", "card": "30"}, [{"type": "show_card", "player": other, "card": "30"}])
+    assert know.of(other) == ["27", "30"] and know.of(seat) == []
+    plain = features.encode_view(view)
+    known = features.encode_view(view, None, know)
+    assert known.count == plain.count + 2
+    know.update(other, {"type": "play_card", "card": "27"}, [])  # played face up: no longer in the hand
+    assert know.of(other) == ["30"]
+    know.update(other, {"type": "tuck", "card": "30"}, [])  # tucked face down: it is not seen which card went
+    assert know.of(other) == ["30"]
+    # the other hand itself is a count: its cards change nothing
+    t = s.model_copy(deep=True)
+    t.players[other].hand = list(reversed(t.players[other].hand))
+    assert tokens_equal(plain, features.encode_view(project(t, seat, previews=False)))

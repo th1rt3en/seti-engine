@@ -15,6 +15,8 @@ from seti_engine import engine
 from seti_engine.models import GameState, Options
 from seti_engine.projection import View, project, to_act
 
+from .knowledge import Knowledge
+
 MAX_STEPS = 3000  # a game that is not over after this many decisions is stopped (the learner is penalised)
 
 
@@ -40,15 +42,22 @@ def play_game(players: list[Any], seed: int, rng: random.Random | None = None, o
     r = engine.start(opts)
     steps = 0
     history: list[tuple[int, dict[str, Any]]] = []  # the actions of both seats so far: the memory of the agent
+    know = Knowledge()  # the cards that the other seats are known to hold (taken from the display, shown)
     for p in players:
         p.history = history
+        p.knowledge = know
     while r.legal and steps < MAX_STEPS:
         seat = to_act(r.state)
         assert seat is not None
         view: View = project(r.state, seat, previews=False)
         i = players[seat].act(r.state, view, rng)
-        history.append((seat, dict(view.legal[i])))
+        move = dict(view.legal[i])
         r = engine.apply(r.state, view.legal[i])
+        know.update(seat, move, r.events)
+        for e in r.events:  # a card taken from the display is named for everybody
+            if e.get("type") == "take_display_card" and e.get("player") == seat:
+                move["display_card"] = e["card"]
+        history.append((seat, move))
         steps += 1
     done = r.state.phase == "finished"
     scores = final_totals(r.state) if done else [p.score for p in r.state.players]

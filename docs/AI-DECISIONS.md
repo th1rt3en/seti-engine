@@ -161,7 +161,7 @@ yardstick we need a stronger opponent (the search of section 6, or human games).
 |---|---|---|
 | 1 | Own score is the metric: it also scales to 3 and 4 players, where a margin does not | keep the reward as built; no margin term |
 | 2 | Start with 2 players; separate models for 3 and 4 players later | the features and the code are written for any number of players; one model for each player count |
-| 3 | The large network, larger if it can be afforded | preset `large` (144M); a larger preset `xlarge` is measured (below) before it is chosen |
+| 3 | The large network, larger if it can be afforded | preset `large` (144M) is the choice; `xlarge` (310M) was measured: see the table below |
 | 4 | Largely agree; an opponent pool of past versions; **improve the heuristic bot first**: it must beat the random bot and the greedy bot at least 70% of the time before the real model is trained against it; search the internet for improvements | the heuristic bot is being improved and measured (section 12); the opponent pool is a part of the training code; no training until the owner approves the plan |
 | 5 | AlphaZero-style training, no determinization | see the open question below |
 | 6 | Implement memory | the agent is given the history of the actions of both seats (section 13) |
@@ -175,11 +175,10 @@ a limited number of children that grows with the visits; a simulation that reach
 until the owner approves the plan. What this needs, so that it is decided before the build:
 - the engine must say which steps are chance events (a card drawn from the deck, a tile or a card revealed, an alien discovered) and let a search choose the
   outcome of one from what the seat has not seen (the unseen cards), instead of reading the real deck: a function in the engine with tests;
-- a hidden thing that is not a chance event is still hidden when the search starts: the other player's hand and the face-down tiles of the stacks. ZeusAI's game had
-  none of these. Proposal: when the search reaches the other player's decision, that player's moves are chosen by the network from the other player's view of
-  the searched state with the hidden hand sampled from the cards the seat has not seen (the same sampling as for a chance event, done once at the root of each
-  search and again at each reveal). Tell me if you want a different treatment (for example the other player's hand left out and its moves chosen from the public
-  information only).
+- **the other player's hand is left out (owner, 2026-10-20).** The search uses only public information: the other hand is a count. What is known about it is what was
+  seen in public: the cards that the other player took from the display and the cards that an effect showed (`knowledge.py`, kept by the arena and, when a bot is served, by
+  the Worker from the action log); every other card in it is unknown and is not guessed. The same holds for the agent's view of the game: it sees the count of the
+  other hand and the list of the known cards in it, nothing else. The face-down tiles of the tech stacks stay hidden in the same way.
 - the training targets: the visit counts for the policy, and the seat's own final score for the value (our objective).
 
 ## 12. The heuristic bot: what the internet says and what was measured
@@ -191,13 +190,38 @@ for income early; orbit before landing, Mercury and Mars first; discarding a car
 missions, free moves and end-of-game goals; do not start round 1 with a scan; the late game is scanning with the purple techs; the best techs are Mercury scan
 and the launch/move tech (S), the asteroid tech (A+), the landing tech (A); blue techs (computer) are A to S, energy first.
 
-Measured (60 to 80 games a match, same seeds, seats swapped): heuristic bot version 2 against random 100%, against greedy 71% (not a safe margin over 70%).
-Variants tried so far (each against greedy and against version 2): fading the value of resources and structures in the last rounds made the bot worse (46% against
-greedy: it spent resources on things that do not score); more income and orbit weights helped a little (53%); the results of the rest are in the next update.
+Measured (200 games a match, the same games for both bots, seats swapped; the bar was 70%):
+
+| Bot | against random | against greedy | against version 2 |
+|---|---|---|---|
+| version 2 (the first weights + the model's play advice) | 100% | 71% (60 games) | - |
+| **version 3 (version 2 with energy 0.9 against credit 0.7)** | **100%** (47 to 4 points) | **84.8%** (43 to 24) | **73.5%** (44 to 32) |
+
+What was tried, and the result (each against version 2 or 3, 60 to 200 games): the value of resources and structures fading in the last rounds: worse (42% to 46%
+against greedy); the techs valued by their tier (S, A+, A, B of the tech article): no gain (53%, then 42% in the 200-game test together with a lower card value);
+more weight on tucked cards: no gain (51%); more weight on orbiting and landing: no gain; energy 1.1: worse (43%); energy 1.3: far worse (4%: it hoards);
+no card and mission bonus: no gain (51%); allowing a scan in round 1: no gain (41% against version 2). Only the energy weight of 0.9 helped. So version 3 is the
+heuristic bot to train against: it clears the 70% bar against both random (100%) and greedy (85%). The earlier versions are kept as `heuristic_v1` and `heuristic_v2`,
+and the model's own values as `model`, so that old numbers can be reproduced; the saved versions of the AI were measured against version 1 and 2.
+
+The sizes of the network, measured on this GPU (RTX 3060, 12 GB) with random positions of 65 entities and 40 moves, no training (`seti_ai.benchmark`):
+
+| Preset | Parameters | One update of a batch of 64 | One answer for a batch of 64 | GPU memory |
+|---|---|---|---|---|
+| small | 14M | 23 ms | 6 ms | 0.5 GB |
+| base | 53M | 87 ms | 24 ms | 1.8 GB |
+| large | 144M | 232 ms | 62 ms | 4.5 GB |
+| xlarge (1024 wide, 16 layers, 16 heads) | 310M | 472 ms | 126 ms | 9.0 GB |
+
+A round of self-play (about 16,000 decisions, 2 passes) is then about 45 s of update for base, 2 min for large and 4 min for xlarge, plus the time to play the
+games. For a search, each simulation needs one answer: about 2,500 positions a second for base, 1,000 for large, 500 for xlarge; at 200 simulations a decision a game
+of about 500 decisions costs 100,000 answers: about 40 s (base), 100 s (large), 200 s (xlarge) of GPU: roughly 2,000, 860 and 430 games a day. So the size is not
+the limit; the games are. `xlarge` fits in memory (9 of 12 GB: nothing else may use the GPU) and halves the number of games compared with `large`. I recommend `large`.
 
 ## 13. Memory of the moves
 
-The agent is given the last 48 actions of both seats as tokens (who, in turn order relative to the agent; the type; the parameters that are public: a card named
+The agent is given the last 48 actions of both seats as tokens (a card taken from the display is named in the entry), and the list of the cards that the other seat
+is known to hold (taken from the display or shown), (who, in turn order relative to the agent; the type; the parameters that are public: a card named
 when it was played or discarded face up, not when it was tucked face down; the age of the action). It is part of the view features; the arena and the training
 keep the history, and a served bot gets it from the game's action log.
 
