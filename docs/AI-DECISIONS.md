@@ -170,12 +170,17 @@ yardstick we need a stronger opponent (the search of section 6, or human games).
 | 9 | No training until the owner approves the plan | nothing is trained; only bots play each other (no learning) to measure the heuristic bot |
 | 10 | Every game that the deployed model plays against a human must be available for training later | section 14 |
 
-**Open question on 5 (a search with no determinization).** A search over the real state would see the deck order and the other player's hand, so it would
-choose moves with information that the network (which only sees the view) does not have, and the network would be trained to copy that. Two readings that
-avoid this: (a) ZeusAI's way: chance events (a card turned up, a reveal) are sampled at the nodes of the tree (afterstates), and the opponent's hidden hand is
-not modelled, only what the seat has seen is used to evaluate; (b) each search is made from the seat's view with the opponent's moves chosen by the network
-on the opponent's own view. Which one do you mean, or do you want the search to use the true state anyway (it is simpler and is a known source of a wrong
-policy)? I will not build the search until you say. Training of any kind waits for your approval of the whole plan.
+**Answer to the question on 5 (2026-10-20): sample the chance events at the nodes of the tree, as ZeusAI did** (a node for the outcome of a draw or a reveal, with
+a limited number of children that grows with the visits; a simulation that reaches a full node continues through one of its existing children). Nothing is built
+until the owner approves the plan. What this needs, so that it is decided before the build:
+- the engine must say which steps are chance events (a card drawn from the deck, a tile or a card revealed, an alien discovered) and let a search choose the
+  outcome of one from what the seat has not seen (the unseen cards), instead of reading the real deck: a function in the engine with tests;
+- a hidden thing that is not a chance event is still hidden when the search starts: the other player's hand and the face-down tiles of the stacks. ZeusAI's game had
+  none of these. Proposal: when the search reaches the other player's decision, that player's moves are chosen by the network from the other player's view of
+  the searched state with the hidden hand sampled from the cards the seat has not seen (the same sampling as for a chance event, done once at the root of each
+  search and again at each reveal). Tell me if you want a different treatment (for example the other player's hand left out and its moves chosen from the public
+  information only).
+- the training targets: the visit counts for the policy, and the seat's own final score for the value (our objective).
 
 ## 12. The heuristic bot: what the internet says and what was measured
 
