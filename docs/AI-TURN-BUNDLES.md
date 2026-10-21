@@ -36,14 +36,31 @@ A bundle is the **step of the model**: the unit that is valued, rewarded and com
 
 ## 4. The classification belongs in the engine
 
-The AI must not hold rules (CLAUDE.md, rule 5). So the engine gets one small addition, with tests:
+The AI must not hold rules (CLAUDE.md, rule 5). So the engine gets one small addition, with tests: every legal move has a **class**: `free`, `main`, `answer` or
+`end`. The engine already knows it (it builds the moves from separate lists); it only has to say it. It is sent next to `legal` in the view, as a list of the same
+length, like `notes` is today:
 
-- every legal move has a **class**: `free`, `main`, `answer` or `end` (the engine already knows it; it only says it), sent next to `legal` in the view (a list of
-  the same length);
-- the view carries a **turn number** that changes when the turn passes to the other seat (`state.turn` counts it already: +1 for each turn, the rival's included).
+```json
+"legal":   [{"type": "place_data"}, {"type": "discard_free", "card": "17"}, {"type": "scan"}, {"type": "end_turn"}],
+"notes":   [null, {"irreversible": true}, null, null],
+"classes": ["free", "free", "main", "end"]
+```
 
-`seti_ai` then cuts a game into bundles without knowing any rule: a new bundle begins when `turn` changes. The classes are used to describe a bundle
-("2 free, the main action `analyze`, 1 free") and to check it (at most one main action).
+The **turn number is already in the view** (`state.round` and `state.turn`: the turn counts +1 for each turn, the rival's included, and starts again in each round), so
+nothing is added for that.
+
+`seti_ai` then cuts a game into bundles without knowing any rule: a new bundle begins when the turn (round and turn number) changes. The classes are used to
+describe a bundle ("2 free, the main action `analyze`, 1 free") and to check it (at most one main action).
+
+What the addition touches:
+
+- the engine: one function that gives the class of a move, one new field of the view, tests (every move type of `move-types.json` has exactly one class: a type
+  without one fails the test);
+- the protocol: the JSON schema and the TypeScript types are generated again (one new list, optional for a reader);
+- the Worker and the website: nothing changes in what they do (the Worker passes the view through, the website does not read the field); they only get the new type;
+- hidden information: nothing, the class of a move depends only on its type;
+- old games and replays: nothing, the classes are worked out when a view is made;
+- deploy: the field is only added, so the order of deploying does not matter.
 
 ## 5. How the model learns with bundles (two stages)
 
@@ -84,8 +101,10 @@ but with whole bundles and in training. It is built only after stage A works.
 ## 8. Decisions for the owner
 
 1. Is the bundle exactly "from the turn passing to a seat until it passes on" (section 3), with the interruptions and the sector resolution inside it (section 6)?
-2. Is the reward per bundle the **own** points gained during it (not minus what the opponent gained in the reply)?
-3. Stage A first (per-bundle value, reward and advantage over micro actions), then stage B (searching bundles), or stage B first?
-4. Is the engine addition in section 4 (the class of each move, and the turn number, in the view) acceptable? It changes the protocol (new fields), and the web client
-   can ignore them.
-5. Anything in section 6 to change?
+   **Answer (2026-10-21): yes.**
+2. Is the reward per bundle the **own** points gained during it (not minus what the opponent gained in the reply)? **Answer: own points only.**
+3. Stage A first or stage B first? A changes only how the model is *trained* (it plays as now, but it is told how good each turn was, instead of each micro move). B changes
+   how it *plays* (at the start of a turn it plays out several candidate turns on copies of the game and picks the best), which is slower, and which needs a good value
+   per turn to choose with, and that is what A produces. Recommendation: A first. **Open.**
+4. Is the engine addition in section 4 (the class of each move, in the view) acceptable? **Open.**
+5. Anything in section 6 to change? **Open.**
