@@ -34,10 +34,46 @@ export default async function BotsPage() {
     <>
       <h1>AI</h1>
       <p className="muted">
-        A computer player that learns to raise its own score by playing games against itself, for 2 players in the base game to begin with.
-        It is trained on the owner&apos;s computer. A new version is only put on the site after the owner has approved it. This page lists
-        every version and how it played against three simple training bots (random, greedy and heuristic) on the same games, with the seats
-        swapped. Scores are final scores.
+        A computer player that learns to play SETI by playing a very large number of games, and tries to get the highest score it can for
+        itself. This page says what it is for, how it is made and how each version played.
+      </p>
+      <h2>What it is</h2>
+      <ul>
+        <li>
+          <b>Goal:</b> its own final score. It plays to score high, not only to beat the others.
+        </li>
+        <li>
+          <b>First:</b> games of 2 players, in the base game and with the Space Agencies expansion (organizations and quick start cards).
+          Games of 3 and 4 players come later, with their own versions.
+        </li>
+        <li>
+          <b>What it knows:</b> only what a player sitting at the table knows. It never sees the cards in your hand or the order of the deck.
+          For what it cannot see it knows how many there are, and it remembers the cards that were shown or taken from the display.
+        </li>
+      </ul>
+      <h2>How it is made</h2>
+      <ul>
+        <li>
+          It learns by playing against itself, against earlier versions of itself and against simple training bots, and it is trained on the
+          owner&apos;s own computer. Training can be paused and continued at any time.
+        </li>
+        <li>
+          A new version is only put on the site after the owner has approved it by hand. The numbers of every version are public, on this
+          page.
+        </li>
+      </ul>
+      <h2>Playing against it</h2>
+      <ul>
+        <li>
+          When the AI can be added to a game, a warning is shown first. Adding it means that you agree that the game is kept and used to
+          train future versions.
+        </li>
+        <li>All the games between the AI and people are kept for that purpose.</li>
+      </ul>
+      <h2>Versions</h2>
+      <p className="muted">
+        Every version is listed with how it played against three simple training bots (random, greedy and heuristic) on the same games, with
+        the seats swapped. Scores are final scores.
       </p>
       <p>
         {live ? (
