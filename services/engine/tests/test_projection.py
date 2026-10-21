@@ -50,7 +50,8 @@ def test_the_view_has_the_solar_system_after_each_of_the_next_rotations_and_the_
 
 
 def test_an_undiscovered_species_board_does_not_show_which_species_it_is() -> None:
-    """CLAUDE.md rule 6: the boards of the species have different numbers of spaces, so a face-down board is shown with the same blank shape."""
+    """CLAUDE.md rule 6: the boards of the species have different numbers of spaces, so a face-down board is shown with the same blank
+    shape."""
     from seti_engine import species
 
     shapes = []

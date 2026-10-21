@@ -35,7 +35,9 @@ export default async function Recover({ searchParams }: { searchParams: Promise<
           <input name="password" type="password" required minLength={8} autoComplete="new-password" />
         </label>
         <TurnstileWidget />
-        <button type="submit" className="primary">Set the new password</button>
+        <button type="submit" className="primary">
+          Set the new password
+        </button>
       </form>
       <p className="muted small">
         <Link href="/login">Back to log in</Link>

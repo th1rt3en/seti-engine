@@ -18,7 +18,9 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
           <input name="password" type="password" required autoComplete="current-password" />
         </label>
         <TurnstileWidget />
-        <button type="submit" className="primary">Log in</button>
+        <button type="submit" className="primary">
+          Log in
+        </button>
       </form>
       <p className="muted small">
         <Link href="/recover">Forgot your password?</Link>

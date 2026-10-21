@@ -1,6 +1,6 @@
 # Checks the project, then deploys the engine (Cloud Run), the database migrations, the game Worker and the website (Cloudflare), in that order.
 # The website is built on Linux because OpenNext's Cloudflare build does not work with Windows paths. The owner starts it by hand: GitHub,
-# Actions, "Deploy", Run workflow; the boxes choose what to do (everything by default). A failed check stops the deploy.
+# Actions, "Deploy", Run workflow; the boxes choose what to do (everything by default). A failed check (tests, types or lint) stops the deploy.
 #
 # Repository secrets (Settings, Secrets and variables, Actions):
 #   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID   a token that may edit Workers and the D1 database
@@ -68,8 +68,7 @@ jobs:
         run: uv run pytest -q
       - name: Types
         run: uv run mypy
-      - name: Lint (does not stop the deploy)
-        continue-on-error: true
+      - name: Lint
         run: uv run ruff check
 
   check-web:
@@ -88,8 +87,7 @@ jobs:
         run: pnpm typecheck
       - name: Tests (the Worker, the website)
         run: pnpm test
-      - name: Lint (does not stop the deploy)
-        continue-on-error: true
+      - name: Lint
         run: pnpm lint
 
   engine:
