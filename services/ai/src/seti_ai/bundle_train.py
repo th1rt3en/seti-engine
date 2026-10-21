@@ -26,7 +26,7 @@ import torch
 from seti_engine.models import Options
 from torch import nn
 
-from . import arena, bots, checkpoint, features, gate, registry
+from . import arena, bots, checkpoint, dataset, features, gate, registry
 from .agent import PRESETS, VALUE_SCALE, LocalNet, NNAgent, PolicyNet, collate, new_net
 from .bundle_data import Examples, examples_from_log
 
@@ -163,6 +163,11 @@ def alpha(a: argparse.Namespace) -> None:
         flush=True,
     )
     assert lengths
+    if a.people:
+        people, found = dataset.load_examples(Path(a.people), a.lost_weight)
+        print(f"games of people: {found}; {len(people.policy)} choices, {len(people.value)} positions after a bundle", flush=True)
+        ex = dataset.mix(ex, people, a.people_share, seed=a.seed)
+        print(f"data with the games of people: {len(ex.policy)} choices, {len(ex.value)} positions after a bundle", flush=True)
     start_epoch = 1
     if a.resume and checkpoint.exists(root):
         net, opt_state, meta, rng_state = checkpoint.load(root, device)
@@ -233,6 +238,9 @@ def main() -> None:
     ap.add_argument("--eval-games", type=int, default=10, help="games against each bot")
     ap.add_argument("--search-eval-games", type=int, default=2, help="games with the bundle search against heuristic v3 (0: none)")
     ap.add_argument("--resume", action="store_true")
+    ap.add_argument("--people", default="", help="a folder with the downloaded archive of games (games with people and with the model)")
+    ap.add_argument("--people-share", type=float, default=0.3, help="about this share of the data is from the archive (repeated if there are few games)")
+    ap.add_argument("--lost-weight", type=float, default=3.0, help="weight of the moves of the people in a game that the model lost")
     a = ap.parse_args()
     if a.cmd == "pause":
         checkpoint.request_pause(Path(a.models))
