@@ -28,7 +28,8 @@ function Match({ m }: { m: BotMatch | undefined }) {
 }
 
 export default async function BotsPage() {
-  const versions = await botVersions(getDb());
+  // only the versions that have been released (approved by the owner) are listed: the ones that are still being tested show no numbers
+  const versions = (await botVersions(getDb())).filter((v) => v.live || v.approved);
   const live = versions.find((v) => v.live);
   return (
     <>
@@ -53,13 +54,10 @@ export default async function BotsPage() {
       </ul>
       <h2>How it is made</h2>
       <ul>
+        <li>It learns by playing against itself, against earlier versions of itself and against simple training bots.</li>
         <li>
-          It learns by playing against itself, against earlier versions of itself and against simple training bots, and it is trained on the
-          owner&apos;s own computer. Training can be paused and continued at any time.
-        </li>
-        <li>
-          A new version is only put on the site after the owner has approved it by hand. The numbers of every version are public, on this
-          page.
+          A new version is only put on the site after the owner has approved it by hand. The numbers of every released version are public,
+          on this page.
         </li>
       </ul>
       <h2>Playing against it</h2>
@@ -81,11 +79,11 @@ export default async function BotsPage() {
             Playing on the site now: <b>{live.version}</b>.
           </>
         ) : (
-          <>No version is served to players yet: the versions below only play offline matches.</>
+          <>No version is served to players yet.</>
         )}
       </p>
       {versions.length === 0 ? (
-        <p>No version has been published yet.</p>
+        <p>No version has been released yet.</p>
       ) : (
         <div className="tablewrap">
           <table>

@@ -95,7 +95,7 @@ class NetSearchBot:
         end = r.state
         if end.phase == "finished":
             rows = {x["player"]: x["total"] for x in end.final_scores}
-            return float(rows.get(seat, end.players[seat].score)) - base
+            return float(rows.get(seat, end.players[seat].score) - base)
         v = project(end, seat, previews=False)
         if not v.legal:
             return float(end.players[seat].score - base)

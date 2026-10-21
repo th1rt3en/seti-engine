@@ -25,7 +25,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from . import arena, bots, checkpoint, features, registry
+from . import arena, bots, checkpoint, features, gate, registry
 from . import pool as pool_mod
 from .agent import PRESETS, VALUE_SCALE, NNAgent, PolicyNet, Step, collate, net_from, new_net, save_net
 from .server import Client, start_server
@@ -98,7 +98,9 @@ def play_job(job: dict[str, Any]) -> dict[str, Any]:
         res = arena.play_game([_Recorder(a, helper), _Recorder(b, helper)], seed, rng)
         agent_seats = [0, 1]
     else:
-        client = _STATE["client"].with_model("teacher") if kind == "teach" else _STATE["client"]  # teach: a saved model plays, to be copied
+        # teach: a saved model plays, to be copied; `model`: a network of the server other than the one that is trained (the champion, in a check)
+        model = job.get("model") or ("teacher" if kind == "teach" else None)
+        client = _STATE["client"].with_model(model) if model else _STATE["client"]
         agent = NNAgent(client, explore=job.get("explore", True), record=job.get("record", True), temperature=job.get("temperature", 1.0))
         if kind in ("self", "teach") and not job.get("opp"):
             res = arena.play_game([agent, agent], seed, rng)
@@ -106,7 +108,7 @@ def play_job(job: dict[str, Any]) -> dict[str, Any]:
         else:
             seat = job["seat"]
             if kind == "snap":  # a frozen network of the pool plays the other seat
-                opp: Any = NNAgent(_STATE["client"].with_model(job["opp"]), explore=True, record=False, memory=job.get("memory", True))
+                opp: Any = NNAgent(_STATE["client"].with_model(job["opp"]), explore=job.get("opp_explore", True), record=False, memory=job.get("memory", True))
             else:
                 opp = bots.BOTS[job["opp"]]()
             res = arena.play_game([agent, opp] if seat == 0 else [opp, agent], seed, rng)
@@ -117,6 +119,24 @@ def play_job(job: dict[str, Any]) -> dict[str, Any]:
         if seat in agent_seats and steps:
             trajs.append({"steps": steps, "rewards": rewards_of(steps, res.scores[seat], res.finished), "final": res.scores[seat]})
     return {"trajs": trajs, "scores": res.scores, "finished": res.finished, "kind": kind, "opp": job.get("opp"), "seat": job.get("seat"), "steps": res.steps}
+
+
+def evaluate_h2h(pool: Any, games: int = gate.H2H_GAMES, first_seed: int = 60_000) -> dict[str, Any]:
+    """The network that is trained against the champion (the network of the server called "champion"), the same seeds with the seats swapped, both taking
+    their best moves: the candidate's mean score, the champion's, and the candidate's win rate (a tie counts half)."""
+    jobs = [
+        {"kind": "snap", "opp": "champion", "memory": True, "opp_explore": False, "seat": k % 2, "seed": first_seed + k // 2, "explore": False, "record": False}
+        for k in range(games)
+    ]
+    mine, theirs, wins = [], [], 0.0
+    for r in run_games(pool, jobs):
+        a, b = r["scores"][r["seat"]], r["scores"][1 - r["seat"]]
+        mine.append(a)
+        theirs.append(b)
+        wins += 1.0 if a > b else 0.5 if a == b else 0.0
+    out = {"games": games, "agent_score": round(float(np.mean(mine)), 1), "bot_score": round(float(np.mean(theirs)), 1), "win_rate": round(wins / games, 3)}
+    print(f"  against the champion: {out['agent_score']} against {out['bot_score']} (wins {out['win_rate']:.0%}, {games} games)", flush=True)
+    return out
 
 
 def gae(values: np.ndarray, rewards: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -220,11 +240,15 @@ def ppo_update(
     return {k: v / max(n_batches, 1) for k, v in stats.items()}
 
 
-def evaluate(pool: Any, games: int, opponents: tuple[str, ...] = ("random", "greedy", "heuristic"), first_seed: int = 50_000) -> dict[str, Any]:
+def evaluate(
+    pool: Any, games: int, opponents: tuple[str, ...] = ("random", "greedy", "heuristic"), first_seed: int = 50_000, model: str | None = None
+) -> dict[str, Any]:
     """The agent (taking the best move) against each bot, the same seeds, the seats swapped: its mean score, the bot's, its win rate."""
     out: dict[str, Any] = {}
     for opp in opponents:
-        jobs = [{"kind": "bot", "opp": opp, "seat": k % 2, "seed": first_seed + k // 2, "explore": False, "record": False} for k in range(games)]
+        jobs = [
+            {"kind": "bot", "opp": opp, "seat": k % 2, "seed": first_seed + k // 2, "explore": False, "record": False, "model": model} for k in range(games)
+        ]
         results = run_games(pool, jobs)
         mine, theirs, wins = [], [], 0.0
         for r in results:
@@ -259,6 +283,7 @@ def main() -> None:
     ap.add_argument("--iters", type=int, default=100)
     ap.add_argument("--preset", default="base", choices=list(PRESETS))
     ap.add_argument("--teacher", default=None, help="bc: a model folder to copy instead of the heuristic bot (it plays the games that are copied)")
+    ap.add_argument("--champion", default=None, help="ppo: a model folder that is the champion at the start (a candidate has to beat it head to head)")
     ap.add_argument("--start", default=None, help="a model folder to start from")
     ap.add_argument("--model", default=None, help="a model folder (eval)")
     ap.add_argument("--models", default="models")
@@ -324,13 +349,20 @@ def main() -> None:
                     opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=0.01)
                     opt.load_state_dict(opt_state)
                     checkpoint.restore_rng(rng_state)
-                    first, best, parent = int(meta["iteration"]) + 1, float(meta["best"]), meta.get("parent")
-                    print(f"resuming after round {meta['iteration']} (best score against the heuristic bot {best})", flush=True)
+                    first, parent = int(meta["iteration"]) + 1, meta.get("parent")
+                    champion: dict[str, Any] | None = meta.get("champion")
+                    print(f"resuming after round {meta['iteration']} (champion: {champion['version'] if champion else 'none yet'})", flush=True)
                 else:
                     net = net_from(str(Path(a.start) / "model.pt"), device) if a.start else new_net(a.preset).to(device)
                     opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=0.01)
                     parent = Path(a.start).name if a.start else None
-                    best, first = -1e9, 1
+                    first = 1
+                    champion = None
+                    if a.champion:  # a candidate has to beat this model head to head: its mean score against heuristic v3 is the yardstick
+                        load_into_server(req_q, ctl_q, str(Path(a.champion) / "model.pt"), "champion")
+                        print(f"the champion at the start: {a.champion}, measured against the bots:", flush=True)
+                        base_ev = evaluate(pool, a.eval_games, model="champion")
+                        champion = {"version": Path(a.champion).name, "path": str(Path(a.champion) / "model.pt"), "bench": base_ev["heuristic"]["agent_score"]}
                 paused = False
                 loaded: set[str] = set()
                 for it in range(first, a.iters + 1):
@@ -367,18 +399,44 @@ def main() -> None:
                     stats = ppo_update(net, opt, trajs, device)
                     print(
                         f"iter {it}: {len(results)} games ({unfinished} not finished), "
-                        f"{sum(len(t['steps']) for t in trajs)} decisions, own score {np.mean(finals):.1f}, "
+                        f"{sum(len(t['steps']) for t in trajs)} decisions, own score {np.mean(finals):.1f} "
+                        f"({gate.share_of_reference(float(np.mean(finals)))}), "
                         f"policy {stats['policy']:.3f} value {stats['value']:.3f} entropy {stats['entropy']:.2f} clipped {stats['clip']:.2f}, "
                         f"play {t1 - t0:.0f}s update {time.time() - t1:.0f}s",
                         flush=True,
+                    )
+                    gate.log_metrics(
+                        root, {"kind": "round", "round": it, "own_score": round(float(np.mean(finals)), 1), "games": len(results), "unfinished": unfinished}
                     )
                     if it % a.eval_every == 0 or it == a.iters:
                         save_net(net, weights)
                         load_into_server(req_q, ctl_q, weights)
                         ev = evaluate(pool, a.eval_games)
-                        key = ev["heuristic"]["agent_score"]
-                        if key > best:
-                            best = key
+                        bench = ev["heuristic"]["agent_score"]  # the fixed yardstick: heuristic bot version 3
+                        h2h = None
+                        if champion is not None:
+                            load_into_server(req_q, ctl_q, champion["path"], "champion")
+                            h2h = evaluate_h2h(pool)
+                        decision = gate.decide(champion, h2h, bench)
+                        shown = h2h["agent_score"] if h2h else bench
+                        print(
+                            f"  gate: {'PROMOTED' if decision.promote else 'not promoted'}: {decision.reason}; "
+                            f"mean score {shown} ({gate.share_of_reference(shown)}), against heuristic v3 {bench}",
+                            flush=True,
+                        )
+                        gate.log_metrics(
+                            root,
+                            {
+                                "kind": "evaluation",
+                                "round": it,
+                                "promoted": decision.promote,
+                                "reason": decision.reason,
+                                "against_bots": ev,
+                                "head_to_head": h2h,
+                                "champion": champion["version"] if champion else None,
+                            },
+                        )
+                        if decision.promote:
                             v = registry.save_version(
                                 root,
                                 net,
@@ -391,12 +449,30 @@ def main() -> None:
                                     "network": f"transformer {net.cfg.layers} layers, {net.cfg.d_model} wide, "
                                     f"{sum(p.numel() for p in net.parameters()) / 1e6:.0f}M parameters",
                                     "features": "v2",
+                                    "head_to_head": h2h,
                                 },
                                 ev,
                             )
-                            print(f"  saved as {v}", flush=True)
+                            champion = {"version": str(v), "path": str(root / str(v) / "model.pt"), "bench": bench}
+                            print(f"  saved as {v} (the champion now)", flush=True)
                             pool_mod.save(root / "pool.json", pool_mod.remember(entries, str(v), str(root / str(v) / "model.pt")))
-                    checkpoint.save(root, net, opt, {"iteration": it, "best": best, "parent": parent, "args": {k: v for k, v in vars(a).items()}})
+                            if gate.is_low(shown):
+                                print(
+                                    f"  NOTE: promoted, but the mean score {shown} is far below the {gate.REFERENCE_SCORE:.0f} of an advanced player",
+                                    flush=True,
+                                )
+                    checkpoint.save(
+                        root,
+                        net,
+                        opt,
+                        {
+                            "iteration": it,
+                            "best": champion["bench"] if champion else -1e9,
+                            "champion": champion,
+                            "parent": parent,
+                            "args": {k: v for k, v in vars(a).items()},
+                        },
+                    )
                 if paused or checkpoint.pause_requested(root):
                     print("paused: the checkpoint is saved; the processor and the graphics card are free (ppo --resume to go on)", flush=True)
                     checkpoint.clear_pause(root)
