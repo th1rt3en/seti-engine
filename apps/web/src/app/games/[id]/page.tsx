@@ -1,6 +1,7 @@
 import { GameClient } from "@/components/GameClient";
 import { GameSettings } from "@/components/GameSettings";
 import { ShortcutsHelp } from "@/components/ShortcutsHelp";
+import { type BotRecord, describeRecord, loadBotRecords } from "@/lib/botRecord";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { botVersions } from "@/lib/queries";
@@ -47,6 +48,7 @@ export default async function Game({
   const open = meta.status === "lobby" && meta.seats.some((s) => s === null);
   const isHost = user !== null && meta.host === user.id && meta.status === "lobby";
   const models = isHost ? (await botVersions(getDb())).filter((v) => v.live) : [];
+  const records = isHost ? await loadBotRecords(getDb()) : new Map<string, BotRecord>();
   return (
     <>
       <h1>
@@ -75,7 +77,7 @@ export default async function Game({
               <select name="model">
                 {models.map((m) => (
                   <option key={m.version} value={m.version}>
-                    {m.version}
+                    {m.version} · {describeRecord(records.get(m.version))}
                   </option>
                 ))}
               </select>

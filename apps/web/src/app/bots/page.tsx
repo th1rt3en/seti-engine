@@ -1,5 +1,6 @@
 // The AI model: its versions and how each one played. The model is trained on the owner's computer (services/ai); only a version that the owner has
 // approved is ever served to players. The numbers here come from offline matches of a version against the three training bots on fixed games.
+import { type BotRecord, loadBotRecords } from "@/lib/botRecord";
 import { getDb } from "@/lib/db";
 import { type BotMatch, botVersions } from "@/lib/queries";
 
@@ -27,9 +28,24 @@ function Match({ m }: { m: BotMatch | undefined }) {
   );
 }
 
+function PeopleCell({ r }: { r: BotRecord | undefined }) {
+  if (!r || r.games === 0) return <td className="muted small">no games yet</td>;
+  return (
+    <td>
+      <b>wins {pct(r.winRate)}</b>
+      <br />
+      <span className="muted small">
+        {r.games} game{r.games === 1 ? "" : "s"} · rating about {r.rating}
+        {r.provisional ? " (rough)" : ""}
+      </span>
+    </td>
+  );
+}
+
 export default async function BotsPage() {
   // only the versions that have been released (approved by the owner) are listed: the ones that are still being tested show no numbers
   const versions = (await botVersions(getDb())).filter((v) => v.live || v.approved);
+  const records = await loadBotRecords(getDb());
   const live = versions.find((v) => v.live);
   return (
     <>
@@ -94,6 +110,7 @@ export default async function BotsPage() {
                 {OPPONENTS.map(([, label]) => (
                   <th key={label}>Against the {label.toLowerCase()}</th>
                 ))}
+                <th>Against people</th>
                 <th>Trained</th>
                 <th>Status</th>
               </tr>
@@ -109,6 +126,7 @@ export default async function BotsPage() {
                   {OPPONENTS.map(([key]) => (
                     <Match key={key} m={v.evaluation[key]} />
                   ))}
+                  <PeopleCell r={records.get(v.version)} />
                   <td className="small">
                     {v.training.iterations
                       ? `${v.training.iterations} rounds of ${v.training.games_per_iteration} games`
@@ -131,6 +149,12 @@ export default async function BotsPage() {
           </table>
         </div>
       )}
+      <p className="muted small">
+        Against people: the share of finished games, with at least one person, in which the version came first (a shared first place counts
+        half). The rating is an internal estimate on the same scale as the players&apos; ratings, starting at 0 and moved by each game
+        against the people&apos;s ratings (0 for a person without a rating). It is rough until the version has played 10 games, and it is
+        not on the leaderboard.
+      </p>
       <p className="muted small">
         The score is the sum of the board, the end-of-game cards, the gold tiles and the other end scoring. The bots are weak players made
         for training. A version that beats the heuristic bot is a long way from a strong human player.
