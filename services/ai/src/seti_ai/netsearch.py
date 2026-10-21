@@ -1,9 +1,11 @@
 """A bot that searches with the network: the policy proposes, a short look into the future disposes (inference only, no training).
 
-At each decision the network scores the legal moves. For the best `k` of them the bot plays on, on copies of the game: the rest of its own turn, then the opponent's
+At each decision the network scores the legal moves. For the best `k` of them the bot plays on, on copies of the game: the rest of its own turn, then
+the opponent's
 turn, with the network choosing the best move for both seats, until it is the bot's move again. The hidden things of the copy are drawn again (the order of the
 deck and the random state, so that the cards that come are not the ones that really come: chance events are sampled, as in ZeusAI). The value of a move is the
-mean over `samples` such futures of (the points gained on the way + the network's value of the position that is reached). The move with the best value is played.
+mean over `samples` such futures of (the points gained on the way + the network's value of the position that is reached). The move with the best
+value is played.
 
 The copies are made from the real game state, so the opponent's hand in them is the real one. That is fine for games between bots; before the bot plays humans
 the hand has to be replaced by a draw from the cards that the bot has not seen (docs/AI-DECISIONS.md).

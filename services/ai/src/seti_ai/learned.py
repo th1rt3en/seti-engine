@@ -33,11 +33,11 @@ OPTIONS = [{}, {"expansion": True, "organizations": True}]
 ORGS = [
     "orbital_dynamics", "fenwick_research_center", "stratus_core", "deep_sky_survey", "turing_systems", "cosmos_strategy_group", "futurespan_institute",
     "helion_assembly", "xenolab", "mission_relay", "dlr",
-]  # fmt: skip
+]  # fmt: skip  # noqa: E501
 CATS = ("probe", "telescope", "computer")
 BASE = [
-    "score", "credits", "energy", "data", "publicity", "movement", "hand", "tucked", "computer", "probes", "launched", "techs", "orbiters", "landers", "missions",
-    "completed", "end_cards", "traces", "wins", "markers", "led", "tokens", "passed", "main_done", *CATS, "credits2", "energy2", "data2", "hand2", "score_x_hand",
+    "score", "credits", "energy", "data", "publicity", "movement", "hand", "tucked", "computer", "probes", "launched", "techs", "orbiters", "landers", "missions",  # noqa: E501
+    "completed", "end_cards", "traces", "wins", "markers", "led", "tokens", "passed", "main_done", *CATS, "credits2", "energy2", "data2", "hand2", "score_x_hand",  # noqa: E501
 ]  # fmt: skip
 N_ROUNDS = 5
 DIM = len(BASE) * N_ROUNDS + len(ORGS) + 2  # the hand-set value of heuristic v3 and the constant are the last two

@@ -98,8 +98,9 @@ def play_job(job: dict[str, Any]) -> dict[str, Any]:
         res = arena.play_game([_Recorder(a, helper), _Recorder(b, helper)], seed, rng)
         agent_seats = [0, 1]
     else:
-        agent = NNAgent(_STATE["client"], explore=job.get("explore", True), record=job.get("record", True), temperature=job.get("temperature", 1.0))
-        if kind == "self":
+        client = _STATE["client"].with_model("teacher") if kind == "teach" else _STATE["client"]  # teach: a saved model plays, to be copied
+        agent = NNAgent(client, explore=job.get("explore", True), record=job.get("record", True), temperature=job.get("temperature", 1.0))
+        if kind in ("self", "teach") and not job.get("opp"):
             res = arena.play_game([agent, agent], seed, rng)
             agent_seats = [0, 1]
         else:
@@ -257,6 +258,7 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=6)
     ap.add_argument("--iters", type=int, default=100)
     ap.add_argument("--preset", default="base", choices=list(PRESETS))
+    ap.add_argument("--teacher", default=None, help="bc: a model folder to copy instead of the heuristic bot (it plays the games that are copied)")
     ap.add_argument("--start", default=None, help="a model folder to start from")
     ap.add_argument("--model", default=None, help="a model folder (eval)")
     ap.add_argument("--models", default="models")
@@ -291,6 +293,17 @@ def main() -> None:
                 print(f"network {a.preset}: {sum(p.numel() for p in net.parameters()) / 1e6:.1f}M parameters", flush=True)
                 pairs = [("heuristic", "heuristic"), ("heuristic", "greedy"), ("greedy", "heuristic"), ("heuristic", "random")]
                 jobs = [{"kind": "bc", "seed": a.seed * 100_000 + k, "bot_a": pairs[k % 4][0], "bot_b": pairs[k % 4][1]} for k in range(a.games)]
+                if a.teacher:  # copy a saved model: it plays itself (most games) and the heuristic bot (some); the games of the bots stay a small share
+                    load_into_server(req_q, ctl_q, str(Path(a.teacher) / "model.pt"), "teacher")
+                    jobs = []
+                    for k in range(a.games):
+                        seed = a.seed * 100_000 + k
+                        if k % 10 < 6:
+                            jobs.append({"kind": "teach", "seed": seed})
+                        elif k % 10 < 8:
+                            jobs.append({"kind": "teach", "opp": "heuristic", "seat": k % 2, "seed": seed})
+                        else:
+                            jobs.append({"kind": "bc", "seed": seed, "bot_a": pairs[k % 4][0], "bot_b": pairs[k % 4][1]})
                 t0 = time.time()
                 results = run_games(pool, jobs)
                 trajs = [t for r in results for t in r["trajs"]]
