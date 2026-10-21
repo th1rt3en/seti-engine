@@ -2,6 +2,7 @@ import type { Options } from "@seti/protocol";
 // The Durable Object "GameRoom": a thin adapter that gives the game room (core/room.ts) storage, WebSockets and an alarm.
 import { publicReplay } from "./core/archive.js";
 import type { Identity } from "./core/auth.js";
+import { HttpBotClient } from "./core/botClient.js";
 import type { ClockSettings } from "./core/clock.js";
 import { D1Sink } from "./core/d1.js";
 import { HttpEngine } from "./core/engine.js";
@@ -47,6 +48,7 @@ export class GameRoomDO implements DurableObject {
     this.room = new GameRoom({
       store: new DoStore(ctx.storage),
       engine: new HttpEngine(env.ENGINE_URL, undefined, sign),
+      ...(env.BOT_URL ? { bot: new HttpBotClient(env.BOT_URL, undefined, sign) } : {}),
       sink: new D1Sink(env.DB as unknown as ConstructorParameters<typeof D1Sink>[0]),
       archive: new EngineArchive(env.ENGINE_URL, undefined, sign),
       defer: (work) => ctx.waitUntil(work),
@@ -94,6 +96,14 @@ export class GameRoomDO implements DurableObject {
     }
     if (url.pathname === "/join") return json(await this.room.join(identity));
     if (url.pathname === "/leave") return json(await this.room.leave(identity));
+    if (url.pathname === "/bot-add") {
+      const b = (await request.json()) as { model?: string; consent?: boolean };
+      return json(await this.room.addBot(identity, String(b.model ?? ""), b.consent === true));
+    }
+    if (url.pathname === "/bot-remove") {
+      const b = (await request.json()) as { seat?: number };
+      return json(await this.room.removeBot(identity, Number(b.seat)));
+    }
     if (url.pathname === "/resign") return json(await this.room.resign(identity));
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
   }

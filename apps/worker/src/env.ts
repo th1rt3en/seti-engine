@@ -4,6 +4,8 @@ export interface Env {
   DB: D1Database;
   /** The URL of the engine service on Cloud Run. */
   ENGINE_URL: string;
+  /** The URL of the AI service (the models that can sit in a lobby). Without it no AI can be added. */
+  BOT_URL?: string;
   /** Secret: the PKCS8 PEM ES256 private key with which the Worker signs its requests to the engine service (decision D16). */
   ENGINE_SIGNING_KEY?: string;
   /** The public key (PEM, SPKI) that checks the tokens issued by the website. */

@@ -4,6 +4,9 @@ import type { Archive } from "../src/core/archive.js";
 import type { Identity } from "../src/core/auth.js";
 import { type Action, type Engine, type GameStats, IllegalAction } from "../src/core/engine.js";
 import {
+  type BotClient,
+  type BotReply,
+  type BotRequest,
   type Connection,
   type Deps,
   type GameRecord,
@@ -144,7 +147,18 @@ export const bob: Identity = { id: "u-bob", name: "Bob", registered: true };
 export const cy: Identity = { id: "u-cy", name: "Cy", registered: true };
 export const guest: Identity = { id: "g-1", name: "Guest", registered: false };
 
-export function makeRoom(opts: { last?: number; now?: () => number; seed?: number } = {}) {
+/** An AI service that always scores; it keeps the requests it got and can be told to fail. */
+export class FakeBot implements BotClient {
+  requests: BotRequest[] = [];
+  failing = false;
+  async move(req: BotRequest): Promise<BotReply> {
+    this.requests.push(structuredClone(req));
+    if (this.failing) throw new Error("the AI service is down");
+    return { action: { type: "score" }, plan: [{ type: "score" }] };
+  }
+}
+
+export function makeRoom(opts: { last?: number; now?: () => number; seed?: number; bot?: BotClient } = {}) {
   const store = new MemoryStore();
   const sink = new RecordingSink();
   const archive = new RecordingArchive();
@@ -154,6 +168,7 @@ export function makeRoom(opts: { last?: number; now?: () => number; seed?: numbe
   const deps: Deps = {
     store,
     engine: new FakeEngine(opts.last ?? 6),
+    ...(opts.bot ? { bot: opts.bot } : {}),
     sink,
     archive,
     now: opts.now ?? (() => time),

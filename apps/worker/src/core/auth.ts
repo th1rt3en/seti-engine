@@ -7,6 +7,8 @@ export interface Identity {
   name: string;
   /** True for a registered account; only registered players can play rated games. */
   registered: boolean;
+  /** Set for a seat taken by the AI model (never in a token): the model version that plays it. */
+  bot?: { model: string };
 }
 
 export interface AuthConfig {

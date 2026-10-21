@@ -1,4 +1,4 @@
-// The game room: one game's lifecycle (lobby, play, end), its clock, its action log and what each player may see.
+﻿// The game room: one game's lifecycle (lobby, play, end), its clock, its action log and what each player may see.
 // It holds no rules (CLAUDE.md rule 5): every move goes to the engine service, and every view comes from the engine's projection.
 // The Durable Object (gameRoom.ts) is a thin adapter around this class; everything here is testable without Cloudflare.
 import type { GameState, Options, View } from "@seti/protocol";
@@ -33,6 +33,8 @@ export interface Meta {
   rng?: "exact";
   endedAt?: number;
   result?: Result;
+  /** Set when the host added an AI model to the lobby: they agreed that the game is collected and used for training. Such a game is never rated. */
+  consent?: { by: string; at: number };
 }
 
 export interface LogEntry {
@@ -91,8 +93,32 @@ export interface ResultSink {
   recordStats?(meta: Meta, result: Result, stats: GameStats): Promise<void>;
 }
 
+/** What the AI service is asked, and what it answers (services/ai/src/seti_ai/server.py). The service keeps nothing: the whole game comes with the request. */
+export interface BotRequest {
+  model: string;
+  options: Options;
+  actions: Action[];
+  seat: number;
+  /** The rest of the turn that the service planned earlier for this seat (it replans when the game went another way). */
+  plan: Action[];
+}
+export interface BotReply {
+  action: Action;
+  plan: Action[];
+}
+export interface BotClient {
+  /** Throws when the service is not reachable or has no such model. */
+  move(req: BotRequest): Promise<BotReply>;
+}
+
+/** The AI is asked again this long after a failure. */
+export const BOT_RETRY_MS = 10_000;
+export const botId = (model: string, n: number): string => `bot:${model}:${n}`;
+
 export interface Deps {
   store: Store;
+  /** The AI service; without it no AI can be added to a lobby. */
+  bot?: BotClient;
   engine: Engine;
   sink: ResultSink;
   /** Where every game is logged for replays (decision D25). */
@@ -108,7 +134,14 @@ export interface Deps {
 }
 
 export type ServerMessage =
-  | { t: "lobby"; status: Status; seats: ({ name: string } | null)[]; host: string | null; rated: boolean; clock: clocks.ClockSettings }
+  | {
+      t: "lobby";
+      status: Status;
+      seats: ({ name: string; bot?: true } | null)[];
+      host: string | null;
+      rated: boolean;
+      clock: clocks.ClockSettings;
+    }
   | { t: "view"; seq: number; status: Status; view: View; names: string[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Action[] }
   /** The moves made so far, for the log beside the board: all of them on connecting (`from` is 0), then each new one. */
@@ -245,6 +278,58 @@ export class GameRoom {
     return { ok: true };
   }
 
+  /**
+   * The host adds an AI model to a seat of the lobby. Adding it is the agreement that the game is collected and used for training, so `consent`
+   * must be true; such a game is never rated.
+   */
+  addBot(who: Identity, model: string, consent: boolean): Promise<SubmitResult & { seat?: number }> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby");
+      if (meta.host !== who.id) return fail("not_host", "only the host can add an AI");
+      if (!this.d.bot) return fail("no_bot", "no AI is available");
+      if (consent !== true) return fail("consent", "adding an AI means the game is collected and used to train it: agree to continue");
+      if (typeof model !== "string" || !/^[A-Za-z0-9._-]{1,40}$/.test(model)) return fail("bad_model", "no such model");
+      const free = meta.seats.findIndex((s) => s === null);
+      if (free < 0) return fail("full", "the game is full");
+      const n = meta.seats.filter((s) => s?.bot).length;
+      meta.seats[free] = { id: botId(model, n), name: `AI ${model}`, registered: false, bot: { model } };
+      meta.rated = false;
+      meta.consent ??= { by: who.id, at: this.d.now() };
+      await this.d.store.put("meta", meta);
+      await this.d.sink.recordLobby(meta);
+      if (meta.seats.every((s) => s !== null)) {
+        const before = [...meta.seats];
+        try {
+          await this.start(meta);
+        } catch (e) {
+          meta.status = "lobby";
+          meta.seats = before;
+          meta.seats[free] = null;
+          await this.d.store.put("meta", meta);
+          await this.d.sink.recordLobby(meta);
+          throw e;
+        }
+      } else await this.broadcastLobby(meta);
+      return { ok: true, seat: free };
+    });
+  }
+
+  removeBot(who: Identity, seat: number): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby");
+      if (meta.host !== who.id) return fail("not_host", "only the host can remove an AI");
+      if (!Number.isInteger(seat) || !meta.seats[seat]?.bot) return fail("not_bot", "that seat is not an AI");
+      meta.seats[seat] = null;
+      if (!meta.seats.some((s) => s?.bot)) meta.consent = undefined;
+      await this.d.store.put("meta", meta);
+      await this.d.sink.recordLobby(meta);
+      await this.broadcastLobby(meta);
+      return { ok: true };
+    });
+  }
+
   /** A player leaves the lobby, or is taken to have left because they stopped answering pings. */
   private async removeFromLobby(meta: Meta, id: string): Promise<boolean> {
     const seat = meta.seats.findIndex((s) => s?.id === id);
@@ -348,6 +433,7 @@ export class GameRoom {
     await this.runClock(meta, res.state);
     await this.broadcastViews();
     this.archiveSoon();
+    this.botSoon();
   }
 
   // --- play ----------------------------------------------------------------------------------------------------------------
@@ -387,6 +473,11 @@ export class GameRoom {
     const count = (await this.d.store.get<number>("logcount")) ?? 0;
     if (seq !== count) return fail("stale", `the game is at action ${count}, not ${seq}`);
     if (toAct(state) !== seat) return fail("not_your_turn", "it is not your turn");
+    return this.play(meta, seat, count, state, action);
+  }
+
+  /** The move of the seat that is to act, checked: the engine applies it, the log and the views follow. */
+  private async play(meta: Meta, seat: number, count: number, state: GameState, action: Action): Promise<SubmitResult> {
     let res: Awaited<ReturnType<Engine["apply"]>>;
     try {
       res = await this.d.engine.apply(state, action);
@@ -409,7 +500,67 @@ export class GameRoom {
     await this.runClock(meta, res.state);
     await this.broadcastViews();
     this.archiveSoon();
+    this.botSoon();
     return { ok: true };
+  }
+
+  // --- the AI seats ----------------------------------------------------------------------------------------------------------
+
+  private botWork: Promise<void> = Promise.resolve();
+  private botBusy = false;
+
+  /** Resolves when the AI has nothing more to do right now (tests wait for it). */
+  botIdle(): Promise<void> {
+    return this.botWork;
+  }
+
+  /** If an AI seat is to act, ask the service for its move in the background, once at a time; a failure is retried by the alarm. */
+  private botSoon(): void {
+    if (!this.d.bot || this.botBusy) return;
+    this.botBusy = true;
+    this.botWork = this.runBot()
+      .catch(() => this.serial(() => this.d.setAlarm(this.d.now() + BOT_RETRY_MS)))
+      .finally(() => {
+        this.botBusy = false;
+      });
+    this.d.defer?.(this.botWork);
+  }
+
+  private async runBot(): Promise<void> {
+    const bot = this.d.bot;
+    if (!bot) return;
+    for (;;) {
+      const step = await this.serial(async () => {
+        const meta = await this.meta();
+        if (meta === undefined || meta.status !== "playing") return null;
+        const state = await this.state();
+        const seat = toAct(state);
+        const who = seat === null ? undefined : meta.seats[seat];
+        if (seat === null || !who?.bot) return null;
+        const log = await this.d.store.list<LogEntry>("log:");
+        const kept = await this.d.store.get<{ count: number; seat: number; plan: Action[] }>("botplan");
+        const plan = kept !== undefined && kept.count === log.length && kept.seat === seat ? kept.plan : [];
+        return {
+          seat,
+          count: log.length,
+          req: { model: who.bot.model, options: meta.options, actions: log.map((e) => e.action), seat, plan },
+        };
+      });
+      if (step === null) return;
+      const reply = await bot.move(step.req);
+      const again = await this.serial(async () => {
+        const meta = await this.meta();
+        if (meta === undefined || meta.status !== "playing") return false;
+        const state = await this.state();
+        const count = (await this.d.store.get<number>("logcount")) ?? 0;
+        if (count !== step.count || toAct(state) !== step.seat) return true; // the game moved on while the service thought: ask again
+        const res = await this.play(meta, step.seat, count, state, reply.action);
+        if (!res.ok) throw new Error(`the AI played an illegal move: ${res.message}`);
+        await this.d.store.put("botplan", { count: count + 1, seat: step.seat, plan: reply.plan });
+        return true;
+      });
+      if (!again) return;
+    }
   }
 
   resign(who: Identity): Promise<SubmitResult> {
@@ -447,11 +598,15 @@ export class GameRoom {
       await this.d.setAlarm(now + LOBBY_CHECK_MS);
       return;
     }
-    if (meta.status !== "playing" || meta.seats.length >= KICK_FROM_PLAYERS) return;
+    if (meta.status !== "playing") return;
+    this.botSoon(); // a request to the AI that failed is made again
+    if (meta.seats.length >= KICK_FROM_PLAYERS) return;
     const clock = await this.d.store.get<clocks.ClockState>("clock");
     if (clock === undefined) return;
     const seat = clocks.expired(meta.clock, clock, this.d.now());
-    if (seat !== null) await this.finish(meta, await this.state(), "timeout", seat);
+    // an AI seat has no clock that can run out; its request is retried
+    if (seat !== null && meta.seats[seat]?.bot) await this.d.setAlarm(this.d.now() + BOT_RETRY_MS);
+    else if (seat !== null) await this.finish(meta, await this.state(), "timeout", seat);
     else await this.d.setAlarm(clocks.deadline(meta.clock, clock));
   }
 
@@ -671,7 +826,7 @@ function lobbyMessage(meta: Meta): ServerMessage {
   return {
     t: "lobby",
     status: meta.status,
-    seats: meta.seats.map((s) => (s === null ? null : { name: s.name })),
+    seats: meta.seats.map((s) => (s === null ? null : s.bot ? { name: s.name, bot: true as const } : { name: s.name })),
     host: meta.seats.find((s) => s?.id === meta.host)?.name ?? null,
     rated: meta.rated,
     clock: meta.clock,

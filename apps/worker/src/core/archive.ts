@@ -25,7 +25,9 @@ export interface ArchiveHeader {
   options: Options;
   clock: ClockSettings;
   rated: boolean;
-  seats: { seat: number; userId: string; name: string; registered: boolean }[];
+  seats: { seat: number; userId: string; name: string; registered: boolean; bot?: { model: string } }[];
+  /** Present when an AI model sat in the game: the host agreed that the game is collected and used for training (docs/AI-TURN-BUNDLES.md). */
+  consent?: { by: string; at: number };
   createdAt: number;
   startedAt: number;
   /** "double": the game was played when JavaScript rounded the random state after every move, and the replay has to do the same (engine `replay.steps`). */
@@ -68,7 +70,10 @@ export function headerOf(meta: Meta): ArchiveHeader {
     options: meta.options,
     clock: meta.clock,
     rated: meta.rated,
-    seats: meta.seats.flatMap((s, seat) => (s === null ? [] : [{ seat, userId: s.id, name: s.name, registered: s.registered }])),
+    seats: meta.seats.flatMap((s, seat) =>
+      s === null ? [] : [{ seat, userId: s.id, name: s.name, registered: s.registered, ...(s.bot ? { bot: s.bot } : {}) }],
+    ),
+    ...(meta.consent ? { consent: meta.consent } : {}),
     createdAt: meta.createdAt,
     startedAt: meta.startedAt ?? meta.createdAt,
     rngEncoding: meta.rng === "exact" ? "exact" : "double",
