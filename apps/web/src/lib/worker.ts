@@ -45,6 +45,12 @@ export const joinGame = (user: User, id: string, cfg = loadConfig(), fetcher: ty
 export const leaveGame = (user: User, id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
   call(user, `/games/${id}/leave`, "POST", undefined, cfg, fetcher);
 
+/** The host adds an AI model to the lobby; `consent` is the host's agreement that the game is collected and used for training. */
+export const addBot = (user: User, id: string, model: string, consent: boolean, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
+  call(user, `/games/${id}/bot-add`, "POST", { model, consent }, cfg, fetcher);
+export const removeBot = (user: User, id: string, seat: number, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
+  call(user, `/games/${id}/bot-remove`, "POST", { seat }, cfg, fetcher);
+
 export const resignGame = (user: User, id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
   call(user, `/games/${id}/resign`, "POST", undefined, cfg, fetcher);
 

@@ -2,24 +2,30 @@ import { GameClient } from "@/components/GameClient";
 import { GameSettings } from "@/components/GameSettings";
 import { ShortcutsHelp } from "@/components/ShortcutsHelp";
 import { loadConfig } from "@/lib/config";
+import { getDb } from "@/lib/db";
+import { botVersions } from "@/lib/queries";
 import { currentUser } from "@/lib/session";
 import { gameMeta } from "@/lib/worker";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { joinAction, leaveAction } from "../../actions";
+import { addBotAction, joinAction, leaveAction, removeBotAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
 interface Meta {
   status: string;
   rated: boolean;
-  seats: ({ id: string; name: string } | null)[];
+  seats: ({ id: string; name: string; bot?: { model: string } } | null)[];
   host: string;
   options: { players: number };
 }
 
-export default async function Game({ params }: { params: Promise<{ id: string }> }) {
+export default async function Game({
+  params,
+  searchParams,
+}: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
+  const { error } = await searchParams;
   const user = await currentUser();
   const meta = (await gameMeta(id)) as Meta | null;
   if (meta === null) {
@@ -39,6 +45,8 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
   const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host") ?? "localhost:3000"}`;
   const hostName = meta.seats.find((x) => x?.id === meta.host)?.name;
   const open = meta.status === "lobby" && meta.seats.some((s) => s === null);
+  const isHost = user !== null && meta.host === user.id && meta.status === "lobby";
+  const models = isHost ? (await botVersions(getDb())).filter((v) => v.live) : [];
   return (
     <>
       <h1>
@@ -52,6 +60,53 @@ export default async function Game({ params }: { params: Promise<{ id: string }>
           <input readOnly value={`${origin}/games/${id}`} aria-label="Invite link" style={{ width: "min(32rem, 100%)" }} />
         </p>
       ) : null}
+      {error ? (
+        <p className="card" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {isHost && open && models.length > 0 ? (
+        <form action={addBotAction} className="card">
+          <input type="hidden" name="id" value={id} />
+          <h2>Add an AI player</h2>
+          <p>
+            <label>
+              Version{" "}
+              <select name="model">
+                {models.map((m) => (
+                  <option key={m.version} value={m.version}>
+                    {m.version}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </p>
+          <p className="small">
+            <label>
+              <input type="checkbox" name="consent" required /> I agree that this game is recorded and used to train the AI. A game with an
+              AI is never rated.
+            </label>
+          </p>
+          <button type="submit" className="secondary">
+            Add the AI
+          </button>
+        </form>
+      ) : null}
+      {isHost
+        ? meta.seats.flatMap((s, seat) =>
+            s?.bot ? (
+              <form action={removeBotAction} key={s.id}>
+                <input type="hidden" name="id" value={id} />
+                <input type="hidden" name="seat" value={seat} />
+                <button type="submit" className="secondary">
+                  Remove {s.name}
+                </button>
+              </form>
+            ) : (
+              []
+            ),
+          )
+        : null}
       {user && !seated && open ? (
         <form action={joinAction}>
           <input type="hidden" name="id" value={id} />

@@ -16,11 +16,11 @@ import {
 } from "@/lib/auth";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
-import { createdRecently } from "@/lib/queries";
+import { botVersions, createdRecently } from "@/lib/queries";
 import { RECOVERY_COOKIE, currentUser, showRecoveryCode, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
 import { TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
-import { CLOCK_PRESETS, createGame, gameMeta, joinGame, leaveGame, resignGame } from "@/lib/worker";
+import { CLOCK_PRESETS, addBot, createGame, gameMeta, joinGame, leaveGame, removeBot, resignGame } from "@/lib/worker";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -239,6 +239,28 @@ export async function joinAction(form: FormData): Promise<void> {
   const id = field(form, "id");
   const reply = await joinGame(me as NonNullable<typeof me>, id);
   if (!reply.ok) back("/lobby", reply.message);
+  redirect(`/games/${id}`);
+}
+
+/** The host adds an AI to the lobby. Only a released version can be chosen, and the box that says the game is collected has to be ticked. */
+export async function addBotAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const id = field(form, "id");
+  const model = field(form, "model");
+  const live = (await botVersions(getDb())).some((v) => v.live && v.version === model);
+  if (!live) back(`/games/${id}`, "That version of the AI is not available.");
+  const reply = await addBot(me as NonNullable<typeof me>, id, model, field(form, "consent") === "on");
+  if (!reply.ok) back(`/games/${id}`, reply.message);
+  redirect(`/games/${id}`);
+}
+
+export async function removeBotAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const id = field(form, "id");
+  const reply = await removeBot(me as NonNullable<typeof me>, id, Number(field(form, "seat")));
+  if (!reply.ok) back(`/games/${id}`, reply.message);
   redirect(`/games/${id}`);
 }
 

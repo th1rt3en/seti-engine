@@ -55,7 +55,7 @@ import { SpotPrompt } from "./SpotPrompt";
 import { TradePanel } from "./TradePanel";
 
 type Server =
-  | { t: "lobby"; status: string; seats: ({ name: string } | null)[]; rated: boolean }
+  | { t: "lobby"; status: string; seats: ({ name: string; bot?: true } | null)[]; rated: boolean }
   | { t: "view"; seq: number; status: string; view: View; names: string[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Move[] }
   | { t: "log"; from: number; entries: LogEntry[] }
@@ -330,7 +330,10 @@ export function GameClient({
         {lobby ? (
           <ol>
             {lobby.seats.map((s, i) => (
-              <li key={`${i}-${s?.name ?? "free"}`}>{s ? s.name : <span className="muted">free seat</span>}</li>
+              <li key={`${i}-${s?.name ?? "free"}`}>
+                {s ? s.name : <span className="muted">free seat</span>}
+                {s?.bot ? <span className="pill">AI</span> : null}
+              </li>
             ))}
           </ol>
         ) : null}
