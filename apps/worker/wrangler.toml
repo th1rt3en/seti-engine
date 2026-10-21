@@ -21,4 +21,5 @@ migrations_dir = "migrations"
 ENGINE_URL = "https://seti-engine-725889947830.us-central1.run.app"
 AUTH_ISSUER = "seti-web"
 AUTH_AUDIENCE = "seti-worker"
+# BOT_URL: the URL of the AI lobby service (docs/deploy-ai.md). Without it no AI can be added to a lobby.
 # Secrets (set with `wrangler secret put`): AUTH_PUBLIC_KEY, and ENGINE_SIGNING_KEY (the key that signs requests to the engine service).

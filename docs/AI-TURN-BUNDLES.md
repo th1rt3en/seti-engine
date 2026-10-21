@@ -200,3 +200,26 @@ people against the model are built.
 | 3 | The alpha: a short training on the games of the bots, then the gate | the go for the run; the approval of the version |
 | 4 | The lobby: a bot seat (the Worker asks the AI service when it is the bot's turn), the AI service, the consent warning, the version in the archive header, the `/bots` page | the approval of the version before it is released |
 | 5 | The data pipeline: `seti_ai.dataset` copies the new games from the bucket, replays them with the engine of their rules version and the right random-state encoding, cuts them into bundles, applies the rule (b), and writes the examples | |
+
+
+## 11. The model in the lobby and the data pipeline (built 2026-10-21)
+
+**Seat.** The host of a lobby adds an AI with the lobby page: they choose a released version and tick that the game is recorded and used to train it. The room
+refuses it without that (`consent`), makes the game unrated, and starts the game when the last seat is filled. The seat has the id `bot:<version>:<n>`, no clock
+that can run out, and no rating row. Hands and the deck never leave the room unprojected: the AI service gets the seed (it is private and its requests are signed),
+and builds the seat's own view.
+
+**Turn.** When the engine waits for an AI seat the room asks the service (`POST /move`: options, the whole log, the seat, the rest of the plan) once at a time and
+plays the answer through the normal path (the same checks as for a person). The service plans a whole bundle with the bundle search and returns its first move and
+the rest; the room hands the rest back with the next request while the game is where the plan left it, so there is one search per turn. If the service fails the
+room asks again every 10 seconds (the alarm). The service is stateless, so any instance can answer.
+
+**Archive.** The header names the seat (`bot: {model}`) and keeps the host's agreement (`consent`: who, when). Nothing in the public replay shows anything new.
+
+**Data.** `seti_ai.dataset` reads the downloaded archive and applies the rule of section 10(b). A game with a model seat and no `consent`, a game not played to the
+end, and a game the engine cannot replay any more are skipped and counted. `mix` brings the games of people into the games of the bots by share (repeating them up
+to 20 times each), as section 10(b) asks, so the value does not become pessimistic. Training with them is `bundle_train alpha --people DIR --people-share 0.3`, and
+waits for the owner's go like every training.
+
+**Open for the owner.** What the rules version of a game is (the header has no rules version; a game the current engine cannot replay is skipped); whether the
+games of the lowest-rated people should count at all (now every completed game counts); the search settings of the service (`SETI_SEARCH`).
