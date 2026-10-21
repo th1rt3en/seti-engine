@@ -3,3 +3,5 @@ models/
 models_test/
 logs/
 __pycache__/
+models_large/*
+!models_large/pool.json

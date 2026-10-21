@@ -89,7 +89,7 @@ TECH_SLOTS = {
 }
 TECH_GLYPH_BY_SLOT = ["cross", "branch", "link", "dot"]  # left to right as printed (upside down)
 TECH_MARGIN = (8, 205, 8, 22)  # left, top, right, bottom around the dark space: the tech's own icons are in the part below it once turned
-PUBLICITY_BOX = (2636, 4150, 3330, 5420)  # the red 0 to 10 strip with the reminders beside it (3 publicity: 1 card, 6 publicity: research a tech)
+PUBLICITY_BOX = (2636, 4070, 3330, 5420)  # the red 0 to 10 strip with the reminders beside it (3 publicity: 1 card, 6 publicity: research a tech)
 BONUSES = {"vp3": "3vp", "card": "card", "energy": "energy", "publicity": "publicity"}
 TILE_WIDTH = 175
 MOON_SOURCE = "texture-moon-disc.png"  # the moon token that marks the next disc to rotate
