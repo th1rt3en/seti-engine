@@ -29,6 +29,8 @@ export interface Meta {
   joined: string[];
   createdAt: number;
   startedAt?: number;
+  /** "exact": the random state of the game is kept whole (the engine writes it as a string). Games made before that have no value here: JavaScript rounded their random state. */
+  rng?: "exact";
   endedAt?: number;
   result?: Result;
 }
@@ -172,7 +174,18 @@ export class GameRoom {
     if (rated && !host.registered) return fail("guest", "only registered players can play rated games");
     const seats: (Identity | null)[] = Array(options.players).fill(null);
     seats[0] = host;
-    const meta: Meta = { id, status: "lobby", options, clock, rated, seats, host: host.id, joined: [host.id], createdAt: this.d.now() };
+    const meta: Meta = {
+      id,
+      status: "lobby",
+      options,
+      clock,
+      rated,
+      seats,
+      host: host.id,
+      joined: [host.id],
+      createdAt: this.d.now(),
+      rng: "exact",
+    };
     await this.d.store.put("meta", meta);
     await this.d.sink.recordLobby(meta);
     if (options.players === 1) await this.start(meta);
@@ -502,6 +515,7 @@ export class GameRoom {
       .stats(
         meta.options,
         log.map((e) => e.action),
+        meta.rng === "exact" ? "exact" : "double",
       )
       .then((stats) => sink.recordStats?.(meta, result, stats))
       .catch(() => undefined);

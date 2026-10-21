@@ -455,7 +455,7 @@
         },
         "rng_state": {
           "title": "Rng State",
-          "type": "integer"
+          "type": "string"
         },
         "rotations": {
           "default": 0,

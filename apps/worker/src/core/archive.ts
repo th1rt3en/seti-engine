@@ -28,6 +28,8 @@ export interface ArchiveHeader {
   seats: { seat: number; userId: string; name: string; registered: boolean }[];
   createdAt: number;
   startedAt: number;
+  /** "double": the game was played when JavaScript rounded the random state after every move, and the replay has to do the same (engine `replay.steps`). */
+  rngEncoding: "exact" | "double";
 }
 
 export interface ArchiveResult {
@@ -69,6 +71,7 @@ export function headerOf(meta: Meta): ArchiveHeader {
     seats: meta.seats.flatMap((s, seat) => (s === null ? [] : [{ seat, userId: s.id, name: s.name, registered: s.registered }])),
     createdAt: meta.createdAt,
     startedAt: meta.startedAt ?? meta.createdAt,
+    rngEncoding: meta.rng === "exact" ? "exact" : "double",
   };
 }
 

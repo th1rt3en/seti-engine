@@ -30,7 +30,7 @@ export interface Engine {
   /** What `viewer` may see of the state (null for a spectator). */
   project(state: GameState, viewer: number | null): Promise<View>;
   /** The statistics of a finished game, from its options and its actions (the engine replays it). */
-  stats?(options: Options, actions: Action[]): Promise<GameStats>;
+  stats?(options: Options, actions: Action[], rngEncoding?: "exact" | "double"): Promise<GameStats>;
 }
 
 export class HttpEngine implements Engine {
@@ -74,8 +74,8 @@ export class HttpEngine implements Engine {
     return json;
   }
 
-  async stats(options: Options, actions: Action[]): Promise<GameStats> {
-    const { status, json } = await this.post<GameStats>("/stats", { options, actions });
+  async stats(options: Options, actions: Action[], rngEncoding: "exact" | "double" = "exact"): Promise<GameStats> {
+    const { status, json } = await this.post<GameStats>("/stats", { options, actions, rng_encoding: rngEncoding });
     if (status !== 200) throw new Error(`engine /stats failed with ${status}`);
     return json;
   }

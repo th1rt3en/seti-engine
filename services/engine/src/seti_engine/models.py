@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, BeforeValidator, Field, PlainSerializer, model_validator
 
 COLORS = ["green", "red", "purple", "white"]
 SECTOR_COLORS = ["red", "yellow", "blue", "black"]
@@ -15,6 +15,11 @@ SPECIES_BASE = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua
 SPECIES_EXPANSION = ["arkhos", "glyphids", "amoeba"]  # EXP-03: the three new species
 
 Phase = Literal["setup", "play", "finished"]
+
+# The state of the random generator is a 64-bit number. In JSON it is written as a string: JavaScript (the Worker keeps the state between
+# two moves) reads a number as a double and would lose its last digits, and then a game could not be replayed from its seed and actions.
+# A number is still accepted when the state is read (games that were stored before this).
+RngState = Annotated[int, BeforeValidator(int), PlainSerializer(str, return_type=str, when_used="json")]
 
 
 class Options(BaseModel):
@@ -231,7 +236,7 @@ class GameState(BaseModel):
     # decisions of the main action that a free action has interrupted, waiting while the free action's own decisions are answered (FREE-00)
     stashed: list[Decision] = Field(default_factory=list)
     free_active: bool = False  # the decisions now pending belong to a free action, which no other free action may interrupt (FREE-00)
-    rng_state: int
+    rng_state: RngState
     phase: Phase = "setup"
     round: int = 1
     turn: int = 1  # the turn within the round: 1 for the first player's turn, +1 for each following turn (counts the rival's turns too)

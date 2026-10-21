@@ -71,6 +71,15 @@ describe.skipIf(!url)("a game through the room and the real engine", () => {
     const final = await g.store.get<GameState>("state");
     expect(r.state).toEqual(final);
     expect(r.state.phase).toBe("finished");
+    // the random state is a string, so JavaScript keeps it whole between two moves; the engine's own replay (the one that makes the statistics)
+    // must then reproduce the game exactly: it throws when an action is not legal in its replay
+    expect(typeof final?.rng_state).toBe("string");
+    const stats = await g.engine.stats?.(
+      meta?.options as Options,
+      (await g.room.log()).map((e) => e.action),
+      "exact",
+    );
+    expect(stats?.players).toHaveLength(2);
   }, 120_000);
 
   it("the views never show the other player's hand or the deck", async () => {
@@ -81,7 +90,7 @@ describe.skipIf(!url)("a game through the room and the real engine", () => {
       const other = v.state.players[1 - (v.viewer as number)];
       expect(other?.hand.every((x) => x === "?")).toBe(true);
       expect(v.state.deck.every((x) => x === "?")).toBe(true);
-      expect(v.state.rng_state).toBe(0);
+      expect(v.state.rng_state).toBe("0");
     }
   }, 120_000);
 

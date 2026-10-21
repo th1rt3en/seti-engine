@@ -114,7 +114,7 @@ def test_legal_and_project_endpoints() -> None:
     assert client.post("/legal", json={"state": st}).json()["legal"] == legal_moves(r.state)
     actor = r.state.pending[0].player
     v = client.post("/project", json={"state": st, "viewer": actor}).json()
-    assert v["viewer"] == actor and v["legal"] == r.legal and v["to_act"] == actor and v["state"]["rng_state"] == 0
+    assert v["viewer"] == actor and v["legal"] == r.legal and v["to_act"] == actor and v["state"]["rng_state"] == "0"
     assert client.post("/project", json={"state": st, "viewer": None}).json()["legal"] == []
 
 

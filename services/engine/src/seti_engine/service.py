@@ -87,6 +87,7 @@ def project_view(req: ProjectRequest) -> View:
 class StatsRequest(BaseModel):
     options: Options
     actions: list[dict[str, Any]]
+    rng_encoding: str = "exact"  # "double" for a game played before the random state was written as a string (replay.steps)
 
 
 @app.post("/stats")
@@ -94,7 +95,7 @@ def game_stats(req: StatsRequest) -> dict[str, Any]:
     """The statistics of a game that was played to its end (stats.py), from its options and its actions: the engine replays it."""
     file = {
         "format": replay.FORMAT,
-        "header": {"options": req.options.model_dump()},
+        "header": {"options": req.options.model_dump(), "rngEncoding": req.rng_encoding},
         "actions": [{"seq": i, "action": a} for i, a in enumerate(req.actions)],
     }
     return stats.game_stats(file)

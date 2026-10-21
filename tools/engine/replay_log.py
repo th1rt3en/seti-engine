@@ -33,6 +33,8 @@ def main(argv: list[str]) -> int:
         print(__doc__)
         return 2
     file = load(Path(argv[1]))
+    # the archives written before the random state became a string were played with a rounded state (replay.steps): their header has no `rngEncoding`
+    file["header"].setdefault("rngEncoding", "double")
     names = {s["seat"]: s["name"] for s in file["header"].get("seats", [])}
     for n, entry, result in replay.steps(file):
         if entry is None:
