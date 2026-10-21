@@ -280,3 +280,9 @@ Self-play opponents are drawn from a pool (`models/pool.json`, code in `seti_ai/
 - Learned value function (`seti_ai/learned.py`, ridge regression of the final score on position counts per round, policy iteration, also with v3's value as a free feature): 9 to 22 points against v3, worse than v3 (41). The fit is confounded (positions with more resources come from players who acted less), so the marginal values it learns are wrong.
 - Bias terms for the actions that v008 plays more than v3 (place data 14.4 against 6.0 per game, research 4.6 against 2.0, traces 5.2 against 1.5, gold 18.7 points against 2.2): v3 40.6 to 57.3 points. Doubling or quadrupling them, or adding landing/tech weights: 54 to 56. Evolution strategy tuning of 71 parameters: also about 58 to 60.
 - Conclusion: a one-step lookahead bot tops out near 55 to 60. The plans that pay off over several moves (data to computer to analyze to traces, research for techs, gold tiles) are not visible to it.
+
+### Heuristic v4/v5 by search with the network (owner chose the recommendation, 2026-10-21)
+
+`seti_ai/netsearch.py`: the network (v008) proposes its 4 best moves; for each, the bot plays on copies of the game (rest of its turn, then the opponent's turn, both played by the network, chance events drawn again) and takes the move with the best points gained plus network value, mean of 2 futures. Inference only.
+
+First measurement, 8 games against heuristic v3 on the same seeds (seats swapped), base game: network alone 100.5 points, with search 120.6 (games: 116, 151, 103, 89, 125, 131, 114, 136 for the seat; 8 games is a small sample). About 340 seconds per game on one process, against 6 seconds for the network alone. Not yet 150. Known limit: the copies use the real opponent hand; before playing humans it must be replaced by a draw from the unseen cards.
