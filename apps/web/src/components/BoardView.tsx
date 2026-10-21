@@ -1124,6 +1124,16 @@ export function BoardView({
           return (
             <g transform={`translate(${at.x} ${at.y})`} pointerEvents="all">
               <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
+              {/* the label, to the left of the icon */}
+              <g pointerEvents="none">
+                <rect x={-NEXT_DISC_SIZE / 2 - 14 - 150} y={-42} width={150} height={84} rx={14} className="dialnote" />
+                <text x={-NEXT_DISC_SIZE / 2 - 14 - 75} y={-4} textAnchor="middle" className="dialnotetext">
+                  Next
+                </text>
+                <text x={-NEXT_DISC_SIZE / 2 - 14 - 75} y={30} textAnchor="middle" className="dialnotetext">
+                  rotation
+                </text>
+              </g>
               <image href={dial.base} x={-NEXT_DISC_SIZE / 2} y={-NEXT_DISC_SIZE / 2} width={NEXT_DISC_SIZE} height={NEXT_DISC_SIZE} />
               {lines.map(({ key, disc }) => (
                 <image

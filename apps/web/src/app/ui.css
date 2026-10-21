@@ -775,6 +775,17 @@ table.shortcuts td:first-child {
 .solarbtn {
   cursor: pointer;
 }
+.dialnote {
+  fill: rgba(11, 15, 21, 0.85);
+  stroke: #fff;
+  stroke-width: 3;
+}
+.dialnotetext {
+  fill: #fff;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
 .solarbtncircle {
   fill: rgba(11, 15, 21, 0.85);
   stroke: #fff;
