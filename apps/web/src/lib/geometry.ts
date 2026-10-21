@@ -3,6 +3,8 @@
 // 25, 50 and 70. Nothing here is a game rule: the engine says where a probe or a marker is, this file only says where that is on the picture.
 
 export const BOARD = { w: 3507, h: 5612 };
+/** The picture of the board is cut off below the score track (the tech zone, the dial and the publicity track are gone): the page shows down to here. */
+export const BOARD_BOTTOM = 4770;
 /** The Sun token fills the hole of the discs (the hole is about 215 board pixels wide, its glowing ring a little more). */
 export const SUN_SIZE = 228;
 export const CENTER = { x: 1752.5, y: 3062.6 };

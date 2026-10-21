@@ -10,10 +10,9 @@ import {
   ALIEN_COLUMN,
   ALIEN_TOP,
   BOARD,
+  BOARD_BOTTOM,
   CENTAURIAN_HEXES,
   CENTER,
-  DIAL,
-  DIAL_POCKET,
   DISC,
   DISCOVERY,
   GOLD,
@@ -209,7 +208,7 @@ export function BoardView({
   return (
     <>
       <svg
-        viewBox={`0 ${Math.floor(ALIEN_TOP) - trackHeight} ${BOARD.w + GOLD_EXTRA} ${BOARD.h - Math.floor(ALIEN_TOP) + trackHeight}`}
+        viewBox={`0 ${Math.floor(ALIEN_TOP) - trackHeight} ${BOARD.w + GOLD_EXTRA} ${BOARD_BOTTOM - Math.floor(ALIEN_TOP) + trackHeight}`}
         className="board"
         role="img"
         aria-label="The game board"
@@ -1069,10 +1068,6 @@ export function BoardView({
           );
         })}
 
-        <g transform={`translate(${DIAL[nextDisc].x} ${DIAL[nextDisc].y})`}>
-          <image href={assets.moon} x={-DIAL_POCKET / 2} y={-DIAL_POCKET / 2} width={DIAL_POCKET} height={DIAL_POCKET} />
-          <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
-        </g>
         {hoverPlaces ? (
           <g className="refmark" pointerEvents="none">
             {refSectors.map((i) => (
