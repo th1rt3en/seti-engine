@@ -65,6 +65,8 @@ const TILES = assets.milestoneTiles as Record<string, string> & { white: string 
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
 /** The radius of the button of the preview: just outside the last ring, between the sectors at 3 o'clock. */
 const SOLAR_BUTTON_RADIUS = 1030;
+// how far above the centre of its top space (in pixels of the species board) the first marker of a top capsule lies, for the boards whose top space has a reward in it
+const TOP_CAPSULE_RISE: Record<string, number> = { centaurians: 80 };
 const NEXT_DISC_SIZE = 150; // the indicator of the disc that turns next (the picture is the disc of the icon, 69 px of the board picture)
 const cap = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
@@ -911,13 +913,14 @@ export function BoardView({
                 if (!at) return;
                 const base = onAlienBoard(i, at[0], at[1]);
                 players.forEach((player, n) => {
-                  // a top capsule takes any number of markers: each later one lies a little higher
+                  // a top capsule takes any number of markers: each later one lies a little higher. On the Centaurian board the capsule lies
+                  // above the 6 point reward that closes it: the first marker lies above that reward, not on it, and the pile grows upward
                   marks.push(
                     <Marker
                       // biome-ignore lint/suspicious/noArrayIndexKey: markers are placed in order and never reorder
                       key={`sb-${i}-${colour}-${k}-${n}`}
                       x={base.x}
-                      y={base.y - n * 22}
+                      y={base.y - n * 22 - (k === 0 ? (TOP_CAPSULE_RISE[sp.species] ?? 0) : 0)}
                       size={86}
                       color={color(player)}
                       title={`${who(player)}: marker on the ${colour} space of ${sp.species}`}
