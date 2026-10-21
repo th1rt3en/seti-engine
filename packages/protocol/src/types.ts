@@ -188,6 +188,7 @@ export type Events = {
 export type Legal2 = {
   [k: string]: unknown;
 }[];
+export type Classes = string[];
 export type Deck3 = number;
 export type EndOfRoundStacks1 = number[];
 export type ExertianHands = number[];
@@ -535,6 +536,7 @@ export interface StepResult {
  * The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act.
  */
 export interface View {
+  classes: Classes;
   counts: Counts;
   legal: Legal3;
   notes: Notes;

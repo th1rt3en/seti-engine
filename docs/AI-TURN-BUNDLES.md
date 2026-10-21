@@ -1,6 +1,7 @@
 # The turn as the unit of the AI: bundling micro actions (design, for the owner's approval)
 
-Status: **a proposal, nothing built.** Training is stopped and all saved models are deleted (`docs/AI-DECISIONS.md`, 2026-10-21). Training does not resume until
+Status: **decisions 1 to 5 are answered (section 8); the engine labels (section 4) are built and tested; the cutting of games into bundles and everything after is
+not.** Training is stopped and all saved models are deleted (`docs/AI-DECISIONS.md`, 2026-10-21). Training does not resume until
 this is built and the owner has approved it.
 
 ## 1. The problem
@@ -36,8 +37,10 @@ A bundle is the **step of the model**: the unit that is valued, rewarded and com
 
 ## 4. The classification belongs in the engine
 
-The AI must not hold rules (CLAUDE.md, rule 5). So the engine gets one small addition, with tests: every legal move has a **class**: `free`, `main`, `answer` or
-`end`. The engine already knows it (it builds the moves from separate lists); it only has to say it. It is sent next to `legal` in the view, as a list of the same
+The AI must not hold rules (CLAUDE.md, rule 5). So the engine gets one small addition, with tests (built: `engine.legal_classified`, `View.classes`,
+`tests/test_move_classes.py`): every legal move has a **class**: `free`, `main`, `answer`, `end`, or `control` (`undo` and the practice-game marker, which are no part
+of a turn). The class depends on the situation, not only on the type of the move: `place_data` is a free action in a turn and an answer when a decision of the
+engine asks for it. The engine already knows it (it builds the moves from separate lists); it only has to say it. It is sent next to `legal` in the view, as a list of the same
 length, like `notes` is today:
 
 ```json
@@ -99,7 +102,8 @@ What is done about it:
 
 ## 6. Cases that need a rule written down (to approve)
 
-1. **Setup** (organization, quick start cards): one bundle per decision, outside the turns (they do not change the points).
+1. **Setup:** the choice of the organization and of the quick start cards (and the cards tucked at the start) are **one bundle** for the seat, outside the turns
+   (owner's ruling, 2026-10-21).
 2. **Passing and the end-of-round card:** the steps of passing (discarding down to 4 cards, rotating the solar system, and **choosing the end-of-round card**) are all
    part of the bundle of the `pass`. (Owner's ruling, 2026-10-21: the card selection is not a bundle of its own.)
 3. **Resolving sectors and milestones after the main action** (decisions of the engine's `stage`): part of the bundle of the turn that caused them.
@@ -122,8 +126,50 @@ What is done about it:
 1. Is the bundle exactly "from the turn passing to a seat until it passes on" (section 3), with the interruptions and the sector resolution inside it (section 6)?
    **Answer (2026-10-21): yes.**
 2. Is the reward per bundle the **own** points gained during it (not minus what the opponent gained in the reply)? **Answer: own points only.**
-3. Stage A first or stage B first (see also section 5b: the neighbour search of stage B is what finds long bundles)? A changes only how the model is *trained* (it plays as now, but it is told how good each turn was, instead of each micro move). B changes
-   how it *plays* (at the start of a turn it plays out several candidate turns on copies of the game and picks the best), which is slower, and which needs a good value
-   per turn to choose with, and that is what A produces. Recommendation: A first. **Open.**
-4. Is the engine addition in section 4 (the class of each move, in the view) acceptable? **Open.**
-5. Anything in section 6 to change? **Open.**
+3. Stage A first or stage B first? **Answer: skip A, go straight to B (searching bundles). B is the target.** (Section 5, stage A, is therefore not built on its own;
+   the per-bundle value and reward that B needs are built as part of B.)
+4. Is the engine addition in section 4 acceptable? **Answer: acceptable, but it has to be tested thoroughly** (done: `tests/test_move_classes.py`, 22 kinds of game, the
+   partition of the moves, the rule that a decision, the main action and the end of the turn exclude one another, the interruption by free actions, one main action in
+   every finished turn).
+5. Anything in section 6 to change? **Answer: the choice of the end-of-round card is part of the pass bundle; the organization and the quick start cards are one
+   bundle; everything else in section 6 agreed.**
+
+## 9. The alpha model and learning from the games of people (a proposal, to approve)
+
+The owner's plan (2026-10-21): build an **alpha** model that may be very weak and unable to form long bundles, release it, and play against it; those games are the
+training data. The method has to improve a lot from that limited data.
+
+**9.1 What the alpha is.** Not a trained network at first. A *bundle-search bot with the existing hand-made evaluator*: at the start of a turn it builds candidate
+bundles (sampled, and the neighbours of the best ones: one free action more, one less, one moved to the other side of the main action) on copies of the game, scores each
+with the evaluator (`bots._board_value`: points plus weights for resources and structures, the heuristic bot's), and plays the best bundle. It needs no training, it is
+weak (about as good as the heuristic bot, 40 to 60 points, but it plays whole turns), and it is the same machinery as stage B, so the pipeline (candidates,
+evaluation, logging of the chosen bundle) is built and tested once. The network takes the evaluator's place later.
+
+**9.2 What is recorded for each game against it** (archive header and actions, as decided earlier): which seats are the bot's, the version of the bot, the version of
+the rules, and for every bundle the bot played the candidates and their scores. Human turns are recorded as they are (every micro action, with its class).
+
+**9.3 How the model learns from a limited number of human games** (what the network is trained with, in the order of the value of the data):
+
+1. **Human bundles as examples.** Every turn of a person is a complete bundle, long ones included: the network learns to *produce* them (imitation of the micro actions
+   of the bundle, weighted by how well that player did in the game: for example only the games of the better half of the players, or a weight that grows with the
+   final score). This is what makes long bundles appear at all, and it needs no search.
+2. **The value from the outcomes.** From each position at the start of a human turn the network learns the points that the seat gained from there to the end of
+   the game (one label per bundle start: about 25 per player per game, from the games of people and of the bots).
+3. **Search on the human positions (expert iteration).** From the start of every human turn the bundle search runs with the current value and finds bundles that are
+   better than the one that was played (or confirms it); the better bundle is a new training example. One human game gives hundreds of such positions, realistic
+   ones, and this is how a small number of games gives a lot of data.
+4. **Games that continue from human positions.** The engine can start a game from any turn of a human game; self-play (the bot against itself, or against the bot)
+   continues from there, so the network meets the kind of positions that people reach and not only those of its own play.
+5. **Checks that it is working, on games that are not used for training:** how often the network's bundle is the human's (the longer bundles included), the error of the
+   value, and the head-to-head gate against the current champion (`gate.py`: 100 games, 55% of the wins, the score against heuristic v3 not lower, the mean scores
+   shown against the 250 of an advanced player).
+
+**9.4 What is needed to release the alpha** (each is a piece of work to be built and tested before any release): a bot seat in the lobby (the Worker asks the AI service
+when it is the bot's turn, with the clock rules of D24 to D28), the AI service (the candidates are searched on copies of the game, so it needs the engine in the same
+process: a small service next to the engine on Cloud Run), the consent warning when a bot is added to a lobby (decided earlier), the bot and its version in the archive
+header, `seti_ai.dataset` (copies the new games from the bucket and replays them with the engine of their rules version), the `/bots` page with the released version, and
+the approval of the version by the owner.
+
+**9.5 Questions for the owner:** (a) is the alpha as described in 9.1 (a search with the heuristic evaluator, no network) what you want to release first? (b) is the
+list in 9.3 the way to learn from the games of people, and should only the better players' games count for the imitation? (c) in what order: the bundles and the search
+first (so that the alpha can be played), then the bot seat and the data pipeline, and the network after the first human games?

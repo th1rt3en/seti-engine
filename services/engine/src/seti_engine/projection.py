@@ -140,6 +140,9 @@ class View(BaseModel):
     trackers: list[PlayerTracker] = Field(default_factory=list)  # one per player, in seat order
     to_act: int | None
     legal: list[dict[str, Any]] = Field(default_factory=list)
+    # the class of each legal move (free, main, answer, end, control: engine.MOVE_CLASSES), in the order of `legal`; for the AI, the
+    # page may ignore it
+    classes: list[str] = Field(default_factory=list)
     # where the viewer's probes can go with their movement plus all their energy (FREE-01); empty unless the viewer may move now
     reach: list[ProbeReach] = Field(default_factory=list)
     # what each legal move means (where, cost, rewards), in the order of `legal`, for the confirmation on the page (move_notes.py)
@@ -233,7 +236,8 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
             d.data = {}
     if actor != viewer:
         s.aside = []
-    legal = engine.legal_moves(state) if viewer is not None and actor == viewer else []
+    classified = engine.legal_classified(state) if viewer is not None and actor == viewer else []
+    legal = [m for m, _ in classified]
     trackers = [tracker(state, p, viewer) for p in state.players]
     reach: list[ProbeReach] = []
     # the probes can be moved with a click when nothing is asked, and also in the middle of a decision that a free action may interrupt
@@ -256,6 +260,7 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
         trackers=trackers,
         to_act=actor,
         legal=legal,
+        classes=[c for _, c in classified],
         reach=reach,
         notes=notes,
         planet_cells=_planet_cells(state),

@@ -122,30 +122,48 @@ def move_reach(state: GameState, p: PlayerState) -> list[tuple[str, list[tuple[t
     return out
 
 
-def legal_moves(state: GameState) -> list[Action]:
+# The class of a legal move: what part of a turn it is (docs/AI-TURN-BUNDLES.md). A turn is free actions, the main action with the
+# answers that it asks
+# for, free actions, and the end of the turn.
+#   free     a free action (FREE-00): also when it interrupts the answers of the main action
+#   main     the main action of the turn (once; `pass` is one)
+#   answer   a decision that a move asked for (`state.pending`: which tech, which trace colour, the setup choices, the sectors to
+#   resolve ...)
+#   end      `end_turn`, offered only after the main action
+#   control  a move that is no part of the game's turn: `undo` and the practice-game marker
+MOVE_CLASSES = ("free", "main", "answer", "end", "control")
+
+
+def legal_classified(state: GameState) -> list[tuple[Action, str]]:
+    """The legal moves, each with its class, in the order of `legal_moves` (which is this list without the classes)."""
     if state.phase == "finished":
         return []
     if state.pending:
         d = state.pending[0]
-        answers = _decision_moves(state, d)
+        decisions = _decision_moves(state, d)
+        answers: list[tuple[Action, str]] = [(m, "answer") for m in decisions]
         if _can_interrupt(state, d):  # FREE-00: a free action may interrupt the main action
-            answers += [m for m in _free_moves(state, state.players[state.current_player]) if m not in answers]
+            answers += [(m, "free") for m in _free_moves(state, state.players[state.current_player]) if m not in decisions]
         if _can_undo(state) and d.player == state.current_player:
-            answers.append({"type": "undo"})  # UNDO-01
+            answers.append(({"type": "undo"}, "control"))  # UNDO-01
         return answers
     if state.phase != "play":
         return []
     p = state.players[state.current_player]
-    moves: list[Action] = _free_moves(state, p)
+    moves: list[tuple[Action, str]] = [(m, "free") for m in _free_moves(state, p)]
     if _can_undo(state):
-        moves.append({"type": "undo"})  # UNDO-01
+        moves.append(({"type": "undo"}, "control"))  # UNDO-01
     if not state.main_done:
-        moves += _main_moves(state, p)
+        moves += [(m, "main") for m in _main_moves(state, p)]
     else:
-        moves.append({"type": "end_turn"})
+        moves.append(({"type": "end_turn"}, "end"))
     if state.options.sandbox:
-        moves.append(sandbox.marker(state))  # D33
+        moves.append((sandbox.marker(state), "control"))  # D33
     return moves
+
+
+def legal_moves(state: GameState) -> list[Action]:
+    return [m for m, _ in legal_classified(state)]
 
 
 def _can_interrupt(state: GameState, d: Decision) -> bool:

@@ -1843,6 +1843,13 @@
     "View": {
       "description": "The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act.",
       "properties": {
+        "classes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Classes",
+          "type": "array"
+        },
         "counts": {
           "$ref": "#/$defs/Counts"
         },
@@ -1927,6 +1934,7 @@
         }
       },
       "required": [
+        "classes",
         "counts",
         "legal",
         "notes",
