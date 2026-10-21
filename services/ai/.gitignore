@@ -6,3 +6,4 @@ __pycache__/
 models_large/*
 !models_large/pool.json
 models_alpha/
+serve_models/

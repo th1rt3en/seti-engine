@@ -43,6 +43,22 @@ def statements(models: Path, approve: list[str], live: str | None) -> list[str]:
     return out
 
 
+def mark_approved(models: Path, versions: list[str]) -> None:
+    """Write the approval into the manifests and the index too, so that what is exported for the lobby service (`lobby_export`) is what the owner approved."""
+    for v in versions:
+        manifest = models / v / "manifest.json"
+        m = json.loads(manifest.read_text(encoding="utf-8"))
+        m["approved"] = True
+        manifest.write_text(json.dumps(m, indent=1) + "\n", encoding="utf-8")
+    index = models / "index.json"
+    if index.exists():
+        rows = json.loads(index.read_text(encoding="utf-8"))
+        for row in rows:
+            if row["version"] in versions:
+                row["approved"] = True
+        index.write_text(json.dumps(rows, indent=1) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--models", default="models")
@@ -55,6 +71,7 @@ def main() -> int:
     ap.add_argument("--out", default="publish_bot_versions.sql")
     a = ap.parse_args()
     lines = statements(Path(a.models), a.approve, a.live)
+    mark_approved(Path(a.models), [*a.approve, *([a.live] if a.live else [])])
     Path(a.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(lines)} statement(s) written to {a.out}")
     if a.apply:

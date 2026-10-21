@@ -152,3 +152,31 @@ def test_the_service_answers_a_signed_free_request_with_a_move(monkeypatch: pyte
     assert client.post("/move", json={"model": "v001", "options": options.model_dump(), "actions": actions, "seat": 1 - seat}).status_code == 409
     assert client.get("/models").json() == {"models": ["v001"]}
     assert client.get("/health").status_code == 200
+
+
+def test_the_export_copies_only_the_approved_versions(tmp_path: Path) -> None:
+    from seti_ai.lobby_export import export
+
+    src = tmp_path / "models"
+    for v in ("v001", "v002"):
+        (src / v).mkdir(parents=True)
+        (src / v / "model.pt").write_bytes(b"w")
+        (src / v / "manifest.json").write_text("{}", encoding="utf-8")
+    (src / "index.json").write_text(json.dumps([{"version": "v001", "approved": False}, {"version": "v002", "approved": True}]), encoding="utf-8")
+    assert export(src, tmp_path / "out") == ["v002"]
+    assert (tmp_path / "out" / "v002" / "model.pt").exists() and not (tmp_path / "out" / "v001").exists()
+
+
+def test_approving_a_version_is_written_where_the_export_reads_it(tmp_path: Path) -> None:
+    from seti_ai.lobby_export import export
+    from seti_ai.publish import mark_approved
+
+    (tmp_path / "v001").mkdir()
+    (tmp_path / "v001" / "model.pt").write_bytes(b"w")
+    (tmp_path / "v001" / "manifest.json").write_text(json.dumps({"version": "v001", "approved": False}), encoding="utf-8")
+    (tmp_path / "index.json").write_text(json.dumps([{"version": "v001", "approved": False}]), encoding="utf-8")
+    assert approved_versions(tmp_path) == []
+    mark_approved(tmp_path, ["v001"])
+    assert approved_versions(tmp_path) == ["v001"]
+    assert json.loads((tmp_path / "v001" / "manifest.json").read_text(encoding="utf-8"))["approved"] is True
+    assert export(tmp_path, tmp_path / "out") == ["v001"]
