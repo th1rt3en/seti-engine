@@ -1105,6 +1105,16 @@ export function BoardView({
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setSolarOpen(true)}
             >
               <title>Preview the solar system and its next rotation</title>
+              {/* the label, to the right of the button (drawn at the size of the board: the button is scaled up) */}
+              <g transform={`scale(${1 / 1.3})`}>
+                <rect x={44 * 1.3 + 14} y={-42} width={180} height={84} rx={14} className="dialnote" />
+                <text x={44 * 1.3 + 14 + 90} y={-4} textAnchor="middle" className="dialnotetext">
+                  Rotation
+                </text>
+                <text x={44 * 1.3 + 14 + 90} y={30} textAnchor="middle" className="dialnotetext">
+                  preview
+                </text>
+              </g>
               <circle r={44} className="solarbtncircle" />
               <circle r={18} className="solarbtnsun" />
               <path d="M-30 0 A30 30 0 0 1 22 -22" className="solarbtnarc" />
@@ -1126,11 +1136,11 @@ export function BoardView({
               <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
               {/* the label, to the left of the icon */}
               <g pointerEvents="none">
-                <rect x={-NEXT_DISC_SIZE / 2 - 14 - 150} y={-42} width={150} height={84} rx={14} className="dialnote" />
-                <text x={-NEXT_DISC_SIZE / 2 - 14 - 75} y={-4} textAnchor="middle" className="dialnotetext">
+                <rect x={-NEXT_DISC_SIZE / 2 - 14 - 180} y={-42} width={180} height={84} rx={14} className="dialnote" />
+                <text x={-NEXT_DISC_SIZE / 2 - 14 - 90} y={-4} textAnchor="middle" className="dialnotetext">
                   Next
                 </text>
-                <text x={-NEXT_DISC_SIZE / 2 - 14 - 75} y={30} textAnchor="middle" className="dialnotetext">
+                <text x={-NEXT_DISC_SIZE / 2 - 14 - 90} y={30} textAnchor="middle" className="dialnotetext">
                   rotation
                 </text>
               </g>
