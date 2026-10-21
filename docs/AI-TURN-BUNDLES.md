@@ -79,14 +79,33 @@ policy (chance events drawn again), evaluates each by `points gained + value at 
 compared to the others) becomes a training target for the micro actions in it. This is the search that `seti_ai/netsearch.py` does for the rest of one turn today,
 but with whole bundles and in training. It is built only after stage A works.
 
+## 5b. The problem of long bundles, and what is done about it
+
+With micro actions chosen one at a time the probability of a bundle is the product of the probabilities of its moves, so **a bundle with many micro actions is
+sampled less often than a short one**: to find "place 3 data, discard 2 corners, scan, place 1 more data" by chance the policy has to make every one of those
+choices in a row. Stage A alone does not fix this: it tells the model well how good a bundle was *once it has been played*; it does not make long bundles be played.
+A second pull in the same direction: after the main action the policy can end the turn at any micro step, and a policy that ends early only produces short bundles.
+
+What is done about it:
+
+1. **The copy stage and the first rounds** start the network from games that contain long bundles (a bot that does all its free actions), so they are in its
+   distribution from the start.
+2. **Search finds what sampling does not** (this is stage B, and it is the real answer): the candidate bundles of a turn are not only sampled, they are *built*:
+   take a sampled bundle and try its neighbours (insert one more free action the engine offers, remove one, move one to the other side of the main action),
+   evaluate each neighbour (points gained plus the value at the next own turn), keep the best. A longer bundle that is better is found even if the policy
+   would almost never have sampled it, and **it becomes the training target** (the policy learns to play it): this is the way AlphaZero escapes the same problem.
+3. **Two numbers are logged at every evaluation** so that the problem would be seen: the distribution of the number of micro actions per bundle, and the share of
+   turns in which a free action was available at the end of the turn and was not used.
+
 ## 6. Cases that need a rule written down (to approve)
 
 1. **Setup** (organization, quick start cards): one bundle per decision, outside the turns (they do not change the points).
-2. **Choice of the end-of-round card, the steps of passing:** the passing steps belong to the bundle of the `pass`; the card choice at the start of a round
-   is a bundle of its own.
+2. **Passing and the end-of-round card:** the steps of passing (discarding down to 4 cards, rotating the solar system, and **choosing the end-of-round card**) are all
+   part of the bundle of the `pass`. (Owner's ruling, 2026-10-21: the card selection is not a bundle of its own.)
 3. **Resolving sectors and milestones after the main action** (decisions of the engine's `stage`): part of the bundle of the turn that caused them.
 4. **Solo rival's turn:** not trained (2 players first); it only advances the game.
-5. **A turn with only `end_turn`:** a bundle with no main action is allowed (the seat did nothing); it is flagged in the log.
+5. **Every bundle has exactly one main action:** the engine offers `end_turn` only after the main action was taken (`pass` is a main action), so a bundle without
+   one cannot exist. The check of a bundle (section 7) fails if it has none or two.
 6. **Interruption of the answers by a free action:** the free action is in the same bundle, and its own place in the order is kept.
 
 ## 7. What is built, and how it is tested (nothing runs on the real games before approval)
@@ -103,7 +122,7 @@ but with whole bundles and in training. It is built only after stage A works.
 1. Is the bundle exactly "from the turn passing to a seat until it passes on" (section 3), with the interruptions and the sector resolution inside it (section 6)?
    **Answer (2026-10-21): yes.**
 2. Is the reward per bundle the **own** points gained during it (not minus what the opponent gained in the reply)? **Answer: own points only.**
-3. Stage A first or stage B first? A changes only how the model is *trained* (it plays as now, but it is told how good each turn was, instead of each micro move). B changes
+3. Stage A first or stage B first (see also section 5b: the neighbour search of stage B is what finds long bundles)? A changes only how the model is *trained* (it plays as now, but it is told how good each turn was, instead of each micro move). B changes
    how it *plays* (at the start of a turn it plays out several candidate turns on copies of the game and picks the best), which is slower, and which needs a good value
    per turn to choose with, and that is what A produces. Recommendation: A first. **Open.**
 4. Is the engine addition in section 4 (the class of each move, in the view) acceptable? **Open.**
