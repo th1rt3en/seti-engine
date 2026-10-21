@@ -1,7 +1,6 @@
 {
  "entries": [
   {"name": "self", "kind": "self", "weight": 4},
-  {"name": "v008", "kind": "snapshot", "path": "models/v008/model.pt", "weight": 2, "memory": true},
   {"name": "heuristic_v3", "kind": "bot", "bot": "heuristic", "weight": 2},
   {"name": "greedy", "kind": "bot", "bot": "greedy", "weight": 1}
  ]
