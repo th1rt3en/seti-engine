@@ -19,6 +19,7 @@ migrations_dir = "migrations"
 
 [vars]
 ENGINE_URL = "https://seti-engine-725889947830.us-central1.run.app"
+BOT_URL = "https://seti-ai-725889947830.us-central1.run.app"
 AUTH_ISSUER = "seti-web"
 AUTH_AUDIENCE = "seti-worker"
 # BOT_URL: the URL of the AI lobby service (docs/deploy-ai.md). Without it no AI can be added to a lobby.
