@@ -53,8 +53,17 @@ main {
   flex-wrap: wrap;
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 700;
   color: var(--text);
+}
+.brandicon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  flex: none;
 }
 .foot {
   border-top: 1px solid var(--line);

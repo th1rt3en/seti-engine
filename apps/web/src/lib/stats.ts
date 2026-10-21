@@ -79,6 +79,12 @@ export interface Stats {
   techs: TechStat[];
   /** the rounds that have an income (the expansion has no round 1) */
   rounds: number[];
+  /** the final scores of the players, lowest first */
+  scores: number[];
+  /** the mean and the best final score, and the share of the players who won */
+  avgScore: number;
+  bestScore: number;
+  winRate: number;
 }
 
 const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
@@ -141,9 +147,14 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     ...new Set(Object.keys(totals).flatMap((k) => (k.startsWith("incomerate.r") ? [Number(k.split(".")[1]?.slice(1))] : []))),
   ].sort((a, b) => a - b);
 
+  const scores = rows.map((r) => r.score).sort((a, b) => a - b);
   return {
     games: new Set(rows.map((r) => r.gameId)).size,
     rows: n,
+    scores,
+    avgScore: n === 0 ? 0 : sum(scores) / n,
+    bestScore: scores.at(-1) ?? 0,
+    winRate: n === 0 ? 0 : rows.filter((r) => r.won).length / n,
     mean,
     orgs: [...orgs.entries()]
       .map(([org, s]) => ({

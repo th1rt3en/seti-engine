@@ -28,6 +28,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       >
         <header className="bar">
           <Link href="/" className="brand">
+            {/* the icon of the site (app/icon.png, the one of the browser tab), at the left corner of the bar */}
+            <img src="/icon.png" alt="" width={28} height={28} className="brandicon" />
             SETI online
           </Link>
           <nav>

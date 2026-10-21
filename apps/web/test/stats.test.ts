@@ -34,6 +34,24 @@ describe("statistics", () => {
     expect(aggregate(rows, parseFilter({ players: "9" })).rows).toBe(3); // not a number of players: any
   });
 
+  it("the scores: the final scores in order, their mean, the best, and the share of the players who won", () => {
+    const rows = [
+      row({ gameId: "a", seat: 0, score: 250, won: true }),
+      row({ gameId: "a", seat: 1, score: 130, won: false }),
+      row({ gameId: "b", seat: 0, score: 100, won: false }),
+      row({ gameId: "b", seat: 1, score: 220, won: true }),
+    ];
+    const s = aggregate(rows, any);
+    expect(s.scores).toEqual([100, 130, 220, 250]);
+    expect(s.avgScore).toBe(175);
+    expect(s.bestScore).toBe(250);
+    expect(s.winRate).toBe(0.5);
+    const none = aggregate([], any);
+    expect(none.scores).toEqual([]);
+    expect(none.avgScore).toBe(0);
+    expect(none.bestScore).toBe(0);
+  });
+
   it("organizations: the pick rate, the win rate and the Elo change of those who picked it", () => {
     const rows = [
       row({ gameId: "a", seat: 0, org: "x", orgOffered: ["x", "y"], won: true, eloDelta: 20 }),
