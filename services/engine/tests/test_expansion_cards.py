@@ -535,14 +535,16 @@ def test_helion_gains_its_reward_and_blocks_the_space_when_a_tech_is_researched(
     assert p.data_pool == data + 1
 
 
-def test_xenolab_research_does_not_rotate_a_disc() -> None:  # EXP-ORG-13 (owner 2026-10-15)
+def test_xenolab_research_rotates_a_disc_like_a_normal_research() -> None:  # EXP-ORG-13, TECHACT-02, A-037 (2026-10-22)
     from test_expansion import act, with_org
 
     s = with_org("xenolab", credits=0, energy=0, publicity=4)
-    angles = list(s.disc_angles)
     stack = next(m["stack"] for m in legal_moves(s) if m["type"] == "org_main" and m["tile"] == "research")
+    normal = with_org("xenolab", credits=0, energy=0, publicity=6)
+    normal = act(normal, type="research", stack=stack)
     s = act(s, type="org_main", org="xenolab", tile="research", stack=stack)
-    assert s.disc_angles == angles and s.rotations == 0
+    assert s.rotations == normal.rotations == 1
+    assert s.disc_angles == normal.disc_angles, "the same rotation as the normal research"
 
 
 def test_promo_set_2_cards() -> None:  # PROMO-04 (owner 2026-10-15)

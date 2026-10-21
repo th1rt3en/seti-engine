@@ -376,6 +376,7 @@ Entry format:
 - Proposed ruling: that mapping; a trace gained in any way (also from a quick start card at setup? no: setup marks give no benefits) reactivates the matching inactive tile.
 - Questions for the owner: confirm the colors of the three tiles.
 - Ruling (owner), 2026-10-15: blue tile: pay 1 credit to perform a launch action, then flip the tile; yellow (orange) tile: pay 2 energy to perform a scan action, then flip it; pink tile: pay 4 publicity to research a tech of any color without rotating a disc, then flip it. A tile is flipped back whenever the player marks a trace of its color.
+- Ruling (owner), 2026-10-22, replaces "without rotating a disc": the research tile rotates the solar system's disc like a normal research action (TECHACT-02); everything else is unchanged.
 
 ## A-038: Rewards of the reward spaces of Cosmos Strategy Group and Helion Assembly
 - Status: ruled (owner, 2026-10-15)
