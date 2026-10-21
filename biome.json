@@ -23,7 +23,7 @@
       ".next",
       ".wrangler",
       "services/engine",
-      "apps/web/src/generated",
+      "**/src/generated",
       "docs/rules"
     ]
   }
