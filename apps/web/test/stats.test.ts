@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type StatRow, aggregate, parseFilter } from "../src/lib/stats";
+import { type StatRow, aggregate, parseFilter, spreadOf } from "../src/lib/stats";
 
 const row = (over: Partial<StatRow>): StatRow => ({
   gameId: "g1",
@@ -50,6 +50,31 @@ describe("statistics", () => {
     expect(none.scores).toEqual([]);
     expect(none.avgScore).toBe(0);
     expect(none.bestScore).toBe(0);
+  });
+
+  it("the spread: the lowest, the highest and the standard deviation of a counter over the players (a player without it counts as 0)", () => {
+    const rows = [
+      row({ gameId: "a", seat: 0, counters: { "action.scan": 2 } }),
+      row({ gameId: "a", seat: 1, counters: { "action.scan": 6 } }),
+      row({ gameId: "b", seat: 0, counters: {} }),
+      row({ gameId: "b", seat: 1, counters: { "action.scan": 4 } }),
+    ];
+    const sp = aggregate(rows, any).spread["action.scan"];
+    expect(sp?.min).toBe(0);
+    expect(sp?.max).toBe(6);
+    expect(sp?.std).toBeCloseTo(Math.sqrt(5), 10); // mean 3: deviations -1, 3, -3, 1 -> variance 5
+    expect(spreadOf([5]).std).toBe(0);
+    expect(spreadOf([])).toEqual({ min: 0, max: 0, std: 0 });
+  });
+
+  it("the spread of the final scores of the players of each species", () => {
+    const rows = [
+      row({ gameId: "a", seat: 0, score: 100, species: ["anomalies"] }),
+      row({ gameId: "a", seat: 1, score: 200, species: ["anomalies"] }),
+    ];
+    const sp = aggregate(rows, any).species[0];
+    expect(sp?.avgScore).toBe(150);
+    expect(sp?.spread).toEqual({ min: 100, max: 200, std: 50 });
   });
 
   it("organizations: the pick rate, the win rate and the Elo change of those who picked it", () => {

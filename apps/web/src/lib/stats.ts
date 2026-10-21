@@ -50,10 +50,26 @@ export interface OrgStat {
   eloGames: number;
 }
 
+/** How the players differ from the mean: the lowest and the highest value, and the standard deviation (of the players counted, not an estimate). */
+export interface Spread {
+  min: number;
+  max: number;
+  std: number;
+}
+
+export function spreadOf(values: number[]): Spread {
+  if (values.length === 0) return { min: 0, max: 0, std: 0 };
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length;
+  return { min: Math.min(...values), max: Math.max(...values), std: Math.sqrt(variance) };
+}
+
 export interface SpeciesStat {
   species: string;
   games: number;
   avgScore: number;
+  /** of the final scores of the players of those games */
+  spread: Spread;
 }
 
 export interface GoldStat {
@@ -79,6 +95,10 @@ export interface Stats {
   techs: TechStat[];
   /** the rounds that have an income (the expansion has no round 1) */
   rounds: number[];
+  /** the players counted (one row each), for the spread of a number that the page works out from the counters */
+  players: StatRow[];
+  /** the spread of every counter over the players (a player without the counter counts as 0) */
+  spread: Record<string, Spread>;
   /** the final scores of the players, lowest first */
   scores: number[];
   /** the mean and the best final score, and the share of the players who won */
@@ -116,17 +136,18 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     }
   }
 
-  const species = new Map<string, { games: Set<string>; score: number; rows: number }>();
+  const species = new Map<string, { games: Set<string>; score: number; rows: number; scores: number[] }>();
   for (const r of rows) {
     for (const sp of r.species) {
       let s = species.get(sp);
       if (!s) {
-        s = { games: new Set(), score: 0, rows: 0 };
+        s = { games: new Set(), score: 0, rows: 0, scores: [] };
         species.set(sp, s);
       }
       s.games.add(r.gameId);
       s.score += r.score;
       s.rows += 1;
+      s.scores.push(r.score);
     }
   }
 
@@ -148,9 +169,13 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   ].sort((a, b) => a - b);
 
   const scores = rows.map((r) => r.score).sort((a, b) => a - b);
+  const spread: Record<string, Spread> = {};
+  for (const k of Object.keys(totals)) spread[k] = spreadOf(rows.map((r) => r.counters[k] ?? 0));
   return {
     games: new Set(rows.map((r) => r.gameId)).size,
     rows: n,
+    players: rows,
+    spread,
     scores,
     avgScore: n === 0 ? 0 : sum(scores) / n,
     bestScore: scores.at(-1) ?? 0,
@@ -168,7 +193,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
       }))
       .sort((a, b) => b.pickRate - a.pickRate),
     species: [...species.entries()]
-      .map(([sp, s]) => ({ species: sp, games: s.games.size, avgScore: s.rows === 0 ? 0 : s.score / s.rows }))
+      .map(([sp, s]) => ({ species: sp, games: s.games.size, avgScore: s.rows === 0 ? 0 : s.score / s.rows, spread: spreadOf(s.scores) }))
       .sort((a, b) => b.avgScore - a.avgScore),
     gold,
     techs,

@@ -4,6 +4,8 @@
     "land": "/assets/icons/land.a6bea860fc.webp",
     "launch": "/assets/icons/launch.bb78e23086.webp",
     "orbit": "/assets/icons/orbit.9f294a3c20.webp",
+    "pass": "/assets/icons/pass.b0cc16d06b.webp",
+    "research": "/assets/icons/research.358904e40a.webp",
     "scan": "/assets/icons/scan.dc7737b60c.webp"
   },
   "alienBacks": {
@@ -321,7 +323,9 @@
     "capsule": "/assets/icons/capsule.5b5847da3d.webp",
     "card-random": "/assets/icons/card-random.210e1efc11.webp",
     "danger": "/assets/icons/danger.95720c0fc2.webp",
-    "income": "/assets/icons/income.e3599fc770.webp"
+    "income": "/assets/icons/income.e3599fc770.webp",
+    "mission": "/assets/icons/mission.f00f06cb93.webp",
+    "mission-done": "/assets/icons/mission-done.3820bb3f68.webp"
   },
   "publicity": {
     "h": 1350,

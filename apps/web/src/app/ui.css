@@ -987,15 +987,14 @@ table.shortcuts td:first-child {
   list-style: none;
   margin: 8px 0 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  /* the three columns are shared by all the rows, so that a bar of the same value is the same length in every row */
+  grid-template-columns: minmax(110px, max-content) minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 8px 10px;
 }
 .bar-row {
-  display: grid;
-  grid-template-columns: minmax(110px, 190px) minmax(0, 1fr) minmax(48px, auto);
-  align-items: center;
-  gap: 10px;
+  display: contents;
 }
 .bar-label {
   display: flex;
@@ -1128,8 +1127,63 @@ table.shortcuts td:first-child {
   .stat-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-  .bar-row {
-    grid-template-columns: minmax(90px, 130px) minmax(0, 1fr) auto;
+  .barlist {
+    grid-template-columns: minmax(80px, max-content) minmax(0, 1fr) max-content;
     gap: 8px;
   }
+}
+
+/* the spread of a number (lowest, highest, standard deviation): a card that opens on the number */
+.has-tip {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted rgba(139, 148, 158, 0.7);
+}
+.has-tip:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+.tip {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 20;
+  min-width: 168px;
+  padding: 8px 12px;
+  background: #0d1117;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.has-tip:hover .tip,
+.has-tip:focus .tip,
+.has-tip:focus-within .tip {
+  display: block;
+}
+.tip-head {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.tip-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 16px;
+}
+.tip-grid b {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.stat-tile .tip {
+  left: 0;
+  right: auto;
 }

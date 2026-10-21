@@ -1,14 +1,53 @@
 // The pieces of the statistics page: stat tiles, panels, bars, a stacked bar, a histogram and a line chart. They are drawn on the server (HTML and SVG,
 // no script): a bar or a point says what it is when the pointer rests on it (the title), and every panel can show its numbers as a table.
 // The colours are the validated categorical colours of the dark surface (seti-engine docs: dataviz), set in ui.css as --viz-1 ... --viz-5.
+import type { Spread } from "@/lib/stats";
 import type { ReactNode } from "react";
 
+/** The lowest value, the highest and the standard deviation of the players, as a small card that opens when the pointer rests on the number (or it has the focus). */
+export function SpreadTip({ spread, unit }: { spread: Spread; unit?: string }) {
+  return (
+    <span className="tip" role="tooltip">
+      <span className="tip-head">Players differ</span>
+      <span className="tip-grid">
+        <span>Lowest</span>
+        <b>{round(spread.min)}</b>
+        <span>Highest</span>
+        <b>{round(spread.max)}</b>
+        <span>Std. deviation</span>
+        <b>{round(spread.std)}</b>
+      </span>
+      {unit ? <span className="tip-foot">{unit}</span> : null}
+    </span>
+  );
+}
+
+/** A number with its spread behind it: hovering or focusing it opens the card. */
+export function WithSpread({ children, spread }: { children: ReactNode; spread?: Spread }) {
+  if (!spread) return <>{children}</>;
+  return (
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: the card opens when the number has the focus (a keyboard has no hover)
+    <span className="has-tip" tabIndex={0}>
+      {children}
+      <SpreadTip spread={spread} />
+    </span>
+  );
+}
+
 /** A number with its name and an icon: the headline figures. */
-export function Tile({ icon, label, value, note }: { icon?: ReactNode; label: string; value: ReactNode; note?: string }) {
+export function Tile({
+  icon,
+  label,
+  value,
+  note,
+  spread,
+}: { icon?: ReactNode; label: string; value: ReactNode; note?: string; spread?: Spread }) {
   return (
     <div className="stat-tile">
       {icon ? <span className="stat-tile-icon">{icon}</span> : null}
-      <span className="stat-tile-value">{value}</span>
+      <span className="stat-tile-value">
+        <WithSpread spread={spread}>{value}</WithSpread>
+      </span>
       <span className="stat-tile-label">{label}</span>
       {note ? <span className="stat-tile-note">{note}</span> : null}
     </div>
@@ -50,6 +89,8 @@ export interface BarRow {
   text: ReactNode;
   /** what the pointer shows when it rests on the row */
   title?: string;
+  /** how the players differ: shown on a card when the pointer rests on the value */
+  spread?: Spread;
   color?: string;
   /** a dark colour needs a light edge to be seen on the dark surface */
   outline?: boolean;
@@ -61,9 +102,12 @@ export function BarList({ rows, max, label }: { rows: BarRow[]; max?: number; la
   return (
     <ul className="barlist" aria-label={label}>
       {rows.map((r) => (
-        <li key={r.key} className="bar-row" title={r.title}>
-          <span className="bar-label">{r.label}</span>
-          <span className="bar-track">
+        // the three columns are shared by all the rows (display: contents), so that every bar has the same length for the same value
+        <li key={r.key} className="bar-row">
+          <span className="bar-label" title={r.title}>
+            {r.label}
+          </span>
+          <span className="bar-track" title={r.title}>
             <span
               className={r.outline ? "bar-fill outlined" : "bar-fill"}
               style={{
@@ -72,7 +116,9 @@ export function BarList({ rows, max, label }: { rows: BarRow[]; max?: number; la
               }}
             />
           </span>
-          <span className="bar-value">{r.text}</span>
+          <span className="bar-value">
+            <WithSpread spread={r.spread}>{r.text}</WithSpread>
+          </span>
         </li>
       ))}
     </ul>
@@ -85,6 +131,7 @@ export interface StackPart {
   icon?: ReactNode;
   value: number;
   color: string;
+  spread?: Spread;
 }
 
 /** One bar cut into parts (with a gap between them), and under it a legend with every part's value and share. */
@@ -110,7 +157,9 @@ export function StackBar({ parts, unit, label }: { parts: StackPart[]; unit?: st
             <span className="vswatch" style={{ background: p.color }} />
             {p.icon}
             <span className="stack-name">{p.label}</span>
-            <b>{round(p.value)}</b>
+            <b>
+              <WithSpread spread={p.spread}>{round(p.value)}</WithSpread>
+            </b>
             <span className="muted small">{total > 0 ? `${Math.round((p.value / total) * 100)}%` : ""}</span>
           </li>
         ))}
@@ -186,6 +235,8 @@ export interface LineSeries {
   color: string;
   icon?: ReactNode;
   values: number[];
+  /** how the players differ at each point (the same order as `values`) */
+  spreads?: Spread[];
 }
 
 /** Lines over a few categories (the rounds): 2 px lines, 5 px markers with a ring of the surface colour, the name of the line at its end. */
@@ -240,7 +291,7 @@ export function LineChart({ xs, series, label, xName }: { xs: string[]; series: 
               <g key={xs[i]}>
                 <circle cx={x(i)} cy={y(v)} r={5} fill={s.color} stroke={SURFACE} strokeWidth={2} />
                 <circle cx={x(i)} cy={y(v)} r={15} fill="transparent">
-                  <title>{`${s.label}, ${xName.toLowerCase()} ${xs[i]}: ${round(v)}`}</title>
+                  <title>{pointTitle(s, i, xName, xs[i] ?? "", v)}</title>
                 </circle>
               </g>
             ))}
@@ -255,6 +306,13 @@ export function LineChart({ xs, series, label, xName }: { xs: string[]; series: 
       </svg>
     </div>
   );
+}
+
+/** What a point says when the pointer rests on it: its value and, when known, how the players differ. */
+function pointTitle(s: LineSeries, i: number, xName: string, x: string, v: number): string {
+  const sp = s.spreads?.[i];
+  const head = `${s.label}, ${xName.toLowerCase()} ${x}: ${round(v)}`;
+  return sp ? `${head} (lowest ${round(sp.min)}, highest ${round(sp.max)}, std. deviation ${round(sp.std)})` : head;
 }
 
 function niceCeil(v: number): number {

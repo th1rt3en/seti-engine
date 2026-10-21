@@ -8,6 +8,7 @@ import {
   DeckCardIcon,
   DisplayCardIcon,
   EnergyIcon,
+  MissionIcon,
   PublicityIcon,
   ScoreIcon,
   TraceIcon,
@@ -17,7 +18,7 @@ import { BarList, Histogram, LineChart, Panel, Pills, StackBar, Tile, round } fr
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
 import { statRows } from "@/lib/queries";
-import { aggregate, parseFilter } from "@/lib/stats";
+import { type Spread, aggregate, parseFilter, spreadOf } from "@/lib/stats";
 import { TECH_INFO } from "@/lib/techs";
 import type { ReactNode } from "react";
 import assets from "../../generated/assets.json";
@@ -75,6 +76,9 @@ export default async function StatsPage({
   const filter = parseFilter(sp);
   const s = aggregate(await statRows(getDb(), filter), filter);
   const m = (k: string): number => s.mean[k] ?? 0;
+  // how the players differ in a counter, and in a number that is worked out from several counters (a player without the counter counts as 0)
+  const sd = (k: string): Spread | undefined => s.spread[k];
+  const sdOf = (f: (c: Record<string, number>) => number): Spread => spreadOf(s.players.map((p) => f(p.counters)));
   const base: Record<string, string> = {};
   if (filter.players !== null) base.players = String(filter.players);
   if (filter.expansion !== null) base.expansion = filter.expansion ? "yes" : "no";
@@ -84,30 +88,49 @@ export default async function StatsPage({
     { key: "launch", label: "Launch", icon: <ActionIcon name="launch" size={26} /> },
     { key: "scan", label: "Scan", icon: <ActionIcon name="scan" size={26} /> },
     { key: "analyze", label: "Analyze", icon: <ActionIcon name="analyze" size={26} /> },
-    { key: "research", label: "Research", icon: <Blank /> },
+    { key: "research", label: "Research", icon: <ActionIcon name="research" size={26} /> },
     { key: "orbit", label: "Orbit", icon: <ActionIcon name="orbit" size={26} /> },
     { key: "land", label: "Land", icon: <ActionIcon name="land" size={26} /> },
     { key: "play_card", label: "Play a card", icon: <DisplayCardIcon size={24} /> },
-    { key: "pass", label: "Pass", icon: <Blank /> },
+    { key: "pass", label: "Pass", icon: <ActionIcon name="pass" size={26} /> },
   ];
-  const planetsPublicity = Object.keys(s.mean)
-    .filter((k) => k.startsWith("publicity.visit.") && !["comet", "asteroid", "asteroids"].includes(k.slice("publicity.visit.".length)))
-    .reduce((a, k) => a + (s.mean[k] ?? 0), 0);
+  const planetKeys = Object.keys(s.mean).filter(
+    (k) => k.startsWith("publicity.visit.") && !["comet", "asteroid", "asteroids"].includes(k.slice("publicity.visit.".length)),
+  );
+  const planetsPublicity = planetKeys.reduce((a, k) => a + (s.mean[k] ?? 0), 0);
   const publicity = [
-    { key: "comet", label: "From comets", value: m("publicity.visit.comet"), color: VIZ[0] as string },
+    { key: "comet", label: "From comets", value: m("publicity.visit.comet"), color: VIZ[0] as string, spread: sd("publicity.visit.comet") },
     {
       key: "asteroid",
       label: "From asteroids",
       value: m("publicity.visit.asteroid") + m("publicity.visit.asteroids"),
       color: VIZ[1] as string,
+      spread: sdOf((c) => (c["publicity.visit.asteroid"] ?? 0) + (c["publicity.visit.asteroids"] ?? 0)),
     },
-    { key: "planet", label: "From planets", value: planetsPublicity, color: VIZ[2] as string },
-    { key: "sector", label: "From completing a sector", value: m("publicity.sector"), color: VIZ[3] as string },
+    {
+      key: "planet",
+      label: "From planets",
+      value: planetsPublicity,
+      color: VIZ[2] as string,
+      spread: sdOf((c) => planetKeys.reduce((a, k) => a + (c[k] ?? 0), 0)),
+    },
+    {
+      key: "sector",
+      label: "From completing a sector",
+      value: m("publicity.sector"),
+      color: VIZ[3] as string,
+      spread: sd("publicity.sector"),
+    },
   ];
   const dataRows = [
-    { key: "gained", label: "Gained", value: m("data.gained") },
-    { key: "computer", label: "Placed in the computer", value: m("data.computer") },
-    { key: "other", label: "Used in other ways", value: Math.max(0, m("data.lost") - m("data.computer")) },
+    { key: "gained", label: "Gained", value: m("data.gained"), spread: sd("data.gained") },
+    { key: "computer", label: "Placed in the computer", value: m("data.computer"), spread: sd("data.computer") },
+    {
+      key: "other",
+      label: "Used in other ways",
+      value: Math.max(0, m("data.lost") - m("data.computer")),
+      spread: sdOf((c) => Math.max(0, (c["data.lost"] ?? 0) - (c["data.computer"] ?? 0))),
+    },
   ];
   const tuckKinds = [
     { key: "credit", label: "Credit", icon: <CreditIcon size={20} /> },
@@ -175,7 +198,7 @@ export default async function StatsPage({
           <div className="stat-tiles">
             <Tile label={s.games === 1 ? "Game" : "Games"} value={s.games} />
             <Tile label={s.rows === 1 ? "Player counted" : "Players counted"} value={s.rows} />
-            <Tile icon={<ScoreIcon size={30} />} label="Average final score" value={round(s.avgScore)} />
+            <Tile icon={<ScoreIcon size={30} />} label="Average final score" value={round(s.avgScore)} spread={spreadOf(s.scores)} />
             <Tile icon={<ScoreIcon size={30} />} label="Best final score" value={s.bestScore} />
           </div>
 
@@ -252,6 +275,7 @@ export default async function StatsPage({
                     </span>
                   ),
                   value: x.avgScore,
+                  spread: x.spread,
                   text: (
                     <>
                       <b>{round(x.avgScore)}</b>
@@ -277,6 +301,7 @@ export default async function StatsPage({
                     </span>
                   ),
                   value: m(`action.${a.key}`),
+                  spread: sd(`action.${a.key}`),
                   text: <b>{round(m(`action.${a.key}`))}</b>,
                 }))}
               />
@@ -284,13 +309,28 @@ export default async function StatsPage({
 
             <Panel title="Probes, planets and cards" wide>
               <div className="stat-tiles small">
-                <Tile icon={<ActionIcon name="launch" size={28} />} label="Probes launched" value={round(m("probes.launched"))} />
-                <Tile icon={<ActionIcon name="orbit" size={28} />} label="Orbiters" value={round(m("orbiters"))} />
-                <Tile icon={<ActionIcon name="land" size={28} />} label="Landers" value={round(m("landers"))} />
-                <Tile icon={<DisplayCardIcon size={26} />} label="Cards drawn" value={round(m("cards.drawn"))} />
-                <Tile icon={<DeckCardIcon size={26} />} label="Cards played" value={round(m("cards.played"))} />
-                <Tile label="Missions played" value={round(m("missions.played"))} />
-                <Tile label="Missions completed" value={round(m("missions.completed"))} />
+                <Tile
+                  icon={<ActionIcon name="launch" size={28} />}
+                  label="Probes launched"
+                  value={round(m("probes.launched"))}
+                  spread={sd("probes.launched")}
+                />
+                <Tile icon={<ActionIcon name="orbit" size={28} />} label="Orbiters" value={round(m("orbiters"))} spread={sd("orbiters")} />
+                <Tile icon={<ActionIcon name="land" size={28} />} label="Landers" value={round(m("landers"))} spread={sd("landers")} />
+                <Tile icon={<DisplayCardIcon size={26} />} label="Cards drawn" value={round(m("cards.drawn"))} spread={sd("cards.drawn")} />
+                <Tile icon={<DeckCardIcon size={26} />} label="Cards played" value={round(m("cards.played"))} spread={sd("cards.played")} />
+                <Tile
+                  icon={<MissionIcon size={30} />}
+                  label="Missions played"
+                  value={round(m("missions.played"))}
+                  spread={sd("missions.played")}
+                />
+                <Tile
+                  icon={<MissionIcon done size={30} />}
+                  label="Missions completed"
+                  value={round(m("missions.completed"))}
+                  spread={sd("missions.completed")}
+                />
               </div>
             </Panel>
 
@@ -306,6 +346,7 @@ export default async function StatsPage({
                     </span>
                   ),
                   value: m(`trace.${c}`),
+                  spread: sd(`trace.${c}`),
                   text: <b>{round(m(`trace.${c}`))}</b>,
                   color: TRACE_HEX[c],
                 }))}
@@ -328,6 +369,7 @@ export default async function StatsPage({
                     </span>
                   ),
                   value: m(`tucked.${k.key}`),
+                  spread: sd(`tucked.${k.key}`),
                   text: <b>{round(m(`tucked.${k.key}`))}</b>,
                 }))}
               />
@@ -354,6 +396,7 @@ export default async function StatsPage({
                   color: INCOME_HEX[k] as string,
                   icon: k === "credit" ? <CreditIcon size={18} /> : k === "energy" ? <EnergyIcon size={18} /> : <DeckCardIcon size={18} />,
                   values: s.rounds.map((r) => m(`incomerate.r${r}.${k}`)),
+                  spreads: s.rounds.map((r) => sd(`incomerate.r${r}.${k}`) ?? { min: 0, max: 0, std: 0 }),
                 }))}
               />
             </Panel>
@@ -369,6 +412,7 @@ export default async function StatsPage({
                   key: r.key,
                   label: r.label,
                   value: r.value,
+                  spread: r.spread,
                   text: <b>{round(r.value)}</b>,
                 }))}
               />
@@ -389,6 +433,7 @@ export default async function StatsPage({
                         </span>
                       ),
                       value: m(`sectorwin.${c}`),
+                      spread: sd(`sectorwin.${c}`),
                       text: <b>{round(m(`sectorwin.${c}`))}</b>,
                       color: SECTOR_HEX[c],
                       outline: c === "black",
@@ -408,6 +453,7 @@ export default async function StatsPage({
                         </span>
                       ),
                       value: m(`signal.${c}`),
+                      spread: sd(`signal.${c}`),
                       text: <b>{round(m(`signal.${c}`))}</b>,
                       color: SECTOR_HEX[c],
                       outline: c === "black",
@@ -436,6 +482,7 @@ export default async function StatsPage({
                       key: c,
                       label: cap(c),
                       value: m(`techcat.${c}`),
+                      spread: sd(`techcat.${c}`),
                       text: <b>{round(m(`techcat.${c}`))}</b>,
                       color: VIZ[i % VIZ.length],
                     }))}
@@ -471,8 +518,18 @@ export default async function StatsPage({
               }
             >
               <div className="stat-tiles small">
-                <Tile icon={<DeckCardIcon size={26} />} label="End-of-game cards played" value={round(m("endcards.played"))} />
-                <Tile icon={<ScoreIcon size={28} />} label="Points from them" value={round(m("endcards.points"))} />
+                <Tile
+                  icon={<DeckCardIcon size={26} />}
+                  label="End-of-game cards played"
+                  value={round(m("endcards.played"))}
+                  spread={sd("endcards.played")}
+                />
+                <Tile
+                  icon={<ScoreIcon size={28} />}
+                  label="Points from them"
+                  value={round(m("endcards.points"))}
+                  spread={sd("endcards.points")}
+                />
               </div>
               {s.gold.length > 0 ? (
                 <>

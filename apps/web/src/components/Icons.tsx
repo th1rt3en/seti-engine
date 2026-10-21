@@ -96,6 +96,16 @@ export function ActionIcon({ name, size = 30 }: { name: string; size?: number })
   return <img src={src} alt="" width={size} height={Math.round(size * 1.1)} className="resicon actionicon" decoding="async" />;
 }
 
+/** A mission: the silver card of the free action "Complete a mission"; with the check mark when it was completed (cut from the player aid). */
+export function MissionIcon({ done = false, size = 26 }: { done?: boolean; size?: number }) {
+  const src = PRINTED[done ? "mission-done" : "mission"];
+  if (!src) return null;
+  const label = done ? "Missions completed" : "Missions played";
+  return (
+    <img src={src} alt={label} title={label} height={size} style={{ height: size, width: "auto" }} className="resicon" decoding="async" />
+  );
+}
+
 export function CreditIcon({ size = SIZE }: { size?: number }) {
   return <Printed name="credit" label="Credit" size={size} />;
 }
