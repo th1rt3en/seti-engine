@@ -74,7 +74,7 @@ def _final_total(state: GameState, seat: int) -> float:
     return float(state.players[seat].score)
 
 
-def _public(move: dict[str, Any], events: list[dict[str, Any]], seat: int) -> dict[str, Any]:
+def public_move(move: dict[str, Any], events: list[dict[str, Any]], seat: int) -> dict[str, Any]:
     """The move as the memory of the network gets it: with the card that was taken from the display named (the arena and the AI service do the same)."""
     out = dict(move)
     for e in events:
@@ -126,7 +126,7 @@ def examples_from_log(
             out.policy.append(PolicyExample(tokens, toks, nums, chosen, _w(policy_weight, seat)))
         res = engine.apply(state, move)
         know.update(seat, move, res.events)
-        history.append((seat, _public(move, res.events, seat)))
+        history.append((seat, public_move(move, res.events, seat)))
         state = res.state
         if finished and index in last_of_bundle and index in kept and _w(value_weight, seat) > 0:
             after = project(state, seat, previews=False)
