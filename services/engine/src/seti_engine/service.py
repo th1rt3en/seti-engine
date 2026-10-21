@@ -1,7 +1,8 @@
 """The stateless HTTP service around the engine (run it with `uvicorn seti_engine.service:app`).
 
 Every request carries the whole game state; nothing is kept between requests, so any number of instances can serve one game (decision D5).
-Endpoints: POST /new, POST /apply, POST /legal, POST /project, POST /stats, PUT /archive, PUT /errors, GET /schema, GET /health.
+Endpoints: POST /new, POST /apply, POST /legal, POST /project, POST /stats, POST /replay/view, PUT /archive, PUT /errors, GET /schema,
+GET /health.
 Callers sign their requests (request_auth.py, decision D16); deploy the service private as well (Cloud Run IAM).
 See docs/deploy-engine.md.
 """
@@ -99,6 +100,32 @@ def game_stats(req: StatsRequest) -> dict[str, Any]:
         "actions": [{"seq": i, "action": a} for i, a in enumerate(req.actions)],
     }
     return stats.game_stats(file)
+
+
+class ReplayViewRequest(BaseModel):
+    options: Options
+    actions: list[dict[str, Any]]
+    step: int = 0
+    viewer: int | None = None  # a seat, or None for the spectator
+    rng_encoding: str = "exact"  # "double" for a game played before the random state was written as a string (replay.steps)
+
+
+class ReplayViewResponse(BaseModel):
+    step: int
+    view: View
+    previous: View | None  # the view of the step before, for what has just changed (None at the start)
+
+
+@app.post("/replay/view", response_model=ReplayViewResponse)
+def replay_view(req: ReplayViewRequest) -> ReplayViewResponse:
+    """One step of a replay, as a seat or the spectator saw it. The caller decides who may look through whose eyes (finished games only)."""
+    step = max(0, min(req.step, len(req.actions)))
+    before, state = replay.state_at(req.options, req.actions, step, req.rng_encoding)
+    return ReplayViewResponse(
+        step=step,
+        view=project(state, req.viewer),
+        previous=None if before is None else project(before, req.viewer),
+    )
 
 
 class ArchiveRequest(BaseModel):

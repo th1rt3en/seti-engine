@@ -1,13 +1,17 @@
 "use client";
-// The replay of a finished game: step through every action, with the events the engine reported for it, and look at the board
-// as the spectator or as any player saw it. Every state comes from the engine (/api/replay); nothing is worked out here.
+// The replay of a finished game: step through every action, with the events the engine reported for it, and look at the game as the spectator or as
+// any player saw it: the same game page as in play (the board, the player boards, the trackers, the hand, the tech stacks, the card row, the log),
+// without the clocks and without moves to make. Every state comes from the engine (/api/replay); nothing is worked out here.
 import { type GameEvent, describeEvent } from "@/lib/events";
+import { lastMoveOf } from "@/lib/lastMove";
 import { describeMove } from "@/lib/moves";
 import type { ReplayData } from "@/lib/worker";
 import type { View } from "@seti/protocol";
 import { useEffect, useState } from "react";
 import { GameView } from "./GameView";
 import { ScoreIcon } from "./Icons";
+import { type LogContext, type LogEntry, MoveLog } from "./MoveLog";
+import { PlayerBoardPanel } from "./PlayerBoard";
 
 const REASONS: Record<string, string> = {
   completed: "The game was played to the end.",
@@ -31,6 +35,10 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
   }, [replay.actions.length]);
   const [viewer, setViewer] = useState("spectator");
   const [view, setView] = useState<View | null>(null);
+  // the view of the step before, for what has just changed (the trackers show the difference)
+  const [previous, setPrevious] = useState<View | null>(null);
+  const [boardOpen, setBoardOpen] = useState(false);
+  const [boardPlayer, setBoardPlayer] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,10 +47,12 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
     setError(null);
     fetch(`/api/replay/${id}?step=${step}&viewer=${viewer}`)
       .then(async (res) => {
-        const body = (await res.json()) as { ok: boolean; view?: View; message?: string };
+        const body = (await res.json()) as { ok: boolean; view?: View; previous?: View | null; message?: string };
         if (!current) return;
-        if (body.ok && body.view) setView(body.view);
-        else setError(body.message ?? "could not load this step");
+        if (body.ok && body.view) {
+          setView(body.view);
+          setPrevious(body.previous ?? null);
+        } else setError(body.message ?? "could not load this step");
       })
       .catch(() => current && setError("could not load this step"));
     return () => {
@@ -97,6 +107,22 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
   }, [playing, step, last]);
 
   const shown = step > 0 ? replay.actions[step - 1] : undefined;
+  // the log of the moves made so far, as in play (the same entries the players saw, up to this step)
+  const logEntries: LogEntry[] = replay.actions.slice(0, step).map((a) => ({
+    seq: a.seq,
+    seat: a.seat,
+    action: a.action as LogEntry["action"],
+    events: a.events as GameEvent[],
+  }));
+  const logCtx = (v: View): LogContext => ({
+    who: (i: number) => (v.state.rival && i === v.state.rival.index ? "Rival" : (names[i] ?? `Player ${i + 1}`)),
+    stars: v.state.sectors.map((sec) => sec.star),
+    species: v.state.species.map((sp, i) =>
+      sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`,
+    ),
+    rival: v.state.rival ? v.state.rival.index : null,
+    me: v.viewer,
+  });
   const end = replay.result?.result;
   return (
     <>
@@ -190,7 +216,38 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
         ) : null}
       </section>
       {error ? <p className="error">{error}</p> : null}
-      {view ? <GameView view={view} names={names} /> : <p className="muted">Loading...</p>}
+      {view ? (
+        <GameView
+          view={view}
+          names={names}
+          previous={previous}
+          lastMove={lastMoveOf(shown?.events as never)}
+          log={<MoveLog entries={logEntries} ctx={logCtx(view)} />}
+          overlay={
+            <>
+              <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
+                {boardOpen ? "Close player boards" : "Player boards"}
+              </button>
+              {boardOpen ? (
+                <PlayerBoardPanel
+                  view={view}
+                  names={names}
+                  shown={boardPlayer}
+                  onShow={setBoardPlayer}
+                  onClose={() => setBoardOpen(false)}
+                />
+              ) : null}
+            </>
+          }
+          topExtra={
+            <span className="small muted">
+              Replay · step {step} of {last}
+            </span>
+          }
+        />
+      ) : (
+        <p className="muted">Loading...</p>
+      )}
       <section className="card">
         <h3>All events</h3>
         <ol className="small eventlog">

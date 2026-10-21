@@ -54,3 +54,27 @@ def test_js_number_is_the_nearest_double_written_with_its_shortest_digits() -> N
     assert rp.js_number(5) == 5
     assert rp.js_number(2**53 + 1) == 2**53  # the odd number above 2**53 is not a double
     assert rp.js_number(12345678901234567890) == 12345678901234567000  # JSON.stringify(12345678901234567890) in JavaScript
+
+
+def test_the_replay_view_endpoint_gives_a_step_and_the_one_before() -> None:
+    from fastapi.testclient import TestClient
+
+    from seti_engine.service import app
+
+    file, _ = played_through_javascript(seed=3, moves=80)
+    actions = [e["action"] for e in file["actions"]]
+    client = TestClient(app)
+    body = {"options": file["header"]["options"], "actions": actions, "step": 40, "viewer": None, "rng_encoding": "double"}
+    res = client.post("/replay/view", json=body)
+    assert res.status_code == 200
+    got = res.json()
+    assert got["step"] == 40 and got["previous"] is not None
+    # the same state as the step-by-step replay (the round count and the scores are enough to see that it is the 40th)
+    states = [r.state for _, _, r in rp.steps(file, rng_encoding="double")]
+    assert got["view"]["state"]["round"] == states[40].round
+    assert [p["score"] for p in got["view"]["state"]["players"]] == [p.score for p in states[40].players]
+    assert [p["score"] for p in got["previous"]["state"]["players"]] == [p.score for p in states[39].players]
+    start = client.post("/replay/view", json={**body, "step": 0}).json()
+    assert start["previous"] is None
+    far = client.post("/replay/view", json={**body, "step": 9999}).json()
+    assert far["step"] == 80  # a step past the end is the last one

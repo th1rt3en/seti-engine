@@ -12,7 +12,7 @@ from decimal import Decimal
 from typing import Any
 
 from . import engine
-from .models import Options
+from .models import GameState, Options
 
 FORMAT = "seti-game-log/1"
 
@@ -48,6 +48,22 @@ def steps(replay: dict[str, Any], rng_encoding: str | None = None) -> Iterator[t
             state.rng_state = js_number(state.rng_state)
         result = engine.apply(state, entry["action"])
         yield n, entry, result
+
+
+def state_at(
+    options: Options, actions: list[dict[str, Any]], step: int, rng_encoding: str = "exact"
+) -> tuple[GameState | None, GameState]:
+    """The state after `step` actions (0 is the start) and the one before it (None at the start), for the replay page: the whole game is
+    replayed here, in one request, because it takes a fraction of a second (a request per action would be hundreds of calls)."""
+    step = max(0, min(step, len(actions)))
+    entries = [{"seq": i, "action": a} for i, a in enumerate(actions[:step])]
+    file = {"format": FORMAT, "header": {"options": options.model_dump()}, "actions": entries}
+    before: GameState | None = None
+    state: GameState | None = None
+    for _, _, result in steps(file, rng_encoding):
+        before, state = state, result.state
+    assert state is not None
+    return before, state
 
 
 def verify(replay: dict[str, Any]) -> engine.StepResult:
