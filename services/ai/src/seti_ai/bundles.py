@@ -73,7 +73,8 @@ class Bundle:
         return self.kind == TURN and self.main is not None and (self.main == "pass" or any(m.cls == "end" for m in self.steps))
 
 
-def _kind(state: GameState, seat: int) -> tuple[str, tuple[int, int, int]]:
+def bundle_key(state: GameState, seat: int) -> tuple[str, tuple[int, int, int]]:
+    """The kind and the key of the bundle that a decision of `seat` in this state belongs to (the bundle search stops when it changes)."""
     if state.phase != "play":
         return SETUP, (0, 0, seat)
     key = (state.round, state.turn, state.current_player)
@@ -111,7 +112,7 @@ def micros_from_log(options: Options, actions: list[dict[str, Any]], rng_encodin
             state = engine.apply(state, move).state
             continue
         before = state.players[seat].score
-        kind, key = _kind(state, seat)
+        kind, key = bundle_key(state, seat)
         nxt = engine.apply(state, move).state
         kept.append(Micro(index, seat, move, cls, kind, key, before, nxt.players[seat].score))
         state = nxt

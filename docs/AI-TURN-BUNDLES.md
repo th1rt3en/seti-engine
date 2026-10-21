@@ -173,3 +173,30 @@ the approval of the version by the owner.
 **9.5 Questions for the owner:** (a) is the alpha as described in 9.1 (a search with the heuristic evaluator, no network) what you want to release first? (b) is the
 list in 9.3 the way to learn from the games of people, and should only the better players' games count for the imitation? (c) in what order: the bundles and the search
 first (so that the alpha can be played), then the bot seat and the data pipeline, and the network after the first human games?
+
+## 10. The owner's answers to section 9 (2026-10-21) and the plan that follows
+
+**(a) The alpha is a trained network**, very weak, not a search with a hand-made evaluator (section 9.1 is replaced by this). It is trained on the games of the bots
+(cut into bundles) so that it plays and can be released; the bundle search of stage B runs on top of it when it plays.
+
+**(b) Learning from the games of people: yes, with these rules for a game of a person against the model:**
+- a game that **the model lost** counts, with **more weight**: the bundles of the person (who won) are examples to imitate, and the positions of both seats give
+  the value labels;
+- a game that **the model won** is **skipped**: nothing is learned from it.
+
+A caution that I will keep in the design (not a change of the rule): if the value is learned only from lost games it becomes pessimistic about every position. The
+games of the bots against each other (and the model against the bots) are mixed in with the games of people in every training batch, so that it sees wins as well. The
+share of the games of people is a setting.
+
+**(c) The order:** 1) the bundle search; 2) the network is trained (the alpha); 3) while it trains, the model in the lobby and the pipeline of data for the games of
+people against the model are built.
+
+### The pieces, in order, and what each needs from the owner
+
+| # | Piece | Needs the owner |
+|---|---|---|
+| 1 | Bundle search (`seti_ai/bundle_search.py`): candidate bundles by sampling the micro policy on copies of the game (the hidden cards of the opponent drawn again, chance drawn again), their neighbours (a free action added, removed, or moved to the other side of the main action), each scored by points gained + the value of the position after the bundle; the best one is played. Tests: it finds a better bundle than the sampled ones when the value is known; it never reads the opponent's real hand. | the design above (done) |
+| 2 | The network at the level of bundles (the same transformer; the class of each move is a feature; the value is read at the end of the own bundle) and the training (`seti_ai/bundle_train.py`): examples are the bundles chosen by the search, the value labels are the points gained from the end of a bundle to the end of the game, the games of people are weighted as in (b); pause and resume; the head-to-head gate; metrics against 250. Tests on the games of the bots, without training. | **a go before the first training run** (the training stays stopped until then) |
+| 3 | The alpha: a short training on the games of the bots, then the gate | the go for the run; the approval of the version |
+| 4 | The lobby: a bot seat (the Worker asks the AI service when it is the bot's turn), the AI service, the consent warning, the version in the archive header, the `/bots` page | the approval of the version before it is released |
+| 5 | The data pipeline: `seti_ai.dataset` copies the new games from the bucket, replays them with the engine of their rules version and the right random-state encoding, cuts them into bundles, applies the rule (b), and writes the examples | |

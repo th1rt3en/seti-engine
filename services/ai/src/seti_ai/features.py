@@ -351,10 +351,13 @@ def _note_tokens(prefix: str, note: Any, out: list[int]) -> None:
         out.append(_bucket(f"{prefix}={note}"))
 
 
-def encode_move(move: dict[str, Any], note: dict[str, Any] | None) -> tuple[list[int], list[float]]:
-    """The tokens (hashed `type`, `key=value`, `type:key=value`, and the engine's note of the move) and the numbers of one legal move."""
+def encode_move(move: dict[str, Any], note: dict[str, Any] | None, cls: str | None = None) -> tuple[list[int], list[float]]:
+    """The tokens (hashed `type`, the class of the move in the turn, `key=value`, `type:key=value`, and the engine's note of the move) and the numbers of one
+    legal move."""
     t = str(move["type"])
     tokens = [_bucket(f"type={t}")]
+    if cls is not None:
+        tokens.append(_bucket(f"class={cls}"))  # free, main, answer, end, control (the engine says it: View.classes)
     for k, v in move.items():
         if k == "type":
             continue
@@ -380,7 +383,7 @@ def encode_moves(view: View, keep: list[int] | None = None) -> tuple[NDArray[np.
     toks = np.zeros((len(ids), MAX_TOKENS), dtype=np.int32)
     nums = np.zeros((len(ids), MOVE_NUM), dtype=np.float32)
     for row, i in enumerate(ids):
-        t, x = encode_move(view.legal[i], view.notes[i] if i < len(view.notes) else None)
+        t, x = encode_move(view.legal[i], view.notes[i] if i < len(view.notes) else None, view.classes[i] if i < len(view.classes) else None)
         toks[row, : len(t)] = t
         nums[row] = x
     return toks, nums
