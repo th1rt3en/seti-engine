@@ -1,4 +1,4 @@
-# Deploying the AI lobby service
+﻿# Deploying the AI lobby service
 
 The model that sits in a lobby is played by a small stateless HTTP service (`services/ai/src/seti_ai/lobby_server.py`). The Worker's room asks it for each move
 of an AI seat. The owner runs these steps; the agents do not deploy (CLAUDE.md rule 7).
@@ -23,6 +23,12 @@ python -m uv run python -m seti_ai.lobby_export --models models_alpha --out serv
 
 `--live` marks the version in the site's table `bot_versions`; the lobby page offers the live versions to the host, and the same version is listed on `/bots`.
 The weights never leave this machine except in the image below.
+
+## Redeploy from this machine
+
+The AI service is not part of the GitHub Action (decision 2026-10-22): the weights are not in git. After approving a new version (`publish --approve`), run
+`powershell -File tools/deploy/deploy-ai.ps1`. It exports the approved versions, stages the code and the weights, and runs `gcloud run deploy seti-ai`; the service keeps its public
+signed-requests setup, so the IAM binding does not need repeating.
 
 ## Build and run
 
