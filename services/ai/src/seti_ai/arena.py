@@ -28,6 +28,7 @@ class GameResult:
     steps: int
     finished: bool
     state: GameState | None = field(default=None, repr=False)
+    actions: list[dict[str, Any]] = field(default_factory=list, repr=False)  # the moves that were played, in order: the log of the game
 
 
 def final_totals(state: GameState) -> list[int]:
@@ -42,6 +43,7 @@ def play_game(players: list[Any], seed: int, rng: random.Random | None = None, o
     r = engine.start(opts)
     steps = 0
     history: list[tuple[int, dict[str, Any]]] = []  # the actions of both seats so far: the memory of the agent
+    actions: list[dict[str, Any]] = []  # the moves as the engine got them (no extra fields): what a replay needs
     know = Knowledge()  # the cards that the other seats are known to hold (taken from the display, shown)
     for p in players:
         p.history = history
@@ -53,6 +55,7 @@ def play_game(players: list[Any], seed: int, rng: random.Random | None = None, o
         i = players[seat].act(r.state, view, rng)
         move = dict(view.legal[i])
         r = engine.apply(r.state, view.legal[i])
+        actions.append(view.legal[i])
         know.update(seat, move, r.events)
         for e in r.events:  # a card taken from the display is named for everybody
             if e.get("type") == "take_display_card" and e.get("player") == seat:
@@ -63,7 +66,7 @@ def play_game(players: list[Any], seed: int, rng: random.Random | None = None, o
     scores = final_totals(r.state) if done else [p.score for p in r.state.players]
     top = max(scores)
     winners = [i for i, s in enumerate(scores) if s == top]
-    return GameResult(seed, scores, winners[0] if len(winners) == 1 else None, steps, done)
+    return GameResult(seed, scores, winners[0] if len(winners) == 1 else None, steps, done, None, actions)
 
 
 def match(a: Any, b: Any, games: int, first_seed: int = 10_000, options: dict[str, Any] | None = None) -> dict[str, float]:
