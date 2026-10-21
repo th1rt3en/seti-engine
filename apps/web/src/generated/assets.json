@@ -277,6 +277,15 @@
   },
   "moon": "/assets/discs/moon.42ba127546.webp",
   "sun": "/assets/discs/sun.da983c8efd.webp",
+  "rotationDial": {
+    "base": "/assets/discs/dial-base.ade7a6c540.webp",
+    "inner": "/assets/discs/dial-inner.d83bab4762.webp",
+    "inner-grey": "/assets/discs/dial-inner-grey.ddd6ffbde8.webp",
+    "middle": "/assets/discs/dial-middle.287abeec8f.webp",
+    "middle-grey": "/assets/discs/dial-middle-grey.ad427dd69a.webp",
+    "outer": "/assets/discs/dial-outer.73e0c520d9.webp",
+    "outer-grey": "/assets/discs/dial-outer-grey.9cdb04ab97.webp"
+  },
   "objectives": {
     "L1-16-vp": "/assets/solo/objective-L1-16-vp.e1cbd1fb62.webp",
     "L1-5-data": "/assets/solo/objective-L1-5-data.99a66eba92.webp",

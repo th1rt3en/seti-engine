@@ -304,7 +304,8 @@ function Board({
           {front.map((f, i) => {
             const x = MISSIONS.x + (i % 6) * (MISSIONS.w + MISSIONS.gap);
             const y = frontY + 40 + Math.floor(i / 6) * (MISSIONS.h + 30);
-            const src = f.card ? cardImage(f.card) : assets.cardBack;
+            // a card played face down is an Exertian card: it shows the Exertian back, not the back of the main deck
+            const src = f.card ? cardImage(f.card) : assets.alienBacks.exertians;
             return (
               <g key={f.key}>
                 {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}

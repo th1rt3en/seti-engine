@@ -66,6 +66,7 @@ const TILES = assets.milestoneTiles as Record<string, string> & { white: string 
 const SAMPLES = assets.samples as Record<string, string> & { back: string };
 /** The radius of the button of the preview: just outside the last ring, between the sectors at 3 o'clock. */
 const SOLAR_BUTTON_RADIUS = 1030;
+const NEXT_DISC_SIZE = 150; // the indicator of the disc that turns next (the picture is the disc of the icon, 69 px of the board picture)
 const cap = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
 const SLOTS = slotData as Record<string, { r: number; width: number; hi: number; lo: number }>;
@@ -1108,6 +1109,32 @@ export function BoardView({
               <circle r={18} className="solarbtnsun" />
               <path d="M-30 0 A30 30 0 0 1 22 -22" className="solarbtnarc" />
               <path d="M22 -34 L22 -14 L4 -22 Z" className="solarbtnhead" />
+            </g>
+          );
+        })()}
+        {(() => {
+          // the disc that turns next, at 9 o'clock between two sectors (opposite the preview button): its line is in colour, the other two are greyed out
+          const at = polar(SOLAR_BUTTON_RADIUS, 180);
+          const dial = assets.rotationDial;
+          const lines: { key: "inner" | "middle" | "outer"; disc: 1 | 2 | 3 }[] = [
+            { key: "inner", disc: 1 },
+            { key: "middle", disc: 2 },
+            { key: "outer", disc: 3 },
+          ];
+          return (
+            <g transform={`translate(${at.x} ${at.y})`} pointerEvents="all">
+              <title>{`Next rotation: ${nextDisc === 1 ? "ring 1" : nextDisc === 2 ? "rings 1 and 2" : "rings 1, 2 and 3"}`}</title>
+              <image href={dial.base} x={-NEXT_DISC_SIZE / 2} y={-NEXT_DISC_SIZE / 2} width={NEXT_DISC_SIZE} height={NEXT_DISC_SIZE} />
+              {lines.map(({ key, disc }) => (
+                <image
+                  key={key}
+                  href={disc === nextDisc ? dial[key] : dial[`${key}-grey` as "inner-grey" | "middle-grey" | "outer-grey"]}
+                  x={-NEXT_DISC_SIZE / 2}
+                  y={-NEXT_DISC_SIZE / 2}
+                  width={NEXT_DISC_SIZE}
+                  height={NEXT_DISC_SIZE}
+                />
+              ))}
             </g>
           );
         })()}

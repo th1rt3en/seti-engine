@@ -13,4 +13,5 @@ tar --exclude=./node_modules --exclude='*/node_modules' --exclude='*/.next' --ex
 cd ~/seti
 pnpm install --no-frozen-lockfile 2>&1 | tail -3
 cd apps/web
-pnpm exec opennextjs-cloudflare build 2>&1 | tail -6
+# Next.js 15 is out of its two-year support window since 2026-10-21: OpenNext refuses it without the flag (upgrading Next is an open decision)
+pnpm exec opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion 2>&1 | tail -6
