@@ -47,8 +47,8 @@ export default async function BotsPage() {
           Games of 3 and 4 players come later, with their own versions.
         </li>
         <li>
-          <b>What it knows:</b> only what a player sitting at the table knows. It never sees the cards in your hand or the order of the deck.
-          For what it cannot see it knows how many there are, and it remembers the cards that were shown or taken from the display.
+          <b>What it knows:</b> only what a player sitting at the table knows. It never sees the cards in your hand or the order of the
+          deck. For what it cannot see it knows how many there are, and it remembers the cards that were shown or taken from the display.
         </li>
       </ul>
       <h2>How it is made</h2>
