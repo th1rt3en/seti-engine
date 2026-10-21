@@ -17,7 +17,7 @@ Settings that are not secret are in `apps/web/wrangler.toml`. The owner runs the
 
 ## Build and deploy
 
-OpenNext's Cloudflare build does not work with Windows paths. On Linux or macOS: `cd apps/web && pnpm exec opennextjs-cloudflare build && pnpm exec wrangler deploy`.
+OpenNext's Cloudflare build does not work with Windows paths. On Linux or macOS: `cd apps/web && pnpm exec opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && pnpm exec wrangler deploy` (Next.js 15 is past its two-year support window since 2026-10-21 and OpenNext refuses it without the flag; the GitHub workflow "Deploy" does the same, after its checks and the database migrations).
 On Windows use WSL: install Node 22 and pnpm 10 in WSL, run `tools/deploy/build-web-wsl.sh` (it builds a copy in `~/seti`), copy `~/seti/apps/web/.open-next` back to
 `apps/web/.open-next`, and run `pnpm exec wrangler deploy` in `apps/web` from Windows with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` set.
 

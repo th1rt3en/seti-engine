@@ -1,20 +1,31 @@
-# Deploys the engine (Cloud Run), the game Worker and the website (Cloudflare), in that order. The website is built on Linux because OpenNext's
-# Cloudflare build does not work with Windows paths. The owner starts it by hand: GitHub, Actions, "Deploy", Run workflow; the boxes choose
-# what to deploy (all by default).
+# Checks the project, then deploys the engine (Cloud Run), the database migrations, the game Worker and the website (Cloudflare), in that order.
+# The website is built on Linux because OpenNext's Cloudflare build does not work with Windows paths. The owner starts it by hand: GitHub,
+# Actions, "Deploy", Run workflow; the boxes choose what to do (everything by default). A failed check stops the deploy.
 #
 # Repository secrets (Settings, Secrets and variables, Actions):
-#   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID   a token that may edit Workers
+#   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID   a token that may edit Workers and the D1 database
 #   GCP_SA_KEY                                    the JSON key of a Google service account that may deploy to Cloud Run from source
 #                                                 (roles: Cloud Run Admin, Cloud Build Editor, Artifact Registry Writer, Storage Admin,
 #                                                 Service Account User)
 # The environment variables and secrets of the Cloud Run service and the Worker secrets stay where they are.
+#
+# Order matters: the engine first (the Worker never calls an engine older than itself), then the migrations, then the Worker, then the website
+# (the website asks the engine to replay games, and the replay of a game depends on how the Worker marked it).
 name: Deploy
 
 on:
   workflow_dispatch:
     inputs:
+      checks:
+        description: Run the tests and the type checks first (a failure stops the deploy)
+        type: boolean
+        default: true
       engine:
         description: Deploy the engine (Cloud Run)
+        type: boolean
+        default: true
+      migrations:
+        description: Apply the new database migrations (D1, apps/worker/migrations); the ones that were applied before are skipped
         type: boolean
         default: true
       worker:
@@ -29,14 +40,61 @@ on:
 permissions:
   contents: read
 
+# one deploy at a time: a second run waits for the first
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 env:
   GCP_PROJECT: freestyle-190711
   GCP_REGION: us-central1
   CLOUD_RUN_SERVICE: seti-engine
 
 jobs:
+  check-engine:
+    if: ${{ inputs.checks }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: services/engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --extra service
+      - name: Tests (the rules, the replay, the protocol schema)
+        run: uv run pytest -q
+      - name: Types
+        run: uv run mypy
+      - name: Lint (does not stop the deploy)
+        continue-on-error: true
+        run: uv run ruff check
+
+  check-web:
+    if: ${{ inputs.checks }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # the version comes from "packageManager" in package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - name: Types
+        run: pnpm typecheck
+      - name: Tests (the Worker, the website)
+        run: pnpm test
+      - name: Lint (does not stop the deploy)
+        continue-on-error: true
+        run: pnpm lint
+
   engine:
-    if: ${{ inputs.engine }}
+    needs: [check-engine, check-web]
+    if: ${{ !cancelled() && !failure() && inputs.engine }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -49,31 +107,36 @@ jobs:
         run: gcloud run deploy "$CLOUD_RUN_SERVICE" --project "$GCP_PROJECT" --region "$GCP_REGION" --source services/engine --quiet
 
   worker:
-    # runs after the engine (when both are chosen) so that the Worker never calls an engine older than itself
-    needs: engine
-    if: ${{ !cancelled() && !failure() && inputs.worker }}
+    # after the engine (when both are chosen) so that the Worker never calls an engine older than itself
+    needs: [check-engine, check-web, engine]
+    if: ${{ !cancelled() && !failure() && (inputs.worker || inputs.migrations) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4 # the version comes from "packageManager" in package.json
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --no-frozen-lockfile
-      - name: Deploy the Worker
+      - name: Apply the database migrations
+        if: ${{ inputs.migrations }}
         working-directory: apps/worker
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler d1 migrations apply seti --remote
+      - name: Deploy the Worker
+        if: ${{ inputs.worker }}
+        working-directory: apps/worker
         run: pnpm exec wrangler deploy
 
   web:
-    needs: worker
+    needs: [check-engine, check-web, worker]
     if: ${{ !cancelled() && !failure() && inputs.web }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -84,7 +147,8 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - name: Build for Cloudflare
         working-directory: apps/web
-        run: pnpm exec opennextjs-cloudflare build
+        # Next.js 15 is past its two-year support window (2026-10-21) and OpenNext refuses to build it without this flag; upgrading Next is a separate decision
+        run: pnpm exec opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion
       - name: Deploy the website
         working-directory: apps/web
         env:
