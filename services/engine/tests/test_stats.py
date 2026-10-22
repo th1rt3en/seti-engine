@@ -1,4 +1,4 @@
-"""The statistics of a game (stats.py): derived from the replay, not a rule."""
+﻿"""The statistics of a game (stats.py): derived from the replay, not a rule."""
 
 import random
 from typing import Any
@@ -12,6 +12,7 @@ from seti_engine.models import Options
 from seti_engine.service import app
 
 client = TestClient(app)
+SPECIES = {"arkhos", "glyphids", "anomalies", "mascamites", "centaurians", "amoeba", "exertians", "oumuamua"}
 
 
 def play(seed: int, players: int, **kw: Any) -> tuple[Options, list[dict[str, Any]]]:
@@ -94,3 +95,16 @@ def test_the_service_makes_the_same_statistics_from_the_options_and_the_actions(
     assert reply.status_code in (200, 401)
     if reply.status_code == 200:
         assert reply.json() == stats.game_stats(file_of(options, actions))
+
+
+def test_the_publicity_that_the_aliens_gave_is_counted_by_species() -> None:
+    """The per-species counters add up to the per-source ones (explore, glyph, anomaly and the alien scope) and name a real species."""
+    for seed in range(3, 25):
+        for kw in ({}, {"expansion": True, "organizations": True}):
+            options, actions = play(seed, 2, **kw)
+            for p in stats.game_stats(file_of(options, actions))["players"]:
+                c = p["counters"]
+                by_species = {k: v for k, v in c.items() if k.startswith("publicity.alien.")}
+                by_source = sum(v for k, v in c.items() if k in [f"gain.{s}.publicity" for s in ("explore", "glyph", "anomaly", "alien")])
+                assert sum(by_species.values()) == by_source
+                assert all(k.split(".")[-1] in SPECIES for k in by_species)

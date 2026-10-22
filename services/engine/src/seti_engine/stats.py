@@ -20,6 +20,8 @@ from . import card_defs, effects, projection, replay, solar, tables
 VERSION = 2
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
+# the sources of a gain that belong to one species (the others name it: {"kind": "alien", "species": ...})
+ALIEN_SOURCES = {"explore": "arkhos", "glyph": "glyphids", "anomaly": "anomalies"}
 # Counted apart: a probe launched, an orbiter or a lander placed by something other than the main action of that name
 # (a card effect, a reward, an organization, the quick start ...).
 
@@ -157,6 +159,8 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                         c[f"publicity.{src}"] += amount
                     if res in RESOURCES and amount > 0:
                         c[f"gain.{src}.{res}"] += amount
+                    if res == "publicity" and amount > 0 and (species := ALIEN_SOURCES.get(src) or e["source"].get("species")):
+                        c[f"publicity.alien.{species}"] += amount  # what the aliens gave, by species (the page adds them up)
             elif t == "place_data":
                 c["data.computer"] += 1
             elif t == "sector_won":

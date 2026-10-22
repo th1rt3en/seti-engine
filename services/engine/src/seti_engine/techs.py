@@ -100,7 +100,8 @@ def place_lower(s: GameState, p: PlayerState, slot: int, events: Events) -> None
     p.computer_techs[slot].lower_filled = True
     tech = p.computer_techs[slot].tech
     lower = next(t["lower"] for t in tables.tech_board()["stacks"]["computer"] if tech_name("computer", t["glyph"]) == tech)
-    rewards.grant(s, p, lower, events)  # TECH-20
+    with trail.scope(s, {"kind": "tech", "tech": tech, "what": "lower"}):
+        rewards.grant(s, p, lower, events)  # TECH-20
     events.append({"type": "place_lower", "player": p.index, "slot": slot})
 
 

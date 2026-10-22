@@ -324,7 +324,8 @@ def deliver_sample(s: GameState, p: PlayerState, capsule_id: str, events: Events
     s.probes.remove(cap)
     s.species[i].extra["sample_spaces"].append(new_sample_space(cap.sample))
     for _ in range(times):  # #ET.7 resolves the delivered sample twice
-        rewards.grant(s, p, sample_faces()[cap.sample], events, slot=i)
+        with trail.scope(s, {"kind": "alien", "species": "mascamites"}):  # the statistics count what the aliens gave, by species
+            rewards.grant(s, p, sample_faces()[cap.sample], events, slot=i)
     events.append(
         {
             "type": "sample_delivered",
@@ -342,7 +343,8 @@ def mark_sample_space(s: GameState, p: PlayerState, slot_index: int, j: int, eve
     sp = s.species[slot_index].extra["sample_spaces"][j]
     sp["marker"] = p.index
     events.append({"type": "sample_space_marked", "player": p.index, "space": j, "reward": sample_faces()[sp["token"]]})
-    rewards.grant(s, p, sample_faces()[sp["token"]], events, slot=slot_index)
+    with trail.scope(s, {"kind": "alien", "species": "mascamites"}):
+        rewards.grant(s, p, sample_faces()[sp["token"]], events, slot=slot_index)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -564,7 +566,8 @@ def reach_message(s: GameState, p: PlayerState, hex_index: int, events: Events) 
     s.species[i].extra["covered"][hex_index] = p.index
     reward = board_data("centaurians")["message_rewards"][hex_index]
     events.append({"type": "message_reward", "player": p.index, "hex": hex_index, "reward": reward})
-    rewards.grant(s, p, reward, events, slot=i)
+    with trail.scope(s, {"kind": "alien", "species": "centaurians"}):
+        rewards.grant(s, p, reward, events, slot=i)
 
 
 def check_messages(s: GameState, p: PlayerState, before: int) -> None:

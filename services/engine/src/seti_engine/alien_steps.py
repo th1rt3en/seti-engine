@@ -10,7 +10,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-from . import card_defs, effects, rewards, solar, species, tables
+from . import card_defs, effects, rewards, solar, species, tables, trail
 from .models import Decision, GameState, MessageCard, PlayerState
 
 Action = dict[str, Any]
@@ -67,7 +67,8 @@ def resolve_message(s: GameState, p: PlayerState, target: int, events: Events) -
             effects.gain_income_resource(s, p, tables.cards()[mc.card]["income"])  # FAQ-C231: the increase pays at once
             became_income = True
         else:
-            rewards.grant(s, p, [r], events)
+            with trail.scope(s, {"kind": "alien", "species": "centaurians"}):
+                rewards.grant(s, p, [r], events)
     if not became_income:
         s.discard.append(mc.card)
     events.append({"type": "message_resolved", "player": p.index, "card": mc.card, "target": mc.target})
@@ -105,7 +106,8 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         tok = next_anomaly(s)
         if tok is not None:
             faces = next(x for x in species.board_data("anomalies")["tokens"] if x["column"] == tok["color"])["sides"]
-            rewards.grant(s, p, faces[tok["side"]], events)
+            with trail.scope(s, {"kind": "alien", "species": "anomalies"}):
+                rewards.grant(s, p, faces[tok["side"]], events)
     elif t == "anomaly_signal_vp":
         sectors = {tok["sector"] for tok in anomaly_tokens(s)}  # FAQ-C220: every signal the player has there, including this card's
         effects.gain_score(s, p, st.get("n", 1) * sum(sec.markers.count(p.index) for i, sec in enumerate(s.sectors) if i in sectors))
@@ -163,7 +165,8 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         if d.data["mode"] == "collect":
             species.collect_sample(s, p, a["planet"], a["sample"], events)
         else:  # peek: gain its reward and put it back (FAQ-C201)
-            rewards.grant(s, p, species.sample_faces()[a["sample"]], events, slot=species.mascamite_slot(s))
+            with trail.scope(s, {"kind": "alien", "species": "mascamites"}):
+                rewards.grant(s, p, species.sample_faces()[a["sample"]], events, slot=species.mascamite_slot(s))
     elif t == "pol_pick":
         s.aside.remove(a["card"])
         s.discard.append(a["card"])

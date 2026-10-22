@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import rewards, rng, tables
+from . import rewards, rng, tables, trail
 from .models import Decision, GameState, PlayerState, SpeciesSlot
 
 Events = list[dict[str, Any]]
@@ -69,7 +69,8 @@ def gain_section(s: GameState, p: PlayerState, color: str, events: Events) -> No
     extra = s.species[i].extra
     spaces = in_section(extra, color)
     for sp in spaces:
-        rewards.grant(s, p, data()["organelles"][extra["organelles"][sp]], events)
+        with trail.scope(s, {"kind": "alien", "species": "amoeba"}):
+            rewards.grant(s, p, data()["organelles"][extra["organelles"][sp]], events)
     events.append({"type": "organelles", "player": p.index, "color": color, "spaces": spaces})
     mutate(extra, spaces)
 
@@ -91,7 +92,8 @@ def pick(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> Non
         events.append({"type": "organelle_skipped", "player": p.index, "color": a["color"]})
         return
     extra = s.species[i].extra
-    rewards.grant(s, p, data()["organelles"][extra["organelles"][a["space"]]], events)
+    with trail.scope(s, {"kind": "alien", "species": "amoeba"}):
+        rewards.grant(s, p, data()["organelles"][extra["organelles"][a["space"]]], events)
     events.append({"type": "organelle", "player": p.index, "space": a["space"]})
     mutate(extra, [a["space"]])
 

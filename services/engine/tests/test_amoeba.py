@@ -184,3 +184,13 @@ def test_automated_analysis_and_low_gravity_research_trigger_on_a_trace_of_any_s
 def test_scientific_papers_triggers_only_on_a_trace_for_the_amoeba() -> None:  # AM.18: "for this species" is printed
     assert _mission_trigger_after_trace("AM.18", 0, "pink")
     assert not _mission_trigger_after_trace("AM.18", 1, "pink")
+
+
+def test_the_publicity_of_an_organelle_is_named_after_its_species() -> None:  # the statistics count it by species (stats.py)
+    s = discovered()
+    s.current_player = 0
+    s.species[0].extra["organelles"] = {"Y1": 3, "Y2": 1, "P1": 4, "P2": 2, "IB": 0}  # P2: 1 publicity
+    cards.run_step(s, s.players[0], {"t": "organelle", "color": "pink"}, [])
+    r = apply(s, {"type": "pick_organelle", "space": "P2"})
+    gains = [e for e in r.events if e["type"] == "gains" and e["changes"].get("publicity")]
+    assert [e["source"] for e in gains] == [{"kind": "alien", "species": "amoeba"}]

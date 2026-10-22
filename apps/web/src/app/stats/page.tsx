@@ -14,7 +14,7 @@ import {
   TraceIcon,
 } from "@/components/Icons";
 import { OrgName } from "@/components/OrgName";
-import { BarList, Histogram, LineChart, Panel, Pills, StackBar, Tile, WithSpread, round } from "@/components/StatCharts";
+import { BarList, Histogram, LineChart, Panel, Pills, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
 import { SPECIES_KEYS, type Spread, parseFilter, spreadOf } from "@/lib/stats";
@@ -118,28 +118,35 @@ export default async function StatsPage({
     (k) => k.startsWith("publicity.visit.") && !["comet", "asteroid", "asteroids"].includes(k.slice("publicity.visit.".length)),
   );
   const planetsPublicity = planetKeys.reduce((a, k) => a + (s.mean[k] ?? 0), 0);
+  const sumOf = (keys: string[]) => ({
+    value: keys.reduce((a, k) => a + m(k), 0),
+    spread: sdOf((c) => keys.reduce((a, k) => a + (c[k] ?? 0), 0)),
+  });
+  const alienKeys = Object.keys(s.mean).filter((k) => k.startsWith("publicity.alien."));
   const publicity = [
-    { key: "comet", label: "From comets", value: m("publicity.visit.comet"), color: VIZ[0] as string, spread: sd("publicity.visit.comet") },
+    { key: "comet", label: "From comets", value: m("publicity.visit.comet"), spread: sd("publicity.visit.comet") },
     {
       key: "asteroid",
       label: "From asteroids",
       value: m("publicity.visit.asteroid") + m("publicity.visit.asteroids"),
-      color: VIZ[1] as string,
       spread: sdOf((c) => (c["publicity.visit.asteroid"] ?? 0) + (c["publicity.visit.asteroids"] ?? 0)),
     },
     {
       key: "planet",
       label: "From planets",
       value: planetsPublicity,
-      color: VIZ[2] as string,
       spread: sdOf((c) => planetKeys.reduce((a, k) => a + (c[k] ?? 0), 0)),
     },
+    { key: "sector", label: "From completing a sector", value: m("publicity.sector"), spread: sd("publicity.sector") },
+    { key: "card", label: "From playing cards", ...sumOf(["gain.card.publicity", "gain.mission.publicity"]) },
+    { key: "corner", label: "From discarding a card for its free corner", ...sumOf(["gain.corner.publicity"]) },
+    { key: "tech", label: "From technologies", ...sumOf(["gain.tech.publicity"]) },
+    { key: "trace", label: "From marking alien traces", ...sumOf(["gain.trace.publicity"]) },
+    { key: "alien", label: "From alien effects", ...sumOf(alienKeys) },
     {
-      key: "sector",
-      label: "From completing a sector",
-      value: m("publicity.sector"),
-      color: VIZ[3] as string,
-      spread: sd("publicity.sector"),
+      key: "other",
+      label: "From the organization and income",
+      ...sumOf(["gain.organization.publicity", "gain.quick_start.publicity", "gain.income.publicity"]),
     },
   ];
   const dataRows = [
@@ -524,7 +531,35 @@ export default async function StatsPage({
             </Panel>
 
             <Panel title="Publicity gained" icon={<PublicityIcon size={24} />} note="Where the publicity of a player came from, per game.">
-              <StackBar label="Publicity gained by source" parts={publicity} />
+              <BarList
+                label="Publicity gained by source"
+                rows={publicity.map((x, k) => ({
+                  key: x.key,
+                  label: x.label,
+                  value: x.value,
+                  spread: x.spread,
+                  color: VIZ[k % VIZ.length] as string,
+                  text: <b>{round(x.value)}</b>,
+                }))}
+              />
+              {alienKeys.length > 0 ? (
+                <details className="stat-table">
+                  <summary>Alien effects by species</summary>
+                  <BarList
+                    label="Publicity gained through alien effects, by species"
+                    rows={alienKeys
+                      .map((k) => ({ key: k, species: k.slice("publicity.alien.".length), value: m(k) }))
+                      .sort((a, b) => b.value - a.value)
+                      .map((x) => ({
+                        key: x.key,
+                        label: SPECIES_NAMES[x.species] ?? cap(x.species),
+                        value: x.value,
+                        spread: sd(x.key),
+                        text: <b>{round(x.value)}</b>,
+                      }))}
+                  />
+                </details>
+              ) : null}
             </Panel>
 
             <Panel title="Data" icon={<DataIcon size={24} />} note="Data per game: what came in, and where it went.">
@@ -611,7 +646,7 @@ export default async function StatsPage({
                   />
                 </div>
                 <div>
-                  <h3>Share of the games of a player</h3>
+                  <h3>Researched in x% of games</h3>
                   <BarList
                     label="Share of the players who researched each tech"
                     max={1}
