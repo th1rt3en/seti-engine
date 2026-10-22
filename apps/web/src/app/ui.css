@@ -1234,3 +1234,13 @@ table.shortcuts td:first-child {
   left: 0;
   right: auto;
 }
+
+.rivaltechs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.rivaltech {
+  display: inline-flex;
+}

@@ -278,6 +278,12 @@ def _trace_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
         s.pending.append(Decision(kind="trace", player=p.index, data=data))
 
 
+def _another_has(s: GameState, p: PlayerState, tech: str) -> bool:
+    """FAQ-C081, SA.18: does another player have this tech? In the solo game the rival is the other player, and its techs are the ones
+    it has stored (`RivalState.techs`, SOLO-18: the rival's own player entry holds none)."""
+    return any(tech in q.techs for q in s.players if q.index != p.index) or (s.rival is not None and tech in s.rival.techs)
+
+
 def _research_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -> None:
     cat = st["cat"]
     cats = {"any": ("probe", "telescope", "computer"), "probe_telescope": ("probe", "telescope")}.get(cat, (cat,))
@@ -289,7 +295,7 @@ def _research_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Eve
         and techs.tech_name(ts.category, ts.glyph) not in p.techs  # TECHACT-07
         and (
             not (st.get("copy") or st.get("owned_by_other"))
-            or any(techs.tech_name(ts.category, ts.glyph) in q.techs for q in s.players if q.index != p.index)
+            or _another_has(s, p, techs.tech_name(ts.category, ts.glyph))
         )  # FAQ-C081, SA.18
     ]
     if stacks:  # TECHACT-06: with all techs of the type already owned the tech part is ignored

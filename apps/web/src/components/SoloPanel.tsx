@@ -1,6 +1,7 @@
 // The solo game: the rival's board with its marker on the progress track, the data on its computer, its stored techs and action deck; and the
 // player's objectives with the tasks that are marked. Everything comes from the engine's view; nothing is worked out here.
 import { PLAYER_COLOR } from "@/lib/geometry";
+import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
@@ -9,6 +10,7 @@ import { ScoreIcon } from "./Icons";
 import { DataToken, Marker, PieceDefs, pieceColor } from "./Pieces";
 import { TapZoomImage } from "./TapZoom";
 
+const TECH_FRONTS = assets.techFronts as Record<string, string>;
 const W = 1000;
 const H = 325;
 const TRACK = [
@@ -168,7 +170,23 @@ function Rival({ view }: { view: View }) {
         <li>
           Advanced cards waiting <b>{r.advanced.length}</b> · Computer <b>{r.computer}</b>/6
         </li>
-        <li>Stored techs: {r.techs.length > 0 ? r.techs.join(", ") : <span className="muted">none</span>}</li>
+        <li className="rivaltechs">
+          Techs researched (stored):{" "}
+          {r.techs.length > 0 ? (
+            r.techs.map((t) => (
+              <span key={t} className="rivaltech" title={`${TECH_INFO[t]?.name ?? t}: ${TECH_INFO[t]?.effect ?? ""}`}>
+                {TECH_FRONTS[t] ? (
+                  <img src={TECH_FRONTS[t]} alt={TECH_INFO[t]?.name ?? t} width={30} height={42} className="mini-tech" />
+                ) : (
+                  t
+                )}
+              </span>
+            ))
+          ) : (
+            <span className="muted">none</span>
+          )}{" "}
+          <span className="muted small">(a card that copies a tech of another player can take one of these)</span>
+        </li>
       </ul>
     </section>
   );
