@@ -86,7 +86,7 @@ def settle(r: StepResult, events: list[dict[str, Any]]) -> StepResult:
 def play_order(
     r: StepResult, order: list[str], techs: tuple[str, ...], tokens: int, variant: int
 ) -> tuple[StepResult, list[dict[str, Any]]]:
-    """Play the scan taking the steps in `order` (the first of them that is offered at each point), checking what is offered at every state."""
+    """Play the scan taking the steps in `order` (the first one offered at each point), checking what is offered at every state."""
     pl = r.state.current_player
     start = r.state
     events: list[dict[str, Any]] = list(r.events)
