@@ -167,6 +167,13 @@ export function GameView({
     s.species.map((sp, i) => (sp.discovered ? sp.species.charAt(0).toUpperCase() + sp.species.slice(1) : `Species ${i + 1}`)),
   );
   const actor = view.to_act === null ? undefined : s.players[view.to_act];
+  // the order of play of the round: the starting player, then the others by seat (it moves one seat on every round); shown in this order with its number
+  const turnOrder = [...s.players].sort(
+    (a, b) =>
+      ((a.index - s.start_player + s.players.length) % s.players.length) -
+      ((b.index - s.start_player + s.players.length) % s.players.length),
+  );
+  const ORDINAL = ["1st", "2nd", "3rd", "4th"];
   return (
     <div className="game">
       <header className="topbar" aria-label="Round, turn, current player and moves">
@@ -199,9 +206,15 @@ export function GameView({
             </div>
             {hint ? <Hint>{hint}</Hint> : null}
           </div>
-          <ul className="scorechips" aria-label="Scores">
-            {s.players.map((p) => (
+          <ul className="scorechips" aria-label="Scores, in the order of play of this round">
+            {turnOrder.map((p, rank) => (
               <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
+                <span
+                  className={rank === 0 ? "turnorder first" : "turnorder"}
+                  title={rank === 0 ? "Plays first in this round" : `Plays ${ORDINAL[rank] ?? `${rank + 1}th`} in this round`}
+                >
+                  {ORDINAL[rank] ?? `${rank + 1}th`}
+                </span>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
                 {s.rival && p.index === s.rival.index ? (
                   "Rival"

@@ -3182,3 +3182,23 @@ input.switch:focus-visible {
   stroke-dasharray: 26 14;
   stroke-linejoin: round;
 }
+
+/* the place of a player in the order of play of the round, on the chip of the score bar: the first one is marked */
+.scorechips .turnorder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong, rgba(139, 148, 158, 0.4));
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.scorechips .turnorder.first {
+  background: var(--accent, #3987e5);
+  border-color: var(--accent, #3987e5);
+  color: #fff;
+}

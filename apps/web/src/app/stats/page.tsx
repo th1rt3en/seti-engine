@@ -634,9 +634,9 @@ export default async function StatsPage({
               note="For the players who researched the tech: what it did for them from then on, per player (the lowest, the highest and the spread are on hover). The first tech of each type has nothing to count."
               table={
                 <Table
-                  head={["Tech", "Players", "What", "Average per player", "Total"]}
+                  head={["Tech", "Players", "What", "Average per player"]}
                   rows={s.techUse.flatMap((t) =>
-                    t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean), m.total]),
+                    t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean)]),
                   )}
                 />
               }
@@ -667,7 +667,6 @@ export default async function StatsPage({
                                 <b>
                                   <WithSpread spread={m.spread}>{round(m.mean)}</WithSpread>
                                 </b>
-                                <span className="muted small"> per player · {m.total} in all</span>
                               </div>
                             ))}
                             <span className="muted small">
