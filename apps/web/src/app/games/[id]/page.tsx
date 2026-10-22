@@ -82,7 +82,7 @@ export default async function Game({
           {error}
         </p>
       ) : null}
-      {isHost && open && models.length > 0 ? (
+      {isHost && open && models.length > 0 && meta.options.players === 2 ? (
         <form action={addBotAction} className="card addai">
           <input type="hidden" name="id" value={id} />
           <h2>Add an AI player</h2>

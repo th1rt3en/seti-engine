@@ -1,7 +1,7 @@
 import type { Options } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
 import { headerOf } from "../src/core/archive.js";
-import { BOT_RETRY_MS, toAct } from "../src/core/room.js";
+import { BOT_PLAYERS, BOT_RETRY_MS, toAct } from "../src/core/room.js";
 import { FakeBot, alice, bob, makeRoom } from "./helpers.js";
 
 const two = { players: 2 } as Options;
@@ -58,11 +58,28 @@ describe("an AI in the lobby", () => {
     await t.room.botIdle();
   });
 
-  it("the host can take it out again; the consent goes with the last AI", async () => {
+  it("is only for games of 2 players: a game of 1, 3 or 4 refuses it", async () => {
+    expect(BOT_PLAYERS).toBe(2);
+    for (const players of [1, 3, 4]) {
+      const t = makeRoom({ bot: new FakeBot() });
+      await t.room.init(`g${players}`, { players } as Options, none, false, alice);
+      // a game of one player starts at once (there is no lobby to add anybody to); the others are lobbies
+      expect(await t.room.addBot(alice, "v001", true)).toMatchObject({ ok: false, code: players === 1 ? "not_in_lobby" : "players" });
+      const meta = await t.room.meta();
+      expect(meta?.seats.some((s) => s?.bot)).toBe(false);
+      expect(meta?.consent).toBeUndefined();
+    }
+  });
+
+  it("the host can take it out again; the consent goes with the last AI (a lobby that holds one: adding it to a lobby of 2 starts the game)", async () => {
     const bot = new FakeBot();
     const t = makeRoom({ bot });
     await t.room.init("g1", three, none, false, alice);
-    await t.room.addBot(alice, "v001", true);
+    // the lobby is made as it would be if an AI had been put there: the room refuses to add one to a lobby of 3
+    const before = (await t.room.meta()) as NonNullable<Awaited<ReturnType<typeof t.room.meta>>>;
+    before.seats[1] = { id: "bot:v001:0", name: "AI v001", registered: false, bot: { model: "v001" } };
+    before.consent = { by: alice.id, at: 1 };
+    await t.store.put("meta", before);
     const seat = (await t.room.meta())?.seats.findIndex((s) => s?.bot) ?? -1;
     expect(seat).toBeGreaterThan(0);
     expect(await t.room.removeBot(bob, seat)).toMatchObject({ ok: false, code: "not_host" });
@@ -71,17 +88,6 @@ describe("an AI in the lobby", () => {
     const meta = await t.room.meta();
     expect(meta?.seats[seat]).toBeNull();
     expect(meta?.consent).toBeUndefined();
-  });
-
-  it("two AIs get different ids", async () => {
-    const bot = new FakeBot();
-    const t = makeRoom({ bot });
-    await t.room.init("g1", three, none, false, alice);
-    await t.room.addBot(alice, "v001", true);
-    await t.room.addBot(alice, "v001", true);
-    await t.room.botIdle();
-    const ids = (await t.room.meta())?.seats.map((s) => s?.id);
-    expect(new Set(ids).size).toBe(3);
   });
 });
 

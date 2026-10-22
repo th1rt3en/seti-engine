@@ -111,6 +111,9 @@ export interface BotClient {
   move(req: BotRequest): Promise<BotReply>;
 }
 
+/** The AI model plays games of this many players only (the first versions are trained for two). */
+export const BOT_PLAYERS = 2;
+
 /** The AI is asked again this long after a failure. */
 export const BOT_RETRY_MS = 10_000;
 export const botId = (model: string, n: number): string => `bot:${model}:${n}`;
@@ -289,6 +292,7 @@ export class GameRoom {
       if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby");
       if (meta.host !== who.id) return fail("not_host", "only the host can add an AI");
       if (!this.d.bot) return fail("no_bot", "no AI is available");
+      if (meta.options.players !== BOT_PLAYERS) return fail("players", `the AI can only play games of ${BOT_PLAYERS} players`);
       if (consent !== true) return fail("consent", "adding an AI means the game is collected and used to train it: agree to continue");
       if (typeof model !== "string" || !/^[A-Za-z0-9._-]{1,40}$/.test(model)) return fail("bad_model", "no such model");
       const free = meta.seats.findIndex((s) => s === null);
