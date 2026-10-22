@@ -1,7 +1,7 @@
 "use client";
 // The name of an organization, wherever it is written: resting the pointer on it for a second shows the whole organization board beside it (on a touch
 // screen a long press does, like the cards).
-import { cardImage } from "@/lib/cardImages";
+import { cardImage, orgNameImage } from "@/lib/cardImages";
 import { ORG_NAMES } from "@/lib/moves";
 import { ZOOM_SECONDS, touchScreen, useLongPress } from "@/lib/touch";
 import { useEffect, useRef, useState } from "react";
@@ -11,7 +11,8 @@ const HOVER_DELAY_MS = 1000;
 const RATIO = 421 / 560; // the organization boards are landscape pictures of 560 x 421
 const zoomWidth = (): number => Math.round(Math.min(720, Math.max(320, window.innerWidth * 0.5)));
 
-export function OrgName({ id, className }: { id: string; className?: string }) {
+/** `banner` shows the printed name from the card (a picture, the same size for every organization) instead of the plain name. */
+export function OrgName({ id, className, banner }: { id: string; className?: string; banner?: boolean }) {
   const [zoom, setZoom] = useState<{ x: number; y: number; w: number } | null>(null);
   const node = useRef<HTMLSpanElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -44,6 +45,7 @@ export function OrgName({ id, className }: { id: string; className?: string }) {
     timer.current = setTimeout(cancel, ZOOM_SECONDS * 1000);
   });
   const src = cardImage(id);
+  const bannerSrc = orgNameImage(id);
   return (
     <>
       <span
@@ -57,7 +59,11 @@ export function OrgName({ id, className }: { id: string; className?: string }) {
         }}
         onMouseLeave={() => !touchScreen() && cancel()}
       >
-        {ORG_NAMES[id] ?? id}
+        {banner && bannerSrc ? (
+          <img src={bannerSrc} alt={ORG_NAMES[id] ?? id} width={262} height={28} className="org-banner" />
+        ) : (
+          (ORG_NAMES[id] ?? id)
+        )}
       </span>
       {zoom && src
         ? createPortal(

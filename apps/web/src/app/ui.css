@@ -1049,6 +1049,15 @@ table.shortcuts td:first-child {
 }
 
 /* the species board as a small icon: the whole board (it is taller than wide), not cropped */
+/* the printed name of an organization, cut from its card: every one has the same size (262 x 28 in the picture) */
+.org-banner {
+  display: block;
+  width: min(100%, 15rem);
+  height: auto;
+  aspect-ratio: 262 / 28;
+  border-radius: 4px;
+}
+
 /* a tech tile as a small icon */
 .mini-tech {
   height: 2.4rem;

@@ -263,7 +263,7 @@ export default async function StatsPage({
                   max={1}
                   rows={s.orgs.map((o) => ({
                     key: o.org,
-                    label: <OrgName id={o.org} />,
+                    label: <OrgName id={o.org} banner />,
                     value: o.pickRate,
                     text: (
                       <>
