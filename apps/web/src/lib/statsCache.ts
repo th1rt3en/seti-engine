@@ -2,6 +2,7 @@
 // in memory (the isolate that serves the page) together with the summary of each filter that was asked for; both stay valid until a row of `game_stats`
 // is written. That is found with one cheap question, the highest row id of the table: every write (a game that ends, a backfill with INSERT OR REPLACE)
 // gives its row a new, higher id. So the page is never older than the last write, and a visit to an unchanged table costs that one question.
+// Past a few thousand rows this should read a precomputed summary instead of every row: docs/stats-scaling.md.
 import type { Db } from "./db";
 import { statRows } from "./queries";
 import { type StatFilter, type Stats, aggregate } from "./stats";
