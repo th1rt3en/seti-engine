@@ -200,6 +200,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             c[f"tech.{tech}"] += 1
             c[f"techcat.{tech.split('-')[0]}"] += 1
         c["missions.done_end"] = len(p.completed_missions)
+        c["stats.version"] = VERSION  # the page counts the newer counters (techuse, from effects) over the rows that have this mark only
         players.append(
             {
                 "seat": p.index,

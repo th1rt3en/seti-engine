@@ -131,14 +131,20 @@ describe("statistics", () => {
 
   it("counts what a tech did over the players who have it, and only over them", () => {
     const rows = [
-      row({ counters: { "tech.probe-link": 1, "techuse.probe-link.asteroids": 4 } }),
-      row({ seat: 1, counters: { "tech.probe-link": 1, "techuse.probe-link.asteroids": 2 } }),
-      row({ seat: 2, counters: { "techuse.probe-link.asteroids": 9 } }), // counted for a tech that the player does not own at the end (a borrowed one): left out
+      row({ counters: { "stats.version": 2, "tech.probe-link": 1, "techuse.probe-link.asteroids": 4 } }),
+      row({ seat: 1, counters: { "stats.version": 2, "tech.probe-link": 1, "techuse.probe-link.asteroids": 2 } }),
+      row({ seat: 2, counters: { "stats.version": 2, "techuse.probe-link.asteroids": 9 } }), // counted for a tech that the player does not own at the end (a borrowed one): left out
       row({
         seat: 3,
-        counters: { "tech.computer-dot": 1, "techuse.computer-dot.top": 2, "techuse.computer-dot.vp": 4, "techuse.computer-dot.bottom": 1 },
+        counters: {
+          "stats.version": 2,
+          "tech.computer-dot": 1,
+          "techuse.computer-dot.top": 2,
+          "techuse.computer-dot.vp": 4,
+          "techuse.computer-dot.bottom": 1,
+        },
       }),
-      row({ seat: 4, counters: {} }),
+      row({ seat: 4, counters: { "stats.version": 2 } }),
     ];
     const use = aggregate(rows, any).techUse;
     expect(use).toHaveLength(12);
@@ -177,6 +183,24 @@ describe("statistics", () => {
     // a name that is not a species or an organization of the engine is no filter
     expect(parseFilter({ species: "klingons", org: "../x" })).toMatchObject({ species: null, org: null });
     expect(aggregate(rows, parseFilter({ species: "klingons" })).rows).toBe(3);
+  });
+
+  it("works the newer counters out over the rows that have them: the rows of games that could not be replayed again count as nothing there", () => {
+    const rows = [
+      row({ seat: 0, counters: { "stats.version": 2, "probes.launched": 6, "action.launch": 2, "probes.launched.other": 4 } }),
+      row({ seat: 1, counters: { "stats.version": 2, "probes.launched": 4, "action.launch": 2, "probes.launched.other": 2 } }),
+      row({ seat: 2, counters: { "probes.launched": 10, "action.launch": 1 } }), // an old row: no "other", and no version
+    ];
+    const a = aggregate(rows, any);
+    expect(a.fresh.rows).toBe(2);
+    // over the rows that have them the numbers add up: launched = launch actions + the others
+    expect(a.fresh.mean["probes.launched"]).toBe(5);
+    expect(a.fresh.mean["action.launch"]).toBe(2);
+    expect(a.fresh.mean["probes.launched.other"]).toBe(3);
+    expect(a.fresh.mean["probes.launched"]).toBe((a.fresh.mean["action.launch"] ?? 0) + (a.fresh.mean["probes.launched.other"] ?? 0));
+    // over all the rows they would not
+    expect(a.mean["probes.launched"]).toBeCloseTo(20 / 3);
+    expect(a.fresh.spread["probes.launched"]).toMatchObject({ min: 4, max: 6 });
   });
 
   it("no game gives zeros, not errors", () => {

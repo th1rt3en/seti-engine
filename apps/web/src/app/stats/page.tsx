@@ -92,6 +92,9 @@ export default async function StatsPage({
   const m = (k: string): number => s.mean[k] ?? 0;
   // how the players differ in a counter, and in a number that is worked out from several counters (a player without the counter counts as 0)
   const sd = (k: string): Spread | undefined => s.spread[k];
+  // the counters that came with the newer statistics are worked out over the rows that have them (see FreshStats)
+  const fm = (k: string): number => s.fresh.mean[k] ?? 0;
+  const fsd = (k: string): Spread | undefined => s.fresh.spread[k];
   const sdOf = (f: (c: Record<string, number>) => number): Spread => spreadOf(s.players.map((p) => f(p.counters)));
   const base: Record<string, string> = {};
   if (filter.players !== null) base.players = String(filter.players);
@@ -393,31 +396,36 @@ export default async function StatsPage({
                 <Tile
                   icon={<ActionIcon name="launch" size={28} />}
                   label="Probes launched"
-                  value={round(m("probes.launched"))}
-                  spread={sd("probes.launched")}
+                  value={round(fm("probes.launched"))}
+                  spread={fsd("probes.launched")}
                 />
                 <Tile
                   icon={<ActionIcon name="launch" size={28} />}
                   label="Probes from effects"
                   note="Launched without the launch action"
-                  value={round(m("probes.launched.other"))}
-                  spread={sd("probes.launched.other")}
+                  value={round(fm("probes.launched.other"))}
+                  spread={fsd("probes.launched.other")}
                 />
-                <Tile icon={<ActionIcon name="orbit" size={28} />} label="Orbiters" value={round(m("orbiters"))} spread={sd("orbiters")} />
+                <Tile
+                  icon={<ActionIcon name="orbit" size={28} />}
+                  label="Orbiters"
+                  value={round(fm("orbiters"))}
+                  spread={fsd("orbiters")}
+                />
                 <Tile
                   icon={<ActionIcon name="orbit" size={28} />}
                   label="Orbiters from effects"
                   note="Placed without the orbit action"
-                  value={round(m("orbits.other"))}
-                  spread={sd("orbits.other")}
+                  value={round(fm("orbits.other"))}
+                  spread={fsd("orbits.other")}
                 />
-                <Tile icon={<ActionIcon name="land" size={28} />} label="Landers" value={round(m("landers"))} spread={sd("landers")} />
+                <Tile icon={<ActionIcon name="land" size={28} />} label="Landers" value={round(fm("landers"))} spread={fsd("landers")} />
                 <Tile
                   icon={<ActionIcon name="land" size={28} />}
                   label="Landers from effects"
                   note="Placed without the land action"
-                  value={round(m("lands.other"))}
-                  spread={sd("lands.other")}
+                  value={round(fm("lands.other"))}
+                  spread={fsd("lands.other")}
                 />
                 <Tile icon={<DisplayCardIcon size={26} />} label="Cards drawn" value={round(m("cards.drawn"))} spread={sd("cards.drawn")} />
                 <Tile icon={<DeckCardIcon size={26} />} label="Cards played" value={round(m("cards.played"))} spread={sd("cards.played")} />
@@ -440,6 +448,12 @@ export default async function StatsPage({
                   value={m("missions.played") > 0 ? `${Math.round((m("missions.completed") / m("missions.played")) * 100)}%` : "–"}
                 />
               </div>
+              {s.fresh.rows < s.rows ? (
+                <p className="muted small">
+                  Probes launched, orbiters, landers and the "from effects" numbers are counted over the {s.fresh.rows} of {s.rows} players
+                  whose games could be replayed with the current rules; the other games only have older figures.
+                </p>
+              ) : null}
             </Panel>
 
             <Panel title="Life traces" icon={<TraceIcon size={24} />} note="Traces marked per game, by color.">

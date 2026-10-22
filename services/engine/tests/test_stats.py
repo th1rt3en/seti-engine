@@ -70,6 +70,12 @@ def test_probes_orbits_and_landings_that_did_not_come_from_their_main_action_are
     assert seen_other["probes.launched.other"] > 0, "the random games launch probes by cards or rewards too"
 
 
+def test_every_row_carries_the_version_of_the_statistics() -> None:
+    options, actions = play(5, 2)
+    for p in stats.game_stats(file_of(options, actions))["players"]:
+        assert p["counters"]["stats.version"] == stats.VERSION
+
+
 def test_the_organizations_offered_and_picked_are_counted() -> None:
     options, actions = play(6, 2, expansion=True, organizations=True)
     s = stats.game_stats(file_of(options, actions))

@@ -126,7 +126,20 @@ export interface TechStat {
   share: number;
 }
 
+/** The counters that came with the version 2 of the statistics (from effects, what the techs did) exist only in the rows made by it: the games that could not be
+ * replayed when they were made again keep the old rows, which would count as zeros. These are worked out over the rows that have the mark. */
+export interface FreshStats {
+  /** the players whose rows have the counters */
+  rows: number;
+  mean: Record<string, number>;
+  spread: Record<string, Spread>;
+}
+
+export const FRESH_VERSION = 2;
+
 export interface Stats {
+  /** the counters of version 2 and later, over the rows that have them */
+  fresh: FreshStats;
   games: number;
   rows: number;
   /** the mean of every counter over the players (a player without the counter counts as 0) */
@@ -212,8 +225,16 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     .map((k) => ({ tech: k.slice("tech.".length), share: n === 0 ? 0 : rows.filter((r) => (r.counters[k] ?? 0) > 0).length / n }))
     .sort((a, b) => b.share - a.share);
 
+  const fresh = rows.filter((r) => (r.counters["stats.version"] ?? 0) >= FRESH_VERSION);
+  const freshTotals: Record<string, number> = {};
+  for (const r of fresh) for (const [k, v] of Object.entries(r.counters)) freshTotals[k] = (freshTotals[k] ?? 0) + v;
+  const freshMean: Record<string, number> = {};
+  for (const [k, v] of Object.entries(freshTotals)) freshMean[k] = fresh.length === 0 ? 0 : v / fresh.length;
+  const freshSpread: Record<string, Spread> = {};
+  for (const k of Object.keys(freshTotals)) freshSpread[k] = spreadOf(fresh.map((r) => r.counters[k] ?? 0));
+
   const techUse: TechUseStat[] = TECH_ORDER.map((tech) => {
-    const owners = rows.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0);
+    const owners = fresh.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0);
     return {
       tech,
       players: owners.length,
@@ -258,6 +279,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     gold,
     techs,
     techUse,
+    fresh: { rows: fresh.length, mean: freshMean, spread: freshSpread },
     rounds,
   };
 }
