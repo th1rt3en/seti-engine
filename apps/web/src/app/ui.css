@@ -1051,7 +1051,7 @@ table.shortcuts td:first-child {
 /* the species board as a small icon: the whole board (it is taller than wide), not cropped */
 /* a tech tile as a small icon */
 .mini-tech {
-  height: 1.7rem;
+  height: 2.4rem;
   width: auto;
   aspect-ratio: 175 / 246;
   border-radius: 3px;
@@ -1062,8 +1062,8 @@ table.shortcuts td:first-child {
 /* a gold scoring tile as a small icon: the top of the tile, with what it counts */
 .mini-gold {
   display: inline-block;
-  width: 3.4rem;
-  height: 1.3rem;
+  width: 5.6rem;
+  height: 2.1rem;
   background-size: 100% auto;
   background-position: 50% 6%;
   background-repeat: no-repeat;

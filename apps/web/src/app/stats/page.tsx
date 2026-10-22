@@ -45,7 +45,7 @@ const TECH_COLOR: Record<string, string> = {
 };
 const techKind = (tech: string): string => tech.split("-")[0] ?? "";
 const TECH_FRONTS = assets.techFronts as Record<string, string>;
-const GOLD = assets.gold as Record<string, { src: string }>;
+const GOLD = assets.gold as Record<string, { src: string; per?: string }>;
 const SECTOR_COLORS = ["red", "yellow", "blue", "black"];
 const TRACE_COLORS = ["pink", "yellow", "blue"];
 const INCOME_KINDS = ["credit", "energy", "card"];
@@ -553,17 +553,22 @@ export default async function StatsPage({
                       label: (
                         <span className="icon-label">
                           {TECH_FRONTS[t.tech] ? (
-                            <img src={TECH_FRONTS[t.tech]} alt="" width={20} height={28} className="mini-tech" />
+                            <img
+                              src={TECH_FRONTS[t.tech]}
+                              alt={TECH_INFO[t.tech]?.name ?? t.tech}
+                              width={28}
+                              height={39}
+                              className="mini-tech"
+                            />
                           ) : (
-                            <Blank />
+                            (TECH_INFO[t.tech]?.name ?? t.tech)
                           )}
-                          {TECH_INFO[t.tech]?.name ?? t.tech}
                         </span>
                       ),
                       color: TECH_COLOR[techKind(t.tech)],
                       value: t.share,
                       text: <b>{pct(t.share)}</b>,
-                      title: TECH_INFO[t.tech]?.effect,
+                      title: TECH_INFO[t.tech] ? `${TECH_INFO[t.tech]?.name}: ${TECH_INFO[t.tech]?.effect}` : undefined,
                     }))}
                   />
                 </div>
@@ -610,15 +615,15 @@ export default async function StatsPage({
                               className="mini-gold"
                               style={{ backgroundImage: `url(${GOLD[g.face]?.src})` }}
                               role="img"
-                              aria-hidden="true"
+                              aria-label={g.face}
                             />
                           ) : (
-                            <Blank />
+                            g.face
                           )}
-                          {g.face}
                         </span>
                       ),
                       color: "var(--gold)",
+                      title: GOLD[g.face]?.per ? `${g.face}: ${GOLD[g.face]?.per}` : g.face,
                       value: g.times,
                       text: (
                         <>
