@@ -76,6 +76,8 @@ export interface GoldStat {
   face: string;
   times: number;
   avgPoints: number;
+  /** of the points each time the tile was scored (a player who scored it twice in a game counts twice, with the mean of the two) */
+  spread: Spread;
 }
 
 export interface TechStat {
@@ -155,7 +157,11 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   for (const k of Object.keys(totals).filter((k) => k.startsWith("gold.") && k.endsWith(".times"))) {
     const face = k.slice("gold.".length, -".times".length);
     const times = totals[k] ?? 0;
-    gold.push({ face, times, avgPoints: times === 0 ? 0 : (totals[`gold.${face}.points`] ?? 0) / times });
+    const each = rows.flatMap((r) => {
+      const t = r.counters[`gold.${face}.times`] ?? 0;
+      return t > 0 ? Array<number>(t).fill((r.counters[`gold.${face}.points`] ?? 0) / t) : [];
+    });
+    gold.push({ face, times, avgPoints: times === 0 ? 0 : (totals[`gold.${face}.points`] ?? 0) / times, spread: spreadOf(each) });
   }
   gold.sort((a, b) => a.face.localeCompare(b.face));
 

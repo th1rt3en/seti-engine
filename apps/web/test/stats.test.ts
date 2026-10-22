@@ -107,7 +107,7 @@ describe("statistics", () => {
       row({ seat: 1, counters: { "gold.Income-A.points": 8, "gold.Income-A.times": 1, "incomerate.r5.credit": 6 } }),
     ];
     const a = aggregate(rows, any);
-    expect(a.gold).toEqual([{ face: "Income-A", times: 3, avgPoints: 10 }]);
+    expect(a.gold).toEqual([{ face: "Income-A", times: 3, avgPoints: 10, spread: { min: 8, max: 11, std: Math.sqrt(2) } }]);
     expect(a.techs).toEqual([{ tech: "probe-dot", share: 0.5 }]);
     expect(a.rounds).toEqual([2, 5]);
   });

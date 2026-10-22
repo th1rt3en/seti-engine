@@ -20,8 +20,8 @@ from . import card_defs, projection, replay, solar, tables
 VERSION = 1
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
-# a probe launched, an orbiter or a lander placed by something other than the main action of that name (a card effect, a reward, an organization, the
-# quick start ...)
+# Counted apart: a probe launched, an orbiter or a lander placed by something other than the main action of that name
+# (a card effect, a reward, an organization, the quick start ...).
 
 
 def _cell_kind(state: Any, ring: int, sector: int) -> str:
@@ -75,7 +75,8 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                 if sum(moved):
                     counts[seat][f"publicity.visit.{where}"] += sum(moved)
         basic_done: set[str] = set()  # the launch that the launch action itself made (the first launch of the step)
-        for q in state.players:  # orbiters and landers placed in this step: the main action of that name places one, anything else is another source
+        # orbiters and landers placed in this step: the main action of that name places one, anything else is another source
+        for q in state.players:
             if q.index in counts and q.index < len(before.players):
                 old = before.players[q.index]
                 for name, key, attr in (("orbit", "orbits.other", "orbiters"), ("land", "lands.other", "landers")):

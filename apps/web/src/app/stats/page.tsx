@@ -14,7 +14,7 @@ import {
   TraceIcon,
 } from "@/components/Icons";
 import { OrgName } from "@/components/OrgName";
-import { BarList, Histogram, LineChart, Panel, Pills, StackBar, Tile, round } from "@/components/StatCharts";
+import { BarList, Histogram, LineChart, Panel, Pills, StackBar, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
 import { statRows } from "@/lib/queries";
@@ -37,6 +37,15 @@ for (const [key, src] of Object.entries(expansionAssets as Record<string, string
   if (key.startsWith("boards/") && !key.includes("-")) BOARDS[key.slice(7)] ??= src;
 }
 const TECH_CATEGORIES = ["probe", "telescope", "computer"];
+/** The color of each type of tech, as on the tiles: probe orange, telescope pink, computer blue. */
+const TECH_COLOR: Record<string, string> = {
+  probe: "var(--tech-probe)",
+  telescope: "var(--tech-telescope)",
+  computer: "var(--tech-computer)",
+};
+const techKind = (tech: string): string => tech.split("-")[0] ?? "";
+const TECH_FRONTS = assets.techFronts as Record<string, string>;
+const GOLD = assets.gold as Record<string, { src: string }>;
 const SECTOR_COLORS = ["red", "yellow", "blue", "black"];
 const TRACE_COLORS = ["pink", "yellow", "blue"];
 const INCOME_KINDS = ["credit", "energy", "card"];
@@ -516,7 +525,7 @@ export default async function StatsPage({
                       value: m(`techcat.${c}`),
                       spread: sd(`techcat.${c}`),
                       text: <b>{round(m(`techcat.${c}`))}</b>,
-                      color: VIZ[i % VIZ.length],
+                      color: TECH_COLOR[c],
                     }))}
                   />
                 </div>
@@ -527,7 +536,17 @@ export default async function StatsPage({
                     max={1}
                     rows={s.techs.map((t) => ({
                       key: t.tech,
-                      label: TECH_INFO[t.tech]?.name ?? t.tech,
+                      label: (
+                        <span className="icon-label">
+                          {TECH_FRONTS[t.tech] ? (
+                            <img src={TECH_FRONTS[t.tech]} alt="" width={20} height={28} className="mini-tech" />
+                          ) : (
+                            <Blank />
+                          )}
+                          {TECH_INFO[t.tech]?.name ?? t.tech}
+                        </span>
+                      ),
+                      color: TECH_COLOR[techKind(t.tech)],
                       value: t.share,
                       text: <b>{pct(t.share)}</b>,
                       title: TECH_INFO[t.tech]?.effect,
@@ -570,12 +589,30 @@ export default async function StatsPage({
                     label="Times each gold scoring tile was scored"
                     rows={s.gold.map((g) => ({
                       key: g.face,
-                      label: g.face,
+                      label: (
+                        <span className="icon-label">
+                          {GOLD[g.face] ? (
+                            <span
+                              className="mini-gold"
+                              style={{ backgroundImage: `url(${GOLD[g.face]?.src})` }}
+                              role="img"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <Blank />
+                          )}
+                          {g.face}
+                        </span>
+                      ),
+                      color: "var(--gold)",
                       value: g.times,
                       text: (
                         <>
                           <b>{g.times}</b>
-                          <span className="muted small"> times · {round(g.avgPoints)} points each</span>
+                          <span className="muted small">
+                            {" "}
+                            times · <WithSpread spread={g.spread}>{round(g.avgPoints)}</WithSpread> points each
+                          </span>
                         </>
                       ),
                     }))}
