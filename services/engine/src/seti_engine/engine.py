@@ -387,7 +387,7 @@ def apply(state: GameState, action: Action) -> StepResult:
         why = sandbox.check(state, action)
         if why is not None:
             raise IllegalAction(f"{action} is not allowed: {why}")
-    elif action not in legal:
+    elif action not in legal and not techs.legacy_scan_skip_ok(state, action):
         raise IllegalAction(f"{action} is not legal; legal moves: {legal}")
     if action == {"type": "undo"}:  # UNDO-01: back to the state before the last move; the moves before it are played again
         back = _undo(state)
@@ -425,7 +425,7 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
 
 
 def _play_step(s: GameState, action: Action, events: list[dict[str, Any]]) -> None:
-    if s.pending and action not in _decision_moves(s, s.pending[0]):
+    if s.pending and action not in _decision_moves(s, s.pending[0]) and not techs.legacy_scan_skip_ok(s, action):
         # FREE-00: a free action in the middle of the main action; the decisions of the main action wait until the free action is done
         s.stashed, s.pending = s.pending, []
         s.free_active = True

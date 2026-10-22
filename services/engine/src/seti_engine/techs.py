@@ -135,9 +135,10 @@ def _active_techs(p: PlayerState) -> list[str]:
 
 
 def start_scan(s: GameState, p: PlayerState, free: bool = False, ctx: dict[str, Any] | None = None) -> None:
-    """SCAN-01 to SCAN-05: the steps are resolved from left to right (owner ruling, 2026-10-17): Earth's sector, a card of the row, the
-    signal tokens, then the telescope techs in the order of the board (Mercury, a card of the hand, the probe). `ctx` carries the extra
-    points of cards such as #53 (FAQ-C051: only the base cost is skipped)."""
+    """SCAN-01 to SCAN-05: the steps can be resolved in any order (rulebook p.12; owner ruling, 2026-10-22, which replaces the left to right
+    order of 2026-10-17): Earth's sector, a card of the row, the signal tokens, and the telescope techs (Mercury, a card of the hand, the
+    probe). The list is the steps that are left; `scan_moves` offers the moves of all of them. `ctx` carries the extra points of cards such
+    as #53 (FAQ-C051: only the base cost is skipped)."""
     s.scan_ctx = ctx or {}
     techs = {t.split("-")[1] for t in _active_techs(p) if t.startswith("telescope-")}
     s.scan_steps = ["earth", "row"]
@@ -147,7 +148,8 @@ def start_scan(s: GameState, p: PlayerState, free: bool = False, ctx: dict[str, 
     s.pending.append(Decision(kind="scan_step", player=p.index))
 
 
-SCAN_TECH_ORDER = ("link", "branch", "cross")  # TECH-TT03, TECH-TT02, TECH-TT04: Mercury, a card of the hand, the probe
+# TECH-TT03, TECH-TT02, TECH-TT04: Mercury, a card of the hand, the probe (the order of the board)
+SCAN_TECH_ORDER = ("link", "branch", "cross")
 OPTIONAL_STEPS = frozenset({"tok", "tt:link", "tt:branch", "tt:cross"})  # Earth's sector and the card of the row are not optional
 
 
@@ -176,26 +178,34 @@ def _step_moves(s: GameState, p: PlayerState, step: str) -> list[Action]:
 
 
 def current_step(s: GameState, p: PlayerState) -> str | None:
-    """The step the scan is at: the first one that is left and can be done (a step that cannot be done is passed over)."""
+    """The first step that is left and can be done in the order of the board. Only the old `scan_skip` (games played from left to right,
+    before 2026-10-22) uses it: it skipped this step."""
     return next((st for st in s.scan_steps if _step_moves(s, p, st)), None)
 
 
+def legacy_scan_skip_ok(s: GameState, action: Action) -> bool:
+    """The log of a game that was played from left to right (before 2026-10-22) has `scan_skip` for a tech step that the player did not do.
+    The move is not offered any more, but it is still accepted where the old rule accepted it, so that those games replay."""
+    if action != {"type": "scan_skip"} or not s.pending or s.pending[0].kind != "scan_step":
+        return False
+    return current_step(s, s.players[s.pending[0].player]) in OPTIONAL_STEPS
+
+
 def scan_moves(s: GameState, p: PlayerState) -> list[Action]:
-    step = current_step(s, p)
-    if step is None:
-        return [{"type": "scan_done"}]
-    out = _step_moves(s, p, step)
-    if step in OPTIONAL_STEPS:
-        out.append({"type": "scan_skip"})
+    """The moves of every step that is left (any order, SCAN-01), and `scan_done` once the steps that are not optional (Earth's sector and
+    the card of the row) are done or cannot be done: the optional ones are then simply left undone (SCAN-04)."""
+    out: list[Action] = []
+    for step in s.scan_steps:
+        out += _step_moves(s, p, step)
+    if not any(step not in OPTIONAL_STEPS and _step_moves(s, p, step) for step in s.scan_steps):
+        out.append({"type": "scan_done"})
     return out
 
 
 def resolve_scan(s: GameState, p: PlayerState, a: Action, events: Events) -> None:
     t = a["type"]
-    step = current_step(s, p)
-    if step is not None and t != "scan_done":  # the steps before it could not be done: they are over
-        del s.scan_steps[: s.scan_steps.index(step)]
-    if t == "scan_skip":  # an optional step is not done (SCAN-04: the techs are optional)
+    if t == "scan_skip":  # a move of the games played from left to right (not offered any more): the current optional step is not done
+        step = current_step(s, p)
         assert step is not None
         s.scan_steps.remove(step)
     elif t == "scan_earth":

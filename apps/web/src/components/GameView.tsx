@@ -57,16 +57,18 @@ const DECISION: Record<string, string> = {
 
 const humanize = (kind: string): string => DECISION[kind] ?? kind.replace(/_/g, " ");
 
-/** Which step of the scan the player is at, from the moves the engine offers (the steps come from left to right, as on the player board). */
+/** The steps of the scan that the player can do now, from the moves the engine offers (any order: they are all offered at once). */
 function scanStepText(types: Set<string>): string {
-  if (types.has("scan_earth")) return "Scan, step 1: mark a signal in Earth's sector (or next to it, with the telescope tech)";
-  if (types.has("scan_discard")) return "Scan, step 2: discard a card of the card row to mark a signal in a sector of its color";
-  if (types.has("scan_token")) return "Scan, signal tokens: discard a token and another card of the card row for a signal, or skip";
-  if (types.has("scan_mercury")) return "Scan, step 3: spend 1 publicity to mark a signal in Mercury's sector, or skip";
-  if (types.has("scan_hand_discard"))
-    return "Scan, step 4: discard a card from your hand to mark a signal in a sector of its color, or skip";
-  if (types.has("scan_probe")) return "Scan, step 5: spend 1 energy to launch a probe, or gain 1 free movement, or skip";
-  return "Scan: no step is left, finish the scan";
+  const steps: string[] = [];
+  if (types.has("scan_earth")) steps.push("mark a signal in Earth's sector (or next to it, with the telescope tech)");
+  if (types.has("scan_discard")) steps.push("discard a card of the card row to mark a signal in a sector of its color");
+  if (types.has("scan_token")) steps.push("discard a signal token and another card of the card row for a signal");
+  if (types.has("scan_mercury")) steps.push("spend 1 publicity to mark a signal in Mercury's sector");
+  if (types.has("scan_hand_discard")) steps.push("discard a card from your hand to mark a signal in a sector of its color");
+  if (types.has("scan_probe")) steps.push("spend 1 energy to launch a probe, or gain 1 free movement");
+  if (steps.length === 0) return "Scan: no step is left, finish the scan";
+  const done = types.has("scan_done") ? "; or finish the scan" : "";
+  return `Scan, in any order: ${steps.join("; ")}${done}`;
 }
 
 export function promptOf(view: View, names: string[]): { who: string; mine: boolean; text: string } {

@@ -540,7 +540,8 @@ def test_signal_tokens_are_used_during_a_scan_to_discard_another_card_of_the_row
     p.credits, p.energy, p.signal_tokens = 9, 9, 1
     r = apply(s, {"type": "scan"})
     r = apply(r.state, {"type": "scan_earth", "sector": solar.earth(r.state)[1]})
-    assert not any(m["type"] == "scan_token" for m in legal_moves(r.state))  # the normal row step comes first
+    # the steps come in any order (SCAN-01): a token may be spent before the card of the row
+    assert any(m["type"] == "scan_token" for m in legal_moves(r.state))
     r = apply(r.state, {"type": "scan_discard", "source": "row:0"})
     while r.state.pending and r.state.pending[0].kind == "signal":
         r = apply(r.state, next(m for m in r.legal if m["type"] == "mark_signal"))

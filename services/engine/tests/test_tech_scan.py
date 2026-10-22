@@ -18,10 +18,11 @@ def test_scan_marks_earth_sector_then_a_row_card_sector() -> None:
     r2 = do(with_state(s), "scan")
     p = r2.state.players[pl]
     assert p.credits == 2 and p.energy == 2
-    assert {m["type"] for m in decisions(r2.legal)} == {"scan_earth"}  # from left to right (owner ruling, 2026-10-17, SCAN-01)
+    # in any order (rulebook p.12; owner ruling, 2026-10-22, SCAN-01): both steps are offered, and the scan cannot be finished before them
+    assert {m["type"] for m in decisions(r2.legal)} == {"scan_earth", "scan_discard"}
     r3 = do(r2, "scan_earth", sector=earth_sector)
     assert r3.state.sectors[earth_sector].markers == [pl]
-    assert {m["type"] for m in decisions(r3.legal)} == {"scan_discard"}  # the row step is next, and it is not optional
+    assert {m["type"] for m in decisions(r3.legal)} == {"scan_discard"}  # the row step is left, and it is not optional
     cid = r3.state.card_row[0]
     color = tables.cards()[cid]["sector"]
     r4 = do(r3, "scan_discard", source="row:0")
@@ -92,24 +93,87 @@ def test_telescope_cross_launches_for_one_energy_or_moves() -> None:
     assert {m["mode"] for m in decisions(with_state(s).legal) if m["type"] == "scan_probe"} == {"move"}
 
 
-def test_the_telescope_steps_come_in_the_order_of_the_board_and_can_be_skipped() -> None:  # SCAN-01 (owner ruling, 2026-10-17), SCAN-04
-    r = after_basic_steps(scan_ready("telescope-link", "telescope-branch", "telescope-cross"))
-    types = {m["type"] for m in decisions(r.legal)}
-    assert types == {"scan_mercury", "scan_skip"}  # step 3: Mercury
-    r = do(r, "scan_skip")
-    assert {m["type"] for m in decisions(r.legal)} == {"scan_hand_discard", "scan_skip"}  # step 4: a card of the hand
-    r = do(r, "scan_skip")
-    assert {m["type"] for m in decisions(r.legal)} == {"scan_probe", "scan_skip"}  # step 5: launch or movement
-    r = do(r, "scan_skip")
+def test_the_steps_of_a_scan_come_in_any_order_and_the_techs_can_be_left_undone() -> None:  # SCAN-01 (owner ruling, 2026-10-22), SCAN-04
+    r = scan_ready("telescope-link", "telescope-branch", "telescope-cross")
+    assert {m["type"] for m in decisions(r.legal)} == {
+        "scan_earth",
+        "scan_discard",
+        "scan_mercury",
+        "scan_hand_discard",
+        "scan_probe",
+    }, "every step is offered from the start, and there is no move to skip one"
+    r = after_basic_steps(r)
+    assert {m["type"] for m in decisions(r.legal)} == {"scan_mercury", "scan_hand_discard", "scan_probe", "scan_done"}
+    assert [m["type"] for m in decisions(do(r, "scan_done").legal)] != ["scan_done"]  # the scan ends with the techs left undone
+
+
+def test_a_tech_step_can_be_done_before_earth_and_the_card_of_the_row() -> None:  # SCAN-01 (owner ruling, 2026-10-22), TECH-TT04, FAQ-22
+    r = scan_ready("telescope-cross")
+    pl = r.state.current_player
+    energy = r.state.players[pl].energy
+    # spend 1 energy to launch a probe, or gain 1 movement, before the signal in Earth's sector
+    launched = do(r, "scan_probe", mode="launch")
+    assert launched.state.players[pl].energy == energy - 1 and len(launched.state.probes) == 1
+    assert {m["type"] for m in decisions(launched.legal)} == {"scan_earth", "scan_discard"}, "the tech step is done"
+    moved = do(r, "scan_probe", mode="move")
+    assert moved.state.players[pl].movement == 1
+    # the scan goes on and can be finished once Earth's sector and the card of the row are done
+    r = do(moved, "scan_earth", sector=next(m["sector"] for m in moved.legal if m["type"] == "scan_earth"))
+    assert "scan_done" not in {m["type"] for m in decisions(r.legal)}
+    r = do(r, "scan_discard", source="row:0")
+    while r.state.pending and r.state.pending[0].kind == "signal":
+        r = apply(r.state, r.legal[0])
+    assert [m["type"] for m in decisions(r.legal)] == ["scan_done"]  # the tech step was done already
+
+
+def test_a_card_of_the_hand_can_be_discarded_for_a_signal_before_earth() -> None:  # SCAN-01 (owner ruling, 2026-10-22), TECH-TT02
+    r = scan_ready("telescope-branch")
+    pl = r.state.current_player
+    hand = r.state.players[pl].hand
+    card = next(c for c in hand if tables.cards()[c].get("sector"))
+    first = do(r, "scan_hand_discard", card=card)
+    assert card not in first.state.players[pl].hand and card in first.state.discard
+    r = first
+    while r.state.pending and r.state.pending[0].kind == "signal":
+        r = apply(r.state, next(m for m in r.legal if m["type"] == "mark_signal"))
+    assert {m["type"] for m in decisions(r.legal)} == {"scan_earth", "scan_discard"}
+
+
+def test_the_card_of_the_row_can_be_discarded_before_the_sector_of_earth() -> None:  # SCAN-01 (owner ruling, 2026-10-22), SCAN-03
+    r = scan_ready()
+    r = do(r, "scan_discard", source="row:0")
+    while r.state.pending and r.state.pending[0].kind == "signal":
+        r = apply(r.state, next(m for m in r.legal if m["type"] == "mark_signal"))
+    assert {m["type"] for m in decisions(r.legal)} == {"scan_earth"}
+    r = do(r, "scan_earth", sector=r.legal[0]["sector"])
     assert [m["type"] for m in decisions(r.legal)] == ["scan_done"]
 
 
-def test_a_step_that_cannot_be_paid_is_passed_over() -> None:  # SCAN-04
+def test_a_step_that_cannot_be_paid_is_not_offered_and_does_not_hold_the_scan() -> None:  # SCAN-04
     r = scan_ready("telescope-link", "telescope-cross")
     s = r.state.model_copy(deep=True)
     s.players[s.current_player].publicity = 0  # no Mercury signal
-    r = after_basic_steps(with_state(s))
-    assert {m["type"] for m in decisions(r.legal)} == {"scan_probe", "scan_skip"}
+    r = with_state(s)
+    assert "scan_mercury" not in {m["type"] for m in decisions(r.legal)}
+    r = after_basic_steps(r)
+    assert {m["type"] for m in decisions(r.legal)} == {"scan_probe", "scan_done"}
+
+
+def test_a_step_that_could_not_be_paid_can_be_done_once_the_signals_gave_the_publicity() -> None:  # SCAN-04: the step is kept, not dropped
+    r = scan_ready("telescope-link")
+    s = r.state.model_copy(deep=True)
+    s.players[s.current_player].publicity = 0
+    r = with_state(s)
+    assert "scan_mercury" not in {m["type"] for m in decisions(r.legal)}
+    s2 = r.state.model_copy(deep=True)
+    s2.players[s2.current_player].publicity = 1  # as if a reward gave it
+    assert "scan_mercury" in {m["type"] for m in decisions(with_state(s2).legal)}
+
+
+def test_a_skip_in_the_log_of_a_game_played_from_left_to_right_still_replays() -> None:  # SCAN-01: the move of the old rule
+    r = after_basic_steps(scan_ready("telescope-link", "telescope-cross"))
+    r = apply(r.state, {"type": "scan_skip"})  # the old move: the current optional step (Mercury) is not done
+    assert {m["type"] for m in decisions(r.legal)} == {"scan_probe", "scan_done"}
 
 
 def test_research_rotates_then_takes_the_top_tile() -> None:
