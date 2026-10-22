@@ -1,3 +1,4 @@
+import { Pager } from "@/components/Pager";
 import { PlayerLink, PlayerNames } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
 import { countEndedGames, countPlayingGames, endedGames, playingGames } from "@/lib/queries";
@@ -30,31 +31,6 @@ const href = (playing: number, ended: number): string => {
   const text = q.toString();
   return text ? `/watch?${text}` : "/watch";
 };
-
-function Pager({ page, pages, link }: { page: number; pages: number; link: (p: number) => string }) {
-  if (pages <= 1) return null;
-  return (
-    <nav className="pager" aria-label="Pages">
-      {page > 1 ? (
-        <Link href={link(page - 1)} className="btn small ghost">
-          ← Newer
-        </Link>
-      ) : (
-        <span />
-      )}
-      <span className="muted small">
-        Page {page} of {pages}
-      </span>
-      {page < pages ? (
-        <Link href={link(page + 1)} className="btn small ghost">
-          Older →
-        </Link>
-      ) : (
-        <span />
-      )}
-    </nav>
-  );
-}
 
 /** How a finished game ended, in words. */
 function endText(reason: string, forfeit: string | null): string | null {

@@ -1,5 +1,6 @@
 // The administrator's page (no link leads here: the address is typed). It asks for the passphrase, and then manages the accounts and the open games.
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
+import { Pager } from "@/components/Pager";
 import { PlayerNames } from "@/components/PlayerLink";
 import { isAdmin } from "@/lib/admin";
 import { countAccounts, countOpenGames, listAccounts, openGames } from "@/lib/adminData";
@@ -29,31 +30,6 @@ const pageOf = (v: string | undefined): number => {
 };
 
 const when = (ms: number | null): string => (ms === null ? "" : new Date(ms).toISOString().slice(0, 16).replace("T", " "));
-
-function Pager({ page, pages, link }: { page: number; pages: number; link: (p: number) => string }) {
-  if (pages <= 1) return null;
-  return (
-    <nav className="pager" aria-label="Pages">
-      {page > 1 ? (
-        <Link href={link(page - 1)} className="btn small ghost">
-          ← Previous
-        </Link>
-      ) : (
-        <span />
-      )}
-      <span className="muted small">
-        Page {page} of {pages}
-      </span>
-      {page < pages ? (
-        <Link href={link(page + 1)} className="btn small ghost">
-          Next →
-        </Link>
-      ) : (
-        <span />
-      )}
-    </nav>
-  );
-}
 
 export default async function Admin({
   searchParams,
@@ -157,7 +133,12 @@ export default async function Admin({
             </article>
           ))}
         </div>
-        <Pager page={Math.min(gamePage, gamePages)} pages={gamePages} link={(p) => here(accountPage, p)} />
+        <Pager
+          page={Math.min(gamePage, gamePages)}
+          pages={gamePages}
+          link={(p) => here(accountPage, p)}
+          labels={["← Previous", "Next →"]}
+        />
       </section>
 
       <section className="open">
@@ -259,7 +240,12 @@ export default async function Admin({
             </tbody>
           </table>
         </div>
-        <Pager page={Math.min(accountPage, accountPages)} pages={accountPages} link={(p) => here(p, gamePage)} />
+        <Pager
+          page={Math.min(accountPage, accountPages)}
+          pages={accountPages}
+          link={(p) => here(p, gamePage)}
+          labels={["← Previous", "Next →"]}
+        />
       </section>
     </>
   );
