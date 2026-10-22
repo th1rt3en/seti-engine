@@ -27,6 +27,27 @@ def d1(wrangler: list[str], db: str, remote: bool, *, command: str | None = None
     return list(data[0]["results"])
 
 
+def stats_of(file: dict[str, Any], result: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    """The statistics of a game and the random-state encoding that replays it. The database does not say which encoding a game was played with
+    (games before the 2026-10-21 fix were played with a rounded random state, `rngEncoding` "double"), so both are tried, "exact" first, and the one
+    that replays the game to the final scores that were recorded is taken."""
+    recorded = {r["seat"]: r["score"] for r in result["ranking"]}
+    last_error: Exception | None = None
+    for encoding in ("exact", "double"):
+        file["header"]["rngEncoding"] = encoding
+        try:
+            final = None
+            for _, _, res in replay.steps(file):
+                final = res
+            assert final is not None and final.state.phase == "finished"
+            totals = {int(r["player"]): int(r["total"]) for r in final.state.final_scores}
+            if all(totals.get(seat) == score for seat, score in recorded.items()):
+                return stats.game_stats(file), encoding
+        except Exception as e:  # this encoding does not replay the game
+            last_error = e
+    raise ValueError(f"no encoding replays it to the recorded scores ({last_error})")
+
+
 def sql(v: Any) -> str:
     if v is None:
         return "NULL"
@@ -73,7 +94,7 @@ def main() -> int:
             "actions": [{"seq": i, "action": e["action"]} for i, e in enumerate(log)],
         }
         try:
-            st = stats.game_stats(file)
+            st, encoding = stats_of(file, result)
         except Exception as e:  # a game that the engine can no longer replay (the rules changed): left out, and said
             print(f"  {gid[:8]}: cannot be replayed ({type(e).__name__}: {str(e)[:80]}), skipped")
             continue
@@ -102,7 +123,7 @@ def main() -> int:
                 "INSERT OR REPLACE INTO game_stats (game_id, seat, user_id, players, rated, expansion, rank, won, score, org, org_offered_json, "
                 f"species_json, counters_json, ended_at) VALUES ({', '.join(sql(v) for v in values)});"
             )
-        print(f"  {gid[:8]}: {len(st['players'])} player(s)")
+        print(f"  {gid[:8]}: {len(st['players'])} player(s) (random state: {encoding})")
     Path(a.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(lines)} row(s) written to {a.out}")
     if a.apply and lines:
