@@ -74,6 +74,13 @@ def test_a_game_with_the_model_and_without_the_hosts_agreement_is_never_used() -
     assert one(replay_file(model_seat=loser, consent=False)) == "an AI without the host's agreement"
 
 
+def test_a_game_of_one_player_is_left_out_unless_it_is_asked_for() -> None:
+    f = replay_file()
+    f["header"]["options"]["players"] = 1
+    assert one(f) == "a game of one player"
+    assert dataset.examples_of(dataset.parse(f), solo=True) != "a game of one player"
+
+
 def test_a_game_that_was_not_played_to_the_end_is_skipped() -> None:
     assert one(replay_file(reason="resigned")) == "not played to the end"
     assert one(replay_file(status="cancelled")) == "not played to the end"

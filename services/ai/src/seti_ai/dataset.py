@@ -8,6 +8,8 @@ What counts:
 - the game was played to its end (a game that was resigned or timed out has no final scores to learn the value from);
 - when a seat was the model's (`bot` in the header), the host agreed that the game is collected (`consent`); a game with a model and no consent is
   never used;
+- a game of one player (against the rival) is left out unless asked for: the games to learn from are people against each other and people against
+  the model (owner, 2026-10-22);
 - every such game counts, whoever won and whoever played (owner, 2026-10-22: no filter on the games for now; one will be added once the model reaches
   a rating that makes it worth it).
 
@@ -107,10 +109,12 @@ class Stats:
         return f"{self.games} games, {self.used} used" + (f" (skipped: {why})" if why else "")
 
 
-def examples_of(game: ArchivedGame, imitate: float = 0.0, memory: bool = True) -> Examples | str:
+def examples_of(game: ArchivedGame, imitate: float = 0.0, memory: bool = True, solo: bool = False) -> Examples | str:
     """The examples of one game, or the reason it is not used. `imitate` is the weight of the human moves as policy examples (0: the value alone)."""
     if not game.completed:
         return "not played to the end"
+    if not solo and game.options.players == 1:
+        return "a game of one player"
     if game.model_seats and not game.consent:
         return "an AI without the host's agreement"
     try:
@@ -126,7 +130,7 @@ def examples_of(game: ArchivedGame, imitate: float = 0.0, memory: bool = True) -
         return "cannot be replayed"
 
 
-def load_examples(root: Path, imitate: float = 0.0, memory: bool = True) -> tuple[Examples, Stats]:
+def load_examples(root: Path, imitate: float = 0.0, memory: bool = True, solo: bool = False) -> tuple[Examples, Stats]:
     """All the usable games under `root`, and what became of the others."""
     out, stats = Examples(), Stats()
     for path in game_paths(root):
@@ -136,7 +140,7 @@ def load_examples(root: Path, imitate: float = 0.0, memory: bool = True) -> tupl
         except Exception:
             stats.skip("unreadable")
             continue
-        got = examples_of(game, imitate, memory)
+        got = examples_of(game, imitate, memory, solo)
         if isinstance(got, str):
             stats.skip(got)
             continue

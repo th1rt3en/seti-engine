@@ -164,7 +164,7 @@ def alpha(a: argparse.Namespace) -> None:
     )
     assert lengths
     if a.people:
-        people, found = dataset.load_examples(Path(a.people), a.imitate)
+        people, found = dataset.load_examples(Path(a.people), a.imitate, solo=a.people_solo)
         print(f"games of people: {found}; {len(people.policy)} choices, {len(people.value)} positions after a bundle", flush=True)
         ex = dataset.mix(ex, people, a.people_share, seed=a.seed)
         print(f"data with the games of people: {len(ex.policy)} choices, {len(ex.value)} positions after a bundle", flush=True)
@@ -240,6 +240,7 @@ def main() -> None:
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--people", default="", help="a folder with the downloaded archive of games (games with people and with the model)")
     ap.add_argument("--people-share", type=float, default=0.3, help="about this share of the data is from the archive (repeated if there are few games)")
+    ap.add_argument("--people-solo", action="store_true", help="also the games of one player (against the rival) of the archive")
     ap.add_argument("--imitate", type=float, default=0.0, help="weight of the exact moves of the people as policy examples (0: the games teach the value only)")
     a = ap.parse_args()
     if a.cmd == "pause":
