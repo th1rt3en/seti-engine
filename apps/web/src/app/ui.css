@@ -1244,3 +1244,25 @@ table.shortcuts td:first-child {
 .rivaltech {
   display: inline-flex;
 }
+
+/* what each tech did (the stats page) */
+.techuse {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 10px;
+}
+.techuse-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line, rgba(139, 148, 158, 0.25));
+  border-left: 4px solid var(--muted, #888);
+  border-radius: 6px;
+}
+.techuse-card .mini-tech {
+  margin: 0;
+}
+.techuse-line {
+  font-size: 14px;
+}

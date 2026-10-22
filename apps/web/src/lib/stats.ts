@@ -1,3 +1,5 @@
+import { TECH_METRICS, TECH_ORDER } from "./techs";
+
 // Statistics of the finished games: the averages of the counters that the engine made for each player of each game (services/engine stats.py, table
 // game_stats). Only games that were played to their end are in the table. Nothing here is a rule: it adds up what the engine counted.
 
@@ -91,6 +93,14 @@ export interface GoldStat {
   spread: Spread;
 }
 
+/** What one tech did for the players who have it (the counters `techuse.<tech>.<key>`, mean and spread over those players). */
+export interface TechUseStat {
+  tech: string;
+  /** the players who had the tech at the end of the game */
+  players: number;
+  metrics: { key: string; label: string; mean: number; total: number; spread: Spread }[];
+}
+
 export interface TechStat {
   tech: string;
   /** the share of the players who researched it */
@@ -106,6 +116,8 @@ export interface Stats {
   species: SpeciesStat[];
   gold: GoldStat[];
   techs: TechStat[];
+  /** for each tech, what it did for the players who have it */
+  techUse: TechUseStat[];
   /** the rounds that have an income (the expansion has no round 1) */
   rounds: number[];
   /** the players counted (one row each), for the spread of a number that the page works out from the counters */
@@ -181,6 +193,18 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     .map((k) => ({ tech: k.slice("tech.".length), share: n === 0 ? 0 : rows.filter((r) => (r.counters[k] ?? 0) > 0).length / n }))
     .sort((a, b) => b.share - a.share);
 
+  const techUse: TechUseStat[] = TECH_ORDER.map((tech) => {
+    const owners = rows.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0);
+    return {
+      tech,
+      players: owners.length,
+      metrics: (TECH_METRICS[tech] ?? []).map((m) => {
+        const values = owners.map((r) => r.counters[`techuse.${tech}.${m.key}`] ?? 0);
+        return { ...m, mean: values.length === 0 ? 0 : sum(values) / values.length, total: sum(values), spread: spreadOf(values) };
+      }),
+    };
+  });
+
   const rounds = [
     ...new Set(Object.keys(totals).flatMap((k) => (k.startsWith("incomerate.r") ? [Number(k.split(".")[1]?.slice(1))] : []))),
   ].sort((a, b) => a - b);
@@ -214,6 +238,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
       .sort((a, b) => b.avgScore - a.avgScore),
     gold,
     techs,
+    techUse,
     rounds,
   };
 }

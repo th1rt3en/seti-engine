@@ -129,6 +129,36 @@ describe("statistics", () => {
     expect(a.rounds).toEqual([2, 5]);
   });
 
+  it("counts what a tech did over the players who have it, and only over them", () => {
+    const rows = [
+      row({ counters: { "tech.probe-link": 1, "techuse.probe-link.asteroids": 4 } }),
+      row({ seat: 1, counters: { "tech.probe-link": 1, "techuse.probe-link.asteroids": 2 } }),
+      row({ seat: 2, counters: { "techuse.probe-link.asteroids": 9 } }), // counted for a tech that the player does not own at the end (a borrowed one): left out
+      row({
+        seat: 3,
+        counters: { "tech.computer-dot": 1, "techuse.computer-dot.top": 2, "techuse.computer-dot.vp": 4, "techuse.computer-dot.bottom": 1 },
+      }),
+      row({ seat: 4, counters: {} }),
+    ];
+    const use = aggregate(rows, any).techUse;
+    expect(use).toHaveLength(12);
+    const skimmer = use.find((t) => t.tech === "probe-link");
+    expect(skimmer).toMatchObject({ players: 2 });
+    expect(skimmer?.metrics).toEqual([
+      { key: "asteroids", label: "Asteroids moved into", mean: 3, total: 6, spread: { min: 2, max: 4, std: 1 } },
+    ]);
+    const memory = use.find((t) => t.tech === "computer-dot");
+    expect(memory?.metrics.map((m) => [m.key, m.total])).toEqual([
+      ["top", 2],
+      ["vp", 4],
+      ["bottom", 1],
+    ]);
+    expect(memory?.metrics[2]?.label).toBe("1 credit spaces filled");
+    expect(use.find((t) => t.tech === "probe-dot")).toMatchObject({ players: 0, metrics: [] }); // nothing to count
+    expect(use.find((t) => t.tech === "telescope-cross")).toMatchObject({ players: 0 });
+    expect(use.map((t) => t.tech).slice(0, 5)).toEqual(["probe-dot", "probe-link", "probe-branch", "probe-cross", "telescope-dot"]);
+  });
+
   it("no game gives zeros, not errors", () => {
     expect(aggregate([], any)).toMatchObject({ games: 0, rows: 0, orgs: [], species: [] });
   });

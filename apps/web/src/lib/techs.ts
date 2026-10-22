@@ -21,4 +21,42 @@ export const TECH_INFO: Record<string, { name: string; effect: string }> = {
   "computer-cross": { name: "Publicity Memory", effect: "A new computer space: 2 points on the upper space, 2 publicity on the lower." },
 };
 
+/**
+ * What is counted for each tech once a player has it (the engine's `techuse.<tech>.<key>` counters, services/engine/src/seti_engine/stats.py `tech_use`). The first tech
+ * of each type has nothing to count (the Twin Probes has no effect to follow; the blue techs only give their spaces).
+ */
+export interface TechMetric {
+  key: string;
+  label: string;
+}
+
+const BLUE = (bottom: string): TechMetric[] => [
+  { key: "top", label: "2 VP spaces filled" },
+  { key: "vp", label: "VP they gave" },
+  { key: "bottom", label: `${bottom} spaces filled` },
+];
+
+export const TECH_METRICS: Record<string, TechMetric[]> = {
+  "probe-dot": [],
+  "probe-link": [{ key: "asteroids", label: "Asteroids moved into" }],
+  "probe-branch": [{ key: "lands", label: "Landing actions (1 energy saved each)" }],
+  "probe-cross": [{ key: "moons", label: "Moons landed on" }],
+  "telescope-dot": [{ key: "adjacent", label: "Scans of a sector next to Earth's" }],
+  "telescope-link": [{ key: "mercury", label: "Signals in Mercury's sector (1 publicity each)" }],
+  "telescope-branch": [{ key: "discards", label: "Cards discarded for a signal" }],
+  "telescope-cross": [
+    { key: "launches", label: "Probes launched (1 energy each)" },
+    { key: "moves", label: "Free movements gained" },
+  ],
+  "computer-dot": BLUE("1 credit"),
+  "computer-link": BLUE("1 energy"),
+  "computer-branch": BLUE("1 card"),
+  "computer-cross": BLUE("2 publicity"),
+};
+
+/** The twelve techs in the order of the board: probe, telescope, computer, each dot, link, branch, cross. */
+export const TECH_ORDER: string[] = ["probe", "telescope", "computer"].flatMap((c) =>
+  ["dot", "link", "branch", "cross"].map((g) => `${c}-${g}`),
+);
+
 export const techName = (category: string, glyph: string): string => TECH_INFO[`${category}-${glyph}`]?.name ?? `${category} tech ${glyph}`;

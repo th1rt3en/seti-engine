@@ -576,6 +576,59 @@ export default async function StatsPage({
             </Panel>
 
             <Panel
+              title="What the techs did"
+              wide
+              note="For the players who researched the tech: what it did for them from then on, per player (the lowest, the highest and the spread are on hover). The first tech of each type has nothing to count."
+              table={
+                <Table
+                  head={["Tech", "Players", "What", "Average per player", "Total"]}
+                  rows={s.techUse.flatMap((t) =>
+                    t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean), m.total]),
+                  )}
+                />
+              }
+            >
+              <div className="techuse">
+                {s.techUse
+                  .filter((t) => t.metrics.length > 0)
+                  .map((t) => (
+                    <div key={t.tech} className="techuse-card" style={{ borderLeftColor: TECH_COLOR[techKind(t.tech)] }}>
+                      {TECH_FRONTS[t.tech] ? (
+                        <img
+                          src={TECH_FRONTS[t.tech]}
+                          alt={TECH_INFO[t.tech]?.name ?? t.tech}
+                          title={`${TECH_INFO[t.tech]?.name ?? t.tech}: ${TECH_INFO[t.tech]?.effect ?? ""}`}
+                          width={28}
+                          height={39}
+                          className="mini-tech"
+                        />
+                      ) : null}
+                      <div>
+                        {t.players === 0 ? (
+                          <span className="muted small">not researched in these games yet</span>
+                        ) : (
+                          <>
+                            {t.metrics.map((m) => (
+                              <div key={m.key} className="techuse-line">
+                                <span>{m.label}</span>{" "}
+                                <b>
+                                  <WithSpread spread={m.spread}>{round(m.mean)}</WithSpread>
+                                </b>
+                                <span className="muted small"> per player · {m.total} in all</span>
+                              </div>
+                            ))}
+                            <span className="muted small">
+                              {t.players} player{t.players === 1 ? "" : "s"} had it
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </Panel>
+
+            <Panel
               title="End-of-game scoring"
               wide
               table={

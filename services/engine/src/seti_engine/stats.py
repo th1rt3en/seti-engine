@@ -15,13 +15,65 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
-from . import card_defs, projection, replay, solar, tables
+from . import card_defs, effects, projection, replay, solar, tables
 
-VERSION = 1
+VERSION = 2
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
 # Counted apart: a probe launched, an orbiter or a lander placed by something other than the main action of that name
 # (a card effect, a reward, an organization, the quick start ...).
+
+
+def tech_use(c: Counter[str], before: Any, after: Any, seat: int, action: dict[str, Any], events: list[dict[str, Any]]) -> None:
+    """What the techs did for a player, counted from one step of the game: `techuse.<tech>.<what>` (zero is left out). Only what
+    happens while the player
+    has the tech counts, that is after they researched it (a tech that Turing Systems borrows counts for the turn). The first tech of
+    each type
+    (the Twin Probes, `probe-dot`, whose effect is a number of probes) is not counted, nor is the Mercury Scope's cost: the number of
+    times is the count.
+
+    - Asteroid Skimmer (`probe-link`): `asteroids`, the probes that moved into an asteroid space;
+    - Soft Landers (`probe-branch`): `lands`, the landing actions (each saves 1 energy);
+    - Moon Rover (`probe-cross`): `moons`, the landings on a moon;
+    - Earth Scope (`telescope-dot`): `adjacent`, the scans of a sector next to the sector of Earth;
+    - Mercury Scope (`telescope-link`): `mercury`, the signals in Mercury's sector for 1 publicity;
+    - Card Scope (`telescope-branch`): `discards`, the cards of the hand discarded for a signal;
+    - Scan Booster (`telescope-cross`): `launches` (1 energy each) and `moves` (the free movement);
+    - the four computer techs: `top`, the times that the upper space (2 points) was filled, `vp`, the points that gave, and `bottom`,
+      the times that
+      the lower space (the credit, the energy, the card or the 2 publicity) was filled."""
+    me = before.players[seat]
+    kind = action.get("type")
+
+    def active(tech: str) -> bool:
+        return effects.tech_active(me, tech)
+
+    if kind == "move_probe" and "to" in action and active("probe-link"):
+        if _cell_kind(before, int(action["to"][0]), int(action["to"][1])) == "asteroid":
+            c["techuse.probe-link.asteroids"] += 1
+    elif kind == "land" and active("probe-branch"):
+        c["techuse.probe-branch.lands"] += 1
+    elif kind == "scan_earth" and active("telescope-dot"):
+        if int(action["sector"]) != solar.earth(before)[1]:
+            c["techuse.telescope-dot.adjacent"] += 1
+    elif kind == "scan_mercury" and active("telescope-link"):
+        c["techuse.telescope-link.mercury"] += 1
+    elif kind == "scan_hand_discard" and active("telescope-branch"):
+        c["techuse.telescope-branch.discards"] += 1
+    elif kind == "scan_probe" and active("telescope-cross"):
+        c["techuse.telescope-cross.launches" if action.get("mode") == "launch" else "techuse.telescope-cross.moves"] += 1
+    for e in events:
+        if e.get("player") != seat:
+            continue
+        if e["type"] == "land" and "moon" in e and active("probe-cross"):
+            c["techuse.probe-cross.moons"] += 1
+        elif e["type"] == "place_data":
+            slot = after.players[seat].computer_techs.get(int(e["position"]))
+            if slot is not None:
+                c[f"techuse.{slot.tech}.top"] += 1
+                c[f"techuse.{slot.tech}.vp"] += 2  # TECH-20: the upper space of a computer tech gives 2 points
+        elif e["type"] == "place_lower":
+            c[f"techuse.{after.players[seat].computer_techs[int(e['slot'])].tech}.bottom"] += 1
 
 
 def _cell_kind(state: Any, ring: int, sector: int) -> str:
@@ -74,6 +126,8 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                 counts[seat][f"visit.{where}"] += 1
                 if sum(moved):
                     counts[seat][f"publicity.visit.{where}"] += sum(moved)
+        if seat in counts:
+            tech_use(counts[seat], before, state, seat, action, result.events)
         basic_done: set[str] = set()  # the launch that the launch action itself made (the first launch of the step)
         # orbiters and landers placed in this step: the main action of that name places one, anything else is another source
         for q in state.players:
