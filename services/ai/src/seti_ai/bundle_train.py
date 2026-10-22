@@ -123,12 +123,12 @@ def train_epoch(
             last = now
             done = int(tot["batches"])
             speed = done / (now - started)
-            loss, acc = tot["policy"] / max(tot["n"], 1), tot["acc"] / max(tot["n"], 1)
+            mean_loss, acc = tot["policy"] / max(tot["n"], 1), tot["acc"] / max(tot["n"], 1)
             rmse = (tot["value"] / max(tot["nv"], 1)) ** 0.5 * VALUE_SCALE
             print(
                 f"    batch {done}/{batches} ({done / batches:.0%}), {now - started:.0f}s so far, "
                 f"about {(batches - done) / speed:.0f}s left ({speed:.2f} batches/s, {1 / speed:.2f}s a batch): "
-                f"policy loss {loss:.3f}, picks the bot's move {acc:.1%}, value error {rmse:.1f} points, "
+                f"policy loss {mean_loss:.3f}, picks the bot's move {acc:.1%}, value error {rmse:.1f} points, "
                 f"gradient {tot['grad'] / done:.2f}{gpu_memory(device)}",
                 flush=True,
             )
