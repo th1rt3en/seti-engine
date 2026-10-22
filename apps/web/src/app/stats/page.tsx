@@ -149,6 +149,9 @@ export default async function StatsPage({
       ...sumOf(["gain.organization.publicity", "gain.quick_start.publicity", "gain.income.publicity"]),
     },
   ];
+  const techsOf = (c: Record<string, number>): number => TECH_CATEGORIES.reduce((n, k) => n + (c[`techcat.${k}`] ?? 0), 0);
+  const techTotal = TECH_CATEGORIES.reduce((n, k) => n + m(`techcat.${k}`), 0);
+  const techManual = m("action.research");
   const dataRows = [
     { key: "gained", label: "Gained", value: m("data.gained"), spread: sd("data.gained") },
     { key: "computer", label: "Placed in the computer", value: m("data.computer"), spread: sd("data.computer") },
@@ -643,6 +646,33 @@ export default async function StatsPage({
                       text: <b>{round(m(`techcat.${c}`))}</b>,
                       color: TECH_COLOR[c],
                     }))}
+                  />
+                  <h3>How they were researched</h3>
+                  <BarList
+                    label="Techs researched per game: by the research action or in another way"
+                    rows={[
+                      {
+                        key: "all",
+                        label: "In all",
+                        value: techTotal,
+                        spread: sdOf(techsOf),
+                        text: <b>{round(techTotal)}</b>,
+                      },
+                      {
+                        key: "manual",
+                        label: "Research action (6 publicity)",
+                        value: techManual,
+                        spread: sd("action.research"),
+                        text: <b>{round(techManual)}</b>,
+                      },
+                      {
+                        key: "other",
+                        label: "Other ways (cards, rewards, bonuses)",
+                        value: Math.max(0, techTotal - techManual),
+                        spread: sdOf((c) => Math.max(0, techsOf(c) - (c["action.research"] ?? 0))),
+                        text: <b>{round(Math.max(0, techTotal - techManual))}</b>,
+                      },
+                    ]}
                   />
                 </div>
                 <div>
