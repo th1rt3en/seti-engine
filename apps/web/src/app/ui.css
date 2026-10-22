@@ -966,6 +966,31 @@ table.shortcuts td:first-child {
 .stat-panel.wide {
   grid-column: 1 / -1;
 }
+.stat-section {
+  grid-column: 1 / -1;
+  margin: 24px 0 4px;
+  font-size: 20px;
+}
+.res-table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-variant-numeric: tabular-nums;
+}
+.res-table th,
+.res-table td {
+  padding: 4px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+}
+.res-table thead th {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 13px;
+}
+.res-table th[scope="row"],
+.res-table thead th:first-child {
+  text-align: left;
+}
 .stat-panel h2 {
   display: flex;
   align-items: center;

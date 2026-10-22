@@ -206,4 +206,18 @@ describe("statistics", () => {
   it("no game gives zeros, not errors", () => {
     expect(aggregate([], any)).toMatchObject({ games: 0, rows: 0, orgs: [], species: [] });
   });
+
+  it("averages the counters of a species over the players of the games where it was discovered, and only over them", () => {
+    const rows = [
+      row({ seat: 0, counters: { "alien.mascamites.games": 1, "mascamites.delivered": 3, "alien.mascamites.sample.vp": 4 } }),
+      row({ seat: 1, counters: { "alien.mascamites.games": 1, "mascamites.delivered": 1 } }),
+      row({ seat: 2, counters: { "mascamites.delivered": 9 } }), // a game where it was not discovered: not counted
+    ];
+    const a = aggregate(rows, any).alien;
+    expect(a.mascamites?.rows).toBe(2);
+    expect(a.mascamites?.mean["mascamites.delivered"]).toBe(2);
+    expect(a.mascamites?.mean["alien.mascamites.sample.vp"]).toBe(2);
+    expect(a.mascamites?.spread["mascamites.delivered"]).toMatchObject({ min: 1, max: 3 });
+    expect(a.amoeba?.rows).toBe(0); // no game with the species
+  });
 });

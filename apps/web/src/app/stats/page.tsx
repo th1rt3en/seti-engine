@@ -1,3 +1,4 @@
+import { AlienStatsSection } from "@/components/AlienStats";
 // Statistics of the games that were played to their end, averaged for each player of each game (the counters come from the engine: stats.py).
 // The filter chooses which games count: the number of players, the expansion, rated or casual. Nothing is worked out here that is a rule.
 // Drawn as tiles and charts (components/StatCharts.tsx), every block with its numbers as a table behind a button.
@@ -823,6 +824,9 @@ export default async function StatsPage({
                 </>
               ) : null}
             </Panel>
+
+            <h2 className="stat-section">The alien species in detail</h2>
+            <AlienStatsSection alien={s.alien} boards={BOARDS} />
           </div>
         </>
       )}

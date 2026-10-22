@@ -137,7 +137,16 @@ export interface FreshStats {
 
 export const FRESH_VERSION = 2;
 
+/** The counters of one alien species over the players of the games where it was discovered (the counters `alien.<species>.games` marks them). */
+export interface AlienStats {
+  rows: number;
+  mean: Record<string, number>;
+  spread: Record<string, Spread>;
+}
+
 export interface Stats {
+  /** by species: what each of them gave and did (see AlienStats) */
+  alien: Record<string, AlienStats>;
   /** the counters of version 2 and later, over the rows that have them */
   fresh: FreshStats;
   games: number;
@@ -233,6 +242,20 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   const freshSpread: Record<string, Spread> = {};
   for (const k of Object.keys(freshTotals)) freshSpread[k] = spreadOf(fresh.map((r) => r.counters[k] ?? 0));
 
+  const alien: Record<string, AlienStats> = {};
+  for (const sp of SPECIES_KEYS) {
+    const mine = rows.filter((r) => (r.counters[`alien.${sp}.games`] ?? 0) > 0);
+    const keys = new Set(mine.flatMap((r) => Object.keys(r.counters)));
+    const mean: Record<string, number> = {};
+    const spreads: Record<string, Spread> = {};
+    for (const k of keys) {
+      const values = mine.map((r) => r.counters[k] ?? 0);
+      mean[k] = sum(values) / values.length;
+      spreads[k] = spreadOf(values);
+    }
+    alien[sp] = { rows: mine.length, mean, spread: spreads };
+  }
+
   const techUse: TechUseStat[] = TECH_ORDER.map((tech) => {
     const owners = fresh.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0);
     return {
@@ -280,6 +303,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     techs,
     techUse,
     fresh: { rows: fresh.length, mean: freshMean, spread: freshSpread },
+    alien,
     rounds,
   };
 }
