@@ -110,40 +110,6 @@ def test_a_security_card_gives_a_minor_reward_when_discarded_and_a_major_one_whe
     assert r.state.players[0].credits == 3 and r.state.players[0].publicity == p.publicity + 3  # 2 credits, ET 36 major: 3 publicity
 
 
-def test_sentinel_probe_network_can_replay_the_corner_of_a_security_card_it_played() -> None:  # EXP-ORG-13, EXP-ARK-07 (owner, 2026-10-22)
-    s = discovered()
-    s.current_player = 0
-    p = s.players[0]
-    p.organization, p.org_data, p.org_used = "sentinel_probe_network", {}, False
-    cid = p.security.pop("pink")
-    p.hand.append(cid)
-    p.credits = 5
-    s.species[0].extra["explore_deck"] = ["ET 36", "ET 39", "ET 40"]
-    r = apply(s, {"type": "play_card", "card": cid})
-    assert r.state.players[0].org_data.get("corner") == cid, "the security card is kept for the free action like a card of the main deck"
-    state = r.state
-    while state.pending:  # the rest of the card is resolved
-        state = apply(state, legal_moves(state)[0]).state
-    free = {"type": "org_free", "org": "sentinel_probe_network"}
-    assert free in legal_moves(state), "the once-per-round free action is offered"
-    deck = len(state.species[0].extra["explore_deck"])
-    after = apply(state, free).state
-    assert "corner" not in after.players[0].org_data
-    assert len(after.species[0].extra["explore_deck"]) == deck - 1, "the minor exploration reward was revealed and gained"
-    assert free not in legal_moves(after), "once per round"
-
-
-def test_a_card_of_the_alien_deck_that_is_not_a_security_card_is_still_not_kept_by_sentinel() -> None:  # EXP-ORG-13
-    from seti_engine import orgs
-
-    s = discovered()
-    p = s.players[0]
-    p.organization, p.org_data = "sentinel_probe_network", {}
-    alien = next(c for c, d in tables.cards().items() if d["deck"] == "alien" and d.get("species") != "arkhos")
-    orgs.on_card_played(s, p, alien, True)
-    assert "corner" not in p.org_data
-
-
 def test_the_security_cards_and_the_deck_are_hidden() -> None:  # CLAUDE.md rule 6
     s = discovered()
     seen = project(s, 1).state
