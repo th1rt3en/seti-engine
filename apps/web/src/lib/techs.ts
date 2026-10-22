@@ -31,21 +31,21 @@ export interface TechMetric {
 }
 
 const BLUE = (bottom: string): TechMetric[] => [
-  { key: "vp", label: "VP they gave" }, // the times the upper space was filled is this divided by 2: not shown
-  { key: "bottom", label: `${bottom} spaces filled` },
+  { key: "vp", label: "Avg VP gained" }, // the times the upper space was filled is this divided by 2: not shown
+  { key: "bottom", label: `Avg ${bottom} spaces filled` },
 ];
 
 export const TECH_METRICS: Record<string, TechMetric[]> = {
   "probe-dot": [],
-  "probe-link": [{ key: "asteroids", label: "Asteroids moved into" }],
-  "probe-branch": [{ key: "lands", label: "Landing actions (1 energy saved each)" }],
-  "probe-cross": [{ key: "moons", label: "Moons landed on" }],
-  "telescope-dot": [{ key: "adjacent", label: "Scans of a sector next to Earth's" }],
-  "telescope-link": [{ key: "mercury", label: "Signals in Mercury's sector (1 publicity each)" }],
-  "telescope-branch": [{ key: "discards", label: "Cards discarded for a signal" }],
+  "probe-link": [{ key: "asteroids", label: "Avg asteroids moved into" }],
+  "probe-branch": [{ key: "lands", label: "Avg landing actions (1 energy saved each)" }],
+  "probe-cross": [{ key: "moons", label: "Avg moons landed on" }],
+  "telescope-dot": [{ key: "adjacent", label: "Avg scans of a sector next to Earth's" }],
+  "telescope-link": [{ key: "mercury", label: "Avg signals in Mercury's sector (1 publicity each)" }],
+  "telescope-branch": [{ key: "discards", label: "Avg cards discarded for a signal" }],
   "telescope-cross": [
-    { key: "launches", label: "Probes launched (1 energy each)" },
-    { key: "moves", label: "Free movements gained" },
+    { key: "launches", label: "Avg probes launched (1 energy each)" },
+    { key: "moves", label: "Avg free movements gained" },
   ],
   "computer-dot": BLUE("1 credit"),
   "computer-link": BLUE("1 energy"),

@@ -631,10 +631,10 @@ export default async function StatsPage({
             <Panel
               title="What the techs did"
               wide
-              note="For the players who researched the tech: what it did for them from then on, per player (the lowest, the highest and the spread are on hover)."
+              note="What each tech gave on average for the rest of the game after it was researched."
               table={
                 <Table
-                  head={["Tech", "Researched", "What", "Average per player"]}
+                  head={["Tech", "Researched", "What", "Average"]}
                   rows={s.techUse.flatMap((t) =>
                     t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean)]),
                   )}
@@ -663,7 +663,7 @@ export default async function StatsPage({
                           <>
                             {t.metrics.map((m) => (
                               <div key={m.key} className="techuse-line">
-                                <span>{m.label}</span>{" "}
+                                <span>{m.label}:</span>{" "}
                                 <b>
                                   <WithSpread spread={m.spread}>{round(m.mean)}</WithSpread>
                                 </b>

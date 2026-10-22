@@ -145,14 +145,14 @@ describe("statistics", () => {
     const skimmer = use.find((t) => t.tech === "probe-link");
     expect(skimmer).toMatchObject({ players: 2 });
     expect(skimmer?.metrics).toEqual([
-      { key: "asteroids", label: "Asteroids moved into", mean: 3, total: 6, spread: { min: 2, max: 4, std: 1 } },
+      { key: "asteroids", label: "Avg asteroids moved into", mean: 3, total: 6, spread: { min: 2, max: 4, std: 1 } },
     ]);
     const memory = use.find((t) => t.tech === "computer-dot");
     expect(memory?.metrics.map((m) => [m.key, m.total])).toEqual([
       ["vp", 4],
       ["bottom", 1],
     ]);
-    expect(memory?.metrics[1]?.label).toBe("1 credit spaces filled");
+    expect(memory?.metrics[1]?.label).toBe("Avg 1 credit spaces filled");
     expect(use.find((t) => t.tech === "probe-dot")).toMatchObject({ players: 0, metrics: [] }); // nothing to count
     expect(use.find((t) => t.tech === "telescope-cross")).toMatchObject({ players: 0 });
     expect(use.map((t) => t.tech).slice(0, 5)).toEqual(["probe-dot", "probe-link", "probe-branch", "probe-cross", "telescope-dot"]);
