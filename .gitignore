@@ -64,3 +64,7 @@ scratch/
 
 # a saved copy of a web page for reading (third-party content, not part of the project)
 docs/A Quantified Guide*
+
+# the administrator's passphrase and its hash (docs/deploy-web.md: never in the repository)
+pwd
+pwd.hash
