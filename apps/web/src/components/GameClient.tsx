@@ -561,6 +561,13 @@ export function GameClient({
   const offers = [...new Set(mine.filter((m) => isOffer(m) && !setupMoves.includes(m)).map(offerId))];
   const offerMove =
     pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
+  // keeping one of the end-of-round cards is confirmed (or given up) with the buttons on the card itself, like a card of the display
+  const offerActions: CardAction[] = offerMove
+    ? [
+        { key: "keep", label: "Keep", primary: true, title: handMoveText(offerMove), onClick: () => playConfirmed(offerMove) },
+        { key: "cancel", label: "Cancel", onClick: () => setPickedOffer(null) },
+      ]
+    : [];
   const setupMove =
     setupKind === "quick"
       ? pickedQuick.length === quickNeed
@@ -745,8 +752,6 @@ export function GameClient({
       buttons: [confirm("Confirm", () => play(goldMove))],
       onCancel: () => setPickedGold(null),
     };
-  } else if (offerMove) {
-    ask = { text: handMoveText(offerMove), buttons: [confirm("Confirm", () => play(offerMove))], onCancel: () => setPickedOffer(null) };
   } else if (spotOption) {
     ask = {
       text: glyphChoices ? (
@@ -1253,6 +1258,7 @@ export function GameClient({
           actions: handActions,
           offered: offers,
           offeredSelected: pickedOffer,
+          offeredActions: offerActions,
           onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
         }}
         tech={{

@@ -27,6 +27,8 @@ export interface HandSelection {
   /** Cards that are offered to the player to keep one of (the end-of-round cards after passing): they lie with the hand for the moment. */
   offered?: string[];
   offeredSelected?: string | null;
+  /** The buttons over the offered card that is selected (keep it, cancel). */
+  offeredActions?: CardAction[];
   onOffer?: (card: string) => void;
   /** An Exertian card is to be played (face down): the cards that can be, the one that is picked, and the buttons over it. */
   exertian?: { selectable: string[]; selected: string | null; onSelect: (card: string) => void; actions: CardAction[] };
@@ -249,15 +251,19 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
                   <b className="offerlabel">Keep one of these</b>
                   <span className="offercards">
                     {selection?.offered?.map((c) => (
-                      <button
-                        key={c}
-                        type="button"
-                        className={selection.offeredSelected === c ? "cardbtn selectable selected" : "cardbtn selectable"}
-                        aria-pressed={selection.offeredSelected === c}
-                        onClick={() => selection.onOffer?.(c)}
-                      >
-                        <CardImage id={c} size="hand" />
-                      </button>
+                      <span key={c} className="cardwrap">
+                        <button
+                          type="button"
+                          className={selection.offeredSelected === c ? "cardbtn selectable selected" : "cardbtn selectable"}
+                          aria-pressed={selection.offeredSelected === c}
+                          onClick={() => selection.onOffer?.(c)}
+                        >
+                          <CardImage id={c} size="hand" />
+                        </button>
+                        {selection.offeredSelected === c && selection.offeredActions ? (
+                          <CardActions actions={selection.offeredActions} />
+                        ) : null}
+                      </span>
                     ))}
                   </span>
                 </span>
