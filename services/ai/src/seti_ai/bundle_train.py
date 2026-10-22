@@ -6,9 +6,9 @@ python -m seti_ai.bundle_train alpha --games 300 --epochs 6 --models models_alph
 # ask a run to stop at the end of the epoch
 
 What it learns from (`bundle_data.py`): the choice of every micro move of a bundle (policy), and from the position after each bundle the points the
-seat still gained until the end of the game (value). The games of people against the model are made into examples the same way, with the weights of
-`bundle_data.game_weights`. The data are made again from the same seeds when a run is resumed, so the games are the same. Written to the log as it
-goes; the mean scores are shown against the 250 of an advanced player (gate.py).
+seat still gained until the end of the game (value). The games of people (and of people against the model) are made into examples by `dataset.py`: the
+value of every position, and no imitation of the exact human moves. The data are made again from the same seeds when a run is resumed, so the games are
+the same. Written to the log as it goes; the mean scores are shown against the 250 of an advanced player (gate.py).
 """
 
 from __future__ import annotations
@@ -164,7 +164,7 @@ def alpha(a: argparse.Namespace) -> None:
     )
     assert lengths
     if a.people:
-        people, found = dataset.load_examples(Path(a.people), a.lost_weight)
+        people, found = dataset.load_examples(Path(a.people), a.imitate)
         print(f"games of people: {found}; {len(people.policy)} choices, {len(people.value)} positions after a bundle", flush=True)
         ex = dataset.mix(ex, people, a.people_share, seed=a.seed)
         print(f"data with the games of people: {len(ex.policy)} choices, {len(ex.value)} positions after a bundle", flush=True)
@@ -240,7 +240,7 @@ def main() -> None:
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--people", default="", help="a folder with the downloaded archive of games (games with people and with the model)")
     ap.add_argument("--people-share", type=float, default=0.3, help="about this share of the data is from the archive (repeated if there are few games)")
-    ap.add_argument("--lost-weight", type=float, default=3.0, help="weight of the moves of the people in a game that the model lost")
+    ap.add_argument("--imitate", type=float, default=0.0, help="weight of the exact moves of the people as policy examples (0: the games teach the value only)")
     a = ap.parse_args()
     if a.cmd == "pause":
         checkpoint.request_pause(Path(a.models))

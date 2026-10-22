@@ -223,3 +223,25 @@ waits for the owner's go like every training.
 
 **Open for the owner.** What the rules version of a game is (the header has no rules version; a game the current engine cannot replay is skipped); whether the
 games of the lowest-rated people should count at all (now every completed game counts); the search settings of the service (`SETI_SEARCH`).
+
+
+## 12. What the model learns from games of people (owner, 2026-10-22)
+
+**No filter on the games for now.** Every completed human game counts: people against each other, and people against the model, whoever won. (This replaces the
+rule of section 10(b) that skipped games the model won and gave games it lost three times the weight.) Once the model reaches a rating that makes it worth it, a
+filter on which games it learns from will be added.
+
+**Learning from a human game is not imitation.** The model is not trained to play the exact move a person played. A game teaches two things:
+1. **That the bundles exist.** A person's bundle (for example a particular order of free actions around a main action) may be one that the model's own sampling
+   would not find. It is shown to the model as a candidate.
+2. **What they are worth.** The model evaluates the candidate bundles itself, with its own value and the points they score, and its weights are updated from what
+   it finds, like any bundle it found on its own. The value of a position is also learned from the points each seat really gained until the end of the game (both
+   seats, every game).
+
+**What is built (2026-10-22).** The value labels of every position of every human game, with no policy imitation (`dataset.py`, `imitate` 0 by default; the
+model's own moves are never imitated). The old weighting `game_weights` stays in `bundle_data.py` but the pipeline no longer uses it.
+
+**What is not built yet.** Offering a human bundle to the bundle search as a candidate at its position (`BundleSearch` takes extra candidate bundles; they are
+replayed on the determinized copies like any other), and training the policy toward what the search finds there (the bundle that scored best, human or not),
+instead of toward the human's move. This needs search runs over the positions of the human games during training, so it is slower than the bot-game data, and it
+waits for the owner's go for any training.

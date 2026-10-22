@@ -43,32 +43,30 @@ def one(file: dict[str, Any]) -> Examples | str:
     return dataset.examples_of(dataset.parse(file))
 
 
-def test_a_game_of_people_counts_once_for_both_seats() -> None:
+def test_a_game_of_people_teaches_the_value_of_both_seats_and_does_not_imitate_the_moves() -> None:
     got = one(replay_file())
     assert isinstance(got, Examples) and got.finished
     plain = examples_from_log(Options(players=2, seed=SEED), GAME.actions)
-    assert len(got.policy) == len(plain.policy) and len(got.value) == len(plain.value)
-    assert {p.weight for p in got.policy} == {1.0}
+    assert len(got.value) == len(plain.value) and {v.weight for v in got.value} == {1.0}
+    assert got.policy == [], "the exact moves of the people are not policy examples"
 
 
-def test_a_game_that_the_model_lost_gives_the_moves_of_the_person_with_more_weight() -> None:
-    loser = SCORES.index(min(SCORES))
-    if SCORES[0] == SCORES[1]:
-        return
-    got = one(replay_file(model_seat=loser))
+def test_the_moves_of_people_can_be_imitated_with_a_weight_if_asked_for() -> None:
+    got = dataset.examples_of(dataset.parse(replay_file()), imitate=0.5)
     assert isinstance(got, Examples)
-    assert got.policy and {p.weight for p in got.policy} == {3.0}, "only the person's moves, with weight 3"
     plain = examples_from_log(Options(players=2, seed=SEED), GAME.actions)
-    assert 0 < len(got.policy) < len(plain.policy)
-    assert len(got.value) == len(plain.value), "the positions of both seats give value labels"
+    assert len(got.policy) == len(plain.policy) and {p.weight for p in got.policy} == {0.5}
 
 
-def test_a_game_that_the_model_won_is_skipped() -> None:
+def test_a_game_with_the_model_counts_whoever_won_and_the_models_own_moves_are_never_imitated() -> None:
     if SCORES[0] == SCORES[1]:
         return
-    winner = SCORES.index(max(SCORES))
-    assert one(replay_file(model_seat=winner)) == "the model won or tied"
-    assert one(replay_file(model_seat=0, scores=[100, 100])) == "the model won or tied"
+    for model_seat in (SCORES.index(min(SCORES)), SCORES.index(max(SCORES))):  # the model lost, the model won
+        got = dataset.examples_of(dataset.parse(replay_file(model_seat=model_seat)), imitate=1.0)
+        assert isinstance(got, Examples)
+        plain = examples_from_log(Options(players=2, seed=SEED), GAME.actions)
+        assert len(got.value) == len(plain.value), "the positions of both seats give value labels"
+        assert 0 < len(got.policy) < len(plain.policy), "only the person's moves, not the model's"
 
 
 def test_a_game_with_the_model_and_without_the_hosts_agreement_is_never_used() -> None:
@@ -102,7 +100,7 @@ def test_the_games_under_a_folder_are_found_in_both_forms(tmp_path: Path) -> Non
         (g2 / "actions" / f"{e['seq']:07d}.json").write_text(json.dumps(e), encoding="utf-8")
     (tmp_path / "2026" / "10" / "23").mkdir()
     (tmp_path / "2026" / "10" / "23" / "replay.json").write_text("not json", encoding="utf-8")
-    data, stats = dataset.load_examples(tmp_path)
+    data, stats = dataset.load_examples(tmp_path, imitate=1.0)
     assert (stats.games, stats.used, stats.skipped) == (3, 2, {"unreadable": 1})
     assert len(data.policy) == 2 * len(examples_from_log(Options(players=2, seed=SEED), GAME.actions).policy)
     assert "3 games, 2 used" in str(stats)
