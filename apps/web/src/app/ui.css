@@ -1266,3 +1266,10 @@ table.shortcuts td:first-child {
 .techuse-line {
   font-size: 14px;
 }
+
+/* on a wide screen the tech icons of the stats page are half as big again (2.4 rem on a phone) */
+@media (min-width: 761px) {
+  .stats-page .mini-tech {
+    height: 3.6rem;
+  }
+}
