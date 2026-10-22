@@ -61,12 +61,32 @@ def make_data(games: int, seed: int, workers: int) -> tuple[Examples, list[int]]
     return out, scores
 
 
-def train_epoch(net: PolicyNet, opt: torch.optim.Optimizer, ex: Examples, device: torch.device, rng: np.random.Generator, batch: int = 64) -> dict[str, float]:
+def gpu_memory(device: torch.device) -> str:
+    if device.type != "cuda":
+        return ""
+    gib = 1024**3
+    return f", gpu memory {torch.cuda.memory_allocated() / gib:.1f} GiB in use, {torch.cuda.max_memory_allocated() / gib:.1f} GiB peak"
+
+
+def train_epoch(
+    net: PolicyNet,
+    opt: torch.optim.Optimizer,
+    ex: Examples,
+    device: torch.device,
+    rng: np.random.Generator,
+    batch: int = 64,
+    log_every: float = 60.0,
+) -> dict[str, float]:
     """One pass over the choices (each batch comes with as many positions after a bundle, for the value). Weighted: an example of weight 3 counts three
-    times."""
+    times. A line of progress goes to the log every `log_every` seconds: the batch, the time left, the speed, the running losses, the gradient and the
+    memory; the numbers of the whole epoch come back with the result."""
     net.train()
     order = rng.permutation(len(ex.policy))
-    tot = {"policy": 0.0, "acc": 0.0, "value": 0.0, "n": 0.0, "nv": 0.0}
+    tot = {"policy": 0.0, "acc": 0.0, "value": 0.0, "n": 0.0, "nv": 0.0, "grad": 0.0, "batches": 0.0}
+    batches = -(-len(order) // batch)
+    started = last = time.time()
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats()
     for b in range(0, len(order), batch):
         pol = [ex.policy[i] for i in order[b : b + batch]]
         val = [ex.value[j] for j in rng.integers(0, len(ex.value), size=len(pol))] if ex.value else []
@@ -88,18 +108,36 @@ def train_epoch(net: PolicyNet, opt: torch.optim.Optimizer, ex: Examples, device
             loss = loss + 0.5 * value_loss
         opt.zero_grad()
         loss.backward()  # type: ignore[no-untyped-call]
-        nn.utils.clip_grad_norm_(net.parameters(), 1.0)
+        grad = float(nn.utils.clip_grad_norm_(net.parameters(), 1.0))
         opt.step()
+        tot["grad"] += grad
+        tot["batches"] += 1
         tot["policy"] += float(policy_loss.detach()) * n
         tot["acc"] += float((logits[:n].argmax(dim=1) == act).float().sum())
         tot["n"] += n
         if val:
             tot["value"] += float(value_loss.detach()) * len(val)
             tot["nv"] += len(val)
+        now = time.time()
+        if now - last >= log_every:
+            last = now
+            done = int(tot["batches"])
+            speed = done / (now - started)
+            print(
+                f"    batch {done}/{batches} ({done / batches:.0%}), {now - started:.0f}s so far, "
+                f"about {(batches - done) / speed:.0f}s left ({speed:.2f} batches/s, {1 / speed:.2f}s a batch): policy loss {tot['policy'] / max(tot['n'], 1):.3f}, picks the bot's move {tot['acc'] / max(tot['n'], 1):.1%}, "
+                f"value error {(tot['value'] / max(tot['nv'], 1)) ** 0.5 * VALUE_SCALE:.1f} points, gradient {tot['grad'] / done:.2f}{gpu_memory(device)}",
+                flush=True,
+            )
+    seconds = time.time() - started
     return {
         "policy_loss": tot["policy"] / max(tot["n"], 1),
         "accuracy": tot["acc"] / max(tot["n"], 1),
         "value_rmse_points": (tot["value"] / max(tot["nv"], 1)) ** 0.5 * VALUE_SCALE,
+        "batches": tot["batches"],
+        "seconds": seconds,
+        "seconds_per_batch": seconds / max(tot["batches"], 1),
+        "mean_gradient": tot["grad"] / max(tot["batches"], 1),
     }
 
 
@@ -184,10 +222,12 @@ def alpha(a: argparse.Namespace) -> None:
     paused = False
     for epoch in range(start_epoch, a.epochs + 1):
         t1 = time.time()
-        st = train_epoch(net, opt, ex, device, rng, a.batch)
+        st = train_epoch(net, opt, ex, device, rng, a.batch, a.log_every)
         print(
             f"epoch {epoch}/{a.epochs}: policy loss {st['policy_loss']:.3f}, picks the bot's move {st['accuracy']:.1%}, "
-            f"value error {st['value_rmse_points']:.1f} points ({time.time() - t1:.0f}s)",
+            f"value error {st['value_rmse_points']:.1f} points ({time.time() - t1:.0f}s; {int(st['batches'])} batches, {st['seconds_per_batch']:.2f}s a batch, "
+            f"mean gradient {st['mean_gradient']:.2f}{gpu_memory(device)}); "
+            f"about {(time.time() - t1) * (a.epochs - epoch) / 3600:.1f} hours for the epochs left",
             flush=True,
         )
         gate.log_metrics(root, {"kind": "alpha-epoch", "epoch": epoch, **st})
@@ -233,6 +273,7 @@ def main() -> None:
     ap.add_argument("--preset", default="small", choices=list(PRESETS))
     ap.add_argument("--workers", type=int, default=min(6, max(1, (os.cpu_count() or 4) - 2)))
     ap.add_argument("--batch", type=int, default=64)
+    ap.add_argument("--log-every", type=float, default=60.0, help="seconds between the lines of progress inside an epoch")
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--eval-games", type=int, default=10, help="games against each bot")
