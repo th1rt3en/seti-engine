@@ -17,8 +17,8 @@ import { OrgName } from "@/components/OrgName";
 import { BarList, Histogram, LineChart, Panel, Pills, StackBar, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
-import { statRows } from "@/lib/queries";
-import { type Spread, aggregate, parseFilter, spreadOf } from "@/lib/stats";
+import { type Spread, parseFilter, spreadOf } from "@/lib/stats";
+import { cachedStats } from "@/lib/statsCache";
 import { TECH_INFO } from "@/lib/techs";
 import type { ReactNode } from "react";
 import assets from "../../generated/assets.json";
@@ -88,7 +88,7 @@ export default async function StatsPage({
 }: { searchParams: Promise<{ players?: string; expansion?: string; rated?: string; who?: string }> }) {
   const sp = await searchParams;
   const filter = parseFilter(sp);
-  const s = aggregate(await statRows(getDb(), filter), filter);
+  const s = await cachedStats(getDb(), filter);
   const m = (k: string): number => s.mean[k] ?? 0;
   // how the players differ in a counter, and in a number that is worked out from several counters (a player without the counter counts as 0)
   const sd = (k: string): Spread | undefined => s.spread[k];
