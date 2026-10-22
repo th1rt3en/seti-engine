@@ -22,7 +22,7 @@ docker run --rm -p 8080:8080 -e PORT=8080 seti-engine
 ## Cloud Run (owner)
 
 - Deploy the image as a private service (no public invoker); only the Worker's service account may call it. The service does not authenticate callers itself.
-- Simultaneous games: a move is CPU work and one Python process uses one core, so the image starts `WEB_CONCURRENCY` uvicorn workers (default 2). Give the instance as many CPUs as workers (for example `--cpu 2` with the default), set Cloud Run concurrency to about 20 to 40 requests per instance, and let it scale out (`--max-instances` to the budget). The service keeps no state, so any number of instances can serve one game.
+- Simultaneous games: a move is CPU work and one Python process uses one core, so the image starts `WEB_CONCURRENCY` uvicorn workers (default 2). Give the instance as many CPUs as workers (for example `--cpu 2` with the default; on 2026-10-22 the service runs on 1 CPU and 1 GiB, which the owner found enough by watching its use), set Cloud Run concurrency to about 20 to 40 requests per instance, and let it scale out (`--max-instances` to the budget). The service keeps no state, so any number of instances can serve one game.
 - Set a minimum of 1 instance to avoid cold starts (docs/PLAN.md risks). The service needs no database and no secrets.
 - Request signing (D16): set the environment variable `ENGINE_TRUSTED_KEYS` to a JSON object with the public keys (PEM, `\n` for line breaks) of the callers:
   `{"worker": "-----BEGIN PUBLIC KEY-----\n...", "web": "-----BEGIN PUBLIC KEY-----\n..."}`. Every request except `/health` must carry a token signed

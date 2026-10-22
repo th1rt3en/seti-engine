@@ -45,7 +45,7 @@ without Docker: `python -m uv run --with fastapi --with uvicorn --with cryptogra
 ## Cloud Run (owner)
 
 - Deployed 2026-10-22 as `seti-ai` (us-central1, https://seti-ai-725889947830.us-central1.run.app) with a public URL like the engine: every request but `/health` must
-  be signed, and an unsigned one gets 401. It carries the seed, so never remove the `ENGINE_TRUSTED_KEYS`. 2 CPUs and 2 GiB, concurrency 4, 0 to 1 instances (a cold start loads the weights, a few seconds).
+  be signed, and an unsigned one gets 401. It carries the seed, so never remove the `ENGINE_TRUSTED_KEYS`. 1 CPU and 1 GiB (the owner watched the use of both on 2026-10-22), concurrency 4, 0 to 1 instances (a cold start loads the weights, a few seconds).
 - `ENGINE_TRUSTED_KEYS`: the same JSON as the engine service (the Worker's public key). Without it a Cloud Run service refuses every request.
 - Optional: `SETI_SEARCH` is a JSON object of search settings (`{"samples": 6, "copies": 3}`); `SETI_MODELS` is the folder of the versions (default `/models`).
 

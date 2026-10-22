@@ -42,6 +42,6 @@ $envFile = Join-Path ([IO.Path]::GetTempPath()) "seti-ai-env.yaml"
 ("ENGINE_TRUSTED_KEYS: " + ($keys | ConvertTo-Json)) | Set-Content $envFile -Encoding utf8
 
 Push-Location $stage
-gcloud run deploy seti-ai --source . --region $Region --cpu 2 --memory 2Gi --concurrency 4 --min-instances 0 --max-instances 1 --timeout 300 --env-vars-file $envFile --quiet
+gcloud run deploy seti-ai --source . --region $Region --cpu 1 --memory 1Gi --concurrency 4 --min-instances 0 --max-instances 1 --timeout 300 --env-vars-file $envFile --quiet
 Pop-Location
 Remove-Item $envFile
