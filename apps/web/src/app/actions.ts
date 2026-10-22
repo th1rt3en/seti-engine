@@ -16,6 +16,7 @@ import {
 } from "@/lib/auth";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
+import { gameNum } from "@/lib/ids";
 import { botVersions, createdRecently } from "@/lib/queries";
 import { RECOVERY_COOKIE, currentUser, showRecoveryCode, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
@@ -25,6 +26,8 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 const field = (f: FormData, k: string): string => String(f.get(k) ?? "");
+/** The address of a game's page: its number. (The forms keep the long id; the address is made here.) */
+const gamePath = async (id: string): Promise<string> => `/games/${await gameNum(getDb(), id)}`;
 const back = (path: string, error: string): never => redirect(`${path}?error=${encodeURIComponent(error)}`);
 
 /** The Turnstile challenge of a form; a visitor who fails it goes back to the page with a message. */
@@ -204,7 +207,7 @@ export async function createGameAction(form: FormData): Promise<void> {
     rated,
   });
   if (!reply.ok) back("/lobby", reply.message);
-  redirect(`/games/${(reply as unknown as { id: string }).id}`);
+  redirect(await gamePath((reply as unknown as { id: string }).id));
 }
 
 /** From the end of a game: a new table with the same options, the same clock and the same rating, for the same players to join (they get the link of the table). */
@@ -220,7 +223,8 @@ export async function playAgainAction(form: FormData): Promise<void> {
     options?: Record<string, unknown> & { players?: number };
     seats?: ({ id: string } | null)[];
   } | null;
-  if (meta === null || meta.status !== "finished" || !meta.options || !meta.seats?.some((s) => s?.id === user.id)) redirect(`/games/${id}`);
+  if (meta === null || meta.status !== "finished" || !meta.options || !meta.seats?.some((s) => s?.id === user.id))
+    redirect(await gamePath(id));
   if (await createdRecently(getDb(), user.id, Date.now()))
     back("/lobby", "You have just created a game. Open it from the list, or wait a few seconds before creating another.");
   const { seed: _seed, ...options } = (meta as NonNullable<typeof meta>).options as Record<string, unknown>;
@@ -230,7 +234,7 @@ export async function playAgainAction(form: FormData): Promise<void> {
     rated: (meta as NonNullable<typeof meta>).rated === true && (options.players as number) >= 2,
   } as never);
   if (!reply.ok) back("/lobby", reply.message);
-  redirect(`/games/${(reply as unknown as { id: string }).id}`);
+  redirect(await gamePath((reply as unknown as { id: string }).id));
 }
 
 export async function joinAction(form: FormData): Promise<void> {
@@ -239,7 +243,7 @@ export async function joinAction(form: FormData): Promise<void> {
   const id = field(form, "id");
   const reply = await joinGame(me as NonNullable<typeof me>, id);
   if (!reply.ok) back("/lobby", reply.message);
-  redirect(`/games/${id}`);
+  redirect(await gamePath(id));
 }
 
 /** The host adds an AI to the lobby. Only a released version can be chosen, and the box that says the game is collected has to be ticked. */
@@ -249,10 +253,10 @@ export async function addBotAction(form: FormData): Promise<void> {
   const id = field(form, "id");
   const model = field(form, "model");
   const live = (await botVersions(getDb())).some((v) => v.live && v.version === model);
-  if (!live) back(`/games/${id}`, "That version of the AI is not available.");
+  if (!live) back(await gamePath(id), "That version of the AI is not available.");
   const reply = await addBot(me as NonNullable<typeof me>, id, model, field(form, "consent") === "on");
-  if (!reply.ok) back(`/games/${id}`, reply.message);
-  redirect(`/games/${id}`);
+  if (!reply.ok) back(await gamePath(id), reply.message);
+  redirect(await gamePath(id));
 }
 
 export async function removeBotAction(form: FormData): Promise<void> {
@@ -260,8 +264,8 @@ export async function removeBotAction(form: FormData): Promise<void> {
   if (me === null) redirect("/login");
   const id = field(form, "id");
   const reply = await removeBot(me as NonNullable<typeof me>, id, Number(field(form, "seat")));
-  if (!reply.ok) back(`/games/${id}`, reply.message);
-  redirect(`/games/${id}`);
+  if (!reply.ok) back(await gamePath(id), reply.message);
+  redirect(await gamePath(id));
 }
 
 /** Resign one of the user's own solo games (from the profile page): the game ends as resigned, as when the player resigns at the table. */
@@ -272,7 +276,7 @@ export async function resignSoloAction(form: FormData): Promise<void> {
   const id = field(form, "id");
   const meta = (await gameMeta(id)) as { options?: { players?: number } } | null;
   if (meta?.options?.players === 1) await resignGame(user, id); // the Worker checks that the user is the player and that the game is being played
-  redirect(`/players/${user.id}`);
+  redirect(`/players/${user.num ?? user.id}`);
 }
 
 export async function leaveAction(form: FormData): Promise<void> {

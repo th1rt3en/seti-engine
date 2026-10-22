@@ -30,6 +30,8 @@ export class D1Sink implements ResultSink {
         meta.rated ? 1 : 0,
         meta.createdAt,
       ),
+      // the number of the game, in the address of its page: an autoincrement key, so a number is never given twice (a destroyed lobby keeps its own)
+      q("INSERT INTO game_nums (game_id) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM game_nums WHERE game_id = ?)", meta.id, meta.id),
       q("DELETE FROM game_players WHERE game_id = ?", meta.id),
       ...meta.seats.flatMap((s, seat) =>
         s === null
@@ -77,6 +79,7 @@ export class D1Sink implements ResultSink {
         meta.createdAt,
         meta.startedAt ?? null,
       ),
+      q("INSERT INTO game_nums (game_id) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM game_nums WHERE game_id = ?)", meta.id, meta.id),
       ...meta.seats.flatMap((s, seat) =>
         s === null
           ? []

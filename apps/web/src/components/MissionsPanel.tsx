@@ -7,6 +7,7 @@ import type { View } from "@seti/protocol";
 import { CardImage } from "./CardImage";
 import { CoverMarker } from "./CoverMarker";
 import { type PieceColor, pieceColor } from "./Pieces";
+import { PlayerName } from "./PlayerName";
 
 type Mission = View["state"]["players"][number]["missions"][number];
 
@@ -64,7 +65,7 @@ export function MissionsPanel({ view, names }: { view: View; names: string[] }) 
         <div key={p.index} className="missionrow">
           <b className="small">
             <span className="dot small" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />{" "}
-            {names[p.index] ?? `Player ${p.index + 1}`}
+            <PlayerName seat={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
             {p.index === view.viewer ? " (you)" : ""}
           </b>{" "}
           <span className="muted small">{p.completed_missions.length} completed</span>

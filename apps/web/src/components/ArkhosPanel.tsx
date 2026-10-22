@@ -6,6 +6,7 @@ import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
+import { PlayerName } from "./PlayerName";
 
 const ASSET = expansionAssets as Record<string, string>;
 const COLORS = ["pink", "yellow", "blue"] as const;
@@ -31,7 +32,9 @@ export function ArkhosPanel({ view, names, spots }: { view: View; names: string[
         const open = Object.keys(p.security ?? {}).length === 0;
         return (
           <div key={p.index}>
-            <b className="small">{names[p.index] ?? `Player ${p.index + 1}`}</b>{" "}
+            <b className="small">
+              <PlayerName seat={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
+            </b>{" "}
             <span className="muted small">
               {open ? "all security cards breached: every space is open" : `${entries.length} security cards`}
             </span>

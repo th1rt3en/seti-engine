@@ -137,12 +137,13 @@ export type ServerMessage =
   | {
       t: "lobby";
       status: Status;
-      seats: ({ name: string; bot?: true } | null)[];
+      seats: ({ name: string; num?: number; bot?: true } | null)[];
       host: string | null;
       rated: boolean;
       clock: clocks.ClockSettings;
     }
-  | { t: "view"; seq: number; status: Status; view: View; names: string[]; remaining: (number | null)[] | null }
+  /** `nums` are the players' numbers (null for an AI, or a game that started before they existed), seat by seat like `names`. */
+  | { t: "view"; seq: number; status: Status; view: View; names: string[]; nums: (number | null)[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Action[] }
   /** The moves made so far, for the log beside the board: all of them on connecting (`from` is 0), then each new one. */
   | { t: "log"; from: number; entries: PublicEntry[] }
@@ -780,6 +781,7 @@ export class GameRoom {
       status: meta.status,
       view,
       names: meta.seats.map((s) => s?.name ?? ""),
+      nums: meta.seats.map((s) => s?.num ?? null),
       remaining,
     });
   }
@@ -826,7 +828,9 @@ function lobbyMessage(meta: Meta): ServerMessage {
   return {
     t: "lobby",
     status: meta.status,
-    seats: meta.seats.map((s) => (s === null ? null : s.bot ? { name: s.name, bot: true as const } : { name: s.name })),
+    seats: meta.seats.map((s) =>
+      s === null ? null : s.bot ? { name: s.name, bot: true as const } : { name: s.name, ...(s.num === undefined ? {} : { num: s.num }) },
+    ),
     host: meta.seats.find((s) => s?.id === meta.host)?.name ?? null,
     rated: meta.rated,
     clock: meta.clock,

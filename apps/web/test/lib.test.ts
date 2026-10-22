@@ -205,11 +205,21 @@ describe("lobby, leaderboard and profile", () => {
       id: "open",
       rated: true,
       players: 3,
-      seats: ["Ann"],
+      seats: [{ name: "Ann", num: expect.any(Number) }],
       clock: "24 h per turn",
-      host: "Ann",
+      host: { name: "Ann", num: expect.any(Number) },
       expansion: false,
+      num: null, // the game was put in the table directly: nothing numbered it (the page is then reached by the long id)
     });
+  });
+
+  it("gives the numbers of the game and of its players for the addresses of their pages", async () => {
+    const { db } = await seed();
+    await db.run("INSERT INTO game_nums (game_id) VALUES ('open')");
+    const [game] = await lobbyGames(db);
+    expect(game?.num).toBe(1);
+    expect(game?.host.num).toBe(game?.seats[0]?.num);
+    expect(game?.host.num).toBeGreaterThan(0);
   });
 
   it("lists the games in progress and the games that are over (resigned ones too) in pages, and leaves sandbox games out", async () => {

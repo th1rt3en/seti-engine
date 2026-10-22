@@ -1,3 +1,4 @@
+import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
 import { soloScores } from "@/lib/queries";
 import Link from "next/link";
@@ -73,7 +74,7 @@ export default async function SoloLeaderboard({ searchParams }: { searchParams: 
               {rows.map((r, i) => (
                 <tr key={r.game_id}>
                   <td>{i + 1}</td>
-                  <td>{r.registered ? <Link href={`/players/${r.user_id}`}>{r.name}</Link> : r.name}</td>
+                  <td>{r.registered ? <PlayerLink num={r.user_num} name={r.name} /> : r.name}</td>
                   <td>
                     <b>{r.score}</b>
                   </td>
@@ -84,7 +85,7 @@ export default async function SoloLeaderboard({ searchParams }: { searchParams: 
                   <td>{r.expansion ? "yes" : "no"}</td>
                   <td>{date(r.ended_at)}</td>
                   <td>
-                    <Link href={`/replay/${r.game_id}`}>replay</Link>
+                    <Link href={`/replay/${r.num ?? r.game_id}`}>replay</Link>
                   </td>
                 </tr>
               ))}

@@ -1,14 +1,17 @@
 import { GameClient } from "@/components/GameClient";
 import { GameSettings } from "@/components/GameSettings";
+import { PlayerLink } from "@/components/PlayerLink";
 import { ShortcutsHelp } from "@/components/ShortcutsHelp";
 import { type BotRecord, describeRecord, loadBotRecords } from "@/lib/botRecord";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
+import { resolveGame } from "@/lib/ids";
 import { botVersions } from "@/lib/queries";
 import { currentUser } from "@/lib/session";
 import { gameMeta } from "@/lib/worker";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { notFound, permanentRedirect } from "next/navigation";
 import { addBotAction, joinAction, leaveAction, removeBotAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +19,7 @@ export const dynamic = "force-dynamic";
 interface Meta {
   status: string;
   rated: boolean;
-  seats: ({ id: string; name: string; bot?: { model: string } } | null)[];
+  seats: ({ id: string; name: string; num?: number; bot?: { model: string } } | null)[];
   host: string;
   options: { players: number };
 }
@@ -25,8 +28,15 @@ export default async function Game({
   params,
   searchParams,
 }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
-  const { id } = await params;
+  const { id: param } = await params;
   const { error } = await searchParams;
+  // the address is the number of the game; the long id (an address from before the numbers) goes to it
+  const resolved = await resolveGame(getDb(), param);
+  if (resolved === null) notFound();
+  const found = resolved as NonNullable<typeof resolved>;
+  if (found.redirect !== null) permanentRedirect(`/games/${found.redirect}`);
+  const id = found.id;
+  const num = Number(param);
   const user = await currentUser();
   const meta = (await gameMeta(id)) as Meta | null;
   if (meta === null) {
@@ -52,14 +62,19 @@ export default async function Game({
   return (
     <>
       <h1>
-        Game {id.slice(0, 8)} <span className="pill">{meta.rated ? "rated" : "casual"}</span>{" "}
+        Game #{num} <span className="pill">{meta.rated ? "rated" : "casual"}</span>{" "}
         <span className="pill">{meta.options.players === 1 ? "solo" : `${meta.options.players} players`}</span> <GameSettings />{" "}
         <ShortcutsHelp />
       </h1>
       {meta.status === "lobby" ? (
         <p className="small">
-          {hostName ? `Host: ${hostName}. ` : ""}Invite players with this link:{" "}
-          <input readOnly value={`${origin}/games/${id}`} aria-label="Invite link" style={{ width: "min(32rem, 100%)" }} />
+          {hostName ? (
+            <>
+              Host: <PlayerLink num={meta.seats.find((x) => x?.id === meta.host)?.num} name={hostName} />.{" "}
+            </>
+          ) : null}
+          Invite players with this link:{" "}
+          <input readOnly value={`${origin}/games/${num}`} aria-label="Invite link" style={{ width: "min(32rem, 100%)" }} />
         </p>
       ) : null}
       {error ? (
@@ -135,10 +150,17 @@ export default async function Game({
           This game was cancelled. Nobody won or lost and no rating changed. <Link href="/lobby">Back to the lobby</Link>
         </p>
       ) : null}
-      <GameClient gameId={id} wsBase={loadConfig().workerWsUrl} names={names} signedIn={user !== null} />
+      <GameClient
+        gameId={id}
+        gameNum={num}
+        wsBase={loadConfig().workerWsUrl}
+        names={names}
+        nums={meta.seats.map((s) => s?.num ?? null)}
+        signedIn={user !== null}
+      />
       {meta.status === "finished" ? (
         <p>
-          <Link href={`/replay/${id}`}>Replay the game</Link>
+          <Link href={`/replay/${num}`}>Replay the game</Link>
         </p>
       ) : null}
     </>

@@ -1,3 +1,4 @@
+import { PlayerLink } from "@/components/PlayerLink";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { getDb } from "@/lib/db";
 import { leaderboard, lobbyGames } from "@/lib/queries";
@@ -54,7 +55,7 @@ export default async function Home() {
               <Link className="btn primary big" href="/lobby">
                 Go to the lobby
               </Link>
-              <Link className="btn big ghost" href={`/players/${user.id}`}>
+              <Link className="btn big ghost" href={`/players/${user.num ?? user.id}`}>
                 Your profile
               </Link>
             </>
@@ -123,7 +124,7 @@ export default async function Home() {
             <ul className="plain">
               {open.map((g) => (
                 <li key={g.id}>
-                  <Link href={`/games/${g.id}`}>{g.host}</Link>{" "}
+                  <Link href={`/games/${g.num ?? g.id}`}>{g.host.name}</Link>{" "}
                   <span className="muted">
                     {g.seats.length}/{g.players} · {g.clock}
                   </span>{" "}
@@ -142,7 +143,7 @@ export default async function Home() {
             <ol className="plain ranked">
               {top.map((r) => (
                 <li key={r.user_id}>
-                  <Link href={`/players/${r.user_id}`}>{r.name}</Link> <b>{r.rating}</b>
+                  <PlayerLink num={r.num} name={r.name} /> <b>{r.rating}</b>
                 </li>
               ))}
             </ol>

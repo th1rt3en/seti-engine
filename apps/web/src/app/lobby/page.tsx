@@ -1,4 +1,5 @@
 import { NewGameFields } from "@/components/NewGameFields";
+import { PlayerLink, PlayerNames } from "@/components/PlayerLink";
 import { SubmitOnce } from "@/components/SubmitOnce";
 import { getDb } from "@/lib/db";
 import { filterLobby, lobbyGames } from "@/lib/queries";
@@ -89,7 +90,9 @@ export default async function Lobby({
             {games.map((g) => (
               <article className="card game" key={g.id}>
                 <div className="gamehead">
-                  <strong>{g.host}</strong>
+                  <strong>
+                    <PlayerLink num={g.host.num} name={g.host.name} />
+                  </strong>
                   <span className="badges">
                     {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
                     {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
@@ -99,12 +102,12 @@ export default async function Lobby({
                 </div>
                 <div className="seats" aria-label={`${g.seats.length} of ${g.players} seats taken`}>
                   {Array.from({ length: g.players }, (_, i) => `${g.id}-${i}`).map((key, i) => (
-                    <span key={key} className={i < g.seats.length ? "seat taken" : "seat"} title={g.seats[i] ?? "free seat"}>
-                      {g.seats[i]?.slice(0, 1).toUpperCase() ?? "+"}
+                    <span key={key} className={i < g.seats.length ? "seat taken" : "seat"} title={g.seats[i]?.name ?? "free seat"}>
+                      {g.seats[i]?.name.slice(0, 1).toUpperCase() ?? "+"}
                     </span>
                   ))}
                   <span className="muted small">
-                    {g.seats.join(", ")} · {g.players - g.seats.length} free
+                    <PlayerNames seats={g.seats} separator=", " /> · {g.players - g.seats.length} free
                   </span>
                 </div>
                 <p className="muted small">{g.clock}</p>
@@ -117,7 +120,7 @@ export default async function Lobby({
                       </button>
                     </form>
                   ) : null}
-                  <Link href={`/games/${g.id}`} className="small">
+                  <Link href={`/games/${g.num ?? g.id}`} className="small">
                     Open the table
                   </Link>
                 </div>

@@ -1,3 +1,4 @@
+import { PlayerLink, PlayerNames } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
 import { countEndedGames, countPlayingGames, endedGames, playingGames } from "@/lib/queries";
 import Link from "next/link";
@@ -98,7 +99,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
           {games.map((g) => (
             <article className="card game" key={g.id}>
               <div className="gamehead">
-                <strong>{g.seats.length > 0 ? g.seats.join(" vs ") : `Game ${g.id.slice(0, 8)}`}</strong>
+                <strong>{g.seats.length > 0 ? <PlayerNames seats={g.seats} /> : `Game ${g.num ?? g.id.slice(0, 8)}`}</strong>
                 <span className="badges">
                   {g.solo ? <span className="pill">solo</span> : <span className="pill">{g.players} players</span>}
                   {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
@@ -110,7 +111,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
                 {g.clock} · started {since(g.started_at)}
               </p>
               <div className="actions">
-                <Link href={`/games/${g.id}`} className="btn small">
+                <Link href={`/games/${g.num ?? g.id}`} className="btn small">
                   Watch
                 </Link>
               </div>
@@ -136,12 +137,12 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
                       ? g.seats.map((x, i) => (
                           <span key={`${g.id}-${x.name}-${i}`}>
                             {i > 0 ? " vs " : ""}
-                            {x.name}
+                            <PlayerLink num={x.num} name={x.name} />
                             {ranked && x.rank === 1 ? " 🏆" : ""}
                             {x.score !== null ? ` (${x.score})` : ""}
                           </span>
                         ))
-                      : `Game ${g.id.slice(0, 8)}`}
+                      : `Game ${g.num ?? g.id.slice(0, 8)}`}
                   </strong>
                   <span className="badges">
                     {g.solo ? <span className="pill">solo</span> : <span className="pill">{g.players} players</span>}
@@ -153,7 +154,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
                 </div>
                 <p className="muted small">ended {since(g.ended_at).replace("just started", "just now")}</p>
                 <div className="actions">
-                  <Link href={`/replay/${g.id}`} className="btn small">
+                  <Link href={`/replay/${g.num ?? g.id}`} className="btn small">
                     Replay
                   </Link>
                 </div>

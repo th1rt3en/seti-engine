@@ -7,6 +7,7 @@ import type { View } from "@seti/protocol";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { playAgainAction } from "../app/actions";
+import { PlayerName } from "./PlayerName";
 
 interface RatingChange {
   user_id: string;
@@ -16,7 +17,13 @@ interface RatingChange {
   rank: number;
 }
 
-export function FinalScores({ view, names, gameId, winners }: { view: View; names: string[]; gameId: string; winners: number[] }) {
+export function FinalScores({
+  view,
+  names,
+  gameId,
+  gameNum,
+  winners,
+}: { view: View; names: string[]; gameId: string; gameNum: number; winners: number[] }) {
   const rows = (view.state.final_scores ?? []) as {
     player: number;
     board: number;
@@ -84,7 +91,8 @@ export function FinalScores({ view, names, gameId, winners }: { view: View; name
               return (
                 <tr key={r.player} className={winners.includes(r.player) ? "winner" : undefined}>
                   <td>
-                    {who(r.player)} {winners.includes(r.player) ? <span className="pill">winner</span> : null}
+                    <PlayerName seat={r.player} name={who(r.player)} />{" "}
+                    {winners.includes(r.player) ? <span className="pill">winner</span> : null}
                   </td>
                   <td>{r.board}</td>
                   <td>{r.cards}</td>
@@ -118,7 +126,7 @@ export function FinalScores({ view, names, gameId, winners }: { view: View; name
         </form>
       ) : null}
       <p className="small">
-        <Link href={`/replay/${gameId}`}>Replay the game</Link> · <Link href="/lobby">Back to the lobby</Link> ·{" "}
+        <Link href={`/replay/${gameNum}`}>Replay the game</Link> · <Link href="/lobby">Back to the lobby</Link> ·{" "}
         <Link href="/leaderboard">Leaderboard</Link>
       </p>
     </div>

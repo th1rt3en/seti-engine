@@ -154,6 +154,20 @@ describe("tokens (decision D16)", () => {
     expect(g).toEqual({ id: "u1", name: "Guest", registered: false });
   });
 
+  it("reads the player's number when the token has one, and ignores anything that is not a positive integer", async () => {
+    const { pem, sign } = await setup();
+    const cfg = { publicKeyPem: pem, issuer: "site", audience: "seti-worker" };
+    expect(await verifyToken(await sign({ name: "Ann", reg: true, num: 12 }), cfg)).toEqual({
+      id: "u1",
+      name: "Ann",
+      registered: true,
+      num: 12,
+    });
+    expect((await verifyToken(await sign({ num: "12" }), cfg)).num).toBeUndefined();
+    expect((await verifyToken(await sign({ num: 0 }), cfg)).num).toBeUndefined();
+    expect((await verifyToken(await sign({ num: 1.5 }), cfg)).num).toBeUndefined();
+  });
+
   it("refuses a wrong audience, a wrong key and an expired token", async () => {
     const { pem, sign } = await setup();
     const other = await setup();

@@ -15,6 +15,7 @@ class SqliteDb implements Db {
   constructor() {
     this.sql.exec(readFileSync(new URL("../migrations/0001_init.sql", import.meta.url), "utf8"));
     this.sql.exec(readFileSync(new URL("../migrations/0006_game_stats.sql", import.meta.url), "utf8"));
+    this.sql.exec(readFileSync(new URL("../migrations/0008_numeric_ids.sql", import.meta.url), "utf8"));
   }
   prepare(query: string): Statement {
     const run = (values: unknown[]): Statement => {
@@ -65,6 +66,24 @@ function record(id: string, seats: (typeof alice)[], ranks: number[], rated: boo
 }
 
 describe("D1 sink", () => {
+  it("gives a game its number once, in the order the games were made, and never gives it again", async () => {
+    const db = new SqliteDb();
+    const sink = new D1Sink(db);
+    const lobby = (id: string): Meta => ({ ...record(id, [alice, bob], [1, 2], false).meta, status: "lobby" });
+    await sink.recordLobby(lobby("first"));
+    await sink.recordLobby(lobby("second"));
+    await sink.recordLobby(lobby("first")); // a seat changed: the same game, the same number
+    await sink.recordStart({ ...lobby("first"), status: "playing" });
+    await sink.removeLobby("second"); // destroyed
+    await sink.recordLobby(lobby("third"));
+    const nums = db.sql.prepare("SELECT game_id, num FROM game_nums ORDER BY num").all();
+    expect(nums).toEqual([
+      { game_id: "first", num: 1 },
+      { game_id: "second", num: 2 },
+      { game_id: "third", num: 3 },
+    ]);
+  });
+
   it("writes the game, its players and its log", async () => {
     const db = new SqliteDb();
     const sink = new D1Sink(db);

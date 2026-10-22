@@ -1,9 +1,10 @@
 import { RatingChart } from "@/components/RatingChart";
 import { getDb } from "@/lib/db";
+import { resolveUser } from "@/lib/ids";
 import { profile } from "@/lib/queries";
 import { currentUser } from "@/lib/session";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { resignSoloAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,13 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
 }
 
 export default async function Player({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  const { id: param } = await params;
+  // the address is the number of the player; the uuid (an address from before the numbers) goes to it
+  const resolved = await resolveUser(getDb(), param);
+  if (resolved === null) notFound();
+  const found = resolved as NonNullable<typeof resolved>;
+  if (found.redirect !== null) permanentRedirect(`/players/${found.redirect}`);
+  const id = found.id;
   const p = await profile(getDb(), id);
   if (p === null) notFound();
   const data = p as NonNullable<typeof p>;
@@ -151,7 +158,9 @@ export default async function Player({ params }: { params: Promise<{ id: string 
               return (
                 <tr key={g.id}>
                   <td>
-                    <Link href={g.status === "finished" ? `/replay/${g.id}` : `/games/${g.id}`}>{g.id.slice(0, 8)}</Link>
+                    <Link href={g.status === "finished" ? `/replay/${g.num ?? g.id}` : `/games/${g.num ?? g.id}`}>
+                      #{g.num ?? g.id.slice(0, 8)}
+                    </Link>
                   </td>
                   <td>
                     {o.sandbox ? "sandbox" : o.players === 1 ? "solo" : `${o.players} players`}

@@ -25,7 +25,8 @@ export interface ArchiveHeader {
   options: Options;
   clock: ClockSettings;
   rated: boolean;
-  seats: { seat: number; userId: string; name: string; registered: boolean; bot?: { model: string } }[];
+  /** `num` is the player's number (the integer in the address of their profile); the public replay keeps it and drops `userId`. */
+  seats: { seat: number; userId: string; name: string; registered: boolean; num?: number; bot?: { model: string } }[];
   /** Present when an AI model sat in the game: the host agreed that the game is collected and used for training (docs/AI-TURN-BUNDLES.md). */
   consent?: { by: string; at: number };
   createdAt: number;
@@ -71,7 +72,18 @@ export function headerOf(meta: Meta): ArchiveHeader {
     clock: meta.clock,
     rated: meta.rated,
     seats: meta.seats.flatMap((s, seat) =>
-      s === null ? [] : [{ seat, userId: s.id, name: s.name, registered: s.registered, ...(s.bot ? { bot: s.bot } : {}) }],
+      s === null
+        ? []
+        : [
+            {
+              seat,
+              userId: s.id,
+              name: s.name,
+              registered: s.registered,
+              ...(s.num ? { num: s.num } : {}),
+              ...(s.bot ? { bot: s.bot } : {}),
+            },
+          ],
     ),
     ...(meta.consent ? { consent: meta.consent } : {}),
     createdAt: meta.createdAt,

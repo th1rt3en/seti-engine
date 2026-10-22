@@ -48,6 +48,8 @@ import { MovePreview } from "./MovePreview";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
+import { PlayerLink } from "./PlayerLink";
+import { PlayerName, PlayerNumsContext } from "./PlayerName";
 import { Amount, Cost, KindIcon } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
 import { SetupChoice } from "./SetupChoice";
@@ -55,8 +57,8 @@ import { SpotPrompt } from "./SpotPrompt";
 import { TradePanel } from "./TradePanel";
 
 type Server =
-  | { t: "lobby"; status: string; seats: ({ name: string; bot?: true } | null)[]; rated: boolean }
-  | { t: "view"; seq: number; status: string; view: View; names: string[]; remaining: (number | null)[] | null }
+  | { t: "lobby"; status: string; seats: ({ name: string; num?: number; bot?: true } | null)[]; rated: boolean }
+  | { t: "view"; seq: number; status: string; view: View; names: string[]; nums?: (number | null)[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Move[] }
   | { t: "log"; from: number; entries: LogEntry[] }
   | { t: "preview"; id: number; changes: Record<string, number> | null }
@@ -88,10 +90,12 @@ function TuckLabel({ income }: { income?: string | null }) {
 
 export function GameClient({
   gameId,
+  gameNum,
   wsBase,
   names: lobbyNames,
+  nums: lobbyNums,
   signedIn,
-}: { gameId: string; wsBase: string; names: string[]; signedIn: boolean }) {
+}: { gameId: string; gameNum: number; wsBase: string; names: string[]; nums: (number | null)[]; signedIn: boolean }) {
   const [lobby, setLobby] = useState<Extract<Server, { t: "lobby" }> | null>(null);
   const [view, setView] = useState<Extract<Server, { t: "view" }> | null>(null);
   const [ended, setEnded] = useState<Extract<Server, { t: "ended" }>["result"] | null>(null);
@@ -331,7 +335,7 @@ export function GameClient({
           <ol>
             {lobby.seats.map((s, i) => (
               <li key={`${i}-${s?.name ?? "free"}`}>
-                {s ? s.name : <span className="muted">free seat</span>}
+                {s ? <PlayerLink num={s.num} name={s.name} /> : <span className="muted">free seat</span>}
                 {s?.bot ? <span className="pill">AI</span> : null}
               </li>
             ))}
@@ -344,6 +348,7 @@ export function GameClient({
 
   // the seats are drawn when the game starts, so the names come with the view and not from the page that was loaded in the lobby
   const names = view.names.length > 0 ? view.names : lobbyNames;
+  const nums = view.nums && view.nums.length > 0 ? view.nums : lobbyNums;
   const v = view.view;
   const mine = v.legal as Move[];
   // what researching a tech costs in publicity: the engine says (an organization can lower it); 6 when it does not
@@ -934,7 +939,7 @@ export function GameClient({
     ),
     rival: v.state.rival ? v.state.rival.index : null,
     me: v.viewer,
-    replayAt: ended ? (step: number) => `/replay/${gameId}#step=${step}` : undefined,
+    replayAt: ended ? (step: number) => `/replay/${gameNum}#step=${step}` : undefined,
   };
   // what the others did since this player's last move, for the player whose turn it is
   const lastMine = myTurn ? log.map((e) => e.seat).lastIndexOf(v.viewer as number) : -1;
@@ -990,18 +995,31 @@ export function GameClient({
         <section className="gameover">
           <h2>{ended.reason === "cancelled" ? "This game was cancelled" : `Game over (${ended.reason})`}</h2>
           <p>
-            {ended.reason === "cancelled"
-              ? "An administrator cancelled it. Nobody wins or loses, and no rating changes."
-              : ended.winners.length > 0
-                ? `Winner: ${ended.winners.map((w) => names[w] ?? w + 1).join(", ")}.`
-                : "The rival won."}{" "}
+            {ended.reason === "cancelled" ? (
+              "An administrator cancelled it. Nobody wins or loses, and no rating changes."
+            ) : ended.winners.length > 0 ? (
+              <>
+                Winner:{" "}
+                {ended.winners.map((w, k) => (
+                  <span key={w}>
+                    {k > 0 ? ", " : ""}
+                    <PlayerName seat={w} name={String(names[w] ?? w + 1)} />
+                  </span>
+                ))}
+                .
+              </>
+            ) : (
+              "The rival won."
+            )}{" "}
             {ended.ranking.map((r) => (
               <span key={r.seat} className="res">
-                {names[r.seat] ?? r.seat + 1}: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}
+                <PlayerName seat={r.seat} name={String(names[r.seat] ?? r.seat + 1)} />: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}
               </span>
             ))}
           </p>
-          {ended.reason !== "cancelled" ? <FinalScores view={v} names={names} gameId={gameId} winners={ended.winners} /> : null}
+          {ended.reason !== "cancelled" ? (
+            <FinalScores view={v} names={names} gameId={gameId} gameNum={gameNum} winners={ended.winners} />
+          ) : null}
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
@@ -1116,154 +1134,166 @@ export function GameClient({
           }
           title={r !== null && r >= 0 && r < 60_000 ? "Less than a minute left" : undefined}
         >
-          {names[i] ?? i + 1} {minutes(r) || "-"}
+          <PlayerName seat={i} name={String(names[i] ?? i + 1)} /> {minutes(r) || "-"}
         </span>
       ))}
     </span>
   ) : null;
   return (
-    <GameView
-      view={v}
-      names={names}
-      moves={waiting && !ended ? sendingPrompt : moves}
-      previous={previous}
-      lastMove={lastMoveOf(log.at(-1)?.events as never)}
-      log={<MoveLog entries={log} ctx={logCtx} />}
-      goldChoice={
-        goldMoves.length > 0
-          ? { tiles: goldMoves.map((m) => String(m.tile)), selected: pickedGold, onPick: (t) => setPickedGold(pickedGold === t ? null : t) }
-          : undefined
-      }
-      overlay={
-        <>
-          {setupOffers.length > 0 && !ended ? (
-            <SetupChoice
-              kind={setupKind}
-              offers={setupOffers}
-              selected={setupKind === "quick" ? pickedQuick : pickedOffer === null ? [] : [pickedOffer]}
-              need={setupKind === "quick" ? quickNeed : 1}
-              quickOffered={(me?.offered_quick ?? []).filter((q) => q !== "?")}
-              onSelect={(id) =>
-                setupKind === "quick"
-                  ? setPickedQuick((old) => (old.includes(id) ? old.filter((c) => c !== id) : [...old, id].slice(-quickNeed)))
-                  : setPickedOffer(pickedOffer === id ? null : id)
-              }
-              onConfirm={() => {
-                if (setupMove) {
-                  setPickedOffer(null);
-                  setPickedQuick([]);
-                  sendAction(setupMove); // the choice dialog is the confirmation: no second question about a move that cannot be undone
-                }
-              }}
-            />
-          ) : null}
-          {tradeOpen && !ended && exchanges.length > 0 ? (
-            <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
-          ) : null}
-          {orgFreeOpen && !ended && orgCardMoves.length > 0 ? (
-            <OrgFreePanel moves={orgCardMoves} hand={hand} display={v.state.card_row} onPlay={play} onClose={() => setOrgFreeOpen(false)} />
-          ) : null}
-          <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
-            {boardOpen ? "Close player boards" : "Player boards"}
-          </button>
-          {boardOpen ? (
-            <PlayerBoardPanel
-              view={v}
-              names={names}
-              shown={boardPlayer}
-              onShow={setBoardPlayer}
-              onClose={() => setBoardOpen(false)}
-              choice={slotChoice}
-              onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
-              lower={
-                ended
-                  ? undefined
-                  : {
-                      slots: mine.filter((m) => m.type === "place_lower").map((m) => Number(m.slot)),
-                      onPlace: (slot) => {
-                        const m = mine.find((x) => x.type === "place_lower" && x.slot === slot);
-                        if (m) play(m);
-                      },
-                    }
-              }
-            />
-          ) : null}
-        </>
-      }
-      hand={{
-        selectable: pickable,
-        selected: picked,
-        onSelect: selectCard,
-        autoOpen: pending && handMoves.length > 0,
-        exertian: {
-          selectable: exertianMoves.map((m) => String(m.card)),
-          selected: pickedExertian,
-          onSelect: (c) => setPickedExertian(pickedExertian === c ? null : c),
-          actions: exertianActions,
-        },
-        actions: handActions,
-        offered: offers,
-        offeredSelected: pickedOffer,
-        onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
-      }}
-      tech={{
-        selectable: techMoves.map((m) => Number(m.stack)),
-        selected: pickedTech,
-        onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
-        // the Confirm on the tech is the confirmation: the move shows the next tile of the stack, but no second question is asked
-        onConfirm: techOption ? () => playConfirmed(techOption) : undefined,
-      }}
-      context={contextNode}
-      contextActions={contextActions}
-      hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
-      spots={{
-        items: spots,
-        selected: pickedSpot,
-        onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id),
-        onConfirm: () => spotMove && play(spotMove),
-        onCancel: () => setPickedSpot(null),
-      }}
-      rowFlash={rowMode !== null}
-      row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
-      interaction={
-        reach.length === 0 && probeMoves.length > 0
-          ? {
-              probes: probeMoves.map((m) => String(m.probe)),
-              selected: chosenProbe,
-              onSelectProbe: (id) => setChosenProbe(chosenProbe === id ? null : id),
-              targets: [],
-              onTarget: () => undefined,
-            }
-          : reach.length > 0
+    <PlayerNumsContext.Provider value={nums}>
+      <GameView
+        view={v}
+        names={names}
+        moves={waiting && !ended ? sendingPrompt : moves}
+        previous={previous}
+        lastMove={lastMoveOf(log.at(-1)?.events as never)}
+        log={<MoveLog entries={log} ctx={logCtx} />}
+        goldChoice={
+          goldMoves.length > 0
             ? {
-                probes: reach.map((r) => r.probe),
-                selected: probe?.probe ?? null,
-                onSelectProbe: (id) => {
-                  setPendingMove(null);
-                  setPickedProbe(id === pickedProbe ? null : id);
-                },
-                // once the destination is confirmed the spaces and their costs go away while the move is carried out
-                targets: waiting
-                  ? []
-                  : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
-                onTarget: (t) => setPendingMove(t),
-                chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
+                tiles: goldMoves.map((m) => String(m.tile)),
+                selected: pickedGold,
+                onPick: (t) => setPickedGold(pickedGold === t ? null : t),
               }
             : undefined
-      }
-      topExtra={
-        <>
-          {clocks}
-          <span className="small muted">
-            {online ? "Connected" : "Reconnecting..."} · action {view.seq}
-          </span>
-          {v.viewer !== null && !ended ? (
-            <button type="button" className="secondary small" onClick={() => window.confirm("Resign the game?") && send({ t: "resign" })}>
-              Resign
+        }
+        overlay={
+          <>
+            {setupOffers.length > 0 && !ended ? (
+              <SetupChoice
+                kind={setupKind}
+                offers={setupOffers}
+                selected={setupKind === "quick" ? pickedQuick : pickedOffer === null ? [] : [pickedOffer]}
+                need={setupKind === "quick" ? quickNeed : 1}
+                quickOffered={(me?.offered_quick ?? []).filter((q) => q !== "?")}
+                onSelect={(id) =>
+                  setupKind === "quick"
+                    ? setPickedQuick((old) => (old.includes(id) ? old.filter((c) => c !== id) : [...old, id].slice(-quickNeed)))
+                    : setPickedOffer(pickedOffer === id ? null : id)
+                }
+                onConfirm={() => {
+                  if (setupMove) {
+                    setPickedOffer(null);
+                    setPickedQuick([]);
+                    sendAction(setupMove); // the choice dialog is the confirmation: no second question about a move that cannot be undone
+                  }
+                }}
+              />
+            ) : null}
+            {tradeOpen && !ended && exchanges.length > 0 ? (
+              <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
+            ) : null}
+            {orgFreeOpen && !ended && orgCardMoves.length > 0 ? (
+              <OrgFreePanel
+                moves={orgCardMoves}
+                hand={hand}
+                display={v.state.card_row}
+                onPlay={play}
+                onClose={() => setOrgFreeOpen(false)}
+              />
+            ) : null}
+            <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
+              {boardOpen ? "Close player boards" : "Player boards"}
             </button>
-          ) : null}
-        </>
-      }
-    />
+            {boardOpen ? (
+              <PlayerBoardPanel
+                view={v}
+                names={names}
+                shown={boardPlayer}
+                onShow={setBoardPlayer}
+                onClose={() => setBoardOpen(false)}
+                choice={slotChoice}
+                onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
+                lower={
+                  ended
+                    ? undefined
+                    : {
+                        slots: mine.filter((m) => m.type === "place_lower").map((m) => Number(m.slot)),
+                        onPlace: (slot) => {
+                          const m = mine.find((x) => x.type === "place_lower" && x.slot === slot);
+                          if (m) play(m);
+                        },
+                      }
+                }
+              />
+            ) : null}
+          </>
+        }
+        hand={{
+          selectable: pickable,
+          selected: picked,
+          onSelect: selectCard,
+          autoOpen: pending && handMoves.length > 0,
+          exertian: {
+            selectable: exertianMoves.map((m) => String(m.card)),
+            selected: pickedExertian,
+            onSelect: (c) => setPickedExertian(pickedExertian === c ? null : c),
+            actions: exertianActions,
+          },
+          actions: handActions,
+          offered: offers,
+          offeredSelected: pickedOffer,
+          onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
+        }}
+        tech={{
+          selectable: techMoves.map((m) => Number(m.stack)),
+          selected: pickedTech,
+          onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
+          // the Confirm on the tech is the confirmation: the move shows the next tile of the stack, but no second question is asked
+          onConfirm: techOption ? () => playConfirmed(techOption) : undefined,
+        }}
+        context={contextNode}
+        contextActions={contextActions}
+        hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
+        spots={{
+          items: spots,
+          selected: pickedSpot,
+          onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id),
+          onConfirm: () => spotMove && play(spotMove),
+          onCancel: () => setPickedSpot(null),
+        }}
+        rowFlash={rowMode !== null}
+        row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
+        interaction={
+          reach.length === 0 && probeMoves.length > 0
+            ? {
+                probes: probeMoves.map((m) => String(m.probe)),
+                selected: chosenProbe,
+                onSelectProbe: (id) => setChosenProbe(chosenProbe === id ? null : id),
+                targets: [],
+                onTarget: () => undefined,
+              }
+            : reach.length > 0
+              ? {
+                  probes: reach.map((r) => r.probe),
+                  selected: probe?.probe ?? null,
+                  onSelectProbe: (id) => {
+                    setPendingMove(null);
+                    setPickedProbe(id === pickedProbe ? null : id);
+                  },
+                  // once the destination is confirmed the spaces and their costs go away while the move is carried out
+                  targets: waiting
+                    ? []
+                    : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
+                  onTarget: (t) => setPendingMove(t),
+                  chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
+                }
+              : undefined
+        }
+        topExtra={
+          <>
+            {clocks}
+            <span className="small muted">
+              {online ? "Connected" : "Reconnecting..."} · action {view.seq}
+            </span>
+            {v.viewer !== null && !ended ? (
+              <button type="button" className="secondary small" onClick={() => window.confirm("Resign the game?") && send({ t: "resign" })}>
+                Resign
+              </button>
+            ) : null}
+          </>
+        }
+      />
+    </PlayerNumsContext.Provider>
   );
 }

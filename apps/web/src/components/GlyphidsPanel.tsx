@@ -5,6 +5,7 @@ import type { View } from "@seti/protocol";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { PanelSpots } from "./PanelSpots";
+import { PlayerName } from "./PlayerName";
 import { TranslationBoard } from "./TranslationBoard";
 
 const ASSET = expansionAssets as Record<string, string>;
@@ -92,7 +93,8 @@ export function GlyphidsPanel({ view, names, spots }: { view: View; names: strin
       <ul className="plain glyphhold">
         {s.players.map((p) => (
           <li key={p.index}>
-            <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} /> {names[p.index] ?? `Player ${p.index + 1}`}{" "}
+            <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />{" "}
+            <PlayerName seat={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />{" "}
             {p.glyphs.length === 0 ? <span className="muted small">no glyph tokens</span> : null}
             {p.glyphs.map((g, i) => (
               <img

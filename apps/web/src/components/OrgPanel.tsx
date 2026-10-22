@@ -12,6 +12,7 @@ import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
 import { OrgName } from "./OrgName";
 import { PanelSpots } from "./PanelSpots";
+import { PlayerName } from "./PlayerName";
 
 const ASSET = expansionAssets as Record<string, string>;
 const TILES = ["launch", "scan", "research"] as const; // tile 1, 2, 3 of Xenolab
@@ -47,7 +48,10 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
         const canAct = p.index === view.viewer && mine.length > 0;
         return (
           <div key={p.index} style={{ marginBottom: 10 }}>
-            <b className="small">{names[p.index] ?? `Player ${p.index + 1}`}</b> <OrgName id={p.organization ?? ""} className="orgname" />
+            <b className="small">
+              <PlayerName seat={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
+            </b>{" "}
+            <OrgName id={p.organization ?? ""} className="orgname" />
             {spaces ? (
               // the reward spaces are on the organization board itself: a marked one is crossed, a space that can be marked is highlighted
               <svg

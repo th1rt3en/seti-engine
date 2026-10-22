@@ -2,13 +2,30 @@
 import type { Db } from "./db";
 import type { StatFilter, StatRow } from "./stats";
 
+/** A seat of a game as the lists show it: the name, and the player's number for the link to their profile (null for an AI). */
+export interface SeatName {
+  name: string;
+  num: number | null;
+}
+
+/** The seats of a game, in order, with the numbers of the players. */
+async function seatsOf(db: Db, gameId: string): Promise<SeatName[]> {
+  return db.all<SeatName>(
+    `SELECT p.name AS name, un.num AS num FROM game_players p LEFT JOIN user_nums un ON un.user_id = p.user_id
+       WHERE p.game_id = ? ORDER BY p.seat`,
+    gameId,
+  );
+}
+
 export interface LobbyGame {
   id: string;
+  /** the number of the game, in the address of its page (null for a game the Worker has not numbered yet: the long id then leads to the page) */
+  num: number | null;
   rated: boolean;
   players: number;
-  seats: string[];
+  seats: SeatName[];
   clock: string;
-  host: string;
+  host: SeatName;
   /** the options that change how the game feels, for the badges on the lobby cards */
   promo: boolean;
   expansion: boolean;
@@ -20,9 +37,10 @@ export interface LobbyGame {
 
 export interface PlayingGame {
   id: string;
+  num: number | null;
   rated: boolean;
   players: number;
-  seats: string[];
+  seats: SeatName[];
   clock: string;
   started_at: number | null;
   actions: number;
@@ -38,26 +56,29 @@ const NOT_SANDBOX = `options_json NOT LIKE '%"sandbox":true%'`;
 export async function playingGames(db: Db, limit = 100, offset = 0): Promise<PlayingGame[]> {
   const games = await db.all<{
     id: string;
+    num: number | null;
     rated: number;
     options_json: string;
     clock_json: string;
     started_at: number | null;
     actions: number;
   }>(
-    `SELECT id, rated, options_json, clock_json, started_at, actions FROM games WHERE status = 'playing' AND ${NOT_SANDBOX}
-     ORDER BY started_at DESC LIMIT ? OFFSET ?`,
+    `SELECT g.id, gn.num, g.rated, g.options_json, g.clock_json, g.started_at, g.actions
+       FROM games g LEFT JOIN game_nums gn ON gn.game_id = g.id WHERE g.status = 'playing' AND g.${NOT_SANDBOX}
+      ORDER BY g.started_at DESC LIMIT ? OFFSET ?`,
     limit,
     offset,
   );
   const out: PlayingGame[] = [];
   for (const g of games) {
     const options = JSON.parse(g.options_json) as { players: number; expansion?: boolean; organizations?: boolean };
-    const seats = await db.all<{ name: string }>("SELECT name FROM game_players WHERE game_id = ? ORDER BY seat", g.id);
+    const seats = await seatsOf(db, g.id);
     out.push({
       id: g.id,
+      num: g.num,
       rated: g.rated === 1,
       players: options.players,
-      seats: seats.map((s) => s.name),
+      seats,
       clock: describeClock(g.clock_json),
       started_at: g.started_at,
       actions: g.actions,
@@ -76,9 +97,10 @@ export async function countPlayingGames(db: Db): Promise<number> {
 
 export interface EndedGame {
   id: string;
+  num: number | null;
   rated: boolean;
   players: number;
-  seats: { name: string; rank: number | null; score: number | null }[];
+  seats: { name: string; num: number | null; rank: number | null; score: number | null }[];
   /** completed, resigned, timeout or kicked */
   reason: string;
   /** the player who resigned or ran out of time */
@@ -93,22 +115,25 @@ export interface EndedGame {
 export async function endedGames(db: Db, limit = 10, offset = 0): Promise<EndedGame[]> {
   const games = await db.all<{
     id: string;
+    num: number | null;
     rated: number;
     options_json: string;
     reason: string | null;
     result_json: string | null;
     ended_at: number | null;
   }>(
-    `SELECT id, rated, options_json, reason, result_json, ended_at FROM games WHERE status = 'finished' AND ${NOT_SANDBOX}
-     ORDER BY ended_at DESC LIMIT ? OFFSET ?`,
+    `SELECT g.id, gn.num, g.rated, g.options_json, g.reason, g.result_json, g.ended_at
+       FROM games g LEFT JOIN game_nums gn ON gn.game_id = g.id WHERE g.status = 'finished' AND g.${NOT_SANDBOX}
+      ORDER BY g.ended_at DESC LIMIT ? OFFSET ?`,
     limit,
     offset,
   );
   const out: EndedGame[] = [];
   for (const g of games) {
     const options = JSON.parse(g.options_json) as { players: number; expansion?: boolean; organizations?: boolean };
-    const seats = await db.all<{ name: string; rank: number | null; score: number | null; seat: number }>(
-      "SELECT name, rank, score, seat FROM game_players WHERE game_id = ? ORDER BY seat",
+    const seats = await db.all<{ name: string; num: number | null; rank: number | null; score: number | null; seat: number }>(
+      `SELECT p.name AS name, un.num AS num, p.rank AS rank, p.score AS score, p.seat AS seat
+         FROM game_players p LEFT JOIN user_nums un ON un.user_id = p.user_id WHERE p.game_id = ? ORDER BY p.seat`,
       g.id,
     );
     let forfeitSeat: number | null = null;
@@ -120,9 +145,10 @@ export async function endedGames(db: Db, limit = 10, offset = 0): Promise<EndedG
     }
     out.push({
       id: g.id,
+      num: g.num,
       rated: g.rated === 1,
       players: options.players,
-      seats: seats.map((x) => ({ name: x.name, rank: x.rank, score: x.score })),
+      seats: seats.map((x) => ({ name: x.name, num: x.num, rank: x.rank, score: x.score })),
       reason: g.reason ?? "completed",
       forfeit: forfeitSeat === null ? null : (seats.find((x) => x.seat === forfeitSeat)?.name ?? null),
       ended_at: g.ended_at,
@@ -141,6 +167,8 @@ export async function countEndedGames(db: Db): Promise<number> {
 
 export interface LeaderRow {
   user_id: string;
+  /** the player's number, in the address of their profile */
+  num: number | null;
   name: string;
   rating: number;
   games: number;
@@ -148,6 +176,7 @@ export interface LeaderRow {
 
 export interface PlayerRow {
   user_id: string;
+  num: number | null;
   name: string;
   /** 0 until the first rated game */
   rating: number;
@@ -162,11 +191,11 @@ export interface PlayerRow {
 export async function allPlayers(db: Db, q = "", limit = 500): Promise<PlayerRow[]> {
   const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
   return db.all<PlayerRow>(
-    `SELECT u.id AS user_id, u.name, COALESCE(r.rating, 0) AS rating, COALESCE(r.games, 0) AS rated_games,
+    `SELECT u.id AS user_id, un.num AS num, u.name, COALESCE(r.rating, 0) AS rating, COALESCE(r.games, 0) AS rated_games,
        (SELECT COUNT(*) FROM game_players gp JOIN games g ON g.id = gp.game_id
          WHERE gp.user_id = u.id AND g.status IN ('playing', 'finished')) AS games,
        u.created_at AS joined
-     FROM users u LEFT JOIN ratings r ON r.user_id = u.id
+     FROM users u LEFT JOIN ratings r ON r.user_id = u.id LEFT JOIN user_nums un ON un.user_id = u.id
      WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' ORDER BY u.name COLLATE NOCASE LIMIT ?`,
     like,
     limit,
@@ -183,6 +212,8 @@ export interface HistoryRow {
 
 export interface RecentGame {
   id: string;
+  /** the number of the game, in the address of its page */
+  num: number | null;
   status: string;
   rated_counted: number;
   reason: string | null;
@@ -193,21 +224,23 @@ export interface RecentGame {
 }
 
 export async function lobbyGames(db: Db, limit = 50): Promise<LobbyGame[]> {
-  const games = await db.all<{ id: string; rated: number; options_json: string; clock_json: string }>(
-    "SELECT id, rated, options_json, clock_json FROM games WHERE status = 'lobby' ORDER BY created_at DESC LIMIT ?",
+  const games = await db.all<{ id: string; num: number | null; rated: number; options_json: string; clock_json: string }>(
+    `SELECT g.id, gn.num, g.rated, g.options_json, g.clock_json FROM games g LEFT JOIN game_nums gn ON gn.game_id = g.id
+      WHERE g.status = 'lobby' ORDER BY g.created_at DESC LIMIT ?`,
     limit,
   );
   const out: LobbyGame[] = [];
   for (const g of games) {
-    const seats = await db.all<{ name: string }>("SELECT name FROM game_players WHERE game_id = ? ORDER BY seat", g.id);
+    const seats = await seatsOf(db, g.id);
     const options = JSON.parse(g.options_json) as { players: number; promo_cards?: boolean; expansion?: boolean; organizations?: boolean };
     out.push({
       id: g.id,
+      num: g.num,
       rated: g.rated === 1,
       players: options.players,
-      seats: seats.map((s) => s.name),
+      seats,
       clock: describeClock(g.clock_json),
-      host: seats[0]?.name ?? "?",
+      host: seats[0] ?? { name: "?", num: null },
       promo: options.promo_cards === true,
       expansion: options.expansion === true,
       organizations: options.organizations === true,
@@ -271,7 +304,8 @@ export function describeClock(json: string): string {
 export function leaderboard(db: Db, limit = 100, name = "", minGames = 0): Promise<LeaderRow[]> {
   const like = `%${name.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
   return db.all<LeaderRow>(
-    `SELECT r.user_id, u.name, r.rating, r.games FROM ratings r JOIN users u ON u.id = r.user_id
+    `SELECT r.user_id, un.num AS num, u.name, r.rating, r.games FROM ratings r JOIN users u ON u.id = r.user_id
+       LEFT JOIN user_nums un ON un.user_id = r.user_id
      WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' AND r.games >= ? ORDER BY r.rating DESC, r.games DESC LIMIT ?`,
     like,
     Math.max(0, Math.floor(minGames)),
@@ -368,8 +402,8 @@ export async function profile(db: Db, userId: string) {
     userId,
   );
   const recent = await db.all<RecentGame>(
-    `SELECT g.id, g.status, g.rated_counted, g.reason, g.ended_at, p.rank, p.score, g.options_json
-     FROM game_players p JOIN games g ON g.id = p.game_id WHERE p.user_id = ? AND g.status IN ('finished', 'playing')
+    `SELECT g.id, gn.num, g.status, g.rated_counted, g.reason, g.ended_at, p.rank, p.score, g.options_json
+     FROM game_players p JOIN games g ON g.id = p.game_id LEFT LEFT JOIN game_nums gn ON gn.game_id = g.id WHERE p.user_id = ? AND g.status IN ('finished', 'playing')
      ORDER BY g.created_at DESC LIMIT 30`,
     userId,
   );
@@ -481,7 +515,11 @@ export async function gameStatRows(db: Db, gameId: string): Promise<{ seat: numb
 
 export interface SoloScore {
   game_id: string;
+  /** the number of the game, in the address of its page */
+  num: number | null;
   user_id: string;
+  /** the player's number */
+  user_num: number | null;
   name: string;
   registered: boolean;
   score: number;
@@ -517,7 +555,9 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
   }
   const rows = await db.all<{
     game_id: string;
+    num: number | null;
     user_id: string;
+    user_num: number | null;
     name: string;
     registered: number;
     score: number;
@@ -526,12 +566,13 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
     expansion: number;
     ended_at: number | null;
   }>(
-    `SELECT g.id AS game_id, p.user_id, p.name, p.registered, p.score,
+    `SELECT g.id AS game_id, gn.num AS num, p.user_id, un.num AS user_num, p.name, p.registered, p.score,
             json_extract(g.result_json, '$.finalScores[1].total') AS rival,
             COALESCE(json_extract(g.options_json, '$.difficulty'), 3) AS difficulty,
             COALESCE(json_extract(g.options_json, '$.expansion'), 0) AS expansion,
             g.ended_at
        FROM games g JOIN game_players p ON p.game_id = g.id AND p.seat = 0
+       LEFT LEFT JOIN game_nums gn ON gn.game_id = g.id LEFT JOIN user_nums un ON un.user_id = p.user_id
       WHERE ${where.join(" AND ")} AND p.score IS NOT NULL
       ORDER BY p.score DESC, g.ended_at ASC
       LIMIT ?`,
@@ -540,7 +581,9 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
   );
   return rows.map((r) => ({
     game_id: r.game_id,
+    num: r.num,
     user_id: r.user_id,
+    user_num: r.user_num,
     name: r.name,
     registered: r.registered === 1,
     score: r.score,

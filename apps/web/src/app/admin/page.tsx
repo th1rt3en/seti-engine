@@ -1,5 +1,6 @@
 // The administrator's page (no link leads here: the address is typed). It asks for the passphrase, and then manages the accounts and the open games.
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
+import { PlayerNames } from "@/components/PlayerLink";
 import { isAdmin } from "@/lib/admin";
 import { countAccounts, countOpenGames, listAccounts, openGames } from "@/lib/adminData";
 import { loadConfig } from "@/lib/config";
@@ -133,14 +134,14 @@ export default async function Admin({
           {games.map((g) => (
             <article className="card game" key={g.id}>
               <div className="gamehead">
-                <strong>{g.seats.length > 0 ? g.seats.join(" vs ") : `Game ${g.id.slice(0, 8)}`}</strong>
+                <strong>{g.seats.length > 0 ? <PlayerNames seats={g.seats} /> : `Game ${g.num ?? g.id.slice(0, 8)}`}</strong>
                 <span className="badges">
                   <span className="pill">{g.status}</span>
                   {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
                 </span>
               </div>
               <p className="muted small">
-                {g.id.slice(0, 12)} · created {when(g.created_at)}
+                game {g.num ?? "?"} · {g.id.slice(0, 12)} · created {when(g.created_at)}
                 {g.started_at ? ` · started ${when(g.started_at)}` : ""}
               </p>
               <form action={cancelGameAction} className="actions">
@@ -149,7 +150,7 @@ export default async function Admin({
                 <ConfirmSubmit ask="Cancel this game for everybody? No rating changes." className="btn danger small">
                   Cancel
                 </ConfirmSubmit>
-                <Link href={`/games/${g.id}`} className="btn small ghost">
+                <Link href={`/games/${g.num ?? g.id}`} className="btn small ghost">
                   Open
                 </Link>
               </form>

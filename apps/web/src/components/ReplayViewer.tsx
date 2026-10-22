@@ -12,6 +12,7 @@ import { GameView } from "./GameView";
 import { ScoreIcon } from "./Icons";
 import { type LogContext, type LogEntry, MoveLog } from "./MoveLog";
 import { PlayerBoardPanel } from "./PlayerBoard";
+import { PlayerNumsContext } from "./PlayerName";
 
 const REASONS: Record<string, string> = {
   completed: "The game was played to the end.",
@@ -22,6 +23,7 @@ const REASONS: Record<string, string> = {
 
 export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData }) {
   const names = replay.header.seats.map((s) => s.name);
+  const nums = replay.header.seats.map((s) => s.num ?? null);
   const who = (i: number): string => names[i] ?? `Player ${i + 1}`;
   const last = replay.actions.length;
   // a link to one move: #step=12 in the address (the page opens at that step)
@@ -125,7 +127,7 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
   });
   const end = replay.result?.result;
   return (
-    <>
+    <PlayerNumsContext.Provider value={nums}>
       <section className="card">
         <div className="moves">
           <button type="button" className="secondary" onClick={() => setStep(0)} disabled={step === 0}>
@@ -263,6 +265,6 @@ export function ReplayViewer({ id, replay }: { id: string; replay: ReplayData })
           ))}
         </ol>
       </section>
-    </>
+    </PlayerNumsContext.Provider>
   );
 }

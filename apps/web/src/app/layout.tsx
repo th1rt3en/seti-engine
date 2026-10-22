@@ -1,3 +1,4 @@
+import { PlayerLink } from "@/components/PlayerLink";
 import { SettingsSync } from "@/components/SettingsSync";
 import assets from "@/generated/assets.json";
 import { currentUser } from "@/lib/session";
@@ -44,7 +45,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <Link href="/players">Players</Link>
             {user ? (
               <>
-                <Link href={`/players/${user.id}`}>{user.name}</Link>
+                <PlayerLink num={user.num} name={user.name} />
                 <Link href="/account">{user.isGuest ? "Create an account" : "Account"}</Link>
                 <form action={logoutAction}>
                   <button type="submit" className="link">

@@ -110,7 +110,7 @@ export interface ReplayData {
     options: Record<string, unknown>;
     clock: Clock;
     rated: boolean;
-    seats: { seat: number; name: string; registered: boolean }[];
+    seats: { seat: number; name: string; registered: boolean; num?: number }[];
     startedAt: number;
     /** "double": the game was played before the random state became a string (the engine replays it with the rounding the Worker did). */
     rngEncoding?: "exact" | "double";

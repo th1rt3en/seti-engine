@@ -1,3 +1,4 @@
+import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
 import { leaderboard } from "@/lib/queries";
 import Link from "next/link";
@@ -56,7 +57,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
               <tr key={r.user_id}>
                 <td>{i + 1}</td>
                 <td>
-                  <Link href={`/players/${r.user_id}`}>{r.name}</Link>
+                  <PlayerLink num={r.num} name={r.name} />
                 </td>
                 <td>{r.rating}</td>
                 <td>{r.games}</td>

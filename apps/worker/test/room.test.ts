@@ -115,6 +115,28 @@ describe("play", () => {
     expect(log[0]).toMatchObject({ seq: 0, seat: 0, action: { type: "score" } });
   });
 
+  it("tells the players' numbers with their names, seat by seat (null for a player without one)", async () => {
+    const t = makeRoom();
+    await t.room.init("g1", two, none, false, { ...alice, num: 7 });
+    await t.room.join(bob);
+    const s = new Conn("s", null);
+    t.conns.push(s);
+    await t.room.submit({ ...alice, num: 7 }, 0, { type: "score" }).catch(() => undefined); // any move makes the room send the view
+    const v = s.last("view") as unknown as { names: string[]; nums: (number | null)[] };
+    expect(v.nums).toHaveLength(2);
+    expect(v.nums[v.names.indexOf("Alice")]).toBe(7);
+    expect(v.nums[v.names.indexOf("Bob")]).toBeNull();
+    // the lobby message too
+    const t2 = makeRoom();
+    const c = new Conn("c", null);
+    t2.conns.push(c);
+    await t2.room.init("g2", two, none, false, { ...alice, num: 7 });
+    expect((c.last("lobby") as unknown as { seats: ({ name: string; num?: number } | null)[] }).seats[0]).toEqual({
+      name: "Alice",
+      num: 7,
+    });
+  });
+
   it("refuses: not your turn, a stale count, an illegal action, a stranger", async () => {
     const t = await started();
     expect(await t.room.submit(bob, 0, { type: "score" })).toMatchObject({ ok: false, code: "not_your_turn" });

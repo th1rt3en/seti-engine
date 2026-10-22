@@ -73,21 +73,26 @@ export interface OpenGame {
   options_json: string;
   created_at: number;
   started_at: number | null;
-  seats: string[];
+  /** the number of the game, in the address of its page */
+  num: number | null;
+  seats: { name: string; num: number | null }[];
 }
 
 /** The lobbies and the games being played, the oldest first. */
 export async function openGames(db: Db, limit: number, offset: number): Promise<OpenGame[]> {
   const games = await db.all<Omit<OpenGame, "seats">>(
-    `SELECT id, status, rated, options_json, created_at, started_at FROM games WHERE status IN ('lobby', 'playing')
-     ORDER BY created_at LIMIT ? OFFSET ?`,
+    `SELECT g.id, gn.num, g.status, g.rated, g.options_json, g.created_at, g.started_at FROM games g LEFT JOIN game_nums gn ON gn.game_id = g.id
+      WHERE g.status IN ('lobby', 'playing') ORDER BY g.created_at LIMIT ? OFFSET ?`,
     limit,
     offset,
   );
   const out: OpenGame[] = [];
   for (const g of games) {
-    const seats = await db.all<{ name: string }>("SELECT name FROM game_players WHERE game_id = ? ORDER BY seat", g.id);
-    out.push({ ...g, seats: seats.map((s) => s.name) });
+    const seats = await db.all<{ name: string; num: number | null }>(
+      "SELECT p.name AS name, un.num AS num FROM game_players p LEFT JOIN user_nums un ON un.user_id = p.user_id WHERE p.game_id = ? ORDER BY p.seat",
+      g.id,
+    );
+    out.push({ ...g, seats });
   }
   return out;
 }

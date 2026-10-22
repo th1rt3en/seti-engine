@@ -1,3 +1,4 @@
+import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
 import { allPlayers } from "@/lib/queries";
 import Link from "next/link";
@@ -38,7 +39,7 @@ export default async function Players({ searchParams }: { searchParams: Promise<
             {rows.map((r) => (
               <tr key={r.user_id}>
                 <td>
-                  <Link href={`/players/${r.user_id}`}>{r.name}</Link>
+                  <PlayerLink num={r.num} name={r.name} />
                 </td>
                 <td>{r.rating}</td>
                 <td>{r.rated_games}</td>

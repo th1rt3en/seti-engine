@@ -4,6 +4,7 @@ import { createHash, randomBytes, randomUUID, scrypt as scryptCb, timingSafeEqua
 import { promisify } from "node:util";
 import type { Config } from "./config";
 import type { Db } from "./db";
+import { userNum } from "./ids";
 import { signJwt } from "./jwt";
 
 const scrypt = promisify(scryptCb) as (password: string, salt: Buffer, keylen: number) => Promise<Buffer>;
@@ -16,6 +17,8 @@ export interface User {
   id: string;
   name: string;
   isGuest: boolean;
+  /** The player's number: the integer in the address of their profile (lib/ids.ts). */
+  num?: number;
 }
 
 export class AuthFailure extends Error {}
@@ -76,7 +79,7 @@ export async function signup(db: Db, name: string, password: string, now = Date.
     await hashPassword(password),
     now,
   );
-  return { id, name: name.trim(), isGuest: false };
+  return { id, name: name.trim(), isGuest: false, num: await userNum(db, id) };
 }
 
 export async function login(db: Db, name: string, password: string): Promise<User> {
@@ -85,7 +88,7 @@ export async function login(db: Db, name: string, password: string): Promise<Use
   // the same message for an unknown username and a wrong password
   if (row?.password_hash == null || !(await checkPassword(password, row.password_hash)))
     throw new AuthFailure("The username or the password is wrong.");
-  return toUser(row);
+  return { ...toUser(row), num: await userNum(db, row.id) };
 }
 
 export async function createGuest(db: Db, name: string | undefined, now = Date.now()): Promise<User> {
@@ -99,7 +102,7 @@ export async function createGuest(db: Db, name: string | undefined, now = Date.n
     display,
     now,
   );
-  return { id, name: display, isGuest: true };
+  return { id, name: display, isGuest: true, num: await userNum(db, id) };
 }
 
 /** A guest becomes an account and keeps the same id, so its games and history stay with it (decision D16). */
@@ -114,7 +117,7 @@ export async function upgradeGuest(db: Db, guestId: string, name: string, passwo
     await hashPassword(password),
     guestId,
   );
-  return { id: guestId, name: name.trim(), isGuest: false };
+  return { id: guestId, name: name.trim(), isGuest: false, num: await userNum(db, guestId) };
 }
 
 // --- recovery code, password change ----------------------------------------------------------------------------------------------
@@ -172,7 +175,7 @@ export async function recoverAccount(
   validate(row.name, newPassword);
   await db.run("UPDATE users SET password_hash = ? WHERE id = ?", await hashPassword(newPassword), row.id);
   await endSessionsOf(db, row.id);
-  return { user: toUser(row), code: await issueRecoveryCode(db, row.id, now) };
+  return { user: { ...toUser(row), num: await userNum(db, row.id) }, code: await issueRecoveryCode(db, row.id, now) };
 }
 
 /** The player changes their own password (they give the old one). Their other sessions end. */
@@ -229,12 +232,13 @@ export async function createSession(db: Db, userId: string, now = Date.now()): P
 
 export async function userForSession(db: Db, token: string | undefined, now = Date.now()): Promise<User | null> {
   if (!token) return null;
-  const rows = await db.all<UserRow>(
-    "SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ? AND s.expires_at > ?",
+  const rows = await db.all<UserRow & { num: number | null }>(
+    "SELECT u.*, n.num AS num FROM sessions s JOIN users u ON u.id = s.user_id LEFT JOIN user_nums n ON n.user_id = u.id WHERE s.id = ? AND s.expires_at > ?",
     digest(token),
     now,
   );
-  return rows[0] ? toUser(rows[0]) : null;
+  const row = rows[0];
+  return row ? { ...toUser(row), num: row.num ?? (await userNum(db, row.id)) } : null;
 }
 
 export async function endSession(db: Db, token: string): Promise<void> {
@@ -247,7 +251,14 @@ export async function mintToken(user: User, cfg: Pick<Config, "authPrivateKey" |
   if (cfg.authPrivateKey === "") throw new Error("AUTH_PRIVATE_KEY is not set");
   return signJwt(
     cfg.authPrivateKey,
-    { name: user.name, reg: !user.isGuest, iss: cfg.authIssuer, aud: cfg.authAudience, sub: user.id },
+    {
+      name: user.name,
+      reg: !user.isGuest,
+      ...(user.num === undefined ? {} : { num: user.num }),
+      iss: cfg.authIssuer,
+      aud: cfg.authAudience,
+      sub: user.id,
+    },
     TOKEN_SECONDS,
   );
 }
