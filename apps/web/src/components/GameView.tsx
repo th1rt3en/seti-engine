@@ -164,6 +164,15 @@ export function GameView({
   // exofossils exist once 'Oumuamua is face up: they show with the other resources (ALIEN-OUM-02)
   const oumuamua = s.species.some((sp) => sp.discovered && sp.species === "oumuamua");
   const prompt = promptOf(view, names);
+  // which one of how many cards to tuck for income it is, when there are several in a row: "(1/3)"
+  const tuckOf = s.pending[0]?.data as { number?: number; of?: number } | undefined;
+  const tuckCount =
+    (s.pending[0]?.kind === "setup_tuck" || s.pending[0]?.kind === "income_tuck") &&
+    tuckOf?.of !== undefined &&
+    tuckOf.of > 1 &&
+    tuckOf.number
+      ? `${tuckOf.number}/${tuckOf.of}`
+      : "";
   // what caused the decision that is asked now, at the end of the bar: "(Helion Assembly)"
   const cause = sourceLabel(
     s.pending[0]?.source as DecisionSource | null | undefined,
@@ -199,6 +208,7 @@ export function GameView({
                 <span className={context ? "prompt asking" : "prompt"}>
                   {context ?? prompt.text}
                   {cause && view.state.pending.length > 0 ? ` (${cause})` : ""}
+                  {tuckCount ? ` (${tuckCount})` : ""}
                 </span>
               </div>
               {contextActions ? <div className="contextactions">{contextActions}</div> : null}

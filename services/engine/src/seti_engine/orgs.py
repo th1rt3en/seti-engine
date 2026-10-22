@@ -136,7 +136,8 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
         p.org_data["tiles"] = {"launch": True, "scan": True, "research": True}
     tucks = min(org["tuck_income_cards"], len(p.hand))
     source = {"kind": "organization", "org": p.organization}
-    s.pending[0:0] = [Decision(kind="setup_tuck", player=p.index, source=source) for _ in range(tucks)]  # EXP-ORG-07: one by one
+    # EXP-ORG-07: one by one; each says which one of how many it is, so that the page can show "(1/3)"
+    s.pending[0:0] = [Decision(kind="setup_tuck", player=p.index, source=source, data={"number": k + 1, "of": tucks}) for k in range(tucks)]
 
 
 def place_marks(s: GameState, p: PlayerState | None, cid: str) -> None:

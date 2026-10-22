@@ -48,7 +48,8 @@ def grant(
         elif t == "card_any":
             s.pending += [Decision(kind="take_card", player=p.index) for _ in range(n)]
         elif t == "tuck":
-            s.pending += [Decision(kind="income_tuck", player=p.index) for _ in range(n)]  # INCOME-01; FAQ-01: may be declined
+            # INCOME-01; FAQ-01: may be declined; each says which one of how many it is
+            s.pending += [Decision(kind="income_tuck", player=p.index, data={"number": k + 1, "of": n}) for k in range(n)]
         elif t == "move":
             p.movement += n
         elif t == "signal_token":

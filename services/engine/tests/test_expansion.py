@@ -84,6 +84,20 @@ def test_choosing_resolves_starting_resources_and_tucks() -> None:  # EXP-ORG-04
         assert not p.offered_orgs and not p.offered_quick
 
 
+def test_the_tucks_of_an_organization_say_which_one_of_how_many_they_are() -> None:  # EXP-ORG-07
+    from seti_engine import orgs  # noqa: PLC0415
+
+    s = new(2, 1)
+    while s.phase == "setup" and not any(d.kind == "setup_tuck" for d in s.pending):
+        s = act(s, **legal_moves(s)[0])
+    tucks = [d for d in s.pending if d.kind == "setup_tuck"]
+    assert tucks, "the first player's organization asks for tucks"
+    want = min(orgs.by_id(s.players[tucks[0].player].organization or "")["tuck_income_cards"], len(s.players[tucks[0].player].hand))
+    mine = [d for d in tucks if d.player == tucks[0].player]
+    assert [(d.data["number"], d.data["of"]) for d in mine] == [(k + 1, want) for k in range(want)]
+    assert all(d.source and d.source["kind"] == "organization" for d in mine)
+
+
 def test_beginner_organizations() -> None:  # EXP-ORG-05
     s = new(4, beginner_organizations=True)
     got = sorted(p.offered_orgs[0] for p in s.players)
