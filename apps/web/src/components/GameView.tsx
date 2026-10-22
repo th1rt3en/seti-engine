@@ -108,6 +108,7 @@ export function GameView({
   row,
   tech,
   log,
+  results,
   overlay,
   context,
   rowFlash,
@@ -130,6 +131,8 @@ export function GameView({
   tech?: TechPick;
   /** The log of the moves (the live game shows it). */
   log?: ReactNode;
+  /** The results of a game that is over, in a panel of their own under the bar and over the board (the page can hide it). */
+  results?: ReactNode;
   /** A panel over the page (the player boards). */
   overlay?: ReactNode;
   /** What the context bar asks at the moment (a choice made on the board): it replaces the prompt of the game. */
@@ -265,6 +268,8 @@ export function GameView({
         </div>
         {moves ? <div className="movebar">{moves}</div> : null}
       </header>
+
+      {results}
 
       <div className="gamegrid">
         <main className="col-center">

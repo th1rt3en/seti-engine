@@ -631,10 +631,10 @@ export default async function StatsPage({
             <Panel
               title="What the techs did"
               wide
-              note="For the players who researched the tech: what it did for them from then on, per player (the lowest, the highest and the spread are on hover). The first tech of each type has nothing to count."
+              note="For the players who researched the tech: what it did for them from then on, per player (the lowest, the highest and the spread are on hover)."
               table={
                 <Table
-                  head={["Tech", "Players", "What", "Average per player"]}
+                  head={["Tech", "Researched", "What", "Average per player"]}
                   rows={s.techUse.flatMap((t) =>
                     t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean)]),
                   )}
@@ -670,7 +670,7 @@ export default async function StatsPage({
                               </div>
                             ))}
                             <span className="muted small">
-                              {t.players} player{t.players === 1 ? "" : "s"} had it
+                              researched {t.players} time{t.players === 1 ? "" : "s"}
                             </span>
                           </>
                         )}

@@ -149,11 +149,10 @@ describe("statistics", () => {
     ]);
     const memory = use.find((t) => t.tech === "computer-dot");
     expect(memory?.metrics.map((m) => [m.key, m.total])).toEqual([
-      ["top", 2],
       ["vp", 4],
       ["bottom", 1],
     ]);
-    expect(memory?.metrics[2]?.label).toBe("1 credit spaces filled");
+    expect(memory?.metrics[1]?.label).toBe("1 credit spaces filled");
     expect(use.find((t) => t.tech === "probe-dot")).toMatchObject({ players: 0, metrics: [] }); // nothing to count
     expect(use.find((t) => t.tech === "telescope-cross")).toMatchObject({ players: 0 });
     expect(use.map((t) => t.tech).slice(0, 5)).toEqual(["probe-dot", "probe-link", "probe-branch", "probe-cross", "telescope-dot"]);

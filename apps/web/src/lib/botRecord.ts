@@ -8,7 +8,7 @@ export interface BotRecord {
   /** First places; a shared first place counts as half. */
   wins: number;
   winRate: number;
-  /** Internal Elo estimate: starts at 0 like the players' ratings, moved by each game against the people's ratings (0 for a person without one). */
+  /** Internal Elo estimate: the players' own rule (start 0, K 60/40/20, the floor of 100: it never drops below it, and below it a loss costs nothing), moved by each game against the people's ratings (0 for a person without one). */
   rating: number;
   /** Fewer than 10 games: the estimate is rough. */
   provisional: boolean;
@@ -21,6 +21,8 @@ export interface GameRow {
 }
 
 const START = 0;
+/** The floor of the players' ratings (docs/PLAN.md D37, apps/worker/src/core/elo.ts): nothing drops below it by losing, and below it a loss costs nothing. */
+const FLOOR = 100;
 const expected = (ra: number, rb: number): number => 1 / (1 + 10 ** ((rb - ra) / 400));
 /** The same K as the players' ratings (docs/PLAN.md, D37): 60 for the first 10 games, 40 for the next 10, then 20. */
 const kFor = (games: number): number => (games < 10 ? 60 : games < 20 ? 40 : 20);
@@ -51,7 +53,9 @@ export function botRecords(rows: GameRow[], ratings: Map<string, number>): Map<s
         const actual = rank < (h.rank as number) ? 1 : rank === h.rank ? 0.5 : 0;
         delta += (kFor(s.games) / people.length) * (actual - expected(s.rating, ratings.get(h.user_id) ?? START));
       }
-      s.rating += delta;
+      // the same rule as the players' ratings (D37): rounded to a whole point after every game; a rating below the floor does not go down, and no
+      // loss takes a rating from the floor or above to below it
+      s.rating = s.rating < FLOOR ? (delta < 0 ? s.rating : Math.round(s.rating + delta)) : Math.max(FLOOR, Math.round(s.rating + delta));
       s.games += 1;
       state.set(v, s);
     }
@@ -63,7 +67,7 @@ export function botRecords(rows: GameRow[], ratings: Map<string, number>): Map<s
         games: s.games,
         wins: s.wins,
         winRate: s.games > 0 ? s.wins / s.games : 0,
-        rating: Math.round(s.rating),
+        rating: s.rating,
         provisional: s.games < 10,
       },
     ]),

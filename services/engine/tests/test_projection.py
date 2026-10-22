@@ -49,6 +49,24 @@ def test_the_view_has_the_solar_system_after_each_of_the_next_rotations_and_the_
     assert [p["id"] for p in pv[0].probes] == [p.id for p in s.probes]
 
 
+def test_the_exertian_cards_played_face_down_are_turned_over_for_everybody_when_the_game_is_over() -> None:  # ALIEN-EXE-06
+    state = new_game(Options(players=2, seed=3))
+    state.players[0].exertian_played = ["ET.41", "ET.42"]
+    state.players[0].exertian_hand = ["ET.43"]
+    # during the game only the owner sees them
+    assert project(state, 0).state.players[0].exertian_played == ["ET.41", "ET.42"]
+    assert project(state, 1).state.players[0].exertian_played == ["?", "?"]
+    assert project(state, None).state.players[0].exertian_played == ["?", "?"]
+    # when the game is over every viewer, a spectator too, sees them; the cards that were only held stay hidden
+    state.phase = "finished"
+    for viewer in (0, 1, None):
+        v = project(state, viewer)
+        assert v.state.players[0].exertian_played == ["ET.41", "ET.42"]
+        assert v.counts.exertian_played[0] == 2
+        assert v.trackers[0].danger_cards is not None, "the danger of the cards is known to all once they are turned over"
+    assert project(state, 1).state.players[0].exertian_hand == ["?"]
+
+
 def test_an_undiscovered_species_board_does_not_show_which_species_it_is() -> None:
     """CLAUDE.md rule 6: the boards of the species have different numbers of spaces, so a face-down board is shown with the same blank
     shape."""

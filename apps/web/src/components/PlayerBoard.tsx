@@ -161,10 +161,19 @@ function Board({
   const front = [
     ...messages.map((m) => ({
       key: `msg-${m.card}`,
+      kind: "message",
       card: m.card as string | null,
       label: `Message card ${cardName(m.card)}: marker at ${m.target} points`,
     })),
-    ...played.map((_, i) => ({ key: `exo-${i}`, card: null, label: `Exertian card played face down (${i + 1})` })),
+    // the Exertian cards played face down show their back until the game is over; then the engine sends the cards to everybody
+    ...played.map((c, i) => ({
+      key: `exo-${i}`,
+      kind: "exertian",
+      card: cardImage(c) ? (c as string | null) : null,
+      label: cardImage(c)
+        ? `Exertian card ${cardName(c)} (${i + 1}), turned over at the end of the game`
+        : `Exertian card played face down (${i + 1})`,
+    })),
   ];
   const frontRows = Math.ceil(front.length / 6);
   const frontY = HEAD + BOARD.h + strip + 26 + rows * (MISSIONS.h + 50);
@@ -309,7 +318,7 @@ function Board({
             return (
               <g key={f.key}>
                 {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}
-                {f.card ? (
+                {f.kind === "message" ? (
                   <text x={x + MISSIONS.w / 2} y={y + MISSIONS.h + 20} textAnchor="middle" className="pbhint">
                     message
                   </text>

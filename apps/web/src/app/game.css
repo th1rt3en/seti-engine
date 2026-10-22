@@ -3202,3 +3202,34 @@ input.switch:focus-visible {
   border-color: var(--accent, #3987e5);
   color: #fff;
 }
+
+/* the results of a game that is over: a panel of its own under the bar, not in the bar, that the player can hide to see more of the board */
+.gameover.compact h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.gameover.compact p {
+  margin: 0;
+}
+.resultspanel {
+  margin: 8px 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong, rgba(139, 148, 158, 0.4));
+  border-radius: 8px;
+  background: var(--panel, rgba(13, 17, 23, 0.92));
+  max-height: min(60vh, 34rem);
+  overflow: auto;
+}
+.resultshead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.resultshead h2 {
+  margin: 0;
+  font-size: 17px;
+}
+.resultshead button {
+  margin-left: auto;
+}

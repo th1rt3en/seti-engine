@@ -151,9 +151,9 @@ export default async function BotsPage() {
       )}
       <p className="muted small">
         Against people: the share of finished games, with at least one person, in which the version came first (a shared first place counts
-        half). The rating is an internal estimate on the same scale as the players&apos; ratings, starting at 0 and moved by each game
-        against the people&apos;s ratings (0 for a person without a rating). It is rough until the version has played 10 games, and it is
-        not on the leaderboard.
+        half). The rating is an internal estimate worked out like the players&apos; ratings: it starts at 0, each game moves it against the
+        people&apos;s ratings (0 for a person without a rating), it never drops below 100, and below 100 a loss costs nothing. It is rough
+        until the version has played 10 games, and it is not on the leaderboard.
       </p>
       <p className="muted small">
         The score is the sum of the board, the end-of-game cards, the gold tiles and the other end scoring. The bots are weak players made

@@ -99,6 +99,8 @@ export function GameClient({
   const [lobby, setLobby] = useState<Extract<Server, { t: "lobby" }> | null>(null);
   const [view, setView] = useState<Extract<Server, { t: "view" }> | null>(null);
   const [ended, setEnded] = useState<Extract<Server, { t: "ended" }>["result"] | null>(null);
+  // the results of the game over (the scores and the statistics) are a panel of their own, apart from the context bar, that can be hidden
+  const [showResults, setShowResults] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // the moves made so far (the server sends all of them when the page connects, then each new one)
   const [log, setLog] = useState<LogEntry[]>([]);
@@ -992,7 +994,7 @@ export function GameClient({
   const moves = (
     <>
       {ended ? (
-        <section className="gameover">
+        <section className="gameover compact">
           <h2>{ended.reason === "cancelled" ? "This game was cancelled" : `Game over (${ended.reason})`}</h2>
           <p>
             {ended.reason === "cancelled" ? (
@@ -1011,15 +1013,12 @@ export function GameClient({
             ) : (
               "The rival won."
             )}{" "}
-            {ended.ranking.map((r) => (
-              <span key={r.seat} className="res">
-                <PlayerName seat={r.seat} name={String(names[r.seat] ?? r.seat + 1)} />: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}
-              </span>
-            ))}
+            {ended.reason !== "cancelled" ? (
+              <button type="button" className="secondary small" onClick={() => setShowResults(!showResults)} aria-expanded={showResults}>
+                {showResults ? "Hide the results" : "Show the results"}
+              </button>
+            ) : null}
           </p>
-          {ended.reason !== "cancelled" ? (
-            <FinalScores view={v} names={names} gameId={gameId} gameNum={gameNum} winners={ended.winners} />
-          ) : null}
         </section>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
@@ -1117,6 +1116,26 @@ export function GameClient({
         : null}
     </>
   );
+  // the scores of every player and the statistics of the game, under the bar and over the board: they can be hidden to see more of the board
+  const results =
+    ended && ended.reason !== "cancelled" && showResults ? (
+      <section className="resultspanel" aria-label="The results of the game">
+        <div className="resultshead">
+          <h2>Results</h2>
+          <span className="res">
+            {ended.ranking.map((r) => (
+              <span key={r.seat} className="res">
+                <PlayerName seat={r.seat} name={String(names[r.seat] ?? r.seat + 1)} />: <ScoreIcon size={18} /> <b>{r.score}</b>{" "}
+              </span>
+            ))}
+          </span>
+          <button type="button" className="secondary small" onClick={() => setShowResults(false)}>
+            Hide
+          </button>
+        </div>
+        <FinalScores view={v} names={names} gameId={gameId} gameNum={gameNum} winners={ended.winners} />
+      </section>
+    ) : null;
   const clocks = view.remaining ? (
     <span className="clocks">
       {left.map((r, i) => (
@@ -1144,6 +1163,7 @@ export function GameClient({
       <GameView
         view={v}
         names={names}
+        results={results}
         moves={waiting && !ended ? sendingPrompt : moves}
         previous={previous}
         lastMove={lastMoveOf(log.at(-1)?.events as never)}

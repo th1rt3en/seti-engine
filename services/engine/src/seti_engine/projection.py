@@ -1,6 +1,7 @@
 """What one player may see of a game (CLAUDE.md rule 6): the state with the hidden parts blanked, and the counts of what was blanked.
 
-Hidden from everyone but the owner: hands, held Exertian cards and the Exertian cards played face down.
+Hidden from everyone but the owner: hands, held Exertian cards and the Exertian cards played face down (these are turned over, for
+everybody, when the game is over).
 Hidden from everyone: the draw deck and its order, the contents of the end-of-round stacks, the identity of undiscovered species,
 the species decks, the sample tokens on the planets, the tech tiles under the top one of each stack (the top tile lies bonus side up for all
 to see, SETUP-16), the rival's deck order, the objectives stack and the random generator state.
@@ -77,7 +78,7 @@ def tracker(state: GameState, p: PlayerState, viewer: int | None = None) -> Play
         score=p.score,
         danger_board=species.board_danger(state, p),
         exertian_played=len(p.exertian_played),
-        danger_cards=species.cards_danger(p) if viewer == p.index else None,
+        danger_cards=species.cards_danger(p) if viewer == p.index or state.phase == "finished" else None,
     )
 
 
@@ -199,7 +200,8 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
         if p.index != viewer:
             p.hand = [HIDDEN] * len(p.hand)
             p.exertian_hand = [HIDDEN] * len(p.exertian_hand)
-            p.exertian_played = [HIDDEN] * len(p.exertian_played)
+            if s.phase != "finished":  # ALIEN-EXE-06: the cards played face down are turned over at the end of the game, for everybody
+                p.exertian_played = [HIDDEN] * len(p.exertian_played)
             p.security = {c: HIDDEN for c in p.security}  # face-down, only the trace color shows (EXP-ARK-03)
             if p.org_data.get("fs_card"):
                 p.org_data["fs_card"] = HIDDEN  # Futurespan's prepared card lies face down

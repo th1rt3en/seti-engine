@@ -14,11 +14,27 @@ describe("the record of the AI against people", () => {
     ];
     const r = botRecords(rows, new Map([["u1", 0]])).get("v001");
     expect(r).toMatchObject({ games: 3, wins: 1.5, winRate: 0.5, provisional: true });
-    // game 1: lost (K 60, expected 0.5) -> -30; game 2: won (K 60, expected 0.457) -> about +33; game 3: a tie against 0 (K 60)
+    // the players' rule: game 1 is lost below the floor of 100, so the rating stays 0; game 2 is won (K 60, expected 0.5) -> +30; game 3 is a tie
+    // against 0 (K 60, expected 0.54 for a rating of 30) -> a small loss, rounded to a whole point after every game
     const exp = (a: number, b: number): number => 1 / (1 + 10 ** ((b - a) / 400));
-    const r1 = 60 * (0 - exp(0, 0));
-    const r2 = r1 + 60 * (1 - exp(r1, 0));
-    expect(r?.rating).toBe(Math.round(r2 + 60 * (0.5 - exp(r2, 0))));
+    const r2 = Math.round(60 * (1 - exp(0, 0)));
+    expect(r2).toBe(30);
+    expect(r?.rating).toBe(r2 < 100 ? (0.5 - exp(r2, 0) < 0 ? r2 : Math.round(r2 + 60 * (0.5 - exp(r2, 0)))) : r2);
+  });
+
+  it("follows the rule of the players' ratings: below 100 a loss costs nothing, and the rating never drops below 100 once it is there", () => {
+    const lose = (id: string) => game(id, ["bot:v001:0", 2], ["u1", 1]);
+    const win = (id: string) => game(id, ["bot:v001:0", 1], ["u1", 2]);
+    const rating = (rows: GameRow[]): number => botRecords(rows, new Map([["u1", 0]])).get("v001")?.rating ?? -1;
+    expect(rating([...lose("a"), ...lose("b"), ...lose("c")])).toBe(0); // losing from the start: nothing is lost
+    expect(rating([...win("a"), ...lose("b")])).toBe(30); // below 100 the loss costs nothing
+    // wins take the rating above 100 (K 60, then 40, then 20): from there a loss costs something but never below 100
+    const wins = Array.from({ length: 12 }, (_, i) => win(`w${i}`)).flat();
+    expect(rating(wins)).toBeGreaterThan(100);
+    const many = [...wins, ...Array.from({ length: 40 }, (_, i) => lose(`l${i}`)).flat()];
+    expect(rating(many)).toBe(100);
+    // at 100 or above, one loss is a real loss, down to the floor at the lowest
+    expect(rating([...wins, ...lose("z")])).toBeLessThan(rating(wins));
   });
 
   it("ignores games without a person, unfinished ranks and other versions are kept apart", () => {

@@ -31,8 +31,7 @@ export interface TechMetric {
 }
 
 const BLUE = (bottom: string): TechMetric[] => [
-  { key: "top", label: "2 VP spaces filled" },
-  { key: "vp", label: "VP they gave" },
+  { key: "vp", label: "VP they gave" }, // the times the upper space was filled is this divided by 2: not shown
   { key: "bottom", label: `${bottom} spaces filled` },
 ];
 
