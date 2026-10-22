@@ -6,6 +6,9 @@ New games get their statistics when they end; this is for the games that ended b
 again). The tool reads the finished games that were played to their end from D1, replays each with the engine package (run it from services/engine
 with `python -m uv run python ../../tools/engine/backfill_stats.py ...`), and writes `backfill_stats.sql` (INSERT OR REPLACE statements). With
 --apply it runs that file against D1; without it, it only writes the file for a look. --local reads and writes the local D1 of `wrangler dev`.
+
+A game that the engine can no longer replay (the rules changed since it was played) has no statistics: with --apply its rows are deleted, and its id goes
+to `backfill_skip.txt` (next to this tool), so that later runs, --all as well, leave it out (owner, 2026-10-22). Delete a line there to try a game again.
 """
 
 import argparse
@@ -48,6 +51,16 @@ def stats_of(file: dict[str, Any], result: dict[str, Any]) -> tuple[dict[str, An
     raise ValueError(f"no encoding replays it to the recorded scores ({last_error})")
 
 
+SKIP_FILE = Path(__file__).with_name("backfill_skip.txt")
+
+
+def skipped() -> set[str]:
+    if not SKIP_FILE.exists():
+        return set()
+    lines = (line.split("#")[0].strip() for line in SKIP_FILE.read_text(encoding="utf-8").splitlines())
+    return {line for line in lines if line}
+
+
 def sql(v: Any) -> str:
     if v is None:
         return "NULL"
@@ -76,8 +89,11 @@ def main() -> int:
         remote,
         command=f"SELECT g.id, g.options_json, g.result_json, g.rated, g.ended_at FROM games g WHERE g.status = 'finished' AND g.reason = 'completed'{skip}",
     )
-    print(f"{len(games)} finished game(s) to do")
+    left_out = skipped()
+    games = [g for g in games if g["id"] not in left_out]
+    print(f"{len(games)} finished game(s) to do ({len(left_out)} left out: they cannot be replayed)")
     lines: list[str] = []
+    unplayable: list[str] = []
     for g in games:
         gid = g["id"]
         rows = d1(wrangler, a.db, remote, command=f"SELECT log_json FROM game_logs WHERE game_id = '{gid}'")
@@ -97,6 +113,7 @@ def main() -> int:
             st, encoding = stats_of(file, result)
         except Exception as e:  # a game that the engine can no longer replay (the rules changed): left out, and said
             print(f"  {gid[:8]}: cannot be replayed ({type(e).__name__}: {str(e)[:80]}), skipped")
+            unplayable.append(gid)
             continue
         user = {s["seat"]: s["user_id"] for s in seats}
         for p in st["players"]:
@@ -124,11 +141,18 @@ def main() -> int:
                 f"species_json, counters_json, ended_at) VALUES ({', '.join(sql(v) for v in values)});"
             )
         print(f"  {gid[:8]}: {len(st['players'])} player(s) (random state: {encoding})")
+    if unplayable:  # their rows go: the page counts only what the current rules replay
+        ids = ", ".join(sql(g) for g in unplayable)
+        lines.insert(0, f"DELETE FROM game_stats WHERE game_id IN ({ids});")
+        print(f"{len(unplayable)} game(s) cannot be replayed: their statistics rows are deleted")
     Path(a.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(lines)} row(s) written to {a.out}")
     if a.apply and lines:
         d1(wrangler, a.db, remote, file=a.out)
         print("applied")
+    if a.apply and unplayable:
+        with SKIP_FILE.open("a", encoding="utf-8") as f:
+            f.writelines(f"{g}  # cannot be replayed with the current engine\n" for g in unplayable)
     return 0
 
 
