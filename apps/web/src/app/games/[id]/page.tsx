@@ -83,28 +83,24 @@ export default async function Game({
         </p>
       ) : null}
       {isHost && open && models.length > 0 ? (
-        <form action={addBotAction} className="card">
+        <form action={addBotAction} className="card addai">
           <input type="hidden" name="id" value={id} />
           <h2>Add an AI player</h2>
-          <p>
-            <label>
-              Version{" "}
-              <select name="model">
-                {models.map((m) => (
-                  <option key={m.version} value={m.version}>
-                    {m.version} · {describeRecord(records.get(m.version))}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </p>
-          <p className="small">
-            <label>
-              <input type="checkbox" name="consent" required /> I agree that this game is recorded and used to train the AI. A game with an
-              AI is never rated.
-            </label>
-          </p>
-          <button type="submit" className="secondary">
+          <label>
+            Version
+            <select name="model">
+              {models.map((m) => (
+                <option key={m.version} value={m.version}>
+                  {m.version} · {describeRecord(records.get(m.version))}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="consent">
+            <input type="checkbox" name="consent" required />
+            <span>I agree that this game is recorded and used to train the AI. A game with an AI is never rated.</span>
+          </label>
+          <button type="submit" className="primary addai-button">
             Add the AI
           </button>
         </form>

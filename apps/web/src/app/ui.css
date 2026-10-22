@@ -1313,3 +1313,30 @@ table.shortcuts td:first-child {
     animation-duration: 2.4s;
   }
 }
+
+/* the box that adds the AI to a lobby */
+.addai {
+  display: grid;
+  gap: 14px;
+}
+.addai h2 {
+  margin: 0;
+}
+/* the agreement: the box on the left of the sentence, whatever the global style of a label */
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.consent input[type="checkbox"] {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0.15rem 0 0;
+}
+.addai-button {
+  justify-self: start;
+}
