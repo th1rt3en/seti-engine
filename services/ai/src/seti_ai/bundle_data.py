@@ -119,11 +119,12 @@ def examples_from_log(
             continue
         if index in kept and _w(policy_weight, seat) > 0:
             view = project(state, seat, previews=False)
-            keep = [i for i, c in enumerate(view.classes) if c != "control"]
-            toks, nums = features.encode_moves(view, keep)
-            chosen = keep.index(view.legal.index(move))
-            tokens = features.encode_view(view, history if memory else None, know if memory else None)
-            out.policy.append(PolicyExample(tokens, toks, nums, chosen, _w(policy_weight, seat)))
+            if move in view.legal:  # a move of an old log that the engine does not offer any more (the legacy scan skip) makes no example
+                keep = [i for i, c in enumerate(view.classes) if c != "control"]
+                toks, nums = features.encode_moves(view, keep)
+                chosen = keep.index(view.legal.index(move))
+                tokens = features.encode_view(view, history if memory else None, know if memory else None)
+                out.policy.append(PolicyExample(tokens, toks, nums, chosen, _w(policy_weight, seat)))
         res = engine.apply(state, move)
         know.update(seat, move, res.events)
         history.append((seat, public_move(move, res.events, seat)))

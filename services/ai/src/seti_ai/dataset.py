@@ -17,7 +17,7 @@ What a game teaches (owner, 2026-10-22): **not the exact moves of the people**. 
 default). A game gives (1) the value of the positions after each bundle, from the points each seat really gained to the end of the game (both seats,
 every game), which is how the model learns what a bundle is worth; and (2) the bundles themselves, as bundles the model may not have found: they are
 meant to be offered to the bundle search as candidates, which the model evaluates with its own value, and the policy learns from what the search
-finds (the second part is not built yet; see docs/AI-TURN-BUNDLES.md section 12).
+finds (expert.py, docs/AI-TURN-BUNDLES.md section 13).
 A game that the engine cannot replay any more (the rules changed since it was played) is skipped and counted, not guessed at.
 """
 
@@ -109,14 +109,22 @@ class Stats:
         return f"{self.games} games, {self.used} used" + (f" (skipped: {why})" if why else "")
 
 
-def examples_of(game: ArchivedGame, imitate: float = 0.0, memory: bool = True, solo: bool = False) -> Examples | str:
-    """The examples of one game, or the reason it is not used. `imitate` is the weight of the human moves as policy examples (0: the value alone)."""
+def skip_reason(game: ArchivedGame, solo: bool = False) -> str | None:
+    """Why a game is not used (None: it is). The same rule for every use of the archive."""
     if not game.completed:
         return "not played to the end"
     if not solo and game.options.players == 1:
         return "a game of one player"
     if game.model_seats and not game.consent:
         return "an AI without the host's agreement"
+    return None
+
+
+def examples_of(game: ArchivedGame, imitate: float = 0.0, memory: bool = True, solo: bool = False) -> Examples | str:
+    """The examples of one game, or the reason it is not used. `imitate` is the weight of the human moves as policy examples (0: the value alone)."""
+    why = skip_reason(game, solo)
+    if why is not None:
+        return why
     try:
         return examples_from_log(
             game.options,

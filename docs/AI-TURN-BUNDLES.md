@@ -1,7 +1,6 @@
 # The turn as the unit of the AI: bundling micro actions (design, for the owner's approval)
 
-Status: **decisions 1 to 5 are answered (section 8); the engine labels (section 4) are built and tested; the cutting of games into bundles and everything after is
-not.** Training is stopped and all saved models are deleted (`docs/AI-DECISIONS.md`, 2026-10-21). Training does not resume until
+Status: see section 13. Training is stopped and all saved models are deleted (`docs/AI-DECISIONS.md`, 2026-10-21). Training does not resume until
 this is built and the owner has approved it.
 
 ## 1. The problem
@@ -241,7 +240,49 @@ filter on which games it learns from will be added.
 **What is built (2026-10-22).** The value labels of every position of every human game, with no policy imitation (`dataset.py`, `imitate` 0 by default; the
 model's own moves are never imitated). The old weighting `game_weights` stays in `bundle_data.py` but the pipeline no longer uses it.
 
-**What is not built yet.** Offering a human bundle to the bundle search as a candidate at its position (`BundleSearch` takes extra candidate bundles; they are
+**Built later the same day (section 13).** Offering a human bundle to the bundle search as a candidate at its position (`BundleSearch` takes extra candidate bundles; they are
 replayed on the determinized copies like any other), and training the policy toward what the search finds there (the bundle that scored best, human or not),
 instead of toward the human's move. This needs search runs over the positions of the human games during training, so it is slower than the bot-game data, and it
 waits for the owner's go for any training.
+
+
+## 13. Version 3: the search as the teacher, the games of people as candidates (built 2026-10-22; no run has been made)
+
+Built for the owner's plan that version 3 learns from the games of people **and** from self-play. Training starts only with the owner's go: `python -m
+seti_ai.iterate run` refuses to start without `--owner-approved`.
+
+**The loop** (`seti_ai/iterate.py`, one iteration):
+1. **Self-play** (`selfplay.py`). The model plays whole turns found by its own bundle search, against itself and for a share of the games (`--bot-share`, 0.25) against
+   the heuristic bot, which keeps it grounded. In the first rounds (`--explore-rounds`, 2) the bundle that is played is drawn among the best ones with a temperature
+   in points (`--explore-temperature`, 3), so that the games differ; later it plays the best. The log of each game is cut into examples as always: the policy
+   toward the moves that the model played (the search is the teacher; the moves of a bot are not imitated) and the value of every position after a bundle,
+   of both seats, from the points that the seat really gained to the end.
+2. **The games of people, with the search** (`expert.py`). From the start of turns of people (a sample of `--human-positions` from the usable games of the
+   archive) the search runs with **the turn that the person played offered as one more candidate** (`BundleSearch.search(..., offered=[...])`; it is scored
+   and given neighbours like any other bundle; if it cannot be played on the copy of the game it is dropped). The policy examples come from the **best bundle
+   the search found, the person's or not**: the policy is never trained toward a person's move as such. The log says how often the person's turn was the best
+   one, how much better the best one was, and whether it was longer or shorter (`ExpertStats`).
+3. **The value of the games of people** is as before (`dataset.py`): every position after a bundle of every usable game, with the points that the seats really
+   gained, mixed in by share (`--people-share`, 0.3; a game repeats at most 20 times).
+4. **Training** on the examples of the last `--buffer` iterations (kept in files, so that a resumed run has them) plus the value of the games of people
+   (`bundle_train.train_epoch`, the same loss as the alpha, the learning rate lower: 1e-4).
+5. **Measuring and the gate.** The network alone against the bots, and **head to head against the champion, both with the search** (`--gate-games`, 4; the
+   search is slow). A candidate that passes `gate.decide` is saved as a new version for testing (`registry.save_version`, parent: the champion, not approved);
+   the owner approves by hand. The network goes on training whether or not it was saved. The champion starts as the version the run starts from (its
+   yardstick is its score against heuristic v3 in its manifest).
+
+**Pause and resume.** `python -m seti_ai.iterate pause --models DIR` (or Ctrl+C): the games in progress finish, nothing of a half iteration is saved, the run exits;
+`--resume` goes on from the checkpoint of the last full iteration (network, optimizer, the champion, the buffer).
+
+**What it needs from the owner before the first run:** the go; the size of the run (`--selfplay-games`, `--human-positions`, `--iterations`: self-play with
+the search is slow, a game takes minutes, so the numbers are set from a short measured run); whether the first iteration should start from the alpha (v002) or
+from a new network (`--preset`); the games of people in a folder (`gcloud storage rsync -r gs://BUCKET/seti-engine/games ./archive`).
+
+**Known limits.** The search draws again the cards of the opponent that the seat has not seen, but not the face-down end-of-round cards, the alien decks and
+the Exertian hands (section 5 of the search). The value targets of self-play are the plain points to the end of the game of one game (high variance; many games
+average it out). The search evaluates a candidate on a few copies; a bigger search is better and slower. No batching of the network calls across searches yet,
+so a self-play game is slow on one GPU; the measured time of a game is logged (`self-play game k/n ... s left`).
+
+**Also fixed on the way.** The cutting of old logs (`bundles.py`, `bundle_data.py`) accepted only moves that the engine offers, so the games played before the scan
+could be done in any order (their `scan_skip`) could not be cut and were skipped as "cannot be replayed"; the move is now an answer of its seat in the cut
+and makes no policy example. Games of people that were skipped for this reason are used again.

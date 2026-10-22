@@ -1,7 +1,9 @@
 """Bundle search (stage B of docs/AI-TURN-BUNDLES.md): at the start of a turn, build several whole turns, score each, play the best one.
 
 A candidate bundle is a list of moves that takes the seat from the start of its turn to the end of it (free actions, the main action with its answers,
-free actions). Candidates come from two places:
+free actions). Candidates come from three places:
+- **offered**: bundles that the caller brings (the turn that a person played at this position, docs/AI-TURN-BUNDLES.md section 13); they are scored like
+  any other, and get neighbours like any other, so the model finds out what they are worth with its own value;
 - **samples**: the policy plays the turn on a copy of the game, one micro move after another (one greedy rollout, the others sampled);
 - **neighbours** of the best samples: the same bundle with one free action added (at any place where the engine offers one), one taken away, or one
   moved to the other side of the main action. A longer or shorter bundle that is better is found even when the policy would hardly ever have played
@@ -53,6 +55,9 @@ class SearchConfig:
     finalists: int = 4  # the best candidates are scored again on the other copies of the game
     copies: int = 3  # copies of the game with the hidden cards drawn again
     max_micro: int = 80  # a bundle is cut off after this many moves (a safeguard)
+    # Self-play explores: with a temperature above 0 the bundle that is played is drawn among the finalists, a candidate that is `t` points worse than
+    # the best being `exp(-t / pick_temperature)` as likely. 0 plays the best one (as the bot in the lobby does).
+    pick_temperature: float = 0.0
 
 
 @dataclass
@@ -60,7 +65,7 @@ class Candidate:
     moves: list[dict[str, Any]]
     points: float  # the points gained in the bundle (the mean over the copies where it could be played)
     value: float  # the value of the position after it (the same mean)
-    origin: str  # "greedy", "sample", "add", "remove", "move"
+    origin: str  # "greedy", "sample", "offered", "add", "remove", "move"
     plays: int = 1  # on how many copies it could be played from the first move to the last as it is
 
     @property
@@ -80,6 +85,8 @@ class SearchResult:
     # depends on
     # a chance event (the card that is drawn, for example) may not be what was planned: the bot then searches again from where the game is.
     start: GameState | None = None
+    # the bundle that is played: the best one, or (self-play, `pick_temperature` above 0) one drawn among the finalists
+    played: Candidate | None = None
 
 
 def determinize(state: GameState, seat: int, knowledge: Knowledge | None, rng: random.Random) -> GameState:
@@ -238,7 +245,17 @@ class BundleSearch:
                     out.append(("move", rest[:main_at] + [moves[i]] + rest[main_at:]))
         return out
 
-    def search(self, state: GameState, seat: int, history: History, knowledge: Knowledge | None, rng: random.Random) -> SearchResult:
+    def search(
+        self,
+        state: GameState,
+        seat: int,
+        history: History,
+        knowledge: Knowledge | None,
+        rng: random.Random,
+        offered: list[list[dict[str, Any]]] | None = None,
+    ) -> SearchResult:
+        """`offered` are bundles (lists of moves) that are scored as candidates besides the sampled ones; one that cannot be played as it is on the copy of
+        the game (a move that is not legal there) is dropped."""
         cfg = self.cfg
         copies = [determinize(state, seat, knowledge, rng) for _ in range(cfg.copies)]
         d0 = copies[0]
@@ -259,6 +276,8 @@ class BundleSearch:
         play_and_score(True, "greedy")
         for _ in range(cfg.samples):
             play_and_score(False, "sample")
+        for moves in offered or []:
+            add(self._score(d0, seat, [dict(m) for m in moves], history, knowledge, rng), "offered")
 
         best_first = sorted(found.values(), key=lambda c: -c.score)
         for base in best_first[: cfg.keep]:
@@ -278,7 +297,11 @@ class BundleSearch:
                     n += 1
             c.points, c.value, c.plays = float(np.mean(pts)), float(np.mean(vals)), n
         best = max(finalists, key=lambda c: (c.score, c.plays))
-        return SearchResult(best, sorted(found.values(), key=lambda c: -c.score), d0)
+        played = best
+        if cfg.pick_temperature > 0 and len(finalists) > 1:
+            weights = [float(np.exp((c.score - best.score) / cfg.pick_temperature)) for c in finalists]
+            played = rng.choices(finalists, weights=weights)[0]
+        return SearchResult(best, sorted(found.values(), key=lambda c: -c.score), d0, played)
 
 
 class BundleBot:
@@ -306,7 +329,7 @@ class BundleBot:
         if planned is None or planned not in view.legal:
             self.last = self.search.search(state, seat, self.history if self.history is not None else [], self.knowledge, rng)
             self.searches += 1
-            self.plan, self.pos, self.key = list(self.last.best.moves), 0, key
+            self.plan, self.pos, self.key = list((self.last.played or self.last.best).moves), 0, key
             planned = self.plan[0] if self.plan else None
         if planned is None or planned not in view.legal:  # nothing found (should not happen): any move that is not an undo
             usable = [i for i, m in enumerate(view.legal) if m["type"] != "undo"] or list(range(len(view.legal)))

@@ -96,9 +96,11 @@ def micros_from_log(options: Options, actions: list[dict[str, Any]], rng_encodin
             state.rng_state = js_number(state.rng_state)
         classified = engine.legal_classified(state)
         cls = next((c for m, c in classified if m == move), None)
-        if cls is None:  # a move that the engine does not offer is refused by `apply` with the list of what is legal
+        if cls is None:
+            # a move that the engine does not offer is refused by `apply` with the list of what is legal; one that it still accepts is a move of an old
+            # log (the `scan_skip` of the games played before the scan could be done in any order, 2026-10-22): an answer of its seat
             engine.apply(state, move)
-            raise AssertionError(f"move {index} {move} is not legal")
+            cls = "answer"
         seat = to_act(state)
         assert seat is not None
         if move["type"] == "undo":

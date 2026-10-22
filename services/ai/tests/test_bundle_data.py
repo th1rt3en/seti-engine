@@ -23,7 +23,8 @@ def real() -> Examples:
 def test_the_real_game_gives_a_choice_for_every_move_that_was_not_taken_back() -> None:
     ex = real()
     undos = sum(1 for a in FIXTURE["actions"] if a["type"] == "undo")
-    assert len(ex.policy) == len(FIXTURE["actions"]) - 2 * undos
+    legacy = 1  # one `scan_skip` of the old rule (played before the scan could be done in any order, 2026-10-22): accepted, no longer offered
+    assert len(ex.policy) == len(FIXTURE["actions"]) - 2 * undos - legacy
     for p in ex.policy:
         assert 0 <= p.action < p.toks.shape[0], "the chosen move is one of the moves that were offered"
         assert p.toks.shape[0] == p.nums.shape[0]
