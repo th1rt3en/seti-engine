@@ -53,3 +53,7 @@ Moving the Futurespan token 3 spaces farther (EXP-ORG-12) gains 1 card that the 
 ## Glyphids: the top row of the board takes any number of markers, 2026-10-18
 
 The three top spaces of the Glyphids board (EXP-GLY-04) are replenished at once, so they take any number of markers, like the top capsule of the base species boards (`repeat` in `expansion-glyphids.json`); each marker takes the new token. The lower spaces take one marker.
+
+## Sentinel Probe Network and the Arkhos security cards, 2026-10-22
+
+A security card of the Arkhos species (AK.21 to AK.32) that the player plays as a main action counts as a non-alien card for the free action of Sentinel Probe Network (EXP-ORG-13): the corner of the card (the minor exploration reward, EXP-ARK-07) is kept and can be gained once in the round after the card is fully resolved. Every other card of an alien deck still does not count. `orgs.on_card_played`.

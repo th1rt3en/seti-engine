@@ -279,8 +279,10 @@ def on_mission_played(s: GameState, p: PlayerState) -> None:
 
 
 def on_card_played(s: GameState, p: PlayerState, cid: str, alien: bool) -> None:
-    """Sentinel Probe Network keeps the corner of the last non-alien card played as a main action, for its free action."""
-    if p.organization == "sentinel_probe_network" and not alien:
+    """Sentinel Probe Network keeps the corner of the last non-alien card played as a main action, for its free action. An Arkhos security
+    card counts as a non-alien card for it (owner, 2026-10-22): its corner is the minor exploration reward."""
+    security = any(x["id"] == cid for x in tables.arkhos()["security"])
+    if p.organization == "sentinel_probe_network" and (not alien or security):
         p.org_data["corner"] = cid
     if p.organization == "cosmos_strategy_group":  # EXP-ORG-13: a card played as a main action may mark a matching reward space
         sector = tables.cards()[cid]["sector"]
