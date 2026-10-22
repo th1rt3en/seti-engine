@@ -15,13 +15,105 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
-from . import card_defs, effects, projection, replay, solar, tables
+from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, species, tables
 
 VERSION = 2
+SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
-# the sources of a gain that belong to one species (the others name it: {"kind": "alien", "species": ...})
+# the sources of a gain that belong to one species (the others name it: {"kind": "alien", "species": ..., "what": ...})
 ALIEN_SOURCES = {"explore": "arkhos", "glyph": "glyphids", "anomaly": "anomalies"}
+
+
+def alien_source(src: dict[str, Any]) -> tuple[str, str] | None:
+    """The species and the part of its rules that a gain came from (`arkhos` `minor`, `glyphids` `translation`, `amoeba` `group` ...)."""
+    kind = src.get("kind")
+    if kind == "explore":
+        return "arkhos", str(src.get("level"))
+    if kind == "glyph":
+        return "glyphids", "translation"
+    if kind == "anomaly":
+        return "anomalies", "token"
+    if kind == "alien":
+        return str(src["species"]), str(src.get("what", "effect"))
+    return None
+
+
+def gain_counts(c: Counter[str], e: dict[str, Any]) -> None:
+    """What one `gains` event adds: the data, the publicity of the sectors and signals, and every resource by the source that gave it."""
+    src = e["source"].get("kind", "other")
+    alien = alien_source(e["source"])
+    for res, amount in e["changes"].items():
+        if res == "data":
+            c["data.gained" if amount > 0 else "data.lost"] += abs(amount)
+        if res == "publicity" and src in ("sector", "signal"):
+            c[f"publicity.{src}"] += amount
+        if res in RESOURCES and amount > 0:
+            c[f"gain.{src}.{res}"] += amount
+            if alien is not None:
+                c[f"alien.{alien[0]}.{alien[1]}.{res}"] += amount
+        if alien is not None and res == "publicity" and amount > 0:
+            c[f"publicity.alien.{alien[0]}"] += amount  # what the aliens gave, by species (the page adds them up)
+
+
+def alien_end(c: Counter[str], end: Any, p: Any) -> None:
+    """What the state at the end of the game says about a player and the species that were discovered."""
+    for sl in end.species:
+        if sl.species and sl.discovered:
+            c[f"alien.{sl.species}.games"] = 1  # its averages are over the players of the games where it was discovered
+    c["oumuamua.orbiters"] = p.orbiters.get("oumuamua", 0)
+    c["oumuamua.landers"] = p.landers.get("oumuamua", 0)
+    row = next((r for r in end.final_scores if r["player"] == p.index), None)
+    if row is not None and species.exertian_slot(end) is not None:  # ALIEN-EXE-06, ALIEN-EXE-07
+        c["exertians.danger"] = species.danger(end, p)
+        c["exertians.danger.cards"] = species.cards_danger(p)
+        c["exertians.danger.board"] = species.board_danger(end, p)
+        c["exertians.played"] = len(p.exertian_played)
+        c["exertians.loss"] = int(row["loss"])
+    if row is not None and glyphids.slot_index(end) is not None:  # EXP-GLY-07
+        c["glyphids.leftover"] = len(p.glyphs)
+        c["glyphids.leftover.vp"] = int(row["glyphs"])
+
+
+def alien_events(c: Counter[str], e: dict[str, Any], before: Any, state: Any) -> None:
+    """What the species did for a player in one event: `<species>.<what>` counters. The resources they gave are counted with the gains
+    (`alien.<species>.<what>.<resource>`)."""
+    t = e["type"]
+    if t == "sample_delivered":
+        c["mascamites.delivered"] += 1  # a delivery mission completed
+    elif t == "anomaly":
+        c["anomalies.won"] += 1
+    elif t == "signal_tile":
+        c["oumuamua.signals"] += 1
+    elif t == "tile_resolved":
+        c["oumuamua.wins"] += 1
+    elif t == "message_reward":
+        i = species.message_slot(before)
+        taken = 0 if i is None else sum(1 for x in before.species[i].extra["covered"] if x is not None)
+        c[f"centaurians.pick.{e['hex']}"] += 1
+        c[f"centaurians.order.{e['hex']}"] += taken + 1  # the 1st to the 4th reward taken on the board, by anyone
+    elif t == "message_card_placed":
+        c["centaurians.cards.played"] += 1
+    elif t == "message_resolved":
+        c["centaurians.cards.completed"] += 1
+    elif t == "explore":
+        c[f"arkhos.explore.{e['level']}"] += 1
+    elif t == "breach":
+        c["arkhos.breach"] += 1
+    elif t == "glyph":
+        kind, _, rest = str(e["where"]).partition(":")
+        if kind == "board":
+            color, _, k = rest.partition(":")
+            columns = {col["color"]: col["spaces"] for col in glyphids.data()["board"]["columns"]}
+            kind = f"board_{columns[color][int(k)]['well']}"  # the upper and the lower wells of the board
+        c[f"glyphids.token.{kind}"] += 1
+    elif t == "decipher":
+        c["glyphids.placed"] += 1
+    elif t == "organelle":
+        c[f"amoeba.single.{amoeba.color_of(str(e['space']))}"] += 1
+    elif t == "organelles":
+        c[f"amoeba.group.{e['color']}"] += 1
+        c[f"amoeba.group.{e['color']}.tokens"] += len(e["spaces"])
 # Counted apart: a probe launched, an orbiter or a lander placed by something other than the main action of that name
 # (a card effect, a reward, an organization, the quick start ...).
 
@@ -139,28 +231,25 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                     placed = sum(getattr(q, attr).values()) - sum(getattr(old, attr).values())
                     if placed > 0:
                         counts[q.index][key] += placed - (1 if q.index == seat and action.get("type") == name else 0)
+        for q in state.players:  # the exofossils that a player gained and spent in this step
+            if q.index in counts and q.index < len(before.players):
+                delta = q.exofossils - before.players[q.index].exofossils
+                if delta:
+                    counts[q.index]["oumuamua.exofossil.gained" if delta > 0 else "oumuamua.exofossil.spent"] += abs(delta)
         for e in result.events:
             t = e["type"]
             who = e.get("player")
             if who not in counts:
                 continue
             c = counts[who]
+            alien_events(c, e, before, state)
             if t == "launch":
                 if who == seat and action.get("type") == "launch" and not basic_done:
                     basic_done.add(t)  # the launch action itself
                 else:
                     c["probes.launched.other"] += 1
             if t == "gains":
-                src = e["source"].get("kind", "other")
-                for res, amount in e["changes"].items():
-                    if res == "data":
-                        c["data.gained" if amount > 0 else "data.lost"] += abs(amount)
-                    if res == "publicity" and src in ("sector", "signal"):
-                        c[f"publicity.{src}"] += amount
-                    if res in RESOURCES and amount > 0:
-                        c[f"gain.{src}.{res}"] += amount
-                    if res == "publicity" and amount > 0 and (species := ALIEN_SOURCES.get(src) or e["source"].get("species")):
-                        c[f"publicity.alien.{species}"] += amount  # what the aliens gave, by species (the page adds them up)
+                gain_counts(c, e)
             elif t == "place_data":
                 c["data.computer"] += 1
             elif t == "sector_won":
@@ -176,6 +265,10 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                 card = card_defs.CARDS.get(str(e["card"]), {})
                 if "mission" in card:
                     c["missions.played"] += 1
+                    if card["mission"].get("kind") == "deliver":
+                        c["mascamites.mission.played"] += 1
+                if str(e["card"]) in SECURITY_CARDS:
+                    c["arkhos.security.played"] += 1
                 if "end" in card:
                     c["endcards.played"] += 1
             elif t == "mission_completed":
@@ -204,6 +297,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             c[f"tech.{tech}"] += 1
             c[f"techcat.{tech.split('-')[0]}"] += 1
         c["missions.done_end"] = len(p.completed_missions)
+        alien_end(c, end, p)
         c["stats.version"] = VERSION  # the page counts the newer counters (techuse, from effects) over the rows that have this mark only
         players.append(
             {

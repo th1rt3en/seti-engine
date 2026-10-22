@@ -193,4 +193,4 @@ def test_the_publicity_of_an_organelle_is_named_after_its_species() -> None:  # 
     cards.run_step(s, s.players[0], {"t": "organelle", "color": "pink"}, [])
     r = apply(s, {"type": "pick_organelle", "space": "P2"})
     gains = [e for e in r.events if e["type"] == "gains" and e["changes"].get("publicity")]
-    assert [e["source"] for e in gains] == [{"kind": "alien", "species": "amoeba"}]
+    assert [e["source"] for e in gains] == [{"kind": "alien", "species": "amoeba", "what": "single"}]

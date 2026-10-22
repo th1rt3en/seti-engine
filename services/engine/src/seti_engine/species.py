@@ -324,7 +324,7 @@ def deliver_sample(s: GameState, p: PlayerState, capsule_id: str, events: Events
     s.probes.remove(cap)
     s.species[i].extra["sample_spaces"].append(new_sample_space(cap.sample))
     for _ in range(times):  # #ET.7 resolves the delivered sample twice
-        with trail.scope(s, {"kind": "alien", "species": "mascamites"}):  # the statistics count what the aliens gave, by species
+        with trail.scope(s, {"kind": "alien", "species": "mascamites", "what": "sample"}):  # the statistics
             rewards.grant(s, p, sample_faces()[cap.sample], events, slot=i)
     events.append(
         {
@@ -343,7 +343,7 @@ def mark_sample_space(s: GameState, p: PlayerState, slot_index: int, j: int, eve
     sp = s.species[slot_index].extra["sample_spaces"][j]
     sp["marker"] = p.index
     events.append({"type": "sample_space_marked", "player": p.index, "space": j, "reward": sample_faces()[sp["token"]]})
-    with trail.scope(s, {"kind": "alien", "species": "mascamites"}):
+    with trail.scope(s, {"kind": "alien", "species": "mascamites", "what": "sample"}):
         rewards.grant(s, p, sample_faces()[sp["token"]], events, slot=slot_index)
 
 
@@ -526,6 +526,8 @@ def resolve_tile(s: GameState, events: Events) -> None:
     tile = s.species[i].extra["tile"]
     for pl in sorted(set(tile["markers"])):
         gain_exofossil(s, s.players[pl], 1)
+    for pl in sorted(set(tile["markers"])):
+        events.append({"type": "tile_resolved", "player": pl})  # the statistics count who took part
     tile["data"], tile["markers"] = TILE_DATA, []
 
 
@@ -566,7 +568,7 @@ def reach_message(s: GameState, p: PlayerState, hex_index: int, events: Events) 
     s.species[i].extra["covered"][hex_index] = p.index
     reward = board_data("centaurians")["message_rewards"][hex_index]
     events.append({"type": "message_reward", "player": p.index, "hex": hex_index, "reward": reward})
-    with trail.scope(s, {"kind": "alien", "species": "centaurians"}):
+    with trail.scope(s, {"kind": "alien", "species": "centaurians", "what": "milestone"}):
         rewards.grant(s, p, reward, events, slot=i)
 
 

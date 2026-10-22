@@ -67,7 +67,7 @@ def resolve_message(s: GameState, p: PlayerState, target: int, events: Events) -
             effects.gain_income_resource(s, p, tables.cards()[mc.card]["income"])  # FAQ-C231: the increase pays at once
             became_income = True
         else:
-            with trail.scope(s, {"kind": "alien", "species": "centaurians"}):
+            with trail.scope(s, {"kind": "alien", "species": "centaurians", "what": "card"}):
                 rewards.grant(s, p, [r], events)
     if not became_income:
         s.discard.append(mc.card)
@@ -106,7 +106,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         tok = next_anomaly(s)
         if tok is not None:
             faces = next(x for x in species.board_data("anomalies")["tokens"] if x["column"] == tok["color"])["sides"]
-            with trail.scope(s, {"kind": "alien", "species": "anomalies"}):
+            with trail.scope(s, {"kind": "alien", "species": "anomalies", "what": "token"}):
                 rewards.grant(s, p, faces[tok["side"]], events)
     elif t == "anomaly_signal_vp":
         sectors = {tok["sector"] for tok in anomaly_tokens(s)}  # FAQ-C220: every signal the player has there, including this card's
@@ -165,7 +165,7 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         if d.data["mode"] == "collect":
             species.collect_sample(s, p, a["planet"], a["sample"], events)
         else:  # peek: gain its reward and put it back (FAQ-C201)
-            with trail.scope(s, {"kind": "alien", "species": "mascamites"}):
+            with trail.scope(s, {"kind": "alien", "species": "mascamites", "what": "sample"}):
                 rewards.grant(s, p, species.sample_faces()[a["sample"]], events, slot=species.mascamite_slot(s))
     elif t == "pol_pick":
         s.aside.remove(a["card"])
