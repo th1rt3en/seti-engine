@@ -159,6 +159,27 @@ describe("statistics", () => {
     expect(use.map((t) => t.tech).slice(0, 5)).toEqual(["probe-dot", "probe-link", "probe-branch", "probe-cross", "telescope-dot"]);
   });
 
+  it("filters by the alien species of the game and by the organization the player picked", () => {
+    const rows = [
+      row({ gameId: "a", seat: 0, species: ["anomalies", "mascamites"], org: "xenolab", counters: { "action.launch": 4 } }),
+      row({ gameId: "a", seat: 1, species: ["anomalies", "mascamites"], org: "fenwick_research_center", counters: { "action.launch": 2 } }),
+      row({ gameId: "b", seat: 0, species: ["oumuamua", "centaurians"], org: "xenolab", counters: { "action.launch": 6 } }),
+    ];
+    // the species keeps every player of the games that have it
+    const withSpecies = aggregate(rows, parseFilter({ species: "mascamites" }));
+    expect([withSpecies.games, withSpecies.rows, withSpecies.mean["action.launch"]]).toEqual([1, 2, 3]);
+    // the organization keeps the players who picked it, whatever the game
+    const withOrg = aggregate(rows, parseFilter({ org: "xenolab" }));
+    expect([withOrg.games, withOrg.rows, withOrg.mean["action.launch"]]).toEqual([2, 2, 5]);
+    // both together: the players with the organization in the games with the species
+    const both = aggregate(rows, parseFilter({ species: "oumuamua", org: "xenolab" }));
+    expect([both.games, both.rows, both.mean["action.launch"]]).toEqual([1, 1, 6]);
+    expect(aggregate(rows, parseFilter({ species: "arkhos" })).rows).toBe(0);
+    // a name that is not a species or an organization of the engine is no filter
+    expect(parseFilter({ species: "klingons", org: "../x" })).toMatchObject({ species: null, org: null });
+    expect(aggregate(rows, parseFilter({ species: "klingons" })).rows).toBe(3);
+  });
+
   it("no game gives zeros, not errors", () => {
     expect(aggregate([], any)).toMatchObject({ games: 0, rows: 0, orgs: [], species: [] });
   });

@@ -30,7 +30,7 @@ export async function statsVersion(db: Db): Promise<number> {
   return r[0]?.v ?? 0;
 }
 
-const ALL: StatFilter = { players: null, expansion: null, rated: null, who: null };
+const ALL: StatFilter = { players: null, expansion: null, rated: null, who: null, species: null, org: null };
 
 /** The summary for a filter: from the cache when the table has not changed since, else made from the rows (read again only if the table changed). */
 export async function cachedStats(db: Db, filter: StatFilter): Promise<Stats> {

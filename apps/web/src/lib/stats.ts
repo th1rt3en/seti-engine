@@ -28,17 +28,34 @@ export interface StatFilter {
   expansion: boolean | null;
   rated: boolean | null;
   who: "people" | "ai" | null;
+  /** the games that have this alien species (discovered or not) */
+  species: string | null;
+  /** the players who picked this organization (the games where it was picked are not otherwise filtered) */
+  org: string | null;
 }
+
+/** The alien species of the game (the engine's names): the five of the base game and the three of the Space Agencies expansion. */
+export const SPECIES_KEYS = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua", "arkhos", "glyphids", "amoeba"];
 
 const flag = (v: string | undefined): boolean | null => (v === "yes" ? true : v === "no" ? false : null);
 
-export function parseFilter(sp: { players?: string; expansion?: string; rated?: string; who?: string }): StatFilter {
+export function parseFilter(sp: {
+  players?: string;
+  expansion?: string;
+  rated?: string;
+  who?: string;
+  species?: string;
+  org?: string;
+}): StatFilter {
   const n = Number(sp.players);
   return {
     players: Number.isInteger(n) && n >= 1 && n <= 4 ? n : null,
     expansion: flag(sp.expansion),
     rated: flag(sp.rated),
     who: sp.who === "people" || sp.who === "ai" ? sp.who : null,
+    species: sp.species !== undefined && SPECIES_KEYS.includes(sp.species) ? sp.species : null,
+    // an organization is a short id of the engine (letters and underscores): anything else is no filter
+    org: sp.org !== undefined && /^[a-z_]{3,40}$/.test(sp.org) ? sp.org : null,
   };
 }
 
@@ -49,7 +66,9 @@ export const matches = (r: StatRow, f: StatFilter): boolean =>
   (f.players === null || r.players === f.players) &&
   (f.expansion === null || r.expansion === f.expansion) &&
   (f.rated === null || r.rated === f.rated) &&
-  (f.who === null || isAi(r) === (f.who === "ai"));
+  (f.who === null || isAi(r) === (f.who === "ai")) &&
+  (f.species === null || r.species.includes(f.species)) &&
+  (f.org === null || r.org === f.org);
 
 export interface OrgStat {
   org: string;

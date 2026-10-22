@@ -17,7 +17,7 @@ import { OrgName } from "@/components/OrgName";
 import { BarList, Histogram, LineChart, Panel, Pills, StackBar, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
-import { type Spread, parseFilter, spreadOf } from "@/lib/stats";
+import { SPECIES_KEYS, type Spread, parseFilter, spreadOf } from "@/lib/stats";
 import { cachedStats } from "@/lib/statsCache";
 import { TECH_INFO } from "@/lib/techs";
 import type { ReactNode } from "react";
@@ -85,7 +85,7 @@ const Blank = () => <span className="icon-blank" aria-hidden="true" />;
 
 export default async function StatsPage({
   searchParams,
-}: { searchParams: Promise<{ players?: string; expansion?: string; rated?: string; who?: string }> }) {
+}: { searchParams: Promise<{ players?: string; expansion?: string; rated?: string; who?: string; species?: string; org?: string }> }) {
   const sp = await searchParams;
   const filter = parseFilter(sp);
   const s = await cachedStats(getDb(), filter);
@@ -98,6 +98,8 @@ export default async function StatsPage({
   if (filter.expansion !== null) base.expansion = filter.expansion ? "yes" : "no";
   if (filter.rated !== null) base.rated = filter.rated ? "yes" : "no";
   if (filter.who !== null) base.who = filter.who;
+  if (filter.species !== null) base.species = filter.species;
+  if (filter.org !== null) base.org = filter.org;
 
   const actions: { key: string; label: string; icon: ReactNode }[] = [
     { key: "launch", label: "Launch", icon: <ActionIcon name="launch" size={26} /> },
@@ -218,6 +220,57 @@ export default async function StatsPage({
           />
         </div>
       </div>
+
+      <details className="card stat-advanced" open={filter.species !== null || filter.org !== null}>
+        <summary>Advanced filters</summary>
+        <form method="get" action="/stats" className="stat-advanced-form">
+          {Object.entries(base)
+            .filter(([k]) => k !== "species" && k !== "org")
+            .map(([k, v]) => (
+              <input key={k} type="hidden" name={k} value={v} />
+            ))}
+          <label>
+            <span className="stat-filter-name">Alien species in the game</span>
+            <select name="species" defaultValue={filter.species ?? ""}>
+              <option value="">Any</option>
+              {SPECIES_KEYS.map((k) => (
+                <option key={k} value={k}>
+                  {SPECIES_NAMES[k] ?? cap(k)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span className="stat-filter-name">Organization the player picked</span>
+            <select name="org" defaultValue={filter.org ?? ""}>
+              <option value="">Any</option>
+              {Object.entries(ORG_NAMES)
+                .sort((a, b) => a[1].localeCompare(b[1]))
+                .map(([id, name]) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <button type="submit" className="secondary small">
+            Apply
+          </button>
+          {filter.species !== null || filter.org !== null ? (
+            <a
+              className="small"
+              href={`/stats${Object.keys(base).length > 1 ? `?${new URLSearchParams(Object.fromEntries(Object.entries(base).filter(([k]) => k !== "species" && k !== "org"))).toString()}` : ""}`}
+            >
+              Clear these
+            </a>
+          ) : null}
+        </form>
+        <p className="muted small">
+          The alien species keeps the games that have it, discovered or not, and counts every player of those games. The organization keeps
+          only the players who picked it, so the tables of organizations, species and techs then describe those players. Both go with the
+          filters above.
+        </p>
+      </details>
 
       {s.rows === 0 ? (
         <p>No finished game matches this filter yet.</p>
