@@ -280,6 +280,48 @@ describe("lobby, leaderboard and profile", () => {
     expect(p?.recent.map((g) => g.id)).toContain("done");
     expect(await profile(db, "nobody")).toBeNull();
   });
+
+  it("pages the game history of a profile, 10 games a page, the newest first, with the rating change of the games on the page", async () => {
+    const { db, ann } = await seed();
+    const before = (await profile(db, ann.id))?.totalGames ?? 0;
+    for (let i = 0; i < 24; i++) {
+      const id = `old-${String(i).padStart(2, "0")}`;
+      await db.run(
+        "INSERT INTO games (id, status, options_json, clock_json, rated, rated_counted, reason, created_at) VALUES (?, 'finished', ?, ?, 1, 1, 'completed', ?)",
+        id,
+        JSON.stringify({ players: 2 }),
+        JSON.stringify({ kind: "none" }),
+        1000 + i,
+      );
+      await db.run(
+        "INSERT INTO game_players (game_id, seat, user_id, name, registered, rank, score) VALUES (?, 0, ?, 'Ann', 1, 1, 100)",
+        id,
+        ann.id,
+      );
+      await db.run(
+        "INSERT INTO rating_history (game_id, user_id, rating_before, rating_after, rank, at) VALUES (?, ?, 0, 10, 1, ?)",
+        id,
+        ann.id,
+        1000 + i,
+      );
+    }
+    const first = await profile(db, ann.id);
+    expect(first?.totalGames).toBe(before + 24);
+    expect(first).toMatchObject({ page: 1, pages: Math.ceil((before + 24) / 10) });
+    expect(first?.recent).toHaveLength(10);
+    const last = await profile(db, ann.id, first?.pages);
+    expect(last?.recent).toHaveLength((before + 24) % 10 || 10);
+    const second = await profile(db, ann.id, 2);
+    const ids = [...(first?.recent ?? []), ...(second?.recent ?? [])].map((g) => g.id);
+    expect(new Set(ids).size).toBe(20); // no game twice across two pages
+    expect(second?.recent.map((g) => g.id)).not.toEqual(first?.recent.map((g) => g.id));
+    // the rating change is found for every game on a page, also the ones beyond the latest 50 of the chart
+    for (const g of second?.recent ?? []) if (g.id.startsWith("old-")) expect(second?.pageRatings.map((r) => r.game_id)).toContain(g.id);
+    // a page that does not exist is the first or the last
+    expect((await profile(db, ann.id, 999))?.page).toBe(first?.pages);
+    expect((await profile(db, ann.id, 0))?.page).toBe(1);
+    expect((await profile(db, ann.id, Number.NaN))?.page).toBe(1);
+  });
 });
 
 describe("the Worker client", () => {

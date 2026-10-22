@@ -1,3 +1,4 @@
+import { Pager } from "@/components/Pager";
 import { RatingChart } from "@/components/RatingChart";
 import { getDb } from "@/lib/db";
 import { resolveUser } from "@/lib/ids";
@@ -21,15 +22,19 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
   );
 }
 
-export default async function Player({ params }: { params: Promise<{ id: string }> }) {
+export default async function Player({
+  params,
+  searchParams,
+}: { params: Promise<{ id: string }>; searchParams: Promise<{ page?: string }> }) {
   const { id: param } = await params;
+  const { page } = await searchParams;
   // the address is the number of the player; the uuid (an address from before the numbers) goes to it
   const resolved = await resolveUser(getDb(), param);
   if (resolved === null) notFound();
   const found = resolved as NonNullable<typeof resolved>;
   if (found.redirect !== null) permanentRedirect(`/players/${found.redirect}`);
   const id = found.id;
-  const p = await profile(getDb(), id);
+  const p = await profile(getDb(), id, Number.parseInt(page ?? "1", 10));
   if (p === null) notFound();
   const data = p as NonNullable<typeof p>;
   const viewer = await currentUser();
@@ -154,7 +159,7 @@ export default async function Player({ params }: { params: Promise<{ id: string 
           <tbody>
             {data.recent.map((g) => {
               const o = JSON.parse(g.options_json) as { players: number; expansion?: boolean; sandbox?: boolean };
-              const h = data.history.find((x) => x.game_id === g.id);
+              const h = data.pageRatings.find((x) => x.game_id === g.id);
               return (
                 <tr key={g.id}>
                   <td>
@@ -204,6 +209,7 @@ export default async function Player({ params }: { params: Promise<{ id: string 
           </tbody>
         </table>
       ) : null}
+      <Pager page={data.page} pages={data.pages} link={(n) => (n > 1 ? `/players/${param}?page=${n}` : `/players/${param}`)} />
     </>
   );
 }

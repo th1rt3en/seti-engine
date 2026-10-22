@@ -388,7 +388,11 @@ export function computeStats(rows: FinishedGame[]): ProfileStats {
   };
 }
 
-export async function profile(db: Db, userId: string) {
+/** The games of the history of a profile on one page. */
+export const HISTORY_PAGE_SIZE = 10;
+
+/** `page` (from 1) is the page of the game history that is wanted, `HISTORY_PAGE_SIZE` games a page, the newest first. A page past the last is the last. */
+export async function profile(db: Db, userId: string, page = 1) {
   const user = (
     await db.all<{ id: string; name: string; is_guest: number; created_at: number }>(
       "SELECT id, name, is_guest, created_at FROM users WHERE id = ?",
@@ -401,12 +405,32 @@ export async function profile(db: Db, userId: string) {
     "SELECT game_id, rating_before, rating_after, rank, at FROM rating_history WHERE user_id = ? ORDER BY at DESC LIMIT 50",
     userId,
   );
+  const total =
+    (
+      await db.all<{ n: number }>(
+        "SELECT COUNT(*) AS n FROM game_players p JOIN games g ON g.id = p.game_id WHERE p.user_id = ? AND g.status IN ('finished', 'playing')",
+        userId,
+      )
+    )[0]?.n ?? 0;
+  const pages = Math.max(1, Math.ceil(total / HISTORY_PAGE_SIZE));
+  const shown = Math.min(Math.max(1, Math.floor(page) || 1), pages);
   const recent = await db.all<RecentGame>(
     `SELECT g.id, gn.num, g.status, g.rated_counted, g.reason, g.ended_at, p.rank, p.score, g.options_json
-     FROM game_players p JOIN games g ON g.id = p.game_id LEFT LEFT JOIN game_nums gn ON gn.game_id = g.id WHERE p.user_id = ? AND g.status IN ('finished', 'playing')
-     ORDER BY g.created_at DESC LIMIT 30`,
+     FROM game_players p JOIN games g ON g.id = p.game_id LEFT JOIN game_nums gn ON gn.game_id = g.id WHERE p.user_id = ? AND g.status IN ('finished', 'playing')
+     ORDER BY g.created_at DESC, g.id DESC LIMIT ? OFFSET ?`,
     userId,
+    HISTORY_PAGE_SIZE,
+    (shown - 1) * HISTORY_PAGE_SIZE,
   );
+  // the rating change of each game on this page (the `history` above is only the latest 50 rated games, for the chart)
+  const pageRatings =
+    recent.length === 0
+      ? []
+      : await db.all<HistoryRow>(
+          `SELECT game_id, rating_before, rating_after, rank, at FROM rating_history WHERE user_id = ? AND game_id IN (${recent.map(() => "?").join(", ")})`,
+          userId,
+          ...recent.map((g) => g.id),
+        );
   const finished = await db.all<FinishedGame>(
     `SELECT p.rank, p.score, g.rated_counted, g.options_json
      FROM game_players p JOIN games g ON g.id = p.game_id WHERE p.user_id = ? AND g.status = 'finished' AND g.reason = 'completed'
@@ -415,7 +439,18 @@ export async function profile(db: Db, userId: string) {
   );
   const ratings = history.map((h) => h.rating_after);
   const peak = Math.max(rating?.rating ?? 0, ...ratings);
-  return { user, rating: rating ?? null, history, recent, stats: computeStats(finished), peak };
+  return {
+    user,
+    rating: rating ?? null,
+    history,
+    recent,
+    pageRatings,
+    page: shown,
+    pages,
+    totalGames: total,
+    stats: computeStats(finished),
+    peak,
+  };
 }
 
 /** The time that must pass between two games that the same player creates (a second press of the button must not make a second game). */
@@ -572,7 +607,7 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
             COALESCE(json_extract(g.options_json, '$.expansion'), 0) AS expansion,
             g.ended_at
        FROM games g JOIN game_players p ON p.game_id = g.id AND p.seat = 0
-       LEFT LEFT JOIN game_nums gn ON gn.game_id = g.id LEFT JOIN user_nums un ON un.user_id = p.user_id
+       LEFT JOIN game_nums gn ON gn.game_id = g.id LEFT JOIN user_nums un ON un.user_id = p.user_id
       WHERE ${where.join(" AND ")} AND p.score IS NOT NULL
       ORDER BY p.score DESC, g.ended_at ASC
       LIMIT ?`,
