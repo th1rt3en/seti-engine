@@ -20,6 +20,8 @@ from . import card_defs, projection, replay, solar, tables
 VERSION = 1
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
+# a probe launched, an orbiter or a lander placed by something other than the main action of that name (a card effect, a reward, an organization, the
+# quick start ...)
 
 
 def _cell_kind(state: Any, ring: int, sector: int) -> str:
@@ -72,12 +74,25 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                 counts[seat][f"visit.{where}"] += 1
                 if sum(moved):
                     counts[seat][f"publicity.visit.{where}"] += sum(moved)
+        basic_done: set[str] = set()  # the launch that the launch action itself made (the first launch of the step)
+        for q in state.players:  # orbiters and landers placed in this step: the main action of that name places one, anything else is another source
+            if q.index in counts and q.index < len(before.players):
+                old = before.players[q.index]
+                for name, key, attr in (("orbit", "orbits.other", "orbiters"), ("land", "lands.other", "landers")):
+                    placed = sum(getattr(q, attr).values()) - sum(getattr(old, attr).values())
+                    if placed > 0:
+                        counts[q.index][key] += placed - (1 if q.index == seat and action.get("type") == name else 0)
         for e in result.events:
             t = e["type"]
             who = e.get("player")
             if who not in counts:
                 continue
             c = counts[who]
+            if t == "launch":
+                if who == seat and action.get("type") == "launch" and not basic_done:
+                    basic_done.add(t)  # the launch action itself
+                else:
+                    c["probes.launched.other"] += 1
             if t == "gains":
                 src = e["source"].get("kind", "other")
                 for res, amount in e["changes"].items():

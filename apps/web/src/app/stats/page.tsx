@@ -320,8 +320,29 @@ export default async function StatsPage({
                   value={round(m("probes.launched"))}
                   spread={sd("probes.launched")}
                 />
+                <Tile
+                  icon={<ActionIcon name="launch" size={28} />}
+                  label="Probes from effects"
+                  note="Launched without the launch action"
+                  value={round(m("probes.launched.other"))}
+                  spread={sd("probes.launched.other")}
+                />
                 <Tile icon={<ActionIcon name="orbit" size={28} />} label="Orbiters" value={round(m("orbiters"))} spread={sd("orbiters")} />
+                <Tile
+                  icon={<ActionIcon name="orbit" size={28} />}
+                  label="Orbiters from effects"
+                  note="Placed without the orbit action"
+                  value={round(m("orbits.other"))}
+                  spread={sd("orbits.other")}
+                />
                 <Tile icon={<ActionIcon name="land" size={28} />} label="Landers" value={round(m("landers"))} spread={sd("landers")} />
+                <Tile
+                  icon={<ActionIcon name="land" size={28} />}
+                  label="Landers from effects"
+                  note="Placed without the land action"
+                  value={round(m("lands.other"))}
+                  spread={sd("lands.other")}
+                />
                 <Tile icon={<DisplayCardIcon size={26} />} label="Cards drawn" value={round(m("cards.drawn"))} spread={sd("cards.drawn")} />
                 <Tile icon={<DeckCardIcon size={26} />} label="Cards played" value={round(m("cards.played"))} spread={sd("cards.played")} />
                 <Tile
@@ -335,6 +356,12 @@ export default async function StatsPage({
                   label="Missions completed"
                   value={round(m("missions.completed"))}
                   spread={sd("missions.completed")}
+                />
+                <Tile
+                  icon={<MissionIcon done size={30} />}
+                  label="Mission completion rate"
+                  note="Missions completed out of missions played"
+                  value={m("missions.played") > 0 ? `${Math.round((m("missions.completed") / m("missions.played")) * 100)}%` : "–"}
                 />
               </div>
             </Panel>

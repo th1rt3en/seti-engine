@@ -55,6 +55,21 @@ def test_every_player_has_counters_that_agree_with_each_other() -> None:
         assert c["incomerate.r1.credit"] >= 2 and c["incomerate.r5.credit"] >= c["incomerate.r1.credit"]
 
 
+def test_probes_orbits_and_landings_that_did_not_come_from_their_main_action_are_counted_apart() -> None:
+    """Every launch, orbit and landing is either the main action of that name or something else (a card, a reward, an organization tile)."""
+    seen_other = {"probes.launched.other": 0, "orbits.other": 0, "lands.other": 0}
+    for seed in (5, 7, 9, 11):
+        options, actions = play(seed, 2, expansion=bool(seed % 2), organizations=bool(seed % 2))
+        for p in stats.game_stats(file_of(options, actions))["players"]:
+            c = p["counters"]
+            assert c.get("probes.launched", 0) == c.get("action.launch", 0) + c.get("probes.launched.other", 0)
+            assert c.get("orbiters", 0) == c.get("action.orbit", 0) + c.get("orbits.other", 0)
+            assert c.get("landers", 0) == c.get("action.land", 0) + c.get("lands.other", 0)
+            for k in seen_other:
+                seen_other[k] += c.get(k, 0)
+    assert seen_other["probes.launched.other"] > 0, "the random games launch probes by cards or rewards too"
+
+
 def test_the_organizations_offered_and_picked_are_counted() -> None:
     options, actions = play(6, 2, expansion=True, organizations=True)
     s = stats.game_stats(file_of(options, actions))
