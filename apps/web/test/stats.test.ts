@@ -34,6 +34,23 @@ describe("statistics", () => {
     expect(aggregate(rows, parseFilter({ players: "9" })).rows).toBe(3); // not a number of players: any
   });
 
+  it("can leave the AI's rows out while the people of the same games still count, or keep only the AI's", () => {
+    const rows = [
+      row({ gameId: "a", seat: 0, userId: "u1", counters: { "action.launch": 4 } }),
+      row({ gameId: "a", seat: 1, userId: "bot:v001:0", counters: { "action.launch": 10 } }),
+      row({ gameId: "b", seat: 0, userId: "u2", counters: { "action.launch": 2 } }),
+    ];
+    const people = aggregate(rows, parseFilter({ who: "people" }));
+    expect(people.rows).toBe(2);
+    expect(people.mean["action.launch"]).toBe(3);
+    expect(people.games).toBe(2); // the game with the AI is still a game of this person
+    const ai = aggregate(rows, parseFilter({ who: "ai" }));
+    expect(ai.rows).toBe(1);
+    expect(ai.mean["action.launch"]).toBe(10);
+    expect(aggregate(rows, parseFilter({ who: "everybody" })).rows).toBe(3); // anything else is everybody
+    expect(aggregate(rows, any).rows).toBe(3);
+  });
+
   it("the scores: the final scores in order, their mean, the best, and the share of the players who won", () => {
     const rows = [
       row({ gameId: "a", seat: 0, score: 250, won: true }),

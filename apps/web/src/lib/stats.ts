@@ -19,24 +19,35 @@ export interface StatRow {
   eloDelta: number | null;
 }
 
-/** What the visitor chose to look at; null is "any". */
+/** What the visitor chose to look at; null is "any". `who` chooses whose numbers count: people only (the AI's rows are left out; the people of a game
+ * with an AI still count), the AI only, or everybody. */
 export interface StatFilter {
   players: number | null;
   expansion: boolean | null;
   rated: boolean | null;
+  who: "people" | "ai" | null;
 }
 
 const flag = (v: string | undefined): boolean | null => (v === "yes" ? true : v === "no" ? false : null);
 
-export function parseFilter(sp: { players?: string; expansion?: string; rated?: string }): StatFilter {
+export function parseFilter(sp: { players?: string; expansion?: string; rated?: string; who?: string }): StatFilter {
   const n = Number(sp.players);
-  return { players: Number.isInteger(n) && n >= 1 && n <= 4 ? n : null, expansion: flag(sp.expansion), rated: flag(sp.rated) };
+  return {
+    players: Number.isInteger(n) && n >= 1 && n <= 4 ? n : null,
+    expansion: flag(sp.expansion),
+    rated: flag(sp.rated),
+    who: sp.who === "people" || sp.who === "ai" ? sp.who : null,
+  };
 }
+
+/** A seat of the AI model has the user id `bot:<version>:<n>` (the Worker's room). */
+const isAi = (r: StatRow): boolean => r.userId.startsWith("bot:");
 
 export const matches = (r: StatRow, f: StatFilter): boolean =>
   (f.players === null || r.players === f.players) &&
   (f.expansion === null || r.expansion === f.expansion) &&
-  (f.rated === null || r.rated === f.rated);
+  (f.rated === null || r.rated === f.rated) &&
+  (f.who === null || isAi(r) === (f.who === "ai"));
 
 export interface OrgStat {
   org: string;

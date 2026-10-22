@@ -85,7 +85,7 @@ const Blank = () => <span className="icon-blank" aria-hidden="true" />;
 
 export default async function StatsPage({
   searchParams,
-}: { searchParams: Promise<{ players?: string; expansion?: string; rated?: string }> }) {
+}: { searchParams: Promise<{ players?: string; expansion?: string; rated?: string; who?: string }> }) {
   const sp = await searchParams;
   const filter = parseFilter(sp);
   const s = aggregate(await statRows(getDb(), filter), filter);
@@ -97,6 +97,7 @@ export default async function StatsPage({
   if (filter.players !== null) base.players = String(filter.players);
   if (filter.expansion !== null) base.expansion = filter.expansion ? "yes" : "no";
   if (filter.rated !== null) base.rated = filter.rated ? "yes" : "no";
+  if (filter.who !== null) base.who = filter.who;
 
   const actions: { key: string; label: string; icon: ReactNode }[] = [
     { key: "launch", label: "Launch", icon: <ActionIcon name="launch" size={26} /> },
@@ -200,6 +201,19 @@ export default async function StatsPage({
               { value: "", label: "Any" },
               { value: "yes", label: "Rated" },
               { value: "no", label: "Casual" },
+            ]}
+          />
+        </div>
+        <div>
+          <span className="stat-filter-name">Players</span>
+          <Pills
+            name="who"
+            current={filter.who ?? ""}
+            base={base}
+            choices={[
+              { value: "", label: "Everybody" },
+              { value: "people", label: "People only" },
+              { value: "ai", label: "AI only" },
             ]}
           />
         </div>
