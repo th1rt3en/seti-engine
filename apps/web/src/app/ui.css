@@ -1042,6 +1042,16 @@ table.shortcuts td:first-child {
   object-fit: cover;
   margin: 0 2px;
 }
+
+/* the species board as a small icon: the whole board (it is taller than wide), not cropped */
+.mini-board {
+  height: 2.4rem;
+  width: auto;
+  aspect-ratio: 777 / 1415;
+  border-radius: 6px 6px 3px 3px;
+  margin: 0 4px 0 2px;
+  flex: none;
+}
 .stack-bar {
   display: flex;
   gap: 2px;

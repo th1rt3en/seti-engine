@@ -22,6 +22,7 @@ import { type Spread, aggregate, parseFilter, spreadOf } from "@/lib/stats";
 import { TECH_INFO } from "@/lib/techs";
 import type { ReactNode } from "react";
 import assets from "../../generated/assets.json";
+import expansionAssets from "../../generated/expansion-assets.json";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Statistics" };
@@ -30,7 +31,11 @@ const pct = (x: number): string => `${Math.round(x * 100)}%`;
 const cap = (w: string): string => w.charAt(0).toUpperCase() + w.slice(1);
 const signed = (x: number): string => `${x > 0 ? "+" : ""}${round(x)}`;
 const SPECIES_NAMES: Record<string, string> = { oumuamua: "'Oumuamua" };
-const BACKS = assets.alienBacks as Record<string, string>;
+/** The picture of a species board (the five of the base game, and the expansion's), shown small as the icon of the species. */
+const BOARDS = { ...(assets.species as Record<string, string>) };
+for (const [key, src] of Object.entries(expansionAssets as Record<string, string>)) {
+  if (key.startsWith("boards/") && !key.includes("-")) BOARDS[key.slice(7)] ??= src;
+}
 const TECH_CATEGORIES = ["probe", "telescope", "computer"];
 const SECTOR_COLORS = ["red", "yellow", "blue", "black"];
 const TRACE_COLORS = ["pink", "yellow", "blue"];
@@ -270,7 +275,7 @@ export default async function StatsPage({
                   key: x.species,
                   label: (
                     <span className="icon-label">
-                      {BACKS[x.species] ? <img src={BACKS[x.species]} alt="" width={20} height={28} className="thumb" /> : <Blank />}
+                      {BOARDS[x.species] ? <img src={BOARDS[x.species]} alt="" width={22} height={40} className="mini-board" /> : <Blank />}
                       {SPECIES_NAMES[x.species] ?? cap(x.species)}
                     </span>
                   ),
