@@ -8,7 +8,7 @@ from test_engine import do, with_state
 
 from seti_engine import card_defs, cards, solar, tables
 from seti_engine.engine import StepResult, apply, legal_moves
-from seti_engine.models import GameState, MissionState, Probe
+from seti_engine.models import ComputerTech, GameState, MissionState, Probe
 
 
 def go(s: GameState, n: int, answer: bool = True) -> StepResult:
@@ -99,6 +99,64 @@ def test_sa5_servicing_mission_returns_next_to_earth_only() -> None:  # SA.5
     assert "SA.5" in me(r).hand and me(r).movement == 1
     r = go(ready(), 5)
     assert "SA.5" not in me(r).hand
+
+
+def far_from_earth(s: GameState) -> tuple[int, int]:
+    """A space that is not adjacent to Earth, with a space next to it that is (one movement away from the condition of SA.5)."""
+    near = set(solar.adjacent(*solar.earth(s)))
+    for ring, sector in near:
+        for cell in solar.adjacent(ring, sector):
+            if cell not in near and cell != solar.earth(s) and solar.visible(s, *cell)[1] != "NULL":
+                return cell
+    raise AssertionError("no space")
+
+
+def test_sa5_waits_for_the_movement_it_gave_and_returns_after_a_probe_moved_next_to_earth() -> None:  # SA.5, EXP-SA5-01
+    s = ready()
+    start = far_from_earth(s)
+    near = next(c for c in solar.adjacent(*solar.earth(s)) if c in solar.adjacent(*start))
+    probe_at(s, *start, "n1")
+    r = go(s, 5, answer=False)
+    assert r.state.pending and r.state.pending[0].kind == "hold" and me(r).movement == 1
+    assert {"type": "hold_done"} in r.legal and {"type": "move_probe", "probe": "n1", "to": list(near)} in r.legal
+    r = apply(r.state, {"type": "move_probe", "probe": "n1", "to": list(near)})  # a free action interrupts the card (FREE-00)
+    assert r.state.pending and r.state.pending[0].kind == "hold" and "SA.5" not in me(r).hand
+    r = apply(r.state, {"type": "hold_done"})
+    assert not r.state.pending and "SA.5" in me(r).hand
+
+
+def test_sa5_without_moving_next_to_earth_the_card_is_discarded() -> None:  # SA.5, EXP-SA5-01
+    s = ready()
+    probe_at(s, *far_from_earth(s), "n1")
+    r = go(s, 5, answer=False)
+    r = apply(r.state, {"type": "hold_done"})
+    assert not r.state.pending and "SA.5" not in me(r).hand and "SA.5" in r.state.discard
+
+
+def test_sa5_does_not_wait_when_the_probe_is_already_there_or_there_is_nothing_to_move() -> None:  # SA.5, EXP-SA5-01
+    s = ready()
+    probe_at(s, *solar.adjacent(*solar.earth(s))[0], "n1")
+    r = go(s, 5, answer=False)
+    assert not r.state.pending and "SA.5" in me(r).hand  # the condition is true at once
+    r = go(ready(), 5, answer=False)
+    assert not r.state.pending and "SA.5" not in me(r).hand  # no probe in space: nothing to wait for
+    s = ready()
+    probe_at(s, *far_from_earth(s), "n1")
+    s.players[s.current_player].movement = 0
+    assert go(s, 5, answer=False).state.pending[0].kind == "hold"  # the card itself gives the movement, so it waits
+
+
+def test_sa38_waits_for_the_movement_and_scores_after_a_probe_joined_another() -> None:  # SA.38, EXP-SA5-01
+    s = ready(publicity=0)
+    probe_at(s, 2, 3, "b", other(s))
+    ring, sector = solar.adjacent(2, 3)[0]
+    probe_at(s, ring, sector, "a")
+    score = s.players[s.current_player].score
+    r = go(s, 38, answer=False)
+    assert r.state.pending[0].kind == "hold" and me(r).score == score
+    r = apply(r.state, {"type": "move_probe", "probe": "a", "to": [2, 3]})
+    r = apply(r.state, {"type": "hold_done"})
+    assert not r.state.pending and me(r).score - score >= 3
 
 
 def test_sa6_live_landing_broadcast_marks_a_signal_where_you_landed() -> None:  # SA.6
@@ -400,6 +458,17 @@ def test_sa35_nasa_exoplanet_archive() -> None:  # SA.35
     assert {"type": "complete_mission", "card": "SA.35"} in legal_moves(st)
     p.data_pool, p.computer = 5, [True] * 6
     assert {"type": "complete_mission", "card": "SA.35"} not in legal_moves(st)
+    # EXP-SA35-01: the data on the lower spaces of the computer techs are in the computer too (ANALYZE-02)
+    p.computer_techs = {0: ComputerTech(tech="computer-dot", lower_filled=True), 2: ComputerTech(tech="computer-link", lower_filled=True)}
+    p.data_pool, p.computer = 4, [True] * 6
+    assert {"type": "complete_mission", "card": "SA.35"} in legal_moves(st)  # 6 + 2 + 4
+    p.data_pool = 3
+    assert {"type": "complete_mission", "card": "SA.35"} not in legal_moves(st)  # 11
+    p.computer_techs[2].lower_filled = False
+    p.data_pool = 5
+    assert {"type": "complete_mission", "card": "SA.35"} in legal_moves(st)  # 6 + 1 + 5
+    p.data_pool = 4
+    assert {"type": "complete_mission", "card": "SA.35"} not in legal_moves(st)  # 11
 
 
 def test_sa36_big_ear_marks_a_yellow_a_red_and_a_blue_signal() -> None:  # SA.36

@@ -7,13 +7,6 @@
  "choose_gold": [
   "tile"
  ],
- "choose_land_slot": [
-  "slot"
- ],
- "choose_message": [
-  "hex",
-  "reward"
- ],
  "choose_org": [
   "org"
  ],
@@ -64,6 +57,7 @@
   "card"
  ],
  "hand_signal_done": [],
+ "hold_done": [],
  "land": [
   "probe"
  ],
@@ -71,10 +65,6 @@
   "probe"
  ],
  "launch": [],
- "mark_objective": [
-  "objective",
-  "task"
- ],
  "mark_signal": [
   "sector"
  ],
@@ -169,19 +159,14 @@
  "scan_probe": [
   "mode"
  ],
- "scan_skip": [],
  "scan_token": [
   "source"
- ],
- "show_move": [
-  "card"
  ],
  "show_move_done": [],
  "signal_where": [
   "where"
  ],
  "skip_breach": [],
- "skip_exertian": [],
  "skip_land": [],
  "skip_tuck": [],
  "slingshot_pick": [

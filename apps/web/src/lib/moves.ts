@@ -95,6 +95,7 @@ export const LABELS: Record<string, Label> = {
   amoeba_remove: (m) => `Remove your marker from the ${String(m.color)} space ${Number(m.index) + 1} of the Amoeba board`,
   spend_credit: () => "Spend 1 credit for 2 VP and 2 publicity",
   spend_done: () => "Stop spending credits",
+  hold_done: () => "Done moving: check the card now",
   restructure_card: (m) => `Discard ${cardName(m.card)} and gain its income resource`,
   restructure_done: () => "Stop discarding cards",
   return_mission: (m) => `Return the mission ${cardName(m.card)} to your hand`,

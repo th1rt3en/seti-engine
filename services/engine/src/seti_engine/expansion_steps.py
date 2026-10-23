@@ -36,6 +36,13 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
     t = st["t"]
     if t == "return_card":  # SA.1, SA.5, SA.14: the card goes back to the hand instead of the discard pile (PLAY-02)
         s.play_return = True
+    elif t == "hold":
+        # EXP-SA5-01 (owner, 2026-10-23): the "then, if ..." of SA.5 and SA.38 comes after the player had the chance to use the movement
+        # just gained (a free action may interrupt the card, FREE-00): it waits while the condition is false and a probe can still move
+        from . import cards  # noqa: PLC0415 - cards imports this module
+
+        if p.movement > 0 and _own_probes(s, p) and not cards.cond_ok(s, p, st["cond"]):
+            s.pending.append(Decision(kind="hold", player=p.index))
     elif t == "show_corner":  # SA.2
         s.pending.append(Decision(kind="corner_pick", player=p.index))
     elif t == "paid_media":  # SA.17
@@ -116,7 +123,8 @@ def cond_ok(s: GameState, p: PlayerState, c: dict[str, Any]) -> bool | None:
     if k == "no_resources":  # SA.28: 0 credits, 0 energy and no cards in hand
         return p.credits == 0 and p.energy == 0 and not p.hand
     if k == "data_total":  # SA.35: data in the computer and in the data pool
-        return bool(sum(p.computer) + p.data_pool >= c["n"])
+        lower = sum(1 for t in p.computer_techs.values() if t.lower_filled)  # EXP-SA35-01: the lower spaces count (ANALYZE-02)
+        return bool(sum(p.computer) + lower + p.data_pool >= c["n"])
     if k == "probe_shared":  # SA.38: a probe on a space with another probe
         spaces = [(pr.ring, pr.sector) for pr in s.probes if not pr.capsule]
         return any(spaces.count((pr.ring, pr.sector)) >= 2 for pr in _own_probes(s, p))
@@ -169,6 +177,8 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
         return [{"type": "corner_pick", "kind": k} for k in CORNERS]
     if d.kind == "glyph_group":
         return [{"type": "glyph_group", "group": i} for i in range(len(d.data["groups"]))]
+    if d.kind == "hold":
+        return [{"type": "hold_done"}]
     if d.kind == "spend_credit":
         return [{"type": "spend_credit"}, {"type": "spend_done"}]
     if d.kind == "restructure":
@@ -204,7 +214,7 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         effects.gain_publicity(s, p, 2)
         if p.credits >= 1:
             s.pending.insert(0, Decision(kind="spend_credit", player=p.index))
-    elif t == "spend_done":
+    elif t == "spend_done" or t == "hold_done":
         pass
     elif t == "restructure_card":  # SA.28: a discarded card gives its income resource
         p.hand.remove(a["card"])

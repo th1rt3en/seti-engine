@@ -53,3 +53,15 @@ Moving the Futurespan token 3 spaces farther (EXP-ORG-12) gains 1 card that the 
 ## Glyphids: the top row of the board takes any number of markers, 2026-10-18
 
 The three top spaces of the Glyphids board (EXP-GLY-04) are replenished at once, so they take any number of markers, like the top capsule of the base species boards (`repeat` in `expansion-glyphids.json`); each marker takes the new token. The lower spaces take one marker.
+
+## Servicing Mission (SA.5) and SA.38: "then" comes after the movement, 2026-10-23 (EXP-SA5-01)
+
+"Gain 1 data and 1 movement. Then, if you have a probe on a space adjacent to Earth, return this card to your hand." The check comes **after** the player had the chance to
+use the movement that the card gave (a free action may interrupt a card, FREE-00). The engine asks the player (the decision `hold`, the move `hold_done`) when the condition
+is not true yet and the player has a movement and a probe; a probe moved with that movement counts. The same order holds for SA.38 (a probe sharing a space, 3 VP).
+Reported by a player (a probe moved next to Earth with the movement and the card was not returned); decided by the owner.
+
+## NASA Exoplanet Archive (SA.35): the data of the computer, 2026-10-23 (EXP-SA35-01)
+
+"A total of at least 12 data in your computer and data pool": the computer is every space (ANALYZE-02), so the data on the lower spaces of the computer techs count with the top
+row and the data pool. (The engine counted the top row and the pool only; a player with 13 could not complete the mission.)

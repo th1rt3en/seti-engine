@@ -455,7 +455,8 @@ CARDS.update(
         "SA.2": {"fx": [R("show_corner")]},
         "SA.3": {"fx": [R("signal_token", 3)]},
         "SA.4": {"fx": [R("signal_token"), move(1)]},
-        "SA.5": {"fx": [data(1), move(1), when({"c": "adjacent_earth"}, R("return_card"))]},
+        # EXP-SA5-01: the "then" waits for the movement that the card gave (SA.5 and SA.38)
+        "SA.5": {"fx": [data(1), move(1), R("hold", cond={"c": "adjacent_earth"}), when({"c": "adjacent_earth"}, R("return_card"))]},
         "SA.6": {"fx": [move(1), R("land_free", signal_here=True)]},
         "SA.7": {"fx": [ROT, research("probe")], "mission": quick({"c": "probes_planets", "n": 2}, credit(2))},
         "SA.8": {"fx": [ROT, research("computer")], "end": end("per_data", 3)},
@@ -488,7 +489,7 @@ CARDS.update(
         "SA.35": {"fx": [R("signal_token")], "mission": quick({"c": "data_total", "n": 12}, energy(1))},
         "SA.36": {"fx": [sig_color("yellow"), sig_color("red"), sig_color("blue")]},
         "SA.37": {"fx": [R("sig_each_marked")]},
-        "SA.38": {"fx": [pub(1), move(1), when({"c": "probe_shared"}, vp(3))]},
+        "SA.38": {"fx": [pub(1), move(1), R("hold", cond={"c": "probe_shared"}), when({"c": "probe_shared"}, vp(3))]},
         "SA.39": {"fx": [move(2)], "end": end("per_planets_orb_or_land", 2)},
         "SA.40": {"fx": [move(5)]},
         "SA.41": {"fx": [R("signal_token"), pub(1), card(1)], "end": end("sig_all_colors", 4)},
