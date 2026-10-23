@@ -94,6 +94,13 @@ def prompts(s: GameState) -> tuple[GameState, list[dict[str, Any]], list[Any]]:
     for i, name in enumerate(names):
         if name == "amoeba":
             s.species[i].board = species.new_board("amoeba")  # the markers that `amoeba_remove` needed are not part of the picture
+    if "amoeba" in names:
+        # the engine offers an organelle where there is one (five of the nine spaces); all nine are added to see where they lie
+        have = {m["space"] for m in legal if m["type"] == "pick_organelle"}
+        for sp in [x for ring in ("outer", "inner") for x, _ in amoeba.data()["rings"][ring]]:
+            if sp not in have:
+                legal.append({"type": "pick_organelle", "space": sp, "color": amoeba.color_of(sp)})
+                notes.append(None)
     if "glyphids" in names:
         # the engine offers the holes of the top row only when the holes under them are filled; they are added here (as the page draws them) to see where they lie
         for g in sorted(set(glyphids.data()["glyphs"])):
@@ -133,7 +140,8 @@ def markers(s: GameState, rnd: random.Random) -> GameState:
         elif slot.species == "amoeba":
             ring = amoeba.data()["rings"]
             spaces = [sp for r in ("outer", "inner") for sp, _ in ring[r]]
-            slot.extra["organelles"] = {sp: rnd.randrange(len(amoeba.data()["organelles"])) for sp in spaces[:5]}
+            # the game has five organelles; for the review every one of the nine spaces holds one, to see each place
+            slot.extra["organelles"] = {sp: rnd.randrange(len(amoeba.data()["organelles"])) for sp in spaces}
     return s
 
 

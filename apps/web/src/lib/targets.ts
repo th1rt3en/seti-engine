@@ -40,9 +40,9 @@ export const ORGANELLE_SPACES: Record<string, [number, number]> = {
   B2: [568, 617],
   P1: [234, 624],
   P2: [152, 471],
-  IY: [397, 320],
+  IY: [397, 331],
   IP: [312, 467],
-  IB: [475, 447],
+  IB: [482, 463],
 };
 /** The organelle tokens in the order of the engine's data: a random card, 1 data, 1 publicity, 2 points, 4 points. */
 export const ORGANELLE_TOKENS = ["1-card", "1-data", "1-pub", "2-score", "4-score"];

@@ -67,6 +67,72 @@ const SAMPLES = assets.samples as Record<string, string> & { back: string };
 const SOLAR_BUTTON_RADIUS = 1030;
 // how far above the centre of its top space (in pixels of the species board) the first marker of a top capsule lies, for the boards whose top space has a reward in it
 const TOP_CAPSULE_RISE: Record<string, number> = { centaurians: 80 };
+
+/** The size of a marker on the single-marker spaces: a space of a species board, a discovery or an overflow space, a sample space, the places of the gold tiles. */
+const SLOT_MARKER = GOLD_MARKER;
+
+/** A sample space of the Mascamites: the token lies on it face up, and the marker of the player who marked it covers it completely. Pointing at the marker
+ * (the mouse), or pressing it for a moment (a finger), lifts it aside to show the token and its reward. */
+function SampleSpace({
+  href,
+  x,
+  y,
+  marker,
+  title,
+  markerTitle,
+}: { href: string; x: number; y: number; marker: PieceColor | null; title: string; markerTitle: string }) {
+  const [lifted, setLifted] = useState(false);
+  const press = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clear = () => {
+    if (press.current !== null) clearTimeout(press.current);
+    press.current = null;
+  };
+  const size = marker === null ? 112 : 88; // the token under a marker is drawn so that the marker covers it
+  return (
+    <g>
+      <image href={href} x={x - size / 2} y={y - size / 2} width={size} height={size}>
+        <title>{title}</title>
+      </image>
+      {marker !== null ? (
+        <g
+          style={{
+            opacity: lifted ? 0.18 : 1,
+            touchAction: "manipulation",
+            WebkitTouchCallout: "none",
+            userSelect: "none",
+            cursor: "help",
+          }}
+          onPointerEnter={(e) => e.pointerType === "mouse" && setLifted(true)}
+          onPointerLeave={(e) => {
+            if (e.pointerType === "mouse") setLifted(false);
+            else {
+              clear();
+              setLifted(false);
+            }
+          }}
+          onPointerDown={(e) => {
+            if (e.pointerType === "mouse") return;
+            clear();
+            press.current = setTimeout(() => setLifted(true), 350);
+          }}
+          onPointerUp={() => {
+            clear();
+            setLifted(false);
+          }}
+          onPointerCancel={() => {
+            clear();
+            setLifted(false);
+          }}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          {/* the place of the marker stays under the pointer when the marker is lifted aside, so that it does not drop and lift again */}
+          <circle cx={x} cy={y} r={58} fill="transparent" />
+          <Marker x={x} y={lifted ? y - 70 : y} size={SLOT_MARKER} color={marker} title={markerTitle} />
+        </g>
+      ) : null}
+    </g>
+  );
+}
 const NEXT_DISC_SIZE = 150; // the indicator of the disc that turns next (the picture is the disc of the icon, 69 px of the board picture)
 const cap = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 const GOLD_TILES = assets.gold as Record<string, { src: string; per: string; values: number[] }>;
@@ -858,23 +924,20 @@ export function BoardView({
                 const href = SAMPLES[String(space.token)];
                 if (!at || !href) return null;
                 const p = onAlienBoard(i, at[0], at[1]);
-                const size = 112;
+                const marked = space.marker !== null && space.marker !== undefined;
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the spaces fill in order
-                  <g key={j}>
-                    <image href={href} x={p.x - size / 2} y={p.y - size / 2} width={size} height={size}>
-                      <title>{`Sample space ${j + 1}`}</title>
-                    </image>
-                    {space.marker !== null && space.marker !== undefined ? (
-                      <Marker
-                        x={p.x + 42}
-                        y={p.y - 42}
-                        size={52}
-                        color={color(space.marker)}
-                        title={`${who(space.marker)}: marker on the sample space`}
-                      />
-                    ) : null}
-                  </g>
+                  <SampleSpace
+                    // biome-ignore lint/suspicious/noArrayIndexKey: the spaces fill in order
+                    key={j}
+                    href={href}
+                    x={p.x}
+                    y={p.y}
+                    marker={marked ? color(space.marker as number) : null}
+                    title={`Sample space ${j + 1}`}
+                    markerTitle={
+                      marked ? `${who(space.marker as number)}: marker on the sample space (point at it to see the token under it)` : ""
+                    }
+                  />
                 );
               })}
             </g>
@@ -921,7 +984,7 @@ export function BoardView({
                       key={`sb-${i}-${colour}-${k}-${n}`}
                       x={base.x}
                       y={base.y - n * 22 - (k === 0 ? (TOP_CAPSULE_RISE[sp.species] ?? 0) : 0)}
-                      size={86}
+                      size={SLOT_MARKER}
                       color={color(player)}
                       title={`${who(player)}: marker on the ${colour} space of ${sp.species}`}
                     />,
@@ -940,7 +1003,7 @@ export function BoardView({
                 key={`of-${i}-${n}`}
                 x={at.x}
                 y={at.y + 190 - sp.overflow_kinds.slice(0, n).filter((c) => c === colour).length * 20}
-                size={80}
+                size={SLOT_MARKER}
                 color={color(player)}
                 title={`${who(player)}: marker on the ${colour} overflow space`}
               />,
@@ -960,7 +1023,7 @@ export function BoardView({
                 key={`${sp.discovery_spaces.join("")}-${i}-${k}`}
                 x={at.x}
                 y={at.y}
-                size={92}
+                size={SLOT_MARKER}
                 color={neutral ? "neutral" : color(player)}
                 title={neutral ? "Neutral marker" : `${who(player)}: marker on a discovery space`}
               />
