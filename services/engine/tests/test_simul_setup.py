@@ -66,7 +66,7 @@ def test_nothing_of_a_choice_is_shown_before_everybody_has_locked_in() -> None: 
     assert all(c == projection.HIDDEN for c in p1.offered_orgs + p1.offered_quick) or not (p1.offered_orgs + p1.offered_quick)
     assert r.state.players[1].setup_org is not None  # the engine keeps it
     assert [d.player for d in r.state.pending] == [0]  # the locked player is not asked any more
-    assert projection.project(r.state, 1, previews=False).legal == []  # and has nothing to do but wait
+    assert [m["type"] for m in projection.project(r.state, 1, previews=False).legal] == ["setup_unlock"]  # and can only unlock
     assert projection.project(r.state, 0, previews=False).legal  # the other still chooses
 
 
@@ -142,3 +142,49 @@ def test_the_flag_is_off_by_default_and_needs_the_organizations() -> None:
     seq = new(2, simul=False)
     assert [d.kind for d in seq.state.pending][:2] == ["choose_org", "choose_quick"]
     assert legal_moves(seq.state) and "seat" not in legal_moves(seq.state)[0]
+
+
+def test_a_player_who_has_locked_in_may_unlock_while_somebody_else_has_not() -> None:  # EXP-ORG-14
+    r = new(3)
+    r = lock_in(r, 1)
+    assert any(m["type"] == "setup_unlock" and m["seat"] == 1 for m in r.legal)
+    assert not any(m["type"] == "setup_unlock" and m["seat"] == 0 for m in r.legal)  # seat 0 has not locked in
+    v = projection.project(r.state, 1, previews=False)
+    assert [m["type"] for m in v.legal] == ["setup_unlock"] and 1 not in v.acting  # not one to act, but may unlock
+    org, quick = r.state.players[1].setup_org, r.state.players[1].setup_quick
+    r = apply(r.state, {"type": "setup_unlock", "seat": 1})
+    assert r.events == [{"type": "setup_unlocked", "player": 1}]
+    p = r.state.players[1]
+    assert not p.setup_locked and (p.setup_org, p.setup_quick) == (org, quick)  # the choices are kept
+    assert sorted(projection.acting(r.state)) == [0, 1, 2]
+    assert any(m["type"] == "setup_lock" and m["seat"] == 1 for m in r.legal)  # and can be locked again at once
+    assert any(m["type"] == "choose_org" and m["seat"] == 1 for m in r.legal)  # or changed
+
+
+def test_nobody_can_unlock_when_everybody_else_has_locked_in_and_the_last_lock_ends_the_setup() -> None:  # EXP-ORG-14
+    r = new(2)
+    r = lock_in(r, 1)
+    r = lock_in(r, 0)  # the last lock: the setup is resolved at once, so there is nobody to unlock for
+    assert not any(m["type"] == "setup_unlock" for m in r.legal)
+    with pytest.raises(IllegalAction):
+        apply(r.state, {"type": "setup_unlock", "seat": 1})
+
+
+def test_a_lock_and_an_unlock_that_cross_end_the_same_way_in_either_order() -> None:  # EXP-ORG-14 (the room runs one move at a time)
+    r = new(2)
+    r = lock_in(r, 1)
+    for _ in range(2):
+        r = apply(r.state, pick(r, 0, "choose_org")) if not r.state.players[0].setup_org else r
+        r = apply(r.state, pick(r, 0, "choose_quick")) if not r.state.players[0].setup_quick else r
+    base = r
+    # the lock of seat 0 first: the setup is resolved, the unlock of seat 1 is then refused
+    a = apply(base.state, {"type": "setup_lock", "seat": 0})
+    assert a.state.phase in ("setup", "play") and not any(d.kind == "setup_choice" for d in a.state.pending)
+    with pytest.raises(IllegalAction):
+        apply(a.state, {"type": "setup_unlock", "seat": 1})
+    # the unlock of seat 1 first: both choose again; the lock of seat 0 then waits for seat 1
+    b = apply(base.state, {"type": "setup_unlock", "seat": 1})
+    b = apply(b.state, {"type": "setup_lock", "seat": 0})
+    assert [d.player for d in b.state.pending] == [1] and not b.state.players[1].setup_locked
+    b = apply(b.state, {"type": "setup_lock", "seat": 1})
+    assert not any(d.kind == "setup_choice" for d in b.state.pending)

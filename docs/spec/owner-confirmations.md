@@ -71,3 +71,10 @@ row and the data pool. (The engine counted the top row and the pool only; a play
 All players choose the organization and the quick start cards at the same time, each in secret, and lock the choice in. Every clock runs until its player locks in; the
 choices of the others are not shown (views, log) until all have locked in. Then the starts run in turn order. The option `simul_setup` is set when a game with
 organizations and 2 or more players starts; games started before keep the choices one after another (their logs replay as they were). The AI chooses at once on its own view.
+
+## Unlocking in the simultaneous setup, 2026-10-23 (EXP-ORG-14)
+
+A player who has locked in may unlock to change the organization or the quick start cards, for as long as at least one other player has not locked in (the last lock ends the
+setup at once, so nobody can unlock after it). The choices are kept when they unlock. Their clock runs again from the time it had left when they locked in (a per-turn clock
+from the time it had used) and stops at the next lock; locking gives no increment, so locking and unlocking again gains no time. A lock and an unlock that arrive at the
+same moment are taken one after the other by the room: if the last lock comes first the unlock is refused, else the lock waits for the player who unlocked.

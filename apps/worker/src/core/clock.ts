@@ -16,6 +16,8 @@ export interface ClockState {
   runs: Run[];
   /** Time left per player, for the bank clock. */
   bank: number[];
+  /** Per-turn clock in the simultaneous setup: the time that a player who locked in had used (it runs on from there when they unlock). */
+  spent?: Record<number, number>;
 }
 
 export function initialClock(settings: ClockSettings, players: number): ClockState {
@@ -32,8 +34,29 @@ export function normalize(raw: ClockState | { running: number | null; since: num
 export function start(clock: ClockState, players: number | number[], now: number): ClockState {
   const seats = Array.isArray(players) ? players : [players];
   const kept = clock.runs.filter((r) => seats.includes(r.seat));
-  const added = seats.filter((s) => !kept.some((r) => r.seat === s)).map((seat) => ({ seat, since: now }));
+  // a player who unlocks in the simultaneous setup goes on with the time they had left (a per-turn clock remembers what was used)
+  const added = seats.filter((s) => !kept.some((r) => r.seat === s)).map((seat) => ({ seat, since: now - (clock.spent?.[seat] ?? 0) }));
   return { ...clock, runs: [...kept, ...added] };
+}
+
+/** The player locked in (simultaneous setup, EXP-ORG-14): their clock stops, the time used is charged and there is no increment (it would be gained again
+ * with every unlock and lock). A per-turn clock remembers the time used, so that the allowance is not new when they unlock. */
+export function pause(settings: ClockSettings, clock: ClockState, now: number, seat: number): ClockState {
+  const run = clock.runs.find((r) => r.seat === seat);
+  const rest = clock.runs.filter((r) => r.seat !== seat);
+  if (run === undefined) return clock;
+  if (settings.kind === "bank") {
+    const bank = [...clock.bank];
+    bank[seat] = (bank[seat] ?? 0) - (now - run.since);
+    return { ...clock, runs: rest, bank };
+  }
+  return { ...clock, runs: rest, spent: { ...(clock.spent ?? {}), [seat]: now - run.since } };
+}
+
+/** The setup is over: nobody's paused time is kept. */
+export function clearPaused(clock: ClockState): ClockState {
+  const { spent: _spent, ...rest } = clock;
+  return rest;
 }
 
 /** Stop the clock of `seat` (all running clocks without it) after the player acted: the bank loses the elapsed time and gains the increment. */

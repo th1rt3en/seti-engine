@@ -488,7 +488,9 @@ export class GameRoom {
     const count = (await this.d.store.get<number>("logcount")) ?? 0;
     // a move of the simultaneous setup (it names its seat, EXP-ORG-14) is made while the others move too, so the count the client saw is not asked for
     if (seq !== count && action.seat === undefined) return fail("stale", `the game is at action ${count}, not ${seq}`);
-    if (!actors(state).includes(seat)) return fail("not_your_turn", "it is not your turn");
+    // in the simultaneous setup a player who has locked in is not asked, but may unlock (the engine decides whether it is legal now)
+    const unlocking = action.type === "setup_unlock" && state.pending[0]?.kind === "setup_choice";
+    if (!actors(state).includes(seat) && !unlocking) return fail("not_your_turn", "it is not your turn");
     // EXP-ORG-14: a move of the simultaneous setup names its seat; nobody may move for another seat
     if (action.seat !== undefined && action.seat !== seat) return fail("not_your_turn", "that move is for another player");
     return this.play(meta, seat, count, state, action);
@@ -512,7 +514,11 @@ export class GameRoom {
     // A move of the simultaneous setup that leaves the player choosing (EXP-ORG-14: choosing again) does not stop their clock: only the lock does,
     // so that nobody gains time by choosing again and again.
     const keepsChoosing = action.seat !== undefined && actors(res.state).includes(seat);
-    if (!keepsChoosing) await this.d.store.put("clock", clocks.stop(meta.clock, await this.clockOf(meta), now, seat));
+    if (!keepsChoosing) {
+      const base = await this.clockOf(meta);
+      const locking = state.pending[0]?.kind === "setup_choice"; // the setup: a lock pauses the clock, with no increment
+      await this.d.store.put("clock", locking ? clocks.pause(meta.clock, base, now, seat) : clocks.stop(meta.clock, base, now, seat));
+    }
     if (res.state.phase === "finished") {
       await this.finish(meta, res.state, "completed");
       return { ok: true };
@@ -659,7 +665,8 @@ export class GameRoom {
 
   private async runClock(meta: Meta, state: GameState): Promise<void> {
     const who = actors(state);
-    const base = await this.clockOf(meta);
+    let base = await this.clockOf(meta);
+    if (state.pending[0]?.kind !== "setup_choice") base = clocks.clearPaused(base);
     const clock = who.length === 0 ? base : clocks.start(base, who, this.d.now());
     await this.d.store.put("clock", clock);
     // Only a game of 1 or 2 players ends at once when a clock runs out; in the others the players decide (kick).

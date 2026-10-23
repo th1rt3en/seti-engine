@@ -34,8 +34,9 @@ class SimulEngine implements Engine {
     };
   }
   private legal(s: Sim): Action[] {
-    if (s.phase === "setup")
-      return s.pending.flatMap((d) => {
+    if (s.phase === "setup") {
+      const open = new Set(s.pending.map((d) => d.player));
+      const choosing = s.pending.flatMap((d) => {
         const p = s.players[d.player] as Sim["players"][number];
         return [
           { type: "choose_org", org: "a", seat: d.player },
@@ -43,6 +44,11 @@ class SimulEngine implements Engine {
           ...(p.setup_org ? [{ type: "setup_lock", seat: d.player }] : []),
         ];
       });
+      const unlocking = s.players
+        .filter((p) => p.setup_locked && [...open].some((o) => o !== p.index))
+        .map((p) => ({ type: "setup_unlock", seat: p.index }));
+      return [...choosing, ...unlocking];
+    }
     return s.phase === "play" ? [{ type: "score" }] : [];
   }
   async newGame(options: Options): Promise<StepResult> {
@@ -57,7 +63,11 @@ class SimulEngine implements Engine {
     if (s.phase === "setup") {
       const p = s.players[action.seat as number] as Sim["players"][number];
       if (action.type === "choose_org") p.setup_org = action.org as string;
-      else {
+      else if (action.type === "setup_unlock") {
+        p.setup_locked = false;
+        s.pending.push({ kind: "setup_choice", player: p.index });
+        events.push({ type: "setup_unlocked", player: p.index });
+      } else {
         p.setup_locked = true;
         s.pending = s.pending.filter((d) => d.player !== action.seat);
         events.push({ type: "setup_locked", player: action.seat });
@@ -169,12 +179,12 @@ describe("the simultaneous setup", () => {
     const view = () => (t.ca.last("view") as Extract<ServerMessage, { t: "view" }>).remaining;
     await t.room.submit(alice, 0, { type: "choose_org", org: "a", seat: t.a });
     await t.room.submit(alice, 1, { type: "setup_lock", seat: t.a });
-    // alice used 3 s and got the increment; bob's clock is still running from the start
-    expect(view()?.[t.a]).toBe(10_000 - 3000 + 1000);
+    // alice used 3 s; bob's clock is still running from the start
+    expect(view()?.[t.a]).toBe(10_000 - 3000); // no increment for a lock of the setup
     t.advance(2000);
     await t.room.submit(bob, 2, { type: "choose_org", org: "a", seat: t.b });
     await t.room.submit(bob, 3, { type: "setup_lock", seat: t.b });
-    expect((t.cb.last("view") as Extract<ServerMessage, { t: "view" }>).remaining?.[t.b]).toBe(10_000 - 5000 + 1000); // 5 s since the start
+    expect((t.cb.last("view") as Extract<ServerMessage, { t: "view" }>).remaining?.[t.b]).toBe(10_000 - 5000); // 5 s since the start
     // and the clock goes to the player to act in the game
     const clock = (await t.store.get("clock")) as { runs: { seat: number }[] };
     expect(clock.runs).toHaveLength(1);
@@ -217,5 +227,71 @@ describe("the simultaneous setup", () => {
     expect(await t.room.submit(bob, 0, { type: "choose_org", org: "a", seat: t.b })).toEqual({ ok: true });
     expect(await t.room.submit(alice, 0, { type: "choose_org", org: "b", seat: t.a })).toEqual({ ok: true }); // alice saw 0 actions, there is 1
     expect(await count(t)).toBe(2);
+  });
+
+  it("lets a player unlock while somebody else has not locked in: their clock runs again from what was left, and it stops at the next lock", async () => {
+    const t = await game(withOrgs, bank);
+    const remaining = (c: Conn) => (c.last("view") as Extract<ServerMessage, { t: "view" }>).remaining;
+    await t.room.submit(alice, 0, { type: "choose_org", org: "a", seat: t.a });
+    t.advance(2000);
+    await t.room.submit(alice, 1, { type: "setup_lock", seat: t.a });
+    t.advance(3000); // alice is locked: her clock is stopped at 8 s
+    expect(remaining(t.ca)?.[t.a]).toBe(8000);
+    expect(await t.room.submit(alice, 2, { type: "setup_unlock", seat: t.a })).toEqual({ ok: true });
+    expect(actors((await t.store.get("state")) as GameState).sort()).toEqual([0, 1]);
+    t.advance(1500); // and it runs again
+    await t.room.submit(bob, 3, { type: "choose_org", org: "b", seat: t.b }); // any view
+    expect(remaining(t.ca)?.[t.a]).toBe(8000 - 1500);
+    await t.room.submit(alice, 4, { type: "setup_lock", seat: t.a });
+    t.advance(4000);
+    await t.room.submit(bob, 5, { type: "choose_org", org: "a", seat: t.b });
+    expect(remaining(t.cb)?.[t.a]).toBe(8000 - 1500); // locked again: stopped, and no time was gained by locking twice
+  });
+
+  it("does not let a per-turn clock start again when the player unlocks", async () => {
+    const t = await game(withOrgs, { kind: "per_turn", ms: 10_000 });
+    const left = (c: Conn) => (c.last("view") as Extract<ServerMessage, { t: "view" }>).remaining;
+    t.advance(4000);
+    await t.room.submit(alice, 0, { type: "choose_org", org: "a", seat: t.a });
+    await t.room.submit(alice, 1, { type: "setup_lock", seat: t.a });
+    t.advance(5000);
+    await t.room.submit(alice, 2, { type: "setup_unlock", seat: t.a });
+    expect(left(t.ca)?.[t.a]).toBe(6000); // 4 s were used before the lock
+  });
+
+  it("refuses an unlock when nobody else is still choosing, and the lock and the unlock that cross end the same way in either order", async () => {
+    const both = async () => {
+      const t = await game();
+      await t.room.submit(alice, 0, { type: "choose_org", org: "a", seat: t.a });
+      await t.room.submit(alice, 1, { type: "setup_lock", seat: t.a });
+      await t.room.submit(bob, 2, { type: "choose_org", org: "b", seat: t.b });
+      return t;
+    };
+    // the last lock first: the game goes on, and the unlock that was sent at the same time is refused
+    const first = await both();
+    const [lock, unlock] = await Promise.all([
+      first.room.submit(bob, 3, { type: "setup_lock", seat: first.b }),
+      first.room.submit(alice, 3, { type: "setup_unlock", seat: first.a }),
+    ]);
+    expect(lock).toEqual({ ok: true });
+    expect(unlock).toMatchObject({ ok: false });
+    expect(((await first.store.get("state")) as GameState).phase).toBe("play");
+    // the unlock first: both choose again, and the lock waits for alice
+    const second = await both();
+    const [unlock2, lock2] = await Promise.all([
+      second.room.submit(alice, 3, { type: "setup_unlock", seat: second.a }),
+      second.room.submit(bob, 3, { type: "setup_lock", seat: second.b }),
+    ]);
+    expect(unlock2).toEqual({ ok: true });
+    expect(lock2).toEqual({ ok: true });
+    const state = (await second.store.get("state")) as GameState;
+    expect(state.phase).toBe("setup");
+    expect(actors(state)).toEqual([second.a]);
+    // a locked player cannot unlock when everyone else has locked (nothing is left to wait for)
+    expect(await second.room.submit(bob, 4, { type: "setup_unlock", seat: second.b })).toMatchObject({ ok: true }); // alice is still choosing
+    await second.room.submit(alice, 5, { type: "setup_lock", seat: second.a });
+    await second.room.submit(bob, 6, { type: "setup_lock", seat: second.b });
+    expect(((await second.store.get("state")) as GameState).phase).toBe("play");
+    expect(await second.room.submit(bob, 7, { type: "setup_unlock", seat: second.b })).toMatchObject({ ok: false });
   });
 });

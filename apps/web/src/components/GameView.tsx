@@ -91,7 +91,7 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
       mine,
       text: mine
         ? "choose your organization and your quick start cards, then lock in"
-        : `your choices are locked in; waiting for the others. ${setupStatus(view, names)}`,
+        : `your choices are locked in; waiting for the others (you can change them until everybody has locked in). ${setupStatus(view, names)}`,
     };
   }
   const actor = view.to_act;

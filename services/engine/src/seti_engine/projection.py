@@ -193,7 +193,7 @@ def acting(state: GameState) -> list[int]:
 def actor_of(state: GameState, action: dict[str, Any]) -> int | None:
     """The seat that made a logged move: the player to act, or the seat that the move names (the simultaneous setup, EXP-ORG-14)."""
     seat = action.get("seat")
-    if isinstance(seat, int) and action.get("type") in ("choose_org", "choose_quick", "setup_lock"):
+    if isinstance(seat, int) and action.get("type") in ("choose_org", "choose_quick", "setup_lock", "setup_unlock"):
         return seat
     return to_act(state)
 
@@ -263,8 +263,8 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
             d.data = {}
     if actor != viewer:
         s.aside = []
-    classified = engine.legal_classified(state) if viewer is not None and actor == viewer else []
-    if simul:
+    classified = engine.legal_classified(state) if viewer is not None and (actor == viewer or simul) else []
+    if simul:  # a player who has locked in is not one to act, but may unlock (EXP-ORG-14)
         classified = [(m, c) for m, c in classified if m.get("seat") == viewer]
     legal = [m for m, _ in classified]
     trackers = [tracker(state, p, viewer) for p in state.players]

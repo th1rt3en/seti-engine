@@ -91,7 +91,7 @@ def deal(s: GameState, order: list[int]) -> None:
 # the simultaneous setup (EXP-ORG-14, owner 2026-10-23)
 # ---------------------------------------------------------------------------------------------------------------------------------
 
-SETUP_TYPES = frozenset({"choose_org", "choose_quick", "setup_lock"})
+SETUP_TYPES = frozenset({"choose_org", "choose_quick", "setup_lock", "setup_unlock"})
 
 
 def setup_open(s: GameState) -> list[Decision]:
@@ -115,7 +115,12 @@ def setup_moves(s: GameState, d: Decision) -> list[Action]:
 
 
 def setup_all_moves(s: GameState) -> list[Action]:
-    return [m for d in setup_open(s) for m in setup_moves(s, d)]
+    """The moves of every player: those who have not locked in choose; a player who has locked in may unlock to change the choice while
+    somebody else has not locked in (EXP-ORG-14, owner 2026-10-23). The last lock resolves the setup at once, so a lock and an unlock never cross."""
+    open_seats = {d.player for d in setup_open(s)}
+    out = [m for d in setup_open(s) for m in setup_moves(s, d)]
+    out += [{"type": "setup_unlock", "seat": p.index} for p in s.players if p.setup_locked and open_seats - {p.index}]
+    return out
 
 
 def setup_apply(s: GameState, a: Action, events: Events) -> None:
@@ -127,6 +132,10 @@ def setup_apply(s: GameState, a: Action, events: Events) -> None:
         p.setup_org = a["org"]
     elif a["type"] == "choose_quick":
         p.setup_quick = list(a["cards"])
+    elif a["type"] == "setup_unlock":  # the choices are kept: the player changes them, or locks in again
+        p.setup_locked = False
+        s.pending.append(Decision(kind="setup_choice", player=p.index))
+        events.append({"type": "setup_unlocked", "player": p.index})
     else:
         p.setup_locked = True
         s.pending = [d for d in s.pending if not (d.kind == "setup_choice" and d.player == p.index)]
