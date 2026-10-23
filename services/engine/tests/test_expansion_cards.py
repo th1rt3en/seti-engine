@@ -146,6 +146,20 @@ def test_sa5_does_not_wait_when_the_probe_is_already_there_or_there_is_nothing_t
     assert go(s, 5, answer=False).state.pending[0].kind == "hold"  # the card itself gives the movement, so it waits
 
 
+def test_a_log_from_before_the_wait_still_replays_any_move_ends_the_wait_first() -> None:  # EXP-SA5-01
+    """The games played before 2026-10-23 have no `hold_done`: after the card they go on with the next move of the player."""
+    s = ready()
+    probe_at(s, *far_from_earth(s), "n1")
+    r = go(s, 5, answer=False)
+    assert r.state.pending[0].kind == "hold" and {"type": "end_turn"} not in r.legal
+    old = apply(r.state, {"type": "end_turn"})  # no hold_done in the log: the wait ends first, then the turn
+    new = apply(apply(r.state, {"type": "hold_done"}).state, {"type": "end_turn"})
+    assert old.state.model_dump() == new.state.model_dump()
+    assert not old.state.pending and old.state.current_player != r.state.current_player
+    with pytest.raises(Exception, match="not legal"):
+        apply(r.state, {"type": "scan_earth", "sector": 99})  # a move that is not legal is still refused
+
+
 def test_sa38_waits_for_the_movement_and_scores_after_a_probe_joined_another() -> None:  # SA.38, EXP-SA5-01
     s = ready(publicity=0)
     probe_at(s, 2, 3, "b", other(s))

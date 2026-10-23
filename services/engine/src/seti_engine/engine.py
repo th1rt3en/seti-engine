@@ -383,6 +383,11 @@ NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lowe
 
 def apply(state: GameState, action: Action) -> StepResult:
     legal = legal_moves(state)
+    if state.pending and state.pending[0].kind == "hold" and action not in legal and not sandbox.is_sandbox_action(action):
+        # EXP-SA5-01: the logs of games played before 2026-10-23 have no `hold_done`: any other move ends the wait first
+        first = apply(state, {"type": "hold_done"})
+        second = apply(first.state, action)
+        return StepResult(state=second.state, events=first.events + second.events, legal=second.legal)
     if sandbox.is_sandbox_action(action):  # D33: too many to list, so they are checked on their own
         why = sandbox.check(state, action)
         if why is not None:
