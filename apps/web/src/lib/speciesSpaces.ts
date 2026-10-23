@@ -94,20 +94,21 @@ export const SPECIES_SPACES: Record<string, Record<string, ([number, number] | n
       [628, 1187],
     ],
   },
+  // fitted to the rings of the picture (tools/web: the circles of the board spaces, measured on the asset)
   mascamites: {
     pink: [
-      [137, 676],
-      [137, 847],
-      [137, 995],
-      [137, 1150],
+      [143, 717],
+      [143, 874],
+      [143, 1031],
+      [143, 1188],
     ],
     yellow: [
-      [373, 769],
-      [373, 917],
-      [373, 1072],
-      [373, 1212],
+      [385, 787],
+      [385, 944],
+      [385, 1102],
+      [385, 1259],
     ],
-    blue: [null, null, [606, 995], [606, 1150]],
+    blue: [null, null, [626, 1031], [626, 1188]],
   },
   arkhos: {
     pink: [
@@ -117,16 +118,16 @@ export const SPECIES_SPACES: Record<string, Record<string, ([number, number] | n
       [160, 1163],
     ],
     yellow: [
-      [388, 597],
-      [388, 817],
-      [388, 1019],
-      [388, 1234],
+      [392, 617],
+      [394, 821],
+      [394, 1028],
+      [392, 1232],
     ],
     blue: [
-      [614, 558],
-      [614, 762],
-      [614, 951],
-      [614, 1163],
+      [617, 562],
+      [617, 761],
+      [616, 959],
+      [616, 1174],
     ],
   },
   glyphids: {
