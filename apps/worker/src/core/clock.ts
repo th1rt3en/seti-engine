@@ -1,57 +1,85 @@
 // Game clocks (decision D13). A game is untimed, has a time limit per turn (turn-based play, hours or days),
 // or gives every player a time bank with an increment (real-time play).
+// Usually the clock runs for one player. In the simultaneous setup of the organization module (EXP-ORG-14) it runs for every player who has not locked in,
+// each with the time of its own period.
 
 export type ClockSettings = { kind: "none" } | { kind: "per_turn"; ms: number } | { kind: "bank"; initialMs: number; incrementMs: number };
 
-export interface ClockState {
-  /** The player the clock is running for, or null when it is stopped. */
-  running: number | null;
-  /** When the running period started (ms since the epoch). */
+export interface Run {
+  seat: number;
+  /** When the running period of this seat started (ms since the epoch). */
   since: number;
+}
+
+export interface ClockState {
+  /** The players the clock is running for (none when it is stopped). */
+  runs: Run[];
   /** Time left per player, for the bank clock. */
   bank: number[];
 }
 
 export function initialClock(settings: ClockSettings, players: number): ClockState {
-  return { running: null, since: 0, bank: settings.kind === "bank" ? Array(players).fill(settings.initialMs) : [] };
+  return { runs: [], bank: settings.kind === "bank" ? Array(players).fill(settings.initialMs) : [] };
 }
 
-/** Start the clock for `player` at `now`. */
-export function start(clock: ClockState, player: number, now: number): ClockState {
-  return { ...clock, running: player, since: now };
+/** A clock as it was stored by the version that ran for one player only (`running`, `since`). */
+export function normalize(raw: ClockState | { running: number | null; since: number; bank: number[] }): ClockState {
+  if ("runs" in raw) return raw;
+  return { runs: raw.running === null ? [] : [{ seat: raw.running, since: raw.since }], bank: raw.bank };
 }
 
-/** Stop the running clock after the player acted: the bank loses the elapsed time and gains the increment. */
-export function stop(settings: ClockSettings, clock: ClockState, now: number): ClockState {
-  if (clock.running === null || settings.kind !== "bank") return { ...clock, running: null };
+/** Run the clock for these players at `now`: a player whose clock already runs keeps its period, the others start one; nobody else runs. */
+export function start(clock: ClockState, players: number | number[], now: number): ClockState {
+  const seats = Array.isArray(players) ? players : [players];
+  const kept = clock.runs.filter((r) => seats.includes(r.seat));
+  const added = seats.filter((s) => !kept.some((r) => r.seat === s)).map((seat) => ({ seat, since: now }));
+  return { ...clock, runs: [...kept, ...added] };
+}
+
+/** Stop the clock of `seat` (all running clocks without it) after the player acted: the bank loses the elapsed time and gains the increment. */
+export function stop(settings: ClockSettings, clock: ClockState, now: number, seat?: number): ClockState {
+  const stopped = clock.runs.filter((r) => seat === undefined || r.seat === seat);
+  const rest = clock.runs.filter((r) => seat !== undefined && r.seat !== seat);
+  if (settings.kind !== "bank") return { ...clock, runs: rest };
   const bank = [...clock.bank];
-  const left = bank[clock.running] ?? 0;
-  // The starting time is also the most a bank can hold (decision D26). It may stay negative: see `overdue`.
-  bank[clock.running] = Math.min(settings.initialMs, left - (now - clock.since) + settings.incrementMs);
-  return { running: null, since: now, bank };
+  for (const r of stopped) {
+    const left = bank[r.seat] ?? 0;
+    // The starting time is also the most a bank can hold (decision D26). It may stay negative: see `overdue`.
+    bank[r.seat] = Math.min(settings.initialMs, left - (now - r.since) + settings.incrementMs);
+  }
+  return { runs: rest, bank };
 }
 
-/** When the running player runs out of time, or null when no deadline applies. */
-export function deadline(settings: ClockSettings, clock: ClockState): number | null {
-  if (clock.running === null) return null;
-  if (settings.kind === "per_turn") return clock.since + settings.ms;
-  if (settings.kind === "bank") return clock.since + (clock.bank[clock.running] ?? 0);
+function endOf(settings: ClockSettings, clock: ClockState, r: Run): number | null {
+  if (settings.kind === "per_turn") return r.since + settings.ms;
+  if (settings.kind === "bank") return r.since + (clock.bank[r.seat] ?? 0);
   return null;
 }
 
-/** The player whose time has run out at `now`, if any. */
+/** When the first running player runs out of time, or null when no deadline applies. */
+export function deadline(settings: ClockSettings, clock: ClockState): number | null {
+  const ends = clock.runs.map((r) => endOf(settings, clock, r)).filter((x): x is number => x !== null);
+  return ends.length === 0 ? null : Math.min(...ends);
+}
+
+/** The player whose time has run out at `now` (the one who ran out first), if any. */
 export function expired(settings: ClockSettings, clock: ClockState, now: number): number | null {
-  const d = deadline(settings, clock);
-  return d !== null && clock.running !== null && now >= d ? clock.running : null;
+  let found: { seat: number; at: number } | null = null;
+  for (const r of clock.runs) {
+    const at = endOf(settings, clock, r);
+    if (at !== null && now >= at && (found === null || at < found.at)) found = { seat: r.seat, at };
+  }
+  return found?.seat ?? null;
 }
 
 /** Time left for every player at `now` (what a client shows); null without a clock. */
 export function remaining(settings: ClockSettings, clock: ClockState, now: number, players: number): (number | null)[] | null {
   if (settings.kind === "none") return null;
   return Array.from({ length: players }, (_, i) => {
-    if (settings.kind === "per_turn") return clock.running === i ? clock.since + settings.ms - now : null;
+    const run = clock.runs.find((r) => r.seat === i);
+    if (settings.kind === "per_turn") return run === undefined ? null : run.since + settings.ms - now;
     const ms = clock.bank[i] ?? 0;
-    return i === clock.running ? ms - (now - clock.since) : ms;
+    return run === undefined ? ms : ms - (now - run.since);
   });
 }
 

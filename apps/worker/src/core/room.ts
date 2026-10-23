@@ -1,4 +1,4 @@
-﻿// The game room: one game's lifecycle (lobby, play, end), its clock, its action log and what each player may see.
+// The game room: one game's lifecycle (lobby, play, end), its clock, its action log and what each player may see.
 // It holds no rules (CLAUDE.md rule 5): every move goes to the engine service, and every view comes from the engine's projection.
 // The Durable Object (gameRoom.ts) is a thin adapter around this class; everything here is testable without Cloudflare.
 import type { GameState, Options, View } from "@seti/protocol";
@@ -175,6 +175,14 @@ export function toAct(state: GameState): number | null {
   const first = state.pending[0];
   if (first) return first.player;
   return state.phase === "play" ? state.current_player : null;
+}
+
+/** Every seat the engine waits for: the player to act, or in the simultaneous setup (EXP-ORG-14) every player who has not locked in yet. */
+export function actors(state: GameState): number[] {
+  if (state.phase === "finished") return [];
+  if (state.pending[0]?.kind === "setup_choice") return state.pending.filter((d) => d.kind === "setup_choice").map((d) => d.player);
+  const seat = toAct(state);
+  return seat === null ? [] : [seat];
 }
 
 interface ArchiveProgress {
@@ -424,7 +432,9 @@ export class GameRoom {
   }
 
   private async start(meta: Meta): Promise<void> {
-    meta.options = { ...meta.options, seed: this.d.newSeed() };
+    // EXP-ORG-14: with organizations every player chooses the organization and the quick start cards at the same time (a game for one player has nobody to wait for)
+    const simul = meta.options.organizations === true && meta.options.players >= 2 ? { simul_setup: true } : {};
+    meta.options = { ...meta.options, ...simul, seed: this.d.newSeed() };
     const res = await this.d.engine.newGame(meta.options);
     // Decision D28: the seats are drawn now, so neither the host nor the order of joining decides who sits where. (The engine draws the first player.)
     meta.seats = shuffledSeats(meta.seats, meta.options.seed ?? 0);
@@ -454,7 +464,7 @@ export class GameRoom {
     const seat = meta.seats.findIndex((s) => s?.id === who.id);
     if (seat < 0) return null;
     const state = await this.state();
-    if (toAct(state) !== seat) return null;
+    if (!actors(state).includes(seat)) return null;
     try {
       const res = await this.d.engine.apply(state, action);
       const delta = res.events.find((e) => e.type === "delta" && e.player === seat) as { changes?: Record<string, number> } | undefined;
@@ -476,8 +486,11 @@ export class GameRoom {
     if (seat < 0) return fail("not_seated", "you are not a player of this game");
     const state = await this.state();
     const count = (await this.d.store.get<number>("logcount")) ?? 0;
-    if (seq !== count) return fail("stale", `the game is at action ${count}, not ${seq}`);
-    if (toAct(state) !== seat) return fail("not_your_turn", "it is not your turn");
+    // a move of the simultaneous setup (it names its seat, EXP-ORG-14) is made while the others move too, so the count the client saw is not asked for
+    if (seq !== count && action.seat === undefined) return fail("stale", `the game is at action ${count}, not ${seq}`);
+    if (!actors(state).includes(seat)) return fail("not_your_turn", "it is not your turn");
+    // EXP-ORG-14: a move of the simultaneous setup names its seat; nobody may move for another seat
+    if (action.seat !== undefined && action.seat !== seat) return fail("not_your_turn", "that move is for another player");
     return this.play(meta, seat, count, state, action);
   }
 
@@ -496,8 +509,10 @@ export class GameRoom {
     await this.d.store.put("logcount", count + 1);
     await this.d.store.put("state", res.state);
     for (const c of this.d.connections()) c.send({ t: "log", from: count, entries: [publicEntry(entry, this.connSeat(meta, c))] });
-    const clock = (await this.d.store.get<clocks.ClockState>("clock")) ?? clocks.initialClock(meta.clock, meta.seats.length);
-    await this.d.store.put("clock", clocks.stop(meta.clock, clock, now));
+    // A move of the simultaneous setup that leaves the player choosing (EXP-ORG-14: choosing again) does not stop their clock: only the lock does,
+    // so that nobody gains time by choosing again and again.
+    const keepsChoosing = action.seat !== undefined && actors(res.state).includes(seat);
+    if (!keepsChoosing) await this.d.store.put("clock", clocks.stop(meta.clock, await this.clockOf(meta), now, seat));
     if (res.state.phase === "finished") {
       await this.finish(meta, res.state, "completed");
       return { ok: true };
@@ -539,9 +554,9 @@ export class GameRoom {
         const meta = await this.meta();
         if (meta === undefined || meta.status !== "playing") return null;
         const state = await this.state();
-        const seat = toAct(state);
-        const who = seat === null ? undefined : meta.seats[seat];
-        if (seat === null || !who?.bot) return null;
+        const seat = actors(state).find((s) => meta.seats[s]?.bot);
+        const who = seat === undefined ? undefined : meta.seats[seat];
+        if (seat === undefined || !who?.bot) return null;
         const log = await this.d.store.list<LogEntry>("log:");
         const kept = await this.d.store.get<{ count: number; seat: number; plan: Action[] }>("botplan");
         const plan = kept !== undefined && kept.count === log.length && kept.seat === seat ? kept.plan : [];
@@ -558,7 +573,7 @@ export class GameRoom {
         if (meta === undefined || meta.status !== "playing") return false;
         const state = await this.state();
         const count = (await this.d.store.get<number>("logcount")) ?? 0;
-        if (count !== step.count || toAct(state) !== step.seat) return true; // the game moved on while the service thought: ask again
+        if (count !== step.count || !actors(state).includes(step.seat)) return true; // the game moved on while the service thought: ask again
         const res = await this.play(meta, step.seat, count, state, reply.action);
         if (!res.ok) throw new Error(`the AI played an illegal move: ${res.message}`);
         await this.d.store.put("botplan", { count: count + 1, seat: step.seat, plan: reply.plan });
@@ -606,13 +621,13 @@ export class GameRoom {
     if (meta.status !== "playing") return;
     this.botSoon(); // a request to the AI that failed is made again
     if (meta.seats.length >= KICK_FROM_PLAYERS) return;
-    const clock = await this.d.store.get<clocks.ClockState>("clock");
+    const clock = await this.d.store.get<clocks.ClockState | { running: number | null; since: number; bank: number[] }>("clock");
     if (clock === undefined) return;
-    const seat = clocks.expired(meta.clock, clock, this.d.now());
+    const seat = clocks.expired(meta.clock, clocks.normalize(clock), this.d.now());
     // an AI seat has no clock that can run out; its request is retried
     if (seat !== null && meta.seats[seat]?.bot) await this.d.setAlarm(this.d.now() + BOT_RETRY_MS);
     else if (seat !== null) await this.finish(meta, await this.state(), "timeout", seat);
-    else await this.d.setAlarm(clocks.deadline(meta.clock, clock));
+    else await this.d.setAlarm(clocks.deadline(meta.clock, clocks.normalize(clock)));
   }
 
   /** Decision D24: in a game of 3 or 4 players any other player can kick a player whose clock is in the negative. The game ends and the others all share first place. */
@@ -626,7 +641,8 @@ export class GameRoom {
       if (!Number.isInteger(target) || target < 0 || target >= meta.seats.length || target === seat) {
         return fail("bad_target", "choose another player");
       }
-      const clock = await this.d.store.get<clocks.ClockState>("clock");
+      const stored = await this.d.store.get<clocks.ClockState>("clock");
+      const clock = stored === undefined ? undefined : clocks.normalize(stored);
       if (clock === undefined || !clocks.overdue(meta.clock, clock, this.d.now(), target)) {
         return fail("not_overdue", "that player's clock is not in the negative");
       }
@@ -635,10 +651,16 @@ export class GameRoom {
     });
   }
 
+  /** The clock as stored (a game started before the clock could run for several players has the older form). */
+  private async clockOf(meta: Meta): Promise<clocks.ClockState> {
+    const stored = await this.d.store.get<clocks.ClockState>("clock");
+    return stored === undefined ? clocks.initialClock(meta.clock, meta.seats.length) : clocks.normalize(stored);
+  }
+
   private async runClock(meta: Meta, state: GameState): Promise<void> {
-    const actor = toAct(state);
-    const base = (await this.d.store.get<clocks.ClockState>("clock")) ?? clocks.initialClock(meta.clock, meta.seats.length);
-    const clock = actor === null ? base : clocks.start(base, actor, this.d.now());
+    const who = actors(state);
+    const base = await this.clockOf(meta);
+    const clock = who.length === 0 ? base : clocks.start(base, who, this.d.now());
     await this.d.store.put("clock", clock);
     // Only a game of 1 or 2 players ends at once when a clock runs out; in the others the players decide (kick).
     await this.d.setAlarm(meta.seats.length < KICK_FROM_PLAYERS ? clocks.deadline(meta.clock, clock) : null);
@@ -777,8 +799,8 @@ export class GameRoom {
     const state = await this.state();
     const seat = conn.who === null ? -1 : meta.seats.findIndex((s) => s?.id === conn.who);
     const view = await this.d.engine.project(state, seat >= 0 ? seat : null);
-    const clock = await this.d.store.get<clocks.ClockState>("clock");
-    const remaining = clock === undefined ? null : clocks.remaining(meta.clock, clock, this.d.now(), meta.seats.length);
+    const stored = await this.d.store.get<clocks.ClockState>("clock");
+    const remaining = stored === undefined ? null : clocks.remaining(meta.clock, clocks.normalize(stored), this.d.now(), meta.seats.length);
     conn.send({
       t: "view",
       seq: (await this.d.store.get<number>("logcount")) ?? 0,

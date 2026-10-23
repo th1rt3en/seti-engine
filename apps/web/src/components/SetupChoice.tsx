@@ -103,3 +103,114 @@ export function SetupChoice({
     </div>
   );
 }
+
+/** The setup of a game in which everybody chooses at the same time (EXP-ORG-14): the organizations and the quick start cards on one screen, a choice that
+ * can be changed until the player locks it in, and who has locked in already. Nothing that anybody chose is shown to the others before all have locked in. */
+export function SetupBoth({
+  orgs,
+  quick,
+  pickedOrg,
+  pickedQuick,
+  need,
+  onPickOrg,
+  onPickQuick,
+  onLock,
+  clock,
+  status,
+}: {
+  orgs: string[];
+  quick: string[];
+  pickedOrg: string | null;
+  pickedQuick: string[];
+  /** How many quick start cards are kept. */
+  need: number;
+  onPickOrg: (id: string) => void;
+  onPickQuick: (id: string) => void;
+  onLock: () => void;
+  /** The time left of the player's clock, when the game has one. */
+  clock: string | null;
+  /** Who has locked in and who is still choosing. */
+  status: string;
+}) {
+  const [aside, setAside] = useState(false);
+  const ready = pickedOrg !== null && pickedQuick.length === need;
+  if (aside) {
+    return (
+      // biome-ignore lint/a11y/useSemanticElements: a bar, not a section of the page
+      <div className="setupaside" role="region" aria-label="The choice is put aside">
+        <span>
+          Choosing your organization and quick start cards{clock ? ` · ${clock}` : ""} · {status}
+        </span>
+        <button type="button" className="primary" onClick={() => setAside(false)}>
+          Back to the choice
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div
+      className="setupchoice"
+      // biome-ignore lint/a11y/useSemanticElements: a layer over the board that the page controls itself, not a native <dialog>
+      role="dialog"
+      aria-modal="true"
+      aria-label="Choose your organization and your quick start cards"
+    >
+      <div className="setupinner">
+        <h2>Choose your organization and your quick start cards</h2>
+        <p className="muted">
+          Everybody chooses at the same time, and nobody sees what the others chose until all of you have locked in. You can change your
+          mind until you lock in. {clock ? <b>Your clock: {clock}. </b> : null}
+          {status}
+        </p>
+        <h3>1. Your organization</h3>
+        <div className="setupcards orgs">
+          {orgs.map((id) => {
+            const info = ORGS[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                className={pickedOrg === id ? "setupcard chosen" : "setupcard"}
+                aria-pressed={pickedOrg === id}
+                onClick={() => onPickOrg(id)}
+              >
+                <img src={cardImage(id)} alt={ORG_NAMES[id] ?? id} />
+                {info ? (
+                  <span className="setuptext">
+                    <b>{info.name}</b>
+                    <span className="muted small">{info.abilities.passive ?? info.abilities.mainAction ?? ""}</span>
+                    {info.abilities.freeAction ? <span className="muted small">Free action: {info.abilities.freeAction}</span> : null}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+        <h3>
+          2. Your quick start cards ({pickedQuick.length} of {need} picked)
+        </h3>
+        <div className="setupcards quick">
+          {quick.map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={pickedQuick.includes(id) ? "setupcard chosen" : "setupcard"}
+              aria-pressed={pickedQuick.includes(id)}
+              onClick={() => onPickQuick(id)}
+            >
+              <img src={cardImage(id)} alt={`Quick start card ${id}`} />
+            </button>
+          ))}
+        </div>
+        <div className="setupbar">
+          <button type="button" className="secondary big" onClick={() => setAside(true)} title="Hide the choice to look at the board">
+            View the board
+          </button>
+          <button type="button" className="primary big" disabled={!ready} onClick={onLock}>
+            Lock in my choices
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

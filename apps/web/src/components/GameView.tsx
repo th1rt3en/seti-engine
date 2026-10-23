@@ -72,8 +72,28 @@ function scanStepText(types: Set<string>): string {
   return `Scan, in any order: ${steps.join("; ")}${done}`;
 }
 
+/** Who has locked in their choices of the organization and the quick start cards, and who is still choosing (EXP-ORG-14). */
+export function setupStatus(view: View, names: string[]): string {
+  const name = (i: number): string => names[i] ?? `Player ${i + 1}`;
+  const players = view.state.players.filter((p) => !(view.state.rival && p.index === view.state.rival.index));
+  const done = players.filter((p) => p.setup_locked).map((p) => name(p.index));
+  const open = players.filter((p) => !p.setup_locked).map((p) => name(p.index));
+  return `Locked in: ${done.length > 0 ? done.join(", ") : "nobody yet"}. Still choosing: ${open.join(", ")}.`;
+}
+
 export function promptOf(view: View, names: string[]): { who: string; mine: boolean; text: string } {
   const s = view.state;
+  if (s.phase !== "finished" && s.pending[0]?.kind === "setup_choice") {
+    // everybody chooses at the same time (EXP-ORG-14)
+    const mine = view.viewer !== null && (view.acting ?? []).includes(view.viewer);
+    return {
+      who: "",
+      mine,
+      text: mine
+        ? "choose your organization and your quick start cards, then lock in"
+        : `your choices are locked in; waiting for the others. ${setupStatus(view, names)}`,
+    };
+  }
   const actor = view.to_act;
   if (s.phase === "finished") return { who: "", mine: false, text: "Game over" };
   if (actor === null) return { who: "", mine: false, text: "Starting..." };

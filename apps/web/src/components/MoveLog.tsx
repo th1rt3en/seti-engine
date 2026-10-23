@@ -187,7 +187,9 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
           ? ` (${cardName(action.card)})`
           : action?.type === "choose_org"
             ? ` (${ORG_NAMES[String(action.org)] ?? "organization"})`
-            : "";
+            : action?.type === "setup_lock"
+              ? " (organization)" // everybody's choice is made public with the last lock (EXP-ORG-14)
+              : "";
       return `${who} launches a probe for free${by}`;
     }
     case "explore": {

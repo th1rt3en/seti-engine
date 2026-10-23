@@ -10,6 +10,10 @@ export interface PublicEntry {
   events: Record<string, unknown>[];
 }
 
+/** The choices of the simultaneous setup stay secret from the other players (EXP-ORG-14): the organization and the quick start cards are shown by the
+ * engine when everybody has locked in (the events), not by these moves. */
+const SECRET_CHOICES = new Set(["choose_org", "choose_quick"]);
+
 /** Actions whose `card` is not shown to the other players. */
 const HIDDEN_CARD_ACTIONS = new Set(["tuck", "take_round_card", "play_exertian", "pol_pick"]);
 /** Events whose `card` is not shown. */
@@ -22,9 +26,12 @@ const without = <T extends Record<string, unknown>>(o: T, key: string): T => {
 
 /** The card drawn from the deck is told to the player who drew it only. */
 export function publicEntry(e: LogEntry, viewer: number | null = null): PublicEntry {
-  const action = HIDDEN_CARD_ACTIONS.has(String((e.action as Record<string, unknown>).type))
+  const type = String((e.action as Record<string, unknown>).type);
+  const action = HIDDEN_CARD_ACTIONS.has(type)
     ? without(e.action as Record<string, unknown>, "card")
-    : e.action;
+    : SECRET_CHOICES.has(type) && e.seat !== viewer
+      ? without(without(e.action as Record<string, unknown>, "org"), "cards")
+      : e.action;
   const events = e.events.map((ev) =>
     HIDDEN_CARD_EVENTS.has(String(ev.type)) || (ev.type === "draw_card" && ev.player !== viewer) ? without(ev, "card") : ev,
   );

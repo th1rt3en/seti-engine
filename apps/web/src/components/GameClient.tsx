@@ -38,6 +38,7 @@ import expansionAssets from "../generated/expansion-assets.json";
 import type { CardAction } from "./CardActions";
 import { FinalScores } from "./FinalScores";
 import { GameView } from "./GameView";
+import { setupStatus } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
 import { SampleReward } from "./Mascamites";
@@ -52,7 +53,7 @@ import { PlayerLink } from "./PlayerLink";
 import { PlayerName, PlayerNumsContext } from "./PlayerName";
 import { Amount, Cost, KindIcon } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
-import { SetupChoice } from "./SetupChoice";
+import { SetupBoth, SetupChoice } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradePanel } from "./TradePanel";
 
@@ -217,11 +218,11 @@ export function GameClient({
           setError(null);
           setPicked([]);
           setPickedBuy(null);
-          setPickedOffer(null);
+          if (m.view.state.pending[0]?.kind !== "setup_choice") setPickedOffer(null); // the simultaneous setup keeps the picks (EXP-ORG-14)
           setPickedCover(null);
           setPickedExertian(null);
           setXenoResearch(false);
-          setPickedQuick([]);
+          if (m.view.state.pending[0]?.kind !== "setup_choice") setPickedQuick([]);
           setPendingMove(null);
           setUnsure(null);
           setRowMode(null);
@@ -384,6 +385,7 @@ export function GameClient({
       !placed.has(m) &&
       m.type !== "sandbox" &&
       !isOffer(m) &&
+      m.type !== "setup_lock" && // the lock of the simultaneous setup is the button of its own screen
       !rowMoves.includes(m) &&
       !(m.type === "org_main" && typeof m.tile === "string") && // the tiles of Xenolab are buttons of the main actions
       m.type !== "play_exertian" && // an Exertian card is picked in its tab of the hand, and played with the buttons over it
@@ -553,14 +555,31 @@ export function GameClient({
   // after passing the player is offered the end-of-round cards: they lie with the hand for the moment and the player picks one to keep
   // the same goes for the organizations and quick start cards offered at the start of a game with the organization module
   // the first choice of a game with organizations (organization, then quick start cards) has a screen of its own
-  const setupMoves = mine.filter((m) => m.type === "choose_org" || m.type === "choose_quick");
+  const simul = v.state.pending[0]?.kind === "setup_choice"; // EXP-ORG-14: everybody chooses the organization and the quick start cards at the same time
+  const setupMoves = simul ? [] : mine.filter((m) => m.type === "choose_org" || m.type === "choose_quick");
   const setupKind = setupMoves[0]?.type === "choose_org" ? "org" : "quick";
   // the quick start cards are kept two at once: every legal move names a pair, and the page offers the cards that are in some pair
   const setupOffers = [...new Set(setupMoves.flatMap((m) => (m.type === "choose_quick" ? quickCards(m) : [offerId(m)])))];
   const quickNeed = setupMoves[0]?.type === "choose_quick" ? quickCards(setupMoves[0]).length : 1;
-  const offers = [...new Set(mine.filter((m) => isOffer(m) && !setupMoves.includes(m)).map(offerId))];
+  const simulOrgs = simul ? [...new Set(mine.filter((m) => m.type === "choose_org").map(offerId))] : [];
+  const simulQuickMoves = simul ? mine.filter((m) => m.type === "choose_quick") : [];
+  const simulQuick = [...new Set(simulQuickMoves.flatMap(quickCards))];
+  const simulNeed = simulQuickMoves[0] ? quickCards(simulQuickMoves[0]).length : 0;
+  // what the player has picked: on this screen, or kept by the engine from before (a reload) until the lock
+  const simulOrg = pickedOffer ?? me?.setup_org ?? null;
+  const simulCards = pickedQuick.length > 0 ? pickedQuick : (me?.setup_quick ?? []);
+  const lockIn = () => {
+    const org = mine.find((m) => m.type === "choose_org" && offerId(m) === simulOrg);
+    const cards = mine.find(
+      (m) => m.type === "choose_quick" && quickCards(m).length === simulNeed && quickCards(m).every((c) => simulCards.includes(c)),
+    );
+    if (!org || !cards || v.viewer === null) return;
+    plan.current = [cards, { type: "setup_lock", seat: v.viewer }]; // the lock is offered once both are chosen
+    sendAction(org);
+  };
+  const offers = [...new Set(mine.filter((m) => isOffer(m) && !setupMoves.includes(m) && !simul).map(offerId))];
   const offerMove =
-    pickedOffer === null ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
+    pickedOffer === null || simul ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
   // keeping one of the end-of-round cards is confirmed (or given up) with the buttons on the card itself, like a card of the display
   const offerActions: CardAction[] = offerMove
     ? [
@@ -667,7 +686,8 @@ export function GameClient({
     play(first);
   };
   // The clock of the player to act runs down on this screen; the server decides what it was when the view was sent.
-  const left = (view.remaining ?? []).map((r, i) => (r === null ? null : i === v.to_act ? r - (now - receivedAt) : r));
+  const acting = v.acting && v.acting.length > 0 ? v.acting : v.to_act === null ? [] : [v.to_act];
+  const left = (view.remaining ?? []).map((r, i) => (r === null ? null : acting.includes(i) ? r - (now - receivedAt) : r));
   const canKick = v.viewer !== null && !ended && v.state.players.length >= 3;
   const sendingPrompt = (
     // biome-ignore lint/a11y/useSemanticElements: a small notice with a spinner, not an <output> of a form
@@ -1150,9 +1170,9 @@ export function GameClient({
           className={
             r !== null && r < 0
               ? "clock over"
-              : r !== null && r < 60_000 && i === v.to_act
+              : r !== null && r < 60_000 && acting.includes(i)
                 ? "clock running low"
-                : i === v.to_act
+                : acting.includes(i)
                   ? "clock running"
                   : "clock"
           }
@@ -1184,7 +1204,25 @@ export function GameClient({
         }
         overlay={
           <>
-            {setupOffers.length > 0 && !ended ? (
+            {simul && simulOrgs.length > 0 && !ended ? (
+              <SetupBoth
+                orgs={simulOrgs}
+                quick={simulQuick}
+                pickedOrg={simulOrg}
+                pickedQuick={simulCards}
+                need={simulNeed}
+                onPickOrg={(id) => setPickedOffer(id)}
+                onPickQuick={(id) =>
+                  setPickedQuick(simulCards.includes(id) ? simulCards.filter((c) => c !== id) : [...simulCards, id].slice(-simulNeed))
+                }
+                onLock={lockIn}
+                clock={
+                  v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
+                }
+                status={setupStatus(v, names)}
+              />
+            ) : null}
+            {setupOffers.length > 0 && !ended && !simul ? (
               <SetupChoice
                 kind={setupKind}
                 offers={setupOffers}

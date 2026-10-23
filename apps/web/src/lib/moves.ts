@@ -80,6 +80,7 @@ export const LABELS: Record<string, Label> = {
   skip_tuck: () => "Do not tuck a card",
   discard: (m) => `Discard ${cardName(m.card)}`,
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
+  setup_lock: () => "Lock in your organization and quick start cards: the others see them when everybody has locked in",
   choose_org: (m) =>
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
   choose_quick: (m) => `Keep the quick start cards ${((m.cards as string[]) ?? []).map(quickText).join(" and ")}`,
@@ -351,6 +352,12 @@ export function handMoveText(m: Move, glyph?: { reward: { t: string; n: number }
 /** A move as a line of the log. The identity of a card that stays hidden is not in the move (the server leaves it out). */
 export function logText(m: Move): string {
   switch (m.type) {
+    case "choose_org":
+      return "chose an organization"; // what it is stays secret until everybody has locked in (EXP-ORG-14); the log names it then
+    case "choose_quick":
+      return "chose the quick start cards";
+    case "setup_lock":
+      return "locked in their choices";
     case "tuck":
       return "tucked a card for income";
     case "take_round_card":

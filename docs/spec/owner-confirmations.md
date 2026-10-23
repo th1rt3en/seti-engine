@@ -65,3 +65,9 @@ Reported by a player (a probe moved next to Earth with the movement and the card
 
 "A total of at least 12 data in your computer and data pool": the computer is every space (ANALYZE-02), so the data on the lower spaces of the computer techs count with the top
 row and the data pool. (The engine counted the top row and the pool only; a player with 13 could not complete the mission.)
+
+## The organization and the quick start cards are chosen at the same time, 2026-10-23 (EXP-ORG-14)
+
+All players choose the organization and the quick start cards at the same time, each in secret, and lock the choice in. Every clock runs until its player locks in; the
+choices of the others are not shown (views, log) until all have locked in. Then the starts run in turn order. The option `simul_setup` is set when a game with
+organizations and 2 or more players starts; games started before keep the choices one after another (their logs replay as they were). The AI chooses at once on its own view.

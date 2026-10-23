@@ -94,6 +94,24 @@ describe.skipIf(!url)("a game through the room and the real engine", () => {
     }
   }, 120_000);
 
+  it("a game with organizations: both players choose at the same time, in secret, and the game goes on to the end (EXP-ORG-14)", async () => {
+    const g = await play({ players: 2, expansion: true, organizations: true } as Options);
+    expect((await g.room.meta())?.status).toBe("finished");
+    const meta = await g.room.meta();
+    expect(meta?.options.simul_setup).toBe(true);
+    const log = await g.room.log();
+    const locks = log.filter((e) => e.action.type === "setup_lock");
+    expect(locks).toHaveLength(2);
+    // both choices were made before the first lock, in any seat order, and each move names its own seat
+    const firstLock = log.findIndex((e) => e.action.type === "setup_lock");
+    expect(log.slice(0, firstLock).every((e) => e.action.seat === e.seat)).toBe(true);
+    // the replay of the log reproduces the game
+    let r = await g.engine.newGame(meta?.options as Options);
+    for (const e of log) r = await g.engine.apply(r.state, e.action);
+    expect(r.state).toEqual(await g.store.get<GameState>("state"));
+    expect(g.sink.ends[0]?.rec.result.reason).toBe("completed");
+  }, 180_000);
+
   it("a solo game against the rival runs to the end", async () => {
     const g = await play({ players: 1, difficulty: 3 } as Options, [alice]);
     expect((await g.room.meta())?.status).toBe("finished");

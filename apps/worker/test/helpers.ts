@@ -158,7 +158,7 @@ export class FakeBot implements BotClient {
   }
 }
 
-export function makeRoom(opts: { last?: number; now?: () => number; seed?: number; bot?: BotClient } = {}) {
+export function makeRoom(opts: { last?: number; now?: () => number; seed?: number; bot?: BotClient; engine?: Engine } = {}) {
   const store = new MemoryStore();
   const sink = new RecordingSink();
   const archive = new RecordingArchive();
@@ -167,7 +167,7 @@ export function makeRoom(opts: { last?: number; now?: () => number; seed?: numbe
   let time = 1_000_000;
   const deps: Deps = {
     store,
-    engine: new FakeEngine(opts.last ?? 6),
+    engine: opts.engine ?? new FakeEngine(opts.last ?? 6),
     ...(opts.bot ? { bot: opts.bot } : {}),
     sink,
     archive,
