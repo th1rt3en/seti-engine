@@ -896,6 +896,11 @@
           "default": 0,
           "title": "Seed",
           "type": "integer"
+        },
+        "simul_setup": {
+          "default": false,
+          "title": "Simul Setup",
+          "type": "boolean"
         }
       },
       "required": [
@@ -1200,6 +1205,30 @@
           "title": "Security",
           "type": "object"
         },
+        "setup_locked": {
+          "default": false,
+          "title": "Setup Locked",
+          "type": "boolean"
+        },
+        "setup_org": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Setup Org"
+        },
+        "setup_quick": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Setup Quick",
+          "type": "array"
+        },
         "signal_tokens": {
           "default": 0,
           "title": "Signal Tokens",
@@ -1274,6 +1303,9 @@
         "score",
         "sector_wins",
         "security",
+        "setup_locked",
+        "setup_org",
+        "setup_quick",
         "signal_tokens",
         "techs",
         "trace_log",
@@ -1843,6 +1875,13 @@
     "View": {
       "description": "The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act.",
       "properties": {
+        "acting": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Acting",
+          "type": "array"
+        },
         "classes": {
           "items": {
             "type": "string"
@@ -1934,6 +1973,7 @@
         }
       },
       "required": [
+        "acting",
         "classes",
         "counts",
         "legal",

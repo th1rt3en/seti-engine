@@ -16,7 +16,7 @@ from .models import Decision, GameState, PlayerState
 Events = list[dict[str, Any]]
 Action = dict[str, Any]
 
-SETUP_KINDS = frozenset({"choose_org", "choose_quick", "setup_tuck"})
+SETUP_KINDS = frozenset({"choose_org", "choose_quick", "setup_tuck", "setup_choice", "setup_start"})
 # the first game tip (EXP-ORG-05, A-030): organizations 1 to 4 are dealt one each
 BEGINNER_ORGS = ("orbital_dynamics", "fenwick_research_center", "stratus_core", "deep_sky_survey")
 FIRST_ROUND = 2  # EXP-ORG-02: rounds 2 to 5 are played
@@ -80,9 +80,75 @@ def deal(s: GameState, order: list[int]) -> None:
         p.hand = [s.deck.pop() for _ in range(4)]
         p.credits = p.energy = p.publicity = 0
     for pl in order:
-        p = s.players[pl]
+        if opts.simul_setup:  # EXP-ORG-14: all choose at the same time; the decisions of all players are open together
+            s.pending.append(Decision(kind="setup_choice", player=pl))
+            continue
         s.pending.append(Decision(kind="choose_org", player=pl))
         s.pending.append(Decision(kind="choose_quick", player=pl))  # EXP-ORG-04: the two cards are kept in one choice (owner, 2026-10-16)
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------
+# the simultaneous setup (EXP-ORG-14, owner 2026-10-23)
+# ---------------------------------------------------------------------------------------------------------------------------------
+
+SETUP_TYPES = frozenset({"choose_org", "choose_quick", "setup_lock"})
+
+
+def setup_open(s: GameState) -> list[Decision]:
+    """The players who have not locked in yet (all of them are asked at the same time)."""
+    return [d for d in s.pending if d.kind == "setup_choice"]
+
+
+def setup_moves(s: GameState, d: Decision) -> list[Action]:
+    """EXP-ORG-14: until the player locks in they may choose the organization and the quick start cards, and choose again; `setup_lock`
+    is offered once both are chosen. Every move names its seat, because the others are choosing at the same time."""
+    p = s.players[d.player]
+    if p.setup_locked:
+        return []
+    out: list[Action] = [{"type": "choose_org", "org": o, "seat": p.index} for o in p.offered_orgs]
+    cards = sorted(p.offered_quick)
+    keep = min(2, len(cards))
+    out += [{"type": "choose_quick", "cards": list(pair), "seat": p.index} for pair in itertools.combinations(cards, keep)]
+    if p.setup_org is not None and len(p.setup_quick) == keep:
+        out.append({"type": "setup_lock", "seat": p.index})
+    return out
+
+
+def setup_all_moves(s: GameState) -> list[Action]:
+    return [m for d in setup_open(s) for m in setup_moves(s, d)]
+
+
+def setup_apply(s: GameState, a: Action, events: Events) -> None:
+    """One player's move of the simultaneous setup. Nothing is shown (no event) until the last player locks in: then the choices are made
+    public together, and each player's quick start cards and starting resources are resolved in turn order, as when the choices were made
+    one after another (EXP-ORG-06, EXP-ORG-07)."""
+    p = s.players[a["seat"]]
+    if a["type"] == "choose_org":
+        p.setup_org = a["org"]
+    elif a["type"] == "choose_quick":
+        p.setup_quick = list(a["cards"])
+    else:
+        p.setup_locked = True
+        s.pending = [d for d in s.pending if not (d.kind == "setup_choice" and d.player == p.index)]
+        events.append({"type": "setup_locked", "player": p.index})
+        if not setup_open(s):
+            order = sorted(s.players, key=lambda q: (q.index - s.start_player) % len(s.players))
+            for q in order:
+                if s.rival is not None and q.index == s.rival.index:
+                    continue
+                q.organization, q.quick_start = q.setup_org, list(q.setup_quick)
+                q.offered_orgs, q.offered_quick = [], []
+                q.setup_org, q.setup_quick = None, []
+                events.append({"type": "organization", "player": q.index, "org": q.organization})
+            rival_seat = s.rival.index if s.rival is not None else -1
+            s.pending = [Decision(kind="setup_start", player=q.index) for q in order if q.index != rival_seat]
+
+
+def run_starts(s: GameState, events: Events) -> None:
+    """Resolve the next player's start (the quick start cards, the resources) when it is its turn in the order; its own tucks come first."""
+    while s.pending and s.pending[0].kind == "setup_start":
+        d = s.pending.pop(0)
+        start(s, s.players[d.player], events)
 
 
 def choose_moves(s: GameState, d: Decision) -> list[Action]:

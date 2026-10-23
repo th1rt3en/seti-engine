@@ -180,3 +180,25 @@ def test_approving_a_version_is_written_where_the_export_reads_it(tmp_path: Path
     assert approved_versions(tmp_path) == ["v001"]
     assert json.loads((tmp_path / "v001" / "manifest.json").read_text(encoding="utf-8"))["approved"] is True
     assert export(tmp_path, tmp_path / "out") == ["v001"]
+
+
+def test_the_model_chooses_its_setup_in_secret_while_a_person_chooses_too() -> None:  # EXP-ORG-14
+    options = Options(players=2, seed=31, expansion=True, organizations=True, simul_setup=True)
+    start = engine.start(options).state
+    human, bot = 0, 1
+    h_org = next(m for m in engine.legal_moves(start) if m["type"] == "choose_org" and m["seat"] == human)
+    h_quick = next(m for m in engine.legal_moves(start) if m["type"] == "choose_quick" and m["seat"] == human)
+    actions = [h_org, h_quick]  # the person has chosen, not locked in: the model must not see it
+    state, history, know = replay(options, actions)
+    assert history == [] and state.players[human].setup_org == h_org["org"]
+    for _ in range(4):  # org, quick start cards, lock
+        reply = lobby().move("v001", options, actions, bot, [])
+        assert reply.action["seat"] == bot and not reply.plan
+        actions = [*actions, reply.action]
+        if reply.action["type"] == "setup_lock":
+            break
+    assert [a["type"] for a in actions[2:]].count("setup_lock") == 1 and len(actions) - 2 <= 3
+    state, _, _ = replay(options, actions)
+    assert state.players[bot].setup_locked and not state.players[human].setup_locked
+    with pytest.raises(NotYourTurn):
+        lobby().move("v001", options, actions, bot, [])  # nothing left for it to do while it waits

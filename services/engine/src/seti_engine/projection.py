@@ -140,6 +140,8 @@ class View(BaseModel):
     counts: Counts
     trackers: list[PlayerTracker] = Field(default_factory=list)  # one per player, in seat order
     to_act: int | None
+    # every seat the engine waits for now: one, except in the simultaneous setup (EXP-ORG-14), when all who have not locked in are asked
+    acting: list[int] = Field(default_factory=list)
     legal: list[dict[str, Any]] = Field(default_factory=list)
     # the class of each legal move (free, main, answer, end, control: engine.MOVE_CLASSES), in the order of `legal`; for the AI, the
     # page may ignore it
@@ -178,6 +180,24 @@ def to_act(state: GameState) -> int | None:
     return state.current_player if state.phase == "play" else None
 
 
+def acting(state: GameState) -> list[int]:
+    """The seats that may move now: the player to act, or in the simultaneous setup (EXP-ORG-14) every player who has not locked in."""
+    if state.phase == "finished":
+        return []
+    if state.pending and state.pending[0].kind == "setup_choice":
+        return [d.player for d in state.pending if d.kind == "setup_choice"]
+    actor = to_act(state)
+    return [] if actor is None else [actor]
+
+
+def actor_of(state: GameState, action: dict[str, Any]) -> int | None:
+    """The seat that made a logged move: the player to act, or the seat that the move names (the simultaneous setup, EXP-ORG-14)."""
+    seat = action.get("seat")
+    if isinstance(seat, int) and action.get("type") in ("choose_org", "choose_quick", "setup_lock"):
+        return seat
+    return to_act(state)
+
+
 def project(state: GameState, viewer: int | None, previews: bool = True) -> View:
     s = state.model_copy(deep=True)
     counts = Counts(
@@ -207,6 +227,7 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
                 p.org_data["fs_card"] = HIDDEN  # Futurespan's prepared card lies face down
             p.offered_orgs = [HIDDEN] * len(p.offered_orgs)  # EXP-ORG-04: the cards offered at setup are the player's secret
             p.offered_quick = [HIDDEN] * len(p.offered_quick)
+            p.setup_org, p.setup_quick = None, []  # EXP-ORG-14: what a player has chosen is secret until everybody has locked in
     for slot in s.species:
         slot.deck = [HIDDEN] * len(slot.deck)
         if not slot.discovered:
@@ -233,12 +254,18 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
     if s.objectives is not None:
         s.objectives.stack = [HIDDEN] * len(s.objectives.stack)
     actor = to_act(state)
+    seats = acting(state)
+    simul = bool(state.pending) and state.pending[0].kind == "setup_choice"
+    if simul and viewer is not None and viewer in seats:
+        actor = viewer  # in the simultaneous setup every player who has not locked in is the one to act
     for d in s.pending:
         if d.player != viewer:
             d.data = {}
     if actor != viewer:
         s.aside = []
     classified = engine.legal_classified(state) if viewer is not None and actor == viewer else []
+    if simul:
+        classified = [(m, c) for m, c in classified if m.get("seat") == viewer]
     legal = [m for m, _ in classified]
     trackers = [tracker(state, p, viewer) for p in state.players]
     reach: list[ProbeReach] = []
@@ -261,6 +288,7 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
         counts=counts,
         trackers=trackers,
         to_act=actor,
+        acting=seats,
         legal=legal,
         classes=[c for _, c in classified],
         reach=reach,

@@ -20,7 +20,7 @@ from typing import Any
 
 from seti_engine import engine
 from seti_engine.models import GameState, Options
-from seti_engine.projection import to_act
+from seti_engine.projection import actor_of
 from seti_engine.replay import js_number
 
 SETUP = "setup"
@@ -101,7 +101,7 @@ def micros_from_log(options: Options, actions: list[dict[str, Any]], rng_encodin
             # log (the `scan_skip` of the games played before the scan could be done in any order, 2026-10-22): an answer of its seat
             engine.apply(state, move)
             cls = "answer"
-        seat = to_act(state)
+        seat = actor_of(state, move)  # the simultaneous setup names the seat in the move (EXP-ORG-14)
         assert seat is not None
         if move["type"] == "undo":
             taken_back = state.undo_log[-1] if state.undo_log else None

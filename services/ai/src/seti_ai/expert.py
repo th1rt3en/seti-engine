@@ -20,9 +20,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from seti_engine import engine
+from seti_engine import engine, orgs
 from seti_engine.models import GameState, Options
-from seti_engine.projection import project, to_act
+from seti_engine.projection import actor_of, project, to_act
 from seti_engine.replay import js_number
 
 from . import dataset, features
@@ -100,7 +100,7 @@ def positions(
         if rng_encoding == "double":
             state = state.model_copy()
             state.rng_state = js_number(state.rng_state)
-        seat = to_act(state)
+        seat = actor_of(state, move)
         assert seat is not None
         if index in turns:
             yield Position(game, index, seat, state.model_copy(deep=True), list(history), copy.deepcopy(know), turns[index], options)
@@ -114,8 +114,9 @@ def positions(
             state = engine.apply(state, move).state
             continue
         res = engine.apply(state, move)
-        know.update(seat, move, res.events)
-        history.append((seat, public_move(move, res.events, seat)))
+        if move["type"] not in orgs.SETUP_TYPES:  # secret until all are locked in (EXP-ORG-14)
+            know.update(seat, move, res.events)
+            history.append((seat, public_move(move, res.events, seat)))
         state = res.state
 
 

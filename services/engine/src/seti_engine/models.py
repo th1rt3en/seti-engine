@@ -38,6 +38,9 @@ class Options(BaseModel):
     organizations: bool = False
     neutral_quick_start: bool = False
     beginner_organizations: bool = False  # EXP-ORG-05: the first game tip (organizations 1 to 4, 2 quick start cards)
+    # EXP-ORG-14 (owner, 2026-10-23): every player chooses the organization and the quick start cards at the same time, in secret, and
+    # locks the choice in; nothing is shown until all have locked in. Off for a game started before (its log has the choices one by one).
+    simul_setup: bool = False
     # sandbox only: the two face-down alien species, left to right; None leaves a slot to chance (SANDBOX-06)
     sandbox_species: list[str | None] = Field(default_factory=lambda: list[str | None]([None, None]))
     seed: int = 0
@@ -50,6 +53,8 @@ class Options(BaseModel):
             raise ValueError("organizations and neutral quick start cards are part of the expansion")
         if self.beginner_organizations and not self.organizations:
             raise ValueError("the beginner organizations are an option of the organization module")
+        if self.simul_setup and not self.organizations:
+            raise ValueError("the simultaneous setup is part of the organization module")
         if self.neutral_quick_start and self.players > 2:
             raise ValueError("the neutral quick start cards are for games of 1 or 2 players")
         chosen = [x for x in self.sandbox_species if x is not None]
@@ -128,6 +133,10 @@ class PlayerState(BaseModel):
     offered_orgs: list[str] = Field(default_factory=list)
     offered_quick: list[str] = Field(default_factory=list)
     quick_start: list[str] = Field(default_factory=list)
+    # EXP-ORG-14: what the player has chosen and not yet locked in (secret), and whether the choice is locked in (public)
+    setup_org: str | None = None
+    setup_quick: list[str] = Field(default_factory=list)
+    setup_locked: bool = False
     org_used: bool = False  # the once per round ability has been used this round (EXP-ORG-10)
     org_marks: list[str] = Field(default_factory=list)  # reward spaces marked on Cosmos Strategy Group or Helion Assembly (EXP-ORG-11)
     org_data: dict[str, Any] = Field(

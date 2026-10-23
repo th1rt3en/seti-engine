@@ -192,10 +192,10 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             before = state
             continue
         assert entry is not None
-        seat = projection.to_act(before)
+        action = entry["action"]
+        seat = projection.actor_of(before, action)  # in the simultaneous setup the move names its seat (EXP-ORG-14)
         if seat is None:
             continue
-        action = entry["action"]
         rnd = before.round
         if state.round != before.round or (state.phase == "finished" and before.phase != "finished"):
             for p in before.players:  # the income that each player has at the end of this round (INCOME-01), by round

@@ -39,6 +39,7 @@ export type PromoSet2 = boolean;
 export type Sandbox = boolean;
 export type SandboxSpecies = (string | null)[];
 export type Seed = number;
+export type SimulSetup = boolean;
 export type OumuamuaPlaced = boolean;
 export type PassCardAsked = boolean;
 export type PassDiscardChecked = boolean;
@@ -94,6 +95,9 @@ export type Publicity = number;
 export type QuickStart = string[];
 export type Score = number;
 export type SectorWins = number;
+export type SetupLocked = boolean;
+export type SetupOrg = string | null;
+export type SetupQuick = string[];
 export type SignalTokens = number;
 export type Techs = string[];
 export type TraceLog = [number, string][];
@@ -188,6 +192,7 @@ export type Events = {
 export type Legal2 = {
   [k: string]: unknown;
 }[];
+export type Acting = number[];
 export type Classes = string[];
 export type Deck3 = number;
 export type EndOfRoundStacks1 = number[];
@@ -351,6 +356,7 @@ export interface Options {
   sandbox?: Sandbox;
   sandbox_species?: SandboxSpecies;
   seed?: Seed;
+  simul_setup?: SimulSetup;
 }
 /**
  * Something the engine waits for a player to choose before play continues.
@@ -415,6 +421,9 @@ export interface PlayerState {
   score: Score;
   sector_wins: SectorWins;
   security: Security;
+  setup_locked: SetupLocked;
+  setup_org: SetupOrg;
+  setup_quick: SetupQuick;
   signal_tokens: SignalTokens;
   techs: Techs;
   trace_log: TraceLog;
@@ -536,6 +545,7 @@ export interface StepResult {
  * The state as one viewer sees it. `viewer` is None for a spectator. `legal` is empty unless the viewer is the one to act.
  */
 export interface View {
+  acting: Acting;
   classes: Classes;
   counts: Counts;
   legal: Legal3;

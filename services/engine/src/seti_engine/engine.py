@@ -138,6 +138,8 @@ def legal_classified(state: GameState) -> list[tuple[Action, str]]:
     """The legal moves, each with its class, in the order of `legal_moves` (which is this list without the classes)."""
     if state.phase == "finished":
         return []
+    if state.pending and state.pending[0].kind == "setup_choice":  # EXP-ORG-14: every player who has not locked in may move
+        return [(m, "answer") for m in orgs.setup_all_moves(state)]
     if state.pending:
         d = state.pending[0]
         decisions = _decision_moves(state, d)
@@ -191,6 +193,8 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
         return [{"type": "resolve_sector", "sector": i} for i in d.data["sectors"] if i in state.completed]
     if d.kind in ("choose_org", "choose_quick"):
         return orgs.choose_moves(state, d)  # EXP-ORG-04
+    if d.kind == "setup_choice":
+        return orgs.setup_moves(state, d)  # EXP-ORG-14
     if d.kind == "organelle":
         return amoeba.pick_moves(state, d)  # EXP-AMO-04
     if d.kind == "amoeba_remove":
@@ -430,6 +434,10 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
 
 
 def _play_step(s: GameState, action: Action, events: list[dict[str, Any]]) -> None:
+    if s.pending and s.pending[0].kind == "setup_choice":
+        orgs.setup_apply(s, action, events)
+        _advance(s, events)
+        return
     if s.pending and action not in _decision_moves(s, s.pending[0]) and not techs.legacy_scan_skip_ok(s, action):
         # FREE-00: a free action in the middle of the main action; the decisions of the main action wait until the free action is done
         s.stashed, s.pending = s.pending, []
@@ -869,6 +877,7 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
 def _advance(s: GameState, events: list[dict[str, Any]]) -> None:
     """Run the automatic steps of a turn until the engine needs a choice or the next player's turn begins."""
     while True:
+        orgs.run_starts(s, events)  # EXP-ORG-14: the players' starts, one after another, once the choices are locked in
         if not s.pending and s.stashed:  # the free action that interrupted the main action is done (FREE-00)
             s.pending, s.stashed = s.stashed, []
             s.free_active = False

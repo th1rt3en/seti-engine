@@ -14,9 +14,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from seti_engine import engine
+from seti_engine import engine, orgs
 from seti_engine.models import GameState, Options
-from seti_engine.projection import project, to_act
+from seti_engine.projection import View, acting, actor_of, project
 from seti_engine.replay import js_number
 
 from .bundle_data import public_move
@@ -52,7 +52,7 @@ def replay(options: Options, actions: list[dict[str, Any]], rng_encoding: str = 
         if rng_encoding == "double":
             state = state.model_copy()
             state.rng_state = js_number(state.rng_state)
-        seat = to_act(state)
+        seat = actor_of(state, move)
         if seat is None:
             raise ValueError("the log has moves after the end of the game")
         if move["type"] == "undo":
@@ -65,8 +65,9 @@ def replay(options: Options, actions: list[dict[str, Any]], rng_encoding: str = 
             state = engine.apply(state, move).state
             continue
         res = engine.apply(state, move)
-        know.update(seat, move, res.events)
-        history.append((seat, public_move(move, res.events, seat)))
+        if move["type"] not in orgs.SETUP_TYPES:  # the others' choices of the simultaneous setup are secret (EXP-ORG-14)
+            know.update(seat, move, res.events)
+            history.append((seat, public_move(move, res.events, seat)))
         state = res.state
     return state, history, know
 
@@ -81,14 +82,33 @@ class Lobby:
     def models(self) -> list[str]:
         return sorted(self.brains)
 
+    def _setup_move(self, brain: Brain, view: View, history: History, know: Knowledge) -> dict[str, Any]:
+        """EXP-ORG-14: the organization, the quick start cards and the lock, one move at a time, on the seat's own view (the choices of the others
+        are hidden): the best of what is still open, and the lock as soon as both are chosen."""
+        seat = view.viewer
+        assert seat is not None
+        me = view.state.players[seat]
+        lock = next((m for m in view.legal if m["type"] == "setup_lock"), None)
+        if lock is not None:
+            return dict(lock)
+        scores = brain.logits(view, history, know)
+        open_moves = [
+            i
+            for i, m in enumerate(view.legal)
+            if not (m["type"] == "choose_org" and me.setup_org is not None) and not (m["type"] == "choose_quick" and me.setup_quick)
+        ]
+        return dict(view.legal[max(open_moves, key=lambda i: scores[i])])
+
     def move(self, model: str, options: Options, actions: list[dict[str, Any]], seat: int, plan: list[dict[str, Any]], rng_encoding: str = "exact") -> Reply:
         brain = self.brains.get(model)
         if brain is None:
             raise NoSuchModel(model)
         state, history, know = replay(options, actions, rng_encoding)
-        if seat is None or to_act(state) != seat:
+        if seat is None or seat not in acting(state):
             raise NotYourTurn(f"seat {seat} is not the one to act")
         view = project(state, seat, previews=False)
+        if state.pending and state.pending[0].kind == "setup_choice":
+            return Reply(self._setup_move(brain, view, history, know), [], False)  # EXP-ORG-14: chosen on the seat's own view, no search
         bot = BundleBot(brain, self.config)
         bot.history, bot.knowledge = history, know
         bot.plan, bot.pos, bot.key = list(plan), 0, bundle_key(state, seat)

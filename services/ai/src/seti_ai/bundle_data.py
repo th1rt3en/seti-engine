@@ -21,9 +21,9 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
-from seti_engine import engine
+from seti_engine import engine, orgs
 from seti_engine.models import GameState, Options
-from seti_engine.projection import project, to_act
+from seti_engine.projection import actor_of, project
 from seti_engine.replay import js_number
 
 from . import features
@@ -106,7 +106,7 @@ def examples_from_log(
         if rng_encoding == "double":
             state = state.model_copy()
             state.rng_state = js_number(state.rng_state)
-        seat = to_act(state)
+        seat = actor_of(state, move)
         assert seat is not None
         if move["type"] == "undo":
             taken = state.undo_log[-1] if state.undo_log else None
@@ -126,8 +126,9 @@ def examples_from_log(
                 tokens = features.encode_view(view, history if memory else None, know if memory else None)
                 out.policy.append(PolicyExample(tokens, toks, nums, chosen, _w(policy_weight, seat)))
         res = engine.apply(state, move)
-        know.update(seat, move, res.events)
-        history.append((seat, public_move(move, res.events, seat)))
+        if move["type"] not in orgs.SETUP_TYPES:  # the choices of the simultaneous setup are secret until all are locked in (EXP-ORG-14)
+            know.update(seat, move, res.events)
+            history.append((seat, public_move(move, res.events, seat)))
         state = res.state
         if finished and index in last_of_bundle and index in kept and _w(value_weight, seat) > 0:
             after = project(state, seat, previews=False)
