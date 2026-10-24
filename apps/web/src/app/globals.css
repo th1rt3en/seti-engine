@@ -970,3 +970,8 @@ html[data-ingame="1"] header.bar {
   color: var(--bad);
   border-top: 1px solid var(--line);
 }
+
+/* the menu of the bar of a game opens over the floating panels (the bar is a stacking layer of its own, under the panels, so it comes up while the menu is open) */
+.topbar:has(.barmenupanel) {
+  z-index: 80;
+}

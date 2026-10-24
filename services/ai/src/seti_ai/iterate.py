@@ -298,7 +298,9 @@ def run(s: Settings, start: Path, resume: bool, brain: BrainFactory = net_brain,
     else:
         net = new_net(preset).to(device) if preset else net_from(str(start if start.is_file() else start / "model.pt"), device)
         opt = torch.optim.AdamW(net.parameters(), lr=s.lr, weight_decay=0.01)
-        print(f"starting from {champion['version']}: {sum(p.numel() for p in net.parameters()) / 1e6:.1f}M parameters, on {device}", flush=True)
+        origin = f"a new {preset} network" if preset else f"the weights of {champion['version']}"
+        size = sum(p.numel() for p in net.parameters()) / 1e6
+        print(f"starting from {origin}: {size:.1f}M parameters, on {device}; the champion to beat in the gate is {champion['version']}", flush=True)
     values = human_values(s)
     buf = Buffer(root, s.buffer)
     for it in range(first, s.iterations + 1):
