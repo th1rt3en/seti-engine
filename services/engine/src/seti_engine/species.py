@@ -100,13 +100,15 @@ def alien_card_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
     return out
 
 
-def take_alien_card(s: GameState, p: PlayerState, slot_index: int, source: str) -> None:
+def take_alien_card(s: GameState, p: PlayerState, slot_index: int, source: str, events: Events) -> None:
     slot = s.species[slot_index]
     if source == "deck":
         p.hand.append(slot.deck.pop())
     else:
         assert slot.face_up is not None
         p.hand.append(slot.face_up)
+        # the card was in view: the log names it
+        events.append({"type": "take_alien_display_card", "player": p.index, "card": slot.face_up, "slot": slot_index})
         slot.face_up = slot.deck.pop() if slot.deck else None  # replaced with the top card of the deck
 
 

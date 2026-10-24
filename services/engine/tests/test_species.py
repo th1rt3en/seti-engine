@@ -112,6 +112,9 @@ def test_alien_card_reward_lets_the_player_draw_from_the_deck_or_the_face_up_car
     r = do(with_state(s), "take_alien", source="face_up")
     assert face_up in r.state.players[pl].hand and len(r.state.players[pl].hand) == hand + 1
     assert r.state.species[0].face_up is not None and r.state.species[0].face_up != face_up
+    assert {"type": "take_alien_display_card", "player": pl, "card": face_up, "slot": 0} in r.events
+    deck_pick = do(with_state(s), "take_alien", source="deck")
+    assert not any(e["type"] == "take_alien_display_card" for e in deck_pick.events)  # the top of the deck is not shown
 
 
 def test_alien_card_icon_does_nothing_when_the_species_has_no_cards_left() -> None:

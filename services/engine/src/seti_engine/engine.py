@@ -845,7 +845,7 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif t == "mark_objective":
         objectives.mark(s, a["objective"], a["task"])
     elif t == "take_alien":
-        species.take_alien_card(s, p, d.data["slot"], a["source"])
+        species.take_alien_card(s, p, d.data["slot"], a["source"], events)
     elif t == "choose_message":
         species.reach_message(s, p, a["hex"], events)
     elif t == "take_card":
