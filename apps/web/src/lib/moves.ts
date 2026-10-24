@@ -84,7 +84,8 @@ export const LABELS: Record<string, Label> = {
   setup_lock: () => "Lock in your choices: the others see them when everybody has locked in",
   choose_org: (m) =>
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
-  choose_tucks: (m) => `Tuck ${((m.cards as string[]) ?? []).map(cardName).join(" and ")} for income`,
+  setup_tuck: (m) => `Tuck ${cardName(m.card)} for income`,
+  setup_untuck: (m) => `Take back the tuck of ${cardName(m.card)}`,
   choose_quick: (m) => `Keep the quick start cards ${((m.cards as string[]) ?? []).map(quickText).join(" and ")}`,
   org_free: (m) => orgFreeLabel(m),
   breach: () => "Breach your security card of that color (take it into your hand)",
@@ -358,8 +359,10 @@ export function logText(m: Move): string {
       return "chose an organization"; // what it is stays secret until everybody has locked in (EXP-ORG-14); the log names it then
     case "choose_quick":
       return "chose the quick start cards";
-    case "choose_tucks":
-      return "chose the cards to tuck for income";
+    case "setup_tuck":
+      return "tucked a card for income";
+    case "setup_untuck":
+      return "took a tuck back";
     case "setup_lock":
       return "locked in their choices";
     case "setup_unlock":

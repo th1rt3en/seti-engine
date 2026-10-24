@@ -105,13 +105,18 @@ def dump(state: GameState) -> dict[str, Any]:
     return d
 
 
+def tuck_all(r: StepResult, seat: int) -> StepResult:
+    """One tuck at a time (the first card of the hand), until the player has made all theirs; then the lock."""
+    while any(m["type"] == "setup_tuck" and m["seat"] == seat for m in r.legal):
+        r = apply(r.state, min((m for m in r.legal if m["type"] == "setup_tuck" and m["seat"] == seat), key=lambda m: m["card"]))
+    return apply(r.state, pick(r, seat, "setup_lock"))
+
+
 def finish_tucks(r: StepResult) -> StepResult:
-    """The tucks: the simultaneous ones (the first cards of the hand, then the lock) or the one-by-one ones of the older flow."""
+    """The tucks: the simultaneous ones (one card at a time, then the lock) or the one-by-one ones of the older flow."""
     while r.state.phase == "setup":
         if r.state.pending[0].kind == "setup_choice":
-            seat = r.state.pending[0].player
-            r = apply(r.state, pick(r, seat, "choose_tucks"))
-            r = apply(r.state, pick(r, seat, "setup_lock"))
+            r = tuck_all(r, r.state.pending[0].player)
         else:
             r = apply(r.state, min((m for m in r.legal if m["type"] == "tuck"), key=lambda m: m["card"]))
     return r
@@ -207,54 +212,106 @@ def at_tucks(players: int = 2, seed: int = 7) -> StepResult:
     return r
 
 
-def test_the_tucks_are_chosen_together_in_secret_and_tucked_when_all_have_locked_in() -> None:  # EXP-ORG-07, EXP-ORG-14
+def test_the_tucks_are_made_one_at_a_time_in_secret_and_final_when_all_have_locked_in() -> None:  # EXP-ORG-07, EXP-ORG-14
     r = at_tucks()
     seats = [d.player for d in r.state.pending]
     assert seats and all(m["seat"] in seats for m in r.legal)
     first, second = seats[0], seats[-1]
-    r = apply(r.state, pick(r, second, "choose_tucks"))
-    chosen = r.state.players[second].setup_tucks
-    assert len(chosen) == r.state.players[second].tucks_owed
-    assert projection.project(r.state, first, previews=False).state.players[second].setup_tucks == []  # nobody else sees them
-    assert r.state.players[second].tucked == []  # nothing is tucked yet
-    r = apply(r.state, pick(r, second, "setup_lock"))
+    owed = r.state.players[second].tucks_owed
+    r = apply(r.state, pick(r, second, "setup_tuck"))
+    me = r.state.players[second]
+    assert len(me.setup_tucks) == 1 and len(me.tucked) == 1 and (owed == 1 or not any(m["type"] == "setup_lock" for m in r.legal))
+    other = projection.project(r.state, first, previews=False).state.players[second]
+    assert other.setup_tucks == [] and other.tucked == ["?"]  # nobody else sees what was tucked
+    r = tuck_all(r, second)
+    assert r.state.players[second].setup_locked
     if first != second:
-        assert r.state.phase == "setup" and r.state.players[second].tucked == []
-        r = apply(r.state, pick(r, first, "choose_tucks"))
-        r = apply(r.state, pick(r, first, "setup_lock"))
+        assert r.state.phase == "setup"
+        r = tuck_all(r, first)
     assert r.state.phase == "play" and not r.state.pending
-    assert [e["player"] for e in r.events if e["type"] == "tuck"]  # announced when the last one locks in
-    assert all(p.setup_tucks == [] and p.tucks_owed == 0 for p in r.state.players)
+    assert all(p.setup_tucks == [] and p.tucks_owed == 0 and p.setup_tuck_undo == [] for p in r.state.players)
     assert all(len(p.tucked) >= 1 for p in r.state.players if p.organization != "xenolab")
 
 
-def test_a_tuck_needs_the_exact_number_of_cards_and_can_be_changed_or_unlocked() -> None:  # EXP-ORG-07, EXP-ORG-14
-    r = at_tucks(3)
-    seats = [d.player for d in r.state.pending]
-    seat = seats[0]
-    assert not any(m["type"] == "setup_lock" and m["seat"] == seat for m in r.legal)  # nothing chosen yet
-    a, b = [m for m in r.legal if m["type"] == "choose_tucks" and m["seat"] == seat][:2]
-    assert len(a["cards"]) == r.state.players[seat].tucks_owed
-    r = apply(r.state, a)
-    r = apply(r.state, b)  # changed its mind
-    assert r.state.players[seat].setup_tucks == b["cards"]
-    r = apply(r.state, pick(r, seat, "setup_lock"))
-    if len(seats) > 1:
-        assert any(m["type"] == "setup_unlock" and m["seat"] == seat for m in r.legal)
+def tuck_of_kind(r: StepResult, seat: int, drawing: bool) -> dict[str, object] | None:
+    from seti_engine import tables  # noqa: PLC0415
+
+    for m in r.legal:
+        if m["type"] == "setup_tuck" and m["seat"] == seat and ((tables.cards()[m["card"]]["income"] == "card") == drawing):
+            return m
+    return None
+
+
+def test_a_tuck_that_draws_a_card_is_final_and_the_card_can_be_tucked_next() -> None:  # EXP-ORG-07, EXP-ORG-14 (owner, 2026-10-24)
+    for seed in range(1, 40):
+        r = at_tucks(2, seed)
+        seat = r.state.pending[0].player
+        if r.state.players[seat].tucks_owed < 2:
+            continue
+        m = tuck_of_kind(r, seat, True)
+        if m is None:
+            continue
+        hand = len(r.state.players[seat].hand)
+        deck = len(r.state.deck)
+        r = apply(r.state, m)
+        p = r.state.players[seat]
+        assert len(r.state.deck) == deck - 1 and len(p.hand) == hand  # the tucked card left the hand, a new one came at once
+        assert p.setup_tuck_undo == [None]
+        assert not any(x["type"] == "setup_untuck" and x["seat"] == seat for x in r.legal)  # the draw cannot be taken back
+        assert not any(x["type"] == "setup_lock" and x["seat"] == seat for x in r.legal)  # one more tuck is owed
+        drawn = [c for c in p.hand if c not in r.state.players[seat].tucked][-1]
+        assert any(x["type"] == "setup_tuck" and x["card"] == drawn and x["seat"] == seat for x in r.legal)  # the new card may be tucked
+        return
+    raise AssertionError("no seed gave a player two tucks and a card income")
+
+
+def test_a_tuck_that_gave_resources_is_taken_back_after_the_unlock_and_another_card_tucked() -> None:  # EXP-ORG-07, EXP-ORG-14
+    for seed in range(1, 40):
+        r = at_tucks(2, seed)
+        seat = r.state.pending[0].player
+        other = 1 - seat
+        m = tuck_of_kind(r, seat, False)
+        if m is None:
+            continue
+        p0 = r.state.players[seat]
+        before = (p0.credits, p0.energy, p0.publicity, p0.data_pool, sorted(p0.hand))
+        r = apply(r.state, m)
+        r = tuck_all(r, seat)
+        assert r.state.players[seat].setup_locked
+        # the other player has not locked in: the first may unlock, take the tuck back and tuck a different card
         r = apply(r.state, pick(r, seat, "setup_unlock"))
-        assert r.state.pending[-1].data["step"] == "tuck"  # it chooses its tucks again, not its organization
-        assert any(m["type"] == "choose_tucks" and m["seat"] == seat for m in r.legal)
+        back = next(x for x in r.legal if x["type"] == "setup_untuck" and x["seat"] == seat and x["card"] == m["card"])
+        r = apply(r.state, back)
+        assert m["card"] in r.state.players[seat].hand and m["card"] not in r.state.players[seat].tucked
+        if r.state.players[seat].tucks_owed == 1:
+            p1 = r.state.players[seat]
+            assert (p1.credits, p1.energy, p1.publicity, p1.data_pool, sorted(p1.hand)) == before  # what it gave is given back
+        different = next(x for x in r.legal if x["type"] == "setup_tuck" and x["seat"] == seat and x["card"] != m["card"])
+        r = apply(r.state, different)
+        assert different["card"] in r.state.players[seat].tucked
+        del other
+        return
+    raise AssertionError("no seed gave a tuck that gives only a resource")
+
+
+def test_the_tuck_moves_name_their_seat_and_a_locked_player_cannot_tuck() -> None:  # EXP-ORG-14
+    r = at_tucks(3)
+    seat = r.state.pending[0].player
+    r = tuck_all(r, seat)
+    assert not any(m["type"] in ("setup_tuck", "setup_untuck") and m["seat"] == seat for m in r.legal)
+    with pytest.raises(IllegalAction):
+        apply(r.state, {"type": "setup_tuck", "card": r.state.players[seat].hand[0], "seat": seat})
 
 
 def test_without_organizations_each_player_tucks_their_card_at_the_same_time() -> None:  # SETUP-36, EXP-ORG-14 (owner, 2026-10-24)
     r = start(Options(players=3, seed=3, simul_setup=True))
     assert r.state.phase == "setup" and [d.kind for d in r.state.pending] == ["setup_choice"] * 3
     assert sorted(projection.acting(r.state)) == [0, 1, 2]
-    assert {m["type"] for m in r.legal} == {"choose_tucks"}  # one card each, chosen by every player on their own
+    assert {m["type"] for m in r.legal} == {"setup_tuck"}  # one card each, chosen by every player on their own
     hands = [len(p.hand) for p in r.state.players]
     for seat in (2, 0, 1):  # in any order: nobody waits for another
-        r = apply(r.state, pick(r, seat, "choose_tucks"))
-        assert r.state.players[seat].tucked == []  # secret until all have locked in
+        r = apply(r.state, pick(r, seat, "setup_tuck"))
+        assert len(r.state.players[seat].tucked) == 1  # the tuck is made at once (and is secret from the others until all have locked in)
         r = apply(r.state, pick(r, seat, "setup_lock"))
     assert r.state.phase == "play" and not r.state.pending
     assert all(len(p.tucked) == 1 for p in r.state.players)

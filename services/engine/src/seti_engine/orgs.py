@@ -91,7 +91,7 @@ def deal(s: GameState, order: list[int]) -> None:
 # the simultaneous setup (EXP-ORG-14, owner 2026-10-23)
 # ---------------------------------------------------------------------------------------------------------------------------------
 
-SETUP_TYPES = frozenset({"choose_org", "choose_quick", "choose_tucks", "setup_lock", "setup_unlock"})
+SETUP_TYPES = frozenset({"choose_org", "choose_quick", "setup_tuck", "setup_untuck", "setup_lock", "setup_unlock"})
 
 
 def is_secret_setup(move: Action) -> bool:
@@ -110,11 +110,17 @@ def setup_moves(s: GameState, d: Decision) -> list[Action]:
     p = s.players[d.player]
     if p.setup_locked:
         return []
-    if d.data.get("step") == "tuck":  # EXP-ORG-07, EXP-ORG-14: the cards to tuck for income, chosen at the same time by all
-        cards = sorted(dict.fromkeys(p.hand))
-        tucks = [{"type": "choose_tucks", "cards": list(c), "seat": p.index} for c in itertools.combinations(cards, p.tucks_owed)]
-        return tucks + ([{"type": "setup_lock", "seat": p.index}] if len(p.setup_tucks) == p.tucks_owed else [])
-    out: list[Action] = [{"type": "choose_org", "org": o, "seat": p.index} for o in p.offered_orgs]
+    if d.data.get("step") == "tuck":  # EXP-ORG-07, EXP-ORG-14: the cards to tuck for income, one at a time, by all players at the same time
+        out: list[Action] = []
+        if len(p.setup_tucks) < p.tucks_owed:
+            out += [{"type": "setup_tuck", "card": c, "seat": p.index} for c in sorted(dict.fromkeys(p.hand))]
+        # a tuck that only gave resources can be taken back (a tuck that drew a card cannot: the player has seen the card)
+        takeable = {c for c, u in zip(p.setup_tucks, p.setup_tuck_undo, strict=True) if u is not None}
+        out += [{"type": "setup_untuck", "card": c, "seat": p.index} for c in sorted(takeable)]
+        if len(p.setup_tucks) == p.tucks_owed:
+            out.append({"type": "setup_lock", "seat": p.index})
+        return out
+    out = [{"type": "choose_org", "org": o, "seat": p.index} for o in p.offered_orgs]
     cards = sorted(p.offered_quick)
     keep = min(2, len(cards))
     out += [{"type": "choose_quick", "cards": list(pair), "seat": p.index} for pair in itertools.combinations(cards, keep)]
@@ -146,8 +152,10 @@ def setup_apply(s: GameState, a: Action, events: Events) -> None:
         p.setup_org = a["org"]
     elif a["type"] == "choose_quick":
         p.setup_quick = list(a["cards"])
-    elif a["type"] == "choose_tucks":
-        p.setup_tucks = list(a["cards"])
+    elif a["type"] == "setup_tuck":
+        tuck_now(s, p, a["card"], events)
+    elif a["type"] == "setup_untuck":
+        untuck(p, a["card"], events)
     elif a["type"] == "setup_unlock":  # the choices are kept: the player changes them, or locks in again
         p.setup_locked = False
         s.pending.append(Decision(kind="setup_choice", player=p.index, data=tuck_step(p) if p.tucks_owed else {}))
@@ -171,6 +179,34 @@ def setup_apply(s: GameState, a: Action, events: Events) -> None:
             s.pending = [Decision(kind="setup_start", player=q.index) for q in order if q.index != rival_seat]
 
 
+def tuck_now(s: GameState, p: PlayerState, card: str, events: Events) -> None:
+    """EXP-ORG-07, INCOME-01: the card is tucked and its resource gained at once. A tuck for a card draws one from the deck: the player
+    has seen it, so that tuck cannot be taken back, and the drawn card may be tucked next."""
+    before = (p.credits, p.energy, p.publicity, p.data_pool)
+    deck, hand = len(s.deck), len(p.hand)
+    effects.tuck_card(s, p, card)
+    after = (p.credits, p.energy, p.publicity, p.data_pool)
+    drew = len(s.deck) != deck or len(p.hand) != hand - 1
+    p.setup_tucks.append(card)
+    gave = dict(zip(("credits", "energy", "publicity", "data_pool"), (a - b for a, b in zip(after, before, strict=True)), strict=True))
+    p.setup_tuck_undo.append(None if drew else gave)
+    events.append({"type": "tuck", "player": p.index, "card": card})
+
+
+def untuck(p: PlayerState, card: str, events: Events) -> None:
+    """Take back a tuck that gave only resources (the last of that card): the card returns to the hand and what it gave is given back."""
+    i = max(k for k, (c, u) in enumerate(zip(p.setup_tucks, p.setup_tuck_undo, strict=True)) if c == card and u is not None)
+    gave = p.setup_tuck_undo[i] or {}
+    del p.setup_tucks[i], p.setup_tuck_undo[i]
+    p.tucked.remove(card)
+    p.hand.append(card)
+    p.credits -= gave.get("credits", 0)
+    p.energy -= gave.get("energy", 0)
+    p.publicity -= gave.get("publicity", 0)
+    p.data_pool -= gave.get("data_pool", 0)
+    events.append({"type": "untuck", "player": p.index, "card": card})
+
+
 def tuck_step(p: PlayerState) -> dict[str, Any]:
     return {"step": "tuck", "number": p.tucks_owed}
 
@@ -191,12 +227,9 @@ def open_tucks(s: GameState) -> None:
 
 
 def resolve_tucks(s: GameState, events: Events) -> None:
-    """The last lock of the tucks: the cards are tucked in turn order (EXP-ORG-07, INCOME-01)."""
-    for q in sorted(s.players, key=lambda x: (x.index - s.start_player) % len(s.players)):
-        for cid in q.setup_tucks:
-            effects.tuck_card(s, q, cid)
-            events.append({"type": "tuck", "player": q.index, "card": cid})
-        q.setup_tucks, q.tucks_owed, q.setup_locked = [], 0, False
+    """The last lock of the tucks: the tucks were made one at a time as the players went; now they are final and the game begins."""
+    for q in s.players:
+        q.setup_tucks, q.setup_tuck_undo, q.tucks_owed, q.setup_locked = [], [], 0, False
     s.phase = "play"
 
 

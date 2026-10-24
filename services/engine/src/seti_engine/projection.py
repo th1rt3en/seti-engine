@@ -193,7 +193,7 @@ def acting(state: GameState) -> list[int]:
 def actor_of(state: GameState, action: dict[str, Any]) -> int | None:
     """The seat that made a logged move: the player to act, or the seat that the move names (the simultaneous setup, EXP-ORG-14)."""
     seat = action.get("seat")
-    if isinstance(seat, int) and action.get("type") in ("choose_org", "choose_quick", "choose_tucks", "setup_lock", "setup_unlock"):
+    if isinstance(seat, int) and action.get("type") in orgs.SETUP_TYPES:
         return seat
     return to_act(state)
 
@@ -227,7 +227,9 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
                 p.org_data["fs_card"] = HIDDEN  # Futurespan's prepared card lies face down
             p.offered_orgs = [HIDDEN] * len(p.offered_orgs)  # EXP-ORG-04: the cards offered at setup are the player's secret
             p.offered_quick = [HIDDEN] * len(p.offered_quick)
-            p.setup_tucks = []  # EXP-ORG-14: the cards that a player means to tuck are secret too
+            p.setup_tucks, p.setup_tuck_undo = [], []  # EXP-ORG-14: the tucks of the setup are secret until all have locked in
+            if p.tucks_owed:
+                p.tucked = [HIDDEN] * len(p.tucked)
             p.setup_org, p.setup_quick = None, []  # EXP-ORG-14: what a player has chosen is secret until everybody has locked in
     for slot in s.species:
         slot.deck = [HIDDEN] * len(slot.deck)

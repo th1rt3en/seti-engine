@@ -99,6 +99,9 @@ export type SectorWins = number;
 export type SetupLocked = boolean;
 export type SetupOrg = string | null;
 export type SetupQuick = string[];
+export type SetupTuckUndo = ({
+  [k: string]: number;
+} | null)[];
 export type SetupTucks = string[];
 export type SignalTokens = number;
 export type Techs = string[];
@@ -428,6 +431,7 @@ export interface PlayerState {
   setup_locked: SetupLocked;
   setup_org: SetupOrg;
   setup_quick: SetupQuick;
+  setup_tuck_undo: SetupTuckUndo;
   setup_tucks: SetupTucks;
   signal_tokens: SignalTokens;
   techs: Techs;

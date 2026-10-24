@@ -408,7 +408,8 @@ export function GameClient({
       !placed.has(m) &&
       m.type !== "sandbox" &&
       !isOffer(m) &&
-      m.type !== "choose_tucks" && // the tucks of the simultaneous setup are chosen on the screen of the setup
+      m.type !== "setup_tuck" && // the tucks of the simultaneous setup are made on the screen of the setup
+      m.type !== "setup_untuck" &&
       m.type !== "setup_lock" && // the lock of the simultaneous setup is the button of its own screen
       !rowMoves.includes(m) &&
       !(m.type === "org_main" && typeof m.tile === "string") && // the tiles of Xenolab are buttons of the main actions
@@ -609,16 +610,13 @@ export function GameClient({
   const simulOrg = pickedOffer ?? me?.setup_org ?? null;
   const simulCards = pickedQuick.length > 0 ? pickedQuick : (me?.setup_quick ?? []);
   // EXP-ORG-07, EXP-ORG-14: then the cards to tuck for income, again all at the same time
-  const tuckMoves = simul ? mine.filter((m) => m.type === "choose_tucks") : [];
-  const tuckNeed = tuckMoves[0] ? quickCards(tuckMoves[0]).length : 0;
-  const tuckHand = [...new Set(tuckMoves.flatMap(quickCards))];
-  const tuckPicked = pickedQuick.length > 0 ? pickedQuick : (me?.setup_tucks ?? []);
-  const lockTucks = () => {
-    const cards = tuckMoves.find((m) => quickCards(m).length === tuckNeed && quickCards(m).every((c) => tuckPicked.includes(c)));
-    if (!cards || v.viewer === null) return;
-    plan.current = [{ type: "setup_lock", seat: v.viewer }];
-    sendAction(cards);
-  };
+  const tuckMoves = simul ? mine.filter((m) => m.type === "setup_tuck") : [];
+  const untuckMoves = simul ? mine.filter((m) => m.type === "setup_untuck") : [];
+  const tuckLock = simul && (me?.tucks_owed ?? 0) > 0 ? mine.find((m) => m.type === "setup_lock") : undefined;
+  const tuckHand = [...new Set(tuckMoves.map((m) => String(m.card)))];
+  const tuckedSoFar = (me?.setup_tucks ?? []).map((card) => ({ card, undoable: untuckMoves.some((u) => u.card === card) }));
+  const tuckPicked = pickedQuick[0] !== undefined && tuckHand.includes(pickedQuick[0]) ? pickedQuick[0] : null;
+  const tuckMove = tuckPicked === null ? undefined : tuckMoves.find((m) => m.card === tuckPicked);
   const lockIn = () => {
     const org = mine.find((m) => m.type === "choose_org" && offerId(m) === simulOrg);
     const cards = mine.find(
@@ -1335,15 +1333,25 @@ export function GameClient({
                 status={setupStatus(v, names)}
               />
             ) : null}
-            {simul && tuckMoves.length > 0 && !ended ? (
+            {simul && (tuckMoves.length > 0 || untuckMoves.length > 0 || tuckLock) && !ended ? (
               <SetupTucks
                 hand={tuckHand}
+                tucked={tuckedSoFar}
+                need={me?.tucks_owed ?? 0}
                 picked={tuckPicked}
-                need={tuckNeed}
-                onPick={(id) =>
-                  setPickedQuick(tuckPicked.includes(id) ? tuckPicked.filter((c) => c !== id) : [...tuckPicked, id].slice(-tuckNeed))
-                }
-                onLock={lockTucks}
+                drawing={tuckPicked !== null && cardInfo(tuckPicked)?.income === "card"}
+                onPick={(id) => setPickedQuick(tuckPicked === id ? [] : [id])}
+                onTuck={() => {
+                  if (tuckMove) {
+                    setPickedQuick([]);
+                    sendAction(tuckMove);
+                  }
+                }}
+                onUntuck={(card) => {
+                  const m = untuckMoves.find((u) => u.card === card);
+                  if (m) sendAction(m);
+                }}
+                onLock={tuckLock ? () => sendAction(tuckLock) : undefined}
                 clock={
                   v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
                 }

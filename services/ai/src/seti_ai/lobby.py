@@ -91,8 +91,8 @@ class Lobby:
         lock = next((m for m in view.legal if m["type"] == "setup_lock"), None)
         if lock is not None:
             return dict(lock)
-        tucks = [m for m in view.legal if m["type"] == "choose_tucks"]
-        if tucks:  # EXP-ORG-07: the cards to tuck for income (the model has no score for this move yet: the first choice is kept)
+        tucks = [m for m in view.legal if m["type"] == "setup_tuck"]
+        if tucks:  # EXP-ORG-07: the cards to tuck for income, one at a time (the model has no score for this move yet: the first card is kept)
             return dict(tucks[0])
         scores = brain.logits(view, history, know)
         open_moves = [

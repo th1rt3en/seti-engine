@@ -1235,6 +1235,23 @@
           "title": "Setup Quick",
           "type": "array"
         },
+        "setup_tuck_undo": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Setup Tuck Undo",
+          "type": "array"
+        },
         "setup_tucks": {
           "items": {
             "type": "string"
@@ -1324,6 +1341,7 @@
         "setup_locked",
         "setup_org",
         "setup_quick",
+        "setup_tuck_undo",
         "setup_tucks",
         "signal_tokens",
         "techs",

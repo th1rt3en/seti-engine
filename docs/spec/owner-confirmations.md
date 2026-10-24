@@ -76,6 +76,10 @@ organizations and 2 or more players starts; games started before keep the choice
 
 Owner: "tucking cards for income as part of org/quickstart selection should also be simultaneous". Because the cards to tuck depend on the draws of the starts (EXP-ORG-07: resources, then tucks), the tucks are a second simultaneous step after the starts are resolved: the same decision (`setup_choice`, `data.step = "tuck"`), the move `choose_tucks` and the same lock, unlock and clocks.
 
+## The tucks are made one at a time, 2026-10-24 (EXP-ORG-07, EXP-ORG-14)
+
+Owner: a player who gets 2 or 3 tucks resolves each one at a time, independent of the other players. A tuck for a card gives the card at once and cannot be taken back; the new card may be tucked with the second tuck. The player locks in after all the tucks; unlocking lets them take back the tucks that can be taken back (those that did not draw) and tuck a different card instead. In the engine: the moves `setup_tuck` and `setup_untuck` (each names its seat), the decision `setup_choice` with `data.step = "tuck"`, and `PlayerState.setup_tuck_undo`, which records what each tuck gave. The move `choose_tucks` of the same day is gone.
+
 ## Unlocking in the simultaneous setup, 2026-10-23 (EXP-ORG-14)
 
 A player who has locked in may unlock to change the organization or the quick start cards, for as long as at least one other player has not locked in (the last lock ends the

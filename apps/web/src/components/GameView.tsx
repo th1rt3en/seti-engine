@@ -93,8 +93,8 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
       who: "",
       mine,
       text: mine
-        ? view.legal.some((m) => m.type === "choose_tucks")
-          ? "choose the cards to tuck for income, then lock in"
+        ? view.legal.some((m) => m.type === "setup_tuck" || m.type === "setup_untuck")
+          ? "tuck your cards for income, one at a time, then lock in"
           : "choose your organization and your quick start cards, then lock in"
         : `your choices are locked in; waiting for the others (you can change them until everybody has locked in). ${setupStatus(view, names)}`,
     };
