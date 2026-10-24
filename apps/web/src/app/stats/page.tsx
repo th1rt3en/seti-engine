@@ -56,6 +56,19 @@ const TRACE_HEX: Record<string, string> = { pink: "#d55181", yellow: "#c98500", 
 const INCOME_HEX: Record<string, string> = { credit: "#c98500", energy: "#199e70", card: "#3987e5" };
 const VIZ = ["var(--viz-1)", "var(--viz-2)", "var(--viz-3)", "var(--viz-4)", "var(--viz-5)"];
 
+/** One of the three bars of an organization: the name of the number, the bar, and the number. */
+function OrgBar({ label, share, color, text }: { label: string; share: number; color: string; text: ReactNode }) {
+  return (
+    <span className="orgbar">
+      <span className="orgbar-label muted small">{label}</span>
+      <span className="bar-track">
+        <span className="bar-fill" style={{ width: `${Math.max(share > 0 ? 1.5 : 0, Math.min(1, share) * 100)}%`, background: color }} />
+      </span>
+      <span className="orgbar-text">{text}</span>
+    </span>
+  );
+}
+
 function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   return (
     <div className="tablewrap">
@@ -86,7 +99,17 @@ const Blank = () => <span className="icon-blank" aria-hidden="true" />;
 
 export default async function StatsPage({
   searchParams,
-}: { searchParams: Promise<{ players?: string; expansion?: string; rated?: string; who?: string; species?: string; org?: string }> }) {
+}: {
+  searchParams: Promise<{
+    players?: string;
+    expansion?: string;
+    rated?: string;
+    who?: string;
+    species?: string;
+    org?: string;
+    osort?: string;
+  }>;
+}) {
   const sp = await searchParams;
   const filter = parseFilter(sp);
   const s = await cachedStats(getDb(), filter);
@@ -101,10 +124,16 @@ export default async function StatsPage({
   if (filter.players !== null) base.players = String(filter.players);
   if (filter.expansion !== null) base.expansion = filter.expansion ? "yes" : "no";
   if (filter.rated !== null) base.rated = filter.rated ? "yes" : "no";
-  if (filter.who !== null) base.who = filter.who;
+  if (filter.who !== "people") base.who = filter.who ?? "all"; // "people" is the default and is not written in the address
   if (filter.species !== null) base.species = filter.species;
   if (filter.org !== null) base.org = filter.org;
 
+  // the organizations, in the order that was asked for (those that nobody picked last)
+  const orgSort = sp.osort === "win" || sp.osort === "score" ? sp.osort : "pick";
+  const orgKey = (o: (typeof s.orgs)[number]): number | null =>
+    orgSort === "win" ? o.winRate : orgSort === "score" ? o.avgScore : o.pickRate;
+  const orgsSorted = [...s.orgs].sort((a, b) => (orgKey(b) ?? -1) - (orgKey(a) ?? -1) || b.picked - a.picked);
+  const bestScore = Math.max(0, ...s.orgs.map((o) => o.avgScore ?? 0));
   const actions: { key: string; label: string; icon: ReactNode }[] = [
     { key: "launch", label: "Launch", icon: <ActionIcon name="launch" size={26} /> },
     { key: "scan", label: "Scan", icon: <ActionIcon name="scan" size={26} /> },
@@ -224,12 +253,12 @@ export default async function StatsPage({
           <span className="stat-filter-name">Players</span>
           <Pills
             name="who"
-            current={filter.who ?? ""}
+            current={filter.who === "people" ? "" : (filter.who ?? "all")}
             base={base}
             choices={[
-              { value: "", label: "Everybody" },
-              { value: "people", label: "People only" },
+              { value: "", label: "People only" },
               { value: "ai", label: "AI only" },
+              { value: "all", label: "Everyone" },
             ]}
           />
         </div>
@@ -304,18 +333,19 @@ export default async function StatsPage({
 
             <Panel
               title="Organizations"
-              note="How often each was picked of the times it was offered, and how the players who picked it did."
+              note="How often each was picked of the times it was offered, how often the players who picked it won, and their average final score."
               wide
               table={
                 s.orgs.length === 0 ? undefined : (
                   <Table
-                    head={["Organization", "Offered", "Picked", "Pick rate", "Win rate", "Elo change (rated)"]}
-                    rows={s.orgs.map((o) => [
+                    head={["Organization", "Offered", "Picked", "Pick rate", "Win rate", "Average score", "Elo change (rated)"]}
+                    rows={orgsSorted.map((o) => [
                       ORG_NAMES[o.org] ?? o.org,
                       o.offered,
                       o.picked,
                       pct(o.pickRate),
                       o.winRate === null ? "–" : pct(o.winRate),
+                      o.avgScore === null ? "–" : round(o.avgScore),
                       o.eloDelta === null ? "–" : `${signed(o.eloDelta)} (${o.eloGames})`,
                     ])}
                   />
@@ -325,27 +355,76 @@ export default async function StatsPage({
               {s.orgs.length === 0 ? (
                 <p className="muted">No game with organizations matches.</p>
               ) : (
-                <BarList
-                  label="Pick rate of each organization"
-                  max={1}
-                  rows={s.orgs.map((o) => ({
-                    key: o.org,
-                    label: <OrgName id={o.org} banner />,
-                    value: o.pickRate,
-                    text: (
-                      <>
-                        <b>{pct(o.pickRate)}</b> picked
-                        <span className="muted small">
-                          {" "}
-                          · {o.picked} of {o.offered}
-                          {o.winRate === null ? "" : ` · wins ${pct(o.winRate)}`}
-                          {o.eloDelta === null ? "" : ` · Elo ${signed(o.eloDelta)}`}
-                        </span>
-                      </>
-                    ),
-                    title: `${ORG_NAMES[o.org] ?? o.org}: offered ${o.offered} times, picked ${o.picked}`,
-                  }))}
-                />
+                <>
+                  <div className="stat-sort">
+                    <span className="stat-filter-name">Sort by</span>
+                    <Pills
+                      name="osort"
+                      current={orgSort === "pick" ? "" : orgSort}
+                      base={base}
+                      choices={[
+                        { value: "", label: "Pick rate" },
+                        { value: "win", label: "Win rate" },
+                        { value: "score", label: "Average score" },
+                      ]}
+                    />
+                  </div>
+                  <ul className="orgbars" aria-label="The organizations: pick rate, win rate and average score">
+                    {orgsSorted.map((o) => (
+                      <li key={o.org} title={`${ORG_NAMES[o.org] ?? o.org}: offered ${o.offered} times, picked ${o.picked}`}>
+                        <OrgName id={o.org} banner />
+                        <OrgBar
+                          label="Pick rate"
+                          share={o.pickRate}
+                          color={VIZ[0] as string}
+                          text={
+                            <>
+                              <b>{pct(o.pickRate)}</b>
+                              <span className="muted small">
+                                {" "}
+                                {o.picked} of {o.offered}
+                              </span>
+                            </>
+                          }
+                        />
+                        <OrgBar
+                          label="Win rate"
+                          share={o.winRate ?? 0}
+                          color={VIZ[1] as string}
+                          text={
+                            o.winRate === null ? (
+                              <span className="muted small">not picked</span>
+                            ) : (
+                              <>
+                                <b>{pct(o.winRate)}</b>
+                                <span className="muted small"> of {o.picked}</span>
+                              </>
+                            )
+                          }
+                        />
+                        <OrgBar
+                          label="Average score"
+                          share={o.avgScore === null || bestScore <= 0 ? 0 : o.avgScore / bestScore}
+                          color={VIZ[2] as string}
+                          text={
+                            o.avgScore === null ? (
+                              <span className="muted small">not picked</span>
+                            ) : (
+                              <WithSpread spread={o.scoreSpread}>
+                                <b>{round(o.avgScore)}</b>
+                              </WithSpread>
+                            )
+                          }
+                        />
+                        {o.eloDelta === null ? null : (
+                          <span className="muted small orgelo">
+                            Elo {signed(o.eloDelta)} ({o.eloGames})
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </Panel>
 

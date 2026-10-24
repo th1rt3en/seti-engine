@@ -6,6 +6,7 @@ import type { View } from "@seti/protocol";
 import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
+import { HelpTip } from "./HelpTip";
 import { ScoreIcon } from "./Icons";
 import { DataToken, Marker, PieceDefs, pieceColor } from "./Pieces";
 import { TapZoomImage } from "./TapZoom";
@@ -192,15 +193,92 @@ function Rival({ view }: { view: View }) {
   );
 }
 
+/** What the objectives are worth to the rival: the numbers of the tiles, and the words of the tooltips that say how the rival gains from the open ones
+ * (SOLO-OBJ-05 to SOLO-OBJ-07, EXP-SOLO-06). Everything counted is in the engine's view. */
+export function objectiveFacts(view: View) {
+  const s = view.state;
+  const ob = s.objectives;
+  if (!ob) return null;
+  const done = (id: string): boolean => (ob.marks[id] ?? []).every(Boolean) && (ob.marks[id] ?? []).length > 0;
+  const finishedOnTable = ob.row.filter(done).length; // done this turn: they join the pile at the end of the turn
+  const unspent = ob.pile.length + finishedOnTable;
+  const completed = (ob.spent ?? 0) + unspent;
+  const openOnTable = ob.row.length - finishedOnTable;
+  const inStack = view.counts.objective_stack;
+  const left = openOnTable + inStack;
+  const round = Math.min(s.round, 5);
+  const longTerm = ob.long_term ?? [];
+  const openLongTerm = longTerm.reduce((n, id) => n + (ob.marks[id] ?? []).filter((m) => !m).length, 0);
+  const short = Math.max(0, round - unspent);
+  return { completed, spent: ob.spent ?? 0, unspent, openOnTable, inStack, left, round, longTerm: longTerm.length, openLongTerm, short };
+}
+
 function Objectives({ view, spots }: { view: View; spots?: BoardSpots }) {
   const ob = view.state.objectives;
-  if (!ob) return null;
+  const f = objectiveFacts(view);
+  if (!ob || !f) return null;
+  const spend =
+    f.round <= 4 ? (
+      <>
+        At the end of round {f.round}, before income, you spend {f.round} completed objective{f.round === 1 ? "" : "s"} (1, 2, 3 and 4 after
+        rounds 1 to 4). You have {f.unspent} to spend now:{" "}
+        {f.short === 0 ? (
+          "enough."
+        ) : (
+          <b>
+            {f.short} short, so the rival would advance {3 * f.short} spaces on its progress track (3 for each one missing).
+          </b>
+        )}
+      </>
+    ) : (
+      <>Nothing is spent after round 5: what counts now is every objective that is not completed.</>
+    );
   return (
     <section className="objectives" aria-label="Objectives">
       <h3>
         Objectives{" "}
         <span className="muted small">
-          {ob.pile.length} completed · {view.counts.objective_stack} in the stack
+          <HelpTip
+            tip={
+              <>
+                <b>Completed: {f.completed}</b> ({f.spent} spent in the earlier rounds, {f.unspent} waiting to be spent).
+                <br />
+                {spend}
+              </>
+            }
+          >
+            {f.completed} completed
+          </HelpTip>{" "}
+          ·{" "}
+          <HelpTip
+            tip={
+              <>
+                <b>Left: {f.left}</b> ({f.openOnTable} not completed on the table, {f.inStack} still in the stack).
+                <br />
+                At the end of round 5 the rival scores <b>5 points</b> for each objective that is not completed, those in the stack too:{" "}
+                {f.left} × 5 = <b>{5 * f.left} points</b> if the game ended now.
+              </>
+            }
+          >
+            {f.left} left
+          </HelpTip>
+          {f.longTerm > 0 ? (
+            <>
+              {" "}
+              ·{" "}
+              <HelpTip
+                tip={
+                  <>
+                    <b>Long-term tiles: {f.longTerm}</b> in play, {f.openLongTerm} open task{f.openLongTerm === 1 ? "" : "s"}. After each of
+                    rounds 2, 3 and 4 the rival advances 1 space on its progress track for every open task of these tiles ({f.openLongTerm}{" "}
+                    now). A finished long-term tile leaves the game; it is never spent and never scores for the rival.
+                  </>
+                }
+              >
+                {f.openLongTerm} long-term task{f.openLongTerm === 1 ? "" : "s"} open
+              </HelpTip>
+            </>
+          ) : null}
         </span>
       </h3>
       <div className="objrow">
@@ -211,7 +289,17 @@ function Objectives({ view, spots }: { view: View; spots?: BoardSpots }) {
           const longTerm = id.startsWith("LT-");
           const src = longTerm ? EXPANSION[`objectives/long-term-${id.slice(3)}`] : OBJECTIVES[id];
           return (
-            <figure key={id} className={done ? "objective done" : "objective"}>
+            <figure
+              key={id}
+              className={done ? "objective done" : "objective"}
+              title={
+                done
+                  ? "Completed: it joins the pile at the end of the turn, and can be spent at the end of the round."
+                  : longTerm
+                    ? "Long-term: the rival advances 1 space for each open task after rounds 2 to 4."
+                    : "Not completed: if it is still open at the end of round 5 the rival scores 5 points for it (and each missing completed objective at the end of rounds 1 to 4 gives it 3 spaces of progress)."
+              }
+            >
               <img
                 src={src}
                 alt={`${longTerm ? "Long-term objective" : "Objective"} ${id}`}

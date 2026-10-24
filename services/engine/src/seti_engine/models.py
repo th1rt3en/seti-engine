@@ -229,6 +229,7 @@ class ObjectiveState(BaseModel):
     row: list[str] = Field(default_factory=list)  # up to 3 revealed objectives
     marks: dict[str, list[bool]] = Field(default_factory=dict)  # objective id -> tasks marked
     pile: list[str] = Field(default_factory=list)  # completed objectives not yet spent
+    spent: int = 0  # completed objectives spent after the rounds 1 to 4 (SOLO-OBJ-06): with the pile, how many were completed
     long_term: list[str] = Field(
         default_factory=list
     )  # EXP-SOLO-04, EXP-SOLO-06: the two long-term tiles in play (their marks are in `marks`)

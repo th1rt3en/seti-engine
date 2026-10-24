@@ -52,7 +52,8 @@ export function parseFilter(sp: {
     players: Number.isInteger(n) && n >= 1 && n <= 4 ? n : null,
     expansion: flag(sp.expansion),
     rated: flag(sp.rated),
-    who: sp.who === "people" || sp.who === "ai" ? sp.who : null,
+    // the default is the people: the games of the AI are looked at on purpose ("ai"), or with everybody ("all")
+    who: sp.who === "ai" ? "ai" : sp.who === "all" ? null : "people",
     species: sp.species !== undefined && SPECIES_KEYS.includes(sp.species) ? sp.species : null,
     // an organization is a short id of the engine (letters and underscores): anything else is no filter
     org: sp.org !== undefined && /^[a-z_]{3,40}$/.test(sp.org) ? sp.org : null,
@@ -80,6 +81,9 @@ export interface OrgStat {
   /** The mean change of rating of the players who picked it, in the rated games only. */
   eloDelta: number | null;
   eloGames: number;
+  /** The mean final score of the players who picked it (null when nobody did), and how they differ. */
+  avgScore: number | null;
+  scoreSpread: Spread;
 }
 
 /** How the players differ from the mean: the lowest and the highest value, and the standard deviation (of the players counted, not an estimate). */
@@ -183,11 +187,11 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   const mean: Record<string, number> = {};
   for (const [k, v] of Object.entries(totals)) mean[k] = n === 0 ? 0 : v / n;
 
-  const orgs = new Map<string, { offered: number; picked: number; won: number; elo: number[] }>();
+  const orgs = new Map<string, { offered: number; picked: number; won: number; elo: number[]; scores: number[] }>();
   const slot = (org: string) => {
     let s = orgs.get(org);
     if (!s) {
-      s = { offered: 0, picked: 0, won: 0, elo: [] };
+      s = { offered: 0, picked: 0, won: 0, elo: [], scores: [] };
       orgs.set(org, s);
     }
     return s;
@@ -197,6 +201,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     if (r.org) {
       const s = slot(r.org);
       s.picked += 1;
+      s.scores.push(r.score);
       if (r.won) s.won += 1;
       if (r.eloDelta !== null) s.elo.push(r.eloDelta);
     }
@@ -294,6 +299,8 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
         winRate: s.picked === 0 ? null : s.won / s.picked,
         eloDelta: s.elo.length === 0 ? null : sum(s.elo) / s.elo.length,
         eloGames: s.elo.length,
+        avgScore: s.scores.length === 0 ? null : sum(s.scores) / s.scores.length,
+        scoreSpread: spreadOf(s.scores),
       }))
       .sort((a, b) => b.pickRate - a.pickRate),
     species: [...species.entries()]

@@ -18,7 +18,7 @@ const row = (over: Partial<StatRow>): StatRow => ({
   eloDelta: null,
   ...over,
 });
-const any = parseFilter({});
+const any = parseFilter({ who: "all" }); // every row; the default of the page is the people
 
 describe("statistics", () => {
   it("the filter keeps the games with the chosen number of players, expansion and rating", () => {
@@ -47,7 +47,9 @@ describe("statistics", () => {
     const ai = aggregate(rows, parseFilter({ who: "ai" }));
     expect(ai.rows).toBe(1);
     expect(ai.mean["action.launch"]).toBe(10);
-    expect(aggregate(rows, parseFilter({ who: "everybody" })).rows).toBe(3); // anything else is everybody
+    expect(aggregate(rows, parseFilter({ who: "all" })).rows).toBe(3);
+    expect(parseFilter({}).who).toBe("people"); // the default
+    expect(parseFilter({ who: "anything" }).who).toBe("people");
     expect(aggregate(rows, any).rows).toBe(3);
   });
 

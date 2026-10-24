@@ -116,7 +116,7 @@ def setup_moves(s: GameState, d: Decision) -> list[Action]:
 
 def setup_all_moves(s: GameState) -> list[Action]:
     """The moves of every player: those who have not locked in choose; a player who has locked in may unlock to change the choice while
-    somebody else has not locked in (EXP-ORG-14, owner 2026-10-23). The last lock resolves the setup at once, so a lock and an unlock never cross."""
+    somebody else has not locked in (EXP-ORG-14). The last lock resolves the setup at once: a lock and an unlock never cross."""
     open_seats = {d.player for d in setup_open(s)}
     out = [m for d in setup_open(s) for m in setup_moves(s, d)]
     out += [{"type": "setup_unlock", "seat": p.index} for p in s.players if p.setup_locked and open_seats - {p.index}]

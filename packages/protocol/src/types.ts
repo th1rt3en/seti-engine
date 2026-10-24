@@ -27,6 +27,7 @@ export type NeutralQuick = string[];
 export type LongTerm = string[];
 export type Pile = string[];
 export type Row = string[];
+export type Spent = number;
 export type Stack = string[];
 export type BeginnerOrganizations = boolean;
 export type Difficulty = number;
@@ -339,6 +340,7 @@ export interface ObjectiveState {
   marks: Marks;
   pile: Pile;
   row: Row;
+  spent: Spent;
   stack: Stack;
 }
 export interface Marks {

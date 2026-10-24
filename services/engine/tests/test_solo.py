@@ -692,10 +692,12 @@ def test_rounds_spend_completed_objectives_or_advance_the_rival() -> None:
     ev: list[dict[str, Any]] = []
     objectives.end_round(s, 3, ev)  # 3 to spend, 1 available: 2 short, 6 progress
     assert ob.pile == [] and rv(s).progress == (progress + 6) % 12
+    assert ob.spent == 1  # the one that was there was spent; the page shows what was completed (the pile and the spent)
     ob.pile = ["a", "b", "c"]
     progress = rv(s).progress
     objectives.end_round(s, 2, ev)
     assert ob.pile == ["c"] and rv(s).progress == progress
+    assert ob.spent == 3
 
 
 def test_the_rival_scores_five_for_each_uncompleted_objective_after_round_five() -> None:

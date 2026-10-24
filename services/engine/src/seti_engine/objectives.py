@@ -181,6 +181,7 @@ def end_round(s: GameState, rnd: int, events: Events) -> None:
     if rnd <= 4:
         spent = min(rnd, len(ob.pile))
         del ob.pile[:spent]
+        ob.spent += spent
         short = rnd - spent
         events.append({"type": "objectives_spent", "round": rnd, "spent": spent, "short": short})
         if short:

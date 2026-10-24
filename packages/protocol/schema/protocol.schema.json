@@ -810,6 +810,11 @@
           "title": "Row",
           "type": "array"
         },
+        "spent": {
+          "default": 0,
+          "title": "Spent",
+          "type": "integer"
+        },
         "stack": {
           "items": {
             "type": "string"
@@ -823,6 +828,7 @@
         "marks",
         "pile",
         "row",
+        "spent",
         "stack"
       ],
       "title": "ObjectiveState",
