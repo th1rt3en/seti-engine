@@ -1449,3 +1449,34 @@ table.shortcuts td:first-child {
 .addai-button {
   justify-self: start;
 }
+
+/* the list of shortcuts: wide, in two columns, one line for each */
+.overlaybox.shortcutsbox {
+  width: min(52rem, 100%);
+}
+.shortcutgrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 2rem;
+}
+.shortcutgrid li {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+}
+.shortcutgrid .keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+@media (max-width: 640px) {
+  .shortcutgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

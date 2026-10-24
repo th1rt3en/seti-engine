@@ -36,6 +36,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
+import { BarMenu } from "./BarMenu";
 import type { CardAction } from "./CardActions";
 import { FinalScores } from "./FinalScores";
 import { GameView } from "./GameView";
@@ -337,6 +338,16 @@ export function GameClient({
 
   // the keyboard shortcuts: the handler is set on every render (below, where the moves are known), the listener once; both are above the first return
   // so that the hooks are called in the same order before and after the first view arrives
+  // while a game is on, the bar of the site is hidden; the menu at the end of the bar of the game brings it back
+  const [siteShown, setSiteShown] = useState(false);
+  const inGame = view !== null;
+  useEffect(() => {
+    if (inGame && !siteShown) document.documentElement.dataset.ingame = "1";
+    else delete document.documentElement.dataset.ingame;
+    return () => {
+      delete document.documentElement.dataset.ingame;
+    };
+  }, [inGame, siteShown]);
   const foldedAll = useRef(false);
   const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
   useEffect(() => {
@@ -1435,11 +1446,11 @@ export function GameClient({
         topExtra={
           <>
             {clocks}
-            {v.viewer !== null && !ended ? (
-              <button type="button" className="secondary small" onClick={() => window.confirm("Resign the game?") && send({ t: "resign" })}>
-                Resign
-              </button>
-            ) : null}
+            <BarMenu
+              onResign={v.viewer !== null && !ended ? () => window.confirm("Resign the game?") && send({ t: "resign" }) : undefined}
+              siteShown={siteShown}
+              onToggleSite={() => setSiteShown(!siteShown)}
+            />
           </>
         }
       />

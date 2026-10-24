@@ -930,3 +930,43 @@ form.inline {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* while a game is on the bar of the site is hidden (the menu at the end of the bar of the game brings it back) */
+html[data-ingame="1"] header.bar {
+  display: none;
+}
+.barmenu {
+  position: relative;
+  display: inline-block;
+}
+.barmenupanel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 80;
+  min-width: 13rem;
+  display: grid;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+.barmenupanel a,
+.barmenupanel button {
+  all: unset;
+  box-sizing: border-box;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  color: var(--text);
+}
+.barmenupanel a:hover,
+.barmenupanel button:hover,
+.barmenupanel a:focus-visible,
+.barmenupanel button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+.barmenupanel .danger {
+  color: var(--bad);
+  border-top: 1px solid var(--line);
+}

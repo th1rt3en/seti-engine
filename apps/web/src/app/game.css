@@ -307,18 +307,20 @@ main:has(.game) {
 
 /* the scores in the bar */
 .scorechips {
-  display: flex;
-  flex-direction: column; /* the pills lie on top of each other, in the order of the first round */
-  align-items: flex-start;
+  display: grid; /* the pills lie on top of each other, in the order of the first round; the cells of all of them share the columns */
+  grid-template-columns: repeat(var(--cols, 10), max-content);
+  justify-content: start;
   gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .scorechips li {
-  display: flex;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid; /* the columns of the list: a name that is longer does not move the resources of the others */
   align-items: center;
-  gap: 6px;
+  column-gap: 8px;
   padding: 3px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;

@@ -7,15 +7,15 @@ export const OPEN_SHORTCUTS_EVENT = "seti-open-shortcuts";
 
 const SHORTCUTS: { keys: string[]; text: string }[] = [
   { keys: ["Enter"], text: "Confirm the question in the context bar" },
-  { keys: ["Esc"], text: "Cancel it (or close this list)" },
+  { keys: ["Esc"], text: "Cancel it, or close this list" },
   { keys: ["E"], text: "End the turn" },
   { keys: ["U"], text: "Take the last move back" },
   { keys: ["F"], text: "Fold or unfold all the panels" },
-  { keys: ["1", "2", "3", "4"], text: "Open or close the board of the player in that pill (the pills keep the order of the first round)" },
-  { keys: ["Q"], text: "Open or close the hand" },
-  { keys: ["W"], text: "Open the other cards (Exertian cards, Mascamite samples, security cards): again for the next, then close" },
-  { keys: ["L"], text: "Open or close the log" },
-  { keys: ["R"], text: "Open or close the details of the players" },
+  { keys: ["1", "2", "3", "4"], text: "Board of the player in that pill" },
+  { keys: ["Q"], text: "Hand: open or close" },
+  { keys: ["W"], text: "Other cards: next tab, then close" },
+  { keys: ["L"], text: "Log: open or close" },
+  { keys: ["R"], text: "Player details: open or close" },
   { keys: ["?"], text: "Open this list" },
 ];
 
@@ -50,22 +50,20 @@ export function ShortcutsHelp() {
       {open ? (
         <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)} role="presentation">
           {/* biome-ignore lint/a11y/useSemanticElements: an overlay with its own backdrop, not a native <dialog> */}
-          <div className="overlaybox" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+          <div className="overlaybox shortcutsbox" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
             <h2>Keyboard shortcuts</h2>
-            <table className="shortcuts">
-              <tbody>
-                {SHORTCUTS.map((s) => (
-                  <tr key={s.keys.join("+")}>
-                    <td>
-                      {s.keys.map((k) => (
-                        <kbd key={k}>{k}</kbd>
-                      ))}
-                    </td>
-                    <td>{s.text}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <ul className="shortcutgrid">
+              {SHORTCUTS.map((s) => (
+                <li key={s.keys.join("+")}>
+                  <span className="keys">
+                    {s.keys.map((k) => (
+                      <kbd key={k}>{k}</kbd>
+                    ))}
+                  </span>
+                  <span>{s.text}</span>
+                </li>
+              ))}
+            </ul>
             <p className="muted small">The keys do nothing while you type in a field or when a button has the focus (except Esc).</p>
             <button type="button" className="primary" onClick={() => setOpen(false)}>
               Close

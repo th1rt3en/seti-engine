@@ -8,7 +8,7 @@ import type { LastMove } from "@/lib/lastMove";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import { firstRoundOrder, ordinal, turnOrder } from "@/lib/turnOrder";
 import type { View } from "@seti/protocol";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { ArkhosPanel } from "./ArkhosPanel";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
@@ -243,7 +243,12 @@ export function GameView({
             </div>
             {hint ? <Hint>{hint}</Hint> : null}
           </div>
-          <ul className="scorechips" aria-label="The players, in the order of play of the first round">
+          <ul
+            className="scorechips"
+            aria-label="The players, in the order of play of the first round"
+            // every pill has the same cells, so the resources of the players line up whatever the length of a name (a grid with a column for each cell)
+            style={{ "--cols": 10 + (s.options.expansion ? 1 : 0) + (oumuamua ? 1 : 0) } as CSSProperties}
+          >
             {pills.map((p) => {
               const rank = order.findIndex((o) => o.index === p.index); // the place in the order of play of this round
               return (
@@ -256,12 +261,12 @@ export function GameView({
                   </span>
                   <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
                   {s.rival && p.index === s.rival.index ? (
-                    "Rival"
+                    <span>Rival</span>
                   ) : (
                     // the name opens the board of the player (the computer and the techs)
                     <ChipName player={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
                   )}
-                  {p.organization ? <OrgName id={p.organization} className="orgname" /> : null}
+                  {p.organization ? <OrgName id={p.organization} className="orgname" /> : <span />}
                   <span
                     className="res"
                     title={finalTotal(p.index) === undefined ? "Victory points" : `Final score (the board scored ${p.score})`}
