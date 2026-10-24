@@ -22,9 +22,8 @@ from typing import Any
 
 DEFAULT_BUCKET = "temp-common-storage"
 ROOT = "seti-engine/games/"  # the bucket is shared, so everything of this project lives under one folder
-_PATH = re.compile(
-    r"^seti-engine/games/\d{4}/\d{2}/\d{2}/[A-Za-z0-9_-]{1,80}/(header\.json|result\.json|replay\.json|actions/\d{7}\.json)$"
-)
+# one file for a game, named by its table number: seti-engine/games/2026/10/24/225.json
+_PATH = re.compile(r"^seti-engine/games/\d{4}/\d{2}/\d{2}/[A-Za-z0-9_-]{1,80}\.json$")
 ERROR_ROOT = "seti-engine/errors/"  # error reports of the engine, the Worker and the website: one object each, a folder for each day (UTC)
 _ERROR_PATH = re.compile(r"^seti-engine/errors/\d{4}-\d{2}-\d{2}/[A-Za-z0-9_.-]{1,160}\.json$")
 _SOURCE = re.compile(r"^[a-z0-9_-]{1,30}$")

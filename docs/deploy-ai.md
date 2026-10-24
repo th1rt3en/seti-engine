@@ -1,4 +1,4 @@
-﻿# Deploying the AI lobby service
+# Deploying the AI lobby service
 
 The model that sits in a lobby is played by a small stateless HTTP service (`services/ai/src/seti_ai/lobby_server.py`). The Worker's room asks it for each move
 of an AI seat. The owner runs these steps; the agents do not deploy (CLAUDE.md rule 7).
@@ -70,6 +70,6 @@ cd services/ai
 python -m uv run python -m seti_ai.bundle_train alpha --people ../../archive --people-share 0.3 ...   # only with the owner's go (training)
 ```
 
-`seti_ai.dataset` reads the downloaded folders (a `replay.json` or a game folder), keeps the games played to the end, applies the rule of
+`seti_ai.dataset` reads the downloaded files (the file of a game, `<table number>.json`, or an older game folder or `replay.json`), keeps the games played to the end, applies the rule of
 `docs/AI-TURN-BUNDLES.md` section 10(b) (a game the model lost: the person's bundles with weight 3, value labels from both seats; a game the model won or tied:
 skipped; a game without the model: once), skips and counts a game the engine cannot replay any more, and mixes the examples into the data of the bots by share.

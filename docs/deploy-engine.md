@@ -35,7 +35,7 @@ docker run --rm -p 8080:8080 -e PORT=8080 seti-engine
 
 `PUT /archive` writes one file of a game's log to the bucket `temp-common-storage` (`ARCHIVE_BUCKET` changes the bucket) using the access token of the Cloud Run
 service account from the metadata server. No key is stored. The service account needs *Storage Object Creator* on the bucket. The endpoint accepts only paths of the
-form `seti-engine/games/YYYY/MM/DD/<id>/{header,result,replay}.json` or `.../actions/<7 digits>.json`. For local use set `ARCHIVE_DIR` to write into a folder.
+form `seti-engine/games/YYYY/MM/DD/<table number>.json` (one file for a whole game, written again as the game goes on). For local use set `ARCHIVE_DIR` to write into a folder.
 
 ## What the Worker must do
 

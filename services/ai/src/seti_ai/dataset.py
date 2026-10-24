@@ -1,7 +1,7 @@
 """The games of people, from the archive, as training examples (docs/AI-TURN-BUNDLES.md section 11).
 
-Every game that was started is archived (decision D25): a `replay.json` per game, or the folder of a game (`header.json`, `actions/*.json`,
-`result.json`). Download the bucket first, for example `gcloud storage rsync -r gs://BUCKET/seti-engine/games ./archive`; this module reads files from
+Every game that was started is archived (decision D25): one file per game, `<table number>.json` (or, for the older games, a `replay.json` or the folder of a game: `header.json`,
+`actions/*.json`, `result.json`). Download the bucket first, for example `gcloud storage rsync -r gs://BUCKET/seti-engine/games ./archive`; this module reads files from
 a folder, it never talks to the bucket.
 
 What counts:
@@ -63,7 +63,11 @@ def load_file(path: Path) -> dict[str, Any]:
 
 
 def game_paths(root: Path) -> Iterator[Path]:
-    """Every game under a folder: a `replay.json`, or a folder that has a `header.json` and no `replay.json`."""
+    """Every game under a folder: the file of a game (`<table number>.json` in the folder of its day), a `replay.json`, or an older folder that has a
+    `header.json` and no `replay.json`."""
+    for p in sorted(root.rglob("*.json")):
+        if p.parent.name.isdigit() and len(p.parent.name) == 2 and p.stem not in ("header", "result", "replay"):
+            yield p
     seen: set[Path] = set()
     for p in sorted(root.rglob("replay.json")):
         seen.add(p.parent)

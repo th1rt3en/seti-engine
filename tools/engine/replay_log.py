@@ -1,9 +1,9 @@
 """Rebuild and print a game from its archive (docs/PLAN.md decision D25).
 
-    python tools/engine/replay_log.py path/to/replay.json          # a downloaded replay.json
-    python tools/engine/replay_log.py path/to/games/<id>/          # a downloaded folder: header.json, actions/*.json, result.json
+    python tools/engine/replay_log.py path/to/225.json             # a downloaded game file (seti-engine/games/YYYY/MM/DD/<table number>.json)
+    python tools/engine/replay_log.py path/to/games/<id>/          # an older game: a folder with header.json, actions/*.json, result.json
 
-Download a game from the bucket first, for example:  gcloud storage cp -r gs://BUCKET/games/<id> .
+Download a game from the bucket first, for example:  gcloud storage cp gs://BUCKET/seti-engine/games/2026/10/24/225.json .
 The tool replays the game with the engine, checks every recorded event against the engine's, and prints one line per action and event.
 Run it from services/engine with `python -m uv run python ../../tools/engine/replay_log.py ...` (it needs the engine package).
 """

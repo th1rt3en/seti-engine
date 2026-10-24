@@ -1,7 +1,7 @@
 // Decisions D24 (kick, rated games of any length), D25 (the archive of every game) and D26 (clock speeds).
 import type { Options } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
-import { type ReplayFile, actionPath, headerPath, replayPath, resultPath } from "../src/core/archive.js";
+import { type ReplayFile, gamePath, withoutUndone } from "../src/core/archive.js";
 import * as clocks from "../src/core/clock.js";
 import { EngineArchive } from "../src/core/engineArchive.js";
 import { shuffledSeats } from "../src/core/seating.js";
@@ -106,45 +106,41 @@ describe("one move at a time", () => {
 });
 
 describe("the archive (D25)", () => {
-  it("files go under seti-engine/games/YYYY/MM/DD/<id>/ (the day the game started, UTC)", () => {
-    expect(headerPath({ id: "abc", createdAt: 0, startedAt: Date.UTC(2026, 9, 13, 23, 59) })).toBe(
-      "seti-engine/games/2026/10/13/abc/header.json",
+  it("a game is one file under seti-engine/games/YYYY/MM/DD/ (the day the game started, UTC), named by its table number", () => {
+    expect(gamePath({ id: "abc", createdAt: 0, startedAt: Date.UTC(2026, 9, 13, 23, 59) }, 225)).toBe(
+      "seti-engine/games/2026/10/13/225.json",
     );
-    expect(actionPath({ id: "abc", createdAt: 0, startedAt: Date.UTC(2026, 0, 2) }, 42)).toBe(
-      "seti-engine/games/2026/01/02/abc/actions/0000042.json",
-    );
+    expect(gamePath({ id: "abc", createdAt: 0, startedAt: Date.UTC(2026, 0, 2) })).toBe("seti-engine/games/2026/01/02/abc.json");
   });
 
-  it("logs the header, every action and the result of a finished game", async () => {
+  it("the whole game, with its header and its result, is in the one file of a finished game", async () => {
     const t = await trio({ kind: "none" }, false);
     await t.room.submit(alice, 0, { type: "score" });
     await t.room.submit(bob, 1, { type: "score" });
     await t.room.resign(cy);
     await t.room.archived();
-    const f = t.archive.files;
-    expect(f.get(headerPath(G3))).toMatchObject({
+    expect([...t.archive.files.keys()]).toEqual([gamePath(G3)]);
+    const replay = t.archive.files.get(gamePath(G3)) as ReplayFile;
+    expect(replay).toMatchObject({
       format: "seti-game-log/1",
-      options: { seed: 4242 },
-      seats: [{ userId: "u-alice" }, {}, {}],
+      header: { options: { seed: 4242 }, seats: [{ userId: "u-alice" }, {}, {}] },
+      result: { status: "finished", result: { reason: "resigned" } },
     });
-    expect(f.get(actionPath(G3, 0))).toMatchObject({ seat: 0, action: { type: "score" } });
-    expect(f.has(actionPath(G3, 1))).toBe(true);
-    expect(f.get(resultPath(G3))).toMatchObject({ status: "finished", result: { reason: "resigned" } });
-    const replay = f.get(replayPath(G3)) as ReplayFile;
     expect(replay.actions).toHaveLength(2);
+    expect(replay.actions[0]).toMatchObject({ seat: 0, action: { type: "score" } });
     expect(replay.result?.result.forfeit).toBe(2);
   });
 
-  it("logs a game that never ends as it is played", async () => {
+  it("a game that never ends is written at the start and then every ARCHIVE_EVERY actions", async () => {
     const t = await trio({ kind: "none" }, false);
+    await t.room.archived();
+    expect((t.archive.files.get(gamePath(G3)) as ReplayFile).actions).toHaveLength(0); // the start
     await t.room.submit(alice, 0, { type: "score" });
     await t.room.archived();
-    expect(t.archive.files.has(headerPath(G3))).toBe(true);
-    expect(t.archive.files.has(actionPath(G3, 0))).toBe(true);
-    expect(t.archive.files.has(replayPath(G3))).toBe(false);
+    expect((t.archive.files.get(gamePath(G3)) as ReplayFile).actions).toHaveLength(0); // not yet
   });
 
-  it("retries after a failure without losing or repeating anything", async () => {
+  it("retries after a failure without losing anything", async () => {
     const t = await trio({ kind: "none" }, false);
     t.archive.failing = true;
     await t.room.submit(alice, 0, { type: "score" });
@@ -154,13 +150,13 @@ describe("the archive (D25)", () => {
     await t.room.submit(bob, 1, { type: "score" });
     await t.room.resign(cy);
     await t.room.archived();
-    expect([...t.archive.files.keys()].sort()).toEqual(
-      [headerPath(G3), actionPath(G3, 0), actionPath(G3, 1), resultPath(G3), replayPath(G3)].sort(),
-    );
+    expect([...t.archive.files.keys()]).toEqual([gamePath(G3)]);
+    expect((t.archive.files.get(gamePath(G3)) as ReplayFile).actions).toHaveLength(2);
   });
 
   it("asks for a new try in a minute when the end of the game cannot be archived", async () => {
     const t = await trio({ kind: "none" }, false);
+    await t.room.archived();
     t.archive.failing = true;
     await t.room.resign(alice);
     await t.room.archived();
@@ -168,7 +164,36 @@ describe("the archive (D25)", () => {
     t.archive.failing = false;
     await t.room.onAlarm();
     await t.room.archived();
-    expect(t.archive.files.has(replayPath(G3))).toBe(true);
+    expect((t.archive.files.get(gamePath(G3)) as ReplayFile).result?.status).toBe("finished");
+  });
+
+  it("the table number names the file when the database knows it", async () => {
+    const t = makeRoom({ last: 1000 });
+    (t.sink as unknown as { gameNum: () => Promise<number> }).gameNum = async () => 225;
+    await t.room.init("g3", three, { kind: "none" }, false, alice);
+    await t.room.join(bob);
+    await t.room.join(cy);
+    await t.room.startGame(alice);
+    await t.room.resign(cy);
+    await t.room.archived();
+    expect([...t.archive.files.keys()]).toEqual([gamePath(G3, 225)]);
+    expect((t.archive.files.get(gamePath(G3, 225)) as ReplayFile).table).toBe(225);
+  });
+
+  it("leaves out `undo` and the moves it took back, and numbers the rest again (UNDO-01)", () => {
+    const e = (seq: number, type: string, extra: object = {}) => ({ seq, seat: 0, action: { type, ...extra }, at: 0, events: [] });
+    const log = [
+      e(0, "move_probe", { to: [1, 2] }),
+      e(1, "place_data"),
+      e(2, "undo"),
+      e(3, "launch"),
+      e(4, "undo"),
+      e(5, "undo"),
+      e(6, "pass"),
+    ];
+    const kept = withoutUndone(log as never);
+    expect(kept.map((x) => [x.seq, (x.action as { type: string }).type])).toEqual([[0, "pass"]]);
+    expect(withoutUndone([])).toEqual([]);
   });
 });
 

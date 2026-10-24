@@ -50,6 +50,11 @@ export class D1Sink implements ResultSink {
     ]);
   }
 
+  async gameNum(id: string): Promise<number | null> {
+    const rows = await this.db.prepare("SELECT num FROM game_nums WHERE game_id = ?").bind(id).all<{ num: number }>();
+    return rows.results[0]?.num ?? null;
+  }
+
   async removeLobby(id: string): Promise<void> {
     await this.db.batch([
       this.db.prepare("DELETE FROM game_players WHERE game_id = ?").bind(id),

@@ -1,11 +1,10 @@
 // The game archive (decision D25): every game that started is written to Google Cloud Storage as plain JSON, so that a replay of
 // everything that happened can be built later without the Durable Object. The bucket is shared with other projects, so everything lives
-// under seti-engine/games/, one folder per game, in a folder of the day the game started (UTC):
-//   seti-engine/games/YYYY/MM/DD/<id>/header.json           written when the game starts: options with the seed, clock, seats
-//   seti-engine/games/YYYY/MM/DD/<id>/actions/<seq>.json    one file per action, written as it is played (a game that never ends is still logged)
-//   seti-engine/games/YYYY/MM/DD/<id>/result.json           written when the game ends, however it ends
-//   seti-engine/games/YYYY/MM/DD/<id>/replay.json           the three above in one file (a ReplayFile), written after result.json
-// The service that writes them (services/engine/src/seti_engine/archive_store.py) accepts only these paths.
+// under seti-engine/games/, in a folder of the day the game started (UTC), and a game is ONE file named by its table number:
+//   seti-engine/games/YYYY/MM/DD/<table number>.json       a ReplayFile: the header, the actions and the result of the whole game
+// While the game is played the file is written again every ARCHIVE_EVERY actions (a game that never ends is still logged), and for the last time when
+// the game ends, however it ends. `undo` and the moves that were taken back are not in the file (`withoutUndone`).
+// The service that writes it (services/engine/src/seti_engine/archive_store.py) accepts only this path.
 // The archive is private: it holds the seed and so the hidden information. A replay shown to other people comes from `publicReplay`.
 import type { Options } from "@seti/protocol";
 import type { ClockSettings } from "./clock.js";
@@ -46,23 +45,30 @@ export interface ArchiveResult {
 
 export interface ReplayFile {
   format: typeof ARCHIVE_FORMAT;
+  /** The number of the table (the address of its page); the long id of the game is in the header. */
+  table?: number;
   header: ArchiveHeader;
   actions: LogEntry[];
   /** Null while the game is not over. */
   result: ArchiveResult | null;
 }
 
-/** The folder of a game: its id under the day it started. */
-export function gameFolder(meta: Pick<Meta, "id" | "startedAt" | "createdAt">): string {
+/** The file of a game: under the day it started, named by its table number (the long id when the number is not known, as in a test). */
+export function gamePath(meta: Pick<Meta, "id" | "startedAt" | "createdAt">, table?: number | null): string {
   const d = new Date(meta.startedAt ?? meta.createdAt);
   const p = (n: number): string => String(n).padStart(2, "0");
-  return `seti-engine/games/${d.getUTCFullYear()}/${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())}/${meta.id}`;
+  return `seti-engine/games/${d.getUTCFullYear()}/${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())}/${table ?? meta.id}.json`;
 }
-export const headerPath = (meta: Pick<Meta, "id" | "startedAt" | "createdAt">): string => `${gameFolder(meta)}/header.json`;
-export const actionPath = (meta: Pick<Meta, "id" | "startedAt" | "createdAt">, seq: number): string =>
-  `${gameFolder(meta)}/actions/${String(seq).padStart(7, "0")}.json`;
-export const resultPath = (meta: Pick<Meta, "id" | "startedAt" | "createdAt">): string => `${gameFolder(meta)}/result.json`;
-export const replayPath = (meta: Pick<Meta, "id" | "startedAt" | "createdAt">): string => `${gameFolder(meta)}/replay.json`;
+
+/** The log without `undo` and without the moves that it took back (UNDO-01): what is left replays to the same game. The moves are numbered again. */
+export function withoutUndone(log: LogEntry[]): LogEntry[] {
+  const kept: LogEntry[] = [];
+  for (const e of log) {
+    if ((e.action as { type?: string }).type === "undo") kept.pop();
+    else kept.push(e);
+  }
+  return kept.map((e, seq) => ({ ...e, seq }));
+}
 
 export function headerOf(meta: Meta): ArchiveHeader {
   return {
@@ -92,15 +98,17 @@ export function headerOf(meta: Meta): ArchiveHeader {
   };
 }
 
-export function replayOf(meta: Meta, log: LogEntry[], ratedCounted: boolean): ReplayFile {
+export function replayOf(meta: Meta, log: LogEntry[], ratedCounted: boolean, table?: number | null): ReplayFile {
+  const actions = withoutUndone(log);
   return {
     format: ARCHIVE_FORMAT,
+    ...(table ? { table } : {}),
     header: headerOf(meta),
-    actions: log,
+    actions,
     result:
       meta.result === undefined
         ? null
-        : { status: meta.status, endedAt: meta.endedAt ?? 0, result: meta.result, actions: log.length, ratedCounted },
+        : { status: meta.status, endedAt: meta.endedAt ?? 0, result: meta.result, actions: actions.length, ratedCounted },
   };
 }
 

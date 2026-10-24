@@ -10,16 +10,14 @@ from seti_engine import archive_store
 from seti_engine.service import app
 
 client = TestClient(app)
-GOOD = "seti-engine/games/2026/10/13/abc123/actions/0000007.json"
+GOOD = "seti-engine/games/2026/10/13/225.json"
 
 
 @pytest.mark.parametrize(
     "path",
     [
         GOOD,
-        "seti-engine/games/2026/10/13/abc/header.json",
-        "seti-engine/games/2026/10/13/abc/replay.json",
-        "seti-engine/games/2026/10/13/abc/result.json",
+        "seti-engine/games/2026/10/13/0a1b2c3d4e5f.json",
     ],
 )
 def test_the_paths_of_an_archive_are_accepted(path: str) -> None:
@@ -32,8 +30,10 @@ def test_the_paths_of_an_archive_are_accepted(path: str) -> None:
         "other/x.json",
         "seti-engine/games/../../etc/passwd",
         "seti-engine/games/2026/10/13/abc/../x/header.json",
-        "seti-engine/games/2026/10/13/abc/notes.txt",
-        "/seti-engine/games/2026/10/13/a/header.json",
+        "seti-engine/games/2026/10/13/abc/header.json",
+        "seti-engine/games/2026/10/13/abc/actions/0000007.json",
+        "seti-engine/games/2026/10/13/225.txt",
+        "/seti-engine/games/2026/10/13/225.json",
     ],
 )
 def test_anything_else_is_refused(path: str) -> None:

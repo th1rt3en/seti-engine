@@ -62,7 +62,7 @@ service, on Cloud Run, writes it with the credentials of its own service account
 For local development set `ARCHIVE_DIR=some/folder` when you run the engine service: the files are then written there instead.
 
 Layout and format: `src/core/archive.ts`. Rebuild a game from a downloaded folder or file:
-`cd services/engine && python -m uv run python ../../tools/engine/replay_log.py <seti-engine/games/.../ID folder or replay.json>`.
+`cd services/engine && python -m uv run python ../../tools/engine/replay_log.py <seti-engine/games/YYYY/MM/DD/<table number>.json, or an older game folder>`.
 
 ## Many games at once
 

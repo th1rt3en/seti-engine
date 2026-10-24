@@ -2,7 +2,7 @@
 // It holds no rules (CLAUDE.md rule 5): every move goes to the engine service, and every view comes from the engine's projection.
 // The Durable Object (gameRoom.ts) is a thin adapter around this class; everything here is testable without Cloudflare.
 import type { GameState, Options, View } from "@seti/protocol";
-import { type Archive, type ReplayFile, actionPath, headerOf, headerPath, replayOf, replayPath, resultPath } from "./archive.js";
+import { type Archive, type ReplayFile, gamePath, replayOf } from "./archive.js";
 import type { Identity } from "./auth.js";
 import * as clocks from "./clock.js";
 import type { Action, Engine, GameStats } from "./engine.js";
@@ -91,6 +91,8 @@ export interface ResultSink {
   recordEnd(rec: GameRecord, log: LogEntry[]): Promise<void>;
   /** An administrator cancelled a game that was being played: it ends without a result, and no rating changes. */
   recordCancelled(meta: Meta): Promise<void>;
+  /** The number of the table (the address of its page), for the name of the archive file. */
+  gameNum?(id: string): Promise<number | null>;
   /** The statistics of a game that was played to its end (the sink may leave them out). */
   recordStats?(meta: Meta, result: Result, stats: GameStats): Promise<void>;
 }
@@ -196,12 +198,18 @@ export function actors(state: GameState): number[] {
 }
 
 interface ArchiveProgress {
-  header: boolean;
+  /** How many actions the file written last held (the file is written again every ARCHIVE_EVERY actions). */
   actions: number;
+  /** The file was written once at least. */
+  header?: boolean;
   done: boolean;
+  /** The number of the table, once known. */
+  table?: number;
 }
 
 const ARCHIVE_RETRY_MS = 60_000;
+/** A game in progress is written to the archive again after this many new actions (the whole game is one file). */
+export const ARCHIVE_EVERY = 20;
 
 /** A client in a lobby sends a ping every LOBBY_PING_MS; a player not heard from for LOBBY_GRACE_MS has left (decision D27). */
 export const LOBBY_PING_MS = 15_000;
@@ -432,6 +440,7 @@ export class GameRoom {
         await this.d.store.put("meta", meta);
         await this.d.sink.recordCancelled(meta);
         for (const c of this.d.connections()) c.send({ t: "cancelled" });
+        this.archiveSoon(); // the game as far as it went is the last version of its file
       }
       await this.d.setAlarm(null);
       return { ok: true };
@@ -625,7 +634,7 @@ export class GameRoom {
   private async doAlarm(): Promise<void> {
     const meta = await this.meta();
     if (meta === undefined) return;
-    if (meta.status === "finished") {
+    if (meta.status === "finished" || meta.status === "cancelled") {
       this.archiveSoon(); // an archive write failed earlier: try again
       return;
     }
@@ -742,41 +751,43 @@ export class GameRoom {
 
   private async flushArchive(): Promise<void> {
     const meta = await this.meta();
-    if (meta === undefined || (meta.status !== "playing" && meta.status !== "finished")) return;
-    const progress = (await this.d.store.get<ArchiveProgress>("archive")) ?? { header: false, actions: 0, done: false };
+    if (meta === undefined || meta.startedAt === undefined) return; // a lobby that never started has nothing to replay
+    const ended = meta.status === "finished" || meta.status === "cancelled";
+    if (!ended && meta.status !== "playing") return;
+    const progress = (await this.d.store.get<ArchiveProgress>("archive")) ?? { actions: 0, done: false };
     if (progress.done) return;
+    const count = (await this.d.store.get<number>("logcount")) ?? 0;
+    // a game in progress is written at the start and then every ARCHIVE_EVERY actions; the end of the game is always written
+    if (!ended && progress.header && count - progress.actions < ARCHIVE_EVERY) return;
     try {
-      if (!progress.header) {
-        await this.d.archive.put(headerPath(meta), headerOf(meta));
-        progress.header = true;
-        await this.d.store.put("archive", progress);
+      if (progress.table === undefined) {
+        const table = await this.d.sink.gameNum?.(meta.id);
+        if (table) progress.table = table;
       }
-      const count = (await this.d.store.get<number>("logcount")) ?? 0;
-      while (progress.actions < count) {
-        const entry = await this.d.store.get<LogEntry>(logKey(progress.actions));
-        if (entry === undefined) throw new Error(`action ${progress.actions} is missing from the log`);
-        await this.d.archive.put(actionPath(meta, progress.actions), entry);
-        progress.actions++;
-        await this.d.store.put("archive", progress);
-      }
-      if (meta.status === "finished") {
-        const replay = await this.replayFile();
-        if (replay?.result) await this.d.archive.put(resultPath(meta), replay.result);
-        if (replay) await this.d.archive.put(replayPath(meta), replay);
-        progress.done = true;
-        await this.d.store.put("archive", progress);
-      }
+      const log = await this.d.store.list<LogEntry>("log:");
+      const replay = replayOf(meta, log, (await this.d.store.get<boolean>("counted")) ?? false, progress.table);
+      await this.d.archive.put(gamePath(meta, progress.table), replay);
+      progress.header = true;
+      progress.actions = count;
+      progress.done = ended;
+      await this.d.store.put("archive", progress);
     } catch (e) {
       console.error(`archive of game ${meta.id} failed, will retry:`, e);
-      if (meta.status === "finished") await this.d.setAlarm(this.d.now() + ARCHIVE_RETRY_MS);
+      if (ended) await this.d.setAlarm(this.d.now() + ARCHIVE_RETRY_MS);
     }
   }
 
-  /** The whole game as a replay file, for a finished game only (a game in progress would give away the seed). */
+  /** The whole game as a replay file, for a finished game only (a game in progress would give away the seed). Without `undo` and the moves it took back. */
   async replayFile(): Promise<ReplayFile | null> {
     const meta = await this.meta();
     if (meta === undefined || meta.status !== "finished") return null;
-    return replayOf(meta, await this.d.store.list<LogEntry>("log:"), (await this.d.store.get<boolean>("counted")) ?? false);
+    const progress = await this.d.store.get<ArchiveProgress>("archive");
+    return replayOf(
+      meta,
+      await this.d.store.list<LogEntry>("log:"),
+      (await this.d.store.get<boolean>("counted")) ?? false,
+      progress?.table,
+    );
   }
 
   // --- connections ---------------------------------------------------------------------------------------------------------
