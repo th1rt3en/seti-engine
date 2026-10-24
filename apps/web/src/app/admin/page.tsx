@@ -1,4 +1,5 @@
 // The administrator's page (no link leads here: the address is typed). It asks for the passphrase, and then manages the accounts and the open games.
+import { InlineForm } from "@/components/AdminInline";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { Pager } from "@/components/Pager";
 import { PlayerNames } from "@/components/PlayerLink";
@@ -93,8 +94,7 @@ export default async function Admin({
           The seed and the log give every hidden card of the game, so keep it to yourself while the game is played. A finished game's seed
           is public in its replay.
         </p>
-        <form action={seedLookupAction} className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
-          <input type="hidden" name="back" value={back} />
+        <InlineForm action={seedLookupAction} className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
           <label>
             Table number
             <input type="text" name="table" inputMode="numeric" placeholder="225" required style={{ width: 140 }} autoComplete="off" />
@@ -102,7 +102,7 @@ export default async function Admin({
           <button type="submit" className="secondary">
             Show the seed
           </button>
-        </form>
+        </InlineForm>
       </section>
 
       <section className="open">
@@ -110,8 +110,13 @@ export default async function Admin({
           Lobbies and games in progress <span className="count">{gameTotal}</span>
         </h2>
         <p className="muted small">Cancelling a game ends it for everybody. Nobody wins or loses, and no rating changes, rated or not.</p>
-        <form action={cancelStaleAction} className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
-          <input type="hidden" name="back" value={back} />
+        <InlineForm
+          action={cancelStaleAction}
+          refresh
+          ask="Cancel all the games that have had no move for that long?"
+          className="card"
+          style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}
+        >
           <label>
             Cancel every game with no move for
             <input type="number" name="amount" min={1} defaultValue={24} style={{ width: 90 }} required />
@@ -120,10 +125,10 @@ export default async function Admin({
             <option value="hours">hours</option>
             <option value="days">days</option>
           </select>
-          <ConfirmSubmit ask="Cancel all the games that have had no move for that long?" className="primary">
+          <button type="submit" className="primary">
             Cancel them
-          </ConfirmSubmit>
-        </form>
+          </button>
+        </InlineForm>
         {games.length === 0 ? <p className="card muted empty">No lobby and no game in progress.</p> : null}
         <div className="gamelist">
           {games.map((g) => (

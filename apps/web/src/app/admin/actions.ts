@@ -88,18 +88,19 @@ export async function resetRatingAction(form: FormData): Promise<void> {
   back(form, `The rating of ${field(form, "name")} is reset (unrated, 0).`);
 }
 
+/** What an action of the administrator's page says when it stays on the page: a message, and whether it is an error. */
+export type Said = { ok: boolean; message: string };
+
 /** The administrator asks for the seed of a table (the number of the game, or its long id). It gives the hidden cards away: it is shown to the administrator only. */
-export async function seedLookupAction(form: FormData): Promise<void> {
-  await requireAdmin(form);
+export async function seedLookupAction(form: FormData): Promise<Said> {
+  if (!(await isAdmin())) return { ok: false, message: "Log in again." };
   const table = field(form, "table").trim().replace(/^#/, "");
   const found = table === "" ? null : await resolveGame(getDb(), table);
-  if (found === null) back(form, "No such table.", true);
-  const id = (found as NonNullable<typeof found>).id;
-  const out = await adminGameSeed(id);
-  if (out === null) back(form, "The Worker does not know that table (it may be older than its records, or deleted).", true);
-  const info = out as NonNullable<typeof out>;
-  if (info.seed === null) back(form, `Table ${table} (${info.status}) has no seed yet: it is drawn when the game starts.`, true);
-  back(form, `Table ${table} (${info.status}): seed ${info.seed}${info.seeded ? " (chosen by the host)" : ""}`);
+  if (found === null) return { ok: false, message: "No such table." };
+  const out = await adminGameSeed(found.id);
+  if (out === null) return { ok: false, message: "The Worker does not know that table (it may be older than its records, or deleted)." };
+  if (out.seed === null) return { ok: false, message: `Table ${table} (${out.status}) has no seed yet: it is drawn when the game starts.` };
+  return { ok: true, message: `Table ${table} (${out.status}): seed ${out.seed}${out.seeded ? " (chosen by the host)" : ""}` };
 }
 
 export async function cancelGameAction(form: FormData): Promise<void> {
@@ -110,12 +111,12 @@ export async function cancelGameAction(form: FormData): Promise<void> {
 }
 
 /** Cancels every lobby and every game being played that has had no move (and, in a lobby, nobody there) for this long. */
-export async function cancelStaleAction(form: FormData): Promise<void> {
-  await requireAdmin(form);
+export async function cancelStaleAction(form: FormData): Promise<Said> {
+  if (!(await isAdmin())) return { ok: false, message: "Log in again." };
   const amount = Number(field(form, "amount"));
-  const unit = field(form, "unit") === "days" ? 86_400_000 : 3_600_000;
-  if (!Number.isFinite(amount) || amount <= 0) back(form, "Say how many hours or days.", true);
-  const cutoff = Date.now() - amount * unit;
+  const days = field(form, "unit") === "days";
+  if (!Number.isFinite(amount) || amount <= 0) return { ok: false, message: "Say how many hours or days." };
+  const cutoff = Date.now() - amount * (days ? 86_400_000 : 3_600_000);
   const db = getDb();
   let cancelled = 0;
   let checked = 0;
@@ -132,8 +133,8 @@ export async function cancelStaleAction(form: FormData): Promise<void> {
       cancelled += 1;
     } else if (info.lastActivity < cutoff && (await adminCancelGame(id)).ok) cancelled += 1;
   }
-  back(
-    form,
-    `Cancelled ${cancelled} of ${checked} open games (no move for ${amount} ${field(form, "unit") === "days" ? "days" : "hours"}). No rating changed.`,
-  );
+  return {
+    ok: true,
+    message: `Cancelled ${cancelled} of ${checked} open games (no move for ${amount} ${days ? "days" : "hours"}). No rating changed.`,
+  };
 }
