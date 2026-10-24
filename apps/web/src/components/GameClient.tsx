@@ -26,8 +26,9 @@ import {
 } from "@/lib/moves";
 import { type Note, ORG_SPACES, buildSpots } from "@/lib/targets";
 import { TECH_INFO, techName } from "@/lib/techs";
+import { firstRoundOrder } from "@/lib/turnOrder";
 import { useTurnSound } from "@/lib/turnSound";
-import { ALL_EVENT } from "@/lib/useDock";
+import { ALL_EVENT, HAND_TAB_EVENT, TOGGLE_EVENT } from "@/lib/useDock";
 // The live game: a WebSocket to the Worker's GameRoom. The server sends this player's view (with the legal moves); the player answers by
 // choosing one of the moves, which is sent back unchanged. A lost connection is re-opened with a fresh token.
 import type { View } from "@seti/protocol";
@@ -1044,6 +1045,28 @@ export function GameClient({
     const t = e.target as HTMLElement | null;
     if (e.ctrlKey || e.metaKey || e.altKey || (t && ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(t.tagName) && e.key !== "Escape"))
       return;
+    // the keys of the panels work in a game that is over too: 1 to 4 the board of the player of that pill (in the order of the first round), q the hand,
+    // w the other cards, l the log, r the details of the players
+    const key = e.key.toLowerCase();
+    if (/^[1-4]$/.test(key)) {
+      const p = firstRoundOrder(v.state.players, v.state.start_player, v.state.round)[Number(key) - 1];
+      if (p && !(v.state.rival && p.index === v.state.rival.index)) {
+        if (boardOpen && boardPlayer === p.index) setBoardOpen(false);
+        else {
+          setBoardPlayer(p.index);
+          setBoardOpen(true);
+        }
+      }
+      return;
+    }
+    if (key === "q" || key === "w") {
+      window.dispatchEvent(new CustomEvent(HAND_TAB_EVENT, { detail: key === "q" ? "hand" : "other" }));
+      return;
+    }
+    if (key === "l" || key === "r") {
+      window.dispatchEvent(new CustomEvent(TOGGLE_EVENT, { detail: key === "l" ? "log" : "players" }));
+      return;
+    }
     if (ended) return;
     if (e.key === "Enter" && ask && ask.buttons.length > 0) {
       const b = ask.buttons.find((x) => !x.disabled);
@@ -1412,9 +1435,6 @@ export function GameClient({
         topExtra={
           <>
             {clocks}
-            <span className="small muted">
-              {online ? "Connected" : "Reconnecting..."} · action {view.seq}
-            </span>
             {v.viewer !== null && !ended ? (
               <button type="button" className="secondary small" onClick={() => window.confirm("Resign the game?") && send({ t: "resign" })}>
                 Resign

@@ -1,11 +1,14 @@
 "use client";
 // The fold state of the floating panels (hand, card row, players, log). On a wide window each panel remembers in this browser whether it is
 // folded. On a phone the four panels are tabs of one bar at the bottom, and opening one folds the others.
-import { type RefObject, useEffect, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 const PHONE = 760;
 const EVENT = "seti-dock-open";
 export const ALL_EVENT = "seti-dock-all";
+/** The keys: a panel (its name) is folded or unfolded; the hand opens on a tab, or closes ("hand" and "other"). */
+export const TOGGLE_EVENT = "seti-dock-toggle";
+export const HAND_TAB_EVENT = "seti-hand-tab";
 
 export const isPhone = (): boolean => typeof window !== "undefined" && window.innerWidth <= PHONE;
 
@@ -58,6 +61,18 @@ export function useDock(name: string, startFolded: () => boolean = () => false):
       }
     }
   };
+  // the key of a panel (l for the log, r for the players) folds or unfolds it
+  const foldedNow = useRef(folded);
+  foldedNow.current = folded;
+  const setNow = useRef(set);
+  setNow.current = set;
+  useEffect(() => {
+    const onToggle = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === name) setNow.current(foldedNow.current);
+    };
+    window.addEventListener(TOGGLE_EVENT, onToggle);
+    return () => window.removeEventListener(TOGGLE_EVENT, onToggle);
+  }, [name]);
   return [folded, () => set(folded), set];
 }
 

@@ -11,6 +11,11 @@ const SHORTCUTS: { keys: string[]; text: string }[] = [
   { keys: ["E"], text: "End the turn" },
   { keys: ["U"], text: "Take the last move back" },
   { keys: ["F"], text: "Fold or unfold all the panels" },
+  { keys: ["1", "2", "3", "4"], text: "Open or close the board of the player in that pill (the pills keep the order of the first round)" },
+  { keys: ["Q"], text: "Open or close the hand" },
+  { keys: ["W"], text: "Open the other cards (Exertian cards, Mascamite samples, security cards): again for the next, then close" },
+  { keys: ["L"], text: "Open or close the log" },
+  { keys: ["R"], text: "Open or close the details of the players" },
   { keys: ["?"], text: "Open this list" },
 ];
 

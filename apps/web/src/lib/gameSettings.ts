@@ -8,6 +8,7 @@ export const SOUND_KEY = "seti-turn-sound"; // "1" or "0" (it was already kept u
 export const CONFIRM_KEY = "seti-confirm-irreversible"; // "1" (ask, the default) or "0": moves that cannot be undone are made at once
 export const NOTIFY_KEY = "seti-turn-notify"; // "1": a browser notification when it is my turn and the tab is in the background (off by default)
 export const ANIM_KEY = "seti-animations"; // "1" (the default) or "0": short animations on the board
+export const PUBLICITY_KEY = "seti-publicity-track"; // "1" (shown, the default) or "0": the publicity track in the right column is hidden
 export const HAND_SCALE_KEY = "seti-hand-scale"; // a number: 1 is the normal size
 export const HAND_SCALE = { min: 0.7, max: 1.6, step: 0.1 };
 const EVENT = "seti-settings";
@@ -56,6 +57,9 @@ export function useGameSettings(): {
   setNotify: (on: boolean) => void;
   animations: boolean;
   setAnimations: (on: boolean) => void;
+  /** Show the publicity track in the column at the right of the board (the publicity of everybody is in the pills anyway). */
+  publicityTrack: boolean;
+  setPublicityTrack: (on: boolean) => void;
 } {
   const sound = useSyncExternalStore(
     subscribe,
@@ -82,6 +86,12 @@ export function useGameSettings(): {
     () => read(ANIM_KEY) !== "0",
     () => true,
   );
+  const publicityTrack = useSyncExternalStore(
+    subscribe,
+    () => read(PUBLICITY_KEY) !== "0",
+    () => true,
+  );
+  const setPublicityTrack = useCallback((on: boolean) => write(PUBLICITY_KEY, on ? "1" : "0"), []);
   const setAnimations = useCallback((on: boolean) => write(ANIM_KEY, on ? "1" : "0"), []);
   const setNotify = useCallback((on: boolean) => write(NOTIFY_KEY, on ? "1" : "0"), []);
   const setConfirmIrreversible = useCallback((on: boolean) => write(CONFIRM_KEY, on ? "1" : "0"), []);
@@ -98,5 +108,7 @@ export function useGameSettings(): {
     setNotify,
     animations,
     setAnimations,
+    publicityTrack,
+    setPublicityTrack,
   };
 }

@@ -1,3 +1,4 @@
+import { useGameSettings } from "@/lib/gameSettings";
 // A game as one viewer sees it: a bar on top with the round, the turn, what the game is waiting for and the moves to choose from; the card row
 // and the alien species on the left; the board in the middle; the publicity track and the tech stacks to its right; the tracker of all players
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
@@ -5,7 +6,7 @@
 import { PLAYER_COLOR } from "@/lib/geometry";
 import type { LastMove } from "@/lib/lastMove";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
-import { ordinal, turnOrder } from "@/lib/turnOrder";
+import { firstRoundOrder, ordinal, turnOrder } from "@/lib/turnOrder";
 import type { View } from "@seti/protocol";
 import type { ReactNode } from "react";
 import { ArkhosPanel } from "./ArkhosPanel";
@@ -16,7 +17,7 @@ import { ChipName } from "./ChipName";
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { ExertianDock, HandDock, type HandSelection } from "./HandDock";
 import { Hint } from "./Hint";
-import { CreditIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
 import { MissionsPanel } from "./MissionsPanel";
 import { OrgName } from "./OrgName";
 import { OrgPanel } from "./OrgPanel";
@@ -28,6 +29,8 @@ import { SoloPanel } from "./SoloPanel";
 import { type TechPick, TechStacks } from "./TechStacks";
 import { TrackerDock } from "./TrackerDock";
 
+/** The publicity track ends at 10 (RES-02). */
+const PUBLICITY_MAX = 10;
 const ROUNDS = 5;
 
 /** What the engine waits for, in words. */
@@ -180,6 +183,7 @@ export function GameView({
   topExtra?: ReactNode;
 }) {
   const s = view.state;
+  const { publicityTrack } = useGameSettings(); // the player can hide the publicity track (the gear in the heading)
   // when the game is over the score is the final one (the board, the end-of-game cards, the gold tiles, the Exertian cards, the danger loss)
   const finalTotal = (player: number): number | undefined =>
     s.phase === "finished" ? (s.final_scores as { player?: number; total?: number }[]).find((f) => f.player === player)?.total : undefined;
@@ -204,6 +208,8 @@ export function GameView({
   const actor = view.to_act === null ? undefined : s.players[view.to_act];
   // the order of play of this round (the marker of the starting player moves one seat on at every round, so it is worked out from every view)
   const order = turnOrder(s.players, s.start_player);
+  // the pills keep the order of the first round all game long
+  const pills = firstRoundOrder(s.players, s.start_player, s.round);
   return (
     <div className="game">
       <header className="topbar" aria-label="Round, turn, current player and moves">
@@ -237,60 +243,73 @@ export function GameView({
             </div>
             {hint ? <Hint>{hint}</Hint> : null}
           </div>
-          <ul className="scorechips" aria-label="Scores, in the order of play of this round">
-            {order.map((p, rank) => (
-              <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
-                <span
-                  className={rank === 0 ? "turnorder first" : "turnorder"}
-                  title={rank === 0 ? "Plays first in this round" : `Plays ${ordinal(rank)} in this round`}
-                >
-                  {ordinal(rank)}
-                </span>
-                <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
-                {s.rival && p.index === s.rival.index ? (
-                  "Rival"
-                ) : (
-                  // the name opens the board of the player (the computer and the techs)
-                  <ChipName player={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
-                )}
-                {p.organization ? <OrgName id={p.organization} className="orgname" /> : null}
-                <span
-                  className="res"
-                  title={finalTotal(p.index) === undefined ? "Victory points" : `Final score (the board scored ${p.score})`}
-                >
-                  <ScoreIcon size={20} />
-                  <b>{finalTotal(p.index) ?? p.score}</b>
-                </span>
-                {s.rival && p.index === s.rival.index ? null : (
-                  <>
-                    <span className="res" title="Credits">
-                      <CreditIcon size={18} />
-                      <b>{p.credits}</b>
-                    </span>
-                    <span className="res" title="Energy">
-                      <EnergyIcon size={18} />
-                      <b>{p.energy}</b>
-                    </span>
-                    <span className="res" title="Publicity">
-                      <PublicityIcon size={18} />
-                      <b>{p.publicity}</b>
-                    </span>
-                    {s.options.expansion ? (
-                      <span className="res" title="Signal tokens">
-                        <SignalTokenIcon size={18} />
-                        <b>{p.signal_tokens}</b>
+          <ul className="scorechips" aria-label="The players, in the order of play of the first round">
+            {pills.map((p) => {
+              const rank = order.findIndex((o) => o.index === p.index); // the place in the order of play of this round
+              return (
+                <li key={p.index} className={view.to_act === p.index ? "active" : undefined}>
+                  <span
+                    className={rank === 0 ? "turnorder first" : "turnorder"}
+                    title={rank === 0 ? "Plays first in this round" : `Plays ${ordinal(rank)} in this round`}
+                  >
+                    {ordinal(rank)}
+                  </span>
+                  <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
+                  {s.rival && p.index === s.rival.index ? (
+                    "Rival"
+                  ) : (
+                    // the name opens the board of the player (the computer and the techs)
+                    <ChipName player={p.index} name={names[p.index] ?? `Player ${p.index + 1}`} />
+                  )}
+                  {p.organization ? <OrgName id={p.organization} className="orgname" /> : null}
+                  <span
+                    className="res"
+                    title={finalTotal(p.index) === undefined ? "Victory points" : `Final score (the board scored ${p.score})`}
+                  >
+                    <ScoreIcon size={20} />
+                    <b>{finalTotal(p.index) ?? p.score}</b>
+                  </span>
+                  {s.rival && p.index === s.rival.index ? null : (
+                    <>
+                      <span className="res" title="Credits">
+                        <CreditIcon size={18} />
+                        <b>{p.credits}</b>
                       </span>
-                    ) : null}
-                    {oumuamua ? (
-                      <span className="res" title="Exofossils">
-                        <ExofossilIcon size={18} />
-                        <b>{p.exofossils}</b>
+                      <span className="res" title="Energy">
+                        <EnergyIcon size={18} />
+                        <b>{p.energy}</b>
                       </span>
-                    ) : null}
-                  </>
-                )}
-              </li>
-            ))}
+                      <span className="res" title="Publicity (the track ends at 10)">
+                        <PublicityIcon size={18} />
+                        <b>
+                          {p.publicity}/{PUBLICITY_MAX}
+                        </b>
+                      </span>
+                      <span className="res" title="Cards in the hand">
+                        <DeckCardIcon size={18} />
+                        <b>{view.counts.hands[p.index] ?? 0}</b>
+                      </span>
+                      <span className="res" title="Data in the pool (not the data in the computer)">
+                        <DataIcon size={18} />
+                        <b>{p.data_pool}</b>
+                      </span>
+                      {s.options.expansion ? (
+                        <span className="res" title="Signal tokens">
+                          <SignalTokenIcon size={18} />
+                          <b>{p.signal_tokens}</b>
+                        </span>
+                      ) : null}
+                      {oumuamua ? (
+                        <span className="res" title="Exofossils">
+                          <ExofossilIcon size={18} />
+                          <b>{p.exofossils}</b>
+                        </span>
+                      ) : null}
+                    </>
+                  )}
+                </li>
+              );
+            })}
           </ul>
           {topExtra ? <div className="extra">{topExtra}</div> : null}
         </div>
@@ -315,14 +334,14 @@ export function GameView({
           </div>
         </main>
 
-        <aside className="col-aux" aria-label="Publicity track and tech stacks">
-          <PublicityTrack view={view} names={names} />
-          <TechStacks view={view} pick={tech} />
+        <aside className="col-aux" aria-label="Card row, tech stacks, organizations and publicity track">
           <RowDock view={view} row={row} inline flash={rowFlash} />
-          <MissionsPanel view={view} names={names} />
+          <TechStacks view={view} pick={tech} />
           <OrgPanel view={view} names={names} spots={spots} />
+          <MissionsPanel view={view} names={names} />
           <ArkhosPanel view={view} names={names} spots={spots} />
           <GlyphidsPanel view={view} names={names} spots={spots} />
+          {publicityTrack ? <PublicityTrack view={view} names={names} /> : null}
         </aside>
       </div>
 

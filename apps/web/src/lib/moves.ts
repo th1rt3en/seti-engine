@@ -80,7 +80,7 @@ export const LABELS: Record<string, Label> = {
   skip_tuck: () => "Do not tuck a card",
   discard: (m) => `Discard ${cardName(m.card)}`,
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
-  setup_unlock: () => "Change my choices (my clock runs again until I lock in)",
+  setup_unlock: () => "Change my choices",
   setup_lock: () => "Lock in your choices: the others see them when everybody has locked in",
   choose_org: (m) =>
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,

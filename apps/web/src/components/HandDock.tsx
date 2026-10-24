@@ -2,7 +2,7 @@
 // The player's hand (the open missions are on the player board) as a floating panel in the bottom left corner. It can be folded down to a tab so that more of the
 // board shows; whether it is folded is remembered in this browser.
 import { cardName } from "@/lib/moves";
-import { isPhone, useBottomSpace, useDock } from "@/lib/useDock";
+import { HAND_TAB_EVENT, isPhone, useBottomSpace, useDock } from "@/lib/useDock";
 import type { View } from "@seti/protocol";
 import { useRef, useState } from "react";
 import { useEffect, useRef as useRefHook } from "react";
@@ -124,6 +124,36 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const me = view.viewer;
   const player = me === null ? undefined : view.state.players[me];
   const [tab, setTab] = useState<"hand" | "exertian" | "mascamite" | "security">("hand");
+  // the keys q (the hand) and w (the other cards): they open the tab, go on to the next of the other tabs, and fold the panel after the last
+  type Tab = "hand" | "exertian" | "mascamite" | "security";
+  const keys = useRefHook<{ folded: boolean; tab: Tab; others: Tab[]; set: (open: boolean) => void; setTab: (t: Tab) => void } | null>(
+    null,
+  );
+  useEffect(() => {
+    const onKey = (e: Event) => {
+      const k = keys.current;
+      if (!k) return;
+      if ((e as CustomEvent<string>).detail === "hand") {
+        if (k.folded) {
+          k.setTab("hand");
+          k.set(true);
+        } else if (k.tab === "hand") k.set(false);
+        else k.setTab("hand");
+        return;
+      }
+      if (k.others.length === 0) return;
+      if (k.folded) {
+        k.setTab(k.others[0] as Tab);
+        k.set(true);
+        return;
+      }
+      const next = k.others[(k.tab === "hand" ? -1 : k.others.indexOf(k.tab)) + 1];
+      if (next) k.setTab(next);
+      else k.set(false);
+    };
+    window.addEventListener(HAND_TAB_EVENT, onKey);
+    return () => window.removeEventListener(HAND_TAB_EVENT, onKey);
+  }, []);
   // an Exertian card is to be played: the hand opens on the Exertian tab
   const wantsExertian = (selection?.exertian?.selectable.length ?? 0) > 0;
   const wasWantedExertian = useRefHook(false);
@@ -154,6 +184,15 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const extraTabs = exertians || mascamites || arkhos;
 
   const onHandTab = !showExertian && !showMascamite && !showSecurity;
+  keys.current = {
+    folded,
+    tab: showExertian ? "exertian" : showMascamite ? "mascamite" : showSecurity ? "security" : "hand",
+    others: [exertians ? "exertian" : null, mascamites ? "mascamite" : null, arkhos ? "security" : null].filter(
+      (t): t is Tab => t !== null,
+    ),
+    set,
+    setTab,
+  };
   const tabsStrip = (
     <div className="handtabs" role="tablist">
       <button type="button" role="tab" aria-selected={onHandTab} onClick={() => setTab("hand")}>

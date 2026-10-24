@@ -17,6 +17,8 @@ export function GameSettings() {
     setNotify,
     animations,
     setAnimations,
+    publicityTrack,
+    setPublicityTrack,
   } = useGameSettings();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
@@ -75,6 +77,17 @@ export function GameSettings() {
                 setSound(e.target.checked);
                 if (e.target.checked) ting(); // a sample of the sound
               }}
+            />
+          </label>
+          <label className="switchrow">
+            <span>Show the publicity track (it is the last panel of the right column)</span>
+            <input
+              type="checkbox"
+              role="switch"
+              className="switch"
+              checked={publicityTrack}
+              aria-checked={publicityTrack}
+              onChange={(e) => setPublicityTrack(e.target.checked)}
             />
           </label>
           <label className="switchrow">

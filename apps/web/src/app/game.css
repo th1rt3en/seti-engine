@@ -308,7 +308,8 @@ main:has(.game) {
 /* the scores in the bar */
 .scorechips {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column; /* the pills lie on top of each other, in the order of the first round */
+  align-items: flex-start;
   gap: 6px;
   margin: 0;
   padding: 0;
@@ -1871,8 +1872,9 @@ button:disabled {
   font-size: 14px;
 }
 .rowinline .rowbody .cards {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  /* at the top of the column the cards are larger: two in a row are about 50% wider than three */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 @media (min-width: 1100px) {
   .rowinline {
