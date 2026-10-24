@@ -62,7 +62,7 @@ export default async function Game({
   return (
     <>
       <h1>
-        Game #{num} <span className="pill">{meta.rated ? "rated" : "casual"}</span>{" "}
+        Game #{num} <span className="pill">{meta.rated ? "rated" : "friendly"}</span>{" "}
         <span className="pill">{meta.options.players === 1 ? "solo" : `${meta.options.players} players`}</span> <GameSettings />{" "}
         <ShortcutsHelp />
       </h1>

@@ -21,7 +21,7 @@ export interface NewGame {
     organizations?: boolean;
     beginner_organizations?: boolean;
     neutral_quick_start?: boolean;
-    /** A seed chosen by the host: casual games only (the Worker refuses it in a rated game). */
+    /** A seed chosen by the host: friendly games only (the Worker refuses it in a rated game). */
     seed?: number;
   };
   clock: Clock;

@@ -590,7 +590,7 @@ describe("the lobby filter and the leaderboard search", () => {
     expect(ids({})).toEqual(["1", "2", "3"]);
     expect(ids({ players: "any", rated: "" })).toEqual(["1", "2", "3"]);
     expect(ids({ rated: "rated" })).toEqual(["1", "3"]);
-    expect(ids({ rated: "casual" })).toEqual(["2"]);
+    expect(ids({ rated: "friendly" })).toEqual(["2"]);
     expect(ids({ expansion: "yes" })).toEqual(["2"]);
     expect(ids({ expansion: "no", mode: "none" })).toEqual(["3"]);
     expect(ids({ players: "3", mode: "turnbased" })).toEqual(["2"]);

@@ -398,7 +398,7 @@ describe("the host starts the game", () => {
 });
 
 describe("a seed chosen by the host", () => {
-  it("is used when the game starts, only in a casual game, and only the administrator can read it", async () => {
+  it("is used when the game starts, only in a friendly game, and only the administrator can read it", async () => {
     const t = makeRoom();
     expect(await t.room.init("r", { players: 2, seed: 77 } as Options, none, true, alice)).toMatchObject({ ok: false, code: "bad_seed" });
     const bad = makeRoom();

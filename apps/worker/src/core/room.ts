@@ -266,9 +266,9 @@ export class GameRoom {
     if ((await this.d.store.get<Meta>("meta")) !== undefined) return fail("exists", "the game already exists");
     if (rated && (options.players < 2 || options.players > 4)) return fail("not_rateable", "rated games have 2 to 4 players");
     if (rated && !host.registered) return fail("guest", "only registered players can play rated games");
-    // a seed chosen by the host (the advanced option of the new game form): only in a casual game, because whoever knows the seed can work out the hidden cards
+    // a seed chosen by the host (the advanced option of the new game form): only in a friendly game, because whoever knows the seed can work out the hidden cards
     if (options.seed !== undefined && (rated || !Number.isSafeInteger(options.seed) || options.seed < 0))
-      return fail("bad_seed", "a seed is a whole number from 0, and only a casual game can have one");
+      return fail("bad_seed", "a seed is a whole number from 0, and only a friendly game can have one");
     const seats: (Identity | null)[] = Array(options.players).fill(null);
     seats[0] = host;
     const meta: Meta = {

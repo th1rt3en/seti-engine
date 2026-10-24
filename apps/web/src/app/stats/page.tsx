@@ -1,7 +1,7 @@
 import { AlienStatsSection } from "@/components/AlienStats";
 import { FilterForm } from "@/components/FilterForm";
 // Statistics of the games that were played to their end, averaged for each player of each game (the counters come from the engine: stats.py).
-// The filter chooses which games count: the number of players, the expansion, rated or casual. Nothing is worked out here that is a rule.
+// The filter chooses which games count: the number of players, the expansion, rated or friendly. Nothing is worked out here that is a rule.
 // Drawn as tiles and charts (components/StatCharts.tsx), every block with its numbers as a table behind a button.
 import {
   ActionIcon,
@@ -246,7 +246,7 @@ export default async function StatsPage({
             choices={[
               { value: "", label: "Any" },
               { value: "yes", label: "Rated" },
-              { value: "no", label: "Casual" },
+              { value: "no", label: "Friendly" },
             ]}
           />
         </div>

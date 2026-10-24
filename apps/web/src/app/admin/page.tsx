@@ -172,7 +172,7 @@ export default async function Admin({
                 <strong>{g.seats.length > 0 ? <PlayerNames seats={g.seats} /> : `Game ${g.num ?? g.id.slice(0, 8)}`}</strong>
                 <span className="badges">
                   <span className="pill">{g.status}</span>
-                  {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
+                  {g.rated ? <span className="pill rated">rated</span> : <span className="pill">friendly</span>}
                 </span>
               </div>
               <p className="muted small">

@@ -56,10 +56,10 @@ export default async function Lobby({
               <option value="3">3 players</option>
               <option value="4">4 players</option>
             </select>
-            <select name="rated" defaultValue={filter.rated ?? "any"} aria-label="Rated or casual">
-              <option value="any">Rated or casual</option>
+            <select name="rated" defaultValue={filter.rated ?? "any"} aria-label="Rated or friendly">
+              <option value="any">Rated or friendly</option>
               <option value="rated">Rated</option>
-              <option value="casual">Casual</option>
+              <option value="friendly">Friendly</option>
             </select>
             <select name="expansion" defaultValue={filter.expansion ?? "any"} aria-label="Expansion">
               <option value="any">With or without the expansion</option>
@@ -94,7 +94,7 @@ export default async function Lobby({
                     <PlayerLink num={g.host.num} name={g.host.name} />
                   </strong>
                   <span className="badges">
-                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
+                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">friendly</span>}
                     {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
                     {g.organizations ? <span className="pill exp">organizations</span> : null}
                     {g.promo ? <span className="pill">promo cards</span> : null}

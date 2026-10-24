@@ -79,7 +79,7 @@ The state that decides what happens next (which match feeds which, the current r
 
 ### 4.1 What counts
 
-**Only rated games count, and so do the games of tournaments** (which are rated anyway): a casual game, a solo game, a practice game and a game with an AI never give an achievement and never count toward a streak (owner, 2026-10-24). Everything below is evaluated for the registered players of a rated game.
+**Only rated games count, and so do the games of tournaments** (which are rated anyway): a friendly game, a solo game, a practice game and a game with an AI never give an achievement and never count toward a streak (owner, 2026-10-24). Everything below is evaluated for the registered players of a rated game.
 
 The list is the owner's, in `docs/achievements.md` (the list is **not exhaustive**: more will be added, so a new achievement is one new entry and no new machinery). The names and thresholds are the owner's; the "how it is checked" column is this plan's reading of each line, **confirmed by the owner on 2026-10-24** (8.2b).
 
@@ -87,7 +87,7 @@ The list is the owner's, in `docs/achievements.md` (the list is **not exhaustive
 |---|---|---|
 | 1 | **Beginner / Intermediate / Expert / Master**: Elo 100 / 300 / 500 / 700 | The rating at the end of a rated game reaches the level (an unlock is kept if the rating falls). Four badges. The **highest title reached is shown beside the player's name** on the profile. |
 | 2 | **First win**: first rated game win | The player is **alone in first place** in a rated game. A shared first place (a tie, or the others after a kick, D24) is **not a win**. |
-| 3 | ***X* in a row**: 2 / 3 / 5 / 10 / 20 / 50 rated wins in a row | A streak of consecutive rated wins (a win as in 2), in the order the games ended. Any other result of a rated game (not first, a shared first place, a kick, a resignation) ends it. Six badges. A casual game does not touch it. |
+| 3 | ***X* in a row**: 2 / 3 / 5 / 10 / 20 / 50 rated wins in a row | A streak of consecutive rated wins (a win as in 2), in the order the games ended. Any other result of a rated game (not first, a shared first place, a kick, a resignation) ends it. Six badges. A friendly game does not touch it. |
 | 4 | **Master Assassin**: first rated win against a Master (700 current Elo) | The player is first (alone, as in 2) in a rated game with a player at the table whose rating **before the game** was 700 or more. |
 | 5 | **First tournament win** | The player finishes a tournament in first place (the winner of the final in elimination; first of the standings in Swiss). Given at the end of the tournament; the game stored is the deciding game of the player. |
 | 6 | **Tournament Creator**: first tournament started (for the creator) | The creator's first tournament goes from registration to in progress. It has no game: no icon in the history, and the pop-up comes with the answer of the "start" button. |
@@ -337,7 +337,7 @@ Every case below becomes one or more tests (`TOUR-nnn` ids in `docs/spec/tournam
 42. A tournament with a walkover or a bye does not give a "won a match" for it. *Clear (Q10).*
 43. Achievements are given only for games that end after the release. *Clear (Q13).* A rating level for a player already above it: *Q28.*
 
-44. A casual game, a solo game, a practice game and a game with an AI never give an achievement and never touch a streak. *Clear (owner).*
+44. A friendly game, a solo game, a practice game and a game with an AI never give an achievement and never touch a streak. *Clear (owner).*
 45. Two achievements in one game (for example a tournament win and a title): both are shown, once each. *Clear;* shown in the alphabetical order of the title (Q46).
 46. A result that is sent twice, or a game archived again after a restart: the unlock is written once (unique on player and achievement). *Clear.*
 47. A player who is kicked in a rated game: no game achievement from that game; a streak is reset. *Clear: a kick is a non-win and ends a streak (Q34, Q35).*

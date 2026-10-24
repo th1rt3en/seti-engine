@@ -101,7 +101,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
                   <strong>{g.seats.length > 0 ? <PlayerNames seats={g.seats} /> : `Game ${g.num ?? g.id.slice(0, 8)}`}</strong>
                   <span className="badges">
                     {g.solo ? <span className="pill">solo</span> : <span className="pill">{g.players} players</span>}
-                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
+                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">friendly</span>}
                     {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
                     {g.organizations ? <span className="pill exp">organizations</span> : null}
                   </span>
@@ -167,7 +167,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
                   </strong>
                   <span className="badges">
                     {g.solo ? <span className="pill">solo</span> : <span className="pill">{g.players} players</span>}
-                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
+                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">friendly</span>}
                     {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
                     {g.organizations ? <span className="pill exp">organizations</span> : null}
                     {note ? <span className="pill">{note}</span> : null}

@@ -32,7 +32,7 @@ export default async function Replay({ params }: { params: Promise<{ id: string 
       <h1>Replay of game #{param}</h1>
       <p className="muted small">
         <PlayerNames seats={replay.header.seats.map((s) => ({ name: s.name, num: s.num ?? null }))} separator=", " /> ·{" "}
-        {replay.header.rated ? "rated" : "casual"} · {replay.actions.length} actions
+        {replay.header.rated ? "rated" : "friendly"} · {replay.actions.length} actions
       </p>
       <ReplayViewer id={id} replay={replay} />
     </>

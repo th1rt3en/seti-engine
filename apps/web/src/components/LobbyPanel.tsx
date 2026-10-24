@@ -33,7 +33,7 @@ export function settingLines(lobby: LobbyInfo): { label: string; value: string }
   const lines = [
     { label: "Players", value: o.players === 1 ? "solo, against the rival" : String(o.players) },
     ...(o.players === 1 ? [{ label: "Rival difficulty", value: String(o.difficulty ?? 3) }] : []),
-    { label: "Rating", value: lobby.rated ? "rated" : "casual" },
+    { label: "Rating", value: lobby.rated ? "rated" : "friendly" },
     { label: "Clock", value: lobby.clock ? describeClock(JSON.stringify(lobby.clock)) : "no clock" },
     { label: "Space Agencies", value: yes(o.expansion) },
   ];
