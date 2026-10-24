@@ -16,6 +16,7 @@ import { AuthError, type Identity, verifyToken } from "./core/auth.js";
 import type { ClockSettings } from "./core/clock.js";
 import { makeSigner } from "./core/engineAuth.js";
 import { makeErrorReporter } from "./core/errorReport.js";
+import { overTableLimit } from "./core/limits.js";
 import type { Env } from "./env.js";
 
 export { GameRoomDO as GameRoom } from "./gameRoom.js";
@@ -83,6 +84,8 @@ async function handle(request: Request, env: Env): Promise<Response> {
       if (body === null || !validOptions(body.options) || !validClock(body.clock ?? { kind: "none" })) {
         return json({ ok: false, code: "bad_request", message: "options or clock are not valid" }, 400);
       }
+      const over = overTableLimit(who.registered, await openTables(env, who.id));
+      if (over !== null) return json(over, 400);
       const id = env.GAME_ROOM.newUniqueId();
       const res = await env.GAME_ROOM.get(id).fetch("https://room/init", {
         method: "POST",
@@ -115,6 +118,11 @@ async function handle(request: Request, env: Env): Promise<Response> {
     }
     if (action === "" && request.method === "GET") return forward(stub, "/meta", headers);
     if ((action === "log" || action === "replay") && request.method === "GET") return forward(stub, `/${action}`, headers);
+    if (action === "join" && request.method === "POST" && who !== null) {
+      // a player who already sits at this table is not counted twice
+      const over = overTableLimit(who.registered, await openTables(env, who.id, gameId));
+      if (over !== null) return json(over, 400);
+    }
     if ((action === "join" || action === "leave" || action === "start" || action === "resign") && request.method === "POST")
       return forward(stub, `/${action}`, headers, "POST");
     if ((action === "bot-add" || action === "bot-remove") && request.method === "POST") {
@@ -126,6 +134,16 @@ async function handle(request: Request, env: Env): Promise<Response> {
     }
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
   }
+}
+
+/** How many tables (lobbies and games in progress) a player has open, not counting `except` (the table that they want to join). */
+async function openTables(env: Env, userId: string, except = ""): Promise<number> {
+  const row = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM game_players p JOIN games g ON g.id = p.game_id WHERE p.user_id = ? AND g.status IN ('lobby', 'playing') AND g.id != ?",
+  )
+    .bind(userId, except)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
 }
 
 function forward(stub: DurableObjectStub, path: string, headers: Record<string, string>, method = "GET"): Promise<Response> {
