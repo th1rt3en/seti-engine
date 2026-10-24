@@ -1,10 +1,13 @@
 // The library: the things of the game to look at, one tab for each kind: the cards, the organizations and the quick start cards of the Space Agencies
 // expansion, and the alien species boards. It shows what the engine's data and the pictures say; it works out no rule.
+import { AlienLibrary, type AlienTile } from "@/components/AlienLibrary";
 import { CardCatalog } from "@/components/CardCatalog";
 import { cardImage } from "@/lib/cardImages";
 import Link from "next/link";
 import assets from "../../generated/assets.json";
+import catalog from "../../generated/card-catalog.json";
 import expansionAssets from "../../generated/expansion-assets.json";
+import expansionImages from "../../generated/expansion-card-images.json";
 import organizations from "../../generated/organizations.json";
 import quickStart from "../../generated/quick-start.json";
 
@@ -29,15 +32,52 @@ const QUICK = Object.entries(quickStart as unknown as Record<string, { marks: st
 );
 const EXPANSION = expansionAssets as Record<string, string>;
 const SPECIES = assets.species as Record<string, string>;
-const ALIENS: { name: string; src: string | undefined; expansion?: boolean }[] = [
-  { name: "Anomalies", src: SPECIES.anomalies },
-  { name: "Centaurians", src: SPECIES.centaurians },
-  { name: "Exertians", src: SPECIES.exertians },
-  { name: "Mascamites", src: SPECIES.mascamites },
-  { name: "'Oumuamua", src: SPECIES.oumuamua },
-  { name: "Arkhos", src: EXPANSION["boards/arkhos"], expansion: true },
-  { name: "Glyphids", src: EXPANSION["boards/glyphids"], expansion: true },
-  { name: "Amoeba", src: EXPANSION["boards/amoeba"], expansion: true },
+const byNumber = (a: string, b: string): number => a.localeCompare(b, undefined, { numeric: true });
+/** The cards of a species that are in the deck of the alien cards (the catalog is made from the engine's own data). */
+const alienCards = (species: string) =>
+  (catalog as { id: string; name: string; deck: string; species: string | null }[])
+    .filter((c) => c.deck === "alien" && c.species === species)
+    .sort((a, b) => byNumber(a.id, b.id));
+/** The exploration cards of Arkhos ("ET 33" to "ET 41"): their pictures are among the cards of the expansion, but they are not in the main deck of the catalog. */
+const EXPLORATION = Object.keys(expansionImages as Record<string, string>)
+  .filter((id) => /^ET \d+$/.test(id))
+  .sort(byNumber);
+
+/** A species with one kind of card has one section; Arkhos has two: the exploration cards and the security cards. */
+function tile(key: string, name: string, src: string | undefined, expansion = false): AlienTile {
+  const cards = alienCards(key);
+  if (key === "arkhos") {
+    return {
+      key,
+      name,
+      src,
+      expansion,
+      sections: [
+        {
+          label: "Exploration cards",
+          note: "The deck that the markers of the Arkhos board explore: a minor reward for each marker, a major one when a card is explored.",
+          cards: EXPLORATION.map((id) => ({ id })),
+        },
+        {
+          label: "Security cards",
+          note: "Each player is dealt one for every trace color; it is breached from an overflow space.",
+          cards: cards.map((c) => ({ id: c.id, caption: `${c.id} ${c.name}` })),
+        },
+      ],
+    };
+  }
+  return { key, name, src, expansion, sections: [{ label: "Alien cards", cards: cards.map((c) => ({ id: c.id })) }] };
+}
+
+const ALIENS: AlienTile[] = [
+  tile("anomalies", "Anomalies", SPECIES.anomalies),
+  tile("centaurians", "Centaurians", SPECIES.centaurians),
+  tile("exertians", "Exertians", SPECIES.exertians),
+  tile("mascamites", "Mascamites", SPECIES.mascamites),
+  tile("oumuamua", "'Oumuamua", SPECIES.oumuamua),
+  tile("arkhos", "Arkhos", EXPANSION["boards/arkhos"], true),
+  tile("glyphids", "Glyphids", EXPANSION["boards/glyphids"], true),
+  tile("amoeba", "Amoeba", EXPANSION["boards/amoeba"], true),
 ];
 
 export default async function LibraryPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
@@ -101,17 +141,7 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
       {current === "aliens" ? (
         <>
           <p className="muted">The alien species boards. Two species, chosen at random, are in a game; the expansion adds three more.</p>
-          <div className="libgrid aliens">
-            {ALIENS.map((a) => (
-              <figure key={a.name}>
-                <img src={a.src} alt={`${a.name} board`} loading="lazy" />
-                <figcaption>
-                  <b>{a.name}</b>
-                  {a.expansion ? <span className="muted small">Space Agencies</span> : null}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          <AlienLibrary aliens={ALIENS} />
         </>
       ) : null}
     </>
