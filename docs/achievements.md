@@ -19,3 +19,4 @@ Game Achievements
 17. Play all 3 security cards for 3 major exploration and trigger 15+ minor exploration in a single game: Explorer
 18. Have 20+ Glyphids tokens at the end of the game: Hoarder
 19. Trigger 20+ groups of organelle in a single game: Evolutionist
+20. Land on Jupiter and on all 4 of its moons (Io, Europa, Ganymede, Callisto) in a single game: Juno
