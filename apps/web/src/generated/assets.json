@@ -231,42 +231,74 @@
     "Income-A": {
       "per": "each set of three tucked income cards, one of each type (credit, energy, card)",
       "src": "/assets/tiles/gold-Income-A.7588c2a545.webp",
-      "values": [11, 8, 5]
+      "values": [
+        11,
+        8,
+        5
+      ]
     },
     "Income-B": {
       "per": "each tucked income card of the type you have most (credit or energy)",
       "src": "/assets/tiles/gold-Income-B.a9fa6466df.webp",
-      "values": [5, 4, 3]
+      "values": [
+        5,
+        4,
+        3
+      ]
     },
     "Mission-A": {
       "per": "each completed mission",
       "src": "/assets/tiles/gold-Mission-A.c87b1c15c6.webp",
-      "values": [4, 3, 2]
+      "values": [
+        4,
+        3,
+        2
+      ]
     },
     "Mission-B": {
       "per": "each pair of completed missions or end-of-game scoring cards",
       "src": "/assets/tiles/gold-Mission-B.d77841c8cc.webp",
-      "values": [8, 6, 4]
+      "values": [
+        8,
+        6,
+        4
+      ]
     },
     "Other-A": {
       "per": "each set of three life traces, one of each color (overflow markers count)",
       "src": "/assets/tiles/gold-Other-A.535aefe8c3.webp",
-      "values": [8, 6, 4]
+      "values": [
+        8,
+        6,
+        4
+      ]
     },
     "Other-B": {
       "per": "each sector win paired with an orbiter or lander",
       "src": "/assets/tiles/gold-Other-B.28491a0bb2.webp",
-      "values": [8, 6, 4]
+      "values": [
+        8,
+        6,
+        4
+      ]
     },
     "Tech-A": {
       "per": "each set of three techs, one of each type",
       "src": "/assets/tiles/gold-Tech-A.50b85772c9.webp",
-      "values": [11, 8, 5]
+      "values": [
+        11,
+        8,
+        5
+      ]
     },
     "Tech-B": {
       "per": "each pair of techs (any two)",
       "src": "/assets/tiles/gold-Tech-B.d182d293a0.webp",
-      "values": [7, 5, 3]
+      "values": [
+        7,
+        5,
+        3
+      ]
     }
   },
   "milestoneTiles": {
@@ -278,16 +310,6 @@
     "white": "/assets/tiles/marker-plus15-white.2a91522f20.webp"
   },
   "moon": "/assets/discs/moon.42ba127546.webp",
-  "sun": "/assets/discs/sun.da983c8efd.webp",
-  "rotationDial": {
-    "base": "/assets/discs/dial-base.ade7a6c540.webp",
-    "inner": "/assets/discs/dial-inner.d83bab4762.webp",
-    "inner-grey": "/assets/discs/dial-inner-grey.ddd6ffbde8.webp",
-    "middle": "/assets/discs/dial-middle.287abeec8f.webp",
-    "middle-grey": "/assets/discs/dial-middle-grey.ad427dd69a.webp",
-    "outer": "/assets/discs/dial-outer.73e0c520d9.webp",
-    "outer-grey": "/assets/discs/dial-outer-grey.9cdb04ab97.webp"
-  },
   "objectives": {
     "L1-16-vp": "/assets/solo/objective-L1-16-vp.e1cbd1fb62.webp",
     "L1-5-data": "/assets/solo/objective-L1-5-data.99a66eba92.webp",
@@ -324,8 +346,13 @@
     "card-random": "/assets/icons/card-random.210e1efc11.webp",
     "danger": "/assets/icons/danger.95720c0fc2.webp",
     "income": "/assets/icons/income.e3599fc770.webp",
+    "long-term": "/assets/icons/long-term.d1509e8963.webp",
     "mission": "/assets/icons/mission.f00f06cb93.webp",
-    "mission-done": "/assets/icons/mission-done.3820bb3f68.webp"
+    "mission-done": "/assets/icons/mission-done.3820bb3f68.webp",
+    "objective": "/assets/icons/objective.4bc2fb5093.webp",
+    "tech-computer": "/assets/icons/tech-computer.563ed21d3f.webp",
+    "tech-probe": "/assets/icons/tech-probe.69b976c6ed.webp",
+    "tech-telescope": "/assets/icons/tech-telescope.49413e1b7b.webp"
   },
   "publicity": {
     "h": 1350,
@@ -359,6 +386,15 @@
     "S.8": "/assets/solo/rival-card-8.166355f3b8.webp",
     "S.9": "/assets/solo/rival-card-9.eae2cb2ec0.webp",
     "back": "/assets/solo/rival-card-back.bfff2932a3.webp"
+  },
+  "rotationDial": {
+    "base": "/assets/discs/dial-base.ade7a6c540.webp",
+    "inner": "/assets/discs/dial-inner.d83bab4762.webp",
+    "inner-grey": "/assets/discs/dial-inner-grey.ddd6ffbde8.webp",
+    "middle": "/assets/discs/dial-middle.287abeec8f.webp",
+    "middle-grey": "/assets/discs/dial-middle-grey.ad427dd69a.webp",
+    "outer": "/assets/discs/dial-outer.73e0c520d9.webp",
+    "outer-grey": "/assets/discs/dial-outer-grey.9cdb04ab97.webp"
   },
   "samples": {
     "0": "/assets/tiles/sample-face-3-publicity.bba386a8a4.webp",
@@ -519,6 +555,7 @@
     "3": "/assets/stars/star-board-3.b607bd3948.webp",
     "4": "/assets/stars/star-board-4.ae0f526e28.webp"
   },
+  "sun": "/assets/discs/sun.da983c8efd.webp",
   "techFronts": {
     "computer-branch": "/assets/tiles/front-computer-branch.ed4dae929f.webp",
     "computer-cross": "/assets/tiles/front-computer-cross.06c7f7de5c.webp",

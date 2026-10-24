@@ -3464,3 +3464,14 @@ html:has(.setupchoice) .hand {
 .scorechips .res .resicon {
   pointer-events: none;
 }
+
+/* the rival's action cards of the round: the backs of the cards it has played (grey) and of those that are left */
+.rivalcards {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+.rivalback.used {
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.6;
+}

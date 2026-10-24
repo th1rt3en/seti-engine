@@ -197,17 +197,6 @@ export function TraceIcon({ size = SIZE }: { size?: number }) {
   );
 }
 
-/** An action card of the rival that was played this round: a card with a tick. */
-export function PlayedCardIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="played card" className="resicon">
-      <title>Played this round</title>
-      <rect x="4" y="2.5" width="14" height="19" rx="2" fill="#243350" stroke="#9fb6d8" strokeWidth="1.2" />
-      <path d="M7.5 12.5l3 3 5.5-6.5" fill="none" stroke="#7be3a4" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 /** The progress track of the rival: a track with its marker and the finish flag. */
 export function ProgressIcon({ size = SIZE }: { size?: number }) {
   return (
@@ -220,46 +209,41 @@ export function ProgressIcon({ size = SIZE }: { size?: number }) {
   );
 }
 
-/** The objectives that were completed: a target with a tick. */
-export function ObjectiveIcon({ size = SIZE }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="completed objectives" className="resicon">
-      <title>Completed objectives</title>
-      <circle cx="12" cy="12" r="9.5" fill="#1f2b44" stroke="#9fb6d8" strokeWidth="1.4" />
-      <circle cx="12" cy="12" r="5.5" fill="none" stroke="#6f86ad" strokeWidth="1.2" />
-      <path d="M8.5 12.5l2.7 2.7 4.8-5.8" fill="none" stroke="#7be3a4" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+function Cut({ name, label, size }: { name: string; label: string; size: number }) {
+  return <img src={PRINTED[name]} alt={label} title={label} width={size} height={size} className="resicon" decoding="async" />;
 }
 
-/** A tech of the three kinds on the tech board: the probe (orange), the telescope (purple) or the computer (blue). */
+/** The completed objectives: the corner badge of an objective tile, cut from its picture (tools/web/build_rival_pill_icons.py). */
+export function ObjectiveIcon({ size = SIZE }: { size?: number }) {
+  return <Cut name="objective" label="Completed objectives" size={size} />;
+}
+
+/** The long-term objectives: the corner badge of a long-term objective tile (Space Agencies). */
+export function LongTermIcon({ size = SIZE }: { size?: number }) {
+  return <Cut name="long-term" label="Long-term objectives" size={size} />;
+}
+
+/** A tech of the three kinds on the tech board: the orange chip of the probe techs, the pink one of the telescope techs and the blue one of the computer techs. */
 export function TechKindIcon({ kind, size = SIZE }: { kind: "probe" | "telescope" | "computer"; size?: number }) {
-  const color = kind === "probe" ? "#e07a2f" : kind === "telescope" ? "#a56bff" : "#3b82d6";
+  return <Cut name={`tech-${kind}`} label={`${kind[0]?.toUpperCase()}${kind.slice(1)} techs`} size={size} />;
+}
+
+/** The back of a card of the rival's action deck, small: a placeholder (the back is not among the pictures, docs/asset-gaps.md); a played card is grey. */
+export function RivalCardBack({ used = false, height = 22 }: { used?: boolean; height?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label={`${kind} tech`} className="resicon">
-      <title>{`${kind[0]?.toUpperCase()}${kind.slice(1)} techs`}</title>
-      <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill={color} fillOpacity="0.28" stroke={color} strokeWidth="1.5" />
-      {kind === "probe" ? (
-        <>
-          <circle cx="12" cy="12" r="3" fill="#fff" />
-          <path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-        </>
-      ) : kind === "telescope" ? (
-        <>
-          <path d="M5 15 17 7l1.6 2.6L6.6 17.6z" fill="#fff" />
-          <path d="M10 17l-2 4.5M13 15.5l3 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-        </>
-      ) : (
-        <>
-          <rect x="7" y="7" width="10" height="10" rx="1.5" fill="#fff" />
-          <path
-            d="M9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"
-            stroke="#fff"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </>
-      )}
+    <svg
+      width={(height * 3) / 4}
+      height={height}
+      viewBox="0 0 30 40"
+      role="img"
+      aria-label={used ? "played action card" : "action card in the deck"}
+      className={used ? "resicon rivalback used" : "resicon rivalback"}
+    >
+      <title>{used ? "Played this round" : "Still in the rival's deck"}</title>
+      <rect x="1" y="1" width="28" height="38" rx="3.5" fill="#8d8ac4" stroke="#d9d6f5" strokeWidth="1.4" />
+      <path d="M1 12h28M1 28h28" stroke="#6f6ca8" strokeWidth="1.2" />
+      <path d="M12 7.5 18 5v5z" fill="#fff" />
+      <rect x="6" y="16" width="18" height="8" rx="2" fill="#6f6ca8" />
     </svg>
   );
 }

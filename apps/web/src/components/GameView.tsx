@@ -22,10 +22,11 @@ import {
   DeckCardIcon,
   EnergyIcon,
   ExofossilIcon,
+  LongTermIcon,
   ObjectiveIcon,
-  PlayedCardIcon,
   ProgressIcon,
   PublicityIcon,
+  RivalCardBack,
   ScoreIcon,
   SignalTokenIcon,
   TechKindIcon,
@@ -168,10 +169,14 @@ function RivalCells({ view }: { view: View }) {
         className="res"
         title="Actions: the cards the rival has played this round, and the cards left in its deck. When none is left it passes."
       >
-        <PlayedCardIcon size={18} />
-        <b>{r.used.length}</b>
-        <DeckCardIcon size={18} title="Cards left in the rival's deck" />
-        <b>{r.deck.length}</b>
+        <span className="rivalcards">
+          {r.used.map((id) => (
+            <RivalCardBack key={`u${String(id)}`} used height={22} />
+          ))}
+          {r.deck.map((id) => (
+            <RivalCardBack key={`d${String(id)}`} height={22} />
+          ))}
+        </span>
       </span>
       <span
         className="res"
@@ -197,6 +202,15 @@ function RivalCells({ view }: { view: View }) {
             {f.unspent}
             {f.round <= 4 ? `/${f.round}` : ""}
           </b>
+        </span>
+      ) : null}
+      {f && f.longTerm > 0 ? (
+        <span
+          className="res"
+          title={`Long-term objectives: ${f.openLongTerm} circle${f.openLongTerm === 1 ? "" : "s"} still open. At the end of rounds 2, 3 and 4 the rival advances one space for each open task.`}
+        >
+          <LongTermIcon size={18} />
+          <b>{f.openLongTerm}</b>
         </span>
       ) : null}
       <span className="res" title={`The techs the rival stores: ${kinds.map((k) => `${k.n} ${k.name}`).join(", ")}`}>
