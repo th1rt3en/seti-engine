@@ -200,15 +200,23 @@ def test_income_cards_count_tucked_cards_then_tuck_themselves() -> None:
     assert "93" in me(r).tucked and me(r).credits == p.credits - 3 + 1  # nothing tucked yet: only the card's credit income
 
 
-def test_hand_income_count_for_fuel_tanks() -> None:
-    """#90: energy for each card with energy income shown from the hand."""
+def test_fuel_tanks_the_player_picks_the_cards_with_an_energy_income_to_show() -> None:
+    """#90 (owner, 2026-10-24): the player picks cards with an energy income to show; the log names them; 1 energy for each."""
     s = ready()
-    give(s, "90")
     p = s.players[s.current_player]
-    shown = sum(1 for c in p.hand if c != "90" and tables.cards()[c]["income"] == "energy")
+    p.hand = ["90", *[c for c, v in tables.cards().items() if v["income"] == "energy" and c != "90"][:3]]
+    energy_cards = p.hand[1:]
     e0 = p.energy
     r = do(with_state(s), "play_card", card="90")
-    assert me(r).energy == e0 + shown
+    assert me(r).energy == e0 and r.state.pending[0].kind == "show_energy"  # nothing is given until the player picks
+    assert {m["card"] for m in r.legal if m["type"] == "show_energy"} == set(energy_cards) and {"type": "show_energy_done"} in r.legal
+    r = do(r, "show_energy", card=energy_cards[0])
+    assert [e["card"] for e in r.events if e["type"] == "show_card"] == [energy_cards[0]]  # the log names the card
+    assert me(r).energy == e0 + 1 and energy_cards[0] in me(r).hand
+    assert energy_cards[0] not in {m["card"] for m in r.legal if m["type"] == "show_energy"}  # shown once
+    assert not any(m["type"] == "undo" for m in r.legal)  # a card was shown to everybody: it cannot be taken back
+    r = do(r, "show_energy_done")  # the player may keep the others hidden
+    assert not r.state.pending and me(r).energy == e0 + 1
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

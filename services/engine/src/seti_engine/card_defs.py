@@ -255,7 +255,7 @@ CARDS: dict[str, dict[str, Any]] = {
     "87": {"fx": [ROT, research("probe")], "mission": quick({"c": "probe_far", "n": 5}, vp(3), energy(1))},  # ambiguity A-017
     "88": {"fx": [sig_probe(2)], "mission": quick({"c": "sig_sectors", "n": 4}, pub(2))},  # FAQ-C088
     "89": {"fx": [rnd(3)], "mission": quick({"c": "hand_empty"}, card(1))},  # FAQ-C089
-    "90": {"fx": [R("per", count="hand_income_energy", r=energy(1))]},
+    "90": {"fx": [R("show_energy")]},  # the player picks the cards with an energy income to show from the hand (owner, 2026-10-24)
     "91": {"fx": [R("per", count="tucked_income_energy", r=energy(1)), R("tuck_self")]},  # FAQ-C091
     "92": {"fx": [pub(2), R("per", count="tucked_income_card", r=pub(1)), R("tuck_self")]},
     "93": {"fx": [R("per", count="tucked_income_credit", r=vp(3)), R("tuck_self")]},

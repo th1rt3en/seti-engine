@@ -162,6 +162,10 @@
  "scan_token": [
   "source"
  ],
+ "show_energy": [
+  "card"
+ ],
+ "show_energy_done": [],
  "show_move_done": [],
  "signal_where": [
   "where"

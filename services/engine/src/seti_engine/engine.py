@@ -382,6 +382,7 @@ FREE_TYPES = frozenset(
     }
 )  # the free actions (FREE-01 to FREE-07, TECH-21)
 # moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
+SHOWS_A_CARD = frozenset({"show_move", "show_energy"})  # a card of the hand is shown to everybody: that cannot be taken back
 NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lower", "launch", "undo", "sandbox"})
 
 
@@ -408,6 +409,7 @@ def apply(state: GameState, action: Action) -> StepResult:
     if (
         state.phase != "play"
         or _reveals(state, s)
+        or action["type"] in SHOWS_A_CARD
         or (s.round, s.turn, s.current_player, s.phase) != (state.round, state.turn, state.current_player, state.phase)
         or state.stage not in (None, "sectors")
         or s.stage not in (None, "sectors")
@@ -492,6 +494,8 @@ def _reveals(before: GameState, after: GameState) -> bool:
 
 def reveals(state: GameState, action: Action) -> bool:
     """Would this move show something hidden, so that it could not be taken back? The page warns before such a move (UNDO-01)."""
+    if action["type"] in SHOWS_A_CARD:
+        return True
     if action["type"] in NEVER_REVEAL:
         return False
     try:

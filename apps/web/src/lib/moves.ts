@@ -75,6 +75,8 @@ export const LABELS: Record<string, Label> = {
   resolve_sector: (m) => `Resolve sector ${Number(m.sector)} next`,
   show_move: (m) => `Show ${cardName(m.card)} from your hand: gain 1 movement`,
   show_move_done: () => "Stop showing cards",
+  show_energy: (m) => `Show ${cardName(m.card)} from your hand: gain 1 energy`,
+  show_energy_done: () => "Stop showing cards",
   place_lower: (m) => `Place 1 data under computer tech ${Number(m.slot) + 1}`,
   tuck: (m) => `Tuck ${cardName(m.card)} for income`,
   skip_tuck: () => "Do not tuck a card",
@@ -255,6 +257,7 @@ export const HAND_MOVE_TYPES = new Set([
   "restructure_card", // Turing Systems restructuring: the cards to discard are picked in the hand
   "discard_corner", // Sentinel Probe Network
   "show_move", // #74 Pre-launch Testing: the cards to show are picked in the hand
+  "show_energy", // #90 Fuel Tanks Construction: the cards with an energy income to show are picked in the hand
   "org_free", // Futurespan, Deep Sky Survey, Helion Assembly: the card is picked in the hand
 ]);
 
@@ -346,6 +349,8 @@ export function handMoveText(m: Move, glyph?: { reward: { t: string; n: number }
       return `Confirm keeping ${name} from the end-of-round cards? The others go back.`;
     case "show_move":
       return `Show ${name} to everybody and gain 1 movement? The card stays in your hand.`;
+    case "show_energy":
+      return `Show ${name} to everybody and gain 1 energy? The card stays in your hand.`;
     case "choose_org":
       return `Take the organization ${name}? The other one goes back to the box.`;
     case "choose_quick":

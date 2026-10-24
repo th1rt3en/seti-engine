@@ -86,3 +86,7 @@ A player who has locked in may unlock to change the organization or the quick st
 setup at once, so nobody can unlock after it). The choices are kept when they unlock. Their clock runs again from the time it had left when they locked in (a per-turn clock
 from the time it had used) and stops at the next lock; locking gives no increment, so locking and unlocking again gains no time. A lock and an unlock that arrive at the
 same moment are taken one after the other by the room: if the last lock comes first the unlock is refused, else the lock waits for the player who unlocked.
+
+## #90 Fuel Tanks Construction, 2026-10-24
+
+Owner: the player chooses which cards with an energy income to show from the hand, and gains 1 energy for each card shown; they may show none, some or all. Each card shown is named in the log (the other players can check it), and the cards stay in the hand. In the engine: the decision `show_energy`, the moves `show_energy` (a card) and `show_energy_done`, and the event `show_card`. A card that was shown cannot be taken back with undo (it was shown to everybody), as for `show_move` of #74. Before this ruling the engine counted every card with an energy income in the hand.

@@ -61,6 +61,7 @@ const DECISION: Record<string, string> = {
   trace: "mark a trace",
   scan_step: "scan",
   take_card: "take a card",
+  show_energy: "show cards with an energy income from your hand (1 energy for each), or stop",
   pol_corner: "discard one of the drawn cards for its free action",
   pol_income: "discard one of the drawn cards for its income",
   land_free: "land for free",

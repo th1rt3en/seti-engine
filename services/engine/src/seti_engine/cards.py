@@ -198,6 +198,9 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
     elif t == "show_move":  # #74 Pre-launch Testing: the player shows cards from the hand, 1 movement for each with a movement corner
         if _movement_cards(p, []):
             s.pending.append(Decision(kind="show_move", player=p.index, data={"shown": []}))
+    elif t == "show_energy":  # #90 Fuel Tanks Construction: the player shows cards with an energy income from the hand, 1 energy for each
+        if _energy_cards(p, []):
+            s.pending.append(Decision(kind="show_energy", player=p.index, data={"shown": []}))
     elif t == "hand_signals":
         if any(tables.cards()[c].get("sector") for c in p.hand):
             s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": n}))
@@ -747,6 +750,11 @@ def _movement_cards(p: PlayerState, shown: list[str]) -> list[str]:
     return [c for c in dict.fromkeys(p.hand) if c not in shown and any(k == "move" for k, _ in tables.cards()[c]["free"])]
 
 
+def _energy_cards(p: PlayerState, shown: list[str]) -> list[str]:
+    """The cards of the hand with an energy income that have not been shown yet by this effect."""
+    return [c for c in dict.fromkeys(p.hand) if c not in shown and tables.cards()[c]["income"] == "energy"]
+
+
 def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
     """Legal moves of the decisions that cards create, or None if `d` is not one of them."""
     p = s.players[d.player]
@@ -758,6 +766,8 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
         return [{"type": "row_pick", "source": f"row:{i}"} for i in range(len(s.card_row))]
     if d.kind == "show_move":
         return [*({"type": "show_move", "card": c} for c in _movement_cards(p, d.data["shown"])), {"type": "show_move_done"}]
+    if d.kind == "show_energy":
+        return [*({"type": "show_energy", "card": c} for c in _energy_cards(p, d.data["shown"])), {"type": "show_energy_done"}]
     if d.kind == "hand_signal":
         picks = [{"type": "hand_signal", "card": c} for c in dict.fromkeys(p.hand) if tables.cards()[c].get("sector")]
         return [*picks, {"type": "hand_signal_done"}]
@@ -827,6 +837,14 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         if _movement_cards(p, shown):
             s.pending.insert(0, Decision(kind="show_move", player=p.index, data={"shown": shown}))
     elif t == "show_move_done":
+        pass
+    elif t == "show_energy":  # the card stays in the hand; everybody sees it (the log names it) and the player gains 1 energy
+        events.append({"type": "show_card", "player": p.index, "card": a["card"]})
+        rewards.grant(s, p, [{"t": "energy", "n": 1}], events)
+        shown = [*d.data["shown"], a["card"]]
+        if _energy_cards(p, shown):
+            s.pending.insert(0, Decision(kind="show_energy", player=p.index, data={"shown": shown}))
+    elif t == "show_energy_done":
         pass
     elif t == "cover":
         cover(s, p, a["card"], a["circle"], events)

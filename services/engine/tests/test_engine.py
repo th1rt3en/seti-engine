@@ -360,7 +360,7 @@ def play_towards_progress(players: int, seed: int) -> StepResult:
 @pytest.mark.parametrize("players", [2, 3, 4])
 def test_progress_seeking_games_finish_and_discover_species(players: int) -> None:
     discovered = 0
-    for seed in range(6):
+    for seed in range(12):  # the games are random walks: a change of the legal moves of one card moves them, so there are enough of them
         r = play_towards_progress(players, seed)
         assert r.state.phase == "finished"
         discovered += sum(1 for x in r.state.species if x.discovered)
