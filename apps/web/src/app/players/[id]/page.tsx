@@ -153,7 +153,6 @@ export default async function Player({
               <th>Game</th>
               <th>Table</th>
               <th>Result</th>
-              <th>Players</th>
               <th>Score</th>
               <th>Rating</th>
             </tr>
@@ -196,7 +195,7 @@ export default async function Player({
                   </td>
                   <td>
                     {o.players === 1 ? (
-                      <span className="muted">—</span>
+                      (g.score ?? "—")
                     ) : (
                       <ol className="tableplayers">
                         {data.pagePlayers
@@ -210,7 +209,6 @@ export default async function Player({
                       </ol>
                     )}
                   </td>
-                  <td>{o.players === 1 ? (g.score ?? "—") : null}</td>
                   <td>
                     {h ? (
                       <span className={h.rating_after >= h.rating_before ? "up" : "down"}>
