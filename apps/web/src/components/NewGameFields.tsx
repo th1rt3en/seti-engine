@@ -2,7 +2,7 @@
 // The fields of the "New game" form, in four steps: who plays (players and, for a solo game, the difficulty), the clock, the options, and the Space
 // Agencies expansion. Choices with a few answers are segmented buttons, yes-or-no choices are switches. The solo difficulty only exists for a game of one
 // player, and rated games need 2 to 4 players, so those two fields follow the choice of the number of players. The names of the fields are those that the
-// server action reads (`createGameAction`): players, difficulty, mode, clock, sandbox, species1, species2, rated, promo, promo2, expansion,
+// server action reads (`createGameAction`): players, difficulty, mode, clock, sandbox, species1, species2, friendly, promo, promo2, expansion,
 // organizations, beginner, neutral.
 import { type ReactNode, useState } from "react";
 
@@ -208,11 +208,17 @@ export function NewGameFields({
             ) : null}
           </>
         ) : (
+          // a game of 2 to 4 players is rated unless this is switched on (we want rated games to be the usual way to play)
           <Option
-            name="rated"
-            title="Rated"
-            hint={isGuest ? "Needs an account: create one first." : "Counts for the rating. 2 to 4 players, accounts only."}
+            name="friendly"
+            title="Friendly game"
+            hint={
+              isGuest
+                ? "Guests play friendly games only: create an account to play rated games."
+                : "Off: the game is rated and counts for the rating (2 to 4 players). On: nothing changes in the ratings."
+            }
             disabled={isGuest}
+            {...(isGuest ? { checked: true } : {})}
           />
         )}
         <Option name="promo" title="Promo cards, set 1" hint="Adds the two promo cards to the deck." />
@@ -232,7 +238,7 @@ export function NewGameFields({
             />
           </label>
           <p className="muted small">
-            The same seed gives the same cards and the same starting position (to replay a game, or to play the same deal again). Casual
+            The same seed gives the same cards and the same starting position (to replay a game, or to play the same deal again). Friendly
             games only: a rated game always has a random seed.
           </p>
         </details>

@@ -174,7 +174,8 @@ export async function createGameAction(form: FormData): Promise<void> {
     back("/lobby", "You have just created a game. Open it from the list, or wait a few seconds before creating another.");
   const players = Math.min(4, Math.max(1, Number(field(form, "players")) || 2));
   const difficulty = Math.min(5, Math.max(1, Number(field(form, "difficulty")) || 3));
-  const rated = form.get("rated") === "on" && players >= 2;
+  // a game of 2 to 4 players is rated unless the player switches on "Friendly game"; a guest has no rating, so a guest's game is always friendly
+  const rated = form.get("friendly") !== "on" && players >= 2 && !user.isGuest;
   const sandbox = players === 1 && form.get("sandbox") === "on";
   // the Space Agencies expansion: organizations work in every game, solo included (EXP-SOLO-01); the neutral pieces are for 1 to 2 players (D35)
   const expansion = form.get("expansion") === "on";
@@ -196,7 +197,8 @@ export async function createGameAction(form: FormData): Promise<void> {
   const seedText = field(form, "seed").trim();
   const seed = seedText === "" ? undefined : Number(seedText);
   if (seed !== undefined && !(Number.isSafeInteger(seed) && seed >= 0)) back("/lobby", "The seed must be a whole number from 0.");
-  if (seed !== undefined && rated) back("/lobby", "A rated game cannot have a chosen seed: untick Rated, or leave the seed empty.");
+  if (seed !== undefined && rated)
+    back("/lobby", "A rated game cannot have a chosen seed: switch on Friendly game, or leave the seed empty.");
   const reply = await createGame(user, {
     options: {
       players,
