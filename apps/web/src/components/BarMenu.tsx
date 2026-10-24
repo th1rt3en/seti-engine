@@ -63,7 +63,7 @@ export function BarMenu({
             <button
               type="button"
               role="menuitem"
-              className="danger"
+              className="menudanger"
               onClick={() => {
                 setOpen(false);
                 onResign();

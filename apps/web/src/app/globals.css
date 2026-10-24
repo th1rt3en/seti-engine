@@ -966,13 +966,13 @@ html[data-ingame="1"] header.bar {
 .barmenupanel button:focus-visible {
   background: rgba(255, 255, 255, 0.08);
 }
-.barmenupanel .danger {
+.barmenupanel .menudanger {
   background: transparent; /* the red of the .danger buttons is for buttons that stand alone */
   color: var(--bad);
   border-top: 1px solid var(--line);
 }
-.barmenupanel .danger:hover,
-.barmenupanel .danger:focus-visible {
+.barmenupanel .menudanger:hover,
+.barmenupanel .menudanger:focus-visible {
   background: rgba(248, 81, 73, 0.16);
 }
 
