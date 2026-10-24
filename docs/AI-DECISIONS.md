@@ -294,3 +294,18 @@ A candidate is saved as the new champion only if it beats the current champion h
 ### Training stopped, models scrapped, turn bundling required (owner, 2026-10-21)
 
 The large run was stopped after 10 self-play rounds (the network was at about 92 points, 37% of the 250 reference, and lost 40% of its head-to-head games against v008). All saved models and checkpoints were deleted. Training does not resume until the turn bundling is built and approved: a step that is evaluated (value, reward, advantage, search) is a whole turn, a main action with 0 or more free actions before and/or after it, and not one micro action. The design is in docs/AI-TURN-BUNDLES.md. The promotion gate stays (seti_ai/gate.py).
+
+## 17. Version 3 (v003): the first run of the self-play and human-game training (owner, 2026-10-24)
+
+v002 copied the heuristic bot and played badly (about 28 to 40 points in the test games), so v003 does not imitate a bot. It is trained by `seti_ai/iterate.py` (docs/AI-TURN-BUNDLES.md section 13): self-play with the bundle search, plus the games of people offered as candidates to the search.
+
+Decisions of the owner:
+- **Start fresh**: a new network, not v002's weights (`--preset <size>` instead of `--start`). The size has not been chosen yet: `base` (512 wide, 8 layers) is the faster one and `large` (768, 12) is v002's size; ask before the run.
+- **Include the solo games** of people (`--people-solo`), with the multiplayer ones (46 usable games of 220 archived on 2026-10-24, about 2,300 positions; 167 were not played to the end and teach nothing).
+- **15 iterations** to start (about 1 hour each with the large network on the RTX 3060, so about 15 hours; the estimate is in the briefing of 2026-10-24: self-play 27 min, human search 10, training 8, gate and evaluation about 13).
+- **Not started.** Training starts only with the owner's explicit go; `run` refuses to start without `--owner-approved`.
+- The finished candidate is saved for testing under `models_v3/vNNN`. The owner names it when approving it (`seti_ai.publish --approve vNNN=<name>`) and turns it on or off for hosts from the admin page.
+
+The command, once the owner says go and the size is chosen:
+`cd services/ai && python -m uv run python -m seti_ai.iterate run --owner-approved --preset <size> --models models_v3 --people archive_new --people-solo --iterations 15`
+(`pause --models models_v3` stops it at the end of an iteration; `--resume` goes on.)
