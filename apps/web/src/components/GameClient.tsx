@@ -683,25 +683,28 @@ export function GameClient({
     ) : undefined;
   const buyOptions = pickedRowMoves.filter((m) => !ROW_SIGNAL_MOVES.includes(m.type));
   const rowCardId = pickedBuy === null || pickedBuy === "deck" ? undefined : v.state.card_row[Number(pickedBuy.slice(4))];
-  const rowActions: CardAction[] = pickedRowMoves.map((m) => {
-    const sector = rowCardId === undefined ? "a" : cardSector(rowCardId);
-    const signal = ROW_SIGNAL_MOVES.includes(m.type);
-    return {
-      key: `${m.type}-${String(m.org ?? "")}`,
-      label: signal
-        ? m.type === "org_free"
-          ? (ORG_ROW_LABEL[String(m.org)] ?? `${orgName(m.org)}: free action`)
-          : m.type === "scan_token"
-            ? `Use a signal token: ${sector} signal`
-            : `Discard to mark a ${sector} signal`
-        : buyOptions.length > 1
-          ? describeMove(m)
-          : "Confirm",
-      primary: true,
-      title: m.type === "org_free" ? describeMove(m) : rowMoveText(m, v.state.card_row),
-      onClick: () => playConfirmed(m), // the button on the card is the confirmation: no second question
-    };
-  });
+  // buying or taking the card that is picked is confirmed in the move bar (the ask below); the buttons on the card are for the free actions that use it
+  const rowActions: CardAction[] = pickedRowMoves
+    .filter((m) => !buyOptions.includes(m))
+    .map((m) => {
+      const sector = rowCardId === undefined ? "a" : cardSector(rowCardId);
+      const signal = ROW_SIGNAL_MOVES.includes(m.type);
+      return {
+        key: `${m.type}-${String(m.org ?? "")}`,
+        label: signal
+          ? m.type === "org_free"
+            ? (ORG_ROW_LABEL[String(m.org)] ?? `${orgName(m.org)}: free action`)
+            : m.type === "scan_token"
+              ? `Use a signal token: ${sector} signal`
+              : `Discard to mark a ${sector} signal`
+          : buyOptions.length > 1
+            ? describeMove(m)
+            : "Confirm",
+        primary: true,
+        title: m.type === "org_free" ? describeMove(m) : rowMoveText(m, v.state.card_row),
+        onClick: () => playConfirmed(m), // the button on the card is the confirmation: no second question
+      };
+    });
   // taking a card that was picked is confirmed (or given up) on the card itself
   if (rowActions.length > 0 && !rowMode) rowActions.push({ key: "cancel", label: "Cancel", onClick: () => setPickedBuy(null) });
   // the movement that the player has, and the budget with the energy they turn into movement
@@ -865,11 +868,22 @@ export function GameClient({
   } else if (rowMode) {
     ask = { text: "Click the card of the display that you want.", buttons: [], onCancel: () => setRowMode(null) };
   } else if (buyOptions.length > 0 && !rowMode) {
+    // the button that buys (or takes) the picked card is in the move bar
+    const price = (m: Move): number => {
+      const at = v.legal.findIndex((x) => sameMove(x as Move, m));
+      return Number((v.notes[at] as Note | undefined)?.cost?.publicity ?? 3);
+    };
     ask = {
       text: buyOptions.map((m) => rowMoveText(m, v.state.card_row)).join(" "),
-      buttons: [],
+      buttons: buyOptions.map((m) =>
+        confirm(
+          m.type === "buy_card"
+            ? `Buy ${m.source === "deck" ? "the top card of the deck" : "this card"} (${price(m)} publicity)`
+            : "Confirm",
+          () => playConfirmed(m),
+        ),
+      ),
       onCancel: () => setPickedBuy(null),
-      onCard: true,
     };
   }
   // moving a probe: what the context bar says while a probe is picked (the budget and its energy are set there)
