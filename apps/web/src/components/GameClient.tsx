@@ -39,6 +39,7 @@ import expansionAssets from "../generated/expansion-assets.json";
 import { BarMenu } from "./BarMenu";
 import { BuyPanel } from "./BuyPanel";
 import type { CardAction } from "./CardActions";
+import { ChatDock, type ChatLine } from "./ChatDock";
 import { FinalScores } from "./FinalScores";
 import { GameView } from "./GameView";
 import { setupStatus } from "./GameView";
@@ -69,7 +70,8 @@ type Server =
   | { t: "log"; from: number; entries: LogEntry[] }
   | { t: "preview"; id: number; changes: Record<string, number> | null }
   | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } }
-  | { t: "cancelled" };
+  | { t: "cancelled" }
+  | { t: "chat"; entries: ChatLine[]; replace?: boolean };
 
 const GOLD_INFO = assets.gold as Record<string, { per: string; values: number[] }>;
 
@@ -120,6 +122,9 @@ export function GameClient({
   const [error, setError] = useState<string | null>(null);
   // the moves made so far (the server sends all of them when the page connects, then each new one)
   const [log, setLog] = useState<LogEntry[]>([]);
+  // the chat of the table: the last lines (the server sends them on connecting and each new one), and what it said about a line it refused
+  const [chat, setChat] = useState<ChatLine[]>([]);
+  const [chatNote, setChatNote] = useState<string | null>(null);
   const logRef = useRef<LogEntry[]>([]); // the same log, to check that a new entry follows the ones that were received
   const [online, setOnline] = useState(false);
   // what a move would change for the player, by the number of the move (MovePreview); forgotten when the game moves on
@@ -269,6 +274,11 @@ export function GameClient({
             return;
           }
           setLog(logRef.current);
+        } else if (m.t === "chat") {
+          setChatNote(null);
+          setChat((old) => (m.replace ? m.entries : [...old, ...m.entries.filter((l) => !old.some((o) => o.n === l.n))].slice(-100)));
+        } else if (m.t === "error" && ["too_fast", "empty", "sign_in"].includes(m.code)) {
+          setChatNote(m.message); // a refused line of the chat is no error of the game: the move that is on its way goes on
         } else if (m.t === "error") {
           plan.current = [];
           endWait();
@@ -1091,8 +1101,8 @@ export function GameClient({
       window.dispatchEvent(new CustomEvent(HAND_TAB_EVENT, { detail: key === "q" ? "hand" : "other" }));
       return;
     }
-    if (key === "l" || key === "r") {
-      window.dispatchEvent(new CustomEvent(TOGGLE_EVENT, { detail: key === "l" ? "log" : "players" }));
+    if (key === "l" || key === "r" || key === "c") {
+      window.dispatchEvent(new CustomEvent(TOGGLE_EVENT, { detail: key === "l" ? "log" : key === "c" ? "chat" : "players" }));
       return;
     }
     if (ended) return;
@@ -1304,6 +1314,19 @@ export function GameClient({
         previous={previous}
         lastMove={lastMoveOf(log.at(-1)?.events as never)}
         log={<MoveLog entries={log} ctx={logCtx} />}
+        chat={
+          <ChatDock
+            lines={chat}
+            colors={v.state.players.map((p) => p.color)}
+            mySeat={v.viewer}
+            canWrite={signedIn}
+            note={chatNote}
+            onSend={(text) => {
+              setChatNote(null);
+              send({ t: "chat", text });
+            }}
+          />
+        }
         goldChoice={
           goldMoves.length > 0
             ? {

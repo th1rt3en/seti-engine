@@ -177,7 +177,27 @@ export type ServerMessage =
   /** The answer to a preview request: what the move would change for the player (null when it cannot be told). */
   | { t: "preview"; id: number; changes: Record<string, number> | null }
   /** An administrator cancelled the game (no result, no rating changes). */
-  | { t: "cancelled" };
+  | { t: "cancelled" }
+  /** The chat of the table: the last lines on connecting (`replace`), then each new line. */
+  | { t: "chat"; entries: ChatEntry[]; replace?: boolean };
+
+/** A line of the chat of a table. `seat` is null for somebody who is not a player of the game (a spectator, or a player of a lobby who has not got a seat). */
+export interface ChatEntry {
+  /** The number of the line in the chat of this table, from 1. */
+  n: number;
+  name: string;
+  seat: number | null;
+  /** The number of the player (the address of their profile), when they have one. */
+  num?: number;
+  text: string;
+  at: number;
+}
+
+/** The chat keeps the last lines of a table, in the room (not in a database, and not in the archive); it goes with the table. */
+export const CHAT_KEEP = 100;
+export const CHAT_MAX_CHARS = 300;
+/** One line from one person in this many milliseconds. */
+export const CHAT_GAP_MS = 1000;
 
 export interface Connection {
   id: string;
@@ -454,6 +474,42 @@ export class GameRoom {
         this.archiveSoon(); // the game as far as it went is the last version of its file
       }
       await this.d.setAlarm(null);
+      return { ok: true };
+    });
+  }
+
+  private readonly lastChat = new Map<string, number>();
+
+  /** Somebody who is signed in (a player, or a spectator) says something to the table: everybody connected gets the line, and the last CHAT_KEEP lines are kept. */
+  chat(who: Identity, raw: string): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status === "cancelled") return fail("unknown_game", "there is no chat at this table");
+      // control characters and the line breaks are blanks: a line is one line of text, which the page shows as text only
+      const text = Array.from(raw)
+        .map((ch) => (ch.charCodeAt(0) < 32 || ch.charCodeAt(0) === 127 ? " " : ch))
+        .join("")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, CHAT_MAX_CHARS);
+      if (text === "") return fail("empty", "write something first");
+      const now = this.d.now();
+      const last = this.lastChat.get(who.id);
+      if (last !== undefined && now - last < CHAT_GAP_MS) return fail("too_fast", "wait a moment before the next line");
+      this.lastChat.set(who.id, now);
+      const lines = (await this.d.store.get<ChatEntry[]>("chat")) ?? [];
+      const seat = meta.seats.findIndex((s) => s?.id === who.id);
+      const entry: ChatEntry = {
+        n: (lines.at(-1)?.n ?? 0) + 1,
+        name: who.name,
+        seat: seat >= 0 ? seat : null,
+        ...(who.num === undefined ? {} : { num: who.num }),
+        text,
+        at: now,
+      };
+      const kept = [...lines, entry].slice(-CHAT_KEEP);
+      await this.d.store.put("chat", kept);
+      for (const c of this.d.connections()) c.send({ t: "chat", entries: [entry] });
       return { ok: true };
     });
   }
@@ -820,6 +876,7 @@ export class GameRoom {
       conn.send({ t: "error", code: "unknown_game", message: "no such game" });
       return;
     }
+    conn.send({ t: "chat", entries: (await this.d.store.get<ChatEntry[]>("chat")) ?? [], replace: true }); // the chat is the same on every device and after a refresh
     if (meta.status === "lobby") conn.send(lobbyMessage(meta, conn.who));
     else {
       await this.sendView(conn, meta);

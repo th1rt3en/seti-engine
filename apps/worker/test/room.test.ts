@@ -436,3 +436,54 @@ describe("the seating of one seed", () => {
     expect(await seatsOf(alice, bob)).toEqual(await seatsOf(bob, alice));
   });
 });
+
+describe("the chat of a table", () => {
+  type ChatMsg = Extract<ServerMessage, { t: "chat" }>;
+  const chats = (c: Conn) => c.got.filter((m): m is ChatMsg => m.t === "chat");
+
+  it("every connection gets each line, a player's with their seat and a spectator's without; a new connection gets the last lines", async () => {
+    const t = makeRoom();
+    const ca = new Conn("a", alice.id);
+    const spec = new Conn("s", null);
+    t.conns.push(ca, spec);
+    await t.room.init("g", two, none, false, alice);
+    await t.room.join(bob);
+    await t.room.startGame(alice);
+    expect(await t.room.chat(alice, "hello  there\n!")).toEqual({ ok: true });
+    t.advance(1500);
+    expect(await t.room.chat(cy, "from the stands")).toEqual({ ok: true }); // cy is not a player of the game
+    for (const c of [ca, spec]) {
+      const lines = chats(c).flatMap((m) => m.entries);
+      expect(lines.map((l) => l.text)).toEqual(["hello there !", "from the stands"]);
+      expect(lines[0]).toMatchObject({ n: 1, name: alice.name, seat: expect.any(Number) });
+      expect(lines[1]).toMatchObject({ n: 2, seat: null });
+    }
+    const later = new Conn("l", null);
+    t.conns.push(later);
+    await t.room.connect(later);
+    expect(chats(later)[0]).toMatchObject({ replace: true });
+    expect(chats(later)[0]?.entries.map((l) => l.n)).toEqual([1, 2]);
+  });
+
+  it("refuses an empty line and a second line within a second, cuts a long line, and keeps the last 100", async () => {
+    const t = makeRoom();
+    await t.room.init("g", two, none, false, alice);
+    expect(await t.room.chat(alice, "   ")).toMatchObject({ ok: false, code: "empty" });
+    expect(await t.room.chat(alice, "a")).toEqual({ ok: true });
+    expect(await t.room.chat(alice, "b")).toMatchObject({ ok: false, code: "too_fast" });
+    t.advance(1000);
+    expect(await t.room.chat(alice, "x".repeat(1000))).toEqual({ ok: true });
+    for (let i = 0; i < 105; i++) {
+      t.advance(1000);
+      await t.room.chat(bob, `line ${i}`);
+    }
+    const c = new Conn("c", null);
+    t.conns.push(c);
+    await t.room.connect(c);
+    const lines = chats(c)[0]?.entries ?? [];
+    expect(lines).toHaveLength(100);
+    expect(lines.at(-1)?.text).toBe("line 104");
+    expect(lines.at(0)?.n).toBe(lines.at(-1)?.n ? (lines.at(-1)?.n as number) - 99 : 0);
+    expect((await t.store.get<{ text: string }[]>("chat"))?.every((l) => l.text.length <= 300)).toBe(true);
+  });
+});

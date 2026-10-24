@@ -139,7 +139,7 @@ export class GameRoomDO implements DurableObject {
   private async onMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     const conn = this.connection(ws);
     const att = ws.deserializeAttachment() as Attachment;
-    let msg: { t?: string; id?: number; seq?: number; seat?: number; action?: Record<string, unknown> };
+    let msg: { t?: string; id?: number; seq?: number; seat?: number; text?: string; action?: Record<string, unknown> };
     try {
       msg = JSON.parse(typeof message === "string" ? message : new TextDecoder().decode(message));
     } catch {
@@ -148,6 +148,15 @@ export class GameRoomDO implements DurableObject {
     }
     if (msg.t === "ping") {
       if (att.identity !== null) await this.room.touch(att.identity);
+      return;
+    }
+    if (msg.t === "chat") {
+      // everybody who is signed in can write, a spectator too; somebody who is not signed in only reads
+      if (att.identity === null) conn.send({ t: "error", code: "sign_in", message: "sign in (or play as a guest) to chat" });
+      else {
+        const said = await this.room.chat(att.identity, typeof msg.text === "string" ? msg.text : "");
+        if (!said.ok) conn.send({ t: "error", code: said.code, message: said.message });
+      }
       return;
     }
     if (att.identity === null) {

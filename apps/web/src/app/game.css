@@ -3326,3 +3326,113 @@ html:has(.setupchoice) .hand {
 .rowinline .rowbody .cards.withdeck {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+
+/* the chat of the table: a panel like the log, to the left of it (the log is at the right edge: it is as wide as clamp(280px, 18vw, 460px) when open) */
+.chatdock {
+  position: fixed;
+  right: calc(12px + clamp(280px, 18vw, 460px) + 12px);
+  bottom: 12px;
+  z-index: 34;
+  width: clamp(280px, 18vw, 420px);
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--panel) 97%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+/* the log folded is only its tab: the chat moves up to it */
+.game:has(.movelog.folded) .chatdock {
+  right: calc(12px + 110px + 12px);
+}
+.chatdock.folded {
+  width: auto;
+}
+.chatunread {
+  color: var(--accent);
+}
+.chatbody {
+  list-style: none;
+  margin: 0;
+  padding: 4px 10px 8px;
+  height: 260px;
+  max-height: min(34vh, 380px);
+  overflow-y: auto;
+  font-size: 0.88rem;
+}
+.chatline {
+  padding: 3px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  overflow-wrap: anywhere;
+}
+.chatline.mine .chatname {
+  color: var(--accent);
+}
+.chattext {
+  margin-left: 6px;
+}
+.chatform {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px 10px;
+}
+.chatform input {
+  flex: 1;
+  min-width: 0;
+}
+.chatnote {
+  margin: 0;
+  padding: 0 10px 8px;
+}
+@media (max-width: 760px) {
+  /* on a phone the chat is a tab of the bottom bar and a sheet, like the others */
+  .chatdock {
+    position: static;
+    width: auto;
+    max-height: none;
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+  .game:has(.chatdock) .dock > .handtab {
+    width: 20%;
+  }
+  .game:has(.chatdock) .rowdock > .handtab {
+    left: 20%;
+  }
+  .game:has(.chatdock) .trackerdock > .handtab {
+    left: 40%;
+  }
+  .game:has(.chatdock) .movelog > .handtab {
+    left: 60%;
+    border-right: 1px solid var(--line);
+  }
+  .game:has(.chatdock) .chatdock > .handtab {
+    left: 80%;
+    border-right: 0;
+  }
+  .chatbody,
+  .chatform,
+  .chatnote {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: var(--panel);
+    z-index: 60;
+  }
+  .chatbody {
+    bottom: calc(48px + 52px);
+    height: auto;
+    max-height: 40vh;
+    border-top: 2px solid var(--accent);
+  }
+  .chatform {
+    bottom: 48px;
+    height: 52px;
+    align-items: center;
+    padding: 6px 10px;
+  }
+  .chatnote {
+    bottom: calc(48px + 52px + 40vh);
+  }
+}

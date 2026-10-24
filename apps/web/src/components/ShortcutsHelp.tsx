@@ -15,6 +15,7 @@ const SHORTCUTS: { keys: string[]; text: string }[] = [
   { keys: ["Q"], text: "Hand: open or close" },
   { keys: ["W"], text: "Other cards: next tab, then close" },
   { keys: ["L"], text: "Log: open or close" },
+  { keys: ["C"], text: "Chat: open or close" },
   { keys: ["R"], text: "Player details: open or close" },
   { keys: ["?"], text: "Open this list" },
 ];

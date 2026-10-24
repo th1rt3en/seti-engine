@@ -206,6 +206,7 @@ export function GameView({
   row,
   tech,
   log,
+  chat,
   results,
   overlay,
   context,
@@ -229,6 +230,8 @@ export function GameView({
   tech?: TechPick;
   /** The log of the moves (the live game shows it). */
   log?: ReactNode;
+  /** The chat of the table (the live game shows it): a panel to the left of the log. */
+  chat?: ReactNode;
   /** The results of a game that is over, in a panel of their own under the bar and over the board (the page can hide it). */
   results?: ReactNode;
   /** A panel over the page (the player boards). */
@@ -433,6 +436,7 @@ export function GameView({
       <HandDock view={view} selection={hand} />
       <ExertianDock view={view} selection={hand} />
       {log}
+      {chat}
       {overlay}
     </div>
   );
