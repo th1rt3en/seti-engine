@@ -3321,3 +3321,8 @@ html:has(.setupchoice) .hand {
   margin-left: 0;
   gap: 4px;
 }
+
+/* when the deck can be picked too, its card lies in the same line as the three of the display (the four share the width of the panel) */
+.rowinline .rowbody .cards.withdeck {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}

@@ -66,7 +66,7 @@ export function RowDock({ view, row, inline, flash }: { view: View; row?: RowSel
               </span>
             </h3>
           ) : null}
-          <div className="cards">
+          <div className={row?.selectable.includes("deck") ? "cards withdeck" : "cards"}>
             {s.card_row.length === 0 ? <span className="muted">empty</span> : null}
             {s.card_row.map((c, i) => {
               const source = `row:${i}`;
