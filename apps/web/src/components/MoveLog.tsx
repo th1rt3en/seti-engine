@@ -266,6 +266,8 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
     }
     case "take_display_card":
       return `${who} takes ${cardName(ev.card)} from the display`;
+    case "pol_discard":
+      return `${who} discards ${cardName(ev.card)} for its ${ev.for === "corner" ? "free action" : "income resource"}`;
     case "take_alien_display_card":
       return `${who} takes ${cardName(ev.card)} (face-up alien card)`;
     case "breach":

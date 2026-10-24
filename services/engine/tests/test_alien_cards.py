@@ -273,9 +273,11 @@ def test_part_of_everyday_life_draws_three_and_places_them() -> None:
     assert first_pending(r) == "pol_corner" and set(r.state.aside) == set(deck_top)
     pick1 = r.legal[0]["card"]
     r = do(r, "pol_pick", card=pick1)
+    assert {"type": "pol_discard", "player": r.state.current_player, "card": pick1, "for": "corner"} in r.events  # the log names the card
     assert first_pending(r) == "pol_income"
     pick2 = next(m["card"] for m in r.legal if m["card"] != pick1)
     r = do(r, "pol_pick", card=pick2)
+    assert {"type": "pol_discard", "player": r.state.current_player, "card": pick2, "for": "income"} in r.events
     keep = [c for c in deck_top if c not in (pick1, pick2)]
     assert not r.state.pending and all(c in me(r).hand for c in keep) and len(me(r).hand) == hand + 1
     assert pick1 in r.state.discard and pick2 in r.state.discard

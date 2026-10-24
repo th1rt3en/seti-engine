@@ -58,6 +58,7 @@ import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { PlayerLink } from "./PlayerLink";
 import { PlayerColorsContext, PlayerName, PlayerNumsContext } from "./PlayerName";
+import { PolPanel } from "./PolPanel";
 import { Amount, Cost, KindIcon } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
 import { SetupBoth, SetupChoice, SetupTucks } from "./SetupChoice";
@@ -967,8 +968,24 @@ export function GameClient({
         ) : null}
       </span>
     ) : null;
+  // #ET.15 (FAQ-C215): the drawn cards in a panel; the card discarded in the first step stays in view in the second
+  const polKind = v.state.pending[0]?.kind;
+  const polStep = polKind === "pol_corner" ? "corner" : polKind === "pol_income" ? "income" : null;
+  const polDiscarded =
+    polStep === "income"
+      ? (log
+          .slice(-4)
+          .flatMap((e) => (e.events ?? []) as { type?: string; player?: number; card?: string; for?: string }[])
+          .filter((ev) => ev.type === "pol_discard" && ev.player === v.viewer && ev.for === "corner")
+          .at(-1)?.card ?? null)
+      : null;
+  const polNode =
+    polStep && mine.some((m) => m.type === "pol_pick") ? (
+      <PolPanel step={polStep} cards={v.state.aside} moves={mine} discarded={polDiscarded} onPick={play} />
+    ) : null;
   const contextNode: ReactNode =
     ask?.text ??
+    polNode ??
     breachNode ??
     (coverNode ? <>Cover a circle of a mission? {coverNode}</> : null) ??
     (orgMarkNode ? <>Mark a reward space of your organization? {orgMarkNode}</> : null) ??

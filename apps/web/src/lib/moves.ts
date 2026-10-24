@@ -278,6 +278,9 @@ const FREE_WORDS: Record<string, string> = {
   move: "movement",
   explore_minor: "minor exploration reward (reveal the next exploration card)",
 };
+/** The free-action corner and the income resource of a card, in words (the panel of #ET.15 shows them on its buttons). */
+export const cornerWords = (id: string): string => freeText(CARDS[id]?.free as [string, number][] | undefined);
+export const incomeWords = (id: string): string => CARDS[id]?.income ?? "nothing";
 const freeText = (free: [string, number][] | undefined): string =>
   free && free.length > 0 ? free.map(([k, n]) => `${n} ${FREE_WORDS[k] ?? k}`).join(", ") : "nothing";
 
@@ -374,7 +377,7 @@ export function logText(m: Move): string {
     case "play_exertian":
       return "played an Exertian card face down";
     case "pol_pick":
-      return "chose a card";
+      return "chose a drawn card";
     case "undo":
       return "took back the last move";
     case "exchange":

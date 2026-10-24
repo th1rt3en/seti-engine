@@ -61,6 +61,8 @@ const DECISION: Record<string, string> = {
   trace: "mark a trace",
   scan_step: "scan",
   take_card: "take a card",
+  pol_corner: "discard one of the drawn cards for its free action",
+  pol_income: "discard one of the drawn cards for its income",
   land_free: "land for free",
   orbit_land_free: "orbit or land for free",
   land_data_slot: "cover a first-lander space: the one with 2 data or the one with 1 data",
@@ -136,6 +138,21 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
         text: none
           ? `no organelle of the ${color} section is available: skip`
           : `choose one organelle of the ${color} section on the Amoeba board and confirm`,
+      };
+    }
+    if (decision?.kind === "pol_corner" || decision?.kind === "pol_income") {
+      const left = s.aside.length;
+      return {
+        who,
+        mine,
+        text:
+          decision.kind === "pol_corner"
+            ? left === 1
+              ? "discard the drawn card for its free action"
+              : `choose one of the ${left} drawn cards to discard for its free action`
+            : left === 1
+              ? "discard the last card for its income"
+              : `choose one of the ${left} remaining cards to discard for its income; you keep the other`,
       };
     }
     if (decision) return { who, mine, text: humanize(decision.kind) };

@@ -170,6 +170,9 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
     elif t == "pol_pick":
         s.aside.remove(a["card"])
         s.discard.append(a["card"])
+        # FAQ-C215: the discarded card is named in the log, so that the opponents can check it
+        kind = "corner" if d.kind == "pol_corner" else "income"
+        events.append({"type": "pol_discard", "player": p.index, "card": a["card"], "for": kind})
         if d.kind == "pol_corner":
             cards_corner(s, p, a["card"])
             if s.aside:

@@ -3475,3 +3475,24 @@ html:has(.setupchoice) .hand {
   filter: grayscale(1) brightness(0.7);
   opacity: 0.6;
 }
+
+/* #ET.15: the drawn cards in the context bar */
+.polpanel {
+  display: grid;
+  gap: 8px;
+}
+.polcards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.polcard {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  max-width: 150px;
+}
+.polcard.gone {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
