@@ -21,7 +21,7 @@ python -m uv run python -m seti_ai.publish --models models_alpha --approve v003=
 python -m uv run python -m seti_ai.lobby_export --models models_alpha --out serve_models      # copies only approved versions (weights are not in git)
 ```
 
-Every published version has a name that you choose (`--approve v003=orion`; `v001` keeps its own): the name is what the lobby, `/bots`, the seat of the game and the folder
+Every published version has a name that you choose (`--approve v003=orion`; `v001` stays as it is): the name is what the lobby, `/bots`, the seat of the game and the folder
 of the AI service call it. `--enable` and `--disable` (or the buttons of the AI models section of the admin page) mark the version in the site's table `bot_versions`; the
 lobby page offers only the enabled versions to a host, and a disabled one cannot be added to a game. The same versions are listed on `/bots`.
 The weights never leave this machine except in the image below.

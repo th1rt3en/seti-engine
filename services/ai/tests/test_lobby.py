@@ -219,7 +219,9 @@ def test_a_version_is_published_under_the_name_the_owner_gives(tmp_path: Path) -
     for bad in ("v004", "has space", "x" * 41):
         with pytest.raises(SystemExit):
             parse_approvals(tmp_path, [f"v003={bad}"])
-    approvals = parse_approvals(tmp_path, ["v001", "v003=orion"])  # v001 keeps its own name
+    with pytest.raises(SystemExit):
+        parse_approvals(tmp_path, ["v001"])  # no folder is named by its number unless the owner says so
+    approvals = parse_approvals(tmp_path, ["v001=v001", "v003=orion"])  # v001 keeps its own name
     assert approvals == {"v001": "v001", "v003": "orion"}
     mark_approved(tmp_path, approvals)
     with pytest.raises(SystemExit):
