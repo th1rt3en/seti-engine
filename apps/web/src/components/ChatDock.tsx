@@ -39,7 +39,7 @@ export function ChatDock({
   note: string | null;
   onSend: (text: string) => void;
 }) {
-  const [folded, toggle] = useDock("chat", () => window.innerWidth < 1700);
+  const [folded, toggle] = useDock("chat", () => true);
   const body = useRef<HTMLOListElement>(null);
   const dock = useRef<HTMLElement>(null);
   useBottomSpace(dock, "chat");
@@ -74,16 +74,24 @@ export function ChatDock({
   };
   // the newest line is in view; while the panel is folded the lines that came are counted on its tab
   const last = lines.at(-1)?.n ?? 0;
-  const seen = useRef(last);
+  // the lines that were there on connecting (the history) are not new: the first lines that come, or two seconds without any, set the mark
+  const seen = useRef<number | null>(null);
   const [unread, setUnread] = useState(0);
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      if (seen.current === null) seen.current = 0;
+    }, 2000);
+    return () => window.clearTimeout(t);
+  }, []);
   // biome-ignore lint/correctness/useExhaustiveDependencies: on every new line, and when the panel opens or closes
   useEffect(() => {
     const el = body.current;
+    if (seen.current === null && last > 0) seen.current = last;
     if (!folded) {
       if (el) el.scrollTop = el.scrollHeight;
       seen.current = last;
       setUnread(0);
-    } else setUnread(lines.filter((l) => l.n > seen.current).length);
+    } else setUnread(lines.filter((l) => l.n > (seen.current ?? 0)).length);
   }, [last, folded]);
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -98,7 +106,11 @@ export function ChatDock({
       <button type="button" className="handtab" onClick={toggle} aria-expanded={!folded}>
         <span>
           Chat{lines.length > 0 ? ` (${lines.length})` : ""}
-          {unread > 0 ? <b className="chatunread"> +{unread}</b> : null}
+          {unread > 0 ? (
+            <b className="chatunread" title={`${unread} new messages`}>
+              {unread > 9 ? "9+" : unread}
+            </b>
+          ) : null}
         </span>
         <span aria-hidden="true">{folded ? "▴" : "▾"}</span>
       </button>

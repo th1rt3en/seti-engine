@@ -3349,7 +3349,18 @@ html:has(.setupchoice) .hand {
   width: auto;
 }
 .chatunread {
-  color: var(--accent);
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 9px;
+  background: #e5484d;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 .chatbody {
   list-style: none;
