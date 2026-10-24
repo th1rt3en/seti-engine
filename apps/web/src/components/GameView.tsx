@@ -24,7 +24,7 @@ import { PlayerTracker } from "./PlayerTracker";
 import { PublicitySlot } from "./PublicitySlot";
 import { RoundPiles } from "./RoundPiles";
 import { RowDock, type RowSelection } from "./RowDock";
-import { SoloPanel } from "./SoloPanel";
+import { SoloPanel, objectiveFacts } from "./SoloPanel";
 import { type TechPick, TechStacks } from "./TechStacks";
 import { TrackerDock } from "./TrackerDock";
 
@@ -128,6 +128,72 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
     return { who, mine, text: s.main_done ? "take free actions, or end the turn" : "choose a main action" };
   }
   return { who, mine, text: decision ? `must ${humanize(decision.kind)}` : "is taking a turn" };
+}
+
+/** The tech board: the prefix of the id of a tech says which kind it is (PT probe, TT telescope, CT computer). */
+const TECH_KINDS = [
+  { prefix: "PT", short: "P", name: "probe" },
+  { prefix: "TT", short: "T", name: "telescope" },
+  { prefix: "CT", short: "C", name: "computer" },
+] as const;
+
+/** What the rival of a solo game has, in the cells of its pill (they are under the resources of the other pills): the data on its computer, the actions it has
+ * played this round and the cards it has left, its place on the progress track, the objectives that you have completed against those that you must spend,
+ * and the techs that it stores by kind. Everything is in the view of the engine; nothing is worked out here. */
+function RivalCells({ view }: { view: View }) {
+  const r = view.state.rival;
+  if (!r) return null;
+  const f = objectiveFacts(view);
+  const kinds = TECH_KINDS.map((k) => ({ ...k, n: r.techs.filter((t) => t.startsWith(`${k.prefix}#`)).length }));
+  return (
+    <span className="rivalcells">
+      <span className="res" title="Data on the rival's computer (0 to 6)">
+        <DataIcon size={18} />
+        <b>{r.computer}/6</b>
+      </span>
+      <span
+        className="res"
+        title="Actions: the cards the rival has played this round, and the cards left in its deck. When none is left it passes."
+      >
+        <b>{r.used.length}</b>
+        <span className="muted small">done</span>
+        <b>{r.deck.length}</b>
+        <span className="muted small">left</span>
+      </span>
+      <span
+        className="res"
+        title="The rival's marker on the 12 spaces of its progress track. Each time it goes round the track (back to the start), the rival gains an advanced action card."
+      >
+        <span className="muted small">progress</span>
+        <b>{r.progress}/12</b>
+        <span className="muted small">+{r.advanced.length} adv.</span>
+      </span>
+      {f ? (
+        <span
+          className="res"
+          title={
+            f.round <= 4
+              ? `Completed objectives: at the end of round ${f.round}, before income, you spend ${f.round} of them (1, 2, 3 and 4 after rounds 1 to 4). For each one that you cannot spend, the rival advances 3 spaces on its progress track.`
+              : "Completed objectives: nothing is spent after round 5. Every objective that is not completed gives the rival 5 points."
+          }
+        >
+          <span className="muted small">objectives</span>
+          <b>
+            {f.unspent}
+            {f.round <= 4 ? `/${f.round}` : ""}
+          </b>
+        </span>
+      ) : null}
+      <span className="res" title={`The techs the rival stores: ${kinds.map((k) => `${k.n} ${k.name}`).join(", ")}`}>
+        {kinds.map((k) => (
+          <span key={k.prefix} title={`${k.name} techs`}>
+            <span className="muted small">{k.short}</span>
+            <b>{k.n}</b>
+          </span>
+        ))}
+      </span>
+    </span>
+  );
 }
 
 export function GameView({
@@ -279,7 +345,9 @@ export function GameView({
                     <ScoreIcon size={20} />
                     <b>{finalTotal(p.index) ?? p.score}</b>
                   </span>
-                  {s.rival && p.index === s.rival.index ? null : (
+                  {s.rival && p.index === s.rival.index ? (
+                    <RivalCells view={view} />
+                  ) : (
                     <>
                       <span className="res" title="Credits">
                         <CreditIcon size={18} />

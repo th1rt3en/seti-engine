@@ -3303,3 +3303,21 @@ html:has(.setupchoice) .hand {
   grid-template-columns: repeat(auto-fill, minmax(150px, 200px));
   justify-content: start;
 }
+
+/* the rival of a solo game: its numbers lie in a second line of its pill, under the columns of the others, and do not widen them */
+.scorechips li .rivalcells {
+  grid-column: 1 / -1;
+  contain: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  padding-top: 2px;
+}
+.scorechips li:has(.rivalcells) {
+  border-radius: 18px;
+}
+.scorechips .rivalcells .res {
+  margin-left: 0;
+  gap: 4px;
+}
