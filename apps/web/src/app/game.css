@@ -1116,6 +1116,17 @@ button:disabled {
     position: static;
     max-height: none;
   }
+  /* the piles of the end of the round lie at the bottom of the page, after the card row, the techs, the organizations and the missions */
+  .col-center,
+  .boardwrap {
+    display: contents;
+  }
+  .col-aux {
+    order: 1;
+  }
+  .roundpiles {
+    order: 2;
+  }
   .publicity svg {
     max-width: 260px;
   }
@@ -1438,8 +1449,11 @@ button:disabled {
     grid-row: 4;
   }
   /* the scores and resources of the players stay visible when the bar is folded */
-  .topbar.collapsed .movebar,
-  .topbar.collapsed .toprow .extra {
+  .topbar.collapsed .movebar {
+    display: none;
+  }
+  /* the menu (the hamburger) stays when the bar is folded: it holds the way out of the game */
+  .topbar.collapsed .toprow .extra > :not(.barmenu) {
     display: none;
   }
 }
@@ -1757,11 +1771,16 @@ button:disabled {
 }
 
 .orgname {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   font-size: 11px;
+  line-height: 1.5;
   color: #c4a8ff;
   border: 1px solid rgba(167, 129, 255, 0.5);
   border-radius: 999px;
-  padding: 0 6px;
+  padding: 1px 8px;
 }
 
 .glyphpanel h3 {
