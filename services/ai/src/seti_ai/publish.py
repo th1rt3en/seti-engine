@@ -6,7 +6,8 @@ Only numbers go to the site (the manifest of each version: when, which rules, ho
 
 Every version that is published has a NAME that the owner gives (`--approve v003=orion`: letters, digits, `.`, `_` and `-`, up to 40, not used
 before). The name is what the lobby, the page of the AIs, the seat of the game and the folder of the AI service call the version; the folder
-`v003` of the training stays what it is. `v001` (published before the names) stays as it is: it is already on the site. `--enable` and `--disable` list the names that a host
+`v003` of the training stays what it is. `v001` (published before the names) stays as it is: it is already on the site.
+`--enable` and `--disable` list the names that a host
 can add to a game (`bot_versions.live`); the administrator's page does the same with a button. Training never approves, names or enables anything.
 """
 
