@@ -1,6 +1,6 @@
 # Plan: tournaments and achievements (the next platform upgrade)
 
-Status: **a plan for the owner to approve. Nothing of it is built.** Written 2026-10-24 from the owner's brief. It extends `docs/PLAN.md` and does not contradict it: when the owner approves it, the decisions in section 9 go into the decision log (D41 and D42) and the open questions in section 8 are answered first (hard rule 3: an unclear rule means stop, not a guess).
+Status: **a plan for the owner to approve. Nothing of it is built.** Written 2026-10-24 from the owner's brief; the owner answered the first 19 questions the same day (section 8). It extends `docs/PLAN.md` and does not contradict it: when the owner approves it, the decisions in section 9 go into the decision log (D41 and D42). The outcomes that are still unclear are listed in section 8.2 and in the catalogue of edge cases (section 10); they are answered before the phase that needs them (hard rule 3: an unclear rule means stop, not a guess).
 
 Two features that share one piece of ground: both are built on the result of a finished game (D24, D37) and both add pages to the player's profile.
 
@@ -17,87 +17,39 @@ Two features that share one piece of ground: both are built on the result of a f
 - **All tournament games are turn based.** The creator chooses the time control. A player who times out can be kicked as usual (D24).
 - A player who is **kicked from a tournament game is disqualified** for the rest of the tournament. Every game they still have scheduled counts as lost, and the remaining players of those games are the winners.
 - Formats:
-  1. **Single elimination**: participants are paired at random; the winner(s) go on, the losers are out.
-  2. **Swiss system**: players play up to *x* matches (the creator sets *x*, from 2 to 8). A match gives points by placement: 4 players +6 / +4 / +2 / 0 for 1st / 2nd / 3rd / 4th; 3 players +4 / +2 / 0; 2 players +2 / 0. After every round the players are shuffled into the next matches by their points (players of similar strength together). A switch at creation tries not to pair the same players again.
-  3. **Round robin**: details to be given.
-  4. **Group stage**: details to be given.
+  1. **Tables of mixed sizes** (both formats). The creator gives a smallest and a largest table size. For *n* players the tables are made like this (the rule is proposed from the owner's two examples and is to be confirmed, Q22):
+1. seat everybody if a split exists with all tables between the smallest and the largest size; leave out as few players as possible otherwise (the players left out get a **bye**);
+2. among those splits, make as many largest tables as possible.
 
-### Achievements
-- A curated list of achievements that a player earns from their performance in tournaments or from their rating.
-- Each has a **badge** shown in the player's profile (placeholder pictures for now).
-- They are tracked automatically and given **at once, after the game in which they were earned, by a pop-up**.
-- A game that unlocked an achievement has a **special icon** (a generated placeholder) in the game history of the profile. The game history gets **filters**: opponent name, alien species, achievement unlocked, minimum score.
-
----
-
-## 2. How it fits what exists
-
-| Existing | What the new work does with it |
-|---|---|
-| Rated games, Elo, floor 100 (D15, D37, `apps/worker/src/core/elo.ts`, `ratings.ts`) | Tournament games are ordinary rated games: no second rating. Achievements read the rating before and after. |
-| Kick, timeout, 2-player loss on timeout (D24) | Unchanged. A kick in a tournament game also disqualifies (section 3.4). |
-| Turn-based clocks (D34: slow 4 d + 12 h, normal 3 d + 9 h, fast 2 d + 6 h per turn) | The creator picks one of the three; "no clock" and the real-time speeds are not offered. |
-| Open-table limit (guest 1, account 10; built 2026-10-24) | Needs a rule for tournament games (open question Q3). |
-| Game rooms (`GameRoom` Durable Object, lobby, host starts the game) | A tournament game is created by the system with its seats fixed and starts by itself, without a lobby. |
-| Result sink in D1 (`recordEnd`, `rating_history`, `game_stats`) | The place where tournament results and achievements are computed, in the same D1 batch as the ratings. |
-| Numbers in addresses (D38) | Tournaments get a number too: `/tournaments/12`. |
-| Archive (D25) | Unchanged; each tournament game is archived like any other and gets its tournament number in the header. |
-| Profile page, game history, filter forms (`FilterForm`) | Extended with the badges, the unlock icon and the filters. |
-| Engine | **Not touched.** Tournament pairing and standings are platform logic, not game rules (rule 5 is about the rules of SETI). They still follow rule 4 in spirit: the pairing code is pure and takes its randomness from a stored seed, so a tournament can be replayed and tested. |
-
----
-
-## 3. Tournaments
-
-### 3.1 Lifecycle
-
-```
-registration --(creator starts, or the deadline passes with enough players)--> in progress --(last game done)--> concluded
-registration --(creator cancels)--> cancelled
-in progress  --(administrator cancels)--> cancelled        (nobody's rating changes for games not played; the games played stay rated)
-```
-
-- **Who**: a registered player creates, and only registered players join (a rated game needs registered players, D15). Guests can watch.
-- **Settings at creation**: name; format; players per match (2, 3 or 4); the size limits (minimum 2 matches' worth of players, maximum to be decided, Q5); the turn-based speed; whether the Space Agencies expansion and organizations are on (the same options as a table, fixed for every game of the tournament); the registration deadline (optional); format settings (rounds *x* for Swiss, the rematch switch, how many advance).
-- **Limit**: at most 5 tournaments per creator in registration or in progress. At 5, creating another is refused with a message that names the limit and says what to do (wait for one to conclude, or cancel one that is in registration). A tournament that is cancelled or concluded no longer counts.
-- **Registration**: join and leave freely. The creator starts it by hand once the minimum is reached; if there is a deadline, it starts then (or is cancelled if there are too few).
-- **After the start**: nobody joins. A player can withdraw; a withdrawal is treated like a disqualification (3.4) because the games they have are forfeited.
-- **Cancel**: the creator can cancel only in registration. An administrator can cancel at any time (the existing admin page gets a section).
-
-### 3.2 Games of a tournament
-
-- The system creates each table: the seats are the players of the match, the options and the clock are the tournament's, `rated` is always true, and the game starts at once (no lobby, no start button). The seats are drawn by the existing seating rule (D28).
-- The table is announced to its players: a "Your tournament games" panel on the site and the existing "ting" when it is their turn (D34). No e-mail (D34 stands).
-- A game result (placement of every seat, with the existing tie rules) is sent by the game room to the tournament, which updates the standings and, when a round is complete, makes the next tables. The call is idempotent and retried (the same pattern as the archive writes).
-- A game that an administrator cancels is a game with no result; what the tournament does with it is Q6.
-
-### 3.3 Formats
-
-All formats implement one small interface so that the two to come (round robin, group stage) are added without touching the rest: `start(players, settings, seed) -> state`, `matchesToPlay(state) -> matches`, `record(state, match, placements) -> state`, `standings(state)`, `isOver(state)`. They live in `apps/worker/src/core/tournament/` as pure functions with tests.
+Examples (the owner's): sizes 2 to 4 with 10 players give 4 + 4 + 2 (rather than 4 + 3 + 3); sizes 3 to 3 with 10 players give 3 + 3 + 3 and one random player with a bye. Sizes 2 to 4 with 9 players give 4 + 3 + 2 (no one is left out: 4 + 4 + 1 is not allowed).
 
 **Single elimination**
-- Round 1: players are shuffled with the tournament seed and cut into matches of the chosen size. When the number of players does not fit, **byes** go to the players drawn last (a bye advances without a game; the bye is chosen before the draw so nobody gets two).
-- A match with 2 players: the winner advances. A match with 3 or 4 players: the creator sets how many advance (default 1; with 4 players, 2 is the other useful choice). The number advancing must keep the bracket sound (Q7).
-- Rounds continue until one match is left; its winner wins the tournament; the others are ranked by the round they left in and then by their score in it.
-- A match starts as soon as its feeder matches are done (no waiting for the whole round), because turn-based games last days.
-- Ties in a match are the open question Q8.
+- Round 1: players are shuffled with the tournament seed and cut into tables as above; the players left out get **random byes**.
+- The creator sets how many players advance from a table, **1 or 2**. A table of 2 players always advances 1 (the number is the smaller of the setting and the table size minus one).
+- The players who advance are the best of the table by placement; ties are broken by the **play order of the first round of that game: the player who played earlier loses** (the rulebook has no tie-break, so this is the owner's rule).
+- A bye is not a win and gives nothing; it only advances the player. A player gets a second bye only after everyone has had one.
+- Rounds continue until the players left fit one table: that table is the final, its placements are the tournament's top places; the winner is first. The others are ranked by the round they left in, then by their placement in the table they left.
+- A table starts as soon as its feeder tables are done (no waiting for the whole round), because turn-based games last days.
+- What happens when too few players are left to make a table of the smallest size (for example, sizes 3 to 3 with 6 players: two tables of 3 leave 2 players) is open: Q23.
 
 **Swiss**
-- *x* rounds, 2 to 8. In every round every player plays one match (bye if the players do not fill the tables).
-- Points by placement (the owner's table): 4 players +6/+4/+2/0, 3 players +4/+2/0, 2 players +2/0. The tables of a tournament have one size, so one row of this table applies to it.
-- Round 1: random. Later rounds: players are sorted by points; players with equal points are shuffled; consecutive players are cut into matches of the chosen size, so similar strength meets.
+- *x* rounds, 2 to 8. In every round every player plays one match; the tables are made as above; a player left out has a **bye and gets +2 points** (a bye is not a win).
+- Points by placement (the owner's table): 4 players +6/+4/+2/0, 3 players +4/+2/0, 2 players +2/0. A tournament can have tables of several sizes, so each table gives the points of its own size. Placement ties are broken by the play order of the first round (the player who played earlier is placed lower), so points are never split; to be confirmed with Q24.
+- Round 1: random. Later rounds: players are sorted by points; players with equal points are shuffled; consecutive players are cut into tables (sizes as above), so similar strength meets. Which player gets the bye is open (Q25).
 - **Avoid rematches** (a switch at creation, default on): the pairing tries to avoid putting together players who have already met. It is best effort: it searches for a pairing with the fewest repeated meetings (a bounded search with the seeded shuffle), and it never leaves a round unplayed because of it.
 - A round ends when all its games are done, then the next round's tables are made at once. (This is the cost of Swiss: one slow game holds the round. Turn-based clocks plus the kick keep it moving; section 7 lists the other safeguards.)
-- Final ranking: points, then the sum of the points of the opponents met (a Buchholz-like tie-break), then the total game score, then the rating at the start. The tie-breaks are open question Q9.
+- Final ranking (the owner's order): points, then **the points of the opponents** (the sum for the opponents met), then the **total game score**, then the **rating at the start (the lower rating wins the tie-break)**.
 
 **Round robin** and **group stage**: details to come from the owner. The plan makes room for them: the interface above, a `format` column, a free-form `settings` JSON, and standings that are not tied to one table size. They will be added as their own phase once described (they may need: points rules, how groups are drawn, how many advance, a play-off).
 
 ### 3.4 Disqualification
 
-- A kick in a tournament game (D24) disqualifies the kicked player from the whole tournament (the owner's rule). In a 2-player game nobody is kicked: the player whose time runs out loses the game (D24, as today); whether that also disqualifies them is Q19.
-- Every game they have scheduled or not yet started is lost, and the other players of those matches are the winners (a walkover; the match is recorded without a game, no rating change, because no game was played, Q10). A game they have in progress at that moment ends as D24 says for a kick.
-- In Swiss, a disqualified player keeps the points they earned (so the opponents' tie-breaks stay fair) and is marked as out; their later matches are walkovers for the others (the points of a win by walkover are Q11).
-- A resignation is not a kick: the player loses that game (as today) and goes on, unless they resign the tournament, which is a withdrawal (3.1).
+- A kick in a tournament game (D24) disqualifies the kicked player from the whole tournament (the owner's rule).
+- In a 2-player game nobody is kicked: the player whose time runs out **loses the game and nothing more** (the owner, Q19), exactly as D24 says today.
+- Every game of a disqualified player that has not started is affected (see below); a game that is in progress when the kick happens ends as D24 says (the other players share first place; the kicked player is placed last).
+- A table that has not started and whose player is disqualified: the others play if at least the smallest table size remains and the creator's size limits allow it; otherwise, or when only one player is left, the remaining player(s) win by **walkover**. A walkover is recorded without a game and without a rating change. These details are open (Q26 and Q27).
+- In Swiss, a disqualified player keeps the points they earned (so the opponents' tie-breaks stay fair) and is marked as out.
+- A resignation is not a kick: the player loses that game (as today) and goes on.
 
 ### 3.5 Data
 
@@ -114,9 +66,9 @@ The state that decides what happens next (which match feeds which, the current r
 
 ### 3.6 Pages
 
-- `/tournaments`: open tournaments (registration), in progress, concluded; a filter by format and by the creator; "Create a tournament" for registered players (shows how many of the 5 are used).
+- **A new tab "Tournaments" in the top navigation bar**, with `/tournaments`: open tournaments (registration), in progress, concluded; a filter by format and by the creator; "Create a tournament" for registered players (shows how many of the 5 are used); and "Your tournament games" (the games that wait for the player, the ones in progress).
 - `/tournaments/12`: settings, the players, the standings, the bracket or the rounds with every match linking to its game (watch while it is on, replay when it is done), the creator's controls (start, cancel) and a join / leave button.
-- "Your tournament games" on the home page and on the lobby page for a player who has games waiting.
+- A player with a tournament game that waits for them sees a mark on the Tournaments tab.
 - Admin page: list, cancel.
 - Profile: the tournaments a player took part in with their rank, and tournament badges (section 4).
 - The game page of a tournament game says which tournament, round and match it is.
@@ -127,7 +79,7 @@ The state that decides what happens next (which match feeds which, the current r
 
 ### 4.1 What counts
 
-The owner said: performance in **tournaments** and the **Elo rating**. The plan fixes the two sources and a first list for the owner to curate. These are **examples, not a decision**: the final list is Q12.
+The owner said: performance in **tournaments** and the **Elo rating**. The plan fixes the two sources and a first list for the owner to curate. These are **examples, not a decision**: the final list is the owner's (answer 12: to be decided).
 
 | Group | Examples |
 |---|---|
@@ -143,7 +95,7 @@ An achievement is defined in one file (`apps/worker/src/core/achievements/list.t
 - **After a game that ends**, in the same step that settles the ratings (`finish` in the room, and the D1 batch of `recordEnd`): the facts are checked against the list for every registered player of the game. A new unlock is written once (`achievement_unlocks`: user, achievement, game, time; unique on user + achievement) and the game id stored is the game that earned it.
 - **Tournament achievements** that depend on the end of the tournament (win, top ten percent) are checked when the tournament concludes; the game stored is the final game of that player's tournament, so that the history has an icon on a real game.
 - **The pop-up**: the `ended` message of the game's WebSocket carries the achievements that this viewer unlocked in the game; the page shows a pop-up (name, badge, text, a link to the profile). A player who was not on the page (the game ended while they were away, which is the normal case on a turn-based clock) sees it the next time they open any page: a `seen` flag on the unlock row, a small request at page load, and a pop-up for each unseen one. Each is shown once.
-- **Existing players**: the first deploy computes, from their rating history and finished tournaments, what they would already hold. These are given **without a pop-up** and dated by the game that earned them, so the history icons are right from the start (Q13).
+- **Existing players**: only games after the release count (the owner, Q13). Nothing is computed from the past. What a rating achievement needs when a player is already above a level at the release is Q28.
 - **Recomputation**: an administrator can recompute a player's achievements after the list changes (an unlock is never removed by recomputation, only added; a removal is an admin action with a note).
 
 ### 4.3 Badges
@@ -167,7 +119,7 @@ A `FilterForm` above the history (a GET form: the address holds the filters, so 
 | Filter | Meaning | Needs |
 |---|---|---|
 | **Opponent name** | games in which a player whose name contains the text (any case) sat at the table | already in `game_players` |
-| **Alien species** | games in which that species was one of the two in play | the species of each game stored per game (see below) |
+| **Alien species** | a **multiple-selection dropdown** of the species; shows the games in which **any** of the chosen species was in play | the species of each game stored per game (see below) |
 | **Achievement unlocked** | only the games that unlocked an achievement; optionally one chosen achievement | `achievement_unlocks.game_id` |
 | **Minimum score** | games in which this player scored at least that many points | `game_players.score` |
 
@@ -179,11 +131,12 @@ A `FilterForm` above the history (a GET form: the address holds the filters, so 
 
 ## 6. Work, in phases
 
-Each phase ends with tests, a report in the form CLAUDE.md asks for, and stays behind the owner's review gate for the phase marked with a star.
+Each phase ends with tests, a report in the form CLAUDE.md asks for, and stays behind the owner's review gate for the phase marked with a star. As for the rules of the game (hard rules 2 and 3), every tournament rule has an id (`TOUR-...`) in `docs/spec/tournaments.md`, the code that implements it cites the id, and every id has a test that names it.
 
 | Phase | Work | Notes |
 |---|---|---|
 | **0** | The owner answers section 8 and approves sections 3, 4 and 5; the two decisions are logged (D41, D42) | star: the gate for everything below |
+| **1a** | **The catalogue of edge cases** (section 10): every corner case of the tournament progression is written with its expected outcome; the owner answers each one marked *needs a ruling*; the answers go into `docs/spec/tournaments.md` and become test cases, **before any pairing or progression code is written** | star |
 | **1** | Foundations: `game_species` with the backfill; the filters and the history icon slot on the profile (filters work without achievements); the migration; tests | useful on its own |
 | **2** | Achievements, rating group: the list file, the unlock table, the check in the result step, the pop-up (live and "unseen"), the profile badge grid, placeholder badges, the retroactive run, the admin recompute | rating achievements need no tournament |
 | **3** | Tournament core: the tables, `TournamentRoom`, creation with the limit of 5, registration, start, the game creation with fixed seats, results back from the game room, disqualification, pages, admin cancel | one format at first: single elimination |
@@ -209,38 +162,62 @@ Order of deploy for every phase that touches the Worker, as before: the engine (
 ## 7. Risks and how the plan meets them
 
 - **A stuck round** (Swiss and elimination wait for games that last days). The turn-based clock plus the kick (3 and 4 players) and the loss on timeout (2 players) always end a game, and every disqualification turns the rest of that player's games into walkovers. An administrator can also cancel a single game and decide its result (Q6).
-- **Many tables for one player**. A player in several tournaments can have many games at once. The open-table limit must not make a tournament unplayable (Q3).
-- **Gaming the rating through tournaments** (all games are rated): a creator can invite friends and feed rating. The limit of 5, registered-only play, and the existing rating rules (pairwise Elo, the floor) are the defence; a minimum number of participants and a visible creator on every tournament help moderation. Whether to hold back rating for very small tournaments is Q14.
+- **Many tables for one player**. A player in several tournaments can have many games at once. Tournament tables do not count toward the open-table limit of an account (answer 3), so a tournament cannot be made unplayable by it.
+- **Gaming the rating through tournaments** (all games are rated): a creator can invite friends and feed rating. The limit of 5, registered-only play, and the existing rating rules (pairwise Elo, the floor) are the defence; a minimum number of participants and a visible creator on every tournament help moderation. The creator can set a minimum rating for a tournament (answer 14); the plan holds no rating back for small tournaments.
 - **Rating cheating by kicks**: a disqualification costs the player the rest of the tournament, so there is no gain in forcing a kick on an opponent beyond the normal game loss.
 - **Pop-ups that are missed**: solved by the unseen flag (4.2).
 - **Placeholder art shipped by mistake**: all placeholders are in `docs/asset-gaps.md`.
-- **Rule logic outside the engine** (rule 5): the tournament formats are platform logic. If the owner reads rule 5 more strictly, the alternative is a second small pure module in the engine package that the Worker calls over HTTP like the game engine; it costs a call per pairing and nothing else. This is noted for the owner's ruling (Q15).
+- **Rule logic outside the engine** (rule 5): the tournament formats are platform logic. If the owner reads rule 5 more strictly, the alternative is a second small pure module in the engine package that the Worker calls over HTTP like the game engine; it costs a call per pairing and nothing else. This is noted for the owner's ruling (8.3).
 
 ---
 
-## 8. Open questions for the owner
+## 8. The owner's answers, and what is still open
 
-Each needs an answer before the phase that depends on it. Suggested answers are marked *(suggested)*.
+### 8.1 Answers (2026-10-24)
 
-1. **Who can join**: only registered players (the games are rated, so yes) *(suggested)*; can the creator be a participant? *(suggested: yes)*.
-2. **Size**: the maximum number of players of a tournament *(suggested: 64)*; the minimum *(suggested: two matches' worth, so 4 players for 2-player matches)*.
-3. **The open-table limit**: do tournament games count toward the 10 of an account? A player in three tournaments would hold three games at once. *(Suggested: they do not count toward the 10, and a player may have at most 5 tournament games in progress at a time; Swiss and elimination give one game per round, so only many tournaments at once could reach it.)*
-4. **Match size**: one size for the whole tournament, chosen by the creator (2, 3 or 4) *(suggested)*. Swiss points are given for that size.
-5. **Time controls**: only the three turn-based speeds of D34 *(suggested)*, or also a custom time?
-6. **A cancelled game** (administrator): the administrator picks a result, or the match is played again with the same seats *(suggested: replayed, as a new table with the same seats and the same clock)*.
-7. **Elimination with 3 or 4 players per match**: how many advance (1 or 2)? When the number of survivors does not make a clean bracket, who gets byes? *(Suggested: the creator sets "advance" as 1 or half the match size; byes are drawn from the lowest seeds, which are random in round 1.)*
-8. **Ties in a match** (equal final scores): the game already ranks equal scores as a shared rank. For elimination something must break the tie *(suggested: the tie-break of the rulebook if it has one, then the seat order of the game, then the tournament seed)* and for Swiss tied players split the points of the placements they share (rounded down) *(suggested)*. The rulebook's own tie-break must be quoted from the rulebook, not guessed (rule 1).
-9. **Swiss ranking tie-breaks**: points, then opponents' points, then total game score, then starting rating *(suggested)*.
-10. **Walkovers and rating**: no game is played, so no rating change *(suggested)*; do the walkover winners get a "won a match" for the achievements? *(Suggested: yes for elimination advancement; no "won a game" count.)*
-11. **Walkover points in Swiss**: the maximum for the table size, or the average placement's points? *(Suggested: the points of 1st place.)* And a **bye**: *(suggested: the points of 2nd place in a 4-player table, the points of 1st place in a 2-player table, written down so a player has at most one bye).*
-12. **The list of achievements**: the first list is in 4.1; the owner curates the final list, names and thresholds.
-13. **Existing players**: give them what they already earned, silently and dated by the game that earned it *(suggested)*, or only count from the deploy?
-14. **Very small tournaments**: all games rated regardless *(as asked)*; any minimum field to avoid feeding rating (4 players?) *(suggested: the minimum in question 2)*.
-15. **Where the format logic lives**: in the Worker as pure TypeScript with tests *(suggested)*, or in the engine package behind an HTTP call.
-16. **Round robin and group stage**: the details the owner will give (points rules, how groups are drawn, how many advance, play-offs). Not needed before phase 6.
-17. **The game history filter on species**: the two species of the game or every species that was ever face up? *(Suggested: the species that were in play, any of the two or three of the game.)*
-18. **Notifications**: the "ting" and an on-site panel only (D34: no e-mail) *(suggested)*.
-19. **A timeout in a 2-player tournament game** is a loss, not a kick (D24). Does it disqualify the player from the tournament like a kick *(suggested: yes, for the same reason: they have left their game on a turn-based clock)*, or only lose that match?
+| # | Question | Answer |
+|---|---|---|
+| 1 | Who can join | Only registered players; the creator can join their own tournament |
+| 2 | Size | The creator chooses, from 2 to 128 |
+| 3 | The open-table limit | Tournament tables do not count toward the 10 tables of an account |
+| 4 | Match size | The creator chooses the smallest and the largest number of players at a table (for example 2 and 4: 10 players make two tables of 4 and one of 2; 3 and 3: 10 players make three tables of 3 and a random player with a bye) |
+| 5 | Time controls | The turn-based speeds of D34 and two new slower ones: *slower* and *slowest* (values: see 8.2) |
+| 6 | A cancelled tournament table | The administrator picks its result when cancelling it |
+| 7 | Elimination with 3 or 4 players per table | The creator sets how many advance from a table, 1 or 2; byes are random |
+| 8 | Tie in a match | The rulebook has no tie-break: the player who played earlier in the first round of that game loses the tie |
+| 9 | Swiss ranking | Points, then the opponents' points, then the total game score, then the starting rating (the lower rating wins) |
+| 10 | Walkovers and ratings | A bye is not a win |
+| 11 | Swiss byes | A bye gives +2 points |
+| 12 | The list of achievements | To be decided |
+| 13 | Existing players | Only games after the release count for achievements |
+| 14 | Very small tournaments | The creator can set a minimum rating for the tournament; the default is 0 |
+| 15 | Where the logic lives | Asked what it is: see 8.3 |
+| 16 | Round robin and group stage | To be decided |
+| 17 | The species filter | A multiple-selection dropdown; shows the games with any of the chosen species |
+| 18 | Notifications | A new tab for tournaments on the top navigation bar |
+| 19 | A 2-player timeout | Only a loss (no disqualification) |
+
+### 8.2 Still open: outcomes that are not clear (the owner is asked to rule; a suggestion is given for each)
+
+These came out of the answers and out of the edge-case catalogue (section 10). Until each is ruled, the code for it is not written.
+
+- **Q20 Withdrawing after the start**: *(suggested: a withdrawal is treated like a disqualification: the player's later games are walkovers; the points they have stay.)*
+- **Q21 A cancelled table with a result picked by the administrator**: does it change the ratings? *(suggested: no: the game was not played to its end, so only the tournament uses the result.)*
+- **Q22 Splitting the players into tables**: the rule in 3.3 (seat everybody if a split exists, then as many largest tables as possible, byes only if no split exists, as few as possible) gives the owner's examples. Is it right? Two more cases it decides: sizes 2 to 4 with 9 players give 4 + 3 + 2; sizes 3 to 4 with 10 players give 4 + 3 + 3 (not 4 + 4 + 2: two is below the smallest size).
+- **Q23 Too few players left for a table of the smallest size** (elimination): for example sizes 3 to 3 with 6 players: 2 tables, 1 advances from each, 2 are left. *(suggested: the last tables may be smaller than the smallest size, down to 2 players, because no other end is possible; with "advance 2" the setting is lowered to 1 when 2 per table would leave fewer players than the smallest table.)*
+- **Q24 Swiss placement ties**: the tie-break by play order (earlier loses) applies to the placement in every match, so no points are split *(suggested)*; or tied players split the points?
+- **Q25 Who gets a Swiss bye**: *(suggested: the lowest in the standings who has not had one; a player gets a second bye only after everybody has had one.)* Elimination byes are random (answered).
+- **Q26 A disqualification before a table starts**: if the smallest table size is still met the others play with fewer players; if not, they win by walkover *(suggested)*. Is that right? What if the table would then be a table of 1 (the last player wins by walkover)?
+- **Q27 Walkover points in Swiss**: the winners of a walkover get *(suggested: the points of 1st place of that table size; an opponent who is out gets 0)*.
+- **Q28 Rating achievements at the release**: a player who is already above a level when the feature goes live: do they unlock that level at their next game *(suggested: yes, at the first game that ends after the release with a rating at or above the level)*, or only when they cross it again?
+- **Q29 The minimum rating of a tournament**: checked when a player joins *(suggested)* and again when the tournament starts (a player who fell below is removed with a message)? Unrated new players start at 0.
+- **Q30 A kick that leaves several players sharing first place in an elimination table** (D24: all the others share first): *(suggested: the play-order tie-break puts them in order, and the first "advance" of them go on.)*
+- **Q31 The two new speeds**: values for *slower* and *slowest* *(suggested: slower 6 days + 18 h per turn; slowest 10 days + 1 day per turn; today's slow is 4 days + 12 h)*.
+- **Q32 What "a tab for tournament games" means**: one tab, "Tournaments", with the list of tournaments and "Your tournament games" inside it *(suggested)*; or two tabs.
+
+### 8.3 What the "format logic" is (question 15)
+
+A tournament format is the part of the system that answers three questions: *who plays whom next* (pairing, byes, the sizes of the tables), *what a result does* (points, who advances, who is out) and *how the players are ranked at the end* (the tie-breaks). It is not part of the rules of SETI. The plan puts it in the Worker as pure TypeScript functions with a seed (no clock, no network), which the tournament Durable Object calls, with tests. The alternative is to put the same functions in the Python engine package and have the Worker call them over HTTP like the game engine; that keeps every rule in one language but costs a call per pairing and puts platform logic into the rules engine. Suggestion: the Worker, unless the owner wants rule 5 read strictly (Q15 stays open until the owner says).
 
 ---
 
@@ -250,3 +227,68 @@ Each needs an answer before the phase that depends on it. Suggested answers are 
 - **D42 Achievements**: a curated list from rating and tournaments; checked in the result step; given by a pop-up and kept unseen until shown; badges are placeholders; a game history icon and filters (opponent, species, achievement, minimum score); `game_species` with backfill.
 
 (D40, the open-table limit of 1 for a guest and 10 for an account, was built on 2026-10-24 on the owner's word and is logged in `docs/PLAN.md`.)
+
+---
+
+## 10. The catalogue of edge cases (phase 1a)
+
+Every case below becomes one or more tests (`TOUR-nnn` ids in `docs/spec/tournaments.md`). *Clear* means that the answers above decide it. *Needs a ruling* points to the open question in 8.2. The test of a case is written in phase 1a as a table of inputs and the expected outcome, so that the owner reads the outcomes before any code exists.
+
+**Registration and limits**
+1. The creator joins their own tournament: allowed, counts as a participant. *Clear.*
+2. A guest tries to join: refused. *Clear.* A registered player below the minimum rating: refused with the minimum named. *Clear;* re-check at the start: *Q29.*
+3. The same player joins twice: refused. *Clear.*
+4. A sixth tournament: refused with the limit and what to do; cancelling one in registration frees a place; a concluded or cancelled one frees a place. *Clear.*
+5. The start with fewer players than one table's smallest size: refused. With exactly one table's worth: starts. *Clear.*
+6. 128 players: allowed; 129: refused. *Clear.*
+7. The registration deadline passes with too few players: the tournament is cancelled. *Suggested; clear unless the owner objects.*
+8. A player leaves during registration: removed, no trace. *Clear.*
+
+**Splitting into tables** (the same function for every round of both formats)
+9. n from 2 to 128 for every pair of smallest and largest size from 2 to 4 (all 6 pairs): every player is at exactly one table or has a bye; no table is outside the sizes; the owner's examples hold (2 to 4 with 10: 4+4+2; 3 to 3 with 10: 3+3+3 and a bye); the number of byes is the smallest possible. *Needs a ruling: Q22.*
+10. n smaller than the smallest size: no table (the tournament cannot start; in later rounds see Q23).
+
+**Single elimination**
+11. 2 players: one table, the final. *Clear.*
+12. n a power of the table size with advance 1 and equal sizes: a clean bracket. *Clear.*
+13. n that leaves byes in round 1: byes are random, not a win, a second bye only after everybody had one. *Clear.*
+14. Advance 2 from a table of 2: becomes 1. *Clear (3.3).*
+15. Advance 2 from tables of 4 with 8 players: 4 players left, they play the final (one table). *Clear.*
+16. Fewer players left than the smallest size (3 to 3 with 6 players). *Needs a ruling: Q23.*
+17. A tie in a table for the advancing place: the earlier player of round 1 loses. *Clear (Q8).* A tie for a place that does not decide who advances: the same order is used for the ranking. *Clear.*
+18. A kick in a table that leaves several players sharing first place. *Needs a ruling: Q30.*
+19. A table whose feeder tables are not done: waits. A table whose feeders are done: starts at once. *Clear.*
+20. The final's placements decide first to last; the players who left earlier are ranked by the round they left in, then by placement. *Clear (3.3).*
+
+**Swiss**
+21. x from 2 to 8 with n from 2 upward: every player plays every round or has a bye; no table is outside the sizes. *Clear.*
+22. A bye gives +2 and is not a win. Who gets it. *Needs a ruling: Q25.*
+23. Pairing by points: the order of the players by points, equal points shuffled with the seed; the same seed gives the same pairing. *Clear.*
+24. Avoid rematches on: the pairing has the fewest repeated meetings possible and never fails; off: no check. *Clear.*
+25. More rounds than distinct opponents (for example 4 players, 8 rounds): rematches are unavoidable, the round is still made. *Clear.*
+26. Points per table size (2, 3, 4 players); placement ties. *Needs a ruling: Q24.*
+27. The final ranking: points, opponents' points, total game score, lower starting rating. Every tie-break level is tested, and a full tie after all four (two players equal in everything): *needs a ruling:* *(suggested: the tournament seed order.)*
+28. A round starts only when every game of the previous round is done. *Clear.*
+
+**Disqualification, withdrawal, cancellation**
+29. A kick in game A: the player is out; their games in later rounds are walkovers; their points stay. *Clear.* The kick in a game with 2 players cannot happen (D24); a 2-player timeout is a loss only. *Clear (Q19).*
+30. A disqualification before a table starts: the table is played with fewer players, or the rest win by walkover. *Needs a ruling: Q26.*
+31. The walkover points (Swiss) and the advancing (elimination). *Needs a ruling: Q27 (points); advancing: the winner of the walkover advances. Clear.*
+32. Every other player of a tournament is disqualified or out: the last one wins. *Clear.*
+33. A withdrawal. *Needs a ruling: Q20.*
+34. The administrator cancels a table and picks the result; the tournament goes on. *Clear;* the ratings: *Q21.*
+35. The administrator cancels the whole tournament: games played keep their ratings; unplayed ones are void. *Clear.*
+36. The creator cancels after the start: refused. *Clear.*
+
+**Results and ratings**
+37. A result arrives twice or two results arrive together: one effect. *Clear.*
+38. A tournament game ends by resignation: the resigning player is last, goes on in Swiss, is out in elimination (they lost). *Clear.*
+39. A tournament game is archived with the tournament's number in its header; a replay works. *Clear.*
+40. The rating changes of a tournament game are the ordinary ones (pairwise Elo, floor 100). *Clear (D37).*
+
+**Achievements that depend on tournaments** (phase 5)
+41. The unlock of "win a tournament" is stored on the deciding game; the pop-up is shown at its end or on the next page load. *Clear.*
+42. A tournament with a walkover or a bye does not give a "won a match" for it. *Clear (Q10).*
+43. Achievements are given only for games that end after the release. *Clear (Q13).* A rating level for a player already above it: *Q28.*
+
+The answers to the questions marked *needs a ruling* are copied into `docs/spec/tournaments.md` with the rule ids, as the answers to ambiguities are copied into the spec of the game.
