@@ -817,3 +817,21 @@ form.inline {
     animation: none;
   }
 }
+
+/* the other players of a game in the history of a player */
+.tableplayers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+.tableplayers li {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  min-width: 9rem;
+}
+.tableplayers li.me {
+  font-weight: 600;
+}

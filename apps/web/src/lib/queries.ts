@@ -455,6 +455,16 @@ export async function profile(db: Db, userId: string, page = 1) {
           userId,
           ...recent.map((g) => g.id),
         );
+  // everybody who sat at the tables of this page, with the score and the rank, for the game history
+  const pagePlayers =
+    recent.length === 0
+      ? []
+      : await db.all<TablePlayer>(
+          `SELECT p.game_id, p.seat, p.user_id, p.name, un.num AS num, p.score, p.rank
+           FROM game_players p LEFT JOIN user_nums un ON un.user_id = p.user_id
+           WHERE p.game_id IN (${recent.map(() => "?").join(", ")}) ORDER BY p.game_id, p.seat`,
+          ...recent.map((g) => g.id),
+        );
   const finished = await db.all<FinishedGame>(
     `SELECT p.rank, p.score, g.rated_counted, g.options_json
      FROM game_players p JOIN games g ON g.id = p.game_id WHERE p.user_id = ? AND g.status = 'finished' AND g.reason = 'completed'
@@ -469,12 +479,24 @@ export async function profile(db: Db, userId: string, page = 1) {
     history,
     recent,
     pageRatings,
+    pagePlayers,
     page: shown,
     pages,
     totalGames: total,
     stats: computeStats(finished),
     peak,
   };
+}
+
+/** A player at a table of the game history: who, and how the game went for them (rank and score are null while the game is on). */
+export interface TablePlayer {
+  game_id: string;
+  seat: number;
+  user_id: string;
+  name: string;
+  num: number | null;
+  score: number | null;
+  rank: number | null;
 }
 
 /** The time that must pass between two games that the same player creates (a second press of the button must not make a second game). */

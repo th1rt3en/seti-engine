@@ -1,4 +1,5 @@
 import { Pager } from "@/components/Pager";
+import { PlayerLink } from "@/components/PlayerLink";
 import { RatingChart } from "@/components/RatingChart";
 import { getDb } from "@/lib/db";
 import { resolveUser } from "@/lib/ids";
@@ -152,6 +153,7 @@ export default async function Player({
               <th>Game</th>
               <th>Table</th>
               <th>Result</th>
+              <th>Players</th>
               <th>Score</th>
               <th>Rating</th>
             </tr>
@@ -190,6 +192,22 @@ export default async function Player({
                         {g.rank === 1 ? <span className="pill win">won</span> : <span className="pill">rank {g.rank ?? "?"}</span>}
                         {g.reason && g.reason !== "completed" ? <span className="muted small"> ({g.reason})</span> : null}
                       </>
+                    )}
+                  </td>
+                  <td>
+                    {o.players === 1 ? (
+                      <span className="muted">—</span>
+                    ) : (
+                      <ol className="tableplayers">
+                        {data.pagePlayers
+                          .filter((p) => p.game_id === g.id)
+                          .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || a.seat - b.seat)
+                          .map((p) => (
+                            <li key={p.seat} className={p.user_id === data.user.id ? "me" : undefined}>
+                              <PlayerLink num={p.num} name={p.name} /> <b>{p.score ?? "—"}</b>
+                            </li>
+                          ))}
+                      </ol>
                     )}
                   </td>
                   <td>{g.score ?? "—"}</td>
