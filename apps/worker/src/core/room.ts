@@ -16,6 +16,17 @@ export type EndReason = "completed" | "resigned" | "timeout" | "kicked";
 /** Games of this many players or more are not ended by a clock: a player whose clock is negative can be kicked (decision D24). */
 export const KICK_FROM_PLAYERS = 3;
 
+/** The standing of a game in progress that anybody may see (the points are public; the hands and the decks are not part of it). */
+export interface Progress {
+  round: number;
+  turn: number;
+  /** The score of each seat, in the order of the seats. */
+  scores: number[];
+  /** The score of the rival of a solo game. */
+  rival?: number;
+  actions: number;
+}
+
 export interface Meta {
   id: string;
   status: Status;
@@ -858,11 +869,26 @@ export class GameRoom {
   }
 
   /** The game as anybody may see it: the seed is kept back until the game is over, because it gives the hidden information away (CLAUDE.md rule 6). */
-  async publicMeta(): Promise<Meta | undefined> {
+  async publicMeta(): Promise<(Meta & { progress?: Progress }) | undefined> {
     const meta = await this.meta();
     if (meta === undefined || meta.status === "finished") return meta;
     const { seed: _seed, ...options } = meta.options;
-    return { ...meta, options: options as Meta["options"] };
+    const progress = meta.status === "playing" ? await this.progress(meta) : undefined;
+    return { ...meta, options: options as Meta["options"], ...(progress ? { progress } : {}) };
+  }
+
+  /** Where a game in progress stands, for the page that lists the games to watch: the round and the turn, and the points that everybody can see. */
+  private async progress(meta: Meta): Promise<Progress | undefined> {
+    const s = await this.d.store.get<GameState>("state");
+    if (s === undefined) return undefined;
+    const rival = s.rival ? s.players[s.rival.index]?.score : undefined;
+    return {
+      round: s.round,
+      turn: s.turn,
+      scores: meta.seats.map((_, i) => s.players[i]?.score ?? 0),
+      ...(rival === undefined ? {} : { rival }),
+      actions: (await this.d.store.get<number>("logcount")) ?? 0,
+    };
   }
 
   /** The seat of an identity in this game, or null. */

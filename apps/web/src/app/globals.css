@@ -833,3 +833,42 @@ form.inline {
 .tableplayers li.me {
   font-weight: 600;
 }
+
+/* the page to watch games: two even columns, centred, so that a page of 10 fills 5 rows and the sections line up on a wide screen */
+.watchpage {
+  max-width: 70rem;
+  margin-inline: auto;
+}
+.watchpage .gamelist {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+@media (min-width: 60rem) {
+  .watchpage .gamelist {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.watchpage .game {
+  align-content: start;
+  min-height: 8rem;
+}
+.watchpage .game .actions {
+  align-self: end;
+}
+.gamestatus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  align-items: baseline;
+}
+.gamestatus .round {
+  font-weight: 600;
+}
+.gamestatus .scorelist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.gamestatus .scorelist b {
+  font-weight: 700;
+}

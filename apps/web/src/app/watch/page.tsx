@@ -1,5 +1,6 @@
 import { Pager } from "@/components/Pager";
 import { PlayerLink, PlayerNames } from "@/components/PlayerLink";
+import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { countEndedGames, countPlayingGames, endedGames, playingGames } from "@/lib/queries";
 import Link from "next/link";
@@ -7,6 +8,25 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 10;
+const ROUNDS = 5;
+
+/** Where a game in progress stands (the Worker tells the round, the turn and the points that everybody can see); null when it does not answer in time. */
+interface Progress {
+  round: number;
+  turn: number;
+  scores: number[];
+  rival?: number;
+  actions: number;
+}
+async function progressOf(id: string): Promise<Progress | null> {
+  try {
+    const res = await fetch(`${loadConfig().workerUrl}/games/${id}`, { signal: AbortSignal.timeout(2500), cache: "no-store" });
+    if (!res.ok) return null;
+    return ((await res.json()) as { progress?: Progress } | null)?.progress ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /** How long ago a game started, in words. */
 function since(ms: number | null): string {
@@ -53,8 +73,9 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
     playingGames(db, PAGE_SIZE, (playingPage - 1) * PAGE_SIZE),
     endedGames(db, PAGE_SIZE, (endedPage - 1) * PAGE_SIZE),
   ]);
+  const standing = await Promise.all(games.map((g) => progressOf(g.id)));
   return (
-    <>
+    <div className="watchpage">
       <header className="pagehead">
         <h1>Watch a game</h1>
         <p className="muted">
@@ -72,27 +93,51 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
           </p>
         ) : null}
         <div className="gamelist">
-          {games.map((g) => (
-            <article className="card game" key={g.id}>
-              <div className="gamehead">
-                <strong>{g.seats.length > 0 ? <PlayerNames seats={g.seats} /> : `Game ${g.num ?? g.id.slice(0, 8)}`}</strong>
-                <span className="badges">
-                  {g.solo ? <span className="pill">solo</span> : <span className="pill">{g.players} players</span>}
-                  {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
-                  {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
-                  {g.organizations ? <span className="pill exp">organizations</span> : null}
-                </span>
-              </div>
-              <p className="muted small">
-                {g.clock} · started {since(g.started_at)}
-              </p>
-              <div className="actions">
-                <Link href={`/games/${g.num ?? g.id}`} className="btn small">
-                  Watch
-                </Link>
-              </div>
-            </article>
-          ))}
+          {games.map((g, k) => {
+            const pr = standing[k] ?? null;
+            return (
+              <article className="card game" key={g.id}>
+                <div className="gamehead">
+                  <strong>{g.seats.length > 0 ? <PlayerNames seats={g.seats} /> : `Game ${g.num ?? g.id.slice(0, 8)}`}</strong>
+                  <span className="badges">
+                    {g.solo ? <span className="pill">solo</span> : <span className="pill">{g.players} players</span>}
+                    {g.rated ? <span className="pill rated">rated</span> : <span className="pill">casual</span>}
+                    {g.expansion ? <span className="pill exp">Space Agencies</span> : null}
+                    {g.organizations ? <span className="pill exp">organizations</span> : null}
+                  </span>
+                </div>
+                {pr ? (
+                  <div className="gamestatus">
+                    <span className="round">
+                      Round {Math.min(pr.round, ROUNDS)} of {ROUNDS}
+                    </span>
+                    <span className="muted small">turn {pr.turn}</span>
+                    <span className="scorelist">
+                      {g.seats.map((x, i) => (
+                        <span key={`${g.id}-${x.name}-${i}`}>
+                          {x.name} (<b>{pr.scores[i] ?? 0}</b>)
+                        </span>
+                      ))}
+                      {pr.rival !== undefined ? (
+                        <span>
+                          rival (<b>{pr.rival}</b>)
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
+                ) : null}
+                <p className="muted small">
+                  {g.clock} · started {since(g.started_at)}
+                  {pr ? ` · ${pr.actions} moves` : ""}
+                </p>
+                <div className="actions">
+                  <Link href={`/games/${g.num ?? g.id}`} className="btn small">
+                    Watch
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
         <Pager page={playingPage} pages={playingPages} link={(p) => href(p, endedPage)} />
       </section>
@@ -140,6 +185,6 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
         </div>
         <Pager page={endedPage} pages={endedPages} link={(p) => href(playingPage, p)} />
       </section>
-    </>
+    </div>
   );
 }

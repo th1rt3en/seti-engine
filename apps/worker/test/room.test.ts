@@ -408,3 +408,18 @@ describe("a seed chosen by the host", () => {
     expect(await t.room.adminSeed()).toMatchObject({ seed: 4242, seeded: false });
   });
 });
+
+describe("the standing of a game in progress", () => {
+  it("is part of the public data of a game that is being played: the round, the turn, the points (never the seed)", async () => {
+    const t = makeRoom();
+    await t.room.init("g", two, none, false, alice);
+    expect(await t.room.publicMeta()).not.toHaveProperty("progress");
+    await t.room.join(bob);
+    await t.room.startGame(alice);
+    const pub = await t.room.publicMeta();
+    expect(pub?.progress).toMatchObject({ actions: 0 });
+    expect(pub?.progress?.scores).toHaveLength(2);
+    expect(typeof pub?.progress?.round).toBe("number");
+    expect(pub?.options).not.toHaveProperty("seed");
+  });
+});
