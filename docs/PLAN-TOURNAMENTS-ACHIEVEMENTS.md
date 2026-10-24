@@ -79,23 +79,46 @@ The state that decides what happens next (which match feeds which, the current r
 
 ### 4.1 What counts
 
-The owner said: performance in **tournaments** and the **Elo rating**. The plan fixes the two sources and a first list for the owner to curate. These are **examples, not a decision**: the final list is the owner's (answer 12: to be decided).
+**Only rated games count, and so do the games of tournaments** (which are rated anyway): a casual game, a solo game, a practice game and a game with an AI never give an achievement and never count toward a streak (owner, 2026-10-24). Everything below is evaluated for the registered players of a rated game.
 
-| Group | Examples |
-|---|---|
-| Rating | Reach a rating of 100 / 250 / 500 / 750 / 1000 / 1250 / 1500 (a badge for each level; the highest level reached is the one shown large) |
-| Tournament, taking part | Finish a first tournament; finish a Swiss tournament with every round played; play in a tournament of 8, 16, 32 players |
-| Tournament, results | Win a match of a tournament; reach the final / the last four; win a tournament (once, three times, in every format); win a Swiss tournament with the maximum points; finish a tournament in the top 10% |
-| Tournament, conduct | Play all the games of a tournament without being the one who times out (no kick, no disqualification) |
+The list is the owner's, in `docs/achievements.md` (the list is **not exhaustive**: more will be added, so a new achievement is one new entry and no new machinery). The names and thresholds are the owner's; the "how it is checked" column is this plan's reading of each line and the places where it is unclear are the questions of 8.2 (Q33 to Q45).
 
-An achievement is defined in one file (`apps/worker/src/core/achievements/list.ts`) as: an id, a name, a text, a group, the badge, and a pure function that says whether it is earned, given the facts of a finished game (the rating before and after, the tournament and the match, the standings). The same list is shown on every player's profile with the locked ones greyed out.
+| # | Achievement (owner's text) | How it is checked (to confirm where marked) |
+|---|---|---|
+| 1 | **Beginner / Intermediate / Expert / Master**: Elo 100 / 300 / 500 / 700 | The rating at the end of a rated game reaches the level (an unlock is kept if the rating falls). Four badges. Is the title also shown beside the player's name? Q33 |
+| 2 | **First win**: first rated game win | The player is first in a rated game. A shared first place (D24: after a kick, everybody else shares first) counts as a win. Q34 |
+| 3 | ***X* in a row**: 2 / 3 / 5 / 10 / 20 / 50 rated wins in a row | A streak of consecutive rated wins, in the order the games ended; any other result of a rated game (not first) ends it; six badges. Is a streak counted across tournament and ordinary rated games together, and does a game that is not won by shared first break it? Q35 |
+| 4 | **Master Assassin**: first rated win against a Master (700 current Elo) | A win with a player at the table whose rating before the game was 700 or more. In a game of 3 or 4: the win, with a Master at the table, or a better placement than the Master? Q36 |
+| 5 | **First tournament win** | The player finishes a tournament in first place (the winner of the final in elimination; first of the standings in Swiss). Given at the end of the tournament; the game stored is the deciding game of the player. |
+| 6 | **Tournament Creator**: first tournament started (for the creator) | The creator's first tournament goes from registration to in progress. It has no game: no icon in the history, and the pop-up comes with the answer of the "start" button. Q37 |
+| 7 | **Engineer**: 10+ orbiters/landers at the end of the game | Orbiters and landers of the player on planets and moons, counted together, at the end. Q38 |
+| 8 | **Dynamo**: 10+ missions completed at the end of the game | Missions completed by the player (full and quick missions; trigger missions with every circle covered). Q39 |
+| 9 | **Researcher**: all 12 techs researched at the end of the game | The player holds one of each of the 12 techs of the tech board (3 kinds of 4). Q40 |
+| 10 | **Tourist**: an orbiter or lander on every planet at the end of the game | On each of the 7 planets (Pluto only exists with the promo card and does not count). Moons? Q41 |
+| 11 | **Deliverer**: deliver 4+ Mascamite samples | Samples delivered by the player in the game (a counter that the statistics already keep). |
+| 12 | **Anomaly Master**: benefactor of every Anomaly token trigger in the game (at least 3) | The player is the one paid by every anomaly trigger of the game, and the game had at least 3 triggers. A trigger that pays nobody breaks it? Q42 |
+| 13 | **Archaeologist** (spelled "Archaelogist" in the list): gain and spend 12+ exofossils | The player gained 12 or more and spent 12 or more in the game? Q43 |
+| 14 | **Cryptologist**: play and complete 8+ Centaurian messages | Message cards that the player played and whose green part was resolved, 8 or more. |
+| 15 | **Daredevil**: 40+ danger at the end of the game | The Exertian danger of the player at the end (cards and board together, a counter that the statistics keep). |
+| 16 | **Tactician**: 20+ danger and not lose points for having the highest danger | Danger of 20 or more at the end, and no loss in the end scoring (ALIEN-EXE-07). |
+| 17 | **Explorer**: play all 3 security cards for 3 major explorations and trigger 15+ minor explorations in one game | All three security cards breached and explored 3 times for the major reward, and 15 or more minor rewards triggered. Q44 |
+| 18 | **Hoarder**: 20+ Glyphids tokens at the end of the game | The glyph tokens the player holds at the end. |
+| 19 | **Evolutionist**: trigger 20+ groups of organelle in a single game | Amoeba group triggers of the player in the game (a counter that the statistics keep). |
+
+An achievement is a small record: an id, a name, a text, a badge and a check. The general ones (1 to 6) are checked by the Worker from D1 (ratings, results, the tournament); the game ones (7 to 19) are checked from **the facts of the game that the engine reports at the end** (the next section).
+
+### 4.1a Where the game achievements are computed
+
+The facts of a game (orbiters and landers, missions, techs, planets, samples delivered, anomaly triggers and their beneficiaries, exofossils gained and spent, messages resolved, danger and the danger loss, security cards, explorations, glyph tokens, organelle groups) are state of the game, and some come from the events of the whole game. The engine already makes such numbers for the statistics (`stats.py`, one counter set per player at the end of a game). The plan adds a **pure function in the engine package, `achievements.py`**, next to `stats.py`: it takes the finished game (the same replay that makes the statistics) and returns, for each player, the list of game achievements that the game earned (ids). The Worker asks for it when a rated game ends, in the same step as the statistics, and passes the ids to the unlock step. Why in the engine: the checks read the state and the events of the game, which the Worker does not interpret (hard rule 5: rule logic stays in the engine). The counters that do not exist yet are added to `stats.py` (anomaly beneficiaries, exofossils spent, messages resolved) with tests and with the statistics backfill, so that the statistics page can use them too.
+
+The general achievements (1 to 6) need only ratings, results and tournaments, which the Worker already holds, so they stay in the Worker.
 
 ### 4.2 When it is given
 
-- **After a game that ends**, in the same step that settles the ratings (`finish` in the room, and the D1 batch of `recordEnd`): the facts are checked against the list for every registered player of the game. A new unlock is written once (`achievement_unlocks`: user, achievement, game, time; unique on user + achievement) and the game id stored is the game that earned it.
+- **After a rated game that ends** (an ordinary rated game or a tournament game; nothing else counts), in the same step that settles the ratings (`finish` in the room, and the D1 batch of `recordEnd`): the facts are checked against the list for every registered player of the game. A new unlock is written once (`achievement_unlocks`: user, achievement, game, time; unique on user + achievement) and the game id stored is the game that earned it.
 - **Tournament achievements** that depend on the end of the tournament (win, top ten percent) are checked when the tournament concludes; the game stored is the final game of that player's tournament, so that the history has an icon on a real game.
 - **The pop-up**: the `ended` message of the game's WebSocket carries the achievements that this viewer unlocked in the game; the page shows a pop-up (name, badge, text, a link to the profile). A player who was not on the page (the game ended while they were away, which is the normal case on a turn-based clock) sees it the next time they open any page: a `seen` flag on the unlock row, a small request at page load, and a pop-up for each unseen one. Each is shown once.
-- **Existing players**: only games after the release count (the owner, Q13). Nothing is computed from the past. What a rating achievement needs when a player is already above a level at the release is Q28.
+- **Existing players**: only rated games that end after the release count (the owner, Q13). Nothing is computed from the past, and a win streak starts at the release. What a rating achievement needs when a player is already above a level at the release is Q28.
 - **Recomputation**: an administrator can recompute a player's achievements after the list changes (an unlock is never removed by recomputation, only added; a removal is an admin action with a note).
 
 ### 4.3 Badges
@@ -214,6 +237,21 @@ These came out of the answers and out of the edge-case catalogue (section 10). U
 - **Q30 A kick that leaves several players sharing first place in an elimination table** (D24: all the others share first): *(suggested: the play-order tie-break puts them in order, and the first "advance" of them go on.)*
 - **Q31 The two new speeds**: values for *slower* and *slowest* *(suggested: slower 6 days + 18 h per turn; slowest 10 days + 1 day per turn; today's slow is 4 days + 12 h)*.
 - **Q32 What "a tab for tournament games" means**: one tab, "Tournaments", with the list of tournaments and "Your tournament games" inside it *(suggested)*; or two tabs.
+- **Q33 The titles** (Beginner, Intermediate, Expert, Master): only badges, or is the highest title also shown next to the player's name in the profile? *(suggested: also on the profile page under the name.)*
+- **Q34 "Win"** for the first-win and the streak achievements: first place, with a shared first place (after a kick, D24, or a tie) counting as a win? *(suggested: yes; a tie is already broken in tournaments but not in ordinary games.)*
+- **Q35 The streak**: consecutive rated wins in the order the games ended, any non-win (including a kick or a resignation) resets it, a casual game does not touch it *(suggested)*. Are 2, 3, 5, 10, 20, 50 six separate badges? *(suggested: yes.)*
+- **Q36 "Win against a Master"** in a game of 3 or 4: win the game with a Master (700 or more before the game) at the table *(suggested)*, or only a placement above the Master?
+- **Q37 Tournament Creator**: given when the creator's first tournament *starts* (registration closes) *(suggested)*, with the pop-up shown at once (no game, so no history icon)?
+- **Q38 Orbiters and landers** (10+): orbiters and landers together, on planets and moons *(suggested)*; the markers that stay on the board only (not the bonus spaces)?
+- **Q39 Missions completed** (10+): full missions and quick missions completed, and trigger missions counted when every circle is covered *(suggested)*?
+- **Q40 "All 12 techs"**: one of each of the 12 techs of the tech board *(suggested: 3 kinds of 4)*.
+- **Q41 "Every planet"**: the 7 planets of the base game, a moon does not count as a planet, and Pluto (a promo card) is not needed *(suggested)*; an orbiter or a lander on the planet, either one.
+- **Q42 Anomaly Master**: "every single trigger" means every trigger of the game paid this player; a trigger that paid nobody (an empty column) breaks it; at least 3 triggers *(suggested)*.
+- **Q43 Archaeologist**: the player gained 12 or more exofossils **and** spent 12 or more in the game *(suggested)*; or spent 12 or more (which needs gaining them)?
+- **Q44 Explorer**: "all 3 security cards for 3 major exploration": all three security cards breached, and three explorations that gave the major reward *(suggested)*; plus 15 or more minor rewards triggered. Is that the meaning?
+- **Q45 A game achievement for a player who is not the winner**: any player at the table can earn it, win or lose *(suggested)*.
+- **Q46 Order of the pop-ups** when a game unlocks several (a tournament win, a streak and a title): all shown one after the other, the biggest first *(suggested)*.
+- **Q47 The "benefactor" of Anomaly triggers** in a 3 or 4 player game, and the "most dangerous" loss: they use the end of the game as the engine has it (the engine's own numbers), not a re-count *(suggested)*.
 
 ### 8.3 What the "format logic" is (question 15)
 
@@ -290,5 +328,13 @@ Every case below becomes one or more tests (`TOUR-nnn` ids in `docs/spec/tournam
 41. The unlock of "win a tournament" is stored on the deciding game; the pop-up is shown at its end or on the next page load. *Clear.*
 42. A tournament with a walkover or a bye does not give a "won a match" for it. *Clear (Q10).*
 43. Achievements are given only for games that end after the release. *Clear (Q13).* A rating level for a player already above it: *Q28.*
+
+44. A casual game, a solo game, a practice game and a game with an AI never give an achievement and never touch a streak. *Clear (owner).*
+45. Two achievements in one game (for example a tournament win and a title): both are shown, once each. *Clear;* the order of the pop-ups: *Q46.*
+46. A result that is sent twice, or a game archived again after a restart: the unlock is written once (unique on player and achievement). *Clear.*
+47. A player who is kicked in a rated game: no game achievement from that game; a streak is reset. *Needs a ruling: Q35.*
+48. The same game achievement earned by two players in one game: each gets it. *Clear (Q45 suggested).*
+49. The achievement checks and the statistics page agree on the numbers of the same game (a test over archived games). *Clear.*
+50. The general achievements: a title is given at the first rated game that ends with the rating at or above its level; a streak counts only games after the release; a win with a Master needs the Master's rating before the game. *Needs a ruling: Q28, Q36.*
 
 The answers to the questions marked *needs a ruling* are copied into `docs/spec/tournaments.md` with the rule ids, as the answers to ambiguities are copied into the spec of the game.
