@@ -37,12 +37,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import { BarMenu } from "./BarMenu";
+import { BuyPanel } from "./BuyPanel";
 import type { CardAction } from "./CardActions";
 import { FinalScores } from "./FinalScores";
 import { GameView } from "./GameView";
 import { setupStatus } from "./GameView";
 import { Hint } from "./Hint";
-import { ActionIcon, ScoreIcon } from "./Icons";
+import { ActionIcon, DeckCardIcon, PublicityIcon, ScoreIcon } from "./Icons";
 import { type LobbyInfo, LobbyPanel } from "./LobbyPanel";
 import { SampleReward } from "./Mascamites";
 import { type CoverChoice, MissionCover } from "./MissionCover";
@@ -148,6 +149,7 @@ export function GameClient({
   const [boardOpen, setBoardOpen] = useState(false);
   // the panel of the free trade
   const [tradeOpen, setTradeOpen] = useState(false);
+  const [buyOpen, setBuyOpen] = useState(false);
   // the panel of an organization's free action that is made with a card of the hand
   const [orgFreeOpen, setOrgFreeOpen] = useState(false);
   const [boardPlayer, setBoardPlayer] = useState(0);
@@ -384,8 +386,12 @@ export function GameClient({
   // the free actions of an organization that name a card of the hand (Helion Assembly, Deep Sky Survey, Futurespan prepare)
   const orgCardMoves = mine.filter((m) => m.type === "org_free" && (typeof m.card === "string" || typeof m.tech === "string"));
   const buys = mine.filter((m) => m.type === "buy_card");
+  // what the card costs in publicity: the engine's note of the move (3, or what an organization makes it)
+  const buyPrice = Number(
+    (v.notes[v.legal.findIndex((x) => buys[0] && sameMove(x as Move, buys[0]))] as Note | undefined)?.cost?.publicity ?? 3,
+  );
   // taking a card, and discarding a card of the display for a signal, are made by clicking the card of the display (or the deck) too
-  const ROW_MOVES = ["buy_card", "take_card", "row_pick", "scan_discard", "scan_token"];
+  const ROW_MOVES = ["take_card", "row_pick", "scan_discard", "scan_token"]; // buying a card has a panel of its own (BuyPanel)
   // the cards that are offered to keep one of (end-of-round cards, organizations, quick start cards)
   const isOffer = (m: Move): boolean => m.type === "take_round_card" || m.type === "choose_org" || m.type === "choose_quick";
   const offerId = (m: Move): string => String(m.type === "choose_org" ? m.org : m.card);
@@ -943,9 +949,8 @@ export function GameClient({
     hints.push(
       `Click a tech stack to take that tech${techMoves[0]?.type === "research" ? ` (${researchCost(techMoves[0])} publicity, and the solar system rotates)` : ""}.`,
     );
-  if (rowMoves.length > 0 && buys.length === 0 && !rowMode)
-    hints.push(`Click a card of the display${rowSources.includes("deck") ? " or the deck" : ""}.`);
-  if (buys.length > 0) hints.push("Click a card of the display or the deck to buy it for 3 publicity.");
+  if (rowMoves.length > 0 && !rowMode) hints.push(`Click a card of the display${rowSources.includes("deck") ? " or the deck" : ""}.`);
+  if (buys.length > 0) hints.push("Free action: lose publicity to take a card of the display (the button in the move bar).");
   if (orgMarkNode) hints.push("Click the reward space of your organization board that you want to mark, or decline.");
   if (coverNode) hints.push("Click the circle of the mission card that you want to cover, or decline.");
   // Arkhos: the overflow space lets the player take the security card of that color into the hand
@@ -1195,9 +1200,19 @@ export function GameClient({
               </div>
             </MoveGroup>
           ))}
-          {exchanges.length > 0 || orgCardMoves.length > 0 || completeMoves.length > 0 ? (
+          {exchanges.length > 0 || buys.length > 0 || orgCardMoves.length > 0 || completeMoves.length > 0 ? (
             <MoveGroup title="Free action" foldable={false}>
               <div className="moves">
+                {buys.length > 0 ? (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => setBuyOpen(true)}
+                    title="Lose publicity to take a card of the display"
+                  >
+                    Lose {buyPrice} <PublicityIcon size={18} /> to take a <DeckCardIcon size={18} />
+                  </button>
+                ) : null}
                 {exchanges.length > 0 ? (
                   <button type="button" className="secondary" onClick={() => setTradeOpen(true)}>
                     Trade resources
@@ -1354,6 +1369,16 @@ export function GameClient({
                     sendAction(setupMove); // the choice dialog is the confirmation: no second question about a move that cannot be undone
                   }
                 }}
+              />
+            ) : null}
+            {buyOpen && !ended && buys.length > 0 ? (
+              <BuyPanel
+                moves={buys}
+                row={v.state.card_row}
+                deck={view.view.counts.deck}
+                price={buyPrice}
+                onBuy={playConfirmed}
+                onClose={() => setBuyOpen(false)}
               />
             ) : null}
             {tradeOpen && !ended && exchanges.length > 0 ? (

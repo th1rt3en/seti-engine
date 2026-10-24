@@ -3249,3 +3249,39 @@ input.switch:focus-visible {
 .resultshead button {
   margin-left: auto;
 }
+
+/* buying a card for publicity: the cards of the display to choose from */
+.buychoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 8px 0 12px;
+}
+.buychoice {
+  all: unset;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+}
+.buychoice:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.buychoice:hover:not(:disabled),
+.buychoice:focus-visible {
+  border-color: var(--line);
+}
+.buychoice.selected {
+  border-color: var(--accent);
+  background: rgba(88, 166, 255, 0.12);
+}
+.buypanel .tradeactions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
