@@ -16,7 +16,20 @@ import { ChipName } from "./ChipName";
 import { GlyphidsPanel } from "./GlyphidsPanel";
 import { ExertianDock, HandDock, type HandSelection } from "./HandDock";
 import { Hint } from "./Hint";
-import { CreditIcon, DataIcon, DeckCardIcon, EnergyIcon, ExofossilIcon, PublicityIcon, ScoreIcon, SignalTokenIcon } from "./Icons";
+import {
+  CreditIcon,
+  DataIcon,
+  DeckCardIcon,
+  EnergyIcon,
+  ExofossilIcon,
+  ObjectiveIcon,
+  PlayedCardIcon,
+  ProgressIcon,
+  PublicityIcon,
+  ScoreIcon,
+  SignalTokenIcon,
+  TechKindIcon,
+} from "./Icons";
 import { MissionsPanel } from "./MissionsPanel";
 import { OrgName } from "./OrgName";
 import { OrgPanel } from "./OrgPanel";
@@ -155,18 +168,20 @@ function RivalCells({ view }: { view: View }) {
         className="res"
         title="Actions: the cards the rival has played this round, and the cards left in its deck. When none is left it passes."
       >
+        <PlayedCardIcon size={18} />
         <b>{r.used.length}</b>
-        <span className="muted small">done</span>
+        <DeckCardIcon size={18} title="Cards left in the rival's deck" />
         <b>{r.deck.length}</b>
-        <span className="muted small">left</span>
       </span>
       <span
         className="res"
         title="The rival's marker on the 12 spaces of its progress track. Each time it goes round the track (back to the start), the rival gains an advanced action card."
       >
-        <span className="muted small">progress</span>
+        <ProgressIcon size={18} />
         <b>{r.progress}/12</b>
-        <span className="muted small">+{r.advanced.length} adv.</span>
+        <span className="muted small" title="Advanced action cards the rival has gained">
+          +{r.advanced.length}
+        </span>
       </span>
       {f ? (
         <span
@@ -177,7 +192,7 @@ function RivalCells({ view }: { view: View }) {
               : "Completed objectives: nothing is spent after round 5. Every objective that is not completed gives the rival 5 points."
           }
         >
-          <span className="muted small">objectives</span>
+          <ObjectiveIcon size={18} />
           <b>
             {f.unspent}
             {f.round <= 4 ? `/${f.round}` : ""}
@@ -187,7 +202,7 @@ function RivalCells({ view }: { view: View }) {
       <span className="res" title={`The techs the rival stores: ${kinds.map((k) => `${k.n} ${k.name}`).join(", ")}`}>
         {kinds.map((k) => (
           <span key={k.prefix} title={`${k.name} techs`}>
-            <span className="muted small">{k.short}</span>
+            <TechKindIcon kind={k.name} size={18} />
             <b>{k.n}</b>
           </span>
         ))}

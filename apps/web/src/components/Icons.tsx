@@ -196,3 +196,70 @@ export function TraceIcon({ size = SIZE }: { size?: number }) {
     </svg>
   );
 }
+
+/** An action card of the rival that was played this round: a card with a tick. */
+export function PlayedCardIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="played card" className="resicon">
+      <title>Played this round</title>
+      <rect x="4" y="2.5" width="14" height="19" rx="2" fill="#243350" stroke="#9fb6d8" strokeWidth="1.2" />
+      <path d="M7.5 12.5l3 3 5.5-6.5" fill="none" stroke="#7be3a4" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** The progress track of the rival: a track with its marker and the finish flag. */
+export function ProgressIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="progress track" className="resicon">
+      <title>Progress track</title>
+      <path d="M2.5 18.5h19" stroke="#9fb6d8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="3 2.2" />
+      <circle cx="7" cy="18.5" r="3" fill="#e0b000" stroke="#fff3c0" strokeWidth="1" />
+      <path d="M17 15V4.5l5 2.2-5 2.3" fill="#d9503c" stroke="#ffd2cb" strokeWidth="1.2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** The objectives that were completed: a target with a tick. */
+export function ObjectiveIcon({ size = SIZE }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="completed objectives" className="resicon">
+      <title>Completed objectives</title>
+      <circle cx="12" cy="12" r="9.5" fill="#1f2b44" stroke="#9fb6d8" strokeWidth="1.4" />
+      <circle cx="12" cy="12" r="5.5" fill="none" stroke="#6f86ad" strokeWidth="1.2" />
+      <path d="M8.5 12.5l2.7 2.7 4.8-5.8" fill="none" stroke="#7be3a4" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** A tech of the three kinds on the tech board: the probe (orange), the telescope (purple) or the computer (blue). */
+export function TechKindIcon({ kind, size = SIZE }: { kind: "probe" | "telescope" | "computer"; size?: number }) {
+  const color = kind === "probe" ? "#e07a2f" : kind === "telescope" ? "#a56bff" : "#3b82d6";
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label={`${kind} tech`} className="resicon">
+      <title>{`${kind[0]?.toUpperCase()}${kind.slice(1)} techs`}</title>
+      <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill={color} fillOpacity="0.28" stroke={color} strokeWidth="1.5" />
+      {kind === "probe" ? (
+        <>
+          <circle cx="12" cy="12" r="3" fill="#fff" />
+          <path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      ) : kind === "telescope" ? (
+        <>
+          <path d="M5 15 17 7l1.6 2.6L6.6 17.6z" fill="#fff" />
+          <path d="M10 17l-2 4.5M13 15.5l3 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      ) : (
+        <>
+          <rect x="7" y="7" width="10" height="10" rx="1.5" fill="#fff" />
+          <path
+            d="M9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"
+            stroke="#fff"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+    </svg>
+  );
+}
