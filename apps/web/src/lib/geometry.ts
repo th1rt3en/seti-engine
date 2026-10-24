@@ -308,7 +308,8 @@ export const ALIEN_COLUMN = { w: 381, h: 530, gap: 30, between: 36 }; // the two
 
 export function alienColumn(slot: number): { deck: { x: number; y: number }; faceUp: { x: number; y: number } } {
   const left = (ALIEN.middleX[slot] ?? 680) - ALIEN.centre * ALIEN.scale;
-  const x = left + ALIEN.w * ALIEN.scale + ALIEN_COLUMN.gap;
+  // the decks lie between the two species boards: the left board's to its right, the right board's to its left
+  const x = slot === 0 ? left + ALIEN.w * ALIEN.scale + ALIEN_COLUMN.gap : left - ALIEN_COLUMN.gap - ALIEN_COLUMN.w;
   const y = ALIEN_TOP;
   return { deck: { x, y }, faceUp: { x, y: y + ALIEN_COLUMN.h + ALIEN_COLUMN.between } };
 }

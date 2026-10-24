@@ -304,7 +304,7 @@ export function BoardView({
         {glyphSlot >= 0 ? <GlyphTrack slot={glyphSlot} extra={s.species[glyphSlot]?.extra as GlyphExtra} /> : null}
 
         {s.species.map((sp, i) => {
-          // the deck of a discovered species lies to the right of its board: its back with the cards left over it, and the card that lies face up
+          // the deck of a discovered species lies beside its board, on the side that faces the other board (both decks are between the boards): its back with the cards left over it, and the card that lies face up
           if (!sp.discovered) return null;
           const back = alienBack(sp.species);
           const at = alienColumn(i);
