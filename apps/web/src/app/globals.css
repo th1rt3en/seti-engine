@@ -662,3 +662,158 @@ form.inline {
   display: inline;
   margin-left: 8px;
 }
+
+/* the lobby of a game */
+.lobbypanel {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: linear-gradient(160deg, rgba(88, 166, 255, 0.07), transparent 55%), var(--panel);
+}
+.lobbyhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.lobbyhead h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+.lobbycount {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.lobbygrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1.25rem;
+}
+.lobbygrid h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.lobbyseats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.lobbyseat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  min-width: 0;
+}
+.lobbyseat.free {
+  border-style: dashed;
+  background: transparent;
+  color: var(--muted);
+}
+.lobbyseat.free .avatar {
+  background: transparent;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  animation: lobbypulse 1.8s ease-in-out infinite;
+}
+.lobbyseat.mine {
+  border-color: rgba(88, 166, 255, 0.55);
+}
+.lobbyseat .avatar {
+  flex: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f6feb, #8957e5);
+  color: #fff;
+}
+.lobbyseat .seatname {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.lobbyseat .pill {
+  margin-left: 0.35rem;
+}
+.lobbyconfig {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+}
+.lobbyconfig > div {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.lobbyconfig dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.lobbyconfig dd {
+  margin: 0;
+  font-weight: 600;
+}
+.lobbystart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.lobbystart button {
+  min-width: 12rem;
+  font-size: 1.05rem;
+  padding: 0.7rem 1.6rem;
+}
+.lobbystart button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.lobbywait {
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+.addai-fold {
+  padding: 0.6rem 1rem;
+}
+.addai-fold summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.addai-fold[open] summary {
+  margin-bottom: 0.75rem;
+}
+@keyframes lobbypulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lobbyseat.free .avatar {
+    animation: none;
+  }
+}

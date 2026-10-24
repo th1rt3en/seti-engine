@@ -57,30 +57,47 @@ export function LobbyPanel({
   const missingText = `Waiting for ${missing} more ${missing === 1 ? "player" : "players"}`;
   return (
     <section className="card lobbypanel" aria-label="The lobby of the game">
-      <h2>{lobby.full ? "Everybody is here" : "Waiting for players"}</h2>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
-        <div style={{ flex: "1 1 14rem", minWidth: 0 }}>
-          <h3>
-            Seats ({taken} of {lobby.seats.length})
-          </h3>
+      <div className="lobbyhead">
+        <h2>{lobby.full ? "Everybody is here" : "Waiting for players"}</h2>
+        <span className="lobbycount">
+          {taken} of {lobby.seats.length} seats taken
+        </span>
+      </div>
+      <div className="lobbygrid">
+        <div>
+          <h3>Players</h3>
           <ol className="lobbyseats">
             {lobby.seats.map((s, i) => (
-              <li key={`${i}-${s?.name ?? "free"}`}>
-                {s ? <PlayerLink num={s.num} name={s.name} /> : <span className="muted">free seat</span>}
-                {s?.bot ? <span className="pill">AI</span> : null}
-                {s && i === lobby.hostSeat ? <span className="pill">host</span> : null}
-                {s && i === lobby.you ? <span className="pill">you</span> : null}
+              <li
+                key={`${i}-${s?.name ?? "free"}`}
+                className={s === null ? "lobbyseat free" : i === lobby.you ? "lobbyseat mine" : "lobbyseat"}
+              >
+                <span className="avatar" aria-hidden="true">
+                  {s ? (s.bot ? "AI" : s.name.charAt(0).toUpperCase()) : "?"}
+                </span>
+                {s ? (
+                  <span className="seatname">
+                    <PlayerLink num={s.num} name={s.name} />
+                  </span>
+                ) : (
+                  <span className="seatname">Waiting for a player...</span>
+                )}
+                <span>
+                  {s?.bot ? <span className="pill">AI</span> : null}
+                  {s && i === lobby.hostSeat ? <span className="pill">host</span> : null}
+                  {s && i === lobby.you ? <span className="pill">you</span> : null}
+                </span>
               </li>
             ))}
           </ol>
         </div>
-        <div style={{ flex: "1 1 14rem", minWidth: 0 }}>
+        <div>
           <h3>The game</h3>
-          <dl className="lobbyconfig" style={{ margin: 0 }}>
+          <dl className="lobbyconfig">
             {settingLines(lobby).map((l) => (
-              <div key={l.label} style={{ display: "flex", gap: "0.5rem", justifyContent: "space-between" }}>
-                <dt className="muted">{l.label}</dt>
-                <dd style={{ margin: 0 }}>{l.value}</dd>
+              <div key={l.label}>
+                <dt>{l.label}</dt>
+                <dd>{l.value}</dd>
               </div>
             ))}
           </dl>
@@ -91,13 +108,13 @@ export function LobbyPanel({
           <input type="hidden" name="id" value={gameId} />
           <button type="submit" className="primary big" disabled={!lobby.full}>
             Start the game
-          </button>{" "}
+          </button>
           <span className="muted small">
             {lobby.full ? "Everybody is seated." : `${missingText}: the button is on when every seat is taken.`}
           </span>
         </form>
       ) : (
-        <p className="muted">
+        <p className="lobbywait">
           {lobby.full
             ? "Everybody is seated. The game starts when the host starts it."
             : `${missingText}. The host starts the game once every seat is taken.`}
