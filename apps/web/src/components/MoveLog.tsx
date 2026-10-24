@@ -8,9 +8,10 @@ import { ORG_NAMES, cardName, logText } from "@/lib/moves";
 import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import { techName } from "@/lib/techs";
 import { useBottomSpace, useDock } from "@/lib/useDock";
-import { type ReactNode, type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
+import { type ReactNode, type PointerEvent as ReactPointerEvent, useContext, useEffect, useRef, useState } from "react";
 import assets from "../generated/assets.json";
 import { CardText } from "./CardText";
+import { PlayerColorsContext } from "./PlayerName";
 import { Changes } from "./Reward";
 import { TapZoomImage } from "./TapZoom";
 
@@ -77,6 +78,12 @@ const MOVE_WORDS: Record<string, string> = {
   place_data: "Placing data",
   tuck: "Tucking a card",
 };
+
+/** The name of a player in the log, in the color of the player. */
+function Who({ seat, ctx, suffix = "" }: { seat: number; ctx: LogContext; suffix?: string }) {
+  const color = useContext(PlayerColorsContext)[seat];
+  return <b style={color ? { color } : undefined}>{`${ctx.who(seat)}${suffix}`}</b>;
+}
 
 /** The cause of a gain or a loss, as the engine named it (trail.py), in words that say which card, planet, sector, tech ... it was. */
 function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): string {
@@ -617,7 +624,7 @@ export function MoveLog({ entries: all, ctx }: { entries: LogEntry[]; ctx: LogCo
                   )}
                 </span>
                 <span className="logmove">
-                  <b>{ctx.who(e.seat)}</b> <CardText text={logText(e.action)} />{" "}
+                  <Who seat={e.seat} ctx={ctx} /> <CardText text={logText(e.action)} />{" "}
                   {mine && !itemised ? <Changes changes={mine.changes} size={16} /> : null}
                 </span>
                 {noteLines(notes, ctx, e.action).map((line, i) => (
@@ -631,7 +638,7 @@ export function MoveLog({ entries: all, ctx }: { entries: LogEntry[]; ctx: LogCo
                   .filter((g) => !(roundAt >= 0 && income(g)))
                   .map((g) => (
                     <span key={`g${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
-                      {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
+                      {g.player !== e.seat ? <Who seat={g.player} ctx={ctx} suffix=": " /> : null}
                       <CardText text={`${sourceText(g.source, ctx, e.action)}:`} /> <Changes changes={g.changes} size={16} />
                     </span>
                   ))}
@@ -651,7 +658,7 @@ export function MoveLog({ entries: all, ctx }: { entries: LogEntry[]; ctx: LogCo
                 {roundAt >= 0
                   ? ownGains.filter(income).map((g) => (
                       <span key={`gi${g.player}-${JSON.stringify(g.source)}`} className="logevent logsource">
-                        {g.player !== e.seat ? <b>{ctx.who(g.player)}: </b> : null}
+                        {g.player !== e.seat ? <Who seat={g.player} ctx={ctx} suffix=": " /> : null}
                         <CardText text={`${sourceText(g.source, ctx, e.action)}:`} /> <Changes changes={g.changes} size={16} />
                       </span>
                     ))
