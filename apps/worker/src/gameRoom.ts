@@ -10,6 +10,7 @@ import { EngineArchive } from "./core/engineArchive.js";
 import { makeSigner } from "./core/engineAuth.js";
 import { type ErrorReporter, makeErrorReporter } from "./core/errorReport.js";
 import { type Connection, GameRoom, type ServerMessage, type Store, type SubmitResult } from "./core/room.js";
+import { messageText } from "./core/validate.js";
 import type { Env } from "./env.js";
 
 /** What a socket remembers across hibernation. */
@@ -140,10 +141,25 @@ export class GameRoomDO implements DurableObject {
     const conn = this.connection(ws);
     const att = ws.deserializeAttachment() as Attachment;
     let msg: { t?: string; id?: number; seq?: number; seat?: number; text?: string; action?: Record<string, unknown> };
+    const text = messageText(message);
+    if (text === null) {
+      conn.send({ t: "error", code: "bad_message", message: "the message is too big" });
+      return;
+    }
     try {
-      msg = JSON.parse(typeof message === "string" ? message : new TextDecoder().decode(message));
+      const parsed: unknown = JSON.parse(text);
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) throw new Error("not an object");
+      msg = parsed as typeof msg;
     } catch {
       conn.send({ t: "error", code: "bad_message", message: "the message is not JSON" });
+      return;
+    }
+    // the action of a move is an object with a type: the engine says whether it is legal, and nothing else is let through
+    if (
+      msg.action !== undefined &&
+      (typeof msg.action !== "object" || msg.action === null || Array.isArray(msg.action) || typeof msg.action.type !== "string")
+    ) {
+      conn.send({ t: "error", code: "bad_message", message: "the move is not valid" });
       return;
     }
     if (msg.t === "ping") {

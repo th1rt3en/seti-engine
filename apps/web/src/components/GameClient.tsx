@@ -1133,6 +1133,33 @@ export function GameClient({
       window.dispatchEvent(new Event(OPEN_SHORTCUTS_EVENT));
     }
   };
+  // the free actions that have a panel of their own (buying a card, trading, the free action of an organization, completing a mission) lie in the same section as the other free actions
+  const hasFreeExtras = exchanges.length > 0 || buys.length > 0 || orgCardMoves.length > 0 || completeMoves.length > 0;
+  const hasFreeGroup = moveGroups.some((g) => g.title === "Free actions");
+  const freeExtras = hasFreeExtras ? (
+    <>
+      {buys.length > 0 ? (
+        <button type="button" className="secondary" onClick={() => setBuyOpen(true)} title="Lose publicity to take a card of the display">
+          Lose {buyPrice} <PublicityIcon size={18} /> to take a <DeckCardIcon size={18} />
+        </button>
+      ) : null}
+      {exchanges.length > 0 ? (
+        <button type="button" className="secondary" onClick={() => setTradeOpen(true)}>
+          Trade resources
+        </button>
+      ) : null}
+      {orgCardMoves.length > 0 ? (
+        <button type="button" className="secondary" onClick={() => setOrgFreeOpen(true)}>
+          {orgName(orgCardMoves[0]?.org)}: free action
+        </button>
+      ) : null}
+      {completeMoves.map((m) => (
+        <button key={String(m.card)} type="button" onClick={() => play(m)}>
+          {describeMove(m)}
+        </button>
+      ))}
+    </>
+  ) : null;
   const moves = (
     <>
       {ended ? (
@@ -1211,38 +1238,13 @@ export function GameClient({
                   </button>
                 ))}
                 {g.title === "Main action" ? xenoButtons : null}
+                {g.title === "Free actions" ? freeExtras : null}
               </div>
             </MoveGroup>
           ))}
-          {exchanges.length > 0 || buys.length > 0 || orgCardMoves.length > 0 || completeMoves.length > 0 ? (
-            <MoveGroup title="Free action" foldable={false}>
-              <div className="moves">
-                {buys.length > 0 ? (
-                  <button
-                    type="button"
-                    className="secondary"
-                    onClick={() => setBuyOpen(true)}
-                    title="Lose publicity to take a card of the display"
-                  >
-                    Lose {buyPrice} <PublicityIcon size={18} /> to take a <DeckCardIcon size={18} />
-                  </button>
-                ) : null}
-                {exchanges.length > 0 ? (
-                  <button type="button" className="secondary" onClick={() => setTradeOpen(true)}>
-                    Trade resources
-                  </button>
-                ) : null}
-                {orgCardMoves.length > 0 ? (
-                  <button type="button" className="secondary" onClick={() => setOrgFreeOpen(true)}>
-                    {orgName(orgCardMoves[0]?.org)}: free action
-                  </button>
-                ) : null}
-                {completeMoves.map((m) => (
-                  <button key={String(m.card)} type="button" onClick={() => play(m)}>
-                    {describeMove(m)}
-                  </button>
-                ))}
-              </div>
+          {!hasFreeGroup && hasFreeExtras ? (
+            <MoveGroup title="Free actions" foldable={false}>
+              <div className="moves">{freeExtras}</div>
             </MoveGroup>
           ) : null}
         </div>

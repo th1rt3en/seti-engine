@@ -16,6 +16,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const step = Math.min(replay.actions.length, Math.max(0, Number(url.searchParams.get("step") ?? 0) || 0));
   const viewerParam = url.searchParams.get("viewer");
   const viewer = viewerParam === null || viewerParam === "spectator" ? null : Number(viewerParam);
+  if (viewer !== null && !(Number.isInteger(viewer) && viewer >= 0 && viewer <= 3))
+    return Response.json({ ok: false, message: "the viewer is a seat from 0 to 3, or spectator" }, { status: 400 });
   try {
     // a game with no `rngEncoding` was played before the random state became a string
     const got = await replayStep(replay.header.options, replay.actions, step, viewer, replay.header.rngEncoding ?? "double");

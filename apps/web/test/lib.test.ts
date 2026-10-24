@@ -698,3 +698,16 @@ describe("the rating changes of a game", () => {
     expect(await gameRatingChanges(db, "g2")).toEqual([]);
   });
 });
+
+describe("the name of a guest", () => {
+  it("keeps only plain letters, digits, spaces, dots, dashes and underscores", async () => {
+    const { cleanGuestName } = await import("../src/lib/auth");
+    expect(cleanGuestName("  Ann  Marie ")).toBe("Ann Marie");
+    expect(cleanGuestName("<b>Bob</b>")).toBe("bBobb");
+    expect(cleanGuestName("a‮bc​\u0000d")).toBe("abcd"); // a direction override, a zero-width space and a control character are dropped
+    expect(cleanGuestName("Аlice")).toBe("lice"); // a Cyrillic A cannot pose as a Latin one
+    expect(cleanGuestName("x".repeat(60))).toHaveLength(24);
+    expect(cleanGuestName("!!!")).toBe("");
+    expect(cleanGuestName(undefined)).toBe("");
+  });
+});

@@ -3340,10 +3340,19 @@ html:has(.setupchoice) .hand {
   grid-column: 1 / -1;
   contain: inline-size;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* everything the rival tracks lies in one row (a row that is too wide for a phone scrolls sideways) */
   align-items: center;
-  gap: 4px 16px;
+  gap: 4px 10px;
   padding-top: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.scorechips .rivalcells .res {
+  flex: none;
+}
+.scorechips .rivalcells .rivalback {
+  width: 14px;
+  height: 18px;
 }
 .scorechips li:has(.rivalcells) {
   border-radius: 18px;

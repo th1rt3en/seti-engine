@@ -91,9 +91,22 @@ export async function login(db: Db, name: string, password: string): Promise<Use
   return { ...toUser(row), num: await userNum(db, row.id) };
 }
 
+/** A name that a guest typed, made safe to show to other players: only the letters A to Z, digits, spaces, dots, dashes and underscores (no control, invisible, direction
+ * or look-alike characters that could hide, reverse or copy another name), single spaces, at most 24 characters. An empty result means that there is no usable name. */
+export function cleanGuestName(raw: string | undefined): string {
+  return (raw ?? "")
+    .normalize("NFKD")
+    .replace(/[^A-Za-z0-9 ._-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 24)
+    .trim();
+}
+
 export async function createGuest(db: Db, name: string | undefined, now = Date.now()): Promise<User> {
   const id = `guest-${randomUUID()}`;
-  let display = name?.trim() ? name.trim().slice(0, 32) : `Guest ${id.slice(-4)}`;
+  const typed = cleanGuestName(name);
+  let display = typed !== "" ? typed : `Guest ${id.slice(-4)}`;
   // a guest cannot pose as a registered player
   if (await nameTaken(db, display)) display = `Guest ${id.slice(-4)}`;
   await db.run(

@@ -17,6 +17,7 @@ import type { ClockSettings } from "./core/clock.js";
 import { makeSigner } from "./core/engineAuth.js";
 import { makeErrorReporter } from "./core/errorReport.js";
 import { overTableLimit } from "./core/limits.js";
+import { validClock, validOptions } from "./core/validate.js";
 import type { Env } from "./env.js";
 
 export { GameRoomDO as GameRoom } from "./gameRoom.js";
@@ -29,19 +30,6 @@ async function identify(request: Request, env: Env, url: URL): Promise<Identity 
   const token = header?.startsWith("Bearer ") ? header.slice(7) : url.searchParams.get("token");
   if (!token) return null;
   return verifyToken(token, { publicKeyPem: env.AUTH_PUBLIC_KEY, issuer: env.AUTH_ISSUER, audience: env.AUTH_AUDIENCE });
-}
-
-function validOptions(o: unknown): o is Options {
-  const x = o as Partial<Options> | null;
-  return typeof x === "object" && x !== null && Number.isInteger(x.players) && (x.players as number) >= 1 && (x.players as number) <= 4;
-}
-
-function validClock(c: unknown): c is ClockSettings {
-  const x = c as { kind?: string; ms?: number; initialMs?: number; incrementMs?: number } | null;
-  if (x === null || typeof x !== "object") return false;
-  if (x.kind === "none") return true;
-  if (x.kind === "per_turn") return typeof x.ms === "number" && x.ms > 0;
-  return x.kind === "bank" && typeof x.initialMs === "number" && x.initialMs > 0 && typeof x.incrementMs === "number" && x.incrementMs >= 0;
 }
 
 export default {
