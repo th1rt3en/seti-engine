@@ -195,7 +195,9 @@ export default async function Player({
                   </td>
                   <td>
                     {o.players === 1 ? (
-                      (g.score ?? "—")
+                      <>
+                        {data.user.name} ({g.score ?? "—"})
+                      </>
                     ) : (
                       <ol className="tableplayers">
                         {data.pagePlayers
@@ -203,7 +205,7 @@ export default async function Player({
                           .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || a.seat - b.seat)
                           .map((p) => (
                             <li key={p.seat} className={p.user_id === data.user.id ? "me" : undefined}>
-                              <PlayerLink num={p.num} name={p.name} /> <b>{p.score ?? "—"}</b>
+                              <PlayerLink num={p.num} name={p.name} /> ({p.score ?? "—"})
                             </li>
                           ))}
                       </ol>

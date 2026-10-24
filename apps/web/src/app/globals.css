@@ -828,9 +828,7 @@ form.inline {
 }
 .tableplayers li {
   display: flex;
-  gap: 0.5rem;
-  justify-content: space-between;
-  min-width: 9rem;
+  gap: 0.35rem;
 }
 .tableplayers li.me {
   font-weight: 600;
