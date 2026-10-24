@@ -3290,3 +3290,9 @@ input.switch:focus-visible {
 html:has(.setupchoice) .hand {
   z-index: 210;
 }
+
+/* the cards of the tucks of the setup: all of the size of a card of the hand, however few they are (a grid that stretches its cells would make one card fill the screen) */
+.setupcards.tucks {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 200px));
+  justify-content: start;
+}

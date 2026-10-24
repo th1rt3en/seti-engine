@@ -172,7 +172,7 @@ export function SetupTucks({
         {tucked.length > 0 ? (
           <>
             <h3>Tucked</h3>
-            <div className="setupcards quick">
+            <div className="setupcards tucks">
               {tucked.map((t, k) => (
                 <div key={`${t.card}-${k}`} className="setupcard">
                   <img src={cardImage(t.card)} alt={`Tucked card ${t.card}`} />
@@ -191,7 +191,7 @@ export function SetupTucks({
         {hand.length > 0 ? (
           <>
             <h3>Your hand</h3>
-            <div className="setupcards quick">
+            <div className="setupcards tucks">
               {hand.map((id) => (
                 <button
                   key={id}
