@@ -427,7 +427,10 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
     # what the move itself changes is for the move (or for the card being played, when the move goes on with one)
     answers = bool(state.pending) and action in _decision_moves(state, state.pending[0])  # not a free action in the middle of it
     playing = action.get("card") if action["type"] == "play_card" else state.playing if answers else None
-    with trail.scope(s, {"kind": "card", "card": playing} if playing else {"kind": "move"}):
+    source: dict[str, Any] = {"kind": "card", "card": playing} if playing else {"kind": "move"}
+    if answers and state.pending[0].source is not None:  # the decision knows its cause (a mission circle ...): the log names it
+        source = state.pending[0].source
+    with trail.scope(s, source):
         _play_step(s, action, events)
     events += trail.events_of(s)
     return s, events

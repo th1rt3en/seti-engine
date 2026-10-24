@@ -39,3 +39,18 @@ def test_a_species_with_its_three_spaces_full_is_revealed_when_the_turn_is_over_
     while state.pending and not state.species[1].discovered:
         state = apply(state, legal_moves(state)[0]).state
     assert state.species[1].discovered
+
+
+def test_the_card_taken_for_a_covered_circle_is_credited_to_the_circle_not_to_the_card_that_was_played() -> None:
+    """CARD-12 (the log): a circle's reward that waits for a choice is named after the mission, also while another card is being played."""
+    s = begin(2).state.model_copy(deep=True)
+    pl = s.current_player
+    s.players[pl].missions = [MissionState(card="76", kind="trigger", used=[False, False, False])]
+    s.playing = next(c for c in s.players[pl].hand if c != "76")
+    s.pending = [Decision(kind="mission_trigger", player=pl, data={"options": [["76", 2]]}, source={"kind": "card", "card": s.playing})]
+    covered = apply(with_state(s).state, {"type": "cover", "card": "76", "circle": 2})
+    assert covered.state.pending[0].kind == "take_card" and covered.state.pending[0].source == {"kind": "mission", "card": "76"}
+    taken = apply(covered.state, {"type": "take_card", "source": "deck"})
+    sources = [e["source"] for e in taken.events if isinstance(e.get("source"), dict)]
+    assert {"kind": "mission", "card": "76"} in sources
+    assert not any(x.get("kind") == "card" for x in sources)
