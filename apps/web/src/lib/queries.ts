@@ -300,17 +300,41 @@ export function describeClock(json: string): string {
   return "no clock";
 }
 
-/** The rated players, best first. `name` keeps the names that contain it (any case); `minGames` keeps those with that many rated games or more. */
-export function leaderboard(db: Db, limit = 100, name = "", minGames = 0): Promise<LeaderRow[]> {
-  const like = `%${name.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+/** The rows of a ranking on one page of the leaderboards. */
+export const LEADERBOARD_PAGE_SIZE = 25;
+
+const likeOf = (name: string): string => `%${name.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+
+/** The rated players, best first. `name` keeps the names that contain it (any case); `minGames` keeps those with that many rated games or more. `offset` skips
+ * the players of the earlier pages. */
+export function leaderboard(db: Db, limit = LEADERBOARD_PAGE_SIZE, name = "", minGames = 0, offset = 0): Promise<LeaderRow[]> {
   return db.all<LeaderRow>(
     `SELECT r.user_id, un.num AS num, u.name, r.rating, r.games FROM ratings r JOIN users u ON u.id = r.user_id
        LEFT JOIN user_nums un ON un.user_id = r.user_id
-     WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' AND r.games >= ? ORDER BY r.rating DESC, r.games DESC LIMIT ?`,
-    like,
+     WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' AND r.games >= ? ORDER BY r.rating DESC, r.games DESC, u.id ASC LIMIT ? OFFSET ?`,
+    likeOf(name),
     Math.max(0, Math.floor(minGames)),
     limit,
+    Math.max(0, Math.floor(offset)),
   );
+}
+
+/** How many players the same filter finds (for the number of pages). */
+export async function leaderboardCount(db: Db, name = "", minGames = 0): Promise<number> {
+  const rows = await db.all<{ n: number }>(
+    `SELECT COUNT(*) AS n FROM ratings r JOIN users u ON u.id = r.user_id WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' AND r.games >= ?`,
+    likeOf(name),
+    Math.max(0, Math.floor(minGames)),
+  );
+  return rows[0]?.n ?? 0;
+}
+
+/** The page of a list that is wanted (from 1) and the number of pages; a page past the last is the last. */
+export function pageOf(total: number, wanted: unknown, size: number): { page: number; pages: number; offset: number } {
+  const pages = Math.max(1, Math.ceil(total / size));
+  const n = Math.floor(Number(wanted));
+  const page = Math.min(Math.max(1, Number.isFinite(n) ? n : 1), pages);
+  return { page, pages, offset: (page - 1) * size };
 }
 
 export interface FinishedGame {
@@ -571,8 +595,7 @@ export interface SoloFilter {
   expansion: boolean | null;
 }
 
-/** The best final scores of solo games that were played to their end (no sandbox game), highest first. */
-export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promise<SoloScore[]> {
+function soloWhere(filter: SoloFilter): { where: string[]; values: unknown[] } {
   const where = [
     "g.status = 'finished'",
     "g.reason = 'completed'",
@@ -588,6 +611,22 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
     where.push("COALESCE(json_extract(g.options_json, '$.expansion'), 0) = ?");
     values.push(filter.expansion ? 1 : 0);
   }
+  return { where, values };
+}
+
+/** How many solo scores a filter finds (for the number of pages). */
+export async function soloCount(db: Db, filter: SoloFilter): Promise<number> {
+  const { where, values } = soloWhere(filter);
+  const rows = await db.all<{ n: number }>(
+    `SELECT COUNT(*) AS n FROM games g JOIN game_players p ON p.game_id = g.id AND p.seat = 0 WHERE ${where.join(" AND ")} AND p.score IS NOT NULL`,
+    ...values,
+  );
+  return rows[0]?.n ?? 0;
+}
+
+/** The best final scores of solo games that were played to their end (no sandbox game), highest first; `offset` skips the scores of the earlier pages. */
+export async function soloScores(db: Db, filter: SoloFilter, limit = LEADERBOARD_PAGE_SIZE, offset = 0): Promise<SoloScore[]> {
+  const { where, values } = soloWhere(filter);
   const rows = await db.all<{
     game_id: string;
     num: number | null;
@@ -609,10 +648,11 @@ export async function soloScores(db: Db, filter: SoloFilter, limit = 100): Promi
        FROM games g JOIN game_players p ON p.game_id = g.id AND p.seat = 0
        LEFT JOIN game_nums gn ON gn.game_id = g.id LEFT JOIN user_nums un ON un.user_id = p.user_id
       WHERE ${where.join(" AND ")} AND p.score IS NOT NULL
-      ORDER BY p.score DESC, g.ended_at ASC
-      LIMIT ?`,
+      ORDER BY p.score DESC, g.ended_at ASC, g.id ASC
+      LIMIT ? OFFSET ?`,
     ...values,
     limit,
+    Math.max(0, Math.floor(offset)),
   );
   return rows.map((r) => ({
     game_id: r.game_id,

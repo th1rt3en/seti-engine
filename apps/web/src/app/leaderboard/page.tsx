@@ -1,13 +1,25 @@
+import { Pager } from "@/components/Pager";
 import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
-import { leaderboard } from "@/lib/queries";
+import { LEADERBOARD_PAGE_SIZE, leaderboard, leaderboardCount, pageOf } from "@/lib/queries";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function Leaderboard({ searchParams }: { searchParams: Promise<{ q?: string; min?: string }> }) {
-  const { q = "", min = "0" } = await searchParams;
-  const rows = await leaderboard(getDb(), 100, q, Number(min) || 0);
+export default async function Leaderboard({ searchParams }: { searchParams: Promise<{ q?: string; min?: string; page?: string }> }) {
+  const { q = "", min = "0", page: wanted } = await searchParams;
+  const minGames = Number(min) || 0;
+  const total = await leaderboardCount(getDb(), q, minGames);
+  const { page, pages, offset } = pageOf(total, wanted, LEADERBOARD_PAGE_SIZE);
+  const rows = await leaderboard(getDb(), LEADERBOARD_PAGE_SIZE, q, minGames, offset);
+  const link = (n: number): string => {
+    const params = new URLSearchParams({
+      ...(q ? { q } : {}),
+      ...(minGames > 0 ? { min } : {}),
+      ...(n > 1 ? { page: String(n) } : {}),
+    }).toString();
+    return params ? `/leaderboard?${params}` : "/leaderboard";
+  };
   return (
     <>
       <h1>Leaderboard</h1>
@@ -55,7 +67,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
           <tbody>
             {rows.map((r, i) => (
               <tr key={r.user_id}>
-                <td>{i + 1}</td>
+                <td>{offset + i + 1}</td>
                 <td>
                   <PlayerLink num={r.num} name={r.name} />
                 </td>
@@ -66,6 +78,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
           </tbody>
         </table>
       )}
+      <Pager page={page} pages={pages} link={link} labels={["← Higher", "Lower →"]} />
     </>
   );
 }

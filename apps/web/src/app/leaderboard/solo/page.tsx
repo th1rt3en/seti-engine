@@ -1,6 +1,7 @@
+import { Pager } from "@/components/Pager";
 import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
-import { soloScores } from "@/lib/queries";
+import { LEADERBOARD_PAGE_SIZE, pageOf, soloCount, soloScores } from "@/lib/queries";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -8,12 +9,24 @@ export const metadata = { title: "Solo high scores" };
 
 const date = (ms: number): string => (ms > 0 ? new Date(ms).toISOString().slice(0, 10) : "");
 
-export default async function SoloLeaderboard({ searchParams }: { searchParams: Promise<{ difficulty?: string; expansion?: string }> }) {
+export default async function SoloLeaderboard({
+  searchParams,
+}: { searchParams: Promise<{ difficulty?: string; expansion?: string; page?: string }> }) {
   const sp = await searchParams;
   const d = Number(sp.difficulty);
   const difficulty = Number.isInteger(d) && d >= 1 && d <= 5 ? d : null;
   const expansion = sp.expansion === "yes" ? true : sp.expansion === "no" ? false : null;
-  const rows = await soloScores(getDb(), { difficulty, expansion });
+  const filter = { difficulty, expansion };
+  const { page, pages, offset } = pageOf(await soloCount(getDb(), filter), sp.page, LEADERBOARD_PAGE_SIZE);
+  const rows = await soloScores(getDb(), filter, LEADERBOARD_PAGE_SIZE, offset);
+  const link = (n: number): string => {
+    const params = new URLSearchParams({
+      ...(difficulty !== null ? { difficulty: String(difficulty) } : {}),
+      ...(expansion !== null ? { expansion: expansion ? "yes" : "no" } : {}),
+      ...(n > 1 ? { page: String(n) } : {}),
+    }).toString();
+    return params ? `/leaderboard/solo?${params}` : "/leaderboard/solo";
+  };
   return (
     <>
       <h1>Solo high scores</h1>
@@ -73,7 +86,7 @@ export default async function SoloLeaderboard({ searchParams }: { searchParams: 
             <tbody>
               {rows.map((r, i) => (
                 <tr key={r.game_id}>
-                  <td>{i + 1}</td>
+                  <td>{offset + i + 1}</td>
                   <td>{r.registered ? <PlayerLink num={r.user_num} name={r.name} /> : r.name}</td>
                   <td>
                     <b>{r.score}</b>
@@ -93,6 +106,7 @@ export default async function SoloLeaderboard({ searchParams }: { searchParams: 
           </table>
         </div>
       )}
+      <Pager page={page} pages={pages} link={link} labels={["← Higher", "Lower →"]} />
     </>
   );
 }
