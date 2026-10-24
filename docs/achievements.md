@@ -21,3 +21,4 @@ Game Achievements
 19. Trigger 20+ groups of organelle in a single game: Evolutionist
 20. Land on Jupiter and on all 4 of its moons (Io, Europa, Ganymede, Callisto) in a single game: Juno
 21. Have your own marker on all 6 discovery spaces (3 of each of the 2 species) in a single game: Pioneer
+22. Win all 8 sectors in a single game, i.e. have your marker beside the star of each of the 8 sectors at the end of the game (SECTOR-11, SECTOR-14): Scanner
