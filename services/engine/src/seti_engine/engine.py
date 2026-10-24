@@ -480,6 +480,8 @@ def _hidden(s: GameState) -> tuple[Any, ...]:
         s.rival.deck if s.rival else None,
         s.objectives.stack if s.objectives else None,
         [(sl.extra.get("samples"), sl.extra.get("sample_spaces")) for sl in s.species if sl.species == "mascamites"],
+        # EXP-ARK-02: a minor or major exploration reveals the next card
+        [(sl.extra.get("explore_deck"), sl.extra.get("explore_aside")) for sl in s.species if sl.species == "arkhos"],
         any(d.kind in ("mascamite_sample", "take_round_card") for d in s.pending),  # the player looks at the samples, at the round pile
     )
 

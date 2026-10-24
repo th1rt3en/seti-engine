@@ -9,10 +9,10 @@ import { createPortal } from "react-dom";
 /** Sent on the window when the pointer is on a card (the id) and when it leaves (null): the board outlines the planets and sectors the card names. */
 export const CARD_HOVER_EVENT = "seti-card-hover";
 /** The enlarged card is a quarter of the window wide, between these. */
-const zoomWidth = (): number => Math.round(Math.min(500, Math.max(320, window.innerWidth * 0.26)));
-const RATIO = 1040 / 747;
+export const zoomWidth = (): number => Math.round(Math.min(500, Math.max(320, window.innerWidth * 0.26)));
+export const RATIO = 1040 / 747;
 /** The enlarged card appears when the pointer has rested on a card this long. */
-const HOVER_DELAY_MS = 1000;
+export const HOVER_DELAY_MS = 1000;
 /** The finger that held a card lifts over the enlarged card: that click must not close it at once. */
 const RELEASE_GUARD_MS = 600;
 

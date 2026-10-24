@@ -10,6 +10,7 @@ import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
 import { OrgName } from "./OrgName";
+import { Marker, PieceDefs, pieceColor } from "./Pieces";
 import { PlayerName } from "./PlayerName";
 
 const ASSET = expansionAssets as Record<string, string>;
@@ -57,18 +58,11 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
                 role="img"
                 aria-label={`${p.organization} board with its reward spaces`}
               >
+                <PieceDefs />
                 <image href={cardImage(p.organization ?? "")} x={0} y={0} width={560} height={421} />
                 {Object.entries(spaces).map(([name, at]) =>
                   p.org_marks.includes(name) ? (
-                    <g key={name}>
-                      <circle cx={at[0]} cy={at[1]} r={32} fill="rgba(0,0,0,0.55)" />
-                      <path
-                        d={`M ${at[0] - 18} ${at[1] - 18} L ${at[0] + 18} ${at[1] + 18} M ${at[0] + 18} ${at[1] - 18} L ${at[0] - 18} ${at[1] + 18}`}
-                        stroke="#fff"
-                        strokeWidth={7}
-                      />
-                      <title>{`${name}: marked`}</title>
-                    </g>
+                    <Marker key={name} x={at[0]} y={at[1]} size={70} color={pieceColor(p.color)} title={`${name}: marked`} />
                   ) : null,
                 )}
               </svg>

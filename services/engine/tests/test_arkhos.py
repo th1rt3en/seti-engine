@@ -148,3 +148,12 @@ def test_the_gains_of_an_exploration_card_are_logged_under_that_card() -> None: 
     arkhos.explore(s, p, "minor", [])
     gains = trail.events_of(s)
     assert gains and gains[0]["source"] == {"kind": "explore", "card": "ET 40", "level": "minor"}
+
+
+def test_an_exploration_reveals_the_next_card_so_it_cannot_be_taken_back() -> None:  # EXP-ARK-02, EXP-ARK-04, UNDO-01
+    from seti_engine.engine import _reveals
+
+    s = discovered()
+    before = s.model_copy(deep=True)
+    arkhos.explore(s, s.players[0], "minor", [])
+    assert _reveals(before, s)  # the deck of the exploration cards changed: the move showed something that was hidden

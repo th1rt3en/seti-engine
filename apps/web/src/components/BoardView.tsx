@@ -58,6 +58,7 @@ import { type AnomalyToken, AnomalyTokenView } from "./Anomaly";
 import { CARD_HOVER_EVENT } from "./CardImage";
 import { DataToken, Marker, type PieceColor, PieceDefs, ProbePiece, ScorePawn, pieceColor } from "./Pieces";
 import { SolarPreview } from "./SolarPreview";
+import { SvgCardZoom } from "./SvgCardZoom";
 import { TranslationBoard } from "./TranslationBoard";
 
 const DISCS = assets.discs as Record<string, string>;
@@ -334,10 +335,10 @@ export function BoardView({
                 </g>
               ) : null}
               {faceUp ? (
-                <g>
+                <SvgCardZoom id={String(sp.face_up)} src={faceUp}>
                   <image href={faceUp} x={at.faceUp.x} y={at.faceUp.y} width={ALIEN_COLUMN.w} height={ALIEN_COLUMN.h} />
                   <title>{`The card that lies face up: ${cardName(sp.face_up)}`}</title>
-                </g>
+                </SvgCardZoom>
               ) : null}
             </g>
           );
@@ -371,10 +372,10 @@ export function BoardView({
                 </g>
               ) : null}
               {shown ? (
-                <g>
+                <SvgCardZoom id={null} src={shown} ratio={h / ALIEN_COLUMN.w}>
                   <image href={shown} x={at.faceUp.x} y={at.faceUp.y + dy} width={ALIEN_COLUMN.w} height={h} />
                   <title>{`Exploration card revealed last (${extra.explore_discard?.length ?? 0} revealed)`}</title>
-                </g>
+                </SvgCardZoom>
               ) : (
                 <rect
                   x={at.faceUp.x}
