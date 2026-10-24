@@ -24,7 +24,7 @@ import {
   rowMoveText,
   sameMove,
 } from "@/lib/moves";
-import { type Note, buildSpots } from "@/lib/targets";
+import { type Note, ORG_SPACES, buildSpots } from "@/lib/targets";
 import { TECH_INFO, techName } from "@/lib/techs";
 import { useTurnSound } from "@/lib/turnSound";
 import { ALL_EVENT } from "@/lib/useDock";
@@ -41,24 +41,26 @@ import { GameView } from "./GameView";
 import { setupStatus } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, ScoreIcon } from "./Icons";
+import { type LobbyInfo, LobbyPanel } from "./LobbyPanel";
 import { SampleReward } from "./Mascamites";
 import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogContext, type LogEntry, MoveLog, plainEntry } from "./MoveLog";
 import { MovePreview } from "./MovePreview";
 import { OrgFreePanel } from "./OrgFreePanel";
+import { OrgMarkPick } from "./OrgMarkPick";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { PlayerLink } from "./PlayerLink";
 import { PlayerName, PlayerNumsContext } from "./PlayerName";
 import { Amount, Cost, KindIcon } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
-import { SetupBoth, SetupChoice } from "./SetupChoice";
+import { SetupBoth, SetupChoice, SetupTucks } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
 import { TradePanel } from "./TradePanel";
 
 type Server =
-  | { t: "lobby"; status: string; seats: ({ name: string; num?: number; bot?: true } | null)[]; rated: boolean }
+  | ({ t: "lobby"; status: string } & LobbyInfo)
   | { t: "view"; seq: number; status: string; view: View; names: string[]; nums?: (number | null)[]; remaining: (number | null)[] | null }
   | { t: "error"; code: string; message: string; legal?: Move[] }
   | { t: "log"; from: number; entries: LogEntry[] }
@@ -96,7 +98,17 @@ export function GameClient({
   names: lobbyNames,
   nums: lobbyNums,
   signedIn,
-}: { gameId: string; gameNum: number; wsBase: string; names: string[]; nums: (number | null)[]; signedIn: boolean }) {
+  startAction,
+}: {
+  gameId: string;
+  gameNum: number;
+  wsBase: string;
+  names: string[];
+  nums: (number | null)[];
+  signedIn: boolean;
+  /** The host's button of the lobby starts the game (the game never starts by itself). */
+  startAction?: (form: FormData) => Promise<void>;
+}) {
   const [lobby, setLobby] = useState<Extract<Server, { t: "lobby" }> | null>(null);
   const [view, setView] = useState<Extract<Server, { t: "view" }> | null>(null);
   const [ended, setEnded] = useState<Extract<Server, { t: "ended" }>["result"] | null>(null);
@@ -120,6 +132,7 @@ export function GameClient({
   // the end-of-round card picked to keep (after passing)
   const [pickedOffer, setPickedOffer] = useState<string | null>(null);
   const [pickedCover, setPickedCover] = useState<CoverChoice | null>(null);
+  const [pickedMark, setPickedMark] = useState<string | null>(null);
   const [pickedExertian, setPickedExertian] = useState<string | null>(null);
   const [xenoResearch, setXenoResearch] = useState(false);
   // the quick start cards picked to keep (two at once)
@@ -228,6 +241,7 @@ export function GameClient({
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
+          setPickedMark(null);
           setChosenProbe(null);
           setPickedSlot(null);
           setPickedGold(null);
@@ -331,20 +345,11 @@ export function GameClient({
   }, []);
 
   if (view === null) {
-    return (
+    return lobby ? (
+      <LobbyPanel gameId={gameId} lobby={lobby} startAction={startAction} />
+    ) : (
       <section className="card">
-        <h2>{lobby ? "Waiting for players" : "Connecting..."}</h2>
-        {lobby ? (
-          <ol>
-            {lobby.seats.map((s, i) => (
-              <li key={`${i}-${s?.name ?? "free"}`}>
-                {s ? <PlayerLink num={s.num} name={s.name} /> : <span className="muted">free seat</span>}
-                {s?.bot ? <span className="pill">AI</span> : null}
-              </li>
-            ))}
-          </ol>
-        ) : null}
-        {lobby ? <p className="muted">{lobby.rated ? "Rated game." : "Casual game."} The game starts when every seat is taken.</p> : null}
+        <h2>Connecting...</h2>
       </section>
     );
   }
@@ -385,6 +390,7 @@ export function GameClient({
       !placed.has(m) &&
       m.type !== "sandbox" &&
       !isOffer(m) &&
+      m.type !== "choose_tucks" && // the tucks of the simultaneous setup are chosen on the screen of the setup
       m.type !== "setup_lock" && // the lock of the simultaneous setup is the button of its own screen
       !rowMoves.includes(m) &&
       !(m.type === "org_main" && typeof m.tile === "string") && // the tiles of Xenolab are buttons of the main actions
@@ -466,7 +472,7 @@ export function GameClient({
     });
   // The move bar has only the actions of a turn (launch, scan, analyze, pass, end the turn) and the free trade; the question of everything else is
   // asked in the context bar above it, where the answers that are no choice on the board are buttons (skip, yes, no, take the data ...).
-  const BAR_MOVES = new Set(["launch", "scan", "analyze", "pass", "end_turn"]);
+  const BAR_MOVES = new Set(["launch", "scan", "analyze", "pass", "end_turn", "org_free", "org_main"]);
   const barMoves = otherMoves.filter((m) => BAR_MOVES.has(m.type));
   // a free action that moves a probe is no answer for a player with no probe on the map
   // the circles of a mission that a trigger can cover are clicked on the mission card, shown in the context bar
@@ -509,6 +515,21 @@ export function GameClient({
         onPick={setPickedCover}
       />
     ) : null;
+  // EXP-ORG-11: the reward space of the organization board to mark (Cosmos Strategy Group, Helion Assembly) is picked on the strip of its board
+  const myOrg = v.state.players[v.viewer ?? 0]?.organization ?? "";
+  const orgMarkMoves = otherMoves.filter((m) => m.type === "org_mark" && ORG_SPACES[myOrg]?.[String(m.space)] !== undefined);
+  const orgMarkMove = pickedMark === null ? undefined : orgMarkMoves.find((m) => m.space === pickedMark);
+  const orgMarkNode =
+    orgMarkMoves.length > 0 ? (
+      <OrgMarkPick
+        org={myOrg}
+        options={orgMarkMoves.map((m) => String(m.space))}
+        marked={v.state.players[v.viewer ?? 0]?.org_marks ?? []}
+        color={pieceColor(v.state.players[v.viewer ?? 0]?.color)}
+        picked={pickedMark}
+        onPick={(space) => setPickedMark(pickedMark === space ? null : space)}
+      />
+    ) : null;
   // free actions that have their own place (energy for movement: the probe's move; data: the computer and the lower spaces of the player board) are no
   // buttons here: placing data is done on the player board
   // completing a quick mission is a free action: its buttons are in the move bar
@@ -517,6 +538,7 @@ export function GameClient({
     (m) =>
       !BAR_MOVES.has(m.type) &&
       m.type !== "cover" &&
+      !orgMarkMoves.includes(m) &&
       m.type !== "complete_mission" &&
       m.type !== "move_energy" &&
       m.type !== "place_data" &&
@@ -568,6 +590,17 @@ export function GameClient({
   // what the player has picked: on this screen, or kept by the engine from before (a reload) until the lock
   const simulOrg = pickedOffer ?? me?.setup_org ?? null;
   const simulCards = pickedQuick.length > 0 ? pickedQuick : (me?.setup_quick ?? []);
+  // EXP-ORG-07, EXP-ORG-14: then the cards to tuck for income, again all at the same time
+  const tuckMoves = simul ? mine.filter((m) => m.type === "choose_tucks") : [];
+  const tuckNeed = tuckMoves[0] ? quickCards(tuckMoves[0]).length : 0;
+  const tuckHand = [...new Set(tuckMoves.flatMap(quickCards))];
+  const tuckPicked = pickedQuick.length > 0 ? pickedQuick : (me?.setup_tucks ?? []);
+  const lockTucks = () => {
+    const cards = tuckMoves.find((m) => quickCards(m).length === tuckNeed && quickCards(m).every((c) => tuckPicked.includes(c)));
+    if (!cards || v.viewer === null) return;
+    plan.current = [{ type: "setup_lock", seat: v.viewer }];
+    sendAction(cards);
+  };
   const lockIn = () => {
     const org = mine.find((m) => m.type === "choose_org" && offerId(m) === simulOrg);
     const cards = mine.find(
@@ -610,7 +643,7 @@ export function GameClient({
   const ORG_ROW_LABEL: Record<string, string> = {
     mission_relay: "Mission Relay: 2 publicity",
     fenwick_research_center: "Fenwick: 1 publicity",
-    cosmos_strategy_group: "Cosmos Strategy: take it",
+    cosmos_strategy_group: "CSG: take and clear markers",
     futurespan_institute: "Futurespan: token +3 and take it",
   };
   const pickedRowMoves = pickedBuy === null ? [] : rowMoves.filter((m) => m.source === pickedBuy);
@@ -727,6 +760,17 @@ export function GameClient({
       ),
       buttons: [confirm("Confirm", () => play(coverMove))],
       onCancel: () => setPickedCover(null),
+      inContext: true,
+    };
+  } else if (orgMarkMove && orgMarkNode) {
+    ask = {
+      text: (
+        <>
+          Mark the {String(orgMarkMove.space).replaceAll("_", " ")} space? {orgMarkNode}
+        </>
+      ),
+      buttons: [confirm("Confirm", () => play(orgMarkMove))],
+      onCancel: () => setPickedMark(null),
       inContext: true,
     };
   } else if (pendingMove && probe) {
@@ -876,6 +920,7 @@ export function GameClient({
   if (rowMoves.length > 0 && buys.length === 0 && !rowMode)
     hints.push(`Click a card of the display${rowSources.includes("deck") ? " or the deck" : ""}.`);
   if (buys.length > 0) hints.push("Click a card of the display or the deck to buy it for 3 publicity.");
+  if (orgMarkNode) hints.push("Click the reward space of your organization board that you want to mark, or decline.");
   if (coverNode) hints.push("Click the circle of the mission card that you want to cover, or decline.");
   // Arkhos: the overflow space lets the player take the security card of that color into the hand
   const breachDecision = v.state.pending[0]?.kind === "breach" && mine.some((m) => m.type === "breach");
@@ -895,7 +940,12 @@ export function GameClient({
       </span>
     ) : null;
   const contextNode: ReactNode =
-    ask?.text ?? breachNode ?? (coverNode ? <>Cover a circle of a mission? {coverNode}</> : null) ?? techContext ?? probeContext;
+    ask?.text ??
+    breachNode ??
+    (coverNode ? <>Cover a circle of a mission? {coverNode}</> : null) ??
+    (orgMarkNode ? <>Mark a reward space of your organization? {orgMarkNode}</> : null) ??
+    techContext ??
+    probeContext;
   // the answers that are not choices on the board are buttons in the context bar
   const contextActions = ask?.inContext ? (
     <>
@@ -1216,6 +1266,21 @@ export function GameClient({
                   setPickedQuick(simulCards.includes(id) ? simulCards.filter((c) => c !== id) : [...simulCards, id].slice(-simulNeed))
                 }
                 onLock={lockIn}
+                clock={
+                  v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
+                }
+                status={setupStatus(v, names)}
+              />
+            ) : null}
+            {simul && tuckMoves.length > 0 && !ended ? (
+              <SetupTucks
+                hand={tuckHand}
+                picked={tuckPicked}
+                need={tuckNeed}
+                onPick={(id) =>
+                  setPickedQuick(tuckPicked.includes(id) ? tuckPicked.filter((c) => c !== id) : [...tuckPicked, id].slice(-tuckNeed))
+                }
+                onLock={lockTucks}
                 clock={
                   v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
                 }

@@ -21,7 +21,7 @@ import { botVersions, createdRecently } from "@/lib/queries";
 import { RECOVERY_COOKIE, currentUser, showRecoveryCode, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
 import { TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
-import { CLOCK_PRESETS, addBot, createGame, gameMeta, joinGame, leaveGame, removeBot, resignGame } from "@/lib/worker";
+import { CLOCK_PRESETS, addBot, createGame, gameMeta, joinGame, leaveGame, removeBot, resignGame, startGame } from "@/lib/worker";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -277,6 +277,16 @@ export async function resignSoloAction(form: FormData): Promise<void> {
   const meta = (await gameMeta(id)) as { options?: { players?: number } } | null;
   if (meta?.options?.players === 1) await resignGame(user, id); // the Worker checks that the user is the player and that the game is being played
   redirect(`/players/${user.num ?? user.id}`);
+}
+
+/** The host starts the game: the Worker checks that the user is the host and that every seat is taken. */
+export async function startGameAction(form: FormData): Promise<void> {
+  const me = await currentUser();
+  if (me === null) redirect("/login");
+  const id = field(form, "id");
+  const reply = await startGame(me as NonNullable<typeof me>, id);
+  if (!reply.ok) back(await gamePath(id), reply.message);
+  redirect(await gamePath(id));
 }
 
 export async function leaveAction(form: FormData): Promise<void> {

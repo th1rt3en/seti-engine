@@ -91,7 +91,12 @@ def deal(s: GameState, order: list[int]) -> None:
 # the simultaneous setup (EXP-ORG-14, owner 2026-10-23)
 # ---------------------------------------------------------------------------------------------------------------------------------
 
-SETUP_TYPES = frozenset({"choose_org", "choose_quick", "setup_lock", "setup_unlock"})
+SETUP_TYPES = frozenset({"choose_org", "choose_quick", "choose_tucks", "setup_lock", "setup_unlock"})
+
+
+def is_secret_setup(move: Action) -> bool:
+    """A move of the simultaneous setup (it names its seat) is secret from the others (EXP-ORG-14); the older ones were public."""
+    return move["type"] in SETUP_TYPES and "seat" in move
 
 
 def setup_open(s: GameState) -> list[Decision]:
@@ -105,6 +110,10 @@ def setup_moves(s: GameState, d: Decision) -> list[Action]:
     p = s.players[d.player]
     if p.setup_locked:
         return []
+    if d.data.get("step") == "tuck":  # EXP-ORG-07, EXP-ORG-14: the cards to tuck for income, chosen at the same time by all
+        cards = sorted(dict.fromkeys(p.hand))
+        tucks = [{"type": "choose_tucks", "cards": list(c), "seat": p.index} for c in itertools.combinations(cards, p.tucks_owed)]
+        return tucks + ([{"type": "setup_lock", "seat": p.index}] if len(p.setup_tucks) == p.tucks_owed else [])
     out: list[Action] = [{"type": "choose_org", "org": o, "seat": p.index} for o in p.offered_orgs]
     cards = sorted(p.offered_quick)
     keep = min(2, len(cards))
@@ -119,7 +128,12 @@ def setup_all_moves(s: GameState) -> list[Action]:
     somebody else has not locked in (EXP-ORG-14). The last lock resolves the setup at once: a lock and an unlock never cross."""
     open_seats = {d.player for d in setup_open(s)}
     out = [m for d in setup_open(s) for m in setup_moves(s, d)]
-    out += [{"type": "setup_unlock", "seat": p.index} for p in s.players if p.setup_locked and open_seats - {p.index}]
+    tucking = any(q.tucks_owed for q in s.players)  # in the tucks of the setup only those who tuck can unlock
+    out += [
+        {"type": "setup_unlock", "seat": p.index}
+        for p in s.players
+        if p.setup_locked and open_seats - {p.index} and (p.tucks_owed or not tucking)
+    ]
     return out
 
 
@@ -132,15 +146,19 @@ def setup_apply(s: GameState, a: Action, events: Events) -> None:
         p.setup_org = a["org"]
     elif a["type"] == "choose_quick":
         p.setup_quick = list(a["cards"])
+    elif a["type"] == "choose_tucks":
+        p.setup_tucks = list(a["cards"])
     elif a["type"] == "setup_unlock":  # the choices are kept: the player changes them, or locks in again
         p.setup_locked = False
-        s.pending.append(Decision(kind="setup_choice", player=p.index))
+        s.pending.append(Decision(kind="setup_choice", player=p.index, data=tuck_step(p) if p.tucks_owed else {}))
         events.append({"type": "setup_unlocked", "player": p.index})
     else:
         p.setup_locked = True
         s.pending = [d for d in s.pending if not (d.kind == "setup_choice" and d.player == p.index)]
         events.append({"type": "setup_locked", "player": p.index})
-        if not setup_open(s):
+        if not setup_open(s) and any(q.tucks_owed for q in s.players):
+            resolve_tucks(s, events)
+        elif not setup_open(s):
             order = sorted(s.players, key=lambda q: (q.index - s.start_player) % len(s.players))
             for q in order:
                 if s.rival is not None and q.index == s.rival.index:
@@ -151,6 +169,35 @@ def setup_apply(s: GameState, a: Action, events: Events) -> None:
                 events.append({"type": "organization", "player": q.index, "org": q.organization})
             rival_seat = s.rival.index if s.rival is not None else -1
             s.pending = [Decision(kind="setup_start", player=q.index) for q in order if q.index != rival_seat]
+
+
+def tuck_step(p: PlayerState) -> dict[str, Any]:
+    return {"step": "tuck", "number": p.tucks_owed}
+
+
+def open_tucks(s: GameState) -> None:
+    """EXP-ORG-07, EXP-ORG-14: once every start is resolved, the players who tuck cards for income choose them at the same time and lock in
+    (a decision of the same kind as the first choice, so the clocks and the lock work alike). Nobody tucks: the game begins."""
+    if s.phase != "setup" or s.pending or not s.options.simul_setup or any(q.setup_org for q in s.players):
+        return
+    owing = [q for q in s.players if q.tucks_owed]
+    if not owing:
+        if all(q.organization for q in s.players if not (s.rival is not None and q.index == s.rival.index)):
+            s.phase = "play"
+        return
+    for q in owing:
+        q.setup_locked = False
+        s.pending.append(Decision(kind="setup_choice", player=q.index, data=tuck_step(q)))
+
+
+def resolve_tucks(s: GameState, events: Events) -> None:
+    """The last lock of the tucks: the cards are tucked in turn order (EXP-ORG-07, INCOME-01)."""
+    for q in sorted(s.players, key=lambda x: (x.index - s.start_player) % len(s.players)):
+        for cid in q.setup_tucks:
+            effects.tuck_card(s, q, cid)
+            events.append({"type": "tuck", "player": q.index, "card": cid})
+        q.setup_tucks, q.tucks_owed, q.setup_locked = [], 0, False
+    s.phase = "play"
 
 
 def run_starts(s: GameState, events: Events) -> None:
@@ -212,6 +259,9 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
     tucks = min(org["tuck_income_cards"], len(p.hand))
     source = {"kind": "organization", "org": p.organization}
     # EXP-ORG-07: one by one; each says which one of how many it is, so that the page can show "(1/3)"
+    if s.options.simul_setup:  # EXP-ORG-14: the tucks are chosen together once every start is resolved (open_tucks)
+        p.tucks_owed = tucks
+        return
     s.pending[0:0] = [Decision(kind="setup_tuck", player=p.index, source=source, data={"number": k + 1, "of": tucks}) for k in range(tucks)]
 
 

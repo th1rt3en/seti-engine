@@ -12,7 +12,7 @@ import { gameMeta } from "@/lib/worker";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { addBotAction, joinAction, leaveAction, removeBotAction } from "../../actions";
+import { addBotAction, joinAction, leaveAction, removeBotAction, startGameAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -82,28 +82,40 @@ export default async function Game({
           {error}
         </p>
       ) : null}
+      <GameClient
+        gameId={id}
+        gameNum={num}
+        wsBase={loadConfig().workerWsUrl}
+        names={names}
+        nums={meta.seats.map((s) => s?.num ?? null)}
+        signedIn={user !== null}
+        startAction={startGameAction}
+      />
       {isHost && open && models.length > 0 && meta.options.players === 2 ? (
-        <form action={addBotAction} className="card addai">
-          <input type="hidden" name="id" value={id} />
-          <h2>Add an AI player</h2>
-          <label>
-            Version
-            <select name="model">
-              {models.map((m) => (
-                <option key={m.version} value={m.version}>
-                  {m.version} · {describeRecord(records.get(m.version))}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="consent">
-            <input type="checkbox" name="consent" required />
-            <span>I agree that this game is recorded and used to train the AI. A game with an AI is never rated.</span>
-          </label>
-          <button type="submit" className="primary addai-button">
-            Add the AI
-          </button>
-        </form>
+        // the AI is a side option, folded away: most games are played by people
+        <details className="card addai-fold">
+          <summary>Play against an AI instead</summary>
+          <form action={addBotAction} className="addai">
+            <input type="hidden" name="id" value={id} />
+            <label>
+              Version
+              <select name="model">
+                {models.map((m) => (
+                  <option key={m.version} value={m.version}>
+                    {m.version} · {describeRecord(records.get(m.version))}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="consent">
+              <input type="checkbox" name="consent" required />
+              <span>I agree that this game is recorded and used to train the AI. A game with an AI is never rated.</span>
+            </label>
+            <button type="submit" className="secondary addai-button">
+              Add the AI
+            </button>
+          </form>
+        </details>
       ) : null}
       {isHost
         ? meta.seats.flatMap((s, seat) =>
@@ -146,14 +158,6 @@ export default async function Game({
           This game was cancelled. Nobody won or lost and no rating changed. <Link href="/lobby">Back to the lobby</Link>
         </p>
       ) : null}
-      <GameClient
-        gameId={id}
-        gameNum={num}
-        wsBase={loadConfig().workerWsUrl}
-        names={names}
-        nums={meta.seats.map((s) => s?.num ?? null)}
-        signedIn={user !== null}
-      />
       {meta.status === "finished" ? (
         <p>
           <Link href={`/replay/${num}`}>Replay the game</Link>

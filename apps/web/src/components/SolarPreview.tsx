@@ -77,8 +77,8 @@ export function SolarPreview({ view, names, onClose }: { view: View; names: stri
               <image
                 key={n}
                 href={href}
-                x={CENTER.x - size / 2}
-                y={CENTER.y - size / 2}
+                x={CENTER.x - size / 2 + DISC[n].dx}
+                y={CENTER.y - size / 2 + DISC[n].dy}
                 width={size}
                 height={size}
                 className="disc"

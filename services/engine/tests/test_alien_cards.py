@@ -459,6 +459,12 @@ def test_reaching_the_marker_resolves_the_green_part() -> None:
     assert not me(r3).message_cards and "ET.35" in r3.state.discard
 
 
+def test_the_effect_of_a_message_card_names_the_card_as_its_source() -> None:
+    """ALIEN-CEN-03: the decision and the log of the green part say which card it comes from."""
+    r2 = reach(settle(play(world("centaurians"), "ET.35")))
+    assert r2.state.pending[0].source == {"kind": "alien", "species": "centaurians", "what": "card", "card": "ET.35"}
+
+
 def test_a_card_can_turn_into_income_when_its_marker_is_reached() -> None:
     """ET.32, FAQ-C231: the card is tucked and its income is gained at once."""
     s = world("centaurians")

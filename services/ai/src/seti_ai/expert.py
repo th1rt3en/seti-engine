@@ -114,7 +114,7 @@ def positions(
             state = engine.apply(state, move).state
             continue
         res = engine.apply(state, move)
-        if move["type"] not in orgs.SETUP_TYPES:  # secret until all are locked in (EXP-ORG-14)
+        if not orgs.is_secret_setup(move):  # secret until all are locked in (EXP-ORG-14)
             know.update(seat, move, res.events)
             history.append((seat, public_move(move, res.events, seat)))
         state = res.state

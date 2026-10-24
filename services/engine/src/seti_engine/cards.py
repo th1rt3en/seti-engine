@@ -144,8 +144,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
     elif t == "move":
         p.movement += n
     elif t == "rotate":
-        techs.rotate_solar_system(s, events)
-        fire_pushed(s, events)
+        rotate_everything(s, events)  # ROTATE-04, ALIEN-ANO-02: the anomalies resolve after this rotation too
     elif t == "research":
         _research_step(s, p, st, events)
     elif t == "scan_free":

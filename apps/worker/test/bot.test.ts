@@ -49,10 +49,11 @@ describe("an AI in the lobby", () => {
     const r = await t.room.addBot(alice, "v001", true);
     expect(r).toMatchObject({ ok: true });
     const meta = await t.room.meta();
-    expect(meta?.status).toBe("playing");
     expect(meta?.rated).toBe(false);
     expect(meta?.consent).toMatchObject({ by: alice.id });
-    const bots = meta?.seats.filter((s) => s?.bot);
+    expect(meta?.status).toBe("lobby"); // the lobby is full and waits for the host
+    expect(await t.room.startGame(alice)).toEqual({ ok: true });
+    const bots = (await t.room.meta())?.seats.filter((s) => s?.bot);
     expect(bots).toHaveLength(1);
     expect(bots?.[0]).toMatchObject({ name: "AI v001", registered: false, bot: { model: "v001" } });
     await t.room.botIdle();
@@ -95,6 +96,7 @@ describe("an AI playing", () => {
   it("makes the moves of its seat, one request for each, with the whole log and the plan it gave last", async () => {
     const t = await lobbyWithBot(false, 6);
     await t.room.addBot(alice, "v001", true);
+    await t.room.startGame(alice);
     await playOut(t);
     const meta = await t.room.meta();
     expect(meta?.status).toBe("finished");
@@ -113,6 +115,7 @@ describe("an AI playing", () => {
   it("does not hand the seed or any hidden state to anybody but the service (the public meta still hides the seed)", async () => {
     const t = await lobbyWithBot();
     await t.room.addBot(alice, "v001", true);
+    await t.room.startGame(alice);
     expect((await t.room.publicMeta())?.options.seed).toBeUndefined();
     await playOut(t);
     expect(t.bot.requests[0]?.options.seed).toBe(4242);
@@ -122,6 +125,7 @@ describe("an AI playing", () => {
     const t = await lobbyWithBot();
     t.bot.failing = true;
     await t.room.addBot(alice, "v001", true);
+    await t.room.startGame(alice);
     await playOut(t);
     expect((await t.room.log()).length).toBeLessThan(6);
     expect(t.alarms.at(-1)).toBe(t.clock() + BOT_RETRY_MS);
@@ -135,6 +139,7 @@ describe("an AI playing", () => {
   it("a game with an AI is not rated, and the archive says which seat was the model and that the host agreed", async () => {
     const t = await lobbyWithBot(true);
     await t.room.addBot(alice, "v001", true);
+    await t.room.startGame(alice);
     await playOut(t);
     expect(t.sink.ends).toHaveLength(1);
     expect(t.sink.ends[0]?.rec.rated).toBe(false);

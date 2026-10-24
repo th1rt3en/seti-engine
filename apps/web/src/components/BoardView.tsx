@@ -487,8 +487,8 @@ export function BoardView({
             <image
               key={n}
               href={href}
-              x={CENTER.x - size / 2}
-              y={CENTER.y - size / 2}
+              x={CENTER.x - size / 2 + DISC[n].dx}
+              y={CENTER.y - size / 2 + DISC[n].dy}
               width={size}
               height={size}
               className="disc"
@@ -955,7 +955,7 @@ export function BoardView({
                 const href = EXPANSION_BOARDS[`tokens/organelle-token-${ORGANELLE_TOKENS[kind] ?? "back"}`];
                 if (!at || !href) return null;
                 const p = onAlienBoard(i, at[0], at[1]);
-                const size = 114;
+                const size = 80; // the token is smaller than the cell it lies in (the rulebook picture of the board)
                 return (
                   <image key={space} href={href} x={p.x - size / 2} y={p.y - size / 2} width={size} height={size}>
                     <title>{`Organelle on ${space}`}</title>

@@ -65,7 +65,7 @@ def replay(options: Options, actions: list[dict[str, Any]], rng_encoding: str = 
             state = engine.apply(state, move).state
             continue
         res = engine.apply(state, move)
-        if move["type"] not in orgs.SETUP_TYPES:  # the others' choices of the simultaneous setup are secret (EXP-ORG-14)
+        if not orgs.is_secret_setup(move):  # the others' choices of the simultaneous setup are secret (EXP-ORG-14)
             know.update(seat, move, res.events)
             history.append((seat, public_move(move, res.events, seat)))
         state = res.state
@@ -91,6 +91,9 @@ class Lobby:
         lock = next((m for m in view.legal if m["type"] == "setup_lock"), None)
         if lock is not None:
             return dict(lock)
+        tucks = [m for m in view.legal if m["type"] == "choose_tucks"]
+        if tucks:  # EXP-ORG-07: the cards to tuck for income (the model has no score for this move yet: the first choice is kept)
+            return dict(tucks[0])
         scores = brain.logits(view, history, know)
         open_moves = [
             i

@@ -99,10 +99,12 @@ export type SectorWins = number;
 export type SetupLocked = boolean;
 export type SetupOrg = string | null;
 export type SetupQuick = string[];
+export type SetupTucks = string[];
 export type SignalTokens = number;
 export type Techs = string[];
 export type TraceLog = [number, string][];
 export type Tucked = string[];
+export type TucksOwed = number;
 export type Players1 = PlayerState[];
 export type Playing = string | null;
 export type PlutoOwner = number | null;
@@ -426,10 +428,12 @@ export interface PlayerState {
   setup_locked: SetupLocked;
   setup_org: SetupOrg;
   setup_quick: SetupQuick;
+  setup_tucks: SetupTucks;
   signal_tokens: SignalTokens;
   techs: Techs;
   trace_log: TraceLog;
   tucked: Tucked;
+  tucks_owed: TucksOwed;
 }
 export interface ComputerTechs {
   [k: string]: ComputerTech;

@@ -122,6 +122,7 @@ async function game(options: Options = withOrgs, clock: Parameters<ReturnType<ty
   t.conns.push(ca, cb, spec);
   await t.room.init("g1", options, clock, false, alice);
   await t.room.join(bob);
+  await t.room.startGame(alice); // the host starts the game once the lobby is full
   const meta = await t.room.meta();
   const seatOf = (who: typeof alice) => (meta?.seats ?? []).findIndex((s) => s?.id === who.id);
   return { ...t, ca, cb, spec, a: seatOf(alice), b: seatOf(bob) };
@@ -138,6 +139,7 @@ describe("the simultaneous setup", () => {
     const plain = makeRoom({ engine: new SimulEngine() });
     await plain.room.init("g3", { players: 2 } as Options, none, false, alice);
     await plain.room.join(bob);
+    await plain.room.startGame(alice); // the host starts the game once the lobby is full
     expect((await plain.room.meta())?.options.simul_setup).toBeUndefined();
   });
 
@@ -208,6 +210,7 @@ describe("the simultaneous setup", () => {
     t.conns.push(ca);
     await t.room.init("g1", withOrgs, none, false, alice);
     await t.room.addBot(alice, "v001", true);
+    await t.room.startGame(alice);
     await t.room.botIdle();
     const state = (await t.store.get("state")) as GameState;
     const meta = await t.room.meta();

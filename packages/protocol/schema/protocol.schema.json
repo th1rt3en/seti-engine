@@ -1235,6 +1235,13 @@
           "title": "Setup Quick",
           "type": "array"
         },
+        "setup_tucks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Setup Tucks",
+          "type": "array"
+        },
         "signal_tokens": {
           "default": 0,
           "title": "Signal Tokens",
@@ -1271,6 +1278,11 @@
           },
           "title": "Tucked",
           "type": "array"
+        },
+        "tucks_owed": {
+          "default": 0,
+          "title": "Tucks Owed",
+          "type": "integer"
         }
       },
       "required": [
@@ -1312,10 +1324,12 @@
         "setup_locked",
         "setup_org",
         "setup_quick",
+        "setup_tucks",
         "signal_tokens",
         "techs",
         "trace_log",
-        "tucked"
+        "tucked",
+        "tucks_owed"
       ],
       "title": "PlayerState",
       "type": "object"

@@ -47,6 +47,8 @@ export function sourceLabel(src: DecisionSource | null | undefined, stars: strin
       return `exploration card ${String(src.card)}`;
     case "glyph":
       return `${String(src.glyph)} glyph`;
+    case "alien":
+      return src.what === "card" && src.card !== undefined ? cardName(src.card) : null; // the green part of a Centaurian message card (ALIEN-CEN-03)
     default:
       return null;
   }

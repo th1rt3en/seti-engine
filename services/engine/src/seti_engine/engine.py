@@ -878,6 +878,7 @@ def _advance(s: GameState, events: list[dict[str, Any]]) -> None:
     """Run the automatic steps of a turn until the engine needs a choice or the next player's turn begins."""
     while True:
         orgs.run_starts(s, events)  # EXP-ORG-14: the players' starts, one after another, once the choices are locked in
+        orgs.open_tucks(s)  # EXP-ORG-14: then everybody chooses the cards to tuck for income at the same time
         if not s.pending and s.stashed:  # the free action that interrupted the main action is done (FREE-00)
             s.pending, s.stashed = s.stashed, []
             s.free_active = False

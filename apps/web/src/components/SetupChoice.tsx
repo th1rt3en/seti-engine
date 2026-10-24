@@ -104,6 +104,82 @@ export function SetupChoice({
   );
 }
 
+/** The cards that a player tucks for income at the start, chosen by all at the same time (EXP-ORG-07, EXP-ORG-14), locked in like the first choice. */
+export function SetupTucks({
+  hand,
+  picked,
+  need,
+  onPick,
+  onLock,
+  clock,
+  status,
+}: {
+  hand: string[];
+  picked: string[];
+  need: number;
+  onPick: (id: string) => void;
+  onLock: () => void;
+  clock: string | null;
+  status: string;
+}) {
+  const [aside, setAside] = useState(false);
+  if (aside) {
+    return (
+      // biome-ignore lint/a11y/useSemanticElements: a bar, not a section of the page
+      <div className="setupaside" role="region" aria-label="The choice is put aside">
+        <span>
+          Choosing the cards to tuck{clock ? ` · ${clock}` : ""} · {status}
+        </span>
+        <button type="button" className="primary" onClick={() => setAside(false)}>
+          Back to the choice
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div
+      className="setupchoice"
+      // biome-ignore lint/a11y/useSemanticElements: a layer over the board that the page controls itself, not a native <dialog>
+      role="dialog"
+      aria-modal="true"
+      aria-label="Choose the cards to tuck for income"
+    >
+      <div className="setupinner">
+        <h2>Tuck {need === 1 ? "a card" : `${need} cards`} for income</h2>
+        <p className="muted">
+          Everybody tucks at the same time, and nobody sees the others' cards until all of you have locked in. Each tucked card gives its
+          income corner now and at the end of every round. {clock ? <b>Your clock: {clock}. </b> : null}
+          {status}
+        </p>
+        <h3>
+          Your hand ({picked.length} of {need} picked)
+        </h3>
+        <div className="setupcards quick">
+          {hand.map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={picked.includes(id) ? "setupcard chosen" : "setupcard"}
+              aria-pressed={picked.includes(id)}
+              onClick={() => onPick(id)}
+            >
+              <img src={cardImage(id)} alt={`Card ${id}`} />
+            </button>
+          ))}
+        </div>
+        <div className="setupbar">
+          <button type="button" className="secondary big" onClick={() => setAside(true)} title="Hide the choice to look at the board">
+            View the board
+          </button>
+          <button type="button" className="primary big" disabled={picked.length !== need} onClick={onLock}>
+            Lock in my tucks
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** The setup of a game in which everybody chooses at the same time (EXP-ORG-14): the organizations and the quick start cards on one screen, a choice that
  * can be changed until the player locks it in, and who has locked in already. Nothing that anybody chose is shown to the others before all have locked in. */
 export function SetupBoth({

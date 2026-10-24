@@ -81,9 +81,10 @@ export const LABELS: Record<string, Label> = {
   discard: (m) => `Discard ${cardName(m.card)}`,
   take_round_card: (m) => `Take ${cardName(m.card)} from the end-of-round cards`,
   setup_unlock: () => "Change my choices (my clock runs again until I lock in)",
-  setup_lock: () => "Lock in your organization and quick start cards: the others see them when everybody has locked in",
+  setup_lock: () => "Lock in your choices: the others see them when everybody has locked in",
   choose_org: (m) =>
     `Take the organization ${orgName(m.org)}${ORGS[String(m.org)] ? ` (${ORGS[String(m.org)]?.abilities.passive ?? ORGS[String(m.org)]?.abilities.mainAction ?? ""})` : ""}`,
+  choose_tucks: (m) => `Tuck ${((m.cards as string[]) ?? []).map(cardName).join(" and ")} for income`,
   choose_quick: (m) => `Keep the quick start cards ${((m.cards as string[]) ?? []).map(quickText).join(" and ")}`,
   org_free: (m) => orgFreeLabel(m),
   breach: () => "Breach your security card of that color (take it into your hand)",
@@ -212,7 +213,7 @@ export function groupMoves(moves: Move[], pending: boolean, answeringFree = fals
     ];
     return groups.filter((g) => g.moves.length > 0);
   }
-  const main = new Set(["launch", "pass", "orbit", "land", "scan", "research", "analyze", "play_card"]);
+  const main = new Set(["launch", "pass", "orbit", "land", "scan", "research", "analyze", "play_card", "org_main"]);
   const end = new Set(["end_turn", "undo"]);
   const groups = [
     { title: "Main action", moves: moves.filter((m) => main.has(m.type)) },
@@ -357,6 +358,8 @@ export function logText(m: Move): string {
       return "chose an organization"; // what it is stays secret until everybody has locked in (EXP-ORG-14); the log names it then
     case "choose_quick":
       return "chose the quick start cards";
+    case "choose_tucks":
+      return "chose the cards to tuck for income";
     case "setup_lock":
       return "locked in their choices";
     case "setup_unlock":

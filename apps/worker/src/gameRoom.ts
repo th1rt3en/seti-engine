@@ -96,6 +96,7 @@ export class GameRoomDO implements DurableObject {
     }
     if (url.pathname === "/join") return json(await this.room.join(identity));
     if (url.pathname === "/leave") return json(await this.room.leave(identity));
+    if (url.pathname === "/start") return json(await this.room.startGame(identity));
     if (url.pathname === "/bot-add") {
       const b = (await request.json()) as { model?: string; consent?: boolean };
       return json(await this.room.addBot(identity, String(b.model ?? ""), b.consent === true));

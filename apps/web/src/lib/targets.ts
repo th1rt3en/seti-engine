@@ -34,15 +34,15 @@ export const ORG_SPACES: Record<string, Record<string, [number, number]>> = {
 
 /** The nine organelle spaces of the Amoeba board in its picture (777 x 1415, like the base species boards): 6 outer spaces clockwise, 3 inner ones counter-clockwise. */
 export const ORGANELLE_SPACES: Record<string, [number, number]> = {
-  Y1: [310, 191],
-  Y2: [462, 178],
-  B1: [649, 474],
-  B2: [568, 617],
-  P1: [234, 624],
-  P2: [152, 471],
-  IY: [397, 331],
-  IP: [312, 467],
-  IB: [482, 463],
+  Y1: [309, 193],
+  Y2: [475, 187],
+  B1: [648, 468],
+  B2: [567, 625],
+  P1: [234, 633],
+  P2: [144, 483],
+  IY: [395, 334],
+  IP: [313, 477],
+  IB: [480, 480],
 };
 /** The organelle tokens in the order of the engine's data: a random card, 1 data, 1 publicity, 2 points, 4 points. */
 export const ORGANELLE_TOKENS = ["1-card", "1-data", "1-pub", "2-score", "4-score"];
@@ -240,17 +240,8 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       }
     } else if (m.type === "mark_objective") {
       add(i, `task:${String(m.objective)}:${String(m.task)}`, { ...none }, { panel: "objectives" });
-    } else if (m.type === "org_mark" && ORG_SPACES[mineOrg]?.[String(m.space)]) {
-      const at = ORG_SPACES[mineOrg]?.[String(m.space)] ?? [0, 0];
-      add(i, `orgspace:${String(m.space)}`, { ...none, x: at[0], y: at[1], r: 34 }, { panel: "org" });
-    } else if (
-      (m.type === "org_free" && m.card === undefined && m.source === undefined && m.tech === undefined) ||
-      (m.type === "org_main" && m.tile === undefined) || // the tiles of Xenolab are buttons of the main actions
-      m.type === "org_mark" ||
-      m.type === "org_skip"
-    ) {
-      add(i, `org:${i}`, { ...none }, { panel: "org" });
     }
+    // the other moves of an organization (its free actions, its main action, skipping) are buttons of the move bar, not of its board
   });
   return { spots: [...spots.values()], handled };
 }

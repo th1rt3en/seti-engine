@@ -3,7 +3,6 @@ import { cardImage } from "@/lib/cardImages";
 // The organization module (EXP-ORG-*, EXP-QS-*): every player's organization and quick start cards, the neutral quick start cards, the tiles of
 // Xenolab, the reward spaces marked on Cosmos Strategy Group and Helion Assembly, and the card prepared by Futurespan. What the organization can
 // do now (its abilities, the reward space to mark) is offered as highlighted places on its card.
-import { type Move, describeMove } from "@/lib/moves";
 import { ORG_SPACES } from "@/lib/targets";
 import type { View } from "@seti/protocol";
 import { useEffect, useState } from "react";
@@ -11,7 +10,6 @@ import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
 import { OrgName } from "./OrgName";
-import { PanelSpots } from "./PanelSpots";
 import { PlayerName } from "./PlayerName";
 
 const ASSET = expansionAssets as Record<string, string>;
@@ -19,7 +17,6 @@ const TILES = ["launch", "scan", "research"] as const; // tile 1, 2, 3 of Xenola
 
 export function OrgPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
   const s = view.state;
-  const legal = view.legal as Move[];
   const mine = (spots?.items ?? []).filter((sp) => sp.panel === "org");
   // folded until the player opens it; it opens by itself when something is to be done on it (a reward space to mark, an ability to use)
   const [open, setOpen] = useState(false);
@@ -74,9 +71,6 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
                     </g>
                   ) : null,
                 )}
-                {p.index === view.viewer ? (
-                  <PanelSpots spots={spots && { ...spots, items: spots.items.filter((sp) => sp.id.startsWith("orgspace:")) }} panel="org" />
-                ) : null}
               </svg>
             ) : (
               <div className={canAct ? "orgcard selectable" : "orgcard"}>
@@ -108,23 +102,6 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
                 {p.quick_start.map((c) => (
                   <CardImage key={c} id={c} width={100} />
                 ))}
-              </div>
-            ) : null}
-            {canAct ? (
-              <div className="chips">
-                {mine
-                  .filter((sp) => !sp.id.startsWith("orgspace:"))
-                  .map((sp) => (
-                    <button
-                      key={sp.id}
-                      type="button"
-                      className={spots?.selected === sp.id ? "chip chosen" : "chip"}
-                      aria-pressed={spots?.selected === sp.id}
-                      onClick={() => spots?.onSelect(sp.id)}
-                    >
-                      {describeMove(legal[sp.move] as Move)}
-                    </button>
-                  ))}
               </div>
             ) : null}
           </div>

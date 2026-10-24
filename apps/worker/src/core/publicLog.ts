@@ -12,7 +12,7 @@ export interface PublicEntry {
 
 /** The choices of the simultaneous setup stay secret from the other players (EXP-ORG-14): the organization and the quick start cards are shown by the
  * engine when everybody has locked in (the events), not by these moves. */
-const SECRET_CHOICES = new Set(["choose_org", "choose_quick"]);
+const SECRET_CHOICES = new Set(["choose_org", "choose_quick", "choose_tucks"]);
 
 /** Actions whose `card` is not shown to the other players. */
 const HIDDEN_CARD_ACTIONS = new Set(["tuck", "take_round_card", "play_exertian", "pol_pick"]);

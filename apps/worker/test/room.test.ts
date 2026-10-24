@@ -10,6 +10,7 @@ async function started(rated = false, last = 6) {
   const t = makeRoom({ last });
   await t.room.init("g1", two, none, rated, alice);
   await t.room.join(bob);
+  await t.room.startGame(alice); // the host starts the game once the lobby is full
   return t;
 }
 
@@ -23,6 +24,7 @@ describe("lobby", () => {
     await t.room.init("g1", two, none, false, alice);
     expect((await t.room.meta())?.status).toBe("lobby");
     const j = await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     expect(j).toMatchObject({ ok: true, seat: 1 });
     const meta = await t.room.meta();
     expect(meta?.status).toBe("playing");
@@ -56,6 +58,7 @@ describe("lobby", () => {
     t.conns.push(c);
     await t.room.init("g", { players: 3 } as Options, none, false, alice);
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     expect(await t.room.leave(bob)).toEqual({ ok: true });
     expect((await t.room.meta())?.seats[1]).toBeNull();
     await t.room.leave(alice);
@@ -71,13 +74,16 @@ describe("lobby", () => {
     await t.room.init("g", { players: 4 } as Options, none, false, alice);
     expect((await t.room.meta())?.host).toBe(alice.id);
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     await t.room.join(cy);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     await t.room.leave(alice);
     expect((await t.room.meta())?.host).toBe(bob.id);
     await t.room.leave(bob);
     expect((await t.room.meta())?.host).toBe(cy.id);
     // a player who rejoins goes to the back of the line
     await t.room.join(alice);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     await t.room.leave(cy);
     const meta = await t.room.meta();
     expect(meta?.host).toBe(alice.id);
@@ -91,6 +97,7 @@ describe("lobby", () => {
     await t.room.init("g", { players: 3 } as Options, none, false, alice);
     expect(c.last("lobby")).toMatchObject({ host: "Alice" });
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     await t.room.leave(alice);
     expect(c.last("lobby")).toMatchObject({ host: "Bob" });
   });
@@ -119,6 +126,7 @@ describe("play", () => {
     const t = makeRoom();
     await t.room.init("g1", two, none, false, { ...alice, num: 7 });
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     const s = new Conn("s", null);
     t.conns.push(s);
     await t.room.submit({ ...alice, num: 7 }, 0, { type: "score" }).catch(() => undefined); // any move makes the room send the view
@@ -249,6 +257,7 @@ describe("the end of a game", () => {
     const t = makeRoom({ last: 1000 });
     await t.room.init("g", two, { kind: "per_turn", ms: 60_000 }, false, alice);
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     expect(t.alarms.at(-1)).toBe(t.clock() + 60_000);
     await t.room.onAlarm();
     expect((await t.room.meta())?.status).toBe("playing"); // not yet
@@ -264,6 +273,7 @@ describe("the end of a game", () => {
     const t = makeRoom({ last: 1000 });
     await t.room.init("g", two, { kind: "bank", initialMs: 10_000, incrementMs: 1000 }, false, alice);
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     t.advance(4000);
     await t.room.submit(alice, 0, { type: "score" });
     const c = new Conn("a", alice.id);
@@ -278,25 +288,27 @@ describe("the lobby list", () => {
     const t = makeRoom();
     await t.room.init("g", { players: 3 } as Options, none, false, alice);
     await t.room.join(bob);
+    await t.room.startGame(alice); // the host starts the game once the lobby is full
     await t.room.leave(bob);
     expect(t.sink.lobbies.map((m) => m.seats.filter((s) => s !== null).length)).toEqual([1, 2, 1]);
   });
 });
 
 describe("a failing engine", () => {
-  it("gives the seat back when the game cannot be started", async () => {
+  it("keeps the lobby when the game cannot be started: the host tries again", async () => {
     const t = makeRoom();
     await t.room.init("g", two, none, false, alice);
+    await t.room.join(bob);
     const engine = (t as unknown as { room: { d: { engine: { newGame: () => Promise<never> } } } }).room.d.engine;
     const good = engine.newGame;
     engine.newGame = async () => {
       throw new Error("engine down");
     };
-    await expect(t.room.join(bob)).rejects.toThrow("engine down");
-    expect((await t.room.meta())?.seats[1]).toBeNull();
+    await expect(t.room.startGame(alice)).rejects.toThrow("engine down");
     expect((await t.room.meta())?.status).toBe("lobby");
+    expect((await t.room.meta())?.seats.every((s) => s !== null)).toBe(true);
     engine.newGame = good;
-    expect(await t.room.join(bob)).toMatchObject({ ok: true, seat: 1 });
+    expect(await t.room.startGame(alice)).toEqual({ ok: true });
     expect((await t.room.meta())?.status).toBe("playing");
   });
 });
@@ -322,5 +334,50 @@ describe("an administrator cancels a game", () => {
     const done = await started(false, 1);
     await done.room.resign(alice);
     expect(await done.room.adminCancel()).toMatchObject({ ok: false, code: "not_open" });
+  });
+});
+
+describe("the host starts the game", () => {
+  it("a full lobby waits: only the host can start it, and only when every seat is taken", async () => {
+    const t = makeRoom();
+    await t.room.init("g", { players: 3 } as Options, none, false, alice);
+    await t.room.join(bob);
+    expect(await t.room.startGame(alice)).toMatchObject({ ok: false, code: "not_full" });
+    await t.room.join(cy);
+    expect((await t.room.meta())?.status).toBe("lobby"); // full, and still not started
+    expect(await t.room.startGame(bob)).toMatchObject({ ok: false, code: "not_host" });
+    expect((await t.room.meta())?.status).toBe("lobby");
+    expect(await t.room.startGame(alice)).toEqual({ ok: true });
+    expect((await t.room.meta())?.status).toBe("playing");
+    expect(await t.room.startGame(alice)).toMatchObject({ ok: false, code: "not_in_lobby" });
+  });
+
+  it("tells each connection the settings, the host, its own seat and whether the lobby is full", async () => {
+    const t = makeRoom();
+    const ca = new Conn("a", alice.id);
+    const cb = new Conn("b", bob.id);
+    const spec = new Conn("s", null);
+    t.conns.push(ca, cb, spec);
+    await t.room.init("g", { players: 2, expansion: true, seed: 5 } as Options, none, true, alice);
+    await t.room.connect(ca);
+    await t.room.connect(spec);
+    await t.room.join(bob);
+    type Lobby = Extract<ServerMessage, { t: "lobby" }>;
+    const last = (c: Conn) => c.last("lobby") as Lobby;
+    expect(last(ca)).toMatchObject({ hostSeat: 0, you: 0, full: true, rated: true });
+    expect(last(cb)).toMatchObject({ hostSeat: 0, you: 1, full: true });
+    expect(last(spec)).toMatchObject({ you: null, full: true });
+    expect(last(ca).options).toMatchObject({ players: 2, expansion: true });
+    expect(last(ca).options).not.toHaveProperty("seed"); // the seed is secret
+  });
+
+  it("the host leaving gives the start to the next player", async () => {
+    const t = makeRoom();
+    await t.room.init("g", two, none, false, alice);
+    await t.room.join(bob);
+    await t.room.leave(alice);
+    expect(await t.room.startGame(alice)).toMatchObject({ ok: false });
+    await t.room.join(cy);
+    expect(await t.room.startGame(bob)).toEqual({ ok: true }); // bob is the host now
   });
 });

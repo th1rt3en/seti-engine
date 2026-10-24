@@ -126,7 +126,7 @@ def examples_from_log(
                 tokens = features.encode_view(view, history if memory else None, know if memory else None)
                 out.policy.append(PolicyExample(tokens, toks, nums, chosen, _w(policy_weight, seat)))
         res = engine.apply(state, move)
-        if move["type"] not in orgs.SETUP_TYPES:  # the choices of the simultaneous setup are secret until all are locked in (EXP-ORG-14)
+        if not orgs.is_secret_setup(move):  # the choices of the simultaneous setup are secret until all are locked in (EXP-ORG-14)
             know.update(seat, move, res.events)
             history.append((seat, public_move(move, res.events, seat)))
         state = res.state

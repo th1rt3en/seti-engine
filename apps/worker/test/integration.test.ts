@@ -32,6 +32,7 @@ async function play(options: Options, ids = [alice, bob]) {
   const room = new GameRoom(deps);
   await room.init("g", options, { kind: "none" }, false, ids[0] as typeof alice);
   for (const who of ids.slice(1)) await room.join(who);
+  await room.startGame(ids[0] as typeof alice); // the host starts the game once the lobby is full
   let n = 0;
   let seed = 7;
   const rnd = () => {
@@ -40,15 +41,18 @@ async function play(options: Options, ids = [alice, bob]) {
   };
   while ((await room.meta())?.status === "playing") {
     const seats = conns.map((c) => c.last("view") as Extract<ServerMessage, { t: "view" }>);
-    const view = seats.find((v) => (v.view as View).legal.length > 0);
+    // a player who has locked in only may unlock (EXP-ORG-14): somebody who is asked comes first, or the game would never go on
+    const view =
+      seats.find((v) => (v.view as View).legal.length > 0 && (v.view.acting ?? []).includes(v.view.viewer as number)) ??
+      seats.find((v) => (v.view as View).legal.length > 0);
     expect(view, "someone must be able to act").toBeDefined();
     const v = view as Extract<ServerMessage, { t: "view" }>;
     const actor = v.view.to_act as number;
     const legal = v.view.legal;
     const move = legal[rnd() % legal.length] as Record<string, unknown>;
-    const mover = (await room.meta())?.seats[actor] as typeof alice;
+    const mover = (await room.meta())?.seats[typeof move.seat === "number" ? move.seat : actor] as typeof alice; // the setup moves name their seat
     const res = await room.submit(mover, v.seq, move);
-    expect(res).toEqual({ ok: true });
+    expect(res, JSON.stringify(move)).toEqual({ ok: true });
     n++;
     expect(n).toBeLessThan(5000);
   }
@@ -101,7 +105,7 @@ describe.skipIf(!url)("a game through the room and the real engine", () => {
     expect(meta?.options.simul_setup).toBe(true);
     const log = await g.room.log();
     const locks = log.filter((e) => e.action.type === "setup_lock");
-    expect(locks).toHaveLength(2);
+    expect(locks.length).toBeGreaterThanOrEqual(2); // the first choice, and the tucks if the organizations have any
     // both choices were made before the first lock, in any seat order, and each move names its own seat
     const firstLock = log.findIndex((e) => e.action.type === "setup_lock");
     expect(log.slice(0, firstLock).every((e) => e.action.seat === e.seat)).toBe(true);

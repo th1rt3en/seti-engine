@@ -67,7 +67,7 @@ def resolve_message(s: GameState, p: PlayerState, target: int, events: Events) -
             effects.gain_income_resource(s, p, tables.cards()[mc.card]["income"])  # FAQ-C231: the increase pays at once
             became_income = True
         else:
-            with trail.scope(s, {"kind": "alien", "species": "centaurians", "what": "card"}):
+            with trail.scope(s, {"kind": "alien", "species": "centaurians", "what": "card", "card": mc.card}):
                 rewards.grant(s, p, [r], events)
     if not became_income:
         s.discard.append(mc.card)

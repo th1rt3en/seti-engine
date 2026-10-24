@@ -131,6 +131,8 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
       return `Quick start card ${String(src.card)}`;
     case "rival_turn":
       return "The rival's turn";
+    case "alien":
+      return src.what === "card" && src.card !== undefined ? `Message card ${cardName(src.card)}` : cap(src.kind);
     default:
       return cap(src.kind.replace(/_/g, " "));
   }

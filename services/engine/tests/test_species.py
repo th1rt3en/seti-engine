@@ -192,6 +192,21 @@ def test_a_research_rotation_checks_the_anomalies() -> None:
     assert any(e["type"] == "rotate" for e in r.events)
 
 
+def test_a_card_that_rotates_the_solar_system_checks_the_anomalies() -> None:
+    """ALIEN-ANO-02: the rotation of a card (Planetary Geologic Mapping) sets off the anomaly that Earth reaches, like any rotation."""
+    from seti_engine import cards  # noqa: PLC0415
+
+    s = discover(game(), 0).state.model_copy(deep=True)
+    ahead = s.model_copy(deep=True)
+    solar.rotate(ahead)
+    reached = solar.earth(ahead)[1]  # where Earth is after the rotation
+    s.species[0].extra["tokens"] = [{"sector": reached, "color": "pink", "side": 0}]
+    s.species[0].board["pink"][0] = [0]
+    ev: list[dict[str, Any]] = []
+    cards.run_step(s, s.players[0], {"t": "rotate"}, ev)
+    assert [x["player"] for x in ev if x["type"] == "anomaly"] == [0]
+
+
 # --- Centaurians -----------------------------------------------------------------------------------------------------------------
 
 

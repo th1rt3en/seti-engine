@@ -72,6 +72,10 @@ All players choose the organization and the quick start cards at the same time, 
 choices of the others are not shown (views, log) until all have locked in. Then the starts run in turn order. The option `simul_setup` is set when a game with
 organizations and 2 or more players starts; games started before keep the choices one after another (their logs replay as they were). The AI chooses at once on its own view.
 
+## The income tucks are chosen at the same time too, 2026-10-24 (EXP-ORG-14)
+
+Owner: "tucking cards for income as part of org/quickstart selection should also be simultaneous". Because the cards to tuck depend on the draws of the starts (EXP-ORG-07: resources, then tucks), the tucks are a second simultaneous step after the starts are resolved: the same decision (`setup_choice`, `data.step = "tuck"`), the move `choose_tucks` and the same lock, unlock and clocks.
+
 ## Unlocking in the simultaneous setup, 2026-10-23 (EXP-ORG-14)
 
 A player who has locked in may unlock to change the organization or the quick start cards, for as long as at least one other player has not locked in (the last lock ends the

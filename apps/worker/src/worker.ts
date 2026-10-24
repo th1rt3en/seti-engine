@@ -2,6 +2,7 @@
 //   POST /games                 create a game (token), body {options, clock, rated}; answers {id}
 //   POST /games/:id/join        take a seat (token)
 //   POST /games/:id/leave       leave the lobby (token)
+//   POST /games/:id/start       the host starts the game once every seat is taken (token)
 //   POST /games/:id/bot-add     the host adds an AI to the lobby (token), body {model, consent: true}
 //   POST /games/:id/bot-remove  the host removes an AI from the lobby (token), body {seat}
 //   POST /games/:id/resign      resign a game that is being played (token; the website uses it for "resign" on the profile page)
@@ -113,7 +114,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     }
     if (action === "" && request.method === "GET") return forward(stub, "/meta", headers);
     if ((action === "log" || action === "replay") && request.method === "GET") return forward(stub, `/${action}`, headers);
-    if ((action === "join" || action === "leave" || action === "resign") && request.method === "POST")
+    if ((action === "join" || action === "leave" || action === "start" || action === "resign") && request.method === "POST")
       return forward(stub, `/${action}`, headers, "POST");
     if ((action === "bot-add" || action === "bot-remove") && request.method === "POST") {
       return stub.fetch(`https://room/${action}`, {

@@ -137,6 +137,9 @@ class PlayerState(BaseModel):
     setup_org: str | None = None
     setup_quick: list[str] = Field(default_factory=list)
     setup_locked: bool = False
+    # EXP-ORG-14: the income tucks are chosen together too: how many the player owes, and the cards chosen (secret until all lock in)
+    tucks_owed: int = 0
+    setup_tucks: list[str] = Field(default_factory=list)
     org_used: bool = False  # the once per round ability has been used this round (EXP-ORG-10)
     org_marks: list[str] = Field(default_factory=list)  # reward spaces marked on Cosmos Strategy Group or Helion Assembly (EXP-ORG-11)
     org_data: dict[str, Any] = Field(

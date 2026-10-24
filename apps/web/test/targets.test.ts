@@ -140,9 +140,10 @@ describe("the places of the Space Agencies expansion", () => {
     expect(spots.find((s) => s.id === "organelle:IB")?.panel).toBeUndefined(); // on the Amoeba board, on the game board
     expect(spots.find((s) => s.id === "amoeba:pink:0")?.panel).toBeUndefined();
     expect(spots.find((s) => s.id.startsWith("od:"))?.panel).toBeUndefined(); // on the board itself
-    expect(spots.find((s) => s.id === "org:5")?.panel).toBe("org");
+    expect(spots.find((s) => s.id === "org:5")).toBeUndefined(); // the free and main actions of an organization are buttons of the move bar
+    expect(handled.has(5)).toBe(false);
     expect(handled.has(6)).toBe(false);
-    expect([...handled].sort()).toEqual([0, 1, 2, 3, 4, 5]);
+    expect([...handled].sort()).toEqual([0, 1, 2, 3, 4]);
   });
 
   it("leaves the breach of a security card to the context bar (no place on the board)", () => {
@@ -172,13 +173,13 @@ describe("the special marker of the Centaurians", () => {
 });
 
 describe("the reward spaces on an organization board", () => {
-  it("are places on the card of the player's own organization", () => {
+  it("are picked on the strip of the board in the context bar, not as places of the game board", () => {
     const v = view([{ type: "org_mark", space: "data" }, { type: "org_skip" }], [null, null]);
     (v as unknown as { viewer: number }).viewer = 0;
     (v.state as unknown as { players: unknown[] }).players = [{ organization: "cosmos_strategy_group" }];
     const { spots, handled } = buildSpots(v);
-    expect(spots.map((s) => s.id)).toEqual(["orgspace:data", "org:1"]); // "do not mark" is a chip on the organization panel
-    expect(handled.has(0)).toBe(true);
+    expect(spots).toEqual([]);
+    expect(handled.size).toBe(0);
   });
 });
 

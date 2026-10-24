@@ -140,6 +140,12 @@ export type ServerMessage =
   | {
       t: "lobby";
       status: Status;
+      /** The seat of the host, the seat of this connection (null: not seated) and whether every seat is taken: the host may then start the game. */
+      hostSeat: number;
+      you: number | null;
+      full: boolean;
+      /** The settings of the game (the seed is not part of them). */
+      options: Options;
       seats: ({ name: string; num?: number; bot?: true } | null)[];
       host: string | null;
       rated: boolean;
@@ -260,22 +266,28 @@ export class GameRoom {
     await this.markSeen(who.id);
     await this.d.store.put("meta", meta);
     await this.d.sink.recordLobby(meta);
-    const lobbySeats = [...meta.seats];
-    if (meta.seats.every((s) => s !== null)) {
+    await this.broadcastLobby(meta); // a full lobby waits for the host to start the game (startGame)
+    return { ok: true, seat: free };
+  }
+
+  /** The host starts the game once every seat is taken (the lobby never starts it by itself). */
+  startGame(who: Identity): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby");
+      if (meta.host !== who.id) return fail("not_host", "only the host can start the game");
+      if (meta.seats.some((s) => s === null)) return fail("not_full", "the game starts when every seat is taken");
+      const before = structuredClone(meta);
       try {
         await this.start(meta);
       } catch (e) {
-        // the engine could not start the game: give the seat back so that the player can try again
-        meta.status = "lobby";
-        meta.seats = lobbySeats;
-        (meta.seats as (Identity | null)[])[free] = null;
-        meta.joined = meta.joined.filter((id) => id !== who.id);
-        await this.d.store.put("meta", meta);
-        await this.d.sink.recordLobby(meta);
+        // the engine could not start the game: it stays in its lobby, and the host can try again
+        await this.d.store.put("meta", before);
+        await this.d.sink.recordLobby(before);
         throw e;
       }
-    } else await this.broadcastLobby(meta);
-    return { ok: true, seat: free };
+      return { ok: true };
+    });
   }
 
   leave(who: Identity): Promise<SubmitResult> {
@@ -311,19 +323,7 @@ export class GameRoom {
       meta.consent ??= { by: who.id, at: this.d.now() };
       await this.d.store.put("meta", meta);
       await this.d.sink.recordLobby(meta);
-      if (meta.seats.every((s) => s !== null)) {
-        const before = [...meta.seats];
-        try {
-          await this.start(meta);
-        } catch (e) {
-          meta.status = "lobby";
-          meta.seats = before;
-          meta.seats[free] = null;
-          await this.d.store.put("meta", meta);
-          await this.d.sink.recordLobby(meta);
-          throw e;
-        }
-      } else await this.broadcastLobby(meta);
+      await this.broadcastLobby(meta);
       return { ok: true, seat: free };
     });
   }
@@ -778,7 +778,7 @@ export class GameRoom {
       conn.send({ t: "error", code: "unknown_game", message: "no such game" });
       return;
     }
-    if (meta.status === "lobby") conn.send(lobbyMessage(meta));
+    if (meta.status === "lobby") conn.send(lobbyMessage(meta, conn.who));
     else {
       await this.sendView(conn, meta);
       // the log goes in pieces of LOG_CHUNK moves: a long game (a solo rival can play several turns in one move) would make one very large message
@@ -820,7 +820,7 @@ export class GameRoom {
   }
 
   private async broadcastLobby(meta: Meta): Promise<void> {
-    for (const c of this.d.connections()) c.send(lobbyMessage(meta));
+    for (const c of this.d.connections()) c.send(lobbyMessage(meta, c.who));
   }
 
   async log(): Promise<LogEntry[]> {
@@ -857,10 +857,17 @@ function fail(code: string, message: string): { ok: false; code: string; message
   return { ok: false, code, message };
 }
 
-function lobbyMessage(meta: Meta): ServerMessage {
+/** What a connection sees of the lobby: the seats, the settings of the game, who the host is and which seat is the connection's own. */
+function lobbyMessage(meta: Meta, who: string | null = null): ServerMessage {
+  const { seed: _seed, ...options } = meta.options;
+  const you = who === null ? -1 : meta.seats.findIndex((s) => s?.id === who);
   return {
     t: "lobby",
     status: meta.status,
+    hostSeat: meta.seats.findIndex((s) => s?.id === meta.host),
+    you: you >= 0 ? you : null,
+    full: meta.seats.every((s) => s !== null),
+    options: options as Meta["options"],
     seats: meta.seats.map((s) =>
       s === null ? null : s.bot ? { name: s.name, bot: true as const } : { name: s.name, ...(s.num === undefined ? {} : { num: s.num }) },
     ),

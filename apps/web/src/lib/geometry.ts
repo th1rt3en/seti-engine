@@ -11,10 +11,12 @@ export const CENTER = { x: 1752.5, y: 3062.6 };
 
 /** The three discs are scans of different resolution: board pixels per image pixel, and the size of each image. */
 export const DISC = {
-  1: { scale: 1.886, size: 396 },
-  2: { scale: 1.886, size: 608 },
-  3: { scale: 1.54, size: 1008 },
+  1: { scale: 1.886, size: 396, dx: 0, dy: 0 },
+  2: { scale: 1.886, size: 608, dx: 6, dy: -2 },
+  3: { scale: 1.54, size: 1008, dx: -9, dy: 9 },
 } as const;
+// `dx`, `dy`: where the printed circles of a disc lie off the middle of its scan (board pixels, measured on the thin ring lines of each scan against the
+// printed circles of the base board); the disc is moved by that much and turns about the centre of the board, so that the rings meet at every turn.
 
 /** Sector `s` covers 45 s to 45 s + 45 degrees counter-clockwise from the 3 o'clock direction (the engine's convention, BOARD-10). */
 export const sectorDegrees = (sector: number): number => 22.5 + 45 * sector;

@@ -89,9 +89,11 @@ def test_the_last_lock_makes_the_choices_public_and_the_starts_run_in_turn_order
     announced = [e["player"] for e in r.events if e["type"] == "organization"]
     assert sorted(announced) == [0, 1]
     assert all(p.organization is not None and p.setup_org is None and p.offered_orgs == [] for p in r.state.players)
-    first = r.state.start_player
-    assert r.state.pending[0].player == first and r.state.pending[0].kind == "setup_tuck"  # the first player's own tucks come first
-    assert not any(d.kind in ("setup_choice", "setup_start") and d.player == first for d in r.state.pending)
+    # EXP-ORG-07, EXP-ORG-14: the starts are done; now everybody who tucks cards chooses them at the same time
+    assert r.state.phase == "setup" and all(d.kind == "setup_choice" and d.data["step"] == "tuck" for d in r.state.pending)
+    owing = {p.index for p in r.state.players if p.tucks_owed}
+    assert {d.player for d in r.state.pending} == owing == set(projection.acting(r.state))
+    assert not any(d.kind == "setup_start" for d in r.state.pending)
 
 
 def dump(state: GameState) -> dict[str, Any]:
@@ -104,8 +106,14 @@ def dump(state: GameState) -> dict[str, Any]:
 
 
 def finish_tucks(r: StepResult) -> StepResult:
+    """The tucks: the simultaneous ones (the first cards of the hand, then the lock) or the one-by-one ones of the older flow."""
     while r.state.phase == "setup":
-        r = apply(r.state, r.legal[0])
+        if r.state.pending[0].kind == "setup_choice":
+            seat = r.state.pending[0].player
+            r = apply(r.state, pick(r, seat, "choose_tucks"))
+            r = apply(r.state, pick(r, seat, "setup_lock"))
+        else:
+            r = apply(r.state, min((m for m in r.legal if m["type"] == "tuck"), key=lambda m: m["card"]))
     return r
 
 
@@ -129,10 +137,12 @@ def test_the_result_is_the_same_as_when_the_choices_were_made_one_after_another(
         seq = apply(seq.state, {"type": "choose_org", "org": org["org"]})
         seq = apply(seq.state, {"type": "choose_quick", "cards": quick["cards"]})
         while seq.state.pending and seq.state.pending[0].kind == "setup_tuck":
-            seq = apply(seq.state, seq.legal[0])
+            seq = apply(seq.state, min((m for m in seq.legal if m["type"] == "tuck"), key=lambda m: m["card"]))
     seq = finish_tucks(seq)
     assert simul.state.phase == "play" and seq.state.phase == "play"
-    assert dump(simul.state) == dump(seq.state)
+    # the tucks come after all the starts now, so what is drawn by income may differ; the choices and their effects are the same
+    for a, b in zip(simul.state.players, seq.state.players, strict=True):
+        assert (a.organization, a.quick_start, len(a.tucked)) == (b.organization, b.quick_start, len(b.tucked))
 
 
 def test_the_flag_is_off_by_default_and_needs_the_organizations() -> None:
@@ -179,7 +189,7 @@ def test_a_lock_and_an_unlock_that_cross_end_the_same_way_in_either_order() -> N
     base = r
     # the lock of seat 0 first: the setup is resolved, the unlock of seat 1 is then refused
     a = apply(base.state, {"type": "setup_lock", "seat": 0})
-    assert a.state.phase in ("setup", "play") and not any(d.kind == "setup_choice" for d in a.state.pending)
+    assert not any(d.kind == "setup_choice" and not d.data for d in a.state.pending)  # only the tucks are left to choose
     with pytest.raises(IllegalAction):
         apply(a.state, {"type": "setup_unlock", "seat": 1})
     # the unlock of seat 1 first: both choose again; the lock of seat 0 then waits for seat 1
@@ -187,4 +197,50 @@ def test_a_lock_and_an_unlock_that_cross_end_the_same_way_in_either_order() -> N
     b = apply(b.state, {"type": "setup_lock", "seat": 0})
     assert [d.player for d in b.state.pending] == [1] and not b.state.players[1].setup_locked
     b = apply(b.state, {"type": "setup_lock", "seat": 1})
-    assert not any(d.kind == "setup_choice" for d in b.state.pending)
+    assert not any(d.kind == "setup_choice" and not d.data for d in b.state.pending)
+
+
+def at_tucks(players: int = 2, seed: int = 7) -> StepResult:
+    r = new(players, seed)
+    for seat in range(players):
+        r = lock_in(r, seat)
+    return r
+
+
+def test_the_tucks_are_chosen_together_in_secret_and_tucked_when_all_have_locked_in() -> None:  # EXP-ORG-07, EXP-ORG-14
+    r = at_tucks()
+    seats = [d.player for d in r.state.pending]
+    assert seats and all(m["seat"] in seats for m in r.legal)
+    first, second = seats[0], seats[-1]
+    r = apply(r.state, pick(r, second, "choose_tucks"))
+    chosen = r.state.players[second].setup_tucks
+    assert len(chosen) == r.state.players[second].tucks_owed
+    assert projection.project(r.state, first, previews=False).state.players[second].setup_tucks == []  # nobody else sees them
+    assert r.state.players[second].tucked == []  # nothing is tucked yet
+    r = apply(r.state, pick(r, second, "setup_lock"))
+    if first != second:
+        assert r.state.phase == "setup" and r.state.players[second].tucked == []
+        r = apply(r.state, pick(r, first, "choose_tucks"))
+        r = apply(r.state, pick(r, first, "setup_lock"))
+    assert r.state.phase == "play" and not r.state.pending
+    assert [e["player"] for e in r.events if e["type"] == "tuck"]  # announced when the last one locks in
+    assert all(p.setup_tucks == [] and p.tucks_owed == 0 for p in r.state.players)
+    assert all(len(p.tucked) >= 1 for p in r.state.players if p.organization != "xenolab")
+
+
+def test_a_tuck_needs_the_exact_number_of_cards_and_can_be_changed_or_unlocked() -> None:  # EXP-ORG-07, EXP-ORG-14
+    r = at_tucks(3)
+    seats = [d.player for d in r.state.pending]
+    seat = seats[0]
+    assert not any(m["type"] == "setup_lock" and m["seat"] == seat for m in r.legal)  # nothing chosen yet
+    a, b = [m for m in r.legal if m["type"] == "choose_tucks" and m["seat"] == seat][:2]
+    assert len(a["cards"]) == r.state.players[seat].tucks_owed
+    r = apply(r.state, a)
+    r = apply(r.state, b)  # changed its mind
+    assert r.state.players[seat].setup_tucks == b["cards"]
+    r = apply(r.state, pick(r, seat, "setup_lock"))
+    if len(seats) > 1:
+        assert any(m["type"] == "setup_unlock" and m["seat"] == seat for m in r.legal)
+        r = apply(r.state, pick(r, seat, "setup_unlock"))
+        assert r.state.pending[-1].data["step"] == "tuck"  # it chooses its tucks again, not its organization
+        assert any(m["type"] == "choose_tucks" and m["seat"] == seat for m in r.legal)
