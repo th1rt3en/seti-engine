@@ -210,7 +210,7 @@ export default async function Player({
                       </ol>
                     )}
                   </td>
-                  <td>{g.score ?? "—"}</td>
+                  <td>{o.players === 1 ? (g.score ?? "—") : null}</td>
                   <td>
                     {h ? (
                       <span className={h.rating_after >= h.rating_before ? "up" : "down"}>
