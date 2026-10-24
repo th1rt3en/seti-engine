@@ -129,10 +129,10 @@ export function DisplayCardIcon({ size = SIZE }: { size?: number }) {
 }
 
 /** A card from the top of the deck: a stack of face-down cards. */
-export function DeckCardIcon({ size = SIZE }: { size?: number }) {
+export function DeckCardIcon({ size = SIZE, title = "Card from the top of the deck" }: { size?: number; title?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="card of the deck" className="resicon">
-      <title>Card from the top of the deck</title>
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label={title} className="resicon">
+      <title>{title}</title>
       <rect x="6" y="2" width="14" height="18" rx="2" fill="#1d2840" stroke="#7d93b8" strokeWidth="1" />
       <rect x="4" y="4" width="14" height="18" rx="2" fill="#243350" stroke="#9fb6d8" strokeWidth="1" />
       <rect x="2" y="6" width="14" height="16" rx="2" fill="#2f4570" stroke="#cfdcf0" strokeWidth="1.2" />

@@ -3436,3 +3436,8 @@ html:has(.setupchoice) .hand {
     bottom: calc(48px + 52px + 40vh);
   }
 }
+
+/* in the pills the tooltip is the one of the whole figure (the icon has a name of its own, which would hide it): the icon does not take the pointer */
+.scorechips .res .resicon {
+  pointer-events: none;
+}
