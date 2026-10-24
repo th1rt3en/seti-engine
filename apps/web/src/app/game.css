@@ -3285,3 +3285,8 @@ input.switch:focus-visible {
   gap: 8px;
   justify-content: flex-end;
 }
+
+/* the hand can be looked at while the screen of the setup (organization, quick start cards, tucks) is open */
+html:has(.setupchoice) .hand {
+  z-index: 210;
+}

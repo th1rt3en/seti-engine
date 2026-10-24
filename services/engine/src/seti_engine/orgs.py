@@ -228,6 +228,10 @@ def open_tucks(s: GameState) -> None:
 
 def resolve_tucks(s: GameState, events: Events) -> None:
     """The last lock of the tucks: the tucks were made one at a time as the players went; now they are final and the game begins."""
+    for q in sorted(s.players, key=lambda x: (x.index - s.start_player) % len(s.players)):
+        # everybody has locked in: what each player ended up with is made public, as one line each (what was taken back is not part of it)
+        done = {"organization": q.organization, "quick_start": list(q.quick_start), "tucks": list(q.setup_tucks)}
+        events.append({"type": "setup_done", "player": q.index, **done})
     for q in s.players:
         q.setup_tucks, q.setup_tuck_undo, q.tucks_owed, q.setup_locked = [], [], 0, False
     s.phase = "play"

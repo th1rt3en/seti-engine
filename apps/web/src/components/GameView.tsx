@@ -1,4 +1,3 @@
-import { useGameSettings } from "@/lib/gameSettings";
 // A game as one viewer sees it: a bar on top with the round, the turn, what the game is waiting for and the moves to choose from; the card row
 // and the alien species on the left; the board in the middle; the publicity track and the tech stacks to its right; the tracker of all players
 // floating at the right edge; the hand floating in the bottom left corner. The live game and the replay both use it. It works out no rule:
@@ -22,7 +21,7 @@ import { MissionsPanel } from "./MissionsPanel";
 import { OrgName } from "./OrgName";
 import { OrgPanel } from "./OrgPanel";
 import { PlayerTracker } from "./PlayerTracker";
-import { PublicityTrack } from "./PublicityTrack";
+import { PublicitySlot } from "./PublicitySlot";
 import { RoundPiles } from "./RoundPiles";
 import { RowDock, type RowSelection } from "./RowDock";
 import { SoloPanel } from "./SoloPanel";
@@ -183,7 +182,6 @@ export function GameView({
   topExtra?: ReactNode;
 }) {
   const s = view.state;
-  const { publicityTrack } = useGameSettings(); // the player can hide the publicity track (the gear in the heading)
   // when the game is over the score is the final one (the board, the end-of-game cards, the gold tiles, the Exertian cards, the danger loss)
   const finalTotal = (player: number): number | undefined =>
     s.phase === "finished" ? (s.final_scores as { player?: number; total?: number }[]).find((f) => f.player === player)?.total : undefined;
@@ -346,7 +344,7 @@ export function GameView({
           <MissionsPanel view={view} names={names} />
           <ArkhosPanel view={view} names={names} spots={spots} />
           <GlyphidsPanel view={view} names={names} spots={spots} />
-          {publicityTrack ? <PublicityTrack view={view} names={names} /> : null}
+          <PublicitySlot view={view} names={names} />
         </aside>
       </div>
 

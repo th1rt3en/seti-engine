@@ -24,9 +24,14 @@ const without = <T extends Record<string, unknown>>(o: T, key: string): T => {
   return rest as T;
 };
 
+/** The moves of the simultaneous setup that the other players are not shown at all (the choices that were made and taken back, EXP-ORG-14): what each
+ * player ends up with is told by one event (`setup_done`) when everybody has locked in. The place in the log stays, so that its numbers do not change. */
+const HIDDEN_SETUP_MOVES = new Set(["choose_org", "choose_quick", "setup_tuck", "setup_untuck"]);
+
 /** The card drawn from the deck is told to the player who drew it only. */
 export function publicEntry(e: LogEntry, viewer: number | null = null): PublicEntry {
   const type = String((e.action as Record<string, unknown>).type);
+  if (HIDDEN_SETUP_MOVES.has(type) && e.seat !== viewer) return { seq: e.seq, seat: e.seat, action: { type: "setup_hidden" }, events: [] };
   const action = HIDDEN_CARD_ACTIONS.has(type)
     ? without(e.action as Record<string, unknown>, "card")
     : SECRET_CHOICES.has(type) && e.seat !== viewer

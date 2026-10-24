@@ -316,3 +316,25 @@ def test_without_organizations_each_player_tucks_their_card_at_the_same_time() -
     assert r.state.phase == "play" and not r.state.pending
     assert all(len(p.tucked) == 1 for p in r.state.players)
     assert all(len(p.hand) >= h - 1 for p, h in zip(r.state.players, hands, strict=True))
+
+
+def test_the_final_choices_are_made_public_when_all_have_locked_in_and_taken_back_tucks_are_not_in_them() -> None:  # EXP-ORG-14
+    for seed in range(1, 40):
+        r = at_tucks(2, seed)
+        a, b = (d.player for d in r.state.pending)
+        m = tuck_of_kind(r, a, False)
+        if m is None:
+            continue
+        r = apply(r.state, m)  # a tuck that a takes back again
+        r = apply(r.state, pick(r, a, "setup_untuck"))
+        r = tuck_all(r, a)
+        r = tuck_all(r, b)
+        done = [e for e in r.events if e["type"] == "setup_done"]
+        assert sorted(e["player"] for e in done) == [0, 1]
+        by = {e["player"]: e for e in done}
+        for q in r.state.players:
+            assert by[q.index]["organization"] == q.organization and by[q.index]["quick_start"] == q.quick_start
+            assert by[q.index]["tucks"] == q.tucked[-len(by[q.index]["tucks"]) :] and len(by[q.index]["tucks"]) >= 1
+        assert r.state.phase == "play"
+        return
+    raise AssertionError("no seed gave a tuck that gives only a resource")

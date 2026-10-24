@@ -203,6 +203,15 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
         </>
       );
     }
+    case "setup_done": {
+      const names = (ids: unknown): string => (Array.isArray(ids) ? ids.map((c) => cardName(c)).join(", ") : "");
+      const parts = [
+        ev.organization ? `organization ${ORG_NAMES[String(ev.organization)] ?? String(ev.organization)}` : "",
+        Array.isArray(ev.quick_start) && ev.quick_start.length > 0 ? `quick start cards ${names(ev.quick_start)}` : "",
+        Array.isArray(ev.tucks) && ev.tucks.length > 0 ? `tucked ${names(ev.tucks)} for income` : "",
+      ].filter((x) => x !== "");
+      return `${who} is set up: ${parts.join("; ")}`;
+    }
     case "organelle_skipped":
       return `${who} has no ${String(ev.color)} organelle to trigger`;
     case "draw_card":
@@ -402,7 +411,9 @@ const LEGEND: [string, string][] = [
   ["move", "movement"],
 ];
 
-export function MoveLog({ entries, ctx }: { entries: LogEntry[]; ctx: LogContext }) {
+export function MoveLog({ entries: all, ctx }: { entries: LogEntry[]; ctx: LogContext }) {
+  // the choices of the setup that the server keeps from the others (and that were possibly taken back) are not lines of the log
+  const entries = all.filter((e) => e.action?.type !== "setup_hidden");
   const [folded, toggle] = useDock("log");
   const body = useRef<HTMLOListElement>(null);
   const dock = useRef<HTMLElement>(null);

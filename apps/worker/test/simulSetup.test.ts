@@ -168,10 +168,10 @@ describe("the simultaneous setup", () => {
     await t.room.submit(alice, 0, { type: "choose_org", org: "b", seat: t.a });
     const logs = (c: Conn) => c.got.filter((m): m is Extract<ServerMessage, { t: "log" }> => m.t === "log").flatMap((m) => m.entries);
     expect(logs(t.ca).at(-1)?.action).toMatchObject({ type: "choose_org", org: "b" }); // its own choice
-    expect(logs(t.cb).at(-1)?.action).toEqual({ type: "choose_org", seat: t.a }); // the others do not see which
-    expect(logs(t.spec).at(-1)?.action).toEqual({ type: "choose_org", seat: t.a });
+    expect(logs(t.cb).at(-1)?.action).toEqual({ type: "setup_hidden" }); // the others do not see the move at all (only its place in the log)
+    expect(logs(t.spec).at(-1)?.action).toEqual({ type: "setup_hidden" });
     const entry = (await t.room.log())[0];
-    expect(entry && publicEntry(entry, t.b).action).not.toHaveProperty("org");
+    expect(entry && publicEntry(entry, t.b).action).toEqual({ type: "setup_hidden" });
     expect(entry && publicEntry(entry, t.a).action).toHaveProperty("org", "b");
   });
 

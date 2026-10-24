@@ -33,3 +33,22 @@ describe("a card drawn from the deck", () => {
     expect(publicEntry(e, null).events[0]).toEqual({ type: "draw_card", player: 1 });
   });
 });
+
+describe("the moves of the simultaneous setup", () => {
+  const entry = (type: string, seat: number, extra: object = {}) => ({
+    seq: 3,
+    seat,
+    action: { type, seat, ...extra },
+    at: 0,
+    events: [{ type: "tuck", player: seat, card: "55" }],
+  });
+  it("are not shown to the other players (only their place in the log stays); the player sees their own", () => {
+    for (const type of ["choose_org", "choose_quick", "setup_tuck", "setup_untuck"]) {
+      const e = entry(type, 0, { card: "55", org: "x", cards: ["a"] }) as never;
+      expect(publicEntry(e, 1)).toEqual({ seq: 3, seat: 0, action: { type: "setup_hidden" }, events: [] });
+      expect(publicEntry(e, null)).toMatchObject({ action: { type: "setup_hidden" } });
+      expect((publicEntry(e, 0).action as { type: string }).type).toBe(type);
+    }
+    expect(publicEntry(entry("setup_lock", 0) as never, 1).action).toMatchObject({ type: "setup_lock" }); // who has locked in is public
+  });
+});
