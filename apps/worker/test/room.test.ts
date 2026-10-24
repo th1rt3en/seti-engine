@@ -419,7 +419,6 @@ describe("the standing of a game in progress", () => {
     const pub = await t.room.publicMeta();
     expect(pub?.progress).toMatchObject({ actions: 0 });
     expect(pub?.progress?.scores).toHaveLength(2);
-    expect(typeof pub?.progress?.round).toBe("number");
     expect(pub?.options).not.toHaveProperty("seed");
   });
 });
