@@ -9,7 +9,7 @@ const DECISION_HELP: Record<string, string> = {
   income_tuck:
     "Tuck a card for income: it goes under your income card and gives its resource now and every round. You may also skip it (FAQ-01).",
   discard_to_four: "You are passing with more than 4 cards in hand: discard down to 4 (PASS-02).",
-  take_round_card: "After passing take one of the end-of-round cards: it joins your hand (PASS-04).",
+  take_round_card: "After passing take one of the end-of-round cards: pick one in the panel and keep it: it joins your hand (PASS-04).",
   data_overflow:
     "Your data pool holds 6 at most. Place data from the pool in your computer first to make room, or take the new data and lose what does not fit (RES-01).",
   sector_order: "Several sectors are complete. Choose which one is resolved next (TURN-05).",

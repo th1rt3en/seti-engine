@@ -52,6 +52,7 @@ import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
 import { type LogContext, type LogEntry, MoveLog, plainEntry } from "./MoveLog";
 import { MovePreview } from "./MovePreview";
+import { OfferPanel } from "./OfferPanel";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { OrgMarkPick } from "./OrgMarkPick";
 import { pieceColor } from "./Pieces";
@@ -642,12 +643,22 @@ export function GameClient({
   const offerMove =
     pickedOffer === null || simul ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
   // keeping one of the end-of-round cards is confirmed (or given up) with the buttons on the card itself, like a card of the display
-  const offerActions: CardAction[] = offerMove
-    ? [
-        { key: "keep", label: "Keep", primary: true, title: handMoveText(offerMove), onClick: () => playConfirmed(offerMove) },
-        { key: "cancel", label: "Cancel", onClick: () => setPickedOffer(null) },
-      ]
-    : [];
+  const offerPanel =
+    offers.length > 0 && !ended ? (
+      <OfferPanel
+        title={mine.some((m) => m.type === "take_round_card") ? "Choose an end-of-round card" : "Choose a card"}
+        text={
+          mine.some((m) => m.type === "take_round_card")
+            ? "You passed: pick one of these cards. It joins your hand (PASS-04)."
+            : "Pick one of these cards."
+        }
+        cards={offers}
+        selected={pickedOffer}
+        keepLabel={offerMove ? handMoveText(offerMove) : "Keep"}
+        onSelect={(c) => setPickedOffer(pickedOffer === c ? null : c)}
+        onKeep={() => offerMove && playConfirmed(offerMove)}
+      />
+    ) : null;
   const setupMove =
     setupKind === "quick"
       ? pickedQuick.length === quickNeed
@@ -941,7 +952,7 @@ export function GameClient({
     hints.push(
       "Place data by clicking the computer or a lower space of a computer tech on your player board (the Player boards button opens it).",
     );
-  if (offers.length > 0) hints.push("Pick 1 of the end-of-round cards in your hand to keep. The cards you had are greyed out.");
+  if (offers.length > 0) hints.push("Pick 1 of the cards in the panel to keep.");
   if (spots.length > 0) hints.push("Click a highlighted place on the board or on a panel beside it.");
   if (techMoves.length > 0)
     hints.push(
@@ -1472,10 +1483,6 @@ export function GameClient({
               actions: exertianActions,
             },
             actions: handActions,
-            offered: offers,
-            offeredSelected: pickedOffer,
-            offeredActions: offerActions,
-            onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
           }}
           tech={{
             selectable: techMoves.map((m) => Number(m.stack)),
@@ -1533,6 +1540,7 @@ export function GameClient({
             </>
           }
         />
+        {offerPanel}
       </PlayerColorsContext.Provider>
     </PlayerNumsContext.Provider>
   );

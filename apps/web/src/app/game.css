@@ -3524,3 +3524,47 @@ html:has(.setupchoice) .hand {
   filter: grayscale(1);
   opacity: 0.6;
 }
+
+/* the cards offered to keep one of (the end-of-round cards after passing): a panel over the page */
+.offerpanel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 90;
+  width: min(94vw, 760px);
+  max-height: 88vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
+}
+.offerpanel h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.offercards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.offercard {
+  all: unset;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 3px;
+  border: 3px solid transparent;
+}
+.offercard:focus-visible {
+  outline: 2px solid var(--accent);
+}
+.offercard.chosen {
+  border-color: #6ef0a5;
+  box-shadow: 0 0 14px rgba(110, 240, 165, 0.6);
+}
