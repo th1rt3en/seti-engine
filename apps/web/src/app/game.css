@@ -1886,6 +1886,11 @@ button:disabled {
   gap: 8px;
 }
 @media (min-width: 1100px) {
+  /* the card row pokes out to the left of its column by half the width of the column: the board leaves that strip free, so the row covers nothing of it
+     (not the alien decks at its right edge) */
+  .col-center {
+    padding-right: calc(var(--col-aux) * 0.5 + 6px);
+  }
   .rowinline {
     display: block;
   }
