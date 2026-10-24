@@ -113,7 +113,9 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
             {s.players.map((p) => (
               <th key={p.index} scope="col" className={view.to_act === p.index ? "active" : undefined}>
                 <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} />
-                <span className="pname">{who(p.index)}</span>
+                <span className="pname" style={{ color: PLAYER_COLOR[p.color] }}>
+                  {who(p.index)}
+                </span>
                 {view.viewer === p.index ? <span className="pill">you</span> : null}
                 {p.passed ? <span className="pill">passed</span> : null}
                 {s.rival && p.index === s.rival.index ? null : (

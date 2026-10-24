@@ -5,8 +5,11 @@ import { createContext, useContext } from "react";
 import { PlayerLink } from "./PlayerLink";
 
 export const PlayerNumsContext = createContext<(number | null)[]>([]);
+/** The color of each seat (the CSS color of its player color): a name is written in the color of its player. */
+export const PlayerColorsContext = createContext<string[]>([]);
 
 export function PlayerName({ seat, name, className }: { seat: number; name: string; className?: string }) {
   const nums = useContext(PlayerNumsContext);
-  return <PlayerLink num={nums[seat] ?? null} name={name} className={className} />;
+  const color = useContext(PlayerColorsContext)[seat];
+  return <PlayerLink num={nums[seat] ?? null} name={name} className={className} style={color ? { color } : undefined} />;
 }

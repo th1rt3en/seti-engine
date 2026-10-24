@@ -10,6 +10,7 @@ import { glyphToken } from "@/lib/glyphids";
 import { cardName } from "@/lib/moves";
 import { TECH_INFO } from "@/lib/techs";
 import type { View } from "@seti/protocol";
+import type { CSSProperties } from "react";
 import assets from "../generated/assets.json";
 import expansionAssets from "../generated/expansion-assets.json";
 import { DataToken, PieceDefs } from "./Pieces";
@@ -394,7 +395,14 @@ export function PlayerBoardPanel({
       <header>
         <div className="boardtabs">
           {players.map((p) => (
-            <button key={p.index} type="button" className={p.index === shown ? "chip on" : "chip"} onClick={() => onShow(p.index)}>
+            <button
+              key={p.index}
+              type="button"
+              className={p.index === shown ? "chip on" : "chip"}
+              aria-pressed={p.index === shown}
+              style={{ "--pc": PLAYER_COLOR[p.color] ?? "#fff" } as CSSProperties}
+              onClick={() => onShow(p.index)}
+            >
               <span className="dot" style={{ background: PLAYER_COLOR[p.color] ?? "#fff" }} /> {names[p.index] ?? `Player ${p.index + 1}`}
               {view.viewer === p.index ? " (you)" : ""}
             </button>

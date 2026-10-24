@@ -2,6 +2,7 @@
 import { OPEN_SHORTCUTS_EVENT } from "@/components/ShortcutsHelp";
 import { OPEN_BOARD_EVENT } from "@/lib/boardEvent";
 import { useGameSettings } from "@/lib/gameSettings";
+import { PLAYER_COLOR } from "@/lib/geometry";
 import { type Reward, glyphIconReward, glyphToken } from "@/lib/glyphids";
 import { helpFor } from "@/lib/helpText";
 import { lastMoveOf } from "@/lib/lastMove";
@@ -56,7 +57,7 @@ import { OrgMarkPick } from "./OrgMarkPick";
 import { pieceColor } from "./Pieces";
 import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { PlayerLink } from "./PlayerLink";
-import { PlayerName, PlayerNumsContext } from "./PlayerName";
+import { PlayerColorsContext, PlayerName, PlayerNumsContext } from "./PlayerName";
 import { Amount, Cost, KindIcon } from "./Reward";
 import { SandboxPanel } from "./Sandbox";
 import { SetupBoth, SetupChoice, SetupTucks } from "./SetupChoice";
@@ -1294,224 +1295,226 @@ export function GameClient({
   ) : null;
   return (
     <PlayerNumsContext.Provider value={nums}>
-      <GameView
-        view={v}
-        names={names}
-        results={results}
-        moves={waiting && !ended ? sendingPrompt : moves}
-        previous={previous}
-        lastMove={lastMoveOf(log.at(-1)?.events as never)}
-        log={<MoveLog entries={log} ctx={logCtx} />}
-        chat={
-          <ChatDock
-            lines={chat}
-            colors={v.state.players.map((p) => p.color)}
-            mySeat={v.viewer}
-            canWrite={signedIn}
-            note={chatNote}
-            onSend={(text) => {
-              setChatNote(null);
-              send({ t: "chat", text });
-            }}
-          />
-        }
-        goldChoice={
-          goldMoves.length > 0
-            ? {
-                tiles: goldMoves.map((m) => String(m.tile)),
-                selected: pickedGold,
-                onPick: (t) => setPickedGold(pickedGold === t ? null : t),
-              }
-            : undefined
-        }
-        overlay={
-          <>
-            {simul && simulOrgs.length > 0 && !ended ? (
-              <SetupBoth
-                orgs={simulOrgs}
-                quick={simulQuick}
-                pickedOrg={simulOrg}
-                pickedQuick={simulCards}
-                need={simulNeed}
-                onPickOrg={(id) => setPickedOffer(id)}
-                onPickQuick={(id) =>
-                  setPickedQuick(simulCards.includes(id) ? simulCards.filter((c) => c !== id) : [...simulCards, id].slice(-simulNeed))
-                }
-                onLock={lockIn}
-                clock={
-                  v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
-                }
-                status={setupStatus(v, names)}
-              />
-            ) : null}
-            {simul && (tuckMoves.length > 0 || untuckMoves.length > 0 || tuckLock) && !ended ? (
-              <SetupTucks
-                hand={tuckHand}
-                tucked={tuckedSoFar}
-                need={me?.tucks_owed ?? 0}
-                picked={tuckPicked}
-                drawing={tuckPicked !== null && cardInfo(tuckPicked)?.income === "card"}
-                onPick={(id) => setPickedQuick(tuckPicked === id ? [] : [id])}
-                onTuck={() => {
-                  if (tuckMove) {
-                    setPickedQuick([]);
-                    sendAction(tuckMove);
-                  }
-                }}
-                onUntuck={(card) => {
-                  const m = untuckMoves.find((u) => u.card === card);
-                  if (m) sendAction(m);
-                }}
-                onLock={tuckLock ? () => sendAction(tuckLock) : undefined}
-                clock={
-                  v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
-                }
-                status={setupStatus(v, names)}
-              />
-            ) : null}
-            {setupOffers.length > 0 && !ended && !simul ? (
-              <SetupChoice
-                kind={setupKind}
-                offers={setupOffers}
-                selected={setupKind === "quick" ? pickedQuick : pickedOffer === null ? [] : [pickedOffer]}
-                need={setupKind === "quick" ? quickNeed : 1}
-                quickOffered={(me?.offered_quick ?? []).filter((q) => q !== "?")}
-                onSelect={(id) =>
-                  setupKind === "quick"
-                    ? setPickedQuick((old) => (old.includes(id) ? old.filter((c) => c !== id) : [...old, id].slice(-quickNeed)))
-                    : setPickedOffer(pickedOffer === id ? null : id)
-                }
-                onConfirm={() => {
-                  if (setupMove) {
-                    setPickedOffer(null);
-                    setPickedQuick([]);
-                    sendAction(setupMove); // the choice dialog is the confirmation: no second question about a move that cannot be undone
-                  }
-                }}
-              />
-            ) : null}
-            {buyOpen && !ended && buys.length > 0 ? (
-              <BuyPanel
-                moves={buys}
-                row={v.state.card_row}
-                deck={view.view.counts.deck}
-                price={buyPrice}
-                onBuy={playConfirmed}
-                onClose={() => setBuyOpen(false)}
-              />
-            ) : null}
-            {tradeOpen && !ended && exchanges.length > 0 ? (
-              <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
-            ) : null}
-            {orgFreeOpen && !ended && orgCardMoves.length > 0 ? (
-              <OrgFreePanel
-                moves={orgCardMoves}
-                hand={hand}
-                display={v.state.card_row}
-                onPlay={play}
-                onClose={() => setOrgFreeOpen(false)}
-              />
-            ) : null}
-            <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
-              {boardOpen ? "Close player boards" : "Player boards"}
-            </button>
-            {boardOpen ? (
-              <PlayerBoardPanel
-                view={v}
-                names={names}
-                shown={boardPlayer}
-                onShow={setBoardPlayer}
-                onClose={() => setBoardOpen(false)}
-                choice={slotChoice}
-                onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
-                lower={
-                  ended
-                    ? undefined
-                    : {
-                        slots: mine.filter((m) => m.type === "place_lower").map((m) => Number(m.slot)),
-                        onPlace: (slot) => {
-                          const m = mine.find((x) => x.type === "place_lower" && x.slot === slot);
-                          if (m) play(m);
-                        },
-                      }
-                }
-              />
-            ) : null}
-          </>
-        }
-        hand={{
-          selectable: pickable,
-          selected: picked,
-          onSelect: selectCard,
-          autoOpen: pending && handMoves.length > 0,
-          exertian: {
-            selectable: exertianMoves.map((m) => String(m.card)),
-            selected: pickedExertian,
-            onSelect: (c) => setPickedExertian(pickedExertian === c ? null : c),
-            actions: exertianActions,
-          },
-          actions: handActions,
-          offered: offers,
-          offeredSelected: pickedOffer,
-          offeredActions: offerActions,
-          onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
-        }}
-        tech={{
-          selectable: techMoves.map((m) => Number(m.stack)),
-          selected: pickedTech,
-          onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
-          // the Confirm on the tech is the confirmation: the move shows the next tile of the stack, but no second question is asked
-          onConfirm: techOption ? () => playConfirmed(techOption) : undefined,
-        }}
-        context={contextNode}
-        contextActions={contextActions}
-        hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
-        spots={{
-          items: spots,
-          selected: pickedSpot,
-          onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id),
-          onConfirm: () => spotMove && play(spotMove),
-          onCancel: () => setPickedSpot(null),
-        }}
-        rowFlash={rowMode !== null}
-        row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
-        interaction={
-          reach.length === 0 && probeMoves.length > 0
-            ? {
-                probes: probeMoves.map((m) => String(m.probe)),
-                selected: chosenProbe,
-                onSelectProbe: (id) => setChosenProbe(chosenProbe === id ? null : id),
-                targets: [],
-                onTarget: () => undefined,
-              }
-            : reach.length > 0
+      <PlayerColorsContext.Provider value={v.state.players.map((p) => PLAYER_COLOR[p.color] ?? "#fff")}>
+        <GameView
+          view={v}
+          names={names}
+          results={results}
+          moves={waiting && !ended ? sendingPrompt : moves}
+          previous={previous}
+          lastMove={lastMoveOf(log.at(-1)?.events as never)}
+          log={<MoveLog entries={log} ctx={logCtx} />}
+          chat={
+            <ChatDock
+              lines={chat}
+              colors={v.state.players.map((p) => p.color)}
+              mySeat={v.viewer}
+              canWrite={signedIn}
+              note={chatNote}
+              onSend={(text) => {
+                setChatNote(null);
+                send({ t: "chat", text });
+              }}
+            />
+          }
+          goldChoice={
+            goldMoves.length > 0
               ? {
-                  probes: reach.map((r) => r.probe),
-                  selected: probe?.probe ?? null,
-                  onSelectProbe: (id) => {
-                    setPendingMove(null);
-                    setPickedProbe(id === pickedProbe ? null : id);
-                  },
-                  // once the destination is confirmed the spaces and their costs go away while the move is carried out
-                  targets: waiting
-                    ? []
-                    : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
-                  onTarget: (t) => setPendingMove(t),
-                  chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
+                  tiles: goldMoves.map((m) => String(m.tile)),
+                  selected: pickedGold,
+                  onPick: (t) => setPickedGold(pickedGold === t ? null : t),
                 }
               : undefined
-        }
-        topExtra={
-          <>
-            {clocks}
-            <BarMenu
-              onResign={v.viewer !== null && !ended ? () => window.confirm("Resign the game?") && send({ t: "resign" }) : undefined}
-              siteShown={siteShown}
-              onToggleSite={() => setSiteShown(!siteShown)}
-            />
-          </>
-        }
-      />
+          }
+          overlay={
+            <>
+              {simul && simulOrgs.length > 0 && !ended ? (
+                <SetupBoth
+                  orgs={simulOrgs}
+                  quick={simulQuick}
+                  pickedOrg={simulOrg}
+                  pickedQuick={simulCards}
+                  need={simulNeed}
+                  onPickOrg={(id) => setPickedOffer(id)}
+                  onPickQuick={(id) =>
+                    setPickedQuick(simulCards.includes(id) ? simulCards.filter((c) => c !== id) : [...simulCards, id].slice(-simulNeed))
+                  }
+                  onLock={lockIn}
+                  clock={
+                    v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
+                  }
+                  status={setupStatus(v, names)}
+                />
+              ) : null}
+              {simul && (tuckMoves.length > 0 || untuckMoves.length > 0 || tuckLock) && !ended ? (
+                <SetupTucks
+                  hand={tuckHand}
+                  tucked={tuckedSoFar}
+                  need={me?.tucks_owed ?? 0}
+                  picked={tuckPicked}
+                  drawing={tuckPicked !== null && cardInfo(tuckPicked)?.income === "card"}
+                  onPick={(id) => setPickedQuick(tuckPicked === id ? [] : [id])}
+                  onTuck={() => {
+                    if (tuckMove) {
+                      setPickedQuick([]);
+                      sendAction(tuckMove);
+                    }
+                  }}
+                  onUntuck={(card) => {
+                    const m = untuckMoves.find((u) => u.card === card);
+                    if (m) sendAction(m);
+                  }}
+                  onLock={tuckLock ? () => sendAction(tuckLock) : undefined}
+                  clock={
+                    v.viewer !== null && left[v.viewer] !== null && left[v.viewer] !== undefined ? minutes(left[v.viewer] ?? null) : null
+                  }
+                  status={setupStatus(v, names)}
+                />
+              ) : null}
+              {setupOffers.length > 0 && !ended && !simul ? (
+                <SetupChoice
+                  kind={setupKind}
+                  offers={setupOffers}
+                  selected={setupKind === "quick" ? pickedQuick : pickedOffer === null ? [] : [pickedOffer]}
+                  need={setupKind === "quick" ? quickNeed : 1}
+                  quickOffered={(me?.offered_quick ?? []).filter((q) => q !== "?")}
+                  onSelect={(id) =>
+                    setupKind === "quick"
+                      ? setPickedQuick((old) => (old.includes(id) ? old.filter((c) => c !== id) : [...old, id].slice(-quickNeed)))
+                      : setPickedOffer(pickedOffer === id ? null : id)
+                  }
+                  onConfirm={() => {
+                    if (setupMove) {
+                      setPickedOffer(null);
+                      setPickedQuick([]);
+                      sendAction(setupMove); // the choice dialog is the confirmation: no second question about a move that cannot be undone
+                    }
+                  }}
+                />
+              ) : null}
+              {buyOpen && !ended && buys.length > 0 ? (
+                <BuyPanel
+                  moves={buys}
+                  row={v.state.card_row}
+                  deck={view.view.counts.deck}
+                  price={buyPrice}
+                  onBuy={playConfirmed}
+                  onClose={() => setBuyOpen(false)}
+                />
+              ) : null}
+              {tradeOpen && !ended && exchanges.length > 0 ? (
+                <TradePanel moves={exchanges} hand={hand} onPlay={play} onPickCard={setRowMode} onClose={() => setTradeOpen(false)} />
+              ) : null}
+              {orgFreeOpen && !ended && orgCardMoves.length > 0 ? (
+                <OrgFreePanel
+                  moves={orgCardMoves}
+                  hand={hand}
+                  display={v.state.card_row}
+                  onPlay={play}
+                  onClose={() => setOrgFreeOpen(false)}
+                />
+              ) : null}
+              <button type="button" className="primary boardsfab" onClick={() => setBoardOpen(!boardOpen)} aria-expanded={boardOpen}>
+                {boardOpen ? "Close player boards" : "Player boards"}
+              </button>
+              {boardOpen ? (
+                <PlayerBoardPanel
+                  view={v}
+                  names={names}
+                  shown={boardPlayer}
+                  onShow={setBoardPlayer}
+                  onClose={() => setBoardOpen(false)}
+                  choice={slotChoice}
+                  onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
+                  lower={
+                    ended
+                      ? undefined
+                      : {
+                          slots: mine.filter((m) => m.type === "place_lower").map((m) => Number(m.slot)),
+                          onPlace: (slot) => {
+                            const m = mine.find((x) => x.type === "place_lower" && x.slot === slot);
+                            if (m) play(m);
+                          },
+                        }
+                  }
+                />
+              ) : null}
+            </>
+          }
+          hand={{
+            selectable: pickable,
+            selected: picked,
+            onSelect: selectCard,
+            autoOpen: pending && handMoves.length > 0,
+            exertian: {
+              selectable: exertianMoves.map((m) => String(m.card)),
+              selected: pickedExertian,
+              onSelect: (c) => setPickedExertian(pickedExertian === c ? null : c),
+              actions: exertianActions,
+            },
+            actions: handActions,
+            offered: offers,
+            offeredSelected: pickedOffer,
+            offeredActions: offerActions,
+            onOffer: (c) => setPickedOffer(pickedOffer === c ? null : c),
+          }}
+          tech={{
+            selectable: techMoves.map((m) => Number(m.stack)),
+            selected: pickedTech,
+            onSelect: (i) => setPickedTech(pickedTech === i ? null : i),
+            // the Confirm on the tech is the confirmation: the move shows the next tile of the stack, but no second question is asked
+            onConfirm: techOption ? () => playConfirmed(techOption) : undefined,
+          }}
+          context={contextNode}
+          contextActions={contextActions}
+          hint={hints.length > 0 && !ask ? hints.map((h) => <p key={h}>{h}</p>) : undefined}
+          spots={{
+            items: spots,
+            selected: pickedSpot,
+            onSelect: (id) => setPickedSpot(pickedSpot === id ? null : id),
+            onConfirm: () => spotMove && play(spotMove),
+            onCancel: () => setPickedSpot(null),
+          }}
+          rowFlash={rowMode !== null}
+          row={{ selectable: rowSources, selected: pickedBuy, onSelect: selectSource, actions: rowActions }}
+          interaction={
+            reach.length === 0 && probeMoves.length > 0
+              ? {
+                  probes: probeMoves.map((m) => String(m.probe)),
+                  selected: chosenProbe,
+                  onSelectProbe: (id) => setChosenProbe(chosenProbe === id ? null : id),
+                  targets: [],
+                  onTarget: () => undefined,
+                }
+              : reach.length > 0
+                ? {
+                    probes: reach.map((r) => r.probe),
+                    selected: probe?.probe ?? null,
+                    onSelectProbe: (id) => {
+                      setPendingMove(null);
+                      setPickedProbe(id === pickedProbe ? null : id);
+                    },
+                    // once the destination is confirmed the spaces and their costs go away while the move is carried out
+                    targets: waiting
+                      ? []
+                      : targets.map((t) => ({ to: t.to as [number, number], cost: t.cost, path: t.path as [number, number][] })),
+                    onTarget: (t) => setPendingMove(t),
+                    chosen: pendingMove ? `${pendingMove.to[0]}-${pendingMove.to[1]}` : null,
+                  }
+                : undefined
+          }
+          topExtra={
+            <>
+              {clocks}
+              <BarMenu
+                onResign={v.viewer !== null && !ended ? () => window.confirm("Resign the game?") && send({ t: "resign" }) : undefined}
+                siteShown={siteShown}
+                onToggleSite={() => setSiteShown(!siteShown)}
+              />
+            </>
+          }
+        />
+      </PlayerColorsContext.Provider>
     </PlayerNumsContext.Provider>
   );
 }

@@ -1565,6 +1565,18 @@ button:disabled {
   flex-wrap: wrap;
   gap: 6px;
 }
+/* the player whose board is shown: the color of the player on the border, a tint behind and a heavier name; the others are dimmed */
+.boardtabs .chip {
+  opacity: 0.65;
+  border: 2px solid transparent;
+}
+.boardtabs .chip.on {
+  opacity: 1;
+  font-weight: 700;
+  border-color: var(--pc);
+  background: color-mix(in srgb, var(--pc) 22%, transparent);
+  box-shadow: 0 0 0 1px var(--pc);
+}
 .playerboard {
   display: block;
   width: 100%;

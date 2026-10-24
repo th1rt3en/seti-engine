@@ -122,7 +122,7 @@ export function ChatDock({
               <li key={l.n} className={l.seat !== null && l.seat === mySeat ? "chatline mine" : "chatline"}>
                 <span className="chattime muted small">{clock(l.at)}</span>{" "}
                 {l.seat !== null ? <span className="dot" style={{ background: PLAYER_COLOR[colors[l.seat] ?? ""] ?? "#fff" }} /> : null}
-                <b className="chatname">
+                <b className="chatname" style={l.seat !== null ? { color: PLAYER_COLOR[colors[l.seat] ?? ""] } : undefined}>
                   <PlayerLink num={l.num} name={l.name} />
                 </b>
                 {l.seat === null ? <span className="muted small"> (watching)</span> : null}

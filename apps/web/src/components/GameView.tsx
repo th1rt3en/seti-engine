@@ -304,7 +304,7 @@ export function GameView({
             {actor ? <span className="dot big" style={{ background: PLAYER_COLOR[actor.color] ?? "#fff" }} /> : null}
             <div className="nowtext">
               <div className="nowline">
-                <b className="who">
+                <b className="who" style={actor ? { color: PLAYER_COLOR[actor.color] } : undefined}>
                   {prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}${prompt.mine || context ? ":" : ""}` : " "}
                 </b>
                 <span className={context ? "prompt asking" : "prompt"}>
