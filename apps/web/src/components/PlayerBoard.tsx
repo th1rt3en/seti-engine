@@ -166,6 +166,13 @@ function Board({
       card: m.card as string | null,
       label: `Message card ${cardName(m.card)}: marker at ${m.target} points`,
     })),
+    // CARD-20: the end-of-game scoring cards that were played (public)
+    ...(p.end_cards ?? []).map((c) => ({
+      key: `end-${c}`,
+      kind: "endgame",
+      card: c as string | null,
+      label: `${cardName(c)}: scores at the end of the game`,
+    })),
     // the Exertian cards played face down show their back until the game is over; then the engine sends the cards to everybody
     ...played.map((c, i) => ({
       key: `exo-${i}`,
@@ -319,9 +326,9 @@ function Board({
             return (
               <g key={f.key}>
                 {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}
-                {f.kind === "message" ? (
+                {f.kind === "message" || f.kind === "endgame" ? (
                   <text x={x + MISSIONS.w / 2} y={y + MISSIONS.h + 20} textAnchor="middle" className="pbhint">
-                    message
+                    {f.kind === "message" ? "message" : "end of game"}
                   </text>
                 ) : null}
                 <title>{f.label}</title>

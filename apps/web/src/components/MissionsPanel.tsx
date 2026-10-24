@@ -76,13 +76,15 @@ export function MissionsPanel({ view, names }: { view: View; names: string[] }) 
             ))}
           </div>
           {p.end_cards.length > 0 ? (
-            <div className="missioncards" aria-label="End-of-game scoring cards">
-              <span className="muted small">End-of-game scoring:</span>
-              {p.end_cards.map((c) => (
-                <figure key={c} className="missioncard" title={`${cardName(c)}: scores at the end of the game`}>
-                  <CardImage id={c} size="mission" />
-                </figure>
-              ))}
+            <div aria-label="End-of-game scoring cards">
+              <div className="muted small">End-of-game scoring:</div>
+              <div className="missioncards">
+                {p.end_cards.map((c) => (
+                  <figure key={c} className="missioncard" title={`${cardName(c)}: scores at the end of the game`}>
+                    <CardImage id={c} size="mission" />
+                  </figure>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>
