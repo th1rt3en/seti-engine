@@ -1,5 +1,6 @@
 import type { Options } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
+import type { Identity } from "../src/core/auth.js";
 import type { ServerMessage } from "../src/core/room.js";
 import { Conn, alice, bob, cy, guest, makeRoom } from "./helpers.js";
 
@@ -420,5 +421,18 @@ describe("the standing of a game in progress", () => {
     expect(pub?.progress).toMatchObject({ actions: 0 });
     expect(pub?.progress?.scores).toHaveLength(2);
     expect(pub?.options).not.toHaveProperty("seed");
+  });
+});
+
+describe("the seating of one seed", () => {
+  it("gives the same players the same seats whoever made the table and in whatever order they joined", async () => {
+    const seatsOf = async (host: Identity, other: Identity) => {
+      const t = makeRoom({ seed: 4242 });
+      await t.room.init("g", { players: 2 } as Options, none, false, host);
+      await t.room.join(other);
+      await t.room.startGame(host);
+      return (await t.room.meta())?.seats.map((s) => s?.id);
+    };
+    expect(await seatsOf(alice, bob)).toEqual(await seatsOf(bob, alice));
   });
 });

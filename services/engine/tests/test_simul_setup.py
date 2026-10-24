@@ -145,10 +145,10 @@ def test_the_result_is_the_same_as_when_the_choices_were_made_one_after_another(
         assert (a.organization, a.quick_start, len(a.tucked)) == (b.organization, b.quick_start, len(b.tucked))
 
 
-def test_the_flag_is_off_by_default_and_needs_the_organizations() -> None:
+def test_the_flag_is_off_by_default_and_needs_2_players() -> None:
     assert Options(players=2).simul_setup is False
     with pytest.raises(ValueError):
-        Options(players=2, simul_setup=True)
+        Options(players=1, simul_setup=True)
     seq = new(2, simul=False)
     assert [d.kind for d in seq.state.pending][:2] == ["choose_org", "choose_quick"]
     assert legal_moves(seq.state) and "seat" not in legal_moves(seq.state)[0]
@@ -244,3 +244,18 @@ def test_a_tuck_needs_the_exact_number_of_cards_and_can_be_changed_or_unlocked()
         r = apply(r.state, pick(r, seat, "setup_unlock"))
         assert r.state.pending[-1].data["step"] == "tuck"  # it chooses its tucks again, not its organization
         assert any(m["type"] == "choose_tucks" and m["seat"] == seat for m in r.legal)
+
+
+def test_without_organizations_each_player_tucks_their_card_at_the_same_time() -> None:  # SETUP-36, EXP-ORG-14 (owner, 2026-10-24)
+    r = start(Options(players=3, seed=3, simul_setup=True))
+    assert r.state.phase == "setup" and [d.kind for d in r.state.pending] == ["setup_choice"] * 3
+    assert sorted(projection.acting(r.state)) == [0, 1, 2]
+    assert {m["type"] for m in r.legal} == {"choose_tucks"}  # one card each, chosen by every player on their own
+    hands = [len(p.hand) for p in r.state.players]
+    for seat in (2, 0, 1):  # in any order: nobody waits for another
+        r = apply(r.state, pick(r, seat, "choose_tucks"))
+        assert r.state.players[seat].tucked == []  # secret until all have locked in
+        r = apply(r.state, pick(r, seat, "setup_lock"))
+    assert r.state.phase == "play" and not r.state.pending
+    assert all(len(p.tucked) == 1 for p in r.state.players)
+    assert all(len(p.hand) >= h - 1 for p, h in zip(r.state.players, hands, strict=True))

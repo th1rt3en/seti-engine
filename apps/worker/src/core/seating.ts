@@ -1,5 +1,6 @@
 // Seating (decision D28): who sits where is drawn when the game starts, so the order of play does not depend on who created the
-// lobby or who joined first. The draw comes from the game's seed, so it is the same every time the game is replayed.
+// lobby or who joined first. The draw comes from the game's seed, so it is the same every time the game is replayed. The caller puts the players in a
+// fixed order first (their ids), so that one seed gives the same seating to the same players whatever the order in which they joined.
 export function shuffledSeats<T>(seats: readonly T[], seed: number): T[] {
   let a = (seed ^ 0x9e3779b9) >>> 0;
   const next = (): number => {

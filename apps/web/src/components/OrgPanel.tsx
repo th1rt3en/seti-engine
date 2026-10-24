@@ -98,23 +98,29 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
             ) : null}
             {p.org_used ? <p className="small muted">The once-per-round ability has been used.</p> : null}
             {p.quick_start.length > 0 ? (
-              <div className="qcards">
-                {p.quick_start.map((c) => (
-                  <CardImage key={c} id={c} width={100} />
-                ))}
-              </div>
+              // the quick start cards are hidden until the player wants to look at them
+              <details className="qfold">
+                <summary className="small muted">Quick start cards ({p.quick_start.length})</summary>
+                <div className="qcards">
+                  {p.quick_start.map((c) => (
+                    <CardImage key={c} id={c} width={100} />
+                  ))}
+                </div>
+              </details>
             ) : null}
           </div>
         );
       })}
       {s.neutral_quick.length > 0 ? (
         <>
-          <b className="small">Neutral quick start cards (marked with white pieces)</b>
-          <div className="qcards">
-            {s.neutral_quick.map((c) => (
-              <CardImage key={c} id={c} width={100} />
-            ))}
-          </div>
+          <details className="qfold">
+            <summary className="small muted">Neutral quick start cards (marked with white pieces) ({s.neutral_quick.length})</summary>
+            <div className="qcards">
+              {s.neutral_quick.map((c) => (
+                <CardImage key={c} id={c} width={100} />
+              ))}
+            </div>
+          </details>
         </>
       ) : null}
     </details>

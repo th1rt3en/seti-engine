@@ -131,7 +131,7 @@ async function game(options: Options = withOrgs, clock: Parameters<ReturnType<ty
 const count = async (t: Awaited<ReturnType<typeof game>>) => ((await t.store.get("logcount")) as number | undefined) ?? 0;
 
 describe("the simultaneous setup", () => {
-  it("is switched on for a game with organizations and 2 or more players, and only for those", async () => {
+  it("is switched on for a game of 2 or more players (organizations or not), and not for a solo game", async () => {
     expect((await (await game()).room.meta())?.options).toMatchObject({ simul_setup: true });
     const solo = makeRoom({ engine: new SimulEngine() });
     await solo.room.init("g2", { players: 1, organizations: true, expansion: true } as Options, none, false, alice);
@@ -140,7 +140,7 @@ describe("the simultaneous setup", () => {
     await plain.room.init("g3", { players: 2 } as Options, none, false, alice);
     await plain.room.join(bob);
     await plain.room.startGame(alice); // the host starts the game once the lobby is full
-    expect((await plain.room.meta())?.options.simul_setup).toBeUndefined();
+    expect((await plain.room.meta())?.options.simul_setup).toBe(true); // the tuck of the setup is made at the same time too
   });
 
   it("asks every seat who has not locked in, in any order, and each seat moves on its own", async () => {

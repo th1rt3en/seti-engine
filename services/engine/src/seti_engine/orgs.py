@@ -182,7 +182,7 @@ def open_tucks(s: GameState) -> None:
         return
     owing = [q for q in s.players if q.tucks_owed]
     if not owing:
-        if all(q.organization for q in s.players if not (s.rival is not None and q.index == s.rival.index)):
+        if not s.options.organizations or all(q.organization for q in s.players if not (s.rival is not None and q.index == s.rival.index)):
             s.phase = "play"
         return
     for q in owing:

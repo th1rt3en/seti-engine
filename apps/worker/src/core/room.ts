@@ -468,11 +468,16 @@ export class GameRoom {
 
   private async start(meta: Meta): Promise<void> {
     // EXP-ORG-14: with organizations every player chooses the organization and the quick start cards at the same time (a game for one player has nobody to wait for)
-    const simul = meta.options.organizations === true && meta.options.players >= 2 ? { simul_setup: true } : {};
+    const simul = meta.options.players >= 2 ? { simul_setup: true } : {}; // the choices and the tucks of the setup are made at the same time (EXP-ORG-14)
     meta.options = { ...meta.options, ...simul, seed: meta.options.seed ?? this.d.newSeed() }; // the host may have chosen it (init)
     const res = await this.d.engine.newGame(meta.options);
     // Decision D28: the seats are drawn now, so neither the host nor the order of joining decides who sits where. (The engine draws the first player.)
-    meta.seats = shuffledSeats(meta.seats, meta.options.seed ?? 0);
+    // The players are put in the order of their ids first: the draw of one seed then gives the same seating to the same players however they joined
+    // (a game that is made again with the same seed keeps the order of play).
+    meta.seats = shuffledSeats(
+      [...meta.seats].sort((a, b) => ((a?.id ?? "") < (b?.id ?? "") ? -1 : (a?.id ?? "") > (b?.id ?? "") ? 1 : 0)),
+      meta.options.seed ?? 0,
+    );
     meta.status = "playing";
     meta.startedAt = this.d.now();
     await this.d.store.put("state", res.state);

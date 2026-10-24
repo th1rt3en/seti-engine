@@ -53,8 +53,8 @@ class Options(BaseModel):
             raise ValueError("organizations and neutral quick start cards are part of the expansion")
         if self.beginner_organizations and not self.organizations:
             raise ValueError("the beginner organizations are an option of the organization module")
-        if self.simul_setup and not self.organizations:
-            raise ValueError("the simultaneous setup is part of the organization module")
+        if self.simul_setup and self.players < 2:
+            raise ValueError("the simultaneous setup is for games of 2 or more players")
         if self.neutral_quick_start and self.players > 2:
             raise ValueError("the neutral quick start cards are for games of 1 or 2 players")
         chosen = [x for x in self.sandbox_species if x is not None]

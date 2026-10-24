@@ -118,6 +118,12 @@ def new_game(options: Options) -> GameState:
             rival.setup_solo(state, options.difficulty)
         orgs.deal(state, [i for rank in range(n) if (i := (state.start_player + rank) % n) != 1 or not solo])
         return state
+    if options.simul_setup and not solo:
+        # SETUP-36, EXP-ORG-14 (owner, 2026-10-24): each player tucks their card at the same time, independent of the others
+        for p in state.players:
+            p.tucks_owed = 1
+        orgs.open_tucks(state)
+        return state
     # each player tucks one card for income, in turn order: the engine waits for each choice (SETUP-36, FAQ-01)
     for rank in range(n):
         pl = (state.start_player + rank) % n
