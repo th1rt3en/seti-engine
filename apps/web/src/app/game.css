@@ -1864,6 +1864,12 @@ button:disabled {
 .rowinline {
   display: none;
   padding: 8px;
+  position: relative;
+  z-index: 6; /* over the board, which it overlaps on the left */
+  box-sizing: border-box;
+  width: calc(var(--col-aux) * 1.5);
+  max-width: calc(100vw - 16px);
+  align-self: flex-end; /* the right edge stays on the column; the rest pokes out to the left */
 }
 .rowinline .rowbody {
   padding: 0;
@@ -1874,8 +1880,9 @@ button:disabled {
   font-size: 14px;
 }
 .rowinline .rowbody .cards {
-  /* at the top of the column the cards are larger: two in a row are about 50% wider than three */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* the three cards of the row lie in one row; the panel is wider than the column and pokes out to the left over the board, so that they are about 50%
+     larger than when they shared the width of the column (the width follows the column, so it is the same on every desktop size) */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 @media (min-width: 1100px) {
