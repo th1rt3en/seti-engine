@@ -88,6 +88,7 @@ export class GameRoomDO implements DurableObject {
     }
     // the administrator's routes: the Worker has checked the key, and only the Worker can reach this object
     if (url.pathname === "/admin-info") return json((await this.room.adminInfo()) ?? null);
+    if (url.pathname === "/admin-seed") return json((await this.room.adminSeed()) ?? null);
     if (url.pathname === "/admin-cancel") return json(await this.room.adminCancel());
     if (identity === null) return json({ ok: false, code: "unauthorized", message: "sign in first" }, 401);
     if (url.pathname === "/init") {

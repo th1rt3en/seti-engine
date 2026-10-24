@@ -21,6 +21,8 @@ export interface NewGame {
     organizations?: boolean;
     beginner_organizations?: boolean;
     neutral_quick_start?: boolean;
+    /** A seed chosen by the host: casual games only (the Worker refuses it in a rated game). */
+    seed?: number;
   };
   clock: Clock;
   rated: boolean;
@@ -154,6 +156,15 @@ async function adminCall(path: string, method: string, cfg: Config, fetcher: typ
 /** State and last activity of a game, or null when the game is not known to the Worker any more. */
 export async function adminGameInfo(id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch): Promise<AdminGameInfo | null> {
   return (await adminCall(`/games/${id}`, "GET", cfg, fetcher)) as AdminGameInfo | null;
+}
+
+/** The seed of a game (also while it is played), or null when the Worker does not know the game. */
+export async function adminGameSeed(
+  id: string,
+  cfg = loadConfig(),
+  fetcher: typeof fetch = fetch,
+): Promise<{ status: string; seed: number | null; seeded: boolean } | null> {
+  return (await adminCall(`/games/${id}/seed`, "GET", cfg, fetcher)) as { status: string; seed: number | null; seeded: boolean } | null;
 }
 
 /** Cancels a lobby or a game that is being played: nobody wins or loses and no rating changes. */

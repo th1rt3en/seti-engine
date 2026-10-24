@@ -29,6 +29,8 @@ export interface Meta {
   joined: string[];
   createdAt: number;
   startedAt?: number;
+  /** The host chose the seed of the game when making it. */
+  seedChosen?: boolean;
   /** "exact": the random state of the game is kept whole (the engine writes it as a string). Games made before that have no value here: JavaScript rounded their random state. */
   rng?: "exact";
   endedAt?: number;
@@ -146,6 +148,8 @@ export type ServerMessage =
       full: boolean;
       /** The settings of the game (the seed is not part of them). */
       options: Options;
+      /** The host chose the seed of the game (it is not told). */
+      seeded: boolean;
       seats: ({ name: string; num?: number; bot?: true } | null)[];
       host: string | null;
       rated: boolean;
@@ -223,6 +227,9 @@ export class GameRoom {
     if ((await this.d.store.get<Meta>("meta")) !== undefined) return fail("exists", "the game already exists");
     if (rated && (options.players < 2 || options.players > 4)) return fail("not_rateable", "rated games have 2 to 4 players");
     if (rated && !host.registered) return fail("guest", "only registered players can play rated games");
+    // a seed chosen by the host (the advanced option of the new game form): only in a casual game, because whoever knows the seed can work out the hidden cards
+    if (options.seed !== undefined && (rated || !Number.isSafeInteger(options.seed) || options.seed < 0))
+      return fail("bad_seed", "a seed is a whole number from 0, and only a casual game can have one");
     const seats: (Identity | null)[] = Array(options.players).fill(null);
     seats[0] = host;
     const meta: Meta = {
@@ -236,6 +243,7 @@ export class GameRoom {
       joined: [host.id],
       createdAt: this.d.now(),
       rng: "exact",
+      ...(options.seed === undefined ? {} : { seedChosen: true }),
     };
     await this.d.store.put("meta", meta);
     await this.d.sink.recordLobby(meta);
@@ -398,6 +406,13 @@ export class GameRoom {
     };
   }
 
+  /** The administrator reads the seed of a game (also while it is played: the seed gives the hidden cards away, so only the administrator's key reaches this). */
+  async adminSeed(): Promise<{ status: Status; seed: number | null; seeded: boolean } | null> {
+    const meta = await this.meta();
+    if (meta === undefined) return null;
+    return { status: meta.status, seed: meta.options.seed ?? null, seeded: meta.seedChosen === true };
+  }
+
   /**
    * An administrator cancels a lobby or a game that is being played. A lobby is destroyed like an emptied one. A game that was started ends without a
    * result: nobody wins or loses, and nobody's rating changes, whether the game was rated or not (the ratings are only settled by `finish`).
@@ -434,7 +449,7 @@ export class GameRoom {
   private async start(meta: Meta): Promise<void> {
     // EXP-ORG-14: with organizations every player chooses the organization and the quick start cards at the same time (a game for one player has nobody to wait for)
     const simul = meta.options.organizations === true && meta.options.players >= 2 ? { simul_setup: true } : {};
-    meta.options = { ...meta.options, ...simul, seed: this.d.newSeed() };
+    meta.options = { ...meta.options, ...simul, seed: meta.options.seed ?? this.d.newSeed() }; // the host may have chosen it (init)
     const res = await this.d.engine.newGame(meta.options);
     // Decision D28: the seats are drawn now, so neither the host nor the order of joining decides who sits where. (The engine draws the first player.)
     meta.seats = shuffledSeats(meta.seats, meta.options.seed ?? 0);
@@ -868,6 +883,7 @@ function lobbyMessage(meta: Meta, who: string | null = null): ServerMessage {
     you: you >= 0 ? you : null,
     full: meta.seats.every((s) => s !== null),
     options: options as Meta["options"],
+    seeded: meta.seedChosen === true,
     seats: meta.seats.map((s) =>
       s === null ? null : s.bot ? { name: s.name, bot: true as const } : { name: s.name, ...(s.num === undefined ? {} : { num: s.num }) },
     ),

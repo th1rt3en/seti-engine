@@ -192,6 +192,11 @@ export async function createGameAction(form: FormData): Promise<void> {
       }
     : {};
   const preset = CLOCK_PRESETS[field(form, "clock")] ?? CLOCK_PRESETS.none;
+  // the advanced option: a seed for the cards and the dice (casual games only: whoever knows it can work out the hidden cards)
+  const seedText = field(form, "seed").trim();
+  const seed = seedText === "" ? undefined : Number(seedText);
+  if (seed !== undefined && !(Number.isSafeInteger(seed) && seed >= 0)) back("/lobby", "The seed must be a whole number from 0.");
+  if (seed !== undefined && rated) back("/lobby", "A rated game cannot have a chosen seed: untick Rated, or leave the seed empty.");
   const reply = await createGame(user, {
     options: {
       players,
@@ -201,6 +206,7 @@ export async function createGameAction(form: FormData): Promise<void> {
         : {}),
       promo_cards: form.get("promo") === "on",
       promo_set_2: form.get("promo2") === "on",
+      ...(seed === undefined ? {} : { seed }),
       ...expansionOptions,
     },
     clock: (preset as NonNullable<typeof preset>).clock,

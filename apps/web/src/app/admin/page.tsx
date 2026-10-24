@@ -15,6 +15,7 @@ import {
   cancelStaleAction,
   deleteAccountAction,
   resetRatingAction,
+  seedLookupAction,
   setPasswordAction,
   setRatingAction,
 } from "./actions";
@@ -85,6 +86,24 @@ export default async function Admin({
       </header>
       {sp.notice ? <p className="card">{sp.notice}</p> : null}
       {sp.error ? <p className="error">{sp.error}</p> : null}
+
+      <section className="open">
+        <h2>The seed of a table</h2>
+        <p className="muted small">
+          The seed and the log give every hidden card of the game, so keep it to yourself while the game is played. A finished game's seed
+          is public in its replay.
+        </p>
+        <form action={seedLookupAction} className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
+          <input type="hidden" name="back" value={back} />
+          <label>
+            Table number
+            <input type="text" name="table" inputMode="numeric" placeholder="225" required style={{ width: 140 }} autoComplete="off" />
+          </label>
+          <button type="submit" className="secondary">
+            Show the seed
+          </button>
+        </form>
+      </section>
 
       <section className="open">
         <h2>

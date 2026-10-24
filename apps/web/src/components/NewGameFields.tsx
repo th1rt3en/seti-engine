@@ -217,6 +217,25 @@ export function NewGameFields({
         )}
         <Option name="promo" title="Promo cards, set 1" hint="Adds the two promo cards to the deck." />
         <Option name="promo2" title="Promo cards, set 2" hint="Adds Space Agencies and DLR to the deck." />
+        <details className="optadvanced">
+          <summary>Advanced</summary>
+          <label>
+            Seed
+            <input
+              type="text"
+              name="seed"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="random"
+              autoComplete="off"
+              style={{ width: "14rem" }}
+            />
+          </label>
+          <p className="muted small">
+            The same seed gives the same cards and the same starting position (to replay a game, or to play the same deal again). Casual
+            games only: a rated game always has a random seed.
+          </p>
+        </details>
       </section>
 
       <section className="formsec expansion" aria-labelledby="ng-exp">

@@ -4,7 +4,8 @@ import { ADMIN_COOKIE, ADMIN_HOURS, adminToken, checkPassphrase, isAdmin, locked
 import { allOpenGameIds, deleteAccount, resetRating, setRating } from "@/lib/adminData";
 import { AuthFailure, setPasswordByAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { adminCancelGame, adminGameInfo } from "@/lib/worker";
+import { resolveGame } from "@/lib/ids";
+import { adminCancelGame, adminGameInfo, adminGameSeed } from "@/lib/worker";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -85,6 +86,20 @@ export async function resetRatingAction(form: FormData): Promise<void> {
   await requireAdmin(form);
   await resetRating(getDb(), field(form, "user"));
   back(form, `The rating of ${field(form, "name")} is reset (unrated, 0).`);
+}
+
+/** The administrator asks for the seed of a table (the number of the game, or its long id). It gives the hidden cards away: it is shown to the administrator only. */
+export async function seedLookupAction(form: FormData): Promise<void> {
+  await requireAdmin(form);
+  const table = field(form, "table").trim().replace(/^#/, "");
+  const found = table === "" ? null : await resolveGame(getDb(), table);
+  if (found === null) back(form, "No such table.", true);
+  const id = (found as NonNullable<typeof found>).id;
+  const out = await adminGameSeed(id);
+  if (out === null) back(form, "The Worker does not know that table (it may be older than its records, or deleted).", true);
+  const info = out as NonNullable<typeof out>;
+  if (info.seed === null) back(form, `Table ${table} (${info.status}) has no seed yet: it is drawn when the game starts.`, true);
+  back(form, `Table ${table} (${info.status}): seed ${info.seed}${info.seeded ? " (chosen by the host)" : ""}`);
 }
 
 export async function cancelGameAction(form: FormData): Promise<void> {

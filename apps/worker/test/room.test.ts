@@ -358,7 +358,7 @@ describe("the host starts the game", () => {
     const cb = new Conn("b", bob.id);
     const spec = new Conn("s", null);
     t.conns.push(ca, cb, spec);
-    await t.room.init("g", { players: 2, expansion: true, seed: 5 } as Options, none, true, alice);
+    await t.room.init("g", { players: 2, expansion: true } as Options, none, true, alice);
     await t.room.connect(ca);
     await t.room.connect(spec);
     await t.room.join(bob);
@@ -379,5 +379,32 @@ describe("the host starts the game", () => {
     expect(await t.room.startGame(alice)).toMatchObject({ ok: false });
     await t.room.join(cy);
     expect(await t.room.startGame(bob)).toEqual({ ok: true }); // bob is the host now
+  });
+});
+
+describe("a seed chosen by the host", () => {
+  it("is used when the game starts, only in a casual game, and only the administrator can read it", async () => {
+    const t = makeRoom();
+    expect(await t.room.init("r", { players: 2, seed: 77 } as Options, none, true, alice)).toMatchObject({ ok: false, code: "bad_seed" });
+    const bad = makeRoom();
+    expect(await bad.room.init("b", { players: 2, seed: -3 } as Options, none, false, alice)).toMatchObject({
+      ok: false,
+      code: "bad_seed",
+    });
+    const u = makeRoom();
+    expect(await u.room.init("g", { players: 2, seed: 77 } as Options, none, false, alice)).toEqual({ ok: true });
+    expect(await u.room.adminSeed()).toMatchObject({ seed: 77, seeded: true });
+    await u.room.join(bob);
+    await u.room.startGame(alice);
+    expect((await u.room.meta())?.options.seed).toBe(77);
+  });
+
+  it("is a random one when the host chose none (the administrator reads it all the same)", async () => {
+    const t = makeRoom();
+    await t.room.init("g", two, none, false, alice);
+    expect(await t.room.adminSeed()).toMatchObject({ seed: null, seeded: false });
+    await t.room.join(bob);
+    await t.room.startGame(alice);
+    expect(await t.room.adminSeed()).toMatchObject({ seed: 4242, seeded: false });
   });
 });

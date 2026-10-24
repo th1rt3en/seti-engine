@@ -10,6 +10,8 @@ export interface LobbyInfo {
   you: number | null;
   full: boolean;
   rated: boolean;
+  /** The host chose the seed of the game. */
+  seeded?: boolean;
   options: {
     players: number;
     difficulty?: number;
@@ -42,6 +44,7 @@ export function settingLines(lobby: LobbyInfo): { label: string; value: string }
     );
   }
   if (o.promo_cards || o.promo_set_2) lines.push({ label: "Promo cards", value: o.promo_set_2 ? "both sets" : "set 1" });
+  if (lobby.seeded) lines.push({ label: "Seed", value: "chosen by the host" });
   if (o.sandbox) lines.push({ label: "Practice game", value: "cards, resources and discs can be changed freely" });
   return lines;
 }

@@ -64,6 +64,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     if (url.pathname === "/health") return json({ status: "ok" });
     // The administrator's routes (the website's admin page calls them with the key that only the site and this Worker hold):
     //   GET  /admin/games/:id          state and last activity of a game
+    //   GET  /admin/games/:id/seed     the seed of a game (it gives the hidden cards away: only the administrator reads it)
     //   POST /admin/games/:id/cancel   cancel a lobby or a game that is being played (no rating changes)
     if (parts[0] === "admin") return admin(request, env, parts);
     if (parts[0] !== "games") return json({ ok: false, code: "not_found", message: "no such route" }, 404);
@@ -152,6 +153,7 @@ async function admin(request: Request, env: Env, parts: string[]): Promise<Respo
     return json({ ok: false, code: "unknown_game", message: "no such game" }, 404);
   }
   if (request.method === "GET" && action === undefined) return forward(stub, "/admin-info", {});
+  if (request.method === "GET" && action === "seed") return forward(stub, "/admin-seed", {});
   if (request.method === "POST" && action === "cancel") return forward(stub, "/admin-cancel", {}, "POST");
   return json({ ok: false, code: "not_found", message: "no such route" }, 404);
 }
