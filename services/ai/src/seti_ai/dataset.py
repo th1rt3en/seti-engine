@@ -1,8 +1,8 @@
 """The games of people, from the archive, as training examples (docs/AI-TURN-BUNDLES.md section 11).
 
-Every game that was started is archived (decision D25): one file per game, `<table number>.json` (or, for the older games, a `replay.json` or the folder of a game: `header.json`,
-`actions/*.json`, `result.json`). Download the bucket first, for example `gcloud storage rsync -r gs://BUCKET/seti-engine/games ./archive`; this module reads files from
-a folder, it never talks to the bucket.
+Every game that was started is archived (decision D25): one file per game, `<table number>.json` (or, for the older games, a `replay.json` or
+the folder of a game: `header.json`, `actions/*.json`, `result.json`). Download the bucket first, for example
+`gcloud storage rsync -r gs://BUCKET/seti-engine/games ./archive`; this module reads files from a folder, it never talks to the bucket.
 
 What counts:
 - the game was played to its end (a game that was resigned or timed out has no final scores to learn the value from);

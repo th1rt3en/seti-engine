@@ -17,11 +17,13 @@ Only versions with `approved: true` in `models/index.json`. Approving is the own
 
 ```
 cd services/ai
-python -m uv run python -m seti_ai.publish --models models_alpha --approve v001 --live v001   # approve, and list as the version a host can add
+python -m uv run python -m seti_ai.publish --models models_alpha --approve v003=orion --enable orion   # approve with the name you choose, and let a host add it
 python -m uv run python -m seti_ai.lobby_export --models models_alpha --out serve_models      # copies only approved versions (weights are not in git)
 ```
 
-`--live` marks the version in the site's table `bot_versions`; the lobby page offers the live versions to the host, and the same version is listed on `/bots`.
+Every published version has a name that you choose (`--approve v003=orion`; `v001` keeps its own): the name is what the lobby, `/bots`, the seat of the game and the folder
+of the AI service call it. `--enable` and `--disable` (or the buttons of the AI models section of the admin page) mark the version in the site's table `bot_versions`; the
+lobby page offers only the enabled versions to a host, and a disabled one cannot be added to a game. The same versions are listed on `/bots`.
 The weights never leave this machine except in the image below.
 
 ## Redeploy from this machine

@@ -202,3 +202,31 @@ def test_the_model_chooses_its_setup_in_secret_while_a_person_chooses_too() -> N
     assert state.players[bot].setup_locked and not state.players[human].setup_locked
     with pytest.raises(NotYourTurn):
         lobby().move("v001", options, actions, bot, [])  # nothing left for it to do while it waits
+
+
+def test_a_version_is_published_under_the_name_the_owner_gives(tmp_path: Path) -> None:
+    from seti_ai.lobby_export import export
+    from seti_ai.publish import mark_approved, parse_approvals, statements
+
+    for v in ("v001", "v003"):
+        (tmp_path / v).mkdir()
+        (tmp_path / v / "model.pt").write_bytes(b"w")
+        manifest = {"version": v, "created": "2026-10-24T00:00:00Z", "rules_version": "abc", "training": {}, "evaluation": {}, "approved": False}
+        (tmp_path / v / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (tmp_path / "index.json").write_text(json.dumps([{"version": "v001", "approved": False}, {"version": "v003", "approved": False}]), encoding="utf-8")
+    with pytest.raises(SystemExit):
+        parse_approvals(tmp_path, ["v003"])  # a new version needs a name
+    for bad in ("v004", "has space", "x" * 41):
+        with pytest.raises(SystemExit):
+            parse_approvals(tmp_path, [f"v003={bad}"])
+    approvals = parse_approvals(tmp_path, ["v001", "v003=orion"])  # v001 keeps its own name
+    assert approvals == {"v001": "v001", "v003": "orion"}
+    mark_approved(tmp_path, approvals)
+    with pytest.raises(SystemExit):
+        parse_approvals(tmp_path, ["v001=orion"])  # a name is used once
+    assert export(tmp_path, tmp_path / "out") == ["v001", "orion"]
+    assert (tmp_path / "out" / "orion" / "model.pt").exists() and not (tmp_path / "out" / "v003").exists()
+    assert approved_versions(tmp_path / "out") == ["v001", "orion"]
+    sql = statements(tmp_path, [], ["orion"], ["v001"])
+    assert any("VALUES ('orion'" in x and '"built_from": "v003"' in x for x in sql)
+    assert "UPDATE bot_versions SET live = 1 WHERE version = 'orion';" in sql and "UPDATE bot_versions SET live = 0 WHERE version = 'v001';" in sql

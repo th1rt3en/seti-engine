@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/admin";
 import { countAccounts, countOpenGames, listAccounts, openGames } from "@/lib/adminData";
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
+import { botVersions } from "@/lib/queries";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -17,6 +18,7 @@ import {
   deleteAccountAction,
   resetRatingAction,
   seedLookupAction,
+  setBotEnabledAction,
   setPasswordAction,
   setRatingAction,
 } from "./actions";
@@ -75,6 +77,7 @@ export default async function Admin({
     return t ? `/admin?${t}` : "/admin";
   };
   const back = here(accountPage, gamePage);
+  const models = (await botVersions(db)).filter((v) => v.approved);
   return (
     <>
       <header className="pagehead" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
@@ -87,6 +90,38 @@ export default async function Admin({
       </header>
       {sp.notice ? <p className="card">{sp.notice}</p> : null}
       {sp.error ? <p className="error">{sp.error}</p> : null}
+
+      <section className="open">
+        <h2>
+          AI models <span className="count">{models.length}</span>
+        </h2>
+        <p className="muted small">
+          An enabled model can be added to a game by its host. A disabled one is hidden from the lobby and cannot be added; games that
+          already have it go on.
+        </p>
+        {models.length === 0 ? <p className="card muted empty">No model is approved yet.</p> : null}
+        <div className="gamelist">
+          {models.map((m) => (
+            <InlineForm
+              key={m.version}
+              action={setBotEnabledAction}
+              refresh
+              className="card"
+              style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", justifyContent: "space-between" }}
+            >
+              <input type="hidden" name="version" value={m.version} />
+              <input type="hidden" name="enable" value={m.live ? "0" : "1"} />
+              <span>
+                <strong>{m.version}</strong> <span className={m.live ? "pill win" : "pill"}>{m.live ? "enabled" : "disabled"}</span>
+                <span className="muted small"> · {m.created.slice(0, 10)}</span>
+              </span>
+              <button type="submit" className={m.live ? "secondary small" : "primary small"}>
+                {m.live ? "Disable" : "Enable"}
+              </button>
+            </InlineForm>
+          ))}
+        </div>
+      </section>
 
       <section className="open">
         <h2>The seed of a table</h2>

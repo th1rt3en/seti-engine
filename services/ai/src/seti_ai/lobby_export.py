@@ -8,6 +8,7 @@ Only a version with `approved: true` in the index is copied (the owner approves 
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 from pathlib import Path
 
@@ -15,14 +16,21 @@ from .lobby import approved_versions
 
 
 def export(models: Path, out: Path) -> list[str]:
+    """The approved versions, each in a folder of its name (the one the owner gave it; v001 keeps its own), and an index of the names."""
     versions = approved_versions(models)
+    rows = {r["version"]: r for r in json.loads((models / "index.json").read_text(encoding="utf-8"))}
     out.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(models / "index.json", out / "index.json")
+    names: list[str] = []
+    index: list[dict[str, object]] = []
     for v in versions:
-        (out / v).mkdir(exist_ok=True)
-        for name in ("model.pt", "manifest.json"):
-            shutil.copyfile(models / v / name, out / v / name)
-    return versions
+        name = str(rows[v].get("name") or v)
+        names.append(name)
+        index.append({**rows[v], "version": name, "built_from": v})
+        (out / name).mkdir(exist_ok=True)
+        for f in ("model.pt", "manifest.json"):
+            shutil.copyfile(models / v / f, out / name / f)
+    (out / "index.json").write_text(json.dumps(index, indent=1) + "\n", encoding="utf-8")
+    return names
 
 
 def main() -> None:

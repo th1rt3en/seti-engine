@@ -103,6 +103,17 @@ export async function seedLookupAction(form: FormData): Promise<Said> {
   return { ok: true, message: `Table ${table} (${out.status}): seed ${out.seed}${out.seeded ? " (chosen by the host)" : ""}` };
 }
 
+/** The administrator lets a host add an AI model to a game, or not (`bot_versions.live`). A model that is not approved cannot be enabled. */
+export async function setBotEnabledAction(form: FormData): Promise<Said> {
+  if (!(await isAdmin())) return { ok: false, message: "Log in again." };
+  const version = field(form, "version");
+  const enable = field(form, "enable") === "1";
+  await getDb().run("UPDATE bot_versions SET live = ? WHERE version = ? AND approved = 1", enable ? 1 : 0, version);
+  const row = (await getDb().all<{ live: number }>("SELECT live FROM bot_versions WHERE version = ? AND approved = 1", version))[0];
+  if (row === undefined) return { ok: false, message: `${version} is not an approved version.` };
+  return { ok: true, message: `${version} is ${row.live === 1 ? "available to hosts" : "off: hosts cannot add it"} now.` };
+}
+
 export async function cancelGameAction(form: FormData): Promise<void> {
   await requireAdmin(form);
   const out = await adminCancelGame(field(form, "game"));
