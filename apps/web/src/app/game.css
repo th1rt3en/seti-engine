@@ -1181,7 +1181,14 @@ button:disabled {
     left: 75%;
     border-right: 0;
   }
-  .dock:not(.folded) > .handtab {
+  /* the tabs keep their background when they are touched: on a touch screen a tab that was tapped stays :hover, and the rule of the buttons that makes
+     a tab transparent (.handtab:hover) must not win over these */
+  .dock > .handtab,
+  .dock > .handtab:hover:not(:disabled) {
+    background: var(--panel);
+  }
+  .dock:not(.folded) > .handtab,
+  .dock:not(.folded) > .handtab:hover:not(:disabled) {
     background: color-mix(in srgb, var(--accent) 28%, var(--panel));
   }
   .handbody,

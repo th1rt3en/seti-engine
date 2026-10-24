@@ -75,6 +75,13 @@ function scanStepText(types: Set<string>): string {
 }
 
 /** Who has locked in their choices of the organization and the quick start cards, and who is still choosing (EXP-ORG-14). */
+export function stillChoosing(view: View, names: string[]): string[] {
+  const name = (i: number): string => names[i] ?? `Player ${i + 1}`;
+  return view.state.players
+    .filter((p) => !(view.state.rival && p.index === view.state.rival.index) && !p.setup_locked)
+    .map((p) => name(p.index));
+}
+
 export function setupStatus(view: View, names: string[]): string {
   const name = (i: number): string => names[i] ?? `Player ${i + 1}`;
   const players = view.state.players.filter((p) => !(view.state.rival && p.index === view.state.rival.index));
@@ -95,7 +102,7 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
         ? view.legal.some((m) => m.type === "setup_tuck" || m.type === "setup_untuck")
           ? "tuck your cards for income, one at a time, then lock in"
           : "choose your organization and your quick start cards, then lock in"
-        : `your choices are locked in; waiting for the others (you can change them until everybody has locked in). ${setupStatus(view, names)}`,
+        : `Waiting for other players. Still choosing: ${stillChoosing(view, names).join(", ")}`,
     };
   }
   const actor = view.to_act;

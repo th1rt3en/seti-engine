@@ -1480,3 +1480,10 @@ table.shortcuts td:first-child {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* no keyboard on a phone: the button of the shortcuts is not shown */
+@media (max-width: 760px) {
+  .kbdbtn {
+    display: none;
+  }
+}
