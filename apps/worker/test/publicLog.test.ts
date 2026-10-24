@@ -49,6 +49,35 @@ describe("the moves of the simultaneous setup", () => {
       expect(publicEntry(e, null)).toMatchObject({ action: { type: "setup_hidden" } });
       expect((publicEntry(e, 0).action as { type: string }).type).toBe(type);
     }
-    expect(publicEntry(entry("setup_lock", 0) as never, 1).action).toMatchObject({ type: "setup_lock" }); // who has locked in is public
+    expect(publicEntry(entry("setup_lock", 0) as never, 1).action).toMatchObject({ type: "setup_lock" }); // the other players see who has locked in
+  });
+});
+
+describe("what an observer sees of the setup", () => {
+  const lock = (type: string, events: Record<string, unknown>[]) =>
+    ({ seq: 4, seat: 0, action: { type, seat: 0 }, at: 0, events }) as never;
+  it("nothing until everybody has locked in: the locks and the unlocks are hidden; the last lock of a step, which tells the final choices, is shown", () => {
+    expect(publicEntry(lock("setup_lock", [{ type: "setup_locked", player: 0 }]), null).action).toEqual({ type: "setup_hidden" });
+    expect(publicEntry(lock("setup_unlock", [{ type: "setup_unlocked", player: 0 }]), null).action).toEqual({ type: "setup_hidden" });
+    expect(
+      publicEntry(
+        lock("setup_lock", [
+          { type: "setup_locked", player: 1 },
+          { type: "organization", player: 0, org: "x" },
+        ]),
+        null,
+      ).action,
+    ).toMatchObject({ type: "setup_lock" });
+    expect(
+      publicEntry(
+        lock("setup_lock", [
+          { type: "setup_locked", player: 1 },
+          { type: "setup_done", player: 0, tucks: ["1"] },
+        ]),
+        null,
+      ).events,
+    ).toHaveLength(2);
+    // a player sees the locks of the others
+    expect(publicEntry(lock("setup_lock", [{ type: "setup_locked", player: 0 }]), 1).action).toMatchObject({ type: "setup_lock" });
   });
 });

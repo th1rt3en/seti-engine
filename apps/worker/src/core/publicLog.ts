@@ -28,10 +28,18 @@ const without = <T extends Record<string, unknown>>(o: T, key: string): T => {
  * player ends up with is told by one event (`setup_done`) when everybody has locked in. The place in the log stays, so that its numbers do not change. */
 const HIDDEN_SETUP_MOVES = new Set(["choose_org", "choose_quick", "setup_tuck", "setup_untuck"]);
 
+/** The locks of the setup: the players see who has locked in (EXP-ORG-14), the observers see nothing of the setup until everybody has locked in. */
+const SETUP_LOCKS = new Set(["setup_lock", "setup_unlock"]);
+/** The events that tell what everybody ended up with: only the last lock of a step has them. */
+const SETUP_REVEALS = new Set(["organization", "setup_done"]);
+
 /** The card drawn from the deck is told to the player who drew it only. */
 export function publicEntry(e: LogEntry, viewer: number | null = null): PublicEntry {
   const type = String((e.action as Record<string, unknown>).type);
-  if (HIDDEN_SETUP_MOVES.has(type) && e.seat !== viewer) return { seq: e.seq, seat: e.seat, action: { type: "setup_hidden" }, events: [] };
+  const hidden: PublicEntry = { seq: e.seq, seat: e.seat, action: { type: "setup_hidden" }, events: [] };
+  if (HIDDEN_SETUP_MOVES.has(type) && e.seat !== viewer) return hidden;
+  // an observer (nobody's seat) is shown the setup when everybody has locked in: the last lock of a step carries the final choices
+  if (SETUP_LOCKS.has(type) && viewer === null && !e.events.some((ev) => SETUP_REVEALS.has(String(ev.type)))) return hidden;
   const action = HIDDEN_CARD_ACTIONS.has(type)
     ? without(e.action as Record<string, unknown>, "card")
     : SECRET_CHOICES.has(type) && e.seat !== viewer
