@@ -562,6 +562,10 @@ export class GameRoom {
     const state = await this.state();
     if (!actors(state).includes(seat)) return null;
     try {
+      // a move that shows something hidden (the next exploration card, a card of the deck ...) is not previewed: its result would give the hidden card away
+      const view = await this.d.engine.project(state, seat);
+      const at = view.legal.findIndex((m) => JSON.stringify(m) === JSON.stringify(action));
+      if (at >= 0 && (view.notes?.[at] as { irreversible?: boolean } | null | undefined)?.irreversible) return null;
       const res = await this.d.engine.apply(state, action);
       const delta = res.events.find((e) => e.type === "delta" && e.player === seat) as { changes?: Record<string, number> } | undefined;
       return delta?.changes ?? {};

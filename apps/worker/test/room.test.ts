@@ -1,8 +1,8 @@
-import type { Options } from "@seti/protocol";
+import type { GameState, Options, View } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
 import type { Identity } from "../src/core/auth.js";
 import type { ServerMessage } from "../src/core/room.js";
-import { Conn, alice, bob, cy, guest, makeRoom } from "./helpers.js";
+import { Conn, FakeEngine, alice, bob, cy, guest, makeRoom } from "./helpers.js";
 
 const two = { players: 2 } as Options;
 const none = { kind: "none" } as const;
@@ -163,6 +163,20 @@ describe("play", () => {
     expect(await t.room.preview(alice, { type: "launch" })).toBeNull(); // an illegal move
     expect(await t.room.log()).toHaveLength(0); // nothing was played
     expect(await t.room.submit(alice, 0, { type: "score" })).toEqual({ ok: true });
+  });
+
+  it("does not preview a move that shows something hidden (an irreversible move)", async () => {
+    class HidingEngine extends FakeEngine {
+      override async project(state: GameState, viewer: number | null): Promise<View> {
+        return { ...(await super.project(state, viewer)), notes: [{ irreversible: true }] } as unknown as View;
+      }
+    }
+    const t = makeRoom({ engine: new HidingEngine() });
+    await t.room.init("g1", two, none, false, alice);
+    await t.room.join(bob);
+    await t.room.startGame(alice);
+    expect(await t.room.preview(alice, { type: "score" })).toBeNull(); // its result would give the hidden card away
+    expect(await (await started()).room.preview(alice, { type: "score" })).toEqual({}); // a move that shows nothing is still previewed
   });
 
   it("a repeated message does not act twice", async () => {
