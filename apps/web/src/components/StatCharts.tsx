@@ -3,6 +3,7 @@
 // The colours are the validated categorical colours of the dark surface (seti-engine docs: dataviz), set in ui.css as --viz-1 ... --viz-5.
 import type { Spread } from "@/lib/stats";
 import type { ReactNode } from "react";
+import { FilterPill } from "./FilterPill";
 
 /** The lowest value, the highest and the standard deviation of the players, as a small card that opens when the pointer rests on the number (or it has the focus). */
 export function SpreadTip({ spread, unit }: { spread: Spread; unit?: string }) {
@@ -336,14 +337,7 @@ export function Pills({
   return (
     <nav className="fpills" aria-label={name}>
       {choices.map((c) => (
-        <a
-          key={c.value}
-          href={href(c.value)}
-          className={c.value === current ? "fpill on" : "fpill"}
-          aria-current={c.value === current ? "true" : undefined}
-        >
-          {c.label}
-        </a>
+        <FilterPill key={c.value} href={href(c.value)} label={c.label} on={c.value === current} />
       ))}
     </nav>
   );

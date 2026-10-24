@@ -1,3 +1,4 @@
+import { FilterForm } from "@/components/FilterForm";
 import { Pager } from "@/components/Pager";
 import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
@@ -37,12 +38,7 @@ export default async function SoloLeaderboard({
         </Link>
       </nav>
       <p className="muted">The best final scores of solo games that were played to their end. Sandbox games do not count.</p>
-      <form
-        method="get"
-        action="/leaderboard/solo"
-        className="card"
-        style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}
-      >
+      <FilterForm action="/leaderboard/solo" className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
         <label>
           Rival difficulty
           <select name="difficulty" defaultValue={difficulty === null ? "" : String(difficulty)}>
@@ -65,7 +61,7 @@ export default async function SoloLeaderboard({
         <button type="submit" className="primary">
           Show
         </button>
-      </form>
+      </FilterForm>
       {rows.length === 0 ? (
         <p>No solo game matches yet.</p>
       ) : (

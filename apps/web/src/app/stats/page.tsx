@@ -1,4 +1,5 @@
 import { AlienStatsSection } from "@/components/AlienStats";
+import { FilterForm } from "@/components/FilterForm";
 // Statistics of the games that were played to their end, averaged for each player of each game (the counters come from the engine: stats.py).
 // The filter chooses which games count: the number of players, the expansion, rated or casual. Nothing is worked out here that is a rule.
 // Drawn as tiles and charts (components/StatCharts.tsx), every block with its numbers as a table behind a button.
@@ -266,7 +267,7 @@ export default async function StatsPage({
 
       <details className="card stat-advanced" open={filter.species !== null || filter.org !== null}>
         <summary>Advanced filters</summary>
-        <form method="get" action="/stats" className="stat-advanced-form">
+        <FilterForm action="/stats" className="stat-advanced-form">
           {Object.entries(base)
             .filter(([k]) => k !== "species" && k !== "org")
             .map(([k, v]) => (
@@ -307,7 +308,7 @@ export default async function StatsPage({
               Clear these
             </a>
           ) : null}
-        </form>
+        </FilterForm>
         <p className="muted small">
           The alien species keeps the games that have it, discovered or not, and counts every player of those games. The organization keeps
           only the players who picked it, so the tables of organizations, species and techs then describe those players. Both go with the

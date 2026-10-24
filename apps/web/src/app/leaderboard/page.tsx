@@ -1,3 +1,4 @@
+import { FilterForm } from "@/components/FilterForm";
 import { Pager } from "@/components/Pager";
 import { PlayerLink } from "@/components/PlayerLink";
 import { getDb } from "@/lib/db";
@@ -33,7 +34,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
         Elo rating from rated games with 2 to 4 players. Everyone starts at 0: a new player gains fast, nobody drops below 100, and a player
         below 100 loses nothing.
       </p>
-      <form method="get" action="/leaderboard" className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
+      <FilterForm action="/leaderboard" className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
         <label>
           Find a player
           <input type="search" name="q" defaultValue={q} placeholder="Name" />
@@ -50,7 +51,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
         <button type="submit" className="secondary">
           Show
         </button>
-      </form>
+      </FilterForm>
       <p className="muted small">A rating does not drop below 100: after that a loss costs nothing.</p>
       {rows.length === 0 ? (
         <p>{q || Number(min) > 0 ? "No player matches." : "No rated game has been played yet."}</p>
