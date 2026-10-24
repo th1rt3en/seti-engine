@@ -15,6 +15,7 @@ from __future__ import annotations
 import copy
 import json
 import random
+import time
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -181,7 +182,11 @@ def search_positions(
     """Search from each position, with the turn of the person offered as a candidate (`offer`), and make the policy examples from the best bundle found.
     Without `offer` the search is the model's alone (to see what the offered bundles add)."""
     out, st = Examples(), ExpertStats()
-    for pos in found:
+    started = time.time()
+    for k, pos in enumerate(found):
+        if k > 0 and k % 20 == 0:  # a search of a position takes seconds: a line of progress every 20 tells that the run is going
+            done = time.time() - started
+            print(f"    searched {k}/{len(found)} positions of people ({done:.0f}s, about {done / k * (len(found) - k):.0f}s left)", flush=True)
         res = search.search(pos.state, pos.seat, pos.history, pos.knowledge, rng, offered=[pos.human] if offer else None)
         st.positions += 1
         best = res.best

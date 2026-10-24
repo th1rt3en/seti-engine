@@ -34,7 +34,7 @@ from typing import Any
 import numpy as np
 import torch
 
-from . import arena, bundle_train, checkpoint, dataset, expert, gate, registry, selfplay
+from . import arena, bundle_train, checkpoint, dataset, expert, gate, logstamp, registry, selfplay
 from .agent import PRESETS, LocalNet, PolicyNet, net_from, new_net
 from .bundle_data import Examples
 from .bundle_search import Brain, BundleBot, BundleSearch, SearchConfig
@@ -343,6 +343,7 @@ def main() -> None:
     ap.add_argument("--explore-rounds", type=int, default=2)
     ap.add_argument("--resume", action="store_true")
     a = ap.parse_args()
+    logstamp.install()  # every line of the log has the date and the time
     if a.cmd == "pause":
         checkpoint.request_pause(Path(a.models))
         print("pause requested: the run stops at the end of the iteration that it is in")
