@@ -89,10 +89,10 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
         <>
           <p className="muted">The quick start cards of the expansion. A player is dealt three of them and keeps two.</p>
           <div className="libgrid">
-            {QUICK.map(([id, q]) => (
+            {QUICK.map(([id]) => (
               <figure key={id}>
                 <img src={cardImage(id)} alt={`Quick start card ${id}`} loading="lazy" />
-                <figcaption className="muted small">Marks {q.marks}</figcaption>
+                <figcaption className="muted small">{id}</figcaption>
               </figure>
             ))}
           </div>
