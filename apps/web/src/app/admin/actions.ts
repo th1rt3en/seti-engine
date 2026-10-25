@@ -105,7 +105,7 @@ export async function seedLookupAction(form: FormData): Promise<Said> {
 }
 
 /** The last actions of a table that is being played, for the administrator to see what to take back. */
-export async function recentActionsAction(form: FormData): Promise<Said> {
+async function recentActions(form: FormData): Promise<Said> {
   if (!(await isAdmin())) return { ok: false, message: "Log in again." };
   const table = field(form, "table").trim().replace(/^#/, "");
   const found = table === "" ? null : await resolveGame(getDb(), table);
@@ -113,12 +113,19 @@ export async function recentActionsAction(form: FormData): Promise<Said> {
   const out = await adminRecentActions(found.id, 8);
   if (!out.ok || out.recent === undefined)
     return { ok: false, message: `Table ${table}: ${out.message ?? "the game is not being played"}.` };
-  const lines = out.recent.map((e) => `#${e.seq + 1} seat ${e.seat + 1}: ${describeMove(e.action as { type: string })}`);
+  const what = (action: Record<string, unknown>): string => {
+    try {
+      return describeMove(action as { type: string });
+    } catch {
+      return JSON.stringify(action); // a move that the page cannot put in words is shown as it is
+    }
+  };
+  const lines = out.recent.map((e) => `#${e.seq + 1} seat ${e.seat + 1}: ${what(e.action)}`);
   return { ok: true, message: [`Table ${table} is at action ${out.total}. The last ones, the most recent last:`, ...lines].join("\n") };
 }
 
 /** Takes back the last actions of a table that is being played (whoever made them, whatever they showed); the players see the table as it was. */
-export async function undoActionsAction(form: FormData): Promise<Said> {
+async function undoActions(form: FormData): Promise<Said> {
   if (!(await isAdmin())) return { ok: false, message: "Log in again." };
   const table = field(form, "table").trim().replace(/^#/, "");
   const count = Number(field(form, "count"));
@@ -131,6 +138,23 @@ export async function undoActionsAction(form: FormData): Promise<Said> {
     ok: true,
     message: `Table ${table}: ${out.removed} action${out.removed === 1 ? "" : "s"} taken back; the game is at action ${out.left} now.`,
   };
+}
+
+/** An action of this page never fails the page: what goes wrong is said beside the button. */
+async function guard(run: () => Promise<Said>): Promise<Said> {
+  try {
+    return await run();
+  } catch (e) {
+    return { ok: false, message: `That did not work: ${e instanceof Error ? e.message : "unknown error"}` };
+  }
+}
+
+export async function recentActionsAction(form: FormData): Promise<Said> {
+  return guard(() => recentActions(form));
+}
+
+export async function undoActionsAction(form: FormData): Promise<Said> {
+  return guard(() => undoActions(form));
 }
 
 /** The administrator lets a host add an AI model to a game, or not (`bot_versions.live`). A model that is not approved cannot be enabled. */

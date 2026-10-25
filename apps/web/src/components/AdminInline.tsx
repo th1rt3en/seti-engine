@@ -31,8 +31,13 @@ export function InlineForm({
     if (ask && !window.confirm(ask)) return;
     const data = new FormData(e.currentTarget);
     start(async () => {
-      setSaid(await action(data));
-      if (refresh) router.refresh();
+      try {
+        setSaid(await action(data));
+        if (refresh) router.refresh();
+      } catch {
+        // a failure of the action is said beside the button: it must not take the whole page down
+        setSaid({ ok: false, message: "That did not work: the server could not do it. Try again, or look at the error reports." });
+      }
     });
   };
   return (

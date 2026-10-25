@@ -154,7 +154,13 @@ async function adminCall(path: string, method: string, cfg: Config, fetcher: typ
     headers: { "x-admin-key": cfg.adminWorkerKey, ...(body === undefined ? {} : { "content-type": "application/json" }) },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
-  return res.json();
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    // the Worker (or what is in front of it) did not answer with JSON: say so instead of failing the page
+    return { ok: false, code: "bad_reply", message: `the Worker answered ${res.status} with something that is not JSON` };
+  }
 }
 
 /** State and last activity of a game, or null when the game is not known to the Worker any more. */
