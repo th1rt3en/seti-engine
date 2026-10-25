@@ -413,7 +413,7 @@ export function rowMoveText(m: Move, row: string[]): string {
       return `Take ${card}?`;
     case "row_pick":
     case "scan_discard":
-      return `Discard ${card} for a signal in a sector of its color?`;
+      return `Discard ${card} for a signal?`;
     case "scan_token":
       return `Discard a signal token and ${card} for a signal?`;
     default:

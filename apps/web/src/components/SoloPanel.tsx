@@ -108,7 +108,7 @@ const EXPANSION = expansionAssets as Record<string, string>;
 const EXPANSION_RIVAL: Record<string, string> = { "SE.1": "rival-00", "SE.2": "rival-01", "SE.3": "rival-02", "SE.4": "rival-03" };
 const rivalCardImage = (id: string): string => RIVAL_CARDS[id] ?? EXPANSION[EXPANSION_RIVAL[id] ?? ""] ?? "";
 
-/** The place of the rival's marker among the 12 circles of its progress track, as the board shows it (1 to 12, clockwise from the lower left): the pill of the
+/** The place of the rival's marker among the 12 circles of its progress track, as the board shows it (1 to 12, clockwise from the first circle after the growth icon at the top): the pill of the
  * rival says the same number. (The engine's own number is the place in its list of the spaces, which is not the order of the printed circles.) */
 export function progressSpace(view: View): number | null {
   const r = view.state.rival;
@@ -116,7 +116,8 @@ export function progressSpace(view: View): number | null {
   const board = boardOf(view.state.options.difficulty ?? 3);
   const [color = "blue", glyph = "dot"] = (TRACK[r.progress] ?? "blue-dot").split("-");
   const k = (GROUP_COLORS[board] ?? []).indexOf(color) * 4 + GLYPHS.indexOf(glyph);
-  return k < 0 ? null : k + 1;
+  // the growth icon (the card at the top of the ring) lies between the circles 4 and 5 of the places above, on every board: the first circle after it is 1
+  return k < 0 ? null : ((k + 8) % 12) + 1;
 }
 
 function Rival({ view }: { view: View }) {

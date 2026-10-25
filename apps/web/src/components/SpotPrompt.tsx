@@ -43,11 +43,7 @@ export function SpotPrompt({ note, fallback }: { note: Note; fallback?: string }
     );
   }
   if (note.land_data) {
-    return (
-      <span className="spotprompt">
-        Confirm landing on the space of <b>{cap(note.land_data.planet)}</b> that gives <b>{note.land_data.data} data</b>?
-      </span>
-    );
+    return <span className="spotprompt">Confirm landing?</span>;
   }
   if (note.resolve) {
     return (

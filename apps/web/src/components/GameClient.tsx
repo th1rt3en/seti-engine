@@ -895,8 +895,7 @@ export function GameClient({
     ask = {
       text: (
         <>
-          Confirm marking the <b>{goldTile.tile}</b> gold scoring tile ({GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.per})? You would be
-          the {["first", "second", "third or later"][Math.min(goldTile.markers.length, 2)]} to mark it:{" "}
+          Confirm marking the <b>{goldTile.tile}</b> gold scoring tile ({GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.per}):{" "}
           <b>{GOLD_INFO[`${goldTile.tile}-${goldTile.side}`]?.values[Math.min(goldTile.markers.length, 2)]} points</b> for each.
         </>
       ),
@@ -952,7 +951,7 @@ export function GameClient({
       onCard: spotOption.id.startsWith("alien:"), // an alien card: its buttons lie on the card on the board
     };
   } else if (rowMode) {
-    ask = { text: "Click the card of the display that you want.", buttons: [], onCancel: () => setRowMode(null) };
+    ask = { text: "Choose a card on the display", buttons: [], onCancel: () => setRowMode(null) };
   } else if (buyOptions.length > 0 && !rowMode) {
     // taking the card that was picked (a bonus or an effect says to) is confirmed (or given up) on the card itself
     ask = {
@@ -1030,7 +1029,7 @@ export function GameClient({
   const breachNode =
     breachDecision && !ask ? (
       <span className="breachbar">
-        Breach your {breachColor} security card? It goes to your hand and opens a deeper level of the Arkhos board.
+        Breach your {breachColor} security card?
         {breachCard ? (
           <img
             src={(expansionAssets as Record<string, string>)[`arkhos/security-back-${breachColor}`]}

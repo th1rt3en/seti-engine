@@ -189,10 +189,11 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         if s.probes:
             s.pending.append(Decision(kind="gop", player=p.index, data={"left": n, "chosen": []}))
     elif t == "row_scan":
-        s.queue[0:0] = [{"t": "row_pick"} for _ in range(min(n, len(s.card_row)))]
+        picks = min(n, len(s.card_row))
+        s.queue[0:0] = [{"t": "row_pick", "idx": k + 1, "of": picks} for k in range(picks)]
     elif t == "row_pick":
         if s.card_row:
-            s.pending.append(Decision(kind="row_pick", player=p.index))
+            s.pending.append(Decision(kind="row_pick", player=p.index, data={"idx": st.get("idx", 1), "of": st.get("of", 1)}))
     elif t == "refill_row":
         effects.refill_card_row(s)
     elif t == "show_move":  # #74 Pre-launch Testing: the player shows cards from the hand, 1 movement for each with a movement corner
@@ -203,7 +204,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
             s.pending.append(Decision(kind="show_energy", player=p.index, data={"shown": []}))
     elif t == "hand_signals":
         if any(tables.cards()[c].get("sector") for c in p.hand):
-            s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": n}))
+            s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": n, "of": n}))
     elif t == "deck_signals":
         s.queue[0:0] = [{"t": "deck_signal"} for _ in range(n)]
     elif t == "deck_signal":
@@ -827,7 +828,7 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         s.discard.append(a["card"])
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[a["card"]]["sector"]}))
         if d.data["left"] > 1:
-            s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": d.data["left"] - 1}))
+            s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": d.data["left"] - 1, "of": d.data.get("of", d.data["left"])}))
     elif t == "hand_signal_done":
         pass
     elif t == "show_move":  # the card stays in the hand; everybody sees it (the log names it) and the player gains 1 movement

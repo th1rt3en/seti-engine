@@ -23,6 +23,7 @@ import {
   EnergyIcon,
   ExofossilIcon,
   LongTermIcon,
+  MoveIcon,
   ObjectiveIcon,
   ProgressIcon,
   PublicityIcon,
@@ -48,48 +49,100 @@ const ROUNDS = 5;
 
 /** What the engine waits for, in words. */
 const DECISION: Record<string, string> = {
-  setup_tuck: "tuck a card for income",
-  helion_tuck: "tuck a card for income",
-  breach: "breach a security card, or not",
-  income_tuck: "tuck a card for income, or skip",
-  discard_to_four: "discard down to four cards",
-  take_round_card: "take an end-of-round card",
-  data_overflow: "place data first, or take the data",
-  sector_order: "choose which completed sector to resolve next",
-  gold_choice: "mark a gold scoring tile",
-  signal: "mark a signal",
-  trace: "mark a trace",
-  scan_step: "scan",
-  take_card: "take a card",
-  oumuamua_signal: "mark the signal in the sector, or on the 'Oumuamua tile (click the sector or the tile)",
-  show_energy: "show cards with an energy income from your hand (1 energy for each), or stop",
-  pol_corner: "discard one of the drawn cards for its free action",
-  pol_income: "discard one of the drawn cards for its income",
-  land_free: "land for free",
-  orbit_land_free: "orbit or land for free",
-  land_data_slot: "cover a first-lander space: the one with 2 data or the one with 1 data",
-  message_reward: "cover a reward of the Centaurian board with your message tile (click it on the board)",
-  exertian_play: "play an Exertian card, or not",
-  research_tech: "take a tech",
-  computer_slot: "choose a computer slot",
-  pick_probe: "click one of your probes on the board",
-  objective_task: "mark a task of an objective: click one of the highlighted tasks in the objectives panel",
+  setup_tuck: "Tuck a card for income",
+  helion_tuck: "Tuck a card for income",
+  setup_start: "Setting up the game",
+  breach: "Choose whether to breach a security card",
+  income_tuck: "Tuck a card for income, or skip",
+  discard_to_four: "Discard down to four cards",
+  take_round_card: "Take an end-of-round card",
+  data_overflow: "Place data first, or take the data",
+  sector_order: "Choose which completed sector to resolve next",
+  gold_choice: "Mark a gold scoring tile",
+  signal: "Mark a signal",
+  trace: "Mark a trace",
+  scan_step: "Scan",
+  take_card: "Take a card",
+  oumuamua_signal: "Mark a signal",
+  show_energy: "Choose a card from your hand to show",
+  show_move: "Choose a card from your hand to show",
+  pol_corner: "Discard for free action corner",
+  pol_income: "Discard for income corner",
+  land_free: "Land for free",
+  orbit_land_free: "Orbit or land for free",
+  land_data_slot: "Choose a landing space to cover",
+  message_reward: "Choose a Centaurian milestone reward",
+  exertian_play: "Play an Exertian card?",
+  research_tech: "Research a tech",
+  computer_slot: "Choose a computer slot",
+  pick_probe: "Pick a probe",
+  objective_task: "Choose an objective task to complete",
+  amoeba_remove: "Remove one of your markers on the Amoeba board",
+  choose_org: "Choose an organization",
+  choose_quick: "Choose 2 quickstart cards to keep",
+  corner_pick: "Choose {publicity}, {data} or 1 {move}",
+  discard_corner: "Discard a non-alien card to gain x3 its free corner effect",
+  glyph_group: "Choose a glyph group",
+  hold: "Use your movement, or continue",
+  mascamite_sample: "Choose a sample token to gain its reward",
+  mission_trigger: "Choose a mission reward",
+  optional: "Spend an {exofossil} for extra effect?",
+  org_mark: "Mark a reward space of your organization board, or skip",
+  remove_lander: "Choose a lander to remove",
+  remove_orbiter: "Choose an orbiter to remove",
+  restructure: "Choose any number of cards to discard",
+  return_mission: "Choose an incomplete mission",
+  slingshot: "Gain movement instead of publicity",
+  take_alien_card: "Take an alien card",
 };
 
-const humanize = (kind: string): string => DECISION[kind] ?? kind.replace(/_/g, " ");
+const capital = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
+const humanize = (kind: string): string => DECISION[kind] ?? capital(kind.replace(/_/g, " "));
+
+const PROMPT_ICONS: Record<string, ReactNode> = {
+  publicity: <PublicityIcon size={20} />,
+  data: <DataIcon size={20} />,
+  move: <MoveIcon size={20} />,
+  energy: <EnergyIcon size={20} />,
+  exofossil: <ExofossilIcon size={20} />,
+};
+/** The text of the context bar, with the icons that it names in braces: "Spend an {exofossil} for extra effect?". */
+function withIcons(text: string): ReactNode {
+  return text.split(/(\{[a-z]+\})/).map((part, i) => {
+    const icon = PROMPT_ICONS[part.slice(1, -1)];
+    return icon && part.startsWith("{") ? <span key={`${i}-${part}`}>{icon}</span> : part;
+  });
+}
+
+/** What a player who is not the one to act reads: "Alice must choose a card" (a question is "must answer: ..."). */
+const mustText = (text: string): string =>
+  text.endsWith("?") ? `must answer: ${text}` : `must ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
+
+/** What the engine waits for, with the counts that it keeps for some decisions ("2/3"). */
+function decisionText(kind: string, data: Record<string, unknown> | undefined): string {
+  const left = Number(data?.left);
+  const of = Number(data?.of);
+  if (kind === "gop" && left > 0) return `Choose up to ${left} probe${left === 1 ? "" : "s"}`;
+  if (kind === "hand_signal") return `Discard a card from your hand to mark a signal${of > 1 ? ` (${of - left + 1}/${of})` : ""}`;
+  if (kind === "row_pick") {
+    const idx = Number(data?.idx);
+    return `Discard a card from the display for a signal${of > 1 ? ` (${idx}/${of})` : ""}`;
+  }
+  return humanize(kind);
+}
 
 /** The steps of the scan that the player can do now, from the moves the engine offers (any order: they are all offered at once). */
 function scanStepText(types: Set<string>): string {
   const steps: string[] = [];
-  if (types.has("scan_earth")) steps.push("mark a signal in Earth's sector (or next to it, with the telescope tech)");
-  if (types.has("scan_discard")) steps.push("discard a card of the card row to mark a signal in a sector of its color");
-  if (types.has("scan_token")) steps.push("discard a signal token and another card of the card row for a signal");
-  if (types.has("scan_mercury")) steps.push("spend 1 publicity to mark a signal in Mercury's sector");
-  if (types.has("scan_hand_discard")) steps.push("discard a card from your hand to mark a signal in a sector of its color");
-  if (types.has("scan_probe")) steps.push("spend 1 energy to launch a probe, or gain 1 free movement");
+  if (types.has("scan_earth")) steps.push("Signal at Earth");
+  if (types.has("scan_discard")) steps.push("Signal from display");
+  if (types.has("scan_token")) steps.push("Signal token and display card for a signal");
+  if (types.has("scan_mercury")) steps.push("Spend 1 publicity to signal at Mercury");
+  if (types.has("scan_hand_discard")) steps.push("Signal from hand");
+  if (types.has("scan_probe")) steps.push("Launch (1 {energy}) / 1 {move}");
   if (steps.length === 0) return "Scan: no step is left, finish the scan";
-  const done = types.has("scan_done") ? "; or finish the scan" : "";
-  return `Scan, in any order: ${steps.join("; ")}${done}`;
+  const done = types.has("scan_done") ? ", or finish the scan" : "";
+  return `Choose in any order: ${steps.join(", ")}${done}`;
 }
 
 /** Who has locked in their choices of the organization and the quick start cards, and who is still choosing (EXP-ORG-14). */
@@ -118,8 +171,8 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
       mine,
       text: mine
         ? view.legal.some((m) => m.type === "setup_tuck" || m.type === "setup_untuck")
-          ? "tuck your cards for income, one at a time, then lock in"
-          : "choose your organization and your quick start cards, then lock in"
+          ? "Tuck your cards for income, one at a time, then lock in"
+          : "Choose an organization and 2 quickstart cards"
         : `Waiting for other players. Still choosing: ${stillChoosing(view, names).join(", ")}`,
     };
   }
@@ -137,30 +190,13 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
       return {
         who,
         mine,
-        text: none
-          ? `no organelle of the ${color} section is available: skip`
-          : `choose one organelle of the ${color} section on the Amoeba board and confirm`,
+        text: none ? `No ${color} organelle token is available: skip` : `Choose an organelle token of the ${color} section`,
       };
     }
-    if (decision?.kind === "pol_corner" || decision?.kind === "pol_income") {
-      const left = s.aside.length;
-      return {
-        who,
-        mine,
-        text:
-          decision.kind === "pol_corner"
-            ? left === 1
-              ? "discard the drawn card for its free action"
-              : `choose one of the ${left} drawn cards to discard for its free action`
-            : left === 1
-              ? "discard the last card for its income"
-              : `choose one of the ${left} remaining cards to discard for its income; you keep the other`,
-      };
-    }
-    if (decision) return { who, mine, text: humanize(decision.kind) };
-    return { who, mine, text: s.main_done ? "take free actions, or end the turn" : "choose a main action" };
+    if (decision) return { who, mine, text: decisionText(decision.kind, decision.data) };
+    return { who, mine, text: s.main_done ? "Take free actions, or end the turn" : "Choose a main action" };
   }
-  return { who, mine, text: decision ? `must ${humanize(decision.kind)}` : "is taking a turn" };
+  return { who, mine, text: decision ? mustText(decisionText(decision.kind, decision.data)) : "is taking a turn" };
 }
 
 /** The techs that the rival stores are named after their kind and their glyph ("probe-dot", "computer-link", SOLO-18). */
@@ -359,7 +395,7 @@ export function GameView({
                   {prompt.who ? `${prompt.who}${prompt.mine ? " (you)" : ""}${prompt.mine || context ? ":" : ""}` : " "}
                 </b>
                 <span className={context ? "prompt asking" : "prompt"}>
-                  {context ?? prompt.text}
+                  {context ?? withIcons(prompt.text)}
                   {cause && view.state.pending.length > 0 ? ` (${cause})` : ""}
                   {tuckCount ? ` (${tuckCount})` : ""}
                 </span>
