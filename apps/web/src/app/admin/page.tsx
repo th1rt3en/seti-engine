@@ -16,11 +16,13 @@ import {
   cancelGameAction,
   cancelStaleAction,
   deleteAccountAction,
+  recentActionsAction,
   resetRatingAction,
   seedLookupAction,
   setBotEnabledAction,
   setPasswordAction,
   setRatingAction,
+  undoActionsAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -136,6 +138,44 @@ export default async function Admin({
           </label>
           <button type="submit" className="secondary">
             Show the seed
+          </button>
+        </InlineForm>
+      </section>
+
+      <section className="open">
+        <h2>Take back actions of a table</h2>
+        <p className="muted small">
+          For a table that is being played. The last actions are removed, whoever made them and whatever they showed, and the game is
+          rebuilt from its seed and the actions that stay: the players see the table as it was, and a line in the chat tells them. The
+          clocks are not given back (the time that the actions used stays used), and the clock of the player to act runs again from now. A
+          finished game cannot be taken back (its rating is settled).
+        </p>
+        <InlineForm action={recentActionsAction} className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
+          <label>
+            Table number
+            <input type="text" name="table" inputMode="numeric" placeholder="225" required style={{ width: 140 }} autoComplete="off" />
+          </label>
+          <button type="submit" className="secondary">
+            Show the last actions
+          </button>
+        </InlineForm>
+        <InlineForm
+          action={undoActionsAction}
+          refresh
+          ask="Take back these actions? The players will see the table as it was before them."
+          className="card"
+          style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}
+        >
+          <label>
+            Table number
+            <input type="text" name="table" inputMode="numeric" placeholder="225" required style={{ width: 140 }} autoComplete="off" />
+          </label>
+          <label>
+            Actions to take back
+            <input type="number" name="count" min={1} max={200} defaultValue={1} required style={{ width: 110 }} />
+          </label>
+          <button type="submit" className="danger">
+            Take them back
           </button>
         </InlineForm>
       </section>

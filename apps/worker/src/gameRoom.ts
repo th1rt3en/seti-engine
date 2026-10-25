@@ -27,6 +27,9 @@ class DoStore implements Store {
   async put(key: string, value: unknown): Promise<void> {
     await this.storage.put(key, value);
   }
+  async delete(key: string): Promise<void> {
+    await this.storage.delete(key);
+  }
   async clear(): Promise<void> {
     await this.storage.deleteAll();
   }
@@ -91,6 +94,9 @@ export class GameRoomDO implements DurableObject {
     if (url.pathname === "/admin-info") return json((await this.room.adminInfo()) ?? null);
     if (url.pathname === "/admin-seed") return json((await this.room.adminSeed()) ?? null);
     if (url.pathname === "/admin-cancel") return json(await this.room.adminCancel());
+    if (url.pathname === "/admin-recent") return json(await this.room.adminRecent(Number(url.searchParams.get("count") ?? 8)));
+    if (url.pathname === "/admin-undo")
+      return json(await this.room.adminUndo(Number(((await request.json().catch(() => ({}))) as { count?: number }).count ?? 1)));
     if (identity === null) return json({ ok: false, code: "unauthorized", message: "sign in first" }, 401);
     if (url.pathname === "/init") {
       const b = (await request.json()) as { id: string; options: Options; clock: ClockSettings; rated: boolean };

@@ -89,6 +89,8 @@ export interface Store {
   put(key: string, value: unknown): Promise<void>;
   /** Values of the keys with this prefix, in key order. */
   list<T>(prefix: string): Promise<T[]>;
+  /** Delete one key. */
+  delete(key: string): Promise<void>;
   /** Delete everything the game stored. */
   clear(): Promise<void>;
 }
@@ -450,6 +452,63 @@ export class GameRoom {
     const meta = await this.meta();
     if (meta === undefined) return null;
     return { status: meta.status, seed: meta.options.seed ?? null, seeded: meta.seedChosen === true };
+  }
+
+  /** The last actions of a game that is being played, for the administrator (the page shows what each one was before it takes some back). */
+  adminRecent(count = 8): Promise<{ ok: true; total: number; recent: LogEntry[] } | { ok: false; code: string; message: string }> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "playing")
+        return { ok: false as const, code: "not_playing", message: "the game is not being played" };
+      const log = await this.d.store.list<LogEntry>("log:");
+      return {
+        ok: true as const,
+        total: log.length,
+        recent: log.slice(-Math.max(1, Math.min(50, Math.floor(count)))).map((e) => ({ ...e, events: [] })),
+      };
+    });
+  }
+
+  /**
+   * An administrator takes back the last `count` actions of a game that is being played, whoever made them and whatever they showed: the game is rebuilt
+   * from its seed and the actions that stay (the engine replays them), the log loses the others, and every player gets the game as it is now. The
+   * clocks are not given back (the time that the taken actions used stays used), and the clock of the player to act runs again from now. A game that is
+   * over cannot be taken back: its result and its rating changes are settled.
+   */
+  adminUndo(count: number): Promise<SubmitResult & { removed?: number; left?: number }> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "playing") return fail("not_playing", "only a game that is being played can be taken back");
+      if (!this.d.engine.replayState) return fail("no_replay", "the engine cannot rebuild the game");
+      if (!Number.isInteger(count) || count < 1 || count > 200) return fail("bad_count", "take back 1 to 200 actions");
+      const log = await this.d.store.list<LogEntry>("log:");
+      const left = Math.max(0, log.length - count);
+      const removed = log.length - left;
+      if (removed === 0) return fail("nothing", "the game has no action to take back");
+      const state = await this.d.engine.replayState(
+        meta.options,
+        log.slice(0, left).map((e) => e.action),
+        meta.rng === "exact" ? "exact" : "double",
+      );
+      for (let i = left; i < log.length; i++) await this.d.store.delete(logKey(i));
+      await this.d.store.put("logcount", left);
+      await this.d.store.put("state", state);
+      await this.runClock(meta, state);
+      await this.systemChat(`An administrator took back the last ${removed} action${removed === 1 ? "" : "s"} of this table.`);
+      for (const c of this.d.connections()) await this.sendLog(c, meta);
+      await this.broadcastViews();
+      this.archiveSoon(); // the file of the game is written again from the log that is left
+      this.botSoon();
+      return { ok: true, removed, left };
+    });
+  }
+
+  /** A line of the chat from the administrator, for everybody at the table. */
+  private async systemChat(text: string): Promise<void> {
+    const lines = (await this.d.store.get<ChatEntry[]>("chat")) ?? [];
+    const entry: ChatEntry = { n: (lines.at(-1)?.n ?? 0) + 1, name: "Administrator", seat: null, text, at: this.d.now() };
+    await this.d.store.put("chat", [...lines, entry].slice(-CHAT_KEEP));
+    for (const c of this.d.connections()) c.send({ t: "chat", entries: [entry] });
   }
 
   /**
@@ -885,12 +944,17 @@ export class GameRoom {
     if (meta.status === "lobby") conn.send(lobbyMessage(meta, conn.who));
     else {
       await this.sendView(conn, meta);
-      // the log goes in pieces of LOG_CHUNK moves: a long game (a solo rival can play several turns in one move) would make one very large message
-      const seat = this.connSeat(meta, conn);
-      const log = (await this.d.store.list<LogEntry>("log:")).map((e) => publicEntry(e, seat));
-      for (let from = 0; from === 0 || from < log.length; from += LOG_CHUNK)
-        conn.send({ t: "log", from, entries: log.slice(from, from + LOG_CHUNK) });
+      await this.sendLog(conn, meta);
     }
+  }
+
+  /** The whole log, from its start (the client replaces what it had): on connecting, and when an administrator took actions back. */
+  private async sendLog(conn: Connection, meta: Meta): Promise<void> {
+    // the log goes in pieces of LOG_CHUNK moves: a long game (a solo rival can play several turns in one move) would make one very large message
+    const seat = this.connSeat(meta, conn);
+    const log = (await this.d.store.list<LogEntry>("log:")).map((e) => publicEntry(e, seat));
+    for (let from = 0; from === 0 || from < log.length; from += LOG_CHUNK)
+      conn.send({ t: "log", from, entries: log.slice(from, from + LOG_CHUNK) });
   }
 
   /** The seat of a connection (null for a spectator). */

@@ -138,3 +138,19 @@ def test_the_committed_protocol_schema_is_up_to_date() -> None:
     assert committed == gen.render(), (
         "the protocol schema is out of date: run tools/engine/gen_protocol.py and pnpm --filter @seti/protocol generate"
     )
+
+
+def test_replay_state_gives_the_state_after_the_actions_that_stay() -> None:
+    """An administrator takes actions back: the state after the first n actions is rebuilt from the seed, as it was played."""
+    options = Options(players=2, seed=9)
+    local = start(options)
+    played: list[dict[str, object]] = []
+    states = [local.state.model_dump(mode="json")]
+    for _ in range(12):
+        move = local.legal[len(local.legal) // 2]
+        played.append(move)
+        local = apply(local.state, move)
+        states.append(local.state.model_dump(mode="json"))
+    for keep in (0, 5, 12):
+        res = client.post("/replay/state", json={"options": options.model_dump(), "actions": played[:keep]})
+        assert res.status_code == 200 and res.json() == states[keep]

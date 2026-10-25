@@ -29,6 +29,8 @@ export interface Engine {
   apply(state: GameState, action: Action): Promise<StepResult>;
   /** What `viewer` may see of the state (null for a spectator). */
   project(state: GameState, viewer: number | null): Promise<View>;
+  /** The state after these actions, replayed from the start (an administrator takes actions back). */
+  replayState?(options: Options, actions: Action[], rngEncoding?: "exact" | "double"): Promise<GameState>;
   /** The statistics of a finished game, from its options and its actions (the engine replays it). */
   stats?(options: Options, actions: Action[], rngEncoding?: "exact" | "double"): Promise<GameStats>;
 }
@@ -71,6 +73,12 @@ export class HttpEngine implements Engine {
   async project(state: GameState, viewer: number | null): Promise<View> {
     const { status, json } = await this.post<View>("/project", { state, viewer });
     if (status !== 200) throw new Error(`engine /project failed with ${status}`);
+    return json;
+  }
+
+  async replayState(options: Options, actions: Action[], rngEncoding: "exact" | "double" = "exact"): Promise<GameState> {
+    const { status, json } = await this.post<GameState>("/replay/state", { options, actions, rng_encoding: rngEncoding });
+    if (status !== 200) throw new Error(`engine /replay/state failed with ${status}`);
     return json;
   }
 

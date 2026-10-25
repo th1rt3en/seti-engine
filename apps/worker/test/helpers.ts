@@ -28,6 +28,9 @@ export class MemoryStore implements Store {
   async put(key: string, value: unknown): Promise<void> {
     this.data.set(key, structuredClone(value));
   }
+  async delete(key: string): Promise<void> {
+    this.data.delete(key);
+  }
   async clear(): Promise<void> {
     this.data.clear();
   }
@@ -65,6 +68,11 @@ export class FakeEngine implements Engine {
     const scores = s.players.map((p, i) => p.score + (action.type === "score" && i === s.current_player ? 1 : 0));
     const next = this.make(s.players.length, s.played + 1, (s.current_player + 1) % s.players.length, scores);
     return { state: next, events: [], legal: [{ type: "score" }] } as unknown as StepResult;
+  }
+  async replayState(options: Options, actions: Action[]): Promise<GameState> {
+    let r = await this.newGame(options);
+    for (const a of actions) r = await this.apply(r.state, a);
+    return r.state;
   }
   async stats(options: Options, actions: Action[]): Promise<GameStats> {
     return {

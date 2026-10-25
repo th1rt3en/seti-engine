@@ -148,8 +148,12 @@ export interface AdminGameInfo {
   actions: number;
 }
 
-async function adminCall(path: string, method: string, cfg: Config, fetcher: typeof fetch): Promise<unknown> {
-  const res = await fetcher(`${cfg.workerUrl}/admin${path}`, { method, headers: { "x-admin-key": cfg.adminWorkerKey } });
+async function adminCall(path: string, method: string, cfg: Config, fetcher: typeof fetch, body?: unknown): Promise<unknown> {
+  const res = await fetcher(`${cfg.workerUrl}/admin${path}`, {
+    method,
+    headers: { "x-admin-key": cfg.adminWorkerKey, ...(body === undefined ? {} : { "content-type": "application/json" }) },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
   return res.json();
 }
 
@@ -165,6 +169,28 @@ export async function adminGameSeed(
   fetcher: typeof fetch = fetch,
 ): Promise<{ status: string; seed: number | null; seeded: boolean } | null> {
   return (await adminCall(`/games/${id}/seed`, "GET", cfg, fetcher)) as { status: string; seed: number | null; seeded: boolean } | null;
+}
+
+export interface AdminRecent {
+  ok: boolean;
+  message?: string;
+  total?: number;
+  recent?: { seq: number; seat: number; action: Record<string, unknown>; at: number }[];
+}
+
+/** The last actions of a game that is being played, for the administrator. */
+export async function adminRecentActions(id: string, count = 8, cfg = loadConfig(), fetcher: typeof fetch = fetch): Promise<AdminRecent> {
+  return (await adminCall(`/games/${id}/recent?count=${count}`, "GET", cfg, fetcher)) as AdminRecent;
+}
+
+/** Takes back the last `count` actions of a game that is being played: the game is rebuilt without them and every player gets it as it is. */
+export async function adminUndoGame(
+  id: string,
+  count: number,
+  cfg = loadConfig(),
+  fetcher: typeof fetch = fetch,
+): Promise<WorkerReply & { removed?: number; left?: number }> {
+  return (await adminCall(`/games/${id}/undo`, "POST", cfg, fetcher, { count })) as WorkerReply & { removed?: number; left?: number };
 }
 
 /** Cancels a lobby or a game that is being played: nobody wins or loses and no rating changes. */

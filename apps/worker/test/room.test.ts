@@ -179,6 +179,37 @@ describe("play", () => {
     expect(await (await started()).room.preview(alice, { type: "score" })).toEqual({}); // a move that shows nothing is still previewed
   });
 
+  it("an administrator takes back actions of a game that is being played: the game, the log and the players follow", async () => {
+    const t = await started();
+    const a = new Conn("a", alice.id);
+    t.conns.push(a);
+    for (let i = 0; i < 4; i++) {
+      const who = i % 2 === 0 ? alice : bob;
+      expect(await t.room.submit(who, i, { type: "score" })).toEqual({ ok: true });
+    }
+    expect(await t.room.log()).toHaveLength(4);
+    const recent = await t.room.adminRecent(2);
+    expect(recent).toMatchObject({ ok: true, total: 4 });
+    expect((recent as { recent: unknown[] }).recent).toHaveLength(2);
+    expect(viewOf(a).view.state.played).toBe(4);
+    const done = await t.room.adminUndo(3);
+    expect(done).toMatchObject({ ok: true, removed: 3, left: 1 });
+    expect(await t.room.log()).toHaveLength(1); // the log lost the others
+    const last = viewOf(a);
+    expect(last.view.state.played).toBe(1); // the game was rebuilt from the actions that stay
+    expect(last.seq).toBe(1); // the players are told the new count, and play on from there
+    expect(await t.room.submit(bob, 1, { type: "score" })).toMatchObject({ ok: true }); // it is Bob's turn again, as after the first action
+    expect(await t.room.log()).toHaveLength(2);
+    // limits: nothing to take back, a bad number, a game that is not being played
+    expect(await t.room.adminUndo(0)).toMatchObject({ ok: false, code: "bad_count" });
+    expect(await t.room.adminUndo(500)).toMatchObject({ ok: false, code: "bad_count" });
+    const empty = await started();
+    expect(await empty.room.adminUndo(1)).toMatchObject({ ok: false, code: "nothing" });
+    const open = makeRoom();
+    await open.room.init("g2", two, none, false, alice);
+    expect(await open.room.adminUndo(1)).toMatchObject({ ok: false, code: "not_playing" });
+  });
+
   it("a repeated message does not act twice", async () => {
     const t = await started();
     await t.room.submit(alice, 0, { type: "score" });

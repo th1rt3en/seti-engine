@@ -19,7 +19,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from . import archive_store, engine, replay, request_auth, stats
-from .models import Options
+from .models import GameState, Options
 from .projection import View, project
 from .protocol import (
     PROTOCOL_VERSION,
@@ -126,6 +126,19 @@ def replay_view(req: ReplayViewRequest) -> ReplayViewResponse:
         view=project(state, req.viewer),
         previous=None if before is None else project(before, req.viewer),
     )
+
+
+class ReplayStateRequest(BaseModel):
+    options: Options
+    actions: list[dict[str, Any]]
+    rng_encoding: str = "exact"
+
+
+@app.post("/replay/state", response_model=GameState)
+def replay_state(req: ReplayStateRequest) -> GameState:
+    """The state after all the actions (an administrator takes actions back: the game is rebuilt from its seed)."""
+    _, state = replay.state_at(req.options, req.actions, len(req.actions), req.rng_encoding)
+    return state
 
 
 class ArchiveRequest(BaseModel):

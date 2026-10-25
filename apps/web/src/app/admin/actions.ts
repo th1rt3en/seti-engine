@@ -5,7 +5,8 @@ import { allOpenGameIds, deleteAccount, resetRating, setRating } from "@/lib/adm
 import { AuthFailure, setPasswordByAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { resolveGame } from "@/lib/ids";
-import { adminCancelGame, adminGameInfo, adminGameSeed } from "@/lib/worker";
+import { describeMove } from "@/lib/moves";
+import { adminCancelGame, adminGameInfo, adminGameSeed, adminRecentActions, adminUndoGame } from "@/lib/worker";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -101,6 +102,35 @@ export async function seedLookupAction(form: FormData): Promise<Said> {
   if (out === null) return { ok: false, message: "The Worker does not know that table (it may be older than its records, or deleted)." };
   if (out.seed === null) return { ok: false, message: `Table ${table} (${out.status}) has no seed yet: it is drawn when the game starts.` };
   return { ok: true, message: `Table ${table} (${out.status}): seed ${out.seed}${out.seeded ? " (chosen by the host)" : ""}` };
+}
+
+/** The last actions of a table that is being played, for the administrator to see what to take back. */
+export async function recentActionsAction(form: FormData): Promise<Said> {
+  if (!(await isAdmin())) return { ok: false, message: "Log in again." };
+  const table = field(form, "table").trim().replace(/^#/, "");
+  const found = table === "" ? null : await resolveGame(getDb(), table);
+  if (found === null) return { ok: false, message: "No such table." };
+  const out = await adminRecentActions(found.id, 8);
+  if (!out.ok || out.recent === undefined)
+    return { ok: false, message: `Table ${table}: ${out.message ?? "the game is not being played"}.` };
+  const lines = out.recent.map((e) => `#${e.seq + 1} seat ${e.seat + 1}: ${describeMove(e.action as { type: string })}`);
+  return { ok: true, message: [`Table ${table} is at action ${out.total}. The last ones, the most recent last:`, ...lines].join("\n") };
+}
+
+/** Takes back the last actions of a table that is being played (whoever made them, whatever they showed); the players see the table as it was. */
+export async function undoActionsAction(form: FormData): Promise<Said> {
+  if (!(await isAdmin())) return { ok: false, message: "Log in again." };
+  const table = field(form, "table").trim().replace(/^#/, "");
+  const count = Number(field(form, "count"));
+  const found = table === "" ? null : await resolveGame(getDb(), table);
+  if (found === null) return { ok: false, message: "No such table." };
+  if (!Number.isInteger(count) || count < 1 || count > 200) return { ok: false, message: "Take back 1 to 200 actions." };
+  const out = await adminUndoGame(found.id, count);
+  if (!out.ok) return { ok: false, message: `Table ${table}: ${out.message}` };
+  return {
+    ok: true,
+    message: `Table ${table}: ${out.removed} action${out.removed === 1 ? "" : "s"} taken back; the game is at action ${out.left} now.`,
+  };
 }
 
 /** The administrator lets a host add an AI model to a game, or not (`bot_versions.live`). A model that is not approved cannot be enabled. */

@@ -40,7 +40,7 @@ export function InlineForm({
       {children}
       {busy ? <span className="spinner" role="status" aria-label="Working" /> : null}
       {said ? (
-        <output className={said.ok ? "adminsaid" : "error"} style={{ alignSelf: "center" }}>
+        <output className={said.ok ? "adminsaid" : "error"} style={{ alignSelf: "center", whiteSpace: "pre-line" }}>
           {said.message}
         </output>
       ) : null}

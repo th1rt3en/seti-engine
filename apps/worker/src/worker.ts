@@ -134,8 +134,12 @@ async function openTables(env: Env, userId: string, except = ""): Promise<number
   return row?.n ?? 0;
 }
 
-function forward(stub: DurableObjectStub, path: string, headers: Record<string, string>, method = "GET"): Promise<Response> {
-  return stub.fetch(`https://room${path}`, { method, headers });
+function forward(stub: DurableObjectStub, path: string, headers: Record<string, string>, method = "GET", body?: string): Promise<Response> {
+  return stub.fetch(`https://room${path}`, {
+    method,
+    headers: body === undefined ? headers : { ...headers, "content-type": "application/json" },
+    ...(body === undefined ? {} : { body }),
+  });
 }
 
 /** A comparison that takes the same time wherever the strings differ. */
@@ -161,5 +165,10 @@ async function admin(request: Request, env: Env, parts: string[]): Promise<Respo
   if (request.method === "GET" && action === undefined) return forward(stub, "/admin-info", {});
   if (request.method === "GET" && action === "seed") return forward(stub, "/admin-seed", {});
   if (request.method === "POST" && action === "cancel") return forward(stub, "/admin-cancel", {}, "POST");
+  if (request.method === "GET" && action === "recent") return forward(stub, `/admin-recent${new URL(request.url).search}`, {});
+  if (request.method === "POST" && action === "undo") {
+    const body = (await request.json().catch(() => ({}))) as { count?: number };
+    return forward(stub, "/admin-undo", {}, "POST", JSON.stringify({ count: Number(body.count ?? 1) }));
+  }
   return json({ ok: false, code: "not_found", message: "no such route" }, 404);
 }
