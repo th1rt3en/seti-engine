@@ -485,11 +485,20 @@ export class GameRoom {
       const left = Math.max(0, log.length - count);
       const removed = log.length - left;
       if (removed === 0) return fail("nothing", "the game has no action to take back");
-      const state = await this.d.engine.replayState(
-        meta.options,
-        log.slice(0, left).map((e) => e.action),
-        meta.rng === "exact" ? "exact" : "double",
-      );
+      let state: GameState;
+      try {
+        state = await this.d.engine.replayState(
+          meta.options,
+          log.slice(0, left).map((e) => e.action),
+          meta.rng === "exact" ? "exact" : "double",
+        );
+      } catch (e) {
+        // nothing was changed: the engine that is running does not know how to rebuild a game (it is older than this Worker) or could not
+        return fail(
+          "engine",
+          `the engine could not rebuild the game (${e instanceof Error ? e.message : "unknown"}): is the engine deployed with /replay/state?`,
+        );
+      }
       for (let i = left; i < log.length; i++) await this.d.store.delete(logKey(i));
       await this.d.store.put("logcount", left);
       await this.d.store.put("state", state);

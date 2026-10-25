@@ -208,6 +208,19 @@ describe("play", () => {
     const open = makeRoom();
     await open.room.init("g2", two, none, false, alice);
     expect(await open.room.adminUndo(1)).toMatchObject({ ok: false, code: "not_playing" });
+    // an engine that cannot rebuild the game (an older engine): a clear answer, and nothing is changed
+    class OldEngine extends FakeEngine {
+      override async replayState(): Promise<GameState> {
+        throw new Error("engine /replay/state failed with 404");
+      }
+    }
+    const old = makeRoom({ engine: new OldEngine() });
+    await old.room.init("g3", two, none, false, alice);
+    await old.room.join(bob);
+    await old.room.startGame(alice);
+    await old.room.submit(alice, 0, { type: "score" });
+    expect(await old.room.adminUndo(1)).toMatchObject({ ok: false, code: "engine" });
+    expect(await old.room.log()).toHaveLength(1);
   });
 
   it("a repeated message does not act twice", async () => {
