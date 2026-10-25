@@ -86,8 +86,9 @@ export function OrgPanel({ view, names, spots }: { view: View; names: string[]; 
             {p.org_marks.length > 0 && !spaces ? <p className="small muted">Marked reward spaces: {p.org_marks.join(", ")}</p> : null}
             {fsToken !== undefined ? (
               <p className="small muted">
-                Futurespan token at {fsToken} points{fsCard ? "; a card is prepared (face down)" : "; no card is prepared"}.
-                {fsCard && fsCard !== "?" ? <CardImage id={fsCard} width={90} /> : null}
+                Futurespan token at {fsToken} points
+                {fsCard ? "; the prepared card lies face up, played for free when the score reaches it" : "; no card is prepared"}.
+                {fsCard && fsCard !== "?" ? <CardImage id={fsCard} width={110} /> : null}
               </p>
             ) : null}
             {p.org_used ? <p className="small muted">The once-per-round ability has been used.</p> : null}

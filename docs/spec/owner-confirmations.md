@@ -94,3 +94,7 @@ Owner: the player chooses which cards with an energy income to show from the han
 ## A signal in the sector of 'Oumuamua, 2026-10-25 (ALIEN-OUM-03)
 
 Owner: when a signal is marked in a sector of a color (a card of the display discarded in a scan, a card of the hand, an effect), the tile of 'Oumuamua is one of the choices if 'Oumuamua is in a sector of that color: no extra step. In the engine the decision `signal` offers `mark_signal` with `where: "sector"` or `where: "tile"` for the sector of 'Oumuamua (`rewards.signal_moves`). The old plain `mark_signal` of that sector, followed by the decision `oumuamua_signal` and `signal_where`, is still accepted so that games played before this day replay (`rewards.legacy_oumuamua_mark_ok`); a signal that does not come from a choice of the player (Earth's sector, a card that marks a given sector) still asks the question after it, and that question comes before the next step of the scan that it was part of.
+
+## Futurespan Institute: the prepared card is face up, 2026-10-25 (EXP-ORG-12)
+
+Owner: the card that Futurespan Institute prepares is face up and public to every player and every spectator. It is shown on the player board (with the cards in front of the player), in the organization zone, and by resting the pointer on the Futurespan token of the scoring track; the log names it when it is prepared. In the engine the projection no longer hides `org_data.fs_card`, and the event `org_free` of the preparation carries the card and the place of the token. The hand of the player stays hidden.

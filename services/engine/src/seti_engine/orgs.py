@@ -556,6 +556,9 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
             p.hand.remove(a["card"])
             p.org_data["fs_card"] = a["card"]
             p.org_data["fs_token"] = p.score + 10 * prepare_cost(a["card"]) + 5  # the card shows +15, +25, +35, +45 (A-052)
+            # the card is face up for everybody: the log names it
+            events.append({"type": "org_free", "player": p.index, "org": o, "card": a["card"], "token": p.org_data["fs_token"]})
+            return
         events.append({"type": "org_free", "player": p.index, "org": o})
         return
     p.org_used = True

@@ -224,8 +224,13 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
     case "draw_card":
       // the player who drew it sees the card; the others (and the spectators) are only told that a card was drawn
       return ev.card ? `${who} draws ${cardName(ev.card)}` : `${who} draws a card from the deck`;
+    case "org_free":
+      // Futurespan Institute prepares a card: it lies face up in front of the player, and the log names it
+      return ev.card
+        ? `${who} prepares ${cardName(ev.card)} (Futurespan Institute): played for free when the score reaches ${String(ev.token)}`
+        : null;
     case "play_card":
-      // the prepared card of Futurespan Institute is played from where it lay face down: the log names it now
+      // the prepared card of Futurespan Institute is played from where it lay face up in front of the player
       return action?.type === "org_main" && ev.card
         ? `${who} plays the prepared card ${cardName(ev.card)} for free (Futurespan Institute)`
         : null;

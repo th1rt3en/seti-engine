@@ -166,6 +166,17 @@ function Board({
       card: m.card as string | null,
       label: `Message card ${cardName(m.card)}: marker at ${m.target} points`,
     })),
+    // Futurespan Institute: the prepared card lies face up in front of the player, for everybody (EXP-ORG-12)
+    ...(typeof p.org_data?.fs_card === "string" && p.org_data.fs_card !== "?"
+      ? [
+          {
+            key: `prepared-${p.org_data.fs_card}`,
+            kind: "prepared",
+            card: p.org_data.fs_card as string | null,
+            label: `Prepared by Futurespan Institute: ${cardName(p.org_data.fs_card)}, played for free when the score reaches ${String(p.org_data.fs_token)}`,
+          },
+        ]
+      : []),
     // CARD-20: the end-of-game scoring cards that were played (public)
     ...(p.end_cards ?? []).map((c) => ({
       key: `end-${c}`,
@@ -326,9 +337,13 @@ function Board({
             return (
               <g key={f.key}>
                 {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}
-                {f.kind === "message" || f.kind === "endgame" ? (
+                {f.kind === "message" || f.kind === "endgame" || f.kind === "prepared" ? (
                   <text x={x + MISSIONS.w / 2} y={y + MISSIONS.h + 20} textAnchor="middle" className="pbhint">
-                    {f.kind === "message" ? "message" : "end of game"}
+                    {f.kind === "message"
+                      ? "message"
+                      : f.kind === "prepared"
+                        ? `prepared (${String(p.org_data?.fs_token)})`
+                        : "end of game"}
                   </text>
                 ) : null}
                 <title>{f.label}</title>

@@ -223,8 +223,7 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
             if s.phase != "finished":  # ALIEN-EXE-06: the cards played face down are turned over at the end of the game, for everybody
                 p.exertian_played = [HIDDEN] * len(p.exertian_played)
             p.security = {c: HIDDEN for c in p.security}  # face-down, only the trace color shows (EXP-ARK-03)
-            if p.org_data.get("fs_card"):
-                p.org_data["fs_card"] = HIDDEN  # Futurespan's prepared card lies face down
+            # Futurespan's prepared card lies face up, public to every player and spectator (owner, 2026-10-25): its card is not hidden here
             p.offered_orgs = [HIDDEN] * len(p.offered_orgs)  # EXP-ORG-04: the cards offered at setup are the player's secret
             p.offered_quick = [HIDDEN] * len(p.offered_quick)
             p.setup_tucks, p.setup_tuck_undo = [], []  # EXP-ORG-14: the tucks of the setup are secret until all have locked in

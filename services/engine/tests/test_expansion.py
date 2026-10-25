@@ -399,13 +399,17 @@ def test_futurespan_prepares_a_card_waits_for_the_token_and_plays_it_free() -> N
     assert "fs_card" not in cur(s).org_data and cur(s).credits == 0
 
 
-def test_futurespan_card_is_hidden_from_the_others() -> None:  # CLAUDE.md rule 6
+def test_futurespan_prepared_card_is_face_up_for_everybody() -> None:  # EXP-ORG-12 (owner, 2026-10-25)
     s = with_org("futurespan_institute")
     card = next(m["card"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("card"))
-    s = pick(s, "org_free", org="futurespan_institute", card=card)
+    r = apply(s, next(m for m in legal_moves(s) if m["type"] == "org_free" and m.get("card") == card))
+    s = r.state
     other = 1 - s.current_player
-    assert project(s, other).state.players[s.current_player].org_data["fs_card"] == "?"
+    assert project(s, other).state.players[s.current_player].org_data["fs_card"] == card  # an opponent sees it
+    assert project(s, None).state.players[s.current_player].org_data["fs_card"] == card  # and so does a spectator
     assert project(s, s.current_player).state.players[s.current_player].org_data["fs_card"] == card
+    assert any(e["type"] == "org_free" and e.get("card") == card for e in r.events)  # the log names it
+    assert card not in project(s, other).state.players[s.current_player].hand  # it left the hand (the hand stays hidden)
 
 
 @pytest.mark.parametrize("org", sorted(tables.organizations()))

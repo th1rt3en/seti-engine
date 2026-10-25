@@ -1098,8 +1098,9 @@ export function BoardView({
                   const target = p.org_data.fs_token as number;
                   const at = polar(LANES[p.index] ?? 1500, scoreDegrees(target));
                   return (
-                    <g key={`fs-${p.index}`}>
-                      <title>{`${who(p.index)}: Futurespan Institute token at ${target} points (the prepared card can be played for free from there)`}</title>
+                    // the prepared card lies face up for everybody: resting the pointer on the token shows it, like any card
+                    <SvgCardZoom key={`fs-${p.index}`} id={String(p.org_data.fs_card)} src={cardImage(String(p.org_data.fs_card)) ?? ""}>
+                      <title>{`${who(p.index)}: Futurespan Institute token at ${target} points: ${cardName(p.org_data.fs_card)} is prepared and can be played for free from there`}</title>
                       <image
                         href={(expansionAssets as Record<string, string>)["tokens/token-futurespan"]}
                         x={-40}
@@ -1108,7 +1109,7 @@ export function BoardView({
                         height={120}
                         transform={`translate(${at.x} ${at.y}) rotate(${-scoreDegrees(target)})`}
                       />
-                    </g>
+                    </SvgCardZoom>
                   );
                 })(),
               ]
