@@ -179,16 +179,15 @@ export default async function Admin({
                 game {g.num ?? "?"} · {g.id.slice(0, 12)} · created {when(g.created_at)}
                 {g.started_at ? ` · started ${when(g.started_at)}` : ""}
               </p>
-              <form action={cancelGameAction} className="actions">
-                <input type="hidden" name="back" value={back} />
+              <InlineForm action={cancelGameAction} refresh ask="Cancel this game for everybody? No rating changes." className="actions">
                 <input type="hidden" name="game" value={g.id} />
-                <ConfirmSubmit ask="Cancel this game for everybody? No rating changes." className="btn danger small">
+                <button type="submit" className="btn danger small">
                   Cancel
-                </ConfirmSubmit>
+                </button>
                 <Link href={`/games/${g.num ?? g.id}`} className="btn small ghost">
                   Open
                 </Link>
-              </form>
+              </InlineForm>
             </article>
           ))}
         </div>

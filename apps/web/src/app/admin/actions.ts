@@ -114,11 +114,12 @@ export async function setBotEnabledAction(form: FormData): Promise<Said> {
   return { ok: true, message: `${version} is ${row.live === 1 ? "available to hosts" : "off: hosts cannot add it"} now.` };
 }
 
-export async function cancelGameAction(form: FormData): Promise<void> {
-  await requireAdmin(form);
+/** Cancels one game; the page stays where it is and its list of games is read again (the form is an `InlineForm` with `refresh`). */
+export async function cancelGameAction(form: FormData): Promise<Said> {
+  if (!(await isAdmin())) return { ok: false, message: "Log in again." };
   const out = await adminCancelGame(field(form, "game"));
-  if (!out.ok) back(form, `The game could not be cancelled: ${out.message}`, true);
-  back(form, "The game is cancelled. Nobody's rating changed.");
+  if (!out.ok) return { ok: false, message: `The game could not be cancelled: ${out.message}` };
+  return { ok: true, message: "The game is cancelled. Nobody's rating changed." };
 }
 
 /** Cancels every lobby and every game being played that has had no move (and, in a lobby, nobody there) for this long. */
