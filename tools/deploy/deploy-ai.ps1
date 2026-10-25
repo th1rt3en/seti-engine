@@ -1,8 +1,8 @@
 # Deploy the AI lobby service to Cloud Run from this machine (docs/deploy-ai.md). The weights are not in git, so the image is built from a staged folder.
-#   powershell -File tools/deploy/deploy-ai.ps1 [-Models models_alpha,models_v3] [-Cpu 1] [-Memory 1Gi]
+#   powershell -File tools/deploy/deploy-ai.ps1 [-Models models_alpha,models_v3] [-Cpu 1] [-Memory 1Gi] [-Concurrency 4]
 # Run `python -m seti_ai.publish --approve <version> --live <version>` first (it marks the version approved where the export reads it).
 # the size of the service is the owner's setting: never raise -Cpu or -Memory without their permission
-param([string[]]$Models = @("models_alpha", "models_v3"), [string]$Region = "us-central1", [int]$Cpu = 1, [string]$Memory = "1Gi")
+param([string[]]$Models = @("models_alpha", "models_v3"), [string]$Region = "us-central1", [int]$Cpu = 1, [string]$Memory = "1Gi", [int]$Concurrency = 4)
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $ai = Join-Path $repo "services\ai"
@@ -43,6 +43,6 @@ $envFile = Join-Path ([IO.Path]::GetTempPath()) "seti-ai-env.yaml"
 ("ENGINE_TRUSTED_KEYS: " + ($keys | ConvertTo-Json)) | Set-Content $envFile -Encoding utf8
 
 Push-Location $stage
-gcloud run deploy seti-ai --source . --region $Region --cpu $Cpu --memory $Memory --concurrency 4 --min-instances 0 --max-instances 1 --timeout 300 --env-vars-file $envFile --quiet
+gcloud run deploy seti-ai --source . --region $Region --cpu $Cpu --memory $Memory --concurrency $Concurrency --min-instances 0 --max-instances 1 --timeout 300 --env-vars-file $envFile --quiet
 Pop-Location
 Remove-Item $envFile

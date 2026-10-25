@@ -95,6 +95,7 @@ export default async function Game({
         // the AI is a side option, folded away: most games are played by people
         <details className="card addai-fold">
           <summary>Play against an AI instead</summary>
+          <p className="small muted">A game against an AI is never rated: this table stops being rated once the AI sits down.</p>
           <form action={addBotAction} className="addai">
             <input type="hidden" name="id" value={id} />
             <label>

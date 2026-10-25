@@ -136,6 +136,15 @@ describe("an AI playing", () => {
     expect((await t.room.meta())?.status).toBe("finished");
   });
 
+  it("a game with an AI is never rated, even if the record of its start or its end says so", async () => {
+    const t = await lobbyWithBot(true);
+    await t.room.addBot(alice, "v001", true);
+    // the host's lobby was rated when it was made; the AI took the flag away, and the start does not give it back
+    await t.room.startGame(alice);
+    expect(t.sink.starts.at(-1)?.rated).toBe(false);
+    expect(t.sink.lobbies.at(-1)?.rated).toBe(false);
+  });
+
   it("a game with an AI is not rated, and the archive says which seat was the model and that the host agreed", async () => {
     const t = await lobbyWithBot(true);
     await t.room.addBot(alice, "v001", true);

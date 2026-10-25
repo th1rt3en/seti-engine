@@ -12,7 +12,7 @@ export interface RatingUpdate {
 
 /** The new ratings of the players of a game; empty when the game does not count (guests, solo, too short). */
 export function settle(rec: GameRecord, current: ReadonlyMap<string, { rating: number; games: number }>): RatingUpdate[] {
-  if (!rec.rated) return [];
+  if (!rec.rated || rec.meta.seats.some((who) => who?.bot)) return []; // a game with an AI is never rated
   const seats = rec.meta.seats;
   const players = rec.result.ranking.map((r) => {
     const who = seats[r.seat];

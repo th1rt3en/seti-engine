@@ -523,6 +523,7 @@ export class GameRoom {
   }
 
   private async start(meta: Meta): Promise<void> {
+    if (meta.seats.some((s) => s?.bot)) meta.rated = false; // a game with an AI is never rated
     // EXP-ORG-14: with organizations every player chooses the organization and the quick start cards at the same time (a game for one player has nobody to wait for)
     const simul = meta.options.players >= 2 ? { simul_setup: true } : {}; // the choices and the tucks of the setup are made at the same time (EXP-ORG-14)
     meta.options = { ...meta.options, ...simul, seed: meta.options.seed ?? this.d.newSeed() }; // the host may have chosen it (init)
@@ -787,7 +788,7 @@ export class GameRoom {
     await this.d.setAlarm(null);
     const log = await this.d.store.list<LogEntry>("log:");
     // A rated game with registered players always counts, however it ends and however short it was (decision D24).
-    const counts = meta.rated && meta.seats.every((s) => s?.registered === true) && players >= 2;
+    const counts = meta.rated && meta.seats.every((s) => s?.registered === true && !s.bot) && players >= 2;
     await this.d.store.put("counted", counts);
     await this.d.sink.recordEnd({ meta, result, actions: log.length, rated: counts }, log);
     await this.broadcastViews();

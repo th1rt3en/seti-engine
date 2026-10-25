@@ -84,6 +84,23 @@ describe("D1 sink", () => {
     ]);
   });
 
+  it("a game that was rated when it was made and then got an AI is not rated in the table, and no rating is written for it", async () => {
+    const db = new SqliteDb();
+    const sink = new D1Sink(db);
+    const ai = { id: "bot:Alpha:0", name: "AI Alpha", registered: false, bot: { model: "Alpha" } };
+    const made = { ...record("g9", [alice, bob], [1, 2], true).meta, status: "lobby" as const };
+    await sink.recordLobby(made); // made rated (the default)
+    await sink.recordLobby({ ...made, seats: [alice, ai], rated: false }); // the host adds an AI: the game is not rated
+    expect(db.sql.prepare("SELECT rated FROM games WHERE id = 'g9'").get()).toEqual({ rated: 0 });
+    await sink.recordStart({ ...made, seats: [alice, ai], rated: false, status: "playing" });
+    expect(db.sql.prepare("SELECT rated FROM games WHERE id = 'g9'").get()).toEqual({ rated: 0 });
+    // even a record that says rated gives no rating when an AI sat at the table
+    const rec = record("g9", [alice, ai], [1, 2], true);
+    await sink.recordEnd(rec, []);
+    expect(db.sql.prepare("SELECT rated_counted FROM games WHERE id = 'g9'").get()).toEqual({ rated_counted: 0 });
+    expect(db.sql.prepare("SELECT COUNT(*) AS n FROM ratings").get()).toEqual({ n: 0 });
+  });
+
   it("writes the game, its players and its log", async () => {
     const db = new SqliteDb();
     const sink = new D1Sink(db);

@@ -22,7 +22,7 @@ export class D1Sink implements ResultSink {
     await this.db.batch([
       q(
         `INSERT INTO games (id, status, options_json, clock_json, rated, created_at) VALUES (?, ?, ?, ?, ?, ?)
-         ON CONFLICT(id) DO UPDATE SET status = excluded.status`,
+         ON CONFLICT(id) DO UPDATE SET status = excluded.status, rated = excluded.rated`,
         meta.id,
         meta.status,
         JSON.stringify(meta.options),
@@ -75,7 +75,7 @@ export class D1Sink implements ResultSink {
     await this.db.batch([
       q(
         `INSERT INTO games (id, status, options_json, clock_json, rated, created_at, started_at) VALUES (?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(id) DO UPDATE SET status = excluded.status, options_json = excluded.options_json, started_at = excluded.started_at`,
+         ON CONFLICT(id) DO UPDATE SET status = excluded.status, options_json = excluded.options_json, started_at = excluded.started_at, rated = excluded.rated`,
         meta.id,
         meta.status,
         JSON.stringify(meta.options),
@@ -139,7 +139,8 @@ export class D1Sink implements ResultSink {
     const q = (sql: string, ...v: unknown[]): Statement => this.db.prepare(sql).bind(...v);
     const ids = rec.meta.seats.flatMap((s) => (s === null ? [] : [s.id]));
     const current = new Map<string, { rating: number; games: number }>();
-    if (rec.rated && ids.length > 0) {
+    // a game with an AI is never rated: no rating is read or written, whatever the record says
+    if (rec.rated && ids.length > 0 && !ids.some((id) => id.startsWith("bot:"))) {
       const marks = ids.map(() => "?").join(", ");
       const rows = await this.db
         .prepare(`SELECT user_id, rating, games FROM ratings WHERE user_id IN (${marks})`)
