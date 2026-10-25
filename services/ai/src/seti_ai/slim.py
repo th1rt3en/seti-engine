@@ -51,7 +51,9 @@ def _linear(weight: torch.Tensor, bias: torch.Tensor | None) -> nn.Linear:
 
 def _skeleton(inn: int, out: int, kind: str = "") -> nn.Module:
     """A quantized linear layer with nothing in it yet (to be filled by `load_state_dict`)."""
-    return _quantized(nn.Linear(inn, out), kind)
+    if kind in KEEP32:
+        return nn.Linear(inn, out)
+    return cast(nn.Module, QLinear(inn, out))  # zeros of the right size, with no 32 bit copy of the matrix on the way
 
 
 class SlimAttention(nn.Module):
