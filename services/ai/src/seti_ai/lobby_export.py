@@ -30,8 +30,15 @@ def export(models: Path, out: Path) -> list[str]:
         names.append(name)
         index.append({**rows[v], "version": name, "built_from": v})
         (out / name).mkdir(exist_ok=True)
-        for f in ("model.pt", "manifest.json"):
+        # a version with an 8 bit copy (slim.py) is served from the copy only: the weights are a quarter of the size, in the image and in memory
+        small = models / v / "model.int8.pt"
+        for f in ("model.int8.pt" if small.exists() else "model.pt", "manifest.json"):
             shutil.copyfile(models / v / f, out / name / f)
+        for stale in ("model.pt", "model.int8.pt"):  # an earlier export of the other kind
+            if (out / name / stale).exists() and not (models / v / stale).exists():
+                (out / name / stale).unlink()
+        if small.exists() and (out / name / "model.pt").exists():
+            (out / name / "model.pt").unlink()
     (out / "index.json").write_text(json.dumps(index, indent=1) + "\n", encoding="utf-8")
     return names
 

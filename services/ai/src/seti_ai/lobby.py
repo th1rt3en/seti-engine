@@ -163,6 +163,11 @@ def load_lobby(root: Path, config: SearchConfig | None = None, allow_unapproved:
     torch.set_num_threads(2)
 
     def load(version: str) -> Brain:
+        small = root / version / "model.int8.pt"  # the 8 bit copy of a large network (slim.py), when there is one: a quarter of the memory
+        if small.exists():
+            from .slim import load_slim
+
+            return NetBrain(LocalNet(load_slim(str(small))))
         net = net_from(str(root / version / "model.pt"), "cpu").eval()
         return NetBrain(LocalNet(net))
 

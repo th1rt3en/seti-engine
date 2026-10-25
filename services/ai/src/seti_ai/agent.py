@@ -216,7 +216,7 @@ class NNAgent:
 class LocalNet:
     """A network used in this process (a test, an evaluation by hand): the same `evaluate` as the client of the server."""
 
-    def __init__(self, net: PolicyNet) -> None:
+    def __init__(self, net: nn.Module) -> None:
         self.net = net.eval()
         self.device = next(net.parameters()).device
 

@@ -1,7 +1,8 @@
 # Deploy the AI lobby service to Cloud Run from this machine (docs/deploy-ai.md). The weights are not in git, so the image is built from a staged folder.
 #   powershell -File tools/deploy/deploy-ai.ps1 [-Models models_alpha,models_v3] [-Cpu 1] [-Memory 1Gi]
 # Run `python -m seti_ai.publish --approve <version> --live <version>` first (it marks the version approved where the export reads it).
-param([string[]]$Models = @("models_alpha", "models_v3"), [string]$Region = "us-central1", [int]$Cpu = 1, [string]$Memory = "1Gi" # the owner sets the size of the service: never raise these without their permission)
+# the size of the service is the owner's setting: never raise -Cpu or -Memory without their permission
+param([string[]]$Models = @("models_alpha", "models_v3"), [string]$Region = "us-central1", [int]$Cpu = 1, [string]$Memory = "1Gi")
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $ai = Join-Path $repo "services\ai"
