@@ -46,7 +46,8 @@ export default async function BotsPage() {
   // only the versions that have been released (approved by the owner) are listed: the ones that are still being tested show no numbers
   const versions = (await botVersions(getDb())).filter((v) => v.live || v.approved);
   const records = await loadBotRecords(getDb());
-  const live = versions.find((v) => v.live);
+  const live = versions.filter((v) => v.live);
+  const published = new Set(versions.map((v) => v.version));
   return (
     <>
       <h1>AI</h1>
@@ -90,9 +91,16 @@ export default async function BotsPage() {
         the seats swapped. Scores are final scores.
       </p>
       <p>
-        {live ? (
+        {live.length > 0 ? (
           <>
-            Playing on the site now: <b>{live.version}</b>.
+            Playing on the site now:{" "}
+            {live.map((v, i) => (
+              <span key={v.version}>
+                {i > 0 ? ", " : ""}
+                <b>{v.version}</b>
+              </span>
+            ))}
+            .
           </>
         ) : (
           <>No version is served to players yet.</>
@@ -120,7 +128,7 @@ export default async function BotsPage() {
                 <tr key={v.version}>
                   <td>
                     <b>{v.version}</b>
-                    {v.parent ? <span className="muted small"> from {v.parent}</span> : null}
+                    {v.parent && published.has(v.parent) ? <span className="muted small"> from {v.parent}</span> : null}
                   </td>
                   <td>{day(v.created)}</td>
                   {OPPONENTS.map(([key]) => (
@@ -129,7 +137,9 @@ export default async function BotsPage() {
                   <PeopleCell r={records.get(v.version)} />
                   <td className="small">
                     {v.training.iterations
-                      ? `${v.training.iterations} rounds of ${v.training.games_per_iteration} games`
+                      ? v.training.games_per_iteration
+                        ? `${v.training.iterations} rounds of ${v.training.games_per_iteration} games`
+                        : `${v.training.iterations} rounds of self-play and games of people`
                       : "copy of the heuristic bot"}
                     <br />
                     <span className="muted">rules {v.rules_version}</span>
