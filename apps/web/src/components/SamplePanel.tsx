@@ -1,6 +1,7 @@
 "use client";
 // The samples on a planet (Mascamites, ALIEN-MASC-02, FAQ-C201): after the planet is picked, a panel shows each sample with what it gives, and the player picks
 // one and confirms. A card that looks at the samples (ET.8) gives the reward of the one picked and puts it back; collecting takes it.
+import { useState } from "react";
 import assets from "../generated/assets.json";
 import { Rewards } from "./Reward";
 
@@ -33,8 +34,18 @@ export function SamplePanel({
   onBack?: () => void;
 }) {
   const name = planet.charAt(0).toUpperCase() + planet.slice(1);
+  const [hidden, setHidden] = useState(false);
+  if (hidden)
+    return (
+      <button type="button" className="offershow primary" onClick={() => setHidden(false)}>
+        ▴ Show the samples on {name}
+      </button>
+    );
   return (
     <section className="offerpanel samplepanel" aria-label={`The samples on ${name}`}>
+      <button type="button" className="offerhide secondary small" onClick={() => setHidden(true)} title="Put the panel away for a moment">
+        Hide ▾
+      </button>
       <h2>Samples on {name}</h2>
       <p className="muted small">
         {mode === "peek"

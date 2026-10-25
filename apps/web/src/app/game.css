@@ -3589,3 +3589,18 @@ html:has(.setupchoice) .hand {
   flex-wrap: wrap;
   justify-content: center;
 }
+
+/* the panels that offer cards or samples can be put away for a moment */
+.offerhide {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.offershow {
+  position: fixed;
+  left: 50%;
+  bottom: 64px;
+  transform: translateX(-50%);
+  z-index: 90;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
