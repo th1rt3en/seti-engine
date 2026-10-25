@@ -75,3 +75,11 @@ python -m uv run python -m seti_ai.bundle_train alpha --people ../../archive --p
 `seti_ai.dataset` reads the downloaded files (the file of a game, `<table number>.json`, or an older game folder or `replay.json`), keeps the games played to the end, applies the rule of
 `docs/AI-TURN-BUNDLES.md` section 10(b) (a game the model lost: the person's bundles with weight 3, value labels from both seats; a game the model won or tied:
 skipped; a game without the model: once), skips and counts a game the engine cannot replay any more, and mixes the examples into the data of the bots by share.
+
+## Alpha (2026-10-25)
+
+`models_v3/v003` (the large network, 143.7M parameters, the champion of the first 15 iterations of the v003 run) is deployed under the name **Alpha**: approved with
+`publish --models models_v3 --approve v003=Alpha --enable Alpha`, exported next to `v001` (the export of a second folder adds to `serve_models/index.json`), and
+served as revision `seti-ai-00008` with **2 CPUs and 4 GiB** (the weights are 575 MB: the 1 GiB of the small network is not enough) and concurrency 2.
+`deploy-ai.ps1 -Models models_alpha,models_v3` exports both folders. A move of Alpha took 3 to 10 seconds on 2 cores in a local test.
+
