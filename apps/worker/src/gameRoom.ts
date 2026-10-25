@@ -146,7 +146,16 @@ export class GameRoomDO implements DurableObject {
   private async onMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     const conn = this.connection(ws);
     const att = ws.deserializeAttachment() as Attachment;
-    let msg: { t?: string; id?: number; seq?: number; seat?: number; text?: string; action?: Record<string, unknown> };
+    let msg: {
+      t?: string;
+      id?: number;
+      seq?: number;
+      seat?: number;
+      count?: number;
+      accept?: boolean;
+      text?: string;
+      action?: Record<string, unknown>;
+    };
     const text = messageText(message);
     if (text === null) {
       conn.send({ t: "error", code: "bad_message", message: "the message is too big" });
@@ -195,9 +204,13 @@ export class GameRoomDO implements DurableObject {
         ? await this.room.submit(att.identity, msg.seq, msg.action)
         : msg.t === "resign"
           ? await this.room.resign(att.identity)
-          : msg.t === "kick" && typeof msg.seat === "number"
-            ? await this.room.kick(att.identity, msg.seat)
-            : { ok: false, code: "bad_message", message: "unknown message" };
+          : msg.t === "propose_undo" && typeof msg.count === "number"
+            ? await this.room.proposeUndo(att.identity, msg.count)
+            : msg.t === "undo_vote" && typeof msg.accept === "boolean"
+              ? await this.room.voteUndo(att.identity, msg.accept)
+              : msg.t === "kick" && typeof msg.seat === "number"
+                ? await this.room.kick(att.identity, msg.seat)
+                : { ok: false, code: "bad_message", message: "unknown message" };
     if (!res.ok) conn.send({ t: "error", code: res.code, message: res.message, ...(res.legal ? { legal: res.legal } : {}) });
   }
 

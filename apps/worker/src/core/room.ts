@@ -181,7 +181,9 @@ export type ServerMessage =
   /** An administrator cancelled the game (no result, no rating changes). */
   | { t: "cancelled" }
   /** The chat of the table: the last lines on connecting (`replace`), then each new line. */
-  | { t: "chat"; entries: ChatEntry[]; replace?: boolean };
+  | { t: "chat"; entries: ChatEntry[]; replace?: boolean }
+  /** The proposal to take back moves that waits for an answer (null: none), and when this player may propose again (null: now). */
+  | { t: "undo"; proposal: { seat: number; name: string; count: number; accepted: number[] } | null; until: number | null };
 
 /** A line of the chat of a table. `seat` is null for somebody who is not a player of the game (a spectator, or a player of a lobby who has not got a seat). */
 export interface ChatEntry {
@@ -197,6 +199,18 @@ export interface ChatEntry {
 
 /** The chat keeps the last lines of a table, in the room (not in a database, and not in the archive); it goes with the table. */
 export const CHAT_KEEP = 100;
+
+/** A proposal to take back moves asks for 1 to this many, and a player can make one this often. */
+export const UNDO_MAX = 10;
+export const UNDO_COOLDOWN_MS = 5 * 60_000;
+interface UndoProposal {
+  seat: number;
+  name: string;
+  count: number;
+  accepted: number[];
+  /** The number of actions of the game when it was proposed: a move made since makes the proposal stale. */
+  logcount: number;
+}
 export const CHAT_MAX_CHARS = 300;
 /** One line from one person in this many milliseconds. */
 export const CHAT_GAP_MS = 1000;
@@ -476,11 +490,25 @@ export class GameRoom {
    * over cannot be taken back: its result and its rating changes are settled.
    */
   adminUndo(count: number): Promise<SubmitResult & { removed?: number; left?: number }> {
-    return this.serial(async () => {
+    return this.serial(() =>
+      this.rewind(count, 200, (removed) => ({
+        from: "Administrator",
+        text: `An administrator took back the last ${removed} action${removed === 1 ? "" : "s"} of this table.`,
+      })),
+    );
+  }
+
+  /** Take back the last `count` actions (at most `max`) and tell the table with the line that `say` gives. Runs inside the serial queue. */
+  private async rewind(
+    count: number,
+    max: number,
+    say: (removed: number) => { from: string; text: string },
+  ): Promise<SubmitResult & { removed?: number; left?: number }> {
+    {
       const meta = await this.meta();
       if (meta === undefined || meta.status !== "playing") return fail("not_playing", "only a game that is being played can be taken back");
       if (!this.d.engine.replayState) return fail("no_replay", "the engine cannot rebuild the game");
-      if (!Number.isInteger(count) || count < 1 || count > 200) return fail("bad_count", "take back 1 to 200 actions");
+      if (!Number.isInteger(count) || count < 1 || count > max) return fail("bad_count", `take back 1 to ${max} actions`);
       const log = await this.d.store.list<LogEntry>("log:");
       const left = Math.max(0, log.length - count);
       const removed = log.length - left;
@@ -503,19 +531,110 @@ export class GameRoom {
       await this.d.store.put("logcount", left);
       await this.d.store.put("state", state);
       await this.runClock(meta, state);
-      await this.systemChat(`An administrator took back the last ${removed} action${removed === 1 ? "" : "s"} of this table.`);
+      await this.d.store.delete("undo");
+      const line = say(removed);
+      await this.systemChat(line.text, line.from);
       for (const c of this.d.connections()) await this.sendLog(c, meta);
       await this.broadcastViews();
+      await this.broadcastUndo(meta);
       this.archiveSoon(); // the file of the game is written again from the log that is left
       this.botSoon();
       return { ok: true, removed, left };
+    }
+  }
+
+  /**
+   * A player proposes to take back the last `count` actions (1 to UNDO_MAX). Every other human player at the table is asked; when all accept, the game is
+   * rebuilt as an administrator's take back does it, and when one denies, nothing changes. A player may propose once in UNDO_COOLDOWN_MS (a proposal that
+   * is denied counts). With no other human player (a solo game, or one against the AI) the take back is made at once.
+   */
+  proposeUndo(who: Identity, count: number): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "playing") return fail("not_playing", "the game is not being played");
+      const seat = meta.seats.findIndex((s) => s?.id === who.id);
+      if (seat < 0) return fail("not_seated", "you are not a player of this game");
+      if (!Number.isInteger(count) || count < 1 || count > UNDO_MAX) return fail("bad_count", `take back 1 to ${UNDO_MAX} moves`);
+      if ((await this.d.store.get<UndoProposal>("undo")) !== undefined) return fail("pending", "a proposal is waiting for an answer");
+      const now = this.d.now();
+      const cool = (await this.d.store.get<Record<string, number>>("undocool")) ?? {};
+      const until = (cool[who.id] ?? 0) + UNDO_COOLDOWN_MS;
+      if (cool[who.id] !== undefined && until > now)
+        return fail("cooldown", `you can propose again in ${Math.ceil((until - now) / 60_000)} min`);
+      const logcount = (await this.d.store.get<number>("logcount")) ?? 0;
+      if (logcount === 0) return fail("nothing", "the game has no move to take back");
+      const n = Math.min(count, logcount);
+      await this.d.store.put("undocool", { ...cool, [who.id]: now });
+      if (this.askedAbout(meta, seat).length === 0)
+        return this.rewind(n, UNDO_MAX, (r) => ({ from: "Table", text: `${who.name} took back the last ${r} move${r === 1 ? "" : "s"}.` }));
+      await this.d.store.put<UndoProposal>("undo", { seat, name: who.name, count: n, accepted: [], logcount });
+      await this.broadcastUndo(meta);
+      return { ok: true };
+    });
+  }
+
+  /** The seats that are asked about a proposal of `proposer`: the other human players (an AI is not asked). */
+  private askedAbout(meta: Meta, proposer: number): number[] {
+    return meta.seats.map((s, i) => (s && !s.bot && i !== proposer ? i : -1)).filter((i) => i >= 0);
+  }
+
+  /** An answer of a player who was asked about the proposal. */
+  voteUndo(who: Identity, accept: boolean): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      const prop = await this.d.store.get<UndoProposal>("undo");
+      if (meta === undefined || meta.status !== "playing" || prop === undefined) return fail("no_proposal", "there is nothing to answer");
+      const seat = meta.seats.findIndex((s) => s?.id === who.id);
+      if (seat < 0 || seat === prop.seat) return fail("not_asked", "you are not asked");
+      if (!accept) {
+        await this.d.store.delete("undo");
+        await this.systemChat(
+          `${who.name} denied taking back the last ${prop.count} move${prop.count === 1 ? "" : "s"} that ${prop.name} proposed.`,
+          "Table",
+        );
+        await this.broadcastUndo(meta);
+        return { ok: true };
+      }
+      const accepted = prop.accepted.includes(seat) ? prop.accepted : [...prop.accepted, seat];
+      if (!this.askedAbout(meta, prop.seat).every((i) => accepted.includes(i))) {
+        await this.d.store.put<UndoProposal>("undo", { ...prop, accepted });
+        await this.broadcastUndo(meta);
+        return { ok: true };
+      }
+      const done = await this.rewind(prop.count, UNDO_MAX, (r) => ({
+        from: "Table",
+        text: `The players agreed to take back the last ${r} move${r === 1 ? "" : "s"} (proposed by ${prop.name}).`,
+      }));
+      if (!done.ok) {
+        await this.d.store.delete("undo");
+        await this.broadcastUndo(meta);
+        return done;
+      }
+      return { ok: true };
+    });
+  }
+
+  /** The proposal that waits (if any) and when each player may propose again, to every connection. */
+  private async broadcastUndo(meta: Meta): Promise<void> {
+    for (const c of this.d.connections()) await this.sendUndo(c, meta);
+  }
+
+  private async sendUndo(conn: Connection, meta: Meta): Promise<void> {
+    if (meta.status === "lobby") return;
+    const prop = meta.status === "playing" ? await this.d.store.get<UndoProposal>("undo") : undefined;
+    const cool = (await this.d.store.get<Record<string, number>>("undocool")) ?? {};
+    const last = conn.who === null ? undefined : cool[conn.who];
+    conn.send({
+      t: "undo",
+      proposal: prop === undefined ? null : { seat: prop.seat, name: prop.name, count: prop.count, accepted: prop.accepted },
+      until: last === undefined ? null : last + UNDO_COOLDOWN_MS,
     });
   }
 
   /** A line of the chat from the administrator, for everybody at the table. */
-  private async systemChat(text: string): Promise<void> {
+  private async systemChat(text: string, from = "Administrator"): Promise<void> {
     const lines = (await this.d.store.get<ChatEntry[]>("chat")) ?? [];
-    const entry: ChatEntry = { n: (lines.at(-1)?.n ?? 0) + 1, name: "Administrator", seat: null, text, at: this.d.now() };
+    const entry: ChatEntry = { n: (lines.at(-1)?.n ?? 0) + 1, name: from, seat: null, text, at: this.d.now() };
     await this.d.store.put("chat", [...lines, entry].slice(-CHAT_KEEP));
     for (const c of this.d.connections()) c.send({ t: "chat", entries: [entry] });
   }
@@ -679,6 +798,10 @@ export class GameRoom {
     await this.d.store.put(logKey(count), entry);
     await this.d.store.put("logcount", count + 1);
     await this.d.store.put("state", res.state);
+    if ((await this.d.store.get<UndoProposal>("undo")) !== undefined) {
+      await this.d.store.delete("undo"); // a move was made: the proposal was about the game before it
+      await this.broadcastUndo(meta);
+    }
     for (const c of this.d.connections()) c.send({ t: "log", from: count, entries: [publicEntry(entry, this.connSeat(meta, c))] });
     // A move of the simultaneous setup that leaves the player choosing (EXP-ORG-14: choosing again) does not stop their clock: only the lock does,
     // so that nobody gains time by choosing again and again.
@@ -954,6 +1077,7 @@ export class GameRoom {
     else {
       await this.sendView(conn, meta);
       await this.sendLog(conn, meta);
+      await this.sendUndo(conn, meta);
     }
   }
 

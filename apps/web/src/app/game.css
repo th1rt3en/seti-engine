@@ -3615,3 +3615,45 @@ html:has(.setupchoice) .hand {
   z-index: 90;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
 }
+
+/* the proposal of another player to take back moves: a bar above the move bar */
+.undobar {
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+.undoask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.undoask span {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.undoask button.menudanger {
+  color: var(--bad);
+}
+.barmenupanel button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.barmenupanel .undoform {
+  display: grid;
+  gap: 6px;
+  padding: 0.5rem 0.9rem 0.7rem;
+  border-top: 1px solid var(--line);
+}
+.barmenupanel .undoform label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+.barmenupanel .undoform input {
+  width: 5rem;
+}
+.barmenupanel .undoform button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-align: center;
+}

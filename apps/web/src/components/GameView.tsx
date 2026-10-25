@@ -249,6 +249,7 @@ export function GameView({
   names,
   moves,
   topExtra,
+  aboveMoves,
   previous,
   hand,
   row,
@@ -304,6 +305,8 @@ export function GameView({
   moves?: ReactNode;
   /** Connection and clock information for the bar. */
   topExtra?: ReactNode;
+  /** A bar above the move bar (a proposal of another player that waits for an answer). */
+  aboveMoves?: ReactNode;
 }) {
   const s = view.state;
   // when the game is over the score is the final one (the board, the end-of-game cards, the gold tiles, the Exertian cards, the danger loss)
@@ -442,6 +445,7 @@ export function GameView({
           </ul>
           {topExtra ? <div className="extra">{topExtra}</div> : null}
         </div>
+        {aboveMoves ? <div className="undobar">{aboveMoves}</div> : null}
         {moves ? <div className="movebar">{moves}</div> : null}
       </header>
 
