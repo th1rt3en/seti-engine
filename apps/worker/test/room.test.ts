@@ -230,11 +230,14 @@ describe("play", () => {
     t.conns.push(a, b);
     for (let i = 0; i < 4; i++) await t.room.submit(i % 2 === 0 ? alice : bob, i, { type: "score" });
     const lastUndo = (c: Conn) =>
-      c.got.filter((m) => m.t === "undo").at(-1) as { proposal: { seat: number; count: number } | null; until: number | null };
+      c.got.filter((m) => m.t === "undo").at(-1) as {
+        proposal: { seat: number; count: number; total: number } | null;
+        until: number | null;
+      };
     expect(await t.room.proposeUndo(alice, 0)).toMatchObject({ ok: false, code: "bad_count" });
     expect(await t.room.proposeUndo(alice, 11)).toMatchObject({ ok: false, code: "bad_count" });
     expect(await t.room.proposeUndo(alice, 2)).toEqual({ ok: true });
-    expect(lastUndo(b).proposal).toMatchObject({ seat: 0, count: 2 }); // the other player is asked
+    expect(lastUndo(b).proposal).toMatchObject({ seat: 0, count: 2, total: 2 }); // the other player is asked
     expect(await t.room.log()).toHaveLength(4); // nothing yet
     expect(await t.room.proposeUndo(bob, 1)).toMatchObject({ ok: false, code: "pending" });
     expect(await t.room.voteUndo(alice, true)).toMatchObject({ ok: false }); // the proposer is not asked
@@ -255,16 +258,14 @@ describe("play", () => {
     expect(await t.room.voteUndo(alice, true)).toMatchObject({ ok: false, code: "no_proposal" });
   });
 
-  it("with no other human player a proposal to take back moves goes through at once", async () => {
+  it("a take back cannot be proposed in a game with an AI", async () => {
     const t = await started();
     await t.room.submit(alice, 0, { type: "score" });
-    await t.room.submit(bob, 1, { type: "score" });
-    // seat 1 is an AI for this check: it is not asked
     const meta = await t.store.get<{ seats: ({ bot?: unknown } | null)[] }>("meta");
     if (meta?.seats[1]) meta.seats[1].bot = { model: "x" };
     await t.store.put("meta", meta);
-    expect(await t.room.proposeUndo(alice, 2)).toMatchObject({ ok: true, removed: 2 });
-    expect(await t.room.log()).toHaveLength(0);
+    expect(await t.room.proposeUndo(alice, 1)).toMatchObject({ ok: false, code: "not_allowed" });
+    expect(await t.room.log()).toHaveLength(1);
   });
 
   it("a repeated message does not act twice", async () => {

@@ -76,10 +76,10 @@ type Server =
   | { t: "ended"; result: { reason: string; winners: number[]; ranking: { seat: number; rank: number; score: number }[] } }
   | { t: "cancelled" }
   | { t: "chat"; entries: ChatLine[]; replace?: boolean }
-  | { t: "undo"; proposal: UndoProposal | null; until: number | null };
+  | { t: "undo"; proposal: UndoProposal | null; until: number | null; allowed: boolean };
 
 /** A proposal to take back the last `count` moves, waiting for the other players (seats in `accepted` have said yes). */
-type UndoProposal = { seat: number; name: string; count: number; accepted: number[] };
+type UndoProposal = { seat: number; name: string; count: number; accepted: number[]; total: number };
 
 const GOLD_INFO = assets.gold as Record<string, { per: string; values: number[] }>;
 
@@ -133,7 +133,11 @@ export function GameClient({
   // the chat of the table: the last lines (the server sends them on connecting and each new one), and what it said about a line it refused
   const [chat, setChat] = useState<ChatLine[]>([]);
   const [chatNote, setChatNote] = useState<string | null>(null);
-  const [undo, setUndo] = useState<{ proposal: UndoProposal | null; until: number | null }>({ proposal: null, until: null });
+  const [undo, setUndo] = useState<{ proposal: UndoProposal | null; until: number | null; allowed: boolean }>({
+    proposal: null,
+    until: null,
+    allowed: false,
+  });
   const logRef = useRef<LogEntry[]>([]); // the same log, to check that a new entry follows the ones that were received
   const [online, setOnline] = useState(false);
   // what a move would change for the player, by the number of the move (MovePreview); forgotten when the game moves on
@@ -289,7 +293,7 @@ export function GameClient({
           }
           setLog(logRef.current);
         } else if (m.t === "undo") {
-          setUndo({ proposal: m.proposal, until: m.until });
+          setUndo({ proposal: m.proposal, until: m.until, allowed: m.allowed });
         } else if (m.t === "chat") {
           setChatNote(null);
           setChat((old) => (m.replace ? m.entries : [...old, ...m.entries.filter((l) => !old.some((o) => o.n === l.n))].slice(-100)));
@@ -1593,13 +1597,13 @@ export function GameClient({
                   undo.proposal.accepted.includes(v.viewer) ? (
                     <span>
                       You accepted taking back the last {undo.proposal.count} move{undo.proposal.count === 1 ? "" : "s"}. Waiting for the
-                      others.
+                      others ({undo.proposal.accepted.length + 1}/{undo.proposal.total}).
                     </span>
                   ) : (
                     <>
                       <span>
                         {undo.proposal.name} wants to undo the last {undo.proposal.count} move{undo.proposal.count === 1 ? "" : "s"}.
-                        Accept?
+                        Accept? ({undo.proposal.accepted.length + 1}/{undo.proposal.total})
                       </span>
                       <button type="button" onClick={() => send({ t: "undo_vote", accept: true })}>
                         Accept
@@ -1612,7 +1616,7 @@ export function GameClient({
                 ) : (
                   <span>
                     You asked to take back the last {undo.proposal.count} move{undo.proposal.count === 1 ? "" : "s"}. Waiting for the other
-                    players.
+                    players ({undo.proposal.accepted.length + 1}/{undo.proposal.total}).
                   </span>
                 )}
               </div>
@@ -1622,7 +1626,7 @@ export function GameClient({
             <>
               {clocks}
               <BarMenu
-                onPropose={v.viewer !== null && !ended ? (count) => send({ t: "propose_undo", count }) : undefined}
+                onPropose={v.viewer !== null && !ended && undo.allowed ? (count) => send({ t: "propose_undo", count }) : undefined}
                 coolUntil={undo.until}
                 onResign={v.viewer !== null && !ended ? () => window.confirm("Resign the game?") && send({ t: "resign" }) : undefined}
                 siteShown={siteShown}

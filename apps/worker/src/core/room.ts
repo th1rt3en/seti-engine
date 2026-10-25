@@ -183,7 +183,12 @@ export type ServerMessage =
   /** The chat of the table: the last lines on connecting (`replace`), then each new line. */
   | { t: "chat"; entries: ChatEntry[]; replace?: boolean }
   /** The proposal to take back moves that waits for an answer (null: none), and when this player may propose again (null: now). */
-  | { t: "undo"; proposal: { seat: number; name: string; count: number; accepted: number[] } | null; until: number | null };
+  | {
+      t: "undo";
+      proposal: { seat: number; name: string; count: number; accepted: number[]; total: number } | null;
+      until: number | null;
+      allowed: boolean;
+    };
 
 /** A line of the chat of a table. `seat` is null for somebody who is not a player of the game (a spectator, or a player of a lobby who has not got a seat). */
 export interface ChatEntry {
@@ -546,7 +551,7 @@ export class GameRoom {
   /**
    * A player proposes to take back the last `count` actions (1 to UNDO_MAX). Every other human player at the table is asked; when all accept, the game is
    * rebuilt as an administrator's take back does it, and when one denies, nothing changes. A player may propose once in UNDO_COOLDOWN_MS (a proposal that
-   * is denied counts). With no other human player (a solo game, or one against the AI) the take back is made at once.
+   * is denied counts). Only in a game of human players, two or more.
    */
   proposeUndo(who: Identity, count: number): Promise<SubmitResult> {
     return this.serial(async () => {
@@ -554,6 +559,7 @@ export class GameRoom {
       if (meta === undefined || meta.status !== "playing") return fail("not_playing", "the game is not being played");
       const seat = meta.seats.findIndex((s) => s?.id === who.id);
       if (seat < 0) return fail("not_seated", "you are not a player of this game");
+      if (!undoAllowed(meta)) return fail("not_allowed", "a take back can be proposed in a game of human players only");
       if (!Number.isInteger(count) || count < 1 || count > UNDO_MAX) return fail("bad_count", `take back 1 to ${UNDO_MAX} moves`);
       if ((await this.d.store.get<UndoProposal>("undo")) !== undefined) return fail("pending", "a proposal is waiting for an answer");
       const now = this.d.now();
@@ -565,8 +571,6 @@ export class GameRoom {
       if (logcount === 0) return fail("nothing", "the game has no move to take back");
       const n = Math.min(count, logcount);
       await this.d.store.put("undocool", { ...cool, [who.id]: now });
-      if (this.askedAbout(meta, seat).length === 0)
-        return this.rewind(n, UNDO_MAX, (r) => ({ from: "Table", text: `${who.name} took back the last ${r} move${r === 1 ? "" : "s"}.` }));
       await this.d.store.put("undo", { seat, name: who.name, count: n, accepted: [], logcount });
       await this.broadcastUndo(meta);
       return { ok: true };
@@ -626,7 +630,11 @@ export class GameRoom {
     const last = conn.who === null ? undefined : cool[conn.who];
     conn.send({
       t: "undo",
-      proposal: prop === undefined ? null : { seat: prop.seat, name: prop.name, count: prop.count, accepted: prop.accepted },
+      proposal:
+        prop === undefined
+          ? null
+          : { seat: prop.seat, name: prop.name, count: prop.count, accepted: prop.accepted, total: meta.seats.length },
+      allowed: undoAllowed(meta),
       until: last === undefined ? null : last + UNDO_COOLDOWN_MS,
     });
   }
@@ -1167,6 +1175,11 @@ export class GameRoom {
     if (s === undefined) throw new Error("the game has no state");
     return s;
   }
+}
+
+/** A take back is proposed in a game of two or more players who are all human (not a solo game, not a game with an AI). */
+function undoAllowed(meta: Meta): boolean {
+  return meta.seats.length >= 2 && meta.seats.every((s) => s && !s.bot);
 }
 
 function fail(code: string, message: string): { ok: false; code: string; message: string } {
