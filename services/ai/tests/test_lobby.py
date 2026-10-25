@@ -167,6 +167,22 @@ def test_the_export_copies_only_the_approved_versions(tmp_path: Path) -> None:
     assert (tmp_path / "out" / "v002" / "model.pt").exists() and not (tmp_path / "out" / "v001").exists()
 
 
+def test_a_version_is_loaded_only_when_it_is_asked_for() -> None:
+    """A large version that nobody plays must not be loaded (and must not take the memory of the others)."""
+    from seti_ai.lobby import LazyBrains
+
+    loaded: list[str] = []
+
+    def load(name: str) -> object:
+        loaded.append(name)
+        return object()
+
+    brains = LazyBrains(["v001", "Alpha"], load)  # type: ignore[arg-type]
+    assert sorted(brains) == ["Alpha", "v001"] and loaded == []  # the names are known, nothing is loaded
+    assert brains.get("v001") is brains.get("v001") and loaded == ["v001"]  # loaded once
+    assert brains.get("v9") is None and loaded == ["v001"]
+
+
 def test_exporting_from_a_second_folder_keeps_the_versions_of_the_first(tmp_path: Path) -> None:
     """The service serves the approved versions of several runs: the second export adds to the index, it does not replace it."""
     from seti_ai.lobby_export import export

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import random
+from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -72,10 +73,33 @@ def replay(options: Options, actions: list[dict[str, Any]], rng_encoding: str = 
     return state, history, know
 
 
+class LazyBrains(Mapping[str, Brain]):
+    """The brains of the approved versions, each loaded when it is first asked for: a version that nobody plays (a large one that does not fit in the
+    memory of the service) cannot take down the others."""
+
+    def __init__(self, names: list[str], load: Callable[[str], Brain]) -> None:
+        self._names = list(names)
+        self._load = load
+        self._loaded: dict[str, Brain] = {}
+
+    def __getitem__(self, name: str) -> Brain:
+        if name not in self._names:
+            raise KeyError(name)
+        if name not in self._loaded:
+            self._loaded[name] = self._load(name)
+        return self._loaded[name]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._names)
+
+    def __len__(self) -> int:
+        return len(self._names)
+
+
 class Lobby:
     """The approved models, loaded when first asked for."""
 
-    def __init__(self, brains: dict[str, Brain], config: SearchConfig | None = None) -> None:
+    def __init__(self, brains: Mapping[str, Brain], config: SearchConfig | None = None) -> None:
         self.brains = brains
         self.config = config or SearchConfig()
 
@@ -137,8 +161,9 @@ def load_lobby(root: Path, config: SearchConfig | None = None, allow_unapproved:
     from .brains import NetBrain
 
     torch.set_num_threads(2)
-    brains: dict[str, Brain] = {}
-    for version in approved_versions(root, allow_unapproved):
+
+    def load(version: str) -> Brain:
         net = net_from(str(root / version / "model.pt"), "cpu").eval()
-        brains[version] = NetBrain(LocalNet(net))
-    return Lobby(brains, config)
+        return NetBrain(LocalNet(net))
+
+    return Lobby(LazyBrains(approved_versions(root, allow_unapproved), load), config)
