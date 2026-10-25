@@ -80,6 +80,8 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
     if kind in ("mark_signal", "scan_earth", "resolve_sector"):
         sector = state.sectors[move["sector"]]
         found: dict[str, Any] = {"sector": move["sector"], "star": sector.star, "color": sector.color}
+        if move.get("where") == "tile":  # ALIEN-OUM-03: the tile of 'Oumuamua is a place of its own on the board
+            found["oumuamua_tile"] = True
         if kind == "resolve_sector":  # TURN-05: the sector that is resolved next, picked on the board
             found["resolve"] = True
         return found

@@ -12,6 +12,8 @@ from typing import Any
 from . import effects, objectives, solar, tables, trail
 from .models import Decision, GameState, PlayerState
 
+Action = dict[str, Any]
+
 Events = list[dict[str, Any]]
 TRACE_COLORS = ("pink", "yellow", "blue")  # LIFE-01; column order of the three discovery spaces
 DISCOVERY_VP = (5, 3)  # BOARD-40: left slot 5 VP, right slot 3 VP, each with 1 publicity
@@ -156,6 +158,26 @@ def _mark_signal(s: GameState, p: PlayerState, index: int, events: Events, data:
     if completed:
         cards.on_sector_completed(s, events)
     cards.fire(s, p, [{"e": "signal", "color": sec.color}], events)  # FAQ-C116
+
+
+def signal_moves(s: GameState, index: int) -> list[Action]:
+    """The moves that mark a signal in sector `index`. In 'Oumuamua's sector there are two (ALIEN-OUM-03): in the sector, or on the
+    tile; the choice is part of the move, so that the player is not asked a second time."""
+    from . import species  # noqa: PLC0415 - this imports this module
+
+    if index == species.oumuamua_sector(s):
+        return [{"type": "mark_signal", "sector": index, "where": "sector"}, {"type": "mark_signal", "sector": index, "where": "tile"}]
+    return [{"type": "mark_signal", "sector": index}]
+
+
+def legacy_oumuamua_mark_ok(s: GameState, action: Action) -> bool:
+    """A game played before 2026-10-25 has `mark_signal` with no `where` for 'Oumuamua's sector (a `signal_where` decision followed):
+    it is still accepted where the old rule accepted it, so that those games replay."""
+    from . import species  # noqa: PLC0415
+
+    if action.get("type") != "mark_signal" or "where" in action or not s.pending or s.pending[0].kind != "signal":
+        return False
+    return action.get("sector") == species.oumuamua_sector(s) and {**action, "where": "tile"} in signal_moves(s, int(action["sector"]))
 
 
 def sectors_of_color(s: GameState, color: str) -> list[int]:

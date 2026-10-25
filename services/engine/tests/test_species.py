@@ -310,9 +310,8 @@ def test_signal_in_oumuamuas_sector_can_go_on_the_tile() -> None:
     assert r2.state.sectors[sec].markers == [r2.state.current_player]
 
 
-def test_a_signal_of_a_scan_in_oumuamuas_sector_asks_for_the_tile_at_once() -> None:
-    """ALIEN-OUM-03: a display card discarded for a signal in 'Oumuamua's sector color: the choice comes first."""
-    s = oum_game()
+def _scan_with_a_discarded_card(s: GameState) -> tuple[StepResult, int]:
+    """A scan in which a display card of the color of 'Oumuamua's sector is discarded for a signal: the game at the choice of the sector."""
     sec = species.oumuamua_sector(s)
     assert sec is not None
     color = s.sectors[sec].color
@@ -324,14 +323,32 @@ def test_a_signal_of_a_scan_in_oumuamuas_sector_asks_for_the_tile_at_once() -> N
     r = do(with_state(s), "scan")
     r = do(r, "scan_discard", source="row:0")
     assert r.state.pending[0].kind == "signal"
-    r = do(r, "mark_signal", sector=sec)
-    assert r.state.pending[0].kind == "oumuamua_signal"  # not behind the next step of the scan
-    assert {m["where"] for m in r.legal if m["type"] == "signal_where"} == {"sector", "tile"}
-    data = r.state.players[r.state.current_player].data_pool
-    r = do(r, "signal_where", where="tile")
-    assert r.state.species[0].extra["tile"]["markers"] == [r.state.current_player]  # the marker is on the tile
-    assert r.state.players[r.state.current_player].data_pool == data + 1  # and the data of the tile is gained
-    assert r.state.pending[0].kind == "scan_step"  # the scan goes on
+    return r, sec
+
+
+def test_discarding_a_display_card_offers_the_tile_of_oumuamua_with_the_sectors() -> None:
+    """ALIEN-OUM-03: the tile is one of the choices of the signal, with the sector: nothing is asked after the choice."""
+    r, sec = _scan_with_a_discarded_card(oum_game())
+    here = [m for m in r.legal if m["type"] == "mark_signal" and m["sector"] == sec]
+    assert {m["where"] for m in here} == {"sector", "tile"}  # both, as moves
+    me = r.state.current_player
+    data = r.state.players[me].data_pool
+    r = apply(r.state, {"type": "mark_signal", "sector": sec, "where": "tile"})
+    assert r.state.species[0].extra["tile"]["markers"] == [me] and not r.state.sectors[sec].markers  # on the tile, not in the sector
+    assert r.state.players[me].data_pool == data + 1  # and the data of the tile is gained
+    assert r.state.pending[0].kind == "scan_step"  # no second question: the scan goes on
+    r2, sec = _scan_with_a_discarded_card(oum_game())
+    r2 = apply(r2.state, {"type": "mark_signal", "sector": sec, "where": "sector"})
+    assert r2.state.sectors[sec].markers == [r2.state.current_player] and r2.state.pending[0].kind == "scan_step"
+
+
+def test_a_game_played_with_the_old_question_still_replays() -> None:
+    """The log of a game before 2026-10-25 has `mark_signal` without `where` and then `signal_where`: both are still accepted."""
+    r, sec = _scan_with_a_discarded_card(oum_game())
+    r = apply(r.state, {"type": "mark_signal", "sector": sec})  # not offered any more, accepted
+    assert r.state.pending[0].kind == "oumuamua_signal"  # the old question follows at once
+    r = apply(r.state, {"type": "signal_where", "where": "tile"})
+    assert r.state.species[0].extra["tile"]["markers"] == [r.state.current_player]
 
 
 def test_tile_completion_gives_exofossils_and_refills() -> None:

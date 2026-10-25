@@ -267,3 +267,21 @@ describe("the planets whose samples can be looked at (Mascamites, ET.8)", () => 
     expect([...handled].sort()).toEqual([0, 1]);
   });
 });
+
+describe("a signal in the sector of 'Oumuamua (ALIEN-OUM-03)", () => {
+  it("has the sector and the tile as two places, the tile being the place of the tile on the disc", () => {
+    const legal = [
+      { type: "mark_signal", sector: 0, where: "sector" },
+      { type: "mark_signal", sector: 0, where: "tile" },
+      { type: "mark_signal", sector: 4 },
+    ];
+    const notes = [
+      { sector: 0, star: "Sirius", color: "red" },
+      { sector: 0, star: "Sirius", color: "red", oumuamua_tile: true },
+      { sector: 4, star: "Vega", color: "red" },
+    ];
+    const { spots, handled } = buildSpots(view(legal, notes));
+    expect(spots.map((s) => s.id)).toEqual(["sector:0", "oumuamua-tile", "sector:4"]);
+    expect([...handled].sort()).toEqual([0, 1, 2]);
+  });
+});

@@ -184,6 +184,11 @@ def _can_undo(state: GameState) -> bool:
     return state.phase == "play" and state.undo is not None and len(state.undo_log) > 0 and state.stage in (None, "sectors")
 
 
+def _answers(state: GameState, action: Action) -> bool:
+    """Does this move answer the decision that is waiting? The moves of old logs that are not offered any more count too."""
+    return action in _decision_moves(state, state.pending[0]) or rewards.legacy_oumuamua_mark_ok(state, action)
+
+
 def _decision_moves(state: GameState, d: Decision) -> list[Action]:
     p = state.players[d.player]
     if d.kind == "data_overflow":  # RES-01 (owner ruling 2026-10-14): place pool data first, or take the data and lose the extra
@@ -238,9 +243,9 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
     if d.kind == "computer_slot":
         return [{"type": "place_computer_tech", "slot": k} for k in d.data["slots"]]
     if d.kind == "signal":
-        if d.data["color"] == "any":
-            return [{"type": "mark_signal", "sector": i} for i in d.data.get("sectors", range(len(state.sectors)))]
-        return [{"type": "mark_signal", "sector": i} for i in rewards.sectors_of_color(state, d.data["color"])]
+        any_color = d.data["color"] == "any"
+        sectors = d.data.get("sectors", range(len(state.sectors))) if any_color else rewards.sectors_of_color(state, d.data["color"])
+        return [m for i in sectors for m in rewards.signal_moves(state, i)]
     if d.kind == "trace":
         return rewards.trace_moves(state, d)
     if d.kind == "land_data_slot":
@@ -397,7 +402,7 @@ def apply(state: GameState, action: Action) -> StepResult:
         why = sandbox.check(state, action)
         if why is not None:
             raise IllegalAction(f"{action} is not allowed: {why}")
-    elif action not in legal and not techs.legacy_scan_skip_ok(state, action):
+    elif action not in legal and not techs.legacy_scan_skip_ok(state, action) and not rewards.legacy_oumuamua_mark_ok(state, action):
         raise IllegalAction(f"{action} is not legal; legal moves: {legal}")
     if action == {"type": "undo"}:  # UNDO-01: back to the state before the last move; the moves before it are played again
         back = _undo(state)
@@ -427,7 +432,7 @@ def _step(state: GameState, action: Action) -> tuple[GameState, list[dict[str, A
     s = state.model_copy(deep=True)
     events: list[dict[str, Any]] = []
     # what the move itself changes is for the move (or for the card being played, when the move goes on with one)
-    answers = bool(state.pending) and action in _decision_moves(state, state.pending[0])  # not a free action in the middle of it
+    answers = bool(state.pending) and _answers(state, action)  # not a free action in the middle of it
     playing = action.get("card") if action["type"] == "play_card" else state.playing if answers else None
     source: dict[str, Any] = {"kind": "card", "card": playing} if playing else {"kind": "move"}
     if answers and state.pending[0].source is not None:  # the decision knows its cause (a mission circle ...): the log names it
@@ -443,7 +448,7 @@ def _play_step(s: GameState, action: Action, events: list[dict[str, Any]]) -> No
         orgs.setup_apply(s, action, events)
         _advance(s, events)
         return
-    if s.pending and action not in _decision_moves(s, s.pending[0]) and not techs.legacy_scan_skip_ok(s, action):
+    if s.pending and not _answers(s, action) and not techs.legacy_scan_skip_ok(s, action):
         # FREE-00: a free action in the middle of the main action; the decisions of the main action wait until the free action is done
         s.stashed, s.pending = s.pending, []
         s.free_active = True
@@ -860,7 +865,11 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
             cards.gain_corner(s, p, cid)
     elif t == "mark_signal":
         for _ in range(d.data.get("times", 1)):
-            rewards.mark_signal(s, p, a["sector"], events, data=not d.data.get("nodata"))
+            where = a.get("where")  # ALIEN-OUM-03: in 'Oumuamua's sector the move says where the signal goes: no question after it
+            if where == "tile":
+                species.mark_tile(s, p, events, data=not d.data.get("nodata"))
+            else:
+                rewards.mark_signal(s, p, a["sector"], events, data=not d.data.get("nodata"), allow_tile=where is None)
     elif t.startswith("scan_"):
         techs.resolve_scan(s, p, a, events)
     elif t == "place_computer_tech":
