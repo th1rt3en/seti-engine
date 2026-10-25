@@ -21,7 +21,10 @@ def export(models: Path, out: Path) -> list[str]:
     rows = {r["version"]: r for r in json.loads((models / "index.json").read_text(encoding="utf-8"))}
     out.mkdir(parents=True, exist_ok=True)
     names: list[str] = []
-    index: list[dict[str, object]] = []
+    # the versions that were exported from another folder of models stay (a service serves the approved versions of several runs)
+    previous = out / "index.json"
+    kept = json.loads(previous.read_text(encoding="utf-8")) if previous.exists() else []
+    index: list[dict[str, object]] = [row for row in kept if row["version"] not in {str(rows[v].get("name") or v) for v in versions}]
     for v in versions:
         name = str(rows[v].get("name") or v)
         names.append(name)

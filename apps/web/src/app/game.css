@@ -3575,3 +3575,17 @@ html:has(.setupchoice) .hand {
   border-color: #6ef0a5;
   box-shadow: 0 0 14px rgba(110, 240, 165, 0.6);
 }
+
+/* the samples of a planet (Mascamites): each with its picture and what it gives */
+.samplechoice {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  padding: 4px;
+}
+.samplebuttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

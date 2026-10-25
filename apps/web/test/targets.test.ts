@@ -238,3 +238,32 @@ describe("the help of the context bar", () => {
     expect(helpFor("something_new")).toContain("highlighted choices");
   });
 });
+
+describe("the planets whose samples can be looked at (Mascamites, ET.8)", () => {
+  const moves = (planets: string[]) =>
+    planets.flatMap((planet, k) => [0, 1].map((t) => ({ type: "pick_sample", planet, sample: k * 2 + t })));
+
+  it("is a place for each planet when there is a choice of planets, and the samples of a planet share it", () => {
+    const legal = moves(["jupiter", "saturn"]);
+    const { spots, handled } = buildSpots(
+      view(
+        legal,
+        legal.map(() => ({ planet: "x", rewards: [] })),
+      ),
+    );
+    expect(spots.map((s) => s.id)).toEqual(["samplepick:jupiter", "samplepick:saturn"]);
+    expect([...handled].sort()).toEqual([0, 1, 2, 3]); // no button of the bar for a sample: the panel shows them
+  });
+
+  it("has no place to click when there is one planet only (its panel opens at once), but no button either", () => {
+    const legal = moves(["jupiter"]);
+    const { spots, handled } = buildSpots(
+      view(
+        legal,
+        legal.map(() => ({ planet: "jupiter", rewards: [] })),
+      ),
+    );
+    expect(spots).toEqual([]);
+    expect([...handled].sort()).toEqual([0, 1]);
+  });
+});

@@ -1,7 +1,7 @@
 # Deploy the AI lobby service to Cloud Run from this machine (docs/deploy-ai.md). The weights are not in git, so the image is built from a staged folder.
-#   powershell -File tools/deploy/deploy-ai.ps1 [-Models models_alpha]
+#   powershell -File tools/deploy/deploy-ai.ps1 [-Models models_alpha,models_v3] [-Cpu 2] [-Memory 4Gi]
 # Run `python -m seti_ai.publish --approve <version> --live <version>` first (it marks the version approved where the export reads it).
-param([string]$Models = "models_alpha", [string]$Region = "us-central1")
+param([string[]]$Models = @("models_alpha", "models_v3"), [string]$Region = "us-central1", [int]$Cpu = 2, [string]$Memory = "4Gi")
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $ai = Join-Path $repo "services\ai"
@@ -10,7 +10,7 @@ if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
 New-Item -ItemType Directory $stage, "$stage\engine", "$stage\ai" | Out-Null
 
 Push-Location $ai
-python -m uv run python -m seti_ai.lobby_export --models $Models --out serve_models
+foreach ($m in ($Models -split ",")) { python -m uv run python -m seti_ai.lobby_export --models $m --out serve_models }
 Pop-Location
 
 Copy-Item "$repo\services\engine\pyproject.toml" "$stage\engine\"
@@ -42,6 +42,6 @@ $envFile = Join-Path ([IO.Path]::GetTempPath()) "seti-ai-env.yaml"
 ("ENGINE_TRUSTED_KEYS: " + ($keys | ConvertTo-Json)) | Set-Content $envFile -Encoding utf8
 
 Push-Location $stage
-gcloud run deploy seti-ai --source . --region $Region --cpu 1 --memory 1Gi --concurrency 4 --min-instances 0 --max-instances 1 --timeout 300 --env-vars-file $envFile --quiet
+gcloud run deploy seti-ai --source . --region $Region --cpu $Cpu --memory $Memory --concurrency 2 --min-instances 0 --max-instances 1 --timeout 300 --env-vars-file $envFile --quiet
 Pop-Location
 Remove-Item $envFile

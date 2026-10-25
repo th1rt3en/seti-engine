@@ -61,6 +61,7 @@ import { PlayerLink } from "./PlayerLink";
 import { PlayerColorsContext, PlayerName, PlayerNumsContext } from "./PlayerName";
 import { PolPanel } from "./PolPanel";
 import { Amount, Cost, KindIcon } from "./Reward";
+import { SamplePanel } from "./SamplePanel";
 import { SandboxPanel } from "./Sandbox";
 import { SetupBoth, SetupChoice, SetupTucks } from "./SetupChoice";
 import { SpotPrompt } from "./SpotPrompt";
@@ -166,6 +167,9 @@ export function GameClient({
   const [pickedGold, setPickedGold] = useState<string | null>(null);
   // a place picked on the board (land, orbit, signal, trace)
   const [pickedSpot, setPickedSpot] = useState<string | null>(null);
+  // the samples of a planet (Mascamites): the planet that was picked on the solar system, and the sample picked in the panel
+  const [samplePlanet, setSamplePlanet] = useState<string | null>(null);
+  const [pickedSample, setPickedSample] = useState<number | null>(null);
   // the glyph token picked for a hole of the translation board that takes several (with the hole it was picked for)
   const [pickedGlyph, setPickedGlyph] = useState<{ spot: string; glyph: string } | null>(null);
   const [pickedProbe, setPickedProbe] = useState<string | null>(null);
@@ -253,6 +257,8 @@ export function GameClient({
           setRowMode(null);
           setPickedTech(null);
           setPickedSpot(null);
+          setSamplePlanet(null);
+          setPickedSample(null);
           setPickedMark(null);
           setChosenProbe(null);
           setPickedSlot(null);
@@ -643,6 +649,36 @@ export function GameClient({
   const offerMove =
     pickedOffer === null || simul ? undefined : mine.find((m) => isOffer(m) && !setupMoves.includes(m) && offerId(m) === pickedOffer);
   // keeping one of the end-of-round cards is confirmed (or given up) with the buttons on the card itself, like a card of the display
+  // the samples of the planet (Mascamites): the panel opens when the planet is known (one planet only, or the one that was picked on the solar system)
+  const sampleMoves = mine.filter((m) => m.type === "pick_sample");
+  const samplePlanets = [...new Set(sampleMoves.map((m) => String(m.planet)))];
+  const openPlanet =
+    samplePlanets.length === 1
+      ? (samplePlanets[0] ?? null)
+      : samplePlanet !== null && samplePlanets.includes(samplePlanet)
+        ? samplePlanet
+        : null;
+  const samplePanel =
+    openPlanet !== null && !ended ? (
+      <SamplePanel
+        planet={openPlanet}
+        mode={v.state.pending[0]?.data?.mode === "collect" ? "collect" : "peek"}
+        samples={sampleMoves
+          .filter((m) => m.planet === openPlanet)
+          .map((m) => ({
+            token: Number(m.sample),
+            rewards:
+              (v.notes[v.legal.findIndex((x) => sameMove(x as Move, m))] as { rewards?: { t: string; n: number }[] } | null)?.rewards ?? [],
+          }))}
+        selected={pickedSample}
+        onSelect={(t) => setPickedSample(pickedSample === t ? null : t)}
+        onConfirm={() => {
+          const m = sampleMoves.find((x) => x.planet === openPlanet && Number(x.sample) === pickedSample);
+          if (m) playConfirmed(m);
+        }}
+        onBack={samplePlanets.length > 1 ? () => setSamplePlanet(null) : undefined}
+      />
+    ) : null;
   const offerPanel =
     offers.length > 0 && !ended ? (
       <OfferPanel
@@ -855,6 +891,20 @@ export function GameClient({
       ),
       buttons: [confirm("Confirm", () => play(goldMove))],
       onCancel: () => setPickedGold(null),
+    };
+  } else if (spotOption?.id.startsWith("samplepick:")) {
+    // a planet to look at (ET.8): confirmed here, then the panel shows its samples
+    const planet = spotOption.id.split(":")[1] ?? "";
+    ask = {
+      text: `Look at the samples on ${planet.charAt(0).toUpperCase()}${planet.slice(1)}?`,
+      buttons: [
+        confirm("Confirm", () => {
+          setSamplePlanet(planet);
+          setPickedSample(null);
+          setPickedSpot(null);
+        }),
+      ],
+      onCancel: () => setPickedSpot(null),
     };
   } else if (spotOption) {
     ask = {
@@ -1541,6 +1591,7 @@ export function GameClient({
           }
         />
         {offerPanel}
+        {samplePanel}
       </PlayerColorsContext.Provider>
     </PlayerNumsContext.Provider>
   );

@@ -167,6 +167,22 @@ def test_the_export_copies_only_the_approved_versions(tmp_path: Path) -> None:
     assert (tmp_path / "out" / "v002" / "model.pt").exists() and not (tmp_path / "out" / "v001").exists()
 
 
+def test_exporting_from_a_second_folder_keeps_the_versions_of_the_first(tmp_path: Path) -> None:
+    """The service serves the approved versions of several runs: the second export adds to the index, it does not replace it."""
+    from seti_ai.lobby_export import export
+
+    for run, version, name in (("a", "v001", None), ("b", "v003", "Alpha")):
+        src = tmp_path / run
+        (src / version).mkdir(parents=True)
+        (src / version / "model.pt").write_bytes(b"w")
+        (src / version / "manifest.json").write_text("{}", encoding="utf-8")
+        row = {"version": version, "approved": True, **({"name": name} if name else {})}
+        (src / "index.json").write_text(json.dumps([row]), encoding="utf-8")
+        export(src, tmp_path / "out")
+    assert [r["version"] for r in json.loads((tmp_path / "out" / "index.json").read_text(encoding="utf-8"))] == ["v001", "Alpha"]
+    assert (tmp_path / "out" / "v001" / "model.pt").exists() and (tmp_path / "out" / "Alpha" / "model.pt").exists()
+
+
 def test_approving_a_version_is_written_where_the_export_reads_it(tmp_path: Path) -> None:
     from seti_ai.lobby_export import export
     from seti_ai.publish import mark_approved

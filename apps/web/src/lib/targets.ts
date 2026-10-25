@@ -190,6 +190,8 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
     handled.add(i);
     if (!spots.has(id)) spots.set(id, { id, shape, move: i, label: id, ...extra });
   };
+  // the planets whose samples can be looked at: with one planet only, the panel of its samples opens at once (no place to click)
+  const samplePlanets = new Set(legal.filter((m) => m.type === "pick_sample").map((m) => String(m.planet)));
   const mineOrg = (view.viewer === null ? null : s.players?.[view.viewer]?.organization) ?? "";
   const first = s.pending?.[0];
   legal.forEach((m, i) => {
@@ -238,6 +240,12 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         const id = m.type === "pick_organelle" ? `organelle:${String(m.space)}` : `amoeba:${String(m.color)}:${String(m.index)}`;
         add(i, id, { kind: "circle", x: p.x, y: p.y, r: m.type === "pick_organelle" ? 56 : 46 });
       }
+    } else if (m.type === "pick_sample") {
+      // ET.8 and the other cards that look at the samples: the planet to look at is clicked on the solar system, then the samples are shown in a panel
+      const at = PLANET[String(m.planet)];
+      if (at && samplePlanets.size > 1)
+        add(i, `samplepick:${String(m.planet)}`, { kind: "circle", x: at.x, y: at.y, r: Math.max(at.r + 24, 90) });
+      else handled.add(i); // one planet only: its samples are shown in the panel at once, and no button of the bar is made for them
     } else if (m.type === "mark_objective") {
       add(i, `task:${String(m.objective)}:${String(m.task)}`, { ...none }, { panel: "objectives" });
     }
