@@ -310,6 +310,30 @@ def test_signal_in_oumuamuas_sector_can_go_on_the_tile() -> None:
     assert r2.state.sectors[sec].markers == [r2.state.current_player]
 
 
+def test_a_signal_of_a_scan_in_oumuamuas_sector_asks_for_the_tile_at_once() -> None:
+    """ALIEN-OUM-03: a display card discarded for a signal in the color of 'Oumuamua's sector: the choice comes before the next scan step."""
+    s = oum_game()
+    sec = species.oumuamua_sector(s)
+    assert sec is not None
+    color = s.sectors[sec].color
+    cid = next(c for c, v in tables.cards().items() if v.get("sector") == color and v["deck"] == "base")
+    p = s.players[s.current_player]
+    s.card_row[0] = cid
+    p.credits, p.energy, p.hand = 5, 5, []
+    s.main_done, s.pending, s.stage = False, [], None
+    r = do(with_state(s), "scan")
+    r = do(r, "scan_discard", source="row:0")
+    assert r.state.pending[0].kind == "signal"
+    r = do(r, "mark_signal", sector=sec)
+    assert r.state.pending[0].kind == "oumuamua_signal"  # not behind the next step of the scan
+    assert {m["where"] for m in r.legal if m["type"] == "signal_where"} == {"sector", "tile"}
+    data = r.state.players[r.state.current_player].data_pool
+    r = do(r, "signal_where", where="tile")
+    assert r.state.species[0].extra["tile"]["markers"] == [r.state.current_player]  # the marker is on the tile
+    assert r.state.players[r.state.current_player].data_pool == data + 1  # and the data of the tile is gained
+    assert r.state.pending[0].kind == "scan_step"  # the scan goes on
+
+
 def test_tile_completion_gives_exofossils_and_refills() -> None:
     """ALIEN-OUM-04: the third marker scores 2 points; every contributor gains 1 exofossil; the tile is refilled with no markers."""
     s = oum_game()

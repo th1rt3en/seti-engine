@@ -132,7 +132,8 @@ def _mark_signal(s: GameState, p: PlayerState, index: int, events: Events, data:
     from . import cards, species  # noqa: PLC0415 - these import this module
 
     if allow_tile and index == species.oumuamua_sector(s):
-        s.pending.append(Decision(kind="oumuamua_signal", player=p.index, data={"sector": index, "nodata": not data}))
+        # the choice belongs to this signal: it is asked at once, before the next step of the scan that the signal came from (ALIEN-OUM-03)
+        s.pending.insert(0, Decision(kind="oumuamua_signal", player=p.index, data={"sector": index, "nodata": not data}))
         return
 
     sec = s.sectors[index]
