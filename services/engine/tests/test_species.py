@@ -311,7 +311,7 @@ def test_signal_in_oumuamuas_sector_can_go_on_the_tile() -> None:
 
 
 def test_a_signal_of_a_scan_in_oumuamuas_sector_asks_for_the_tile_at_once() -> None:
-    """ALIEN-OUM-03: a display card discarded for a signal in the color of 'Oumuamua's sector: the choice comes before the next scan step."""
+    """ALIEN-OUM-03: a display card discarded for a signal in 'Oumuamua's sector color: the choice comes first."""
     s = oum_game()
     sec = species.oumuamua_sector(s)
     assert sec is not None
