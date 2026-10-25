@@ -1160,7 +1160,7 @@ button:disabled {
     position: fixed;
     bottom: 0;
     z-index: 70;
-    width: 25%;
+    width: calc(100% / (3 + var(--e, 0) + var(--c, 0))); /* the tabs share the bar equally: hand, [Exertians], players, log, [chat] */
     height: 48px;
     padding: 0 4px;
     justify-content: center;
@@ -1179,19 +1179,42 @@ button:disabled {
   .dock > .handtab [aria-hidden="true"] {
     display: none;
   }
+  /* the places of the tabs, left to right: the hand, the Exertian cards (when there are any), the players, the log, the chat (in a game that is on).
+     --e is 1 with the Exertian tab and --c is 1 with the chat tab; the card row is not a tab on a phone, it lies on the page between the board and the techs */
+  .game {
+    --n: calc(3 + var(--e, 0) + var(--c, 0));
+  }
+  .game:has(.exertdock) {
+    --e: 1;
+  }
+  .game:has(.chatdock) {
+    --c: 1;
+  }
   .hand > .handtab {
     left: 0;
   }
-  .rowdock > .handtab {
-    left: 25%;
+  .exertdock > .handtab {
+    left: calc(100% / var(--n));
   }
   .trackerdock > .handtab {
-    left: 50%;
+    left: calc(100% / var(--n) * (1 + var(--e, 0)));
   }
   .movelog > .handtab {
-    left: 75%;
+    left: calc(100% / var(--n) * (2 + var(--e, 0)));
     border-right: 0;
   }
+  .chatdock > .handtab {
+    left: calc(100% / var(--n) * (3 + var(--e, 0)));
+    border-right: 0;
+  }
+  .game:has(.chatdock) .movelog > .handtab {
+    border-right: 1px solid var(--line);
+  }
+  /* the card row: on the page, in one piece with the board and the techs (not a panel of the bar) */
+  .rowdock.floating {
+    display: none;
+  }
+
   /* the tabs keep their background when they are touched: on a touch screen a tab that was tapped stays :hover, and the rule of the buttons that makes
      a tab transparent (.handtab:hover) must not win over these */
   .dock > .handtab,
@@ -1944,6 +1967,26 @@ button:disabled {
   }
 }
 
+/* the card row of a phone lies on the page, between the board and the techs (the rules are here, after the ones that hide it, so that they win) */
+@media (max-width: 760px) {
+  .rowinline {
+    display: block;
+    width: auto;
+    max-width: none;
+    align-self: stretch;
+  }
+  /* its cards are part of the page, not a sheet over the bar like the bodies of the other panels */
+  .rowinline .rowbody {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
 /* missions: the card with its circles under it */
 .missioncard {
   margin: 0;
@@ -2326,21 +2369,6 @@ button:disabled {
 @media (max-width: 760px) {
   .exertdock {
     display: block;
-  }
-  .game:has(.exertdock) .dock > .handtab {
-    width: 20%;
-  }
-  .game:has(.exertdock) .rowdock > .handtab {
-    left: 20%;
-  }
-  .game:has(.exertdock) .exertdock > .handtab {
-    left: 40%;
-  }
-  .game:has(.exertdock) .trackerdock > .handtab {
-    left: 60%;
-  }
-  .game:has(.exertdock) .movelog > .handtab {
-    left: 80%;
   }
 }
 /* the cards in front of a player on the board: message cards and Exertian cards played face down */
@@ -3451,23 +3479,6 @@ html:has(.setupchoice) .hand {
     background: none;
     border: 0;
     box-shadow: none;
-  }
-  .game:has(.chatdock) .dock > .handtab {
-    width: 20%;
-  }
-  .game:has(.chatdock) .rowdock > .handtab {
-    left: 20%;
-  }
-  .game:has(.chatdock) .trackerdock > .handtab {
-    left: 40%;
-  }
-  .game:has(.chatdock) .movelog > .handtab {
-    left: 60%;
-    border-right: 1px solid var(--line);
-  }
-  .game:has(.chatdock) .chatdock > .handtab {
-    left: 80%;
-    border-right: 0;
   }
   .chatbody,
   .chatform,
