@@ -567,7 +567,7 @@ export class GameRoom {
       await this.d.store.put("undocool", { ...cool, [who.id]: now });
       if (this.askedAbout(meta, seat).length === 0)
         return this.rewind(n, UNDO_MAX, (r) => ({ from: "Table", text: `${who.name} took back the last ${r} move${r === 1 ? "" : "s"}.` }));
-      await this.d.store.put<UndoProposal>("undo", { seat, name: who.name, count: n, accepted: [], logcount });
+      await this.d.store.put("undo", { seat, name: who.name, count: n, accepted: [], logcount });
       await this.broadcastUndo(meta);
       return { ok: true };
     });
@@ -597,7 +597,7 @@ export class GameRoom {
       }
       const accepted = prop.accepted.includes(seat) ? prop.accepted : [...prop.accepted, seat];
       if (!this.askedAbout(meta, prop.seat).every((i) => accepted.includes(i))) {
-        await this.d.store.put<UndoProposal>("undo", { ...prop, accepted });
+        await this.d.store.put("undo", { ...prop, accepted });
         await this.broadcastUndo(meta);
         return { ok: true };
       }
