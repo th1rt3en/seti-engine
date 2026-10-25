@@ -1641,9 +1641,16 @@ button:disabled {
 
 .tracker .messagequeue {
   margin: 0;
-  padding-left: 1.2em;
+  padding-left: 1.4em;
   text-align: left;
   font-size: 0.85em;
+  line-height: 1.25;
+  /* a long list of messages must not widen the table: each is a short line (the card number, the milestone), the name is in its tooltip */
+}
+.tracker .messagequeue li {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding-bottom: 2px;
 }
 .tracker .messagequeue li:first-child {
   font-weight: 600;

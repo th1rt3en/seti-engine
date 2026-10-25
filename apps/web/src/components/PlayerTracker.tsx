@@ -269,8 +269,8 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
                 {s.players.map((p) => {
                   // ALIEN-CEN-03: the message milestone comes first (placed at discovery), then the message cards in the order played
                   const queue = [
-                    ...p.messages.map((target) => ({ target, label: "Milestone tile" })),
-                    ...p.message_cards.map((m) => ({ target: m.target, label: cardName(m.card) })),
+                    ...p.messages.map((target) => ({ target, label: "Tile", full: "Milestone tile" })),
+                    ...p.message_cards.map((m) => ({ target: m.target, label: String(m.card), full: cardName(m.card) })),
                   ];
                   return (
                     <td key={p.index}>
@@ -280,7 +280,7 @@ export function PlayerTracker({ view, names, previous }: { view: View; names: st
                         <ol className="messagequeue">
                           {queue.map((m, n) => (
                             // biome-ignore lint/suspicious/noArrayIndexKey: the position in the queue is the identity
-                            <li key={n} title={`Reached at ${m.target} points`}>
+                            <li key={n} title={`${m.full}: reached at ${m.target} points`}>
                               {m.label} at {m.target}
                             </li>
                           ))}
