@@ -38,7 +38,7 @@ import { PlayerTracker } from "./PlayerTracker";
 import { PublicitySlot } from "./PublicitySlot";
 import { RoundPiles } from "./RoundPiles";
 import { RowDock, type RowSelection } from "./RowDock";
-import { SoloPanel, objectiveFacts } from "./SoloPanel";
+import { SoloPanel, objectiveFacts, progressSpace } from "./SoloPanel";
 import { type TechPick, TechStacks } from "./TechStacks";
 import { TrackerDock } from "./TrackerDock";
 
@@ -162,11 +162,11 @@ export function promptOf(view: View, names: string[]): { who: string; mine: bool
   return { who, mine, text: decision ? `must ${humanize(decision.kind)}` : "is taking a turn" };
 }
 
-/** The tech board: the prefix of the id of a tech says which kind it is (PT probe, TT telescope, CT computer). */
+/** The techs that the rival stores are named after their kind and their glyph ("probe-dot", "computer-link", SOLO-18). */
 const TECH_KINDS = [
-  { prefix: "PT", short: "P", name: "probe" },
-  { prefix: "TT", short: "T", name: "telescope" },
-  { prefix: "CT", short: "C", name: "computer" },
+  { prefix: "probe", name: "probe" },
+  { prefix: "telescope", name: "telescope" },
+  { prefix: "computer", name: "computer" },
 ] as const;
 
 /** What the rival of a solo game has, in the cells of its pill (they are under the resources of the other pills): the data on its computer, the actions it has
@@ -176,9 +176,13 @@ function RivalCells({ view }: { view: View }) {
   const r = view.state.rival;
   if (!r) return null;
   const f = objectiveFacts(view);
-  const kinds = TECH_KINDS.map((k) => ({ ...k, n: r.techs.filter((t) => t.startsWith(`${k.prefix}#`)).length }));
+  const kinds = TECH_KINDS.map((k) => ({ ...k, n: r.techs.filter((t) => t.startsWith(`${k.prefix}-`)).length }));
   return (
     <span className="rivalcells">
+      <span className="res" title="The rival's publicity (0 to 10)">
+        <PublicityIcon size={18} />
+        <b>{view.state.players[r.index]?.publicity ?? 0}/10</b>
+      </span>
       <span className="res" title="Data on the rival's computer (0 to 6)">
         <DataIcon size={18} />
         <b>{r.computer}/6</b>
@@ -187,21 +191,17 @@ function RivalCells({ view }: { view: View }) {
         className="res"
         title="Actions: the cards the rival has played this round, and the cards left in its deck. When none is left it passes."
       >
-        <span className="rivalcards">
-          {r.used.map((id) => (
-            <RivalCardBack key={`u${String(id)}`} used height={22} />
-          ))}
-          {r.deck.map((id) => (
-            <RivalCardBack key={`d${String(id)}`} height={22} />
-          ))}
-        </span>
+        <RivalCardBack used height={20} />
+        <b>{r.used.length}</b>
+        <RivalCardBack height={20} />
+        <b>{r.deck.length}</b>
       </span>
       <span
         className="res"
         title="The rival's marker on the 12 spaces of its progress track. Each time it goes round the track (back to the start), the rival gains an advanced action card."
       >
         <ProgressIcon size={18} />
-        <b>{r.progress}/12</b>
+        <b>{progressSpace(view) ?? r.progress + 1}/12</b>
         <span className="muted small" title="Advanced action cards the rival has gained">
           +{r.advanced.length}
         </span>
