@@ -30,6 +30,7 @@ OBS_DIM = 32768  # the slots of the hashed features of a view
 TOKEN_BUCKETS = 4096  # the move tokens are hashed into this many buckets (0 is the padding)
 MAX_TOKENS = 28  # tokens kept for a move
 MOVE_NUM = 17  # numbers for a move: costs, flags, the numbers of the card it names
+VALUE_SCALE = 20.0  # rewards and values are in units of 20 points
 INCOME = ("credit", "energy", "card", "data", "publicity")
 SECTOR_COLORS = ("red", "yellow", "blue", "black")
 POSITIONAL = 24  # a list is also seen position by position up to this many entries

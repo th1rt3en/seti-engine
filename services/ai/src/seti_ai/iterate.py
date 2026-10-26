@@ -45,6 +45,18 @@ from .mcts import MCTSConfig, make_search
 BrainFactory = Callable[[PolicyNet], Brain]
 
 
+def low_priority() -> None:
+    """The run asks Windows to give way to the programs that the person is using (the workers do the same, parallel.py): training goes on in the background
+    and the PC stays usable."""
+    if sys.platform == "win32":
+        import ctypes  # noqa: PLC0415
+
+        kernel = ctypes.WinDLL("kernel32")
+        kernel.GetCurrentProcess.restype = ctypes.c_void_p
+        kernel.SetPriorityClass.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+        kernel.SetPriorityClass(kernel.GetCurrentProcess(), 0x00004000)  # BELOW_NORMAL_PRIORITY_CLASS
+
+
 def keep_awake() -> None:
     """Windows goes to sleep when nobody touches the PC, which stops a run of many hours (the first Beta run lost hours that way): ask it to stay awake for as
     long as this process lives (the screen may still turn off)."""
@@ -338,6 +350,7 @@ def run(s: Settings, start: Path, resume: bool, brain: BrainFactory = net_brain,
     checkpoint.clear_pause(root)
     checkpoint.install_signal_handler()
     keep_awake()
+    low_priority()
     champion = champion_of(start)
     first = 1
     if resume and checkpoint.exists(root):

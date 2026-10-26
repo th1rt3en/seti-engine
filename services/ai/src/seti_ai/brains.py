@@ -10,8 +10,8 @@ from seti_engine.models import GameState
 from seti_engine.projection import View
 
 from . import bots, features
-from .agent import VALUE_SCALE
 from .bundle_search import History
+from .features import VALUE_SCALE
 from .knowledge import Knowledge
 from .views import project
 

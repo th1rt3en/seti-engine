@@ -27,8 +27,8 @@ from seti_engine.projection import actor_of
 from seti_engine.replay import js_number
 
 from . import features
-from .agent import VALUE_SCALE
 from .bundles import cut, micros_from_log
+from .features import VALUE_SCALE
 from .knowledge import Knowledge
 from .views import project
 

@@ -30,7 +30,7 @@ from torch import nn
 
 from . import features
 
-VALUE_SCALE = 20.0  # rewards and values are in units of 20 points
+VALUE_SCALE = features.VALUE_SCALE  # rewards and values are in units of 20 points (here for the code that imports it from the network)
 
 
 @dataclass(frozen=True)
