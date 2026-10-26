@@ -152,6 +152,15 @@ def start_scan(s: GameState, p: PlayerState, free: bool = False, ctx: dict[str, 
     s.pending.append(Decision(kind="scan_step", player=p.index))
 
 
+def add_scan_step(s: GameState, tech: str) -> None:
+    """A telescope tech that becomes usable in the middle of a scan (Turing Systems borrows it, EXP-ORG-13) gets its step among the
+    steps that are left: `start_scan` made the list from the techs that were usable then. Earth Scope has no step of its own."""
+    category, _, glyph = tech.partition("-")
+    step = f"tt:{glyph}"
+    if category == "telescope" and s.scan_steps and glyph in SCAN_TECH_ORDER and step not in s.scan_steps:
+        s.scan_steps.append(step)
+
+
 # TECH-TT03, TECH-TT02, TECH-TT04: Mercury, a card of the hand, the probe (the order of the board)
 SCAN_TECH_ORDER = ("link", "branch", "cross")
 OPTIONAL_STEPS = frozenset({"tok", "tt:link", "tt:branch", "tt:cross"})  # Earth's sector and the card of the row are not optional

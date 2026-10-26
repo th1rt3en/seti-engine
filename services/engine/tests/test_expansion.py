@@ -287,6 +287,17 @@ def test_turing_systems_borrows_a_tech_for_the_turn() -> None:  # EXP-ORG-13
     assert not effects.tech_active(cur(s), "probe-dot")
 
 
+def test_turing_systems_borrows_a_scan_tech_in_the_middle_of_a_scan() -> None:  # EXP-ORG-13, SCAN-01
+    """The borrowed telescope tech can be used in the scan that is going on, as if the player had researched it before."""
+    for tech, move in (("telescope-cross", "scan_probe"), ("telescope-link", "scan_mercury"), ("telescope-branch", "scan_hand_discard")):
+        s = with_org("turing_systems")
+        s = act(s, type="scan")
+        assert not can(s, move)
+        s = act(s, type="org_free", org="turing_systems", tech=tech)
+        assert can(s, move), (tech, legal_moves(s))
+        s = pick(s, move)
+
+
 def test_turing_systems_gains_publicity_for_a_computer_tech() -> None:  # EXP-ORG-13
     s = with_org("turing_systems")
     p = cur(s)

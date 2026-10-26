@@ -26,7 +26,7 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # end of the turn, the exofossils left over (`spend.leftover.exofossil`), the glyph tokens as a resource (`gain.<source>.token`,
 # `spend.decipher.token`), and the publicity and data income of each round (`incomerate.r<round>.publicity|data`)
 # 8: the quick start cards that were offered (`quickoffered.<id>`), for the keep rate
-VERSION = 11
+VERSION = 12
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil", "token")
@@ -200,6 +200,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
     org_offered: dict[int, list[str]] = {}
     org_picked: dict[int, str] = {}
     tech_origin: dict[int, str] = {}  # the main action of each seat in its turn: what a tech gained in it is credited to
+    back: list[dict[int, Counter[str]]] = []  # the counters before each move that can be taken back (UNDO-01)
     final: Any = None
     before: Any = None
     for n, entry, result in replay.steps(file):
@@ -214,8 +215,17 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             continue
         assert entry is not None
         action = entry["action"]
+        if action.get("type") == "undo":  # UNDO-01: the last move is taken back, and with it what it counted
+            if back:
+                counts = back.pop()
+            before = state
+            continue
+        back.append({i: Counter(c) for i, c in counts.items()})
+        if state.undo is None:  # nothing can be taken back after this step (the turn moved on, or something hidden was shown)
+            back.clear()
         seat = projection.actor_of(before, action)  # in the simultaneous setup the move names its seat (EXP-ORG-14)
         if seat is None:
+            before = state
             continue
         rnd = before.round
         if state.round != before.round or (state.phase == "finished" and before.phase != "finished"):

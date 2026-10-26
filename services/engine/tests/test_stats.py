@@ -7,7 +7,7 @@ from typing import Any
 from fastapi.testclient import TestClient
 from test_engine import PROGRESS_TYPES
 
-from seti_engine import stats
+from seti_engine import replay, stats
 from seti_engine.engine import apply, start
 from seti_engine.models import Options
 from seti_engine.service import app
@@ -187,5 +187,27 @@ def test_the_cards_held_discarded_for_a_corner_and_scored_at_the_end_are_counted
         for k, v in p["counters"].items():
             total[k.split(".")[0]] += v
     assert total["cardheld"] > 0 and total["cardheld"] >= total["card"]  # a card that is played was in a hand
-    assert total["cardcorner"] == sum(1 for a in actions if a["type"] == "discard_free")
+    assert total["cardcorner"] == sum(1 for a in without_undone(options, actions) if a["type"] == "discard_free")
     assert total["cardend"] == sum(p["counters"].get("endcards.points", 0) for p in s["players"])
+
+
+def without_undone(options: Options, actions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The moves that stayed: an undo takes back the last move that was not taken back yet (UNDO-01)."""
+    live: list[int] = []
+    for n, entry, _ in replay.steps(file_of(options, actions)):
+        if n == 0:
+            continue
+        assert entry is not None
+        if entry["action"]["type"] == "undo":
+            live.pop()
+        else:
+            live.append(n - 1)
+    return [actions[k] for k in live]
+
+
+def test_a_move_that_was_taken_back_is_not_counted() -> None:
+    """UNDO-01: the statistics of a game with undos are those of the game without the moves that were taken back."""
+    for seed in (5, 6):
+        options, actions = play(seed, 3)
+        assert any(a["type"] == "undo" for a in actions)
+        assert stats.game_stats(file_of(options, actions)) == stats.game_stats(file_of(options, without_undone(options, actions)))

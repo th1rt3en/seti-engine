@@ -621,3 +621,6 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
         cards.gain_corner(s, p, p.org_data.pop("corner"))
     elif o == "turing_systems":  # until the end of the turn, as if researched, without the immediate bonuses
         p.org_data["borrowed"] = [a["tech"]]
+        from . import techs  # noqa: PLC0415 - techs imports this module
+
+        techs.add_scan_step(s, a["tech"])  # borrowed in the middle of a scan: its step is one of the steps that are left (SCAN-01)
