@@ -9,7 +9,8 @@ import { Panel } from "./StatCharts";
 
 const PLURAL = new Set(["credit", "card", "vp", "exofossil"]); // credits, cards and points are plural
 const sourceName = (key: string): string => SOURCE_NAMES[key] ?? key.replace(/_/g, " ");
-const spendName = (key: string): string => SPEND_NAMES[key] ?? SOURCE_NAMES[key] ?? key.replace(/_/g, " ");
+const spendName = (key: string, res = ""): string =>
+  res === "move" && key === "move" ? "Moving probes" : (SPEND_NAMES[key] ?? SOURCE_NAMES[key] ?? key.replace(/_/g, " "));
 
 export function ResourcePies({ gains, spends }: { gains: Record<string, Slice[]>; spends: Record<string, Slice[]> }) {
   return (
@@ -57,8 +58,8 @@ export function ResourcePies({ gains, spends }: { gains: Record<string, Slice[]>
                     unit="per player, spent"
                     slices={spent.map((x) => ({
                       key: x.key,
-                      name: spendName(x.key),
-                      label: spendName(x.key),
+                      name: spendName(x.key, res),
+                      label: spendName(x.key, res),
                       value: x.mean,
                       spread: x.spread,
                       color: SOURCE_COLORS[x.key] ?? "#8b949e",

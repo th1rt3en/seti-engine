@@ -168,6 +168,9 @@ def test_delivering_a_sample_completes_the_mission() -> None:
     data = me(r).data_pool
     r2 = do(r, "deliver_sample", card="ET.1", capsule="cap")
     assert me(r2).data_pool == data + 2 + 2 and "ET.1" in me(r2).completed_missions
+    # the whole delivery, the card's own reward too, is told as the sample of the Mascamites (the statistics count it as an alien effect)
+    gains = [g for g in r2.events if g["type"] == "gains" and g["player"] == me(r2).index]
+    assert gains and all(g["source"].get("kind") == "alien" and g["source"].get("species") == "mascamites" for g in gains)
     assert not [pr for pr in r2.state.probes if pr.capsule] and r2.state.species[0].extra["sample_spaces"][-1]["token"] == 3
 
 

@@ -172,19 +172,59 @@ export interface Slice {
   parts?: { key: string; mean: number }[];
 }
 
-/** The sources of the credits, in groups (the owner's choice, 2026-10-26): what is not named here is "other". The keys are the kinds of the engine. */
-export const CREDIT_GROUPS: Record<string, string> = {
-  income: "income",
-  organization: "organization",
-  alien: "alien",
-  anomaly: "alien",
-  explore: "alien",
-  glyph: "alien",
-  trace: "alien",
-  mission: "mission",
-  quick_start: "quick_start",
-  tech: "tech",
-};
+/** The groups of the sources of each resource (the owner's choice for the credits, 2026-10-26; the others are to be reviewed): what is not named is "other".
+ * The keys are the kinds of the engine (and the splits of the publicity of moving). */
+export const RESOURCE_GROUPS: Record<string, Record<string, string>> = (() => {
+  const alien = { alien: "alien", anomaly: "alien", explore: "alien", glyph: "alien", trace: "alien", move_deliver_sample: "alien" };
+  const common = { income: "income", organization: "organization", mission: "mission", quick_start: "quick_start", tech: "tech", ...alien };
+  return {
+    credit: { ...common },
+    energy: { ...common, planet: "planet" },
+    card: {
+      ...common,
+      planet: "planet",
+      move_take_round_card: "pass",
+      move_buy_card: "trade",
+      move_exchange: "trade",
+      move_org_free: "organization",
+      move_org_main: "organization",
+    },
+    data: {
+      ...common,
+      signal: "signal",
+      planet: "planet",
+      move_choose_land_slot: "planet",
+      card: "card",
+      corner: "corner",
+      move_org_free: "organization",
+    },
+    publicity: {
+      ...common,
+      visit_comet: "probe",
+      visit_asteroid: "probe",
+      visit_planet: "probe",
+      move_move_probe: "probe",
+      move_place_data: "computer",
+      move_org_free: "organization",
+      sector: "sector",
+      planet: "planet",
+      card: "card",
+      corner: "corner",
+    },
+    vp: {
+      ...common,
+      planet: "planet",
+      signal: "signal",
+      sector: "sector",
+      card: "card",
+      corner: "corner",
+      move_pass: "pass",
+      move_place_data: "computer",
+    },
+    move: { ...common, move_move_energy: "energy", card: "card", corner: "corner", move_org_free: "organization", move_scan_probe: "tech" },
+    exofossil: { ...common, planet: "planet", sector: "sector", card: "card" },
+  };
+})();
 
 /** What a card of the main deck or of a species did, over the players who played it (the counters `card.<id>.r<round>`, from version 3). */
 export interface CardStat {
@@ -414,73 +454,93 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   };
 }
 
-/** The sources of each resource. A source is the kind of the scope in which the resource was gained (`gain.<kind>.<resource>`). The publicity of the moves of
- * probes is split by what the probe moved onto, and the points of the end of the game by the part of the final score they came from. */
+/** The sources of each resource. A source is the kind of the scope in which the resource was gained (`gain.<kind>.<resource>`); what the actions and free
+ * actions gave is told by action (`gainmove.<action>.<resource>`, the keys `move_<action>`), the publicity of moving a probe by what it moved onto, and the
+ * points of the end of the game by the part of the final score they came from. The sources are then put in groups for the resources that have some
+ * (RESOURCE_GROUPS). */
 function gainSlices(rows: StatRow[], v3: StatRow[]): Record<string, Slice[]> {
   const out: Record<string, Slice[]> = {};
   const slice = (key: string, of: StatRow[], f: (c: Record<string, number>) => number): Slice => {
     const values = of.map((r) => f(r.counters));
     return { key, mean: values.length === 0 ? 0 : sum(values) / values.length, spread: spreadOf(values) };
   };
+  const visits = (c: Record<string, number>, names: string[]): number =>
+    names.reduce((acc, n) => acc + (c[`publicity.visit.${n}`] ?? 0), 0);
+  const planets = (c: Record<string, number>): string[] =>
+    Object.keys(c)
+      .filter((k) => k.startsWith("publicity.visit."))
+      .map((k) => k.slice("publicity.visit.".length))
+      .filter((n) => !["comet", "asteroid", "asteroids"].includes(n));
+  const allVisits = (c: Record<string, number>): number => visits(c, ["comet", "asteroid", "asteroids", ...planets(c)]);
   for (const res of GAIN_RESOURCES) {
     const kinds = new Set<string>();
+    const actions = new Set<string>();
     for (const r of rows) {
       for (const k of Object.keys(r.counters)) {
         const m = /^gain\.([a-z_]+)\.([a-z]+)$/.exec(k);
         if (m && m[2] === res) kinds.add(m[1] as string);
+        const a = new RegExp(`^gainmove\.([a-z_]+)\.${res}$`).exec(k);
+        if (a) actions.add(a[1] as string);
       }
     }
-    const list: Slice[] = [];
+    const getters = new Map<string, (c: Record<string, number>) => number>();
     for (const kind of [...kinds].sort()) {
       const key = `gain.${kind}.${res}`;
-      if (res === "publicity" && kind === "move") {
-        // the publicity of moving a probe: by what it moved onto; what is left is from the other free actions
-        const visits = (c: Record<string, number>, names: string[]): number =>
-          names.reduce((a, n) => a + (c[`publicity.visit.${n}`] ?? 0), 0);
-        const planets = (c: Record<string, number>): string[] =>
-          Object.keys(c)
-            .filter((k) => k.startsWith("publicity.visit."))
-            .map((k) => k.slice("publicity.visit.".length))
-            .filter((n) => !["comet", "asteroid", "asteroids"].includes(n));
-        list.push(slice("visit_comet", rows, (c) => visits(c, ["comet"])));
-        list.push(slice("visit_asteroid", rows, (c) => visits(c, ["asteroid", "asteroids"])));
-        list.push(slice("visit_planet", rows, (c) => visits(c, planets(c))));
-        list.push(slice("move", rows, (c) => Math.max(0, (c[key] ?? 0) - visits(c, ["comet", "asteroid", "asteroids", ...planets(c)]))));
-      } else list.push(slice(kind, rows, (c) => c[key] ?? 0));
+      if (kind !== "move") {
+        getters.set(kind, (c) => c[key] ?? 0);
+        continue;
+      }
+      if (res === "publicity") {
+        getters.set("visit_comet", (c) => visits(c, ["comet"]));
+        getters.set("visit_asteroid", (c) => visits(c, ["asteroid", "asteroids"]));
+        getters.set("visit_planet", (c) => visits(c, planets(c)));
+      }
+      for (const a of actions) {
+        const k = `gainmove.${a}.${res}`;
+        if (res === "publicity" && a === "move_probe") getters.set("move_move_probe", (c) => Math.max(0, (c[k] ?? 0) - allVisits(c)));
+        else getters.set(`move_${a}`, (c) => c[k] ?? 0);
+      }
+      // what the engine did not tell by action (the rows of older versions)
+      getters.set("move", (c) => {
+        const told = [...actions].reduce((acc, a) => acc + (c[`gainmove.${a}.${res}`] ?? 0), 0);
+        // a row that tells no moves of probes by action has the publicity of the visits inside the total: it is not counted twice
+        const visited = res === "publicity" && !(`gainmove.move_probe.${res}` in c) ? allVisits(c) : 0;
+        return Math.max(0, (c[key] ?? 0) - told - visited);
+      });
     }
+    const list = [...getters.entries()].map(([key, f]) => slice(key, rows, f)).filter((x) => x.mean > 0);
+    const map = RESOURCE_GROUPS[res];
+    const grouped = map ? groupSlices(rows, list, map, getters) : list.sort((a, b) => b.mean - a.mean);
+    const finals: Slice[] = [];
     if (res === "vp") {
       for (const part of ["cards", "gold", "exertian", "glyphs"])
-        if (v3.some((r) => (r.counters[`final.${part}`] ?? 0) > 0)) list.push(slice(`final_${part}`, v3, (c) => c[`final.${part}`] ?? 0));
+        if (v3.some((r) => (r.counters[`final.${part}`] ?? 0) > 0)) finals.push(slice(`final_${part}`, v3, (c) => c[`final.${part}`] ?? 0));
     }
-    out[res] = list.filter((x) => x.mean > 0).sort((a, b) => b.mean - a.mean);
-    if (res === "credit") out[res] = groupSlices(rows, out[res] ?? [], CREDIT_GROUPS, "credit");
+    out[res] = [...grouped, ...finals.filter((x) => x.mean > 0)].sort((a, b) =>
+      a.key === "other" ? 1 : b.key === "other" ? -1 : b.mean - a.mean,
+    );
   }
   return out;
 }
 
-/** The slices of a resource in groups: the mean and the spread are those of the sum of the group for each player. What is not in a group is "other",
- * and the actions and free actions that it holds are told by action (`gainmove.<action>.<resource>`) in its parts. */
-function groupSlices(rows: StatRow[], slices: Slice[], groups: Record<string, string>, res: string): Slice[] {
+/** The slices of a resource in groups: the mean and the spread are those of the sum of the group for each player. What is not in a group is "other";
+ * the parts of a group are on its card. */
+function groupSlices(
+  rows: StatRow[],
+  slices: Slice[],
+  groups: Record<string, string>,
+  getters: Map<string, (c: Record<string, number>) => number>,
+): Slice[] {
   const members = new Map<string, string[]>();
-  for (const x of slices) members.set(groups[x.key] ?? "other", [...(members.get(groups[x.key] ?? "other") ?? []), x.key]);
+  for (const x of slices) {
+    const g = groups[x.key] ?? "other";
+    members.set(g, [...(members.get(g) ?? []), x.key]);
+  }
   const out: Slice[] = [];
-  for (const [group, kinds] of members) {
-    const values = rows.map((r) => sum(kinds.map((k) => r.counters[`gain.${k}.${res}`] ?? 0)));
-    const parts = kinds
-      .flatMap((k) => {
-        if (k !== "move") return [{ key: k, mean: slices.find((x) => x.key === k)?.mean ?? 0 }];
-        const actions = new Map<string, number>();
-        for (const r of rows)
-          for (const [key, v] of Object.entries(r.counters)) {
-            const m = new RegExp(`^gainmove\.([a-z_]+)\.${res}$`).exec(key);
-            if (m) actions.set(m[1] as string, (actions.get(m[1] as string) ?? 0) + v);
-          }
-        const known = sum([...actions.values()]);
-        const all = sum(rows.map((r) => r.counters[`gain.move.${res}`] ?? 0));
-        const split = [...actions.entries()].map(([a, v]) => ({ key: `move_${a}`, mean: v / Math.max(1, rows.length) }));
-        if (all > known) split.push({ key: "move", mean: (all - known) / Math.max(1, rows.length) });
-        return split;
-      })
+  for (const [group, keys] of members) {
+    const values = rows.map((r) => sum(keys.map((k) => getters.get(k)?.(r.counters) ?? 0)));
+    const parts = keys
+      .map((k) => ({ key: k, mean: slices.find((x) => x.key === k)?.mean ?? 0 }))
       .filter((p) => p.mean > 0)
       .sort((a, b) => b.mean - a.mean);
     out.push({
@@ -490,7 +550,7 @@ function groupSlices(rows: StatRow[], slices: Slice[], groups: Record<string, st
       parts,
     });
   }
-  return out.sort((a, b) => (a.key === "other" ? 1 : b.key === "other" ? -1 : b.mean - a.mean));
+  return out;
 }
 
 /** The cards that were played (any card of the main deck or of a species), by what the players who played them scored, won and did. */

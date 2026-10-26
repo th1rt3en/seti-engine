@@ -522,7 +522,8 @@ def deliver(s: GameState, p: PlayerState, cid: str, capsule: str, events: Events
     p.missions.remove(m)
     p.completed_missions.append(cid)
     species.deliver_sample(s, p, capsule, events, times=2 if mission.get("twice") else 1)
-    rewards.grant(s, p, mission["r"], events)
+    with trail.scope(s, {"kind": "alien", "species": "mascamites", "what": "sample"}):  # the card reward goes with the delivery
+        rewards.grant(s, p, mission["r"], events)
     fire(s, p, [{"e": "mission_done"}], events)
 
 

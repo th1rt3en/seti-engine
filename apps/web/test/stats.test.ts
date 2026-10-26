@@ -192,7 +192,7 @@ describe("statistics", () => {
     expect(g.credit?.[1]?.spread).toEqual({ min: 2, max: 4, std: 1 });
     expect(g.credit?.[1]?.parts).toEqual([{ key: "card", mean: 3 }]);
     const pub = Object.fromEntries((g.publicity ?? []).map((x) => [x.key, x.mean]));
-    expect(pub).toEqual({ visit_comet: 1, visit_asteroid: 0.5, visit_planet: 0.5, move: 1 }); // 5 + 1 = 6 in all: 3 + 1 + 1 + ... per player 3
+    expect(pub).toEqual({ group_probe: 2, other: 1 }); // the visits (1 + 0.5 + 0.5) are one group; the rest of the moves is in the others
   });
 
   it("what a resource was spent on, and the quick start cards that were kept (version 5 rows only)", () => {
@@ -246,7 +246,7 @@ describe("statistics", () => {
       row({ gameId: "b", counters: { "gain.card.vp": 20 } }), // an older row: no parts
     ];
     const vp = Object.fromEntries((aggregate(rows, any).gains.vp ?? []).map((x) => [x.key, x.mean]));
-    expect(vp).toEqual({ card: 15, final_cards: 12, final_gold: 8 });
+    expect(vp).toEqual({ group_card: 15, final_cards: 12, final_gold: 8 });
   });
 
   it("the cards played: by the players who played them, with the round, the final score, the win and the organization", () => {
