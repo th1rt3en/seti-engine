@@ -20,11 +20,12 @@ from typing import Any
 import numpy as np
 from seti_engine import engine
 from seti_engine.models import GameState
-from seti_engine.projection import View, project, to_act
+from seti_engine.projection import View, to_act
 
 from . import features
 from .agent import VALUE_SCALE, NNAgent
 from .knowledge import Knowledge
+from .views import project
 
 NEVER = ("undo",)
 MAX_ROLLOUT = 400  # decisions of one look-ahead

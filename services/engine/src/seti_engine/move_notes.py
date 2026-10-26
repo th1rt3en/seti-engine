@@ -118,13 +118,15 @@ def note(state: GameState, move: dict[str, Any]) -> Note:
     return None
 
 
-def notes(state: GameState, legal: list[dict[str, Any]]) -> list[Note]:
+def notes(state: GameState, legal: list[dict[str, Any]], irreversible: bool = True) -> list[Note]:
     """One note per legal move. A move that would show something hidden (a card drawn from the deck, the round pile, a species, the next
-    tech tile) and so cannot be taken back is marked `irreversible`, so that the page warns before it (UNDO-01)."""
+    tech tile) and so cannot be taken back is marked `irreversible`, so that the page warns before it (UNDO-01).
+    The offline AI can leave the mark out (`irreversible=False`): it is found by trying each move on a copy of the game,
+    which is most of the time of a view."""
     out: list[Note] = []
     for m in legal:
         n = note(state, m)
-        if engine.reveals(state, m):
+        if irreversible and engine.reveals(state, m):
             n = {**(n or {}), "irreversible": True}
         out.append(n)
     return out

@@ -23,13 +23,14 @@ import numpy as np
 from numpy.typing import NDArray
 from seti_engine import engine, orgs
 from seti_engine.models import GameState, Options
-from seti_engine.projection import actor_of, project
+from seti_engine.projection import actor_of
 from seti_engine.replay import js_number
 
 from . import features
 from .agent import VALUE_SCALE
 from .bundles import cut, micros_from_log
 from .knowledge import Knowledge
+from .views import project
 
 Weight = float | Callable[[int], float]
 

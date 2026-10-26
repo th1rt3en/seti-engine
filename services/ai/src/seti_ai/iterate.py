@@ -22,11 +22,12 @@ iteration and exits. Training is only ever started by the owner's go: `run` refu
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import pickle
 import random
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -34,10 +35,11 @@ from typing import Any
 import numpy as np
 import torch
 
-from . import arena, bundle_train, checkpoint, dataset, expert, gate, logstamp, registry, selfplay
-from .agent import PRESETS, LocalNet, PolicyNet, net_from, new_net
+from . import arena, bundle_train, checkpoint, dataset, expert, gate, logstamp, parallel, registry, selfplay, views
+from .agent import PRESETS, LocalNet, PolicyNet, net_from, new_net, save_net
 from .bundle_data import Examples
-from .bundle_search import Brain, BundleBot, BundleSearch, SearchConfig
+from .bundle_search import Brain, BundleBot, SearchConfig
+from .mcts import MCTSConfig, make_search
 
 BrainFactory = Callable[[PolicyNet], Brain]
 
@@ -68,6 +70,7 @@ class Settings:
     search: SearchConfig = field(default_factory=SearchConfig)
     explore_temperature: float = 3.0
     explore_rounds: int = 2
+    workers: int = 0  # processes that play the self-play and the gate games (0: this process; the search is CPU work, see parallel.py)
 
 
 @dataclass
@@ -107,11 +110,29 @@ def self_play_data(
     steps = searches = 0
     started = time.time()
     every = round(1 / s.bot_share) if s.bot_share > 0 else 0
-    for k in range(s.selfplay_games):
+    cfgs = [
+        selfplay.SelfPlayConfig(s.search, s.explore_temperature, s.explore_rounds, "heuristic" if every and k % every == 0 else "")
+        for k in range(s.selfplay_games)
+    ]
+    workers: parallel.Workers | None = None
+    games: Iterator[tuple[int, selfplay.SelfPlayGame]] = iter(())
+    if s.workers > 0:
+        work = s.models / "_work"
+        work.mkdir(parents=True, exist_ok=True)
+        save_net(net, str(work / "selfplay.pt"))
+        workers = parallel.Workers(s.workers, str(work / "selfplay.pt"), device=str(next(net.parameters()).device))
+        games = workers.play([(s.seed * 1_000_003 + it * 1_000 + k, cfgs[k], k % 2) for k in range(s.selfplay_games)])
+    for n in range(s.selfplay_games):
         if stop():
+            if workers is not None:
+                workers.close()
             return None
-        cfg = selfplay.SelfPlayConfig(s.search, s.explore_temperature, s.explore_rounds, "heuristic" if every and k % every == 0 else "")
-        g = selfplay.play(brain(net), s.seed * 1_000_003 + it * 1_000 + k, cfg, kind=k % 2)
+        if workers is not None:
+            k, g = next(games)
+        else:
+            k = n
+            g = selfplay.play(brain(net), s.seed * 1_000_003 + it * 1_000 + k, cfgs[k], kind=k % 2)
+        cfg = cfgs[k]
         out.extend(g.examples)
         steps += g.steps
         searches += g.searches
@@ -121,11 +142,13 @@ def self_play_data(
             vs_bot.append((g.scores[seat], g.scores[1 - seat]))
         done = time.time() - started
         print(
-            f"    self-play game {k + 1}/{s.selfplay_games}{' against the heuristic bot' if cfg.bot else ''}: "
+            f"    self-play game {n + 1}/{s.selfplay_games}{' against the heuristic bot' if cfg.bot else ''}: "
             f"{g.scores} in {g.steps} steps, {g.searches} searches; {len(out.policy)} choices, {len(out.value)} positions so far "
-            f"({done:.0f}s, about {done / (k + 1) * (s.selfplay_games - k - 1):.0f}s left)",
+            f"({done:.0f}s, about {done / (n + 1) * (s.selfplay_games - n - 1):.0f}s left)",
             flush=True,
         )
+    if workers is not None:
+        workers.close()
     out.finished = True
     return out, {
         "games": s.selfplay_games,
@@ -149,7 +172,7 @@ def human_data(
         return Examples(), expert.ExpertStats()
     found, stats = expert.sample_positions(s.people, s.human_positions, s.seed * 7919 + it, solo=s.people_solo)
     print(f"    positions of people: {len(found)} turn starts from {stats}", flush=True)
-    search = BundleSearch(brain(net), s.search)
+    search = make_search(brain(net), s.search)
     ex, st = expert.search_positions([p for p in found if not stop()], search, random.Random(s.seed * 31 + it), s.expert_weight)
     if stop():
         return None
@@ -166,14 +189,25 @@ def human_values(s: Settings) -> Examples:
     return ex
 
 
-def head_to_head(net: PolicyNet, champion: PolicyNet, games: int, cfg: SearchConfig, brain: BrainFactory) -> dict[str, Any]:
-    """The candidate against the champion, both with the bundle search, the same seeds and the seats swapped."""
+def head_to_head(
+    net: PolicyNet, champion: PolicyNet, games: int, cfg: SearchConfig, brain: BrainFactory, work: parallel.Workers | None = None
+) -> dict[str, Any]:
+    """The candidate against the champion, both with the bundle search, the same seeds and the seats swapped (in the workers, when there are some)."""
     mine: list[int] = []
     theirs: list[int] = []
     wins = 0.0
+    results = work.duel([(70_000 + k // 2, k % 2, cfg) for k in range(games)]) if work is not None else None
     for k in range(games):
         seed, seat = 70_000 + k // 2, k % 2
-        a, b = BundleBot(brain(net), SearchConfig(**vars(cfg))), BundleBot(brain(champion), SearchConfig(**vars(cfg)))
+        if results is not None:
+            _, (x, y) = next(results)
+            mine.append(x)
+            theirs.append(y)
+            wins += 1.0 if x > y else 0.5 if x == y else 0.0
+            print(f"    against the champion, game {k + 1}/{games}: {x} against {y}", flush=True)
+            continue
+        bn, bc = brain(net), brain(champion)
+        a, b = BundleBot(bn, copy.copy(cfg), make_search(bn, cfg)), BundleBot(bc, copy.copy(cfg), make_search(bc, cfg))
         res = arena.play_game([a, b] if seat == 0 else [b, a], seed, random.Random(seed))
         x, y = res.scores[seat], res.scores[1 - seat]
         mine.append(x)
@@ -260,7 +294,15 @@ def iteration(
     bench = float(record["against_bots"].get("heuristic", {}).get("agent_score", 0.0))
     if s.gate_games > 0:
         champ_net = net_from(champion["path"], device)
-        h2h = head_to_head(net, champ_net, s.gate_games, s.search, brain)
+        duel: parallel.Workers | None = None
+        if s.workers > 0:
+            work = s.models / "_work"
+            work.mkdir(parents=True, exist_ok=True)
+            save_net(net, str(work / "candidate.pt"))
+            duel = parallel.Workers(s.workers, str(work / "candidate.pt"), champion["path"], device=str(device))
+        h2h = head_to_head(net, champ_net, s.gate_games, s.search, brain, duel)
+        if duel is not None:
+            duel.close()
         decision = gate.decide(champion, h2h, bench)
         record["gate"] = {"h2h": h2h, "promote": decision.promote, "reason": decision.reason, "champion": champion["version"]}
         print(f"  gate: {decision.reason} -> {'saved as a new version' if decision.promote else 'not saved'}", flush=True)
@@ -301,6 +343,7 @@ def run(s: Settings, start: Path, resume: bool, brain: BrainFactory = net_brain,
         origin = f"a new {preset} network" if preset else f"the weights of {champion['version']}"
         size = sum(p.numel() for p in net.parameters()) / 1e6
         print(f"starting from {origin}: {size:.1f}M parameters, on {device}; the champion to beat in the gate is {champion['version']}", flush=True)
+    views.set_irreversible(net.cfg.irreversible)  # the views of the examples are made as the network was made (views.py)
     values = human_values(s)
     buf = Buffer(root, s.buffer)
     for it in range(first, s.iterations + 1):
@@ -341,6 +384,12 @@ def main() -> None:
     ap.add_argument("--log-every", type=float, default=60.0)
     ap.add_argument("--explore-temperature", type=float, default=3.0)
     ap.add_argument("--explore-rounds", type=int, default=2)
+    ap.add_argument("--search", choices=["bundle", "mcts"], default="bundle", help="the search of the turns: one turn ahead, or the tree (docs/AI-MCTS.md)")
+    ap.add_argument("--simulations", type=int, default=48, help="the tree search: node expansions for a turn, in all the worlds")
+    ap.add_argument("--worlds", type=int, default=4, help="the tree search: determinized worlds, each with its own tree")
+    ap.add_argument("--leaves", type=int, default=4, help="the tree search: simulations of a world that are made together")
+    ap.add_argument("--branch", type=int, default=6, help="the tree search: bundles made at a node")
+    ap.add_argument("--workers", type=int, default=0, help="processes for the self-play and gate games (0: one process); the search is CPU work")
     ap.add_argument("--resume", action="store_true")
     a = ap.parse_args()
     logstamp.install()  # every line of the log has the date and the time
@@ -370,6 +419,8 @@ def main() -> None:
         log_every=a.log_every,
         explore_temperature=a.explore_temperature,
         explore_rounds=a.explore_rounds,
+        workers=a.workers,
+        search=MCTSConfig(simulations=a.simulations, worlds=a.worlds, leaves=a.leaves, branch=a.branch) if a.search == "mcts" else SearchConfig(),
     )
     run(s, Path(a.start), a.resume, preset=a.preset)
 

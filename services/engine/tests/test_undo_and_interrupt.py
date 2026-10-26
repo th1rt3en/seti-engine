@@ -54,6 +54,16 @@ def test_the_page_is_told_which_moves_cannot_be_taken_back() -> None:
     assert not any(n and n.get("irreversible") for m, n in zip(legal, notes, strict=True) if m["type"] in ("move_energy", "launch", "scan"))
 
 
+def test_the_offline_ai_can_leave_the_irreversible_mark_out() -> None:
+    """UNDO-01: `irreversible=False` skips the trial of each move (the AI does not need the warning); the rest of the notes is the same."""
+    s, pl = ready()
+    legal = legal_moves(s)
+    with_mark = move_notes.notes(s, legal)
+    without = move_notes.notes(s, legal, irreversible=False)
+    assert any(n and n.get("irreversible") for n in with_mark) and not any(n and n.get("irreversible") for n in without)
+    assert [{k: v for k, v in (n or {}).items() if k != "irreversible"} for n in with_mark] == [dict(n or {}) for n in without]
+
+
 def test_finishing_a_scan_refills_the_row_and_cannot_be_taken_back() -> None:
     """SCAN-03, A-026: the row is refilled after the whole scan, from the deck."""
     s, pl = ready()

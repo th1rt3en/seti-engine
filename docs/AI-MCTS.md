@@ -107,3 +107,25 @@ for measuring; what is served changes only after a measurement of the time per m
 2. Whether a long training run may start only after Step 2 has won in games (my recommendation: yes).
 3. The value definition to try: score difference first, win chance as the second.
 4. The time per move that the lobby bot is allowed on the service (today seconds on a CPU; a measurement is part of Step 0).
+
+## 8. What was built (2026-10-26, on the owner's order "implement MCTS")
+
+Nothing here is trained or served yet; the Alpha service is unchanged (its networks keep the mark of the irreversible moves as an input and the search of one turn).
+
+- **Step 0, batching**: `bundle_search.play_bundle_g` is a process that yields lists of requests (`logits` of a view, `value` of a position) and is sent the answers;
+  `drive` runs many processes in lockstep and answers all their requests with one network call (`NetBrain.answer_many`, `LocalNet.evaluate_many`). A test
+  (`tests/test_mcts.py`) checks that a batch gives the same bundles as the same processes alone.
+- **Steps 1 and 2, the tree**: `mcts.py`. PUCT over bundles in 4 determinized worlds, with the opponent's reply as nodes of the tree (the opponent moves with its own
+  policy), a virtual loss so that several simulations of a world run together, the visits added over the worlds at the root, a score-difference value (own score
+  plus own value, minus the opponent's score plus the opponent's value: the network is asked once for each seat, no new head is needed). Used by self-play, the gate
+  and the lobby bot through `make_search(brain, config)`; `iterate.py --search mcts` (and `--simulations --worlds --leaves --branch`).
+- **Not built**: Step 3 (the policy trained toward the visit counts: `SearchResult.visits` has them, the examples still learn the bundle that was played), a value
+  head for the score difference (the two value calls stand in for it).
+- **What the measurements said** (a new medium network, one game position at a time; `services/ai/src/seti_ai/iter_benchmark.py`): the search is CPU work. The old
+  search took 2.6 s on average (0.4 to 3.9 s); the tree took 5.4 s (16 simulations), 8.6 s (32) and 19.9 s (48 simulations, 4 worlds, 6 bundles a node). The time is
+  not in the network (about 15%): it is the views (the encoding of each view takes 5 ms, the mark of the irreversible moves 15 ms of a view of 62 moves, 95% of the time of a
+  view before the next point) and the copies of the engine state. So:
+  1. the mark of the irreversible moves is **left out of the views of the Beta networks** (`NetConfig.irreversible=False`, `views.py`): a view then takes 0.5 ms instead of
+     up to 23 ms. The older networks keep it, because it is one of their inputs. Decision for the owner: the mark is a hint about hidden draws; a network that has to find
+     out for itself from the moves' own descriptions is the cost of 10 times faster searches.
+  2. games are played in several processes (`parallel.py`, `--workers`), one core each.

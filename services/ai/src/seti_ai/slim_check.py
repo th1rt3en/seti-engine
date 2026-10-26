@@ -7,11 +7,11 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from seti_engine.projection import project
 
 from . import expert, features
 from .agent import LocalNet, PolicyNet
 from .slim import SlimNet
+from .views import project
 
 
 def agreement(big: PolicyNet, small: SlimNet, people: Path, positions: int) -> str:

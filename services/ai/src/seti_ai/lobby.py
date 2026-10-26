@@ -17,13 +17,14 @@ from typing import Any
 
 from seti_engine import engine, orgs
 from seti_engine.models import GameState, Options
-from seti_engine.projection import View, acting, actor_of, project
+from seti_engine.projection import View, acting, actor_of
 from seti_engine.replay import js_number
 
 from .bundle_data import public_move
 from .bundle_search import Brain, BundleBot, SearchConfig
 from .bundles import bundle_key
 from .knowledge import Knowledge
+from .views import project
 
 History = list[tuple[int, dict[str, Any]]]
 

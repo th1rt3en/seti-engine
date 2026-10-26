@@ -13,6 +13,7 @@ points, and the number of rounds it is used for; the search of the lobby plays t
 
 from __future__ import annotations
 
+import copy
 import random
 from dataclasses import dataclass, field
 from typing import Any
@@ -24,6 +25,7 @@ from . import arena, bots
 from .brains import NetBrain
 from .bundle_data import Examples, examples_from_log
 from .bundle_search import Brain, BundleBot, SearchConfig
+from .mcts import make_search
 
 OPTIONS = [{}, {"expansion": True, "organizations": True}]  # the base game and the expansion, half of the games each (as bundle_train)
 
@@ -40,7 +42,7 @@ class ExploringBot(BundleBot):
     """The bundle bot of the lobby that draws its bundle among the best ones in the first rounds of a game."""
 
     def __init__(self, brain: Brain, config: SearchConfig, temperature: float, rounds: int) -> None:
-        super().__init__(brain, config)
+        super().__init__(brain, config, make_search(brain, config))
         self.temperature, self.rounds = temperature, rounds
 
     def act(self, state: GameState, view: View, rng: random.Random) -> int:
@@ -68,7 +70,7 @@ def play(brain: Brain, seed: int, cfg: SelfPlayConfig, kind: int = 0) -> SelfPla
         if cfg.bot and seat != model_seat:
             players.append(bots.BOTS[cfg.bot]())
         else:
-            players.append(ExploringBot(brain, SearchConfig(**vars(cfg.search)), cfg.explore_temperature, cfg.explore_rounds))
+            players.append(ExploringBot(brain, copy.copy(cfg.search), cfg.explore_temperature, cfg.explore_rounds))
     res = arena.play_game(players, seed, rng, opts)
     seats = [s for s in range(2) if not cfg.bot or s == model_seat]
     ex = examples_from_log(

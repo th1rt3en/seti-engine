@@ -22,18 +22,88 @@ from __future__ import annotations
 import copy
 import json
 import random
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 import numpy as np
 from seti_engine import engine
 from seti_engine.models import GameState
-from seti_engine.projection import View, project, to_act
+from seti_engine.projection import View, to_act
 
 from .bundles import bundle_key
 from .knowledge import Knowledge
+from .views import project
 
 History = list[tuple[int, dict[str, Any]]]
+
+# A search can ask a brain for many things at once: a process (a generator) yields a list of requests, `("logits", view, history, knowledge)` or
+# `("value", state, seat, history, knowledge)`, and is sent the list of answers. `drive` runs several processes in lockstep and answers all their
+# requests together, so that a network is called once for a whole batch (docs/AI-MCTS.md, Step 0); with one process it is the plain sequential search.
+Request = tuple[Any, ...]
+Process = Generator[list[Request], list[Any], Any]
+
+
+def answer(brain: Brain, requests: list[Request]) -> list[Any]:
+    """The answers to the requests, in order: all at once if the brain can (`answer_many`), else one by one."""
+    many = getattr(brain, "answer_many", None)
+    if many is not None:
+        return list(many(requests))
+    out: list[Any] = []
+    for r in requests:
+        out.append(brain.logits(r[1], r[2], r[3]) if r[0] == "logits" else brain.value(r[1], r[2], r[3], r[4]))
+    return out
+
+
+def drive(processes: list[Process], brain: Brain) -> list[Any]:
+    """Run the processes together until all are done; their results, in order."""
+    results: list[Any] = [None] * len(processes)
+    waiting: dict[int, list[Request]] = {}
+
+    def step(i: int, reply: list[Any] | None) -> None:
+        try:
+            waiting[i] = processes[i].send(reply)  # type: ignore[arg-type]
+        except StopIteration as stop:
+            results[i] = stop.value
+            waiting.pop(i, None)
+
+    for i in range(len(processes)):
+        step(i, None)
+    while waiting:
+        who = list(waiting)
+        flat = [r for i in who for r in waiting[i]]
+        replies = answer(brain, flat)
+        at = 0
+        for i in who:
+            n = len(waiting[i])
+            step(i, replies[at : at + n])
+            at += n
+    return results
+
+
+def parallel(processes: list[Process]) -> Process:
+    """A process that runs the others side by side, joining their requests into one list at each step; its result is the list of their results."""
+    results: list[Any] = [None] * len(processes)
+    waiting: dict[int, list[Request]] = {}
+
+    def step(i: int, reply: list[Any] | None) -> None:
+        try:
+            waiting[i] = processes[i].send(reply)  # type: ignore[arg-type]
+        except StopIteration as stop:
+            results[i] = stop.value
+            waiting.pop(i, None)
+
+    for i in range(len(processes)):
+        step(i, None)
+    while waiting:
+        who = list(waiting)
+        replies = yield [r for i in who for r in waiting[i]]
+        at = 0
+        for i in who:
+            n = len(waiting[i])
+            step(i, replies[at : at + n])
+            at += n
+    return results
 
 
 class Brain(Protocol):
@@ -87,6 +157,8 @@ class SearchResult:
     start: GameState | None = None
     # the bundle that is played: the best one, or (self-play, `pick_temperature` above 0) one drawn among the finalists
     played: Candidate | None = None
+    # for the tree search: how many times each bundle (by its key) was visited, added over the worlds
+    visits: dict[str, int] = field(default_factory=dict)
 
 
 def determinize(state: GameState, seat: int, knowledge: Knowledge | None, rng: random.Random) -> GameState:
@@ -125,6 +197,7 @@ class _Rollout:
     history: History
     knowledge: Knowledge
     followed: bool  # the plan was followed to its last move, and each of its moves was legal when its turn came
+    logp: float = 0.0  # the log probability that the policy gave to the moves it chose itself (not to those of the plan)
 
 
 def _final_total(state: GameState, seat: int) -> float:
@@ -134,10 +207,9 @@ def _final_total(state: GameState, seat: int) -> float:
     return float(state.players[seat].score)
 
 
-def play_bundle(
+def play_bundle_g(
     state0: GameState,
     seat: int,
-    brain: Brain,
     history: History,
     knowledge: Knowledge | None,
     rng: random.Random,
@@ -146,9 +218,10 @@ def play_bundle(
     greedy: bool = False,
     temperature: float = 1.0,
     max_micro: int = 80,
-) -> _Rollout:
+    irreversible: bool | None = None,
+) -> Process:
     """Play the rest of the bundle on a copy: the moves of `plan` while they are legal, then the policy (the best move if `greedy`, else sampled), until
-    the turn passes to someone else."""
+    the turn passes to someone else. A process (see `drive`)."""
     state = state0
     start = bundle_key(state, seat)
     hist = list(history)
@@ -156,6 +229,7 @@ def play_bundle(
     moves: list[dict[str, Any]] = []
     pos = 0
     followed = plan is not None
+    logp = 0.0
     for _ in range(max_micro):
         classified = [(m, c) for m, c in engine.legal_classified(state) if c != "control"]
         if not classified:
@@ -169,19 +243,21 @@ def play_bundle(
                 followed = False  # the plan does not fit this copy of the game any more: go on with the policy
                 plan = None
         if move is None:
-            view = project(state, seat, previews=False)
-            scores = np.asarray(brain.logits(view, hist, know), dtype=np.float64)
+            view = project(state, seat, previews=False, irreversible=irreversible)
+            scores = np.asarray((yield [("logits", view, hist, know)])[0], dtype=np.float64)
             ok = [i for i, m in enumerate(view.legal) if view.classes[i] != "control"]
             if not ok:
                 break
             sub = scores[ok]
             if greedy or len(ok) == 1:
-                pick = ok[int(np.argmax(sub))]
+                at = int(np.argmax(sub))
             else:
                 z = (sub - sub.max()) / max(temperature, 1e-6)
                 p = np.exp(z)
                 p /= p.sum()
-                pick = ok[int(rng.choices(range(len(ok)), weights=p.tolist())[0])]
+                at = int(rng.choices(range(len(ok)), weights=p.tolist())[0])
+            pick = ok[at]
+            logp += float(sub[at] - sub.max() - np.log(np.exp(sub - sub.max()).sum()))
             move = view.legal[pick]
         res = engine.apply(state, move)
         know.update(seat, move, res.events)
@@ -192,7 +268,14 @@ def play_bundle(
             break
     if plan is not None and pos < len(plan):
         followed = False  # the bundle ended before the plan did
-    return _Rollout(moves, state, hist, know, followed)
+    return _Rollout(moves, state, hist, know, followed, logp)
+
+
+def play_bundle(state0: GameState, seat: int, brain: Brain, history: History, knowledge: Knowledge | None, rng: random.Random, **kw: Any) -> _Rollout:
+    """`play_bundle_g` run alone (sequentially)."""
+    kw.setdefault("irreversible", getattr(brain, "irreversible", None))
+    rollout: _Rollout = drive([play_bundle_g(state0, seat, history, knowledge, rng, **kw)], brain)[0]
+    return rollout
 
 
 def _points(end: GameState, start: GameState, seat: int) -> float:
@@ -311,8 +394,8 @@ class BundleBot:
 
     name = "bundle-search"
 
-    def __init__(self, brain: Brain, config: SearchConfig | None = None) -> None:
-        self.search = BundleSearch(brain, config)
+    def __init__(self, brain: Brain, config: SearchConfig | None = None, search: Any = None) -> None:
+        self.search = search if search is not None else BundleSearch(brain, config)  # or the tree search (`mcts.make_search`)
         self.history: History | None = None
         self.knowledge: Knowledge | None = None
         self.plan: list[dict[str, Any]] = []

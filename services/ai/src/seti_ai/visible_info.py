@@ -20,9 +20,10 @@ from typing import Any
 
 from seti_engine import engine
 from seti_engine.models import GameState, Options
-from seti_engine.projection import project, to_act
+from seti_engine.projection import to_act
 
 from . import features
+from .views import project
 
 sys.path.insert(0, str(Path(__file__).parents[3] / "engine" / "tests"))
 

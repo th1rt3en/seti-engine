@@ -45,10 +45,12 @@ class NetConfig:
     token_buckets: int = features.TOKEN_BUCKETS
     max_tokens: int = features.MAX_TOKENS
     move_num: int = features.MOVE_NUM
+    irreversible: bool = True  # the views have the mark of the moves that cannot be taken back (views.py); the Beta line is made without it
 
 
 PRESETS = {
     "small": NetConfig(d_model=256, layers=4, heads=4, ffn=1024, move_layers=1),  # about 12M parameters: tests and quick experiments
+    "medium": NetConfig(d_model=384, layers=6, heads=6, ffn=1536, move_layers=2, irreversible=False),  # about 30M: between small and base (the Beta line)
     "base": NetConfig(d_model=512, layers=8, heads=8, ffn=2048, move_layers=2),  # about 45M: where training starts
     "large": NetConfig(d_model=768, layers=12, heads=12, ffn=3072, move_layers=3),  # about 144M: the size of ZeusAI's network and more
     "xlarge": NetConfig(d_model=1024, layers=16, heads=16, ffn=4096, move_layers=4),  # about 300M: larger than ZeusAI's; measured before it is chosen
@@ -225,6 +227,21 @@ class LocalNet:
             batch = collate([(tokens, toks, nums)], self.device)
             logits, value = self.net(batch)
         return logits[0, : toks.shape[0]].cpu().numpy(), float(value[0].item())
+
+    def evaluate_many(
+        self, items: list[tuple[features.Tokens, NDArray[np.int32], NDArray[np.float32]]], chunk: int = 64
+    ) -> list[tuple[NDArray[np.float32], float]]:
+        """The answers to many positions at once (the network is called once for each `chunk`): what the batched search uses."""
+        out: list[tuple[NDArray[np.float32], float]] = []
+        for at in range(0, len(items), chunk):
+            part = items[at : at + chunk]
+            with torch.no_grad():
+                batch = collate(part, self.device)
+                logits, value = self.net(batch)
+            lg = logits.float().cpu().numpy()
+            vs = value.float().cpu().numpy()
+            out += [(lg[i, : it[1].shape[0]], float(vs[i])) for i, it in enumerate(part)]
+        return out
 
 
 def new_net(preset: str = "base") -> PolicyNet:

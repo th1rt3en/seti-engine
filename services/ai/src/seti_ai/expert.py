@@ -23,7 +23,7 @@ from typing import Any
 
 from seti_engine import engine, orgs
 from seti_engine.models import GameState, Options
-from seti_engine.projection import actor_of, project, to_act
+from seti_engine.projection import actor_of, to_act
 from seti_engine.replay import js_number
 
 from . import dataset, features
@@ -31,6 +31,7 @@ from .bundle_data import Examples, PolicyExample, public_move
 from .bundle_search import BundleSearch, History
 from .bundles import TURN, bundles_of_game
 from .knowledge import Knowledge
+from .views import project
 
 
 @dataclass

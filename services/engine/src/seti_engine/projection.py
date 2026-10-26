@@ -211,7 +211,7 @@ def rival_preview(deck: list[str], seen: list[str]) -> list[str]:
     return [*known, *[HIDDEN] * (len(deck) - len(known))]
 
 
-def project(state: GameState, viewer: int | None, previews: bool = True) -> View:
+def project(state: GameState, viewer: int | None, previews: bool = True, irreversible: bool = True) -> View:
     s = state.model_copy(deep=True)
     counts = Counts(
         deck=len(s.deck),
@@ -296,7 +296,7 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
             )
             for pid, cells in engine.move_reach(state, state.players[viewer])
         ]
-    notes = move_notes.notes(state, legal) if legal else []
+    notes = move_notes.notes(state, legal, irreversible) if legal else []
     return View(
         viewer=viewer,
         state=s,
