@@ -144,8 +144,9 @@ def train_epoch(
     }
 
 
-def evaluate_vs_bots(net: PolicyNet, games: int, device: torch.device, opponents: tuple[str, ...] = ("random", "greedy", "heuristic")) -> dict[str, Any]:
-    """The network taking its best micro move, against each bot (the same seeds, the seats swapped): its mean score, the bot's, its win rate."""
+def evaluate_vs_bots(net: PolicyNet, games: int, device: torch.device, opponents: tuple[str, ...] = ("heuristic",)) -> dict[str, Any]:
+    """The network taking its best micro move, against each bot (the same seeds, the seats swapped): its mean score, the bot's, its win rate.
+    Only the heuristic bot by default: the random and the greedy bots are far too weak to say anything (owner, 2026-10-26)."""
     net.eval()
     out: dict[str, Any] = {}
     for opp in opponents:
