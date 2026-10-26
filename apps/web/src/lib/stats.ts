@@ -155,6 +155,8 @@ export const CARDS_VERSION = 3;
 export const SPEND_VERSION = 5;
 /** The version that counts where each tech came from (the research action, a card of the main deck, an alien card). */
 export const TECH_ORIGIN_VERSION = 9;
+/** The version that counts the cards that were in a hand and the cards discarded for their free corner (the play rate and the discard rate). */
+export const CARD_RATE_VERSION = 10;
 /** The version that counts the quick start cards that were offered. */
 export const QUICK_VERSION = 8;
 
@@ -242,6 +244,14 @@ export interface CardStat {
   plays: number;
   /** the share of the players of the version 3 rows who played it */
   share: number;
+  /** the player-games (of the version 10 rows) in which it was in a hand, and in which it was played and discarded for its free corner: rates are null without them */
+  held: number;
+  playRate: number | null;
+  discardRate: number | null;
+  discards: number;
+  /** of a mission card: the share of its plays whose mission was completed; of an end-of-game card: the points it gave, per play (null without plays counted) */
+  missionRate: number | null;
+  endAvg: number | null;
   /** the final score of the players who played it */
   avgScore: number;
   scoreSpread: Spread;
@@ -401,7 +411,10 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
 
   const v3 = rows.filter((r) => (r.counters["stats.version"] ?? 0) >= CARDS_VERSION);
   const gains = gainSlices(rows, v3);
-  const cards = cardStats(v3);
+  const cards = cardStats(
+    v3,
+    rows.filter((r) => (r.counters["stats.version"] ?? 0) >= CARD_RATE_VERSION),
+  );
   const v4 = rows.filter((r) => (r.counters["stats.version"] ?? 0) >= SPEND_VERSION);
   const spends = spendSlices(v4);
   const quick = quickStats(v4);
@@ -582,7 +595,7 @@ function groupSlices(
 }
 
 /** The cards that were played (any card of the main deck or of a species), by what the players who played them scored, won and did. */
-function cardStats(v3: StatRow[]): CardStat[] {
+function cardStats(v3: StatRow[], v10: StatRow[]): CardStat[] {
   const byCard = new Map<string, { rows: StatRow[]; plays: number; rounds: Record<number, number> }>();
   for (const r of v3) {
     for (const [k, v] of Object.entries(r.counters)) {
@@ -599,8 +612,25 @@ function cardStats(v3: StatRow[]): CardStat[] {
       e.rounds[Number(m[2])] = (e.rounds[Number(m[2])] ?? 0) + v;
     }
   }
+  const held = new Map<string, { held: number; played: number; discards: number; completed: number; endPoints: number }>();
+  for (const r of v10) {
+    for (const [k, v] of Object.entries(r.counters)) {
+      const m = /^cardheld\.(.+)$/.exec(k);
+      if (!m || v <= 0) continue;
+      const id = m[1] as string;
+      const e = held.get(id) ?? { held: 0, played: 0, discards: 0, completed: 0, endPoints: 0 };
+      e.held += 1;
+      for (const [k2, v2] of Object.entries(r.counters)) if (k2.startsWith(`card.${id}.r`)) e.played += v2;
+      e.discards += r.counters[`cardcorner.${id}`] ?? 0;
+      e.completed += r.counters[`cardmission.${id}`] ?? 0;
+      e.endPoints += r.counters[`cardend.${id}`] ?? 0;
+      held.set(id, e);
+    }
+  }
+  for (const id of held.keys()) if (!byCard.has(id)) byCard.set(id, { rows: [], plays: 0, rounds: {} });
   return [...byCard.entries()]
     .map(([id, e]) => {
+      const h = held.get(id);
       const scores = e.rows.map((r) => r.score);
       const orgs = new Map<string, number>();
       for (const r of e.rows) if (r.org) orgs.set(r.org, (orgs.get(r.org) ?? 0) + 1);
@@ -610,9 +640,15 @@ function cardStats(v3: StatRow[]): CardStat[] {
         players: e.rows.length,
         plays: e.plays,
         share: v3.length === 0 ? 0 : e.rows.length / v3.length,
-        avgScore: sum(scores) / scores.length,
+        held: h?.held ?? 0,
+        playRate: h && h.held > 0 ? h.played / h.held : null,
+        discardRate: h && h.held > 0 ? h.discards / h.held : null,
+        discards: h?.discards ?? 0,
+        missionRate: h && h.played > 0 ? h.completed / h.played : null,
+        endAvg: h && h.played > 0 ? h.endPoints / h.played : null,
+        avgScore: scores.length === 0 ? 0 : sum(scores) / scores.length,
         scoreSpread: spreadOf(scores),
-        winRate: e.rows.filter((r) => r.won).length / e.rows.length,
+        winRate: e.rows.length === 0 ? 0 : e.rows.filter((r) => r.won).length / e.rows.length,
         avgRound: e.plays === 0 ? 0 : sum(rounds.map(([r, n]) => Number(r) * n)) / e.plays,
         rounds: e.rounds,
         orgs: [...orgs.entries()].map(([org, n]) => ({ org, n })).sort((a, b) => b.n - a.n),

@@ -372,4 +372,29 @@ describe("statistics", () => {
     expect(a.techTypes.map((x) => x.key)).toEqual(["probe", "computer"]);
     expect(a.techUse.find((t) => t.tech === "probe-dot")?.share).toBeCloseTo(1 / 3);
   });
+  it("the play rate, the discard rate, the mission completion and the end-of-game points of a card (version 10 rows)", () => {
+    const v = { "stats.version": 10 };
+    const rows = [
+      row({
+        counters: {
+          ...v,
+          "cardheld.7": 1,
+          "card.7.r2": 1,
+          "cardmission.7": 1,
+          "cardheld.9": 1,
+          "cardcorner.9": 1,
+          "cardend.12": 6,
+          "cardheld.12": 1,
+          "card.12.r1": 1,
+        },
+      }),
+      row({ counters: { ...v, "cardheld.7": 1, "cardheld.9": 1, "card.9.r3": 1 } }),
+      row({ counters: { "stats.version": 9, "cardheld.7": 1 } }), // an older row: nothing was counted
+    ];
+    const cards = aggregate(rows, any).cards;
+    const by = (id: string) => cards.find((c) => c.id === id);
+    expect(by("7")).toMatchObject({ held: 2, playRate: 0.5, discardRate: 0, missionRate: 1 });
+    expect(by("9")).toMatchObject({ held: 2, playRate: 0.5, discardRate: 0.5, discards: 1 });
+    expect(by("12")).toMatchObject({ held: 1, playRate: 1, endAvg: 6 });
+  });
 });

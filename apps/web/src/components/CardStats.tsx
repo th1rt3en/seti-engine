@@ -13,6 +13,7 @@ interface Entry {
   name: string;
   deck: string;
   species: string | null;
+  type: string;
 }
 const CARDS = new Map((catalog as Entry[]).map((c) => [c.id, c]));
 /** The printed name of the card (the catalog's; the card number is shown beside it). */
@@ -47,11 +48,13 @@ const TABS = [
   ...Object.entries(SPECIES_NAMES).map(([id, label]) => ({ id, label })),
 ];
 
-type Sort = "plays" | "score" | "win" | "early" | "late";
+type Sort = "plays" | "score" | "win" | "early" | "late" | "playrate" | "discardrate";
 const SORTS: { id: Sort; label: string }[] = [
   { id: "plays", label: "Most played" },
   { id: "score", label: "Highest average score" },
   { id: "win", label: "Highest win rate" },
+  { id: "playrate", label: "Highest play rate" },
+  { id: "discardrate", label: "Highest discard rate" },
   { id: "early", label: "Played earliest" },
   { id: "late", label: "Played latest" },
 ];
@@ -67,7 +70,19 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
   const [q, setQ] = useState("");
   const shown = useMemo(() => {
     const key = (c: CardStat): number =>
-      sort === "score" ? c.avgScore : sort === "win" ? c.winRate : sort === "early" ? -c.avgRound : sort === "late" ? c.avgRound : c.plays;
+      sort === "score"
+        ? c.avgScore
+        : sort === "win"
+          ? c.winRate
+          : sort === "playrate"
+            ? (c.playRate ?? -1)
+            : sort === "discardrate"
+              ? (c.discardRate ?? -1)
+              : sort === "early"
+                ? -c.avgRound
+                : sort === "late"
+                  ? c.avgRound
+                  : c.plays;
     return cards
       .filter((c) => (group === "" || groupOf(c.id) === group) && c.plays >= min)
       .filter((c) => q === "" || cardName(c.id).toLowerCase().includes(q.toLowerCase()) || c.id.toLowerCase().includes(q.toLowerCase()))
@@ -137,12 +152,49 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                   <div title={`${c.plays} plays by ${c.players} players`}>
                     <dt>Played</dt>
                     <dd>
-                      <b>{c.plays}</b>{" "}
-                      <span className="muted small">
-                        time{c.plays === 1 ? "" : "s"} by {c.players} player{c.players === 1 ? "" : "s"} ({pct(c.share)})
-                      </span>
+                      <b>{c.plays}</b> <span className="muted small">time{c.plays === 1 ? "" : "s"}</span>
                     </dd>
                   </div>
+                  <div
+                    title={
+                      c.held === 0
+                        ? "Not counted in the games so far"
+                        : `Played in ${Math.round((c.playRate ?? 0) * c.held)} of the ${c.held} games in which it was in a hand`
+                    }
+                  >
+                    <dt>Play rate</dt>
+                    <dd>
+                      <b>{c.playRate === null ? "–" : pct(c.playRate)}</b>
+                    </dd>
+                  </div>
+                  <div
+                    title={
+                      c.held === 0
+                        ? "Not counted in the games so far"
+                        : `Discarded for its free corner ${c.discards} times in the ${c.held} games in which it was in a hand`
+                    }
+                  >
+                    <dt>Discard rate</dt>
+                    <dd>
+                      <b>{c.discardRate === null ? "–" : pct(c.discardRate)}</b>
+                    </dd>
+                  </div>
+                  {CARDS.get(c.id)?.type === "mission" ? (
+                    <div title="The share of its plays whose mission was completed (over the games that count it)">
+                      <dt>Mission completed</dt>
+                      <dd>
+                        <b>{c.missionRate === null ? "–" : pct(c.missionRate)}</b>
+                      </dd>
+                    </div>
+                  ) : null}
+                  {CARDS.get(c.id)?.type === "end" ? (
+                    <div title="The points its end-of-game scoring gave, on average, each time it was played">
+                      <dt>Average end-of-game points</dt>
+                      <dd>
+                        <b>{c.endAvg === null ? "–" : r1(c.endAvg)}</b>
+                      </dd>
+                    </div>
+                  ) : null}
                   <div title={`The final score of the players who played it: ${spreadText(c.scoreSpread)}`}>
                     <dt>Average final score</dt>
                     <dd>

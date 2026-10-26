@@ -26,7 +26,7 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # end of the turn, the exofossils left over (`spend.leftover.exofossil`), the glyph tokens as a resource (`gain.<source>.token`,
 # `spend.decipher.token`), and the publicity and data income of each round (`incomerate.r<round>.publicity|data`)
 # 8: the quick start cards that were offered (`quickoffered.<id>`), for the keep rate
-VERSION = 9
+VERSION = 10
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil", "token")
@@ -207,6 +207,9 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
         final = result
         if n == 0:
             counts = {p.index: Counter() for p in state.players}
+            for p in state.players:
+                for cid in p.hand:
+                    counts[p.index][f"cardheld.{cid}"] = 1
             before = state
             continue
         assert entry is not None
@@ -253,6 +256,12 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                     counts[seat][f"publicity.visit.{where}"] += sum(moved)
         if seat in counts:
             tech_use(counts[seat], before, state, seat, action, result.events)
+            if action.get("type") == "discard_free":  # a card discarded for its free corner (tucking is another action)
+                counts[seat][f"cardcorner.{action['card']}"] += 1
+        for q in state.players:  # the cards that were in a hand at some time (the play rate and the discard rate are over these)
+            if q.index in counts:
+                for cid in q.hand:
+                    counts[q.index][f"cardheld.{cid}"] = 1
         for q in state.players:  # the techs that a player took in this step, by where they came from (version 9)
             if q.index in counts and q.index < len(before.players):
                 gained = Counter(q.techs) - Counter(before.players[q.index].techs)
@@ -311,8 +320,10 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                     c["endcards.played"] += 1
             elif t == "mission_completed":
                 c["missions.completed"] += 1
+                c[f"cardmission.{e['card']}"] += 1
             elif t == "endgame_card":
                 c["endcards.points"] += int(e["points"])
+                c[f"cardend.{e['card']}"] += int(e["points"])
             elif t == "endgame_gold":
                 tile = f"{e['tile']}-{e['side']}"
                 c[f"gold.{tile}.points"] += int(e["points"])

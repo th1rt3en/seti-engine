@@ -177,3 +177,15 @@ def test_the_techs_are_counted_by_where_they_came_from() -> None:
                 origins[k] += v
     assert origins["techorigin.research"] > 0
     assert sum(origins.values()) >= sum(v for p in s["players"] for k, v in p["counters"].items() if k.startswith("techcat."))
+
+
+def test_the_cards_held_discarded_for_a_corner_and_scored_at_the_end_are_counted() -> None:
+    options, actions = play(5, 3)
+    s = stats.game_stats(file_of(options, actions))
+    total: Counter[str] = Counter()
+    for p in s["players"]:
+        for k, v in p["counters"].items():
+            total[k.split(".")[0]] += v
+    assert total["cardheld"] > 0 and total["cardheld"] >= total["card"]  # a card that is played was in a hand
+    assert total["cardcorner"] == sum(1 for a in actions if a["type"] == "discard_free")
+    assert total["cardend"] == sum(p["counters"].get("endcards.points", 0) for p in s["players"])
