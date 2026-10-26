@@ -159,7 +159,7 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                     title={
                       c.held === 0
                         ? "Not counted in the games so far"
-                        : `Played in ${Math.round((c.playRate ?? 0) * c.held)} of the ${c.held} games in which it was in a hand`
+                        : `Played ${Math.round((c.playRate ?? 0) * c.held)} times of the ${c.held} times it came into a hand`
                     }
                   >
                     <dt>Play rate</dt>
@@ -171,7 +171,7 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                     title={
                       c.held === 0
                         ? "Not counted in the games so far"
-                        : `Discarded for its free corner ${c.discards} times in the ${c.held} games in which it was in a hand`
+                        : `Discarded for its free corner ${c.discards} times of the ${c.held} times it came into a hand`
                     }
                   >
                     <dt>Discard rate</dt>

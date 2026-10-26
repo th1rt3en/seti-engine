@@ -1,4 +1,4 @@
-"""Statistics of a finished game: for each player, what they did, counted from the replay of the game.
+﻿"""Statistics of a finished game: for each player, what they did, counted from the replay of the game.
 
 The Worker stores the result of this module for every game that was played to its end (table `game_stats`); the site averages it over
 the games that match a filter (players, expansion, rated). It is pure: the same options and the same actions always give the same
@@ -26,7 +26,7 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # end of the turn, the exofossils left over (`spend.leftover.exofossil`), the glyph tokens as a resource (`gain.<source>.token`,
 # `spend.decipher.token`), and the publicity and data income of each round (`incomerate.r<round>.publicity|data`)
 # 8: the quick start cards that were offered (`quickoffered.<id>`), for the keep rate
-VERSION = 10
+VERSION = 11
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil", "token")
@@ -209,7 +209,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             counts = {p.index: Counter() for p in state.players}
             for p in state.players:
                 for cid in p.hand:
-                    counts[p.index][f"cardheld.{cid}"] = 1
+                    counts[p.index][f"cardheld.{cid}"] += 1
             before = state
             continue
         assert entry is not None
@@ -258,10 +258,10 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             tech_use(counts[seat], before, state, seat, action, result.events)
             if action.get("type") == "discard_free":  # a card discarded for its free corner (tucking is another action)
                 counts[seat][f"cardcorner.{action['card']}"] += 1
-        for q in state.players:  # the cards that were in a hand at some time (the play rate and the discard rate are over these)
-            if q.index in counts:
-                for cid in q.hand:
-                    counts[q.index][f"cardheld.{cid}"] = 1
+        for q in state.players:  # times a card came into a hand (the rates are over these; a card can come back)
+            if q.index in counts and q.index < len(before.players):
+                for cid, n in (Counter(q.hand) - Counter(before.players[q.index].hand)).items():
+                    counts[q.index][f"cardheld.{cid}"] += n
         for q in state.players:  # the techs that a player took in this step, by where they came from (version 9)
             if q.index in counts and q.index < len(before.players):
                 gained = Counter(q.techs) - Counter(before.players[q.index].techs)

@@ -96,11 +96,12 @@ def lower_moves(p: PlayerState) -> list[Action]:
 
 
 def place_lower(s: GameState, p: PlayerState, slot: int, events: Events) -> None:
-    with trail.cost(s, "computer"):
-        p.data_pool -= 1
-    p.computer_techs[slot].lower_filled = True
     tech = p.computer_techs[slot].tech
     lower = next(t["lower"] for t in tables.tech_board()["stacks"]["computer"] if tech_name("computer", t["glyph"]) == tech)
+    kind = {"credit": "credit", "energy": "energy", "card_any": "card", "publicity": "pub"}[lower[0]["t"]]  # statistics: the space
+    with trail.cost(s, f"computer_lower_{kind}"):
+        p.data_pool -= 1
+    p.computer_techs[slot].lower_filled = True
     with trail.scope(s, {"kind": "tech", "tech": tech, "what": "lower"}):
         rewards.grant(s, p, lower, events)  # TECH-20
     events.append({"type": "place_lower", "player": p.index, "slot": slot})

@@ -50,9 +50,14 @@ def take(s: GameState, p: PlayerState, where: str, events: Events) -> None:
     g = extra["tokens"].pop(where, None)
     if g is None:
         return
-    p.glyphs.append(g)
-    event: dict[str, Any] = {"type": "glyph", "player": p.index, "glyph": g, "where": where}
     kind, _, rest = where.partition(":")
+    # the statistics tell where a token came from: a planet, a tech stack, a sector, the upper or the lower row of the board
+    origin = {"planet": "glyph_planet", "tech": "glyph_tech", "sector": "glyph_sector"}.get(
+        kind, "glyph_board_upper" if where.endswith(":0") else "glyph_board_lower"
+    )
+    with trail.scope(s, {"kind": origin}):
+        p.glyphs.append(g)
+    event: dict[str, Any] = {"type": "glyph", "player": p.index, "glyph": g, "where": where}
     if kind == "sector":  # the log names the place the token lay at
         event["star"] = s.sectors[int(rest)].star
     elif kind == "tech":
@@ -140,7 +145,8 @@ def decipher_moves(s: GameState, p: PlayerState) -> list[dict[str, Any]]:
 def decipher(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
     i = slot_index(s)
     assert i is not None
-    with trail.cost(s, "decipher"):  # the token leaves the player's tokens for the translation board
+    slot = slot_reward(s, a["row"], a["index"])[0]["t"]  # the token is told by the resource of the slot it goes to
+    with trail.cost(s, f"decipher_{slot}"):  # the token leaves the player's tokens for the translation board
         p.glyphs.remove(a["glyph"])
     s.species[i].extra[a["row"]][a["index"]] = a["glyph"]
     events.append({"type": "decipher", "player": p.index, "glyph": a["glyph"], "row": a["row"], "index": a["index"]})

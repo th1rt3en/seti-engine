@@ -782,9 +782,17 @@ def _take_land_data(s: GameState, p: PlayerState, planet: str, slot: int) -> Non
 
 def _place_data(s: GameState, p: PlayerState, events: list[dict[str, Any]]) -> None:
     """FREE-03/FREE-04: move one data from the pool to the leftmost empty top-row space and resolve that space at once."""
-    with trail.cost(s, "computer"):  # the data goes from the pool to the computer
-        p.data_pool -= 1
     pos = p.computer.index(False)
+    # the data goes from the pool to the computer; the cost is told by the space it lands on (the statistics)
+    space = "empty"
+    if pos == COMPUTER_PUBLICITY_POS:
+        space = "pub"
+    elif pos in p.computer_techs:
+        space = "vp"
+    elif pos == COMPUTER_INCOME_POS:
+        space = "tuck"
+    with trail.cost(s, f"computer_{space}"):
+        p.data_pool -= 1
     p.computer[pos] = True
     if pos == COMPUTER_PUBLICITY_POS:
         effects.gain_publicity(s, p)

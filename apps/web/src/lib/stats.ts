@@ -232,7 +232,13 @@ export const RESOURCE_GROUPS: Record<string, Record<string, string>> = (() => {
     },
     move: { ...common, move_move_energy: "energy", card: "card", corner: "corner", move_org_free: "organization", move_scan_probe: "tech" },
     exofossil: { ...common, planet: "planet", sector: "sector", card: "card" },
-    token: { ...common, planet: "planet", sector: "sector" },
+    token: {
+      glyph_planet: "glyph_planet",
+      glyph_tech: "glyph_tech",
+      glyph_sector: "glyph_sector",
+      glyph_board_lower: "glyph_board_lower",
+      glyph_board_upper: "glyph_board_upper",
+    },
   };
 })();
 
@@ -619,7 +625,7 @@ function cardStats(v3: StatRow[], v10: StatRow[]): CardStat[] {
       if (!m || v <= 0) continue;
       const id = m[1] as string;
       const e = held.get(id) ?? { held: 0, played: 0, discards: 0, completed: 0, endPoints: 0 };
-      e.held += 1;
+      e.held += v;
       for (const [k2, v2] of Object.entries(r.counters)) if (k2.startsWith(`card.${id}.r`)) e.played += v2;
       e.discards += r.counters[`cardcorner.${id}`] ?? 0;
       e.completed += r.counters[`cardmission.${id}`] ?? 0;

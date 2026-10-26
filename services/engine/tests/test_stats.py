@@ -115,7 +115,7 @@ def test_what_each_resource_was_spent_on_is_counted() -> None:
     s = stats.game_stats(file_of(options, actions))
     assert s["version"] == stats.VERSION
     keys = {k for p in s["players"] for k in p["counters"] if k.startswith("spend.")}
-    assert {"spend.scan.credit", "spend.play_card.credit", "spend.computer.data", "spend.trade.card"} <= keys
+    assert {"spend.scan.credit", "spend.play_card.credit", "spend.computer_empty.data", "spend.trade.card"} <= keys
     assert not [k for k in keys if k.endswith(".vp")]  # points are not spent
 
 
