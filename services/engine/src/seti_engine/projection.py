@@ -198,6 +198,19 @@ def actor_of(state: GameState, action: dict[str, Any]) -> int | None:
     return to_act(state)
 
 
+def _card_number(cid: str) -> tuple[str, int]:
+    prefix, _, number = cid.partition(".")
+    return prefix, int(number) if number.isdigit() else 0
+
+
+def rival_preview(deck: list[str], seen: list[str]) -> list[str]:
+    """The unused action cards of the rival, for a preview: by card number (not in the order of the deck). The basic and the species
+    cards are known; an advanced card that was never played is only a card back, put last (it has no number to be sorted by)."""
+    advanced = {f"S.{i}" for i in range(5, 15)}
+    known = sorted((c for c in deck if c not in advanced or c in seen), key=_card_number)
+    return [*known, *[HIDDEN] * (len(deck) - len(known))]
+
+
 def project(state: GameState, viewer: int | None, previews: bool = True) -> View:
     s = state.model_copy(deep=True)
     counts = Counts(
@@ -251,7 +264,7 @@ def project(state: GameState, viewer: int | None, previews: bool = True) -> View
     for st in s.tech_stacks:
         st.tiles = st.tiles[:1] + [HIDDEN] * max(0, len(st.tiles) - 1)  # SETUP-16: only the top tile of a stack shows its bonus
     if s.rival is not None:
-        s.rival.deck = [HIDDEN] * len(s.rival.deck)
+        s.rival.deck = rival_preview(s.rival.deck, s.rival.seen)  # the cards left, by card number: the order of the deck is not told
         s.rival.advanced = [HIDDEN] * len(s.rival.advanced)
     if s.objectives is not None:
         s.objectives.stack = [HIDDEN] * len(s.objectives.stack)

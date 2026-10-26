@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from test_engine import do, with_state
 
-from seti_engine import cards, objectives, rewards, rival, scoring, solar, species, tables, trail
+from seti_engine import cards, objectives, projection, rewards, rival, scoring, solar, species, tables, trail
 from seti_engine.engine import StepResult, apply, start
 from seti_engine.models import GameState, Options, Probe, SpeciesSlot
 
@@ -148,6 +148,24 @@ def test_crossing_the_growth_icon_adds_an_advanced_card_to_the_top_of_the_deck()
     rv(s).progress = 11
     rival.advance(s, 1)  # nothing is left to add: nothing happens
     assert len(rv(s).deck) == deck + 1
+
+
+def test_the_deck_of_the_rival_is_shown_by_card_number_with_the_unplayed_advanced_cards_as_backs() -> None:
+    """The preview of the rival's unplayed cards: the order of the deck is not told, a new advanced card is a back."""
+    s = solo(3)
+    r = rv(s)
+    r.deck = ["S.9", "S.3", "SE.1", "S.1", "S.16", "S.12"]
+    r.seen = ["S.12"]  # S.12 was played once: the player knows it; S.9 was not
+    view = projection.project(s, 0)
+    assert view.state.rival is not None
+    assert view.state.rival.deck == ["S.1", "S.3", "S.12", "S.16", "SE.1", projection.HIDDEN]
+    assert len(view.state.rival.deck) == len(r.deck) == view.counts.rival_deck
+    # an advanced card that the rival plays is known from then on
+    r.deck, r.used, r.seen = ["S.8", "S.2"], [], []
+    rival.take_turn(s, [])
+    assert r.seen == ["S.8"] and "S.8" in r.used
+    r.deck = ["S.8", "S.1"]
+    assert projection.project(s, 0).state.rival.deck == ["S.1", "S.8"]  # type: ignore[union-attr]
 
 
 def test_the_log_says_when_the_rival_gains_an_advanced_card_whoever_moved_it() -> None:

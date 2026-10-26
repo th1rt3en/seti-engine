@@ -9,6 +9,7 @@ import type { BoardSpots } from "./BoardView";
 import { HelpTip } from "./HelpTip";
 import { ScoreIcon } from "./Icons";
 import { DataToken, Marker, PieceDefs, pieceColor } from "./Pieces";
+import { openRivalDeck } from "./RivalDeckPanel";
 import { TapZoomImage } from "./TapZoom";
 
 const TECH_FRONTS = assets.techFronts as Record<string, string>;
@@ -106,7 +107,7 @@ const RIVAL_CARDS = assets.rivalCards as Record<string, string>;
 const EXPANSION = expansionAssets as Record<string, string>;
 // the rival's cards of the expansion (EXP-SOLO-02, A-033): the extra starting card and the three species cards
 const EXPANSION_RIVAL: Record<string, string> = { "SE.1": "rival-00", "SE.2": "rival-01", "SE.3": "rival-02", "SE.4": "rival-03" };
-const rivalCardImage = (id: string): string => RIVAL_CARDS[id] ?? EXPANSION[EXPANSION_RIVAL[id] ?? ""] ?? "";
+export const rivalCardImage = (id: string): string => RIVAL_CARDS[id] ?? EXPANSION[EXPANSION_RIVAL[id] ?? ""] ?? "";
 
 /** The place of the rival's marker among the 12 circles of its progress track, as the board shows it (1 to 12, clockwise from the first circle after the growth icon at the top): the pill of the
  * rival says the same number. (The engine's own number is the place in its list of the spaces, which is not the order of the printed circles.) */
@@ -169,10 +170,23 @@ function Rival({ view }: { view: View }) {
         </div>
         <div className="rcgroup">
           <h4>Action deck</h4>
-          <figure className="rcard rcpile" title={`${view.counts.rival_deck} cards left in the rival's deck`}>
-            <TapZoomImage src={RIVAL_CARDS.back as string} alt="The rival's action deck" width={330} height={367} />
+          <figure
+            className="rcard rcpile rcpeek"
+            role="button"
+            tabIndex={0}
+            title={`${view.counts.rival_deck} cards left in the rival's deck: click to see which`}
+            onClick={() => openRivalDeck()}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && openRivalDeck()}
+          >
+            <img
+              src={RIVAL_CARDS.back as string}
+              alt="The rival's action deck: click to preview the unused cards"
+              width={330}
+              height={367}
+            />
             <figcaption className="rccount">{view.counts.rival_deck}</figcaption>
           </figure>
+          <p className="muted small">Click the deck to see the cards that are left.</p>
         </div>
       </div>
       <ul className="rivalfacts">

@@ -132,6 +132,7 @@ export type Deck1 = string[];
 export type Index1 = number;
 export type MessagesInReserve = number;
 export type Progress = number;
+export type Seen = string[];
 export type Techs1 = string[];
 export type Used1 = string[];
 export type RngState = string;
@@ -495,6 +496,7 @@ export interface RivalState {
   index: Index1;
   messages_in_reserve: MessagesInReserve;
   progress: Progress;
+  seen: Seen;
   techs: Techs1;
   used: Used1;
 }

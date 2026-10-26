@@ -321,6 +321,8 @@ def take_turn(s: GameState, events: Events) -> None:
     turn_id = f"{cid}:{sum(1 for e in events if e['type'] == 'rival_card')}"
     events.append({"type": "rival_card", "card": cid})
     spent = cid
+    if cid in ADVANCED and cid not in r.seen:
+        r.seen.append(cid)  # played face up: from now on the preview of the deck shows it
     with trail.scope(s, {"kind": "rival_turn", "card": cid}, turn=turn_id):
         for action in card["actions"]:
             if action["kind"] == "species_check":

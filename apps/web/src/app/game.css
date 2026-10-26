@@ -3657,3 +3657,33 @@ html:has(.setupchoice) .hand {
   border-radius: 8px;
   text-align: center;
 }
+
+/* the deck of the rival opens a preview of its unused cards (components/RivalDeckPanel.tsx) */
+.rivalpeek {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0 2px;
+}
+.rivalpeek:hover,
+.rivalpeek:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+}
+.rcpeek {
+  cursor: pointer;
+}
+.rcpeek:hover img,
+.rcpeek:focus-visible img {
+  outline: 2px solid var(--accent);
+}
+.rivaldeckpanel .offercards {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.rivaldeckpanel .rcard {
+  width: 150px;
+  margin: 0;
+}

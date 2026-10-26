@@ -37,6 +37,7 @@ import { OrgName } from "./OrgName";
 import { OrgPanel } from "./OrgPanel";
 import { PlayerTracker } from "./PlayerTracker";
 import { PublicitySlot } from "./PublicitySlot";
+import { RivalDeckPanel, openRivalDeck } from "./RivalDeckPanel";
 import { RoundPiles } from "./RoundPiles";
 import { RowDock, type RowSelection } from "./RowDock";
 import { SoloPanel, objectiveFacts, progressSpace } from "./SoloPanel";
@@ -230,8 +231,15 @@ function RivalCells({ view }: { view: View }) {
       >
         <RivalCardBack used height={20} />
         <b>{r.used.length}</b>
-        <RivalCardBack height={20} />
-        <b>{r.deck.length}</b>
+        <button
+          type="button"
+          className="rivalpeek"
+          title="Preview the action cards that the rival has not played yet"
+          onClick={() => openRivalDeck()}
+        >
+          <RivalCardBack height={20} />
+          <b>{r.deck.length}</b>
+        </button>
       </span>
       <span
         className="res"
@@ -515,6 +523,7 @@ export function GameView({
       </div>
 
       <SoloPanel view={view} spots={spots} />
+      <RivalDeckPanel view={view} />
 
       <BarHeight />
       <TrackerDock>

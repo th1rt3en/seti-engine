@@ -65,7 +65,9 @@ def test_exertian_cards_and_the_solo_decks_are_hidden() -> None:
     assert other.state.players[0].exertian_hand == ["?", "?"] and other.state.players[0].exertian_played == ["?"]
     solo = start(Options(players=1, seed=2, difficulty=3)).state
     v = projection.project(solo, 0)
-    assert set(v.state.rival.deck) == {"?"} and set(v.state.rival.advanced) == {"?"} and v.counts.rival_deck == len(solo.rival.deck)  # type: ignore[union-attr]
+    # the cards left are shown by card number (not in the order of the deck); an advanced card that was never played is only a back
+    assert set(v.state.rival.advanced) == {"?"} and v.counts.rival_deck == len(solo.rival.deck) == len(v.state.rival.deck)  # type: ignore[union-attr]
+    assert not [c for c in v.state.rival.deck if c in {f"S.{i}" for i in range(5, 15)}]  # type: ignore[union-attr]
     assert set(v.state.objectives.stack) == {"?"} and v.state.objectives.row == solo.objectives.row  # type: ignore[union-attr]
 
 

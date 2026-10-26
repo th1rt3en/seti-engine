@@ -220,6 +220,7 @@ class RivalState(BaseModel):
     deck: list[str] = Field(default_factory=list)  # action deck, top first
     used: list[str] = Field(default_factory=list)  # action cards played this round
     advanced: list[str] = Field(default_factory=list)  # advanced action cards not yet gained (SOLO-05, SOLO-12)
+    seen: list[str] = Field(default_factory=list)  # advanced cards played once: known to the player
     computer: int = 0  # data on the rival's computer, 0 to 6 (its unlimited data pool is `PlayerState.data_pool`, SOLO-17)
     techs: list[str] = Field(default_factory=list)  # stored techs (SOLO-18)
     arrow: str = "left"  # decision arrow of the card being resolved

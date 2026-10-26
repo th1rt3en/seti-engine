@@ -1635,6 +1635,13 @@
           "title": "Progress",
           "type": "integer"
         },
+        "seen": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Seen",
+          "type": "array"
+        },
         "techs": {
           "items": {
             "type": "string"
@@ -1659,6 +1666,7 @@
         "index",
         "messages_in_reserve",
         "progress",
+        "seen",
         "techs",
         "used"
       ],
