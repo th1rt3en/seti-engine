@@ -26,6 +26,7 @@ import copy
 import json
 import pickle
 import random
+import sys
 import time
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
@@ -42,6 +43,15 @@ from .bundle_search import Brain, BundleBot, SearchConfig
 from .mcts import MCTSConfig, make_search
 
 BrainFactory = Callable[[PolicyNet], Brain]
+
+
+def keep_awake() -> None:
+    """Windows goes to sleep when nobody touches the PC, which stops a run of many hours (the first Beta run lost hours that way): ask it to stay awake for as
+    long as this process lives (the screen may still turn off)."""
+    if sys.platform == "win32":
+        import ctypes  # noqa: PLC0415
+
+        ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)  # ES_CONTINUOUS | ES_SYSTEM_REQUIRED
 
 
 def net_brain(net: PolicyNet) -> Brain:
@@ -327,6 +337,7 @@ def run(s: Settings, start: Path, resume: bool, brain: BrainFactory = net_brain,
     device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
     checkpoint.clear_pause(root)
     checkpoint.install_signal_handler()
+    keep_awake()
     champion = champion_of(start)
     first = 1
     if resume and checkpoint.exists(root):
