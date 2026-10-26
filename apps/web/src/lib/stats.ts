@@ -151,13 +151,16 @@ export const FRESH_VERSION = 2;
 export const CARDS_VERSION = 3;
 /** The version that counts what each resource was spent on and the quick start cards kept. */
 export const SPEND_VERSION = 5;
+/** The version that counts the quick start cards that were offered. */
+export const QUICK_VERSION = 8;
 
 /** What a quick start card did for the players who kept it (the counters `quick.<id>`, from version 4). */
 export interface QuickStat {
   id: string;
+  /** the players who kept it, and the players to whom it was offered (the keep rate is the first over the second) */
   players: number;
-  /** of the players of the games with organizations (version 4 rows that kept two quick start cards) */
-  share: number;
+  offered: number;
+  keepRate: number;
   avgScore: number;
   scoreSpread: Spread;
   winRate: number;
@@ -618,26 +621,26 @@ function spendSlices(v4: StatRow[]): Record<string, Slice[]> {
 
 /** The quick start cards that the players kept, by what those players scored and how often they won. */
 function quickStats(v4: StatRow[]): QuickStat[] {
-  const withCards = v4.filter((r) => Object.keys(r.counters).some((k) => k.startsWith("quick.")));
-  const byCard = new Map<string, StatRow[]>();
-  for (const r of withCards) {
-    for (const k of Object.keys(r.counters)) {
-      if (!k.startsWith("quick.")) continue;
-      const id = k.slice("quick.".length);
-      byCard.set(id, [...(byCard.get(id) ?? []), r]);
-    }
-  }
-  return [...byCard.entries()]
-    .map(([id, rs]) => {
-      const scores = rs.map((r) => r.score);
+  // the rows that know what was offered (version 8): a card that was offered and never kept has a keep rate of 0
+  const rows = v4.filter((r) => (r.counters["stats.version"] ?? 0) >= QUICK_VERSION);
+  const offered = new Map<string, StatRow[]>();
+  for (const r of rows)
+    for (const k of Object.keys(r.counters))
+      if (k.startsWith("quickoffered."))
+        offered.set(k.slice("quickoffered.".length), [...(offered.get(k.slice("quickoffered.".length)) ?? []), r]);
+  return [...offered.entries()]
+    .map(([id, offers]) => {
+      const kept = offers.filter((r) => (r.counters[`quick.${id}`] ?? 0) > 0);
+      const scores = kept.map((r) => r.score);
       return {
         id,
-        players: rs.length,
-        share: withCards.length === 0 ? 0 : rs.length / withCards.length,
-        avgScore: sum(scores) / scores.length,
+        players: kept.length,
+        offered: offers.length,
+        keepRate: kept.length / offers.length,
+        avgScore: kept.length === 0 ? 0 : sum(scores) / scores.length,
         scoreSpread: spreadOf(scores),
-        winRate: rs.filter((r) => r.won).length / rs.length,
+        winRate: kept.length === 0 ? 0 : kept.filter((r) => r.won).length / kept.length,
       };
     })
-    .sort((a, b) => b.players - a.players || a.id.localeCompare(b.id));
+    .sort((a, b) => b.keepRate - a.keepRate || b.offered - a.offered || a.id.localeCompare(b.id));
 }

@@ -25,7 +25,8 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # at the
 # end of the turn, the exofossils left over (`spend.leftover.exofossil`), the glyph tokens as a resource (`gain.<source>.token`,
 # `spend.decipher.token`), and the publicity and data income of each round (`incomerate.r<round>.publicity|data`)
-VERSION = 7
+# 8: the quick start cards that were offered (`quickoffered.<id>`), for the keep rate
+VERSION = 8
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil", "token")
@@ -227,6 +228,9 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             kind = action.get("type")
             if kind in MAIN_ACTIONS:
                 counts[seat][f"action.{kind}"] += 1
+            if kind == "choose_quick":  # the quick start cards that were offered (a player may choose again: it is counted once)
+                for cid in before.players[seat].offered_quick:
+                    counts[seat][f"quickoffered.{cid}"] = 1
             if kind == "choose_org":
                 org_offered[seat] = list(before.players[seat].offered_orgs)
                 org_picked[seat] = str(action.get("org"))

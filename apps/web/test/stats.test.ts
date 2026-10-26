@@ -195,16 +195,29 @@ describe("statistics", () => {
     expect(pub).toEqual({ group_probe: 2, other: 1 }); // the visits (1 + 0.5 + 0.5) are one group; the rest of the moves is in the others
   });
 
-  it("what a resource was spent on, and the quick start cards that were kept (version 5 rows only)", () => {
-    const v = { "stats.version": 5 };
+  it("what a resource was spent on, and the quick start cards that were kept (version 8 rows only)", () => {
+    const v = { "stats.version": 8 };
     const rows = [
       row({
         gameId: "a",
         score: 90,
         won: true,
-        counters: { ...v, "spend.play_card.credit": 6, "spend.launch.credit": 2, "quick.SR.1": 1, "quick.SR.3": 1 },
+        counters: {
+          ...v,
+          "spend.play_card.credit": 6,
+          "spend.launch.credit": 2,
+          "quick.SR.1": 1,
+          "quick.SR.3": 1,
+          "quickoffered.SR.1": 1,
+          "quickoffered.SR.3": 1,
+        },
       }),
-      row({ gameId: "b", score: 70, won: false, counters: { ...v, "spend.play_card.credit": 2, "quick.SR.1": 1 } }),
+      row({
+        gameId: "b",
+        score: 70,
+        won: false,
+        counters: { ...v, "spend.play_card.credit": 2, "quick.SR.1": 1, "quickoffered.SR.1": 1, "quickoffered.SR.3": 1 },
+      }),
       row({ gameId: "c", score: 300, counters: { "spend.play_card.credit": 50 } }), // an older row: nothing was counted
     ];
     const a = aggregate(rows, any);
@@ -213,7 +226,8 @@ describe("statistics", () => {
       ["launch", 1],
     ]);
     const sr1 = a.quick.find((q) => q.id === "SR.1");
-    expect(sr1).toMatchObject({ players: 2, share: 1, winRate: 0.5 });
+    expect(sr1).toMatchObject({ players: 2, offered: 2, keepRate: 1, winRate: 0.5 });
+    expect(a.quick.find((q) => q.id === "SR.3")).toMatchObject({ players: 1, offered: 2, keepRate: 0.5 });
     expect(sr1?.avgScore).toBe(80);
     expect(a.quick.map((q) => q.id)).toEqual(["SR.1", "SR.3"]);
   });
