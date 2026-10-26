@@ -828,7 +828,8 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         s.discard.append(a["card"])
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[a["card"]]["sector"]}))
         if d.data["left"] > 1:
-            s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": d.data["left"] - 1, "of": d.data.get("of", d.data["left"])}))
+            of = d.data.get("of", d.data["left"])
+            s.pending.append(Decision(kind="hand_signal", player=p.index, data={"left": d.data["left"] - 1, "of": of}))
     elif t == "hand_signal_done":
         pass
     elif t == "show_move":  # the card stays in the hand; everybody sees it (the log names it) and the player gains 1 movement

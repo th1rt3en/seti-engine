@@ -2,7 +2,7 @@
 
 from seti_engine import arkhos, rewards, species, tables
 from seti_engine.engine import apply, legal_moves, start
-from seti_engine.models import GameState, Options
+from seti_engine.models import Decision, GameState, Options
 from seti_engine.projection import project
 
 
@@ -91,6 +91,26 @@ def test_marking_an_overflow_space_lets_the_player_breach_that_color() -> None: 
     assert breach_event["color"] == "yellow" and "card" not in breach_event  # the log names the color, not the card (rule 6)
     declined = apply(s, {"type": "skip_breach"}).state
     assert "yellow" in declined.players[0].security and card not in declined.players[0].hand
+
+
+def test_two_overflow_marks_of_one_color_breach_the_card_once() -> None:  # EXP-ARK-06 (a crash found by the training on a real game)
+    s = discovered()
+    p = s.players[0]
+    card = p.security["yellow"]
+    rewards.place_trace(s, p, {"slot": 0, "space": "overflow", "color": "yellow"}, [])
+    rewards.place_trace(s, p, {"slot": 0, "space": "overflow", "color": "yellow"}, [])
+    assert [d.kind for d in s.pending].count("breach") == 2
+    s.phase, s.current_player = "play", 0
+    r = apply(s, {"type": "breach"})
+    assert card in r.state.players[0].hand
+    assert not [d for d in r.state.pending if d.kind == "breach"]  # the second one is void: no card is left to breach
+    # a decision that was left over (a game saved by the earlier engine) can only be declined, and declining does not fail
+    stale = r.state.model_copy(deep=True)
+    stale.pending = [Decision(kind="breach", player=0, data={"color": "yellow"})]
+    types = {m["type"] for m in legal_moves(stale)}
+    assert "skip_breach" in types and "breach" not in types
+    arkhos.breach(stale, stale.players[0], stale.pending.pop(0), {"type": "breach"}, [])  # answered anyway: no error
+    assert not stale.players[0].security.get("yellow")
 
 
 def test_a_security_card_gives_a_minor_reward_when_discarded_and_a_major_one_when_played() -> None:  # EXP-ARK-07

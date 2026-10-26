@@ -80,11 +80,16 @@ def on_overflow(s: GameState, p: PlayerState, slot: int, color: str) -> None:
 
 
 def breach_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
+    # EXP-ARK-06: the card of that color is gone (a second overflow mark of the same color): only declining is left
+    if d.data["color"] not in s.players[d.player].security:
+        return [{"type": "skip_breach"}]
     return [{"type": "breach"}, {"type": "skip_breach"}]
 
 
 def breach(s: GameState, p: PlayerState, d: Decision, a: dict[str, Any], events: Events) -> None:
-    if a["type"] == "breach":
+    if a["type"] == "breach" and d.data["color"] in p.security:
         card = p.security.pop(d.data["color"])
+        # EXP-ARK-06: the card is gone, so a second breach of that color that was waiting (two overflow marks in one turn) is void
+        s.pending[:] = [x for x in s.pending if not (x.kind == "breach" and x.player == p.index and x.data.get("color") == d.data["color"])]
         events.append({"type": "breach", "player": p.index, "color": d.data["color"]})  # the card goes to the hand: it is not named
         p.hand.append(card)  # EXP-ARK-07: in the hand it counts toward the hand limit
