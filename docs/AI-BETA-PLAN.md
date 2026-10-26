@@ -42,8 +42,8 @@ plan uses **50 s a game**. Training: **3.85 ms an example** (one pass over 645 e
 | Self-play, 24 games (a quarter against the heuristic bot) | 20 min | 50 s a game |
 | Training, 2 epochs over the buffer (about 20,000 examples) | 3 min | 3.85 ms an example |
 | Network alone against the heuristic bot, 6 games | 2 min | not measured |
-| Gate, 8 games against the champion, both with the tree | 7 min | one wave of 8 workers, about 400 s a game |
-| **An iteration** | **about 32 min** | about 45 a day |
+| Gate, 20 games against the champion, both with the tree (the owner: at least 20) | 20 min | three waves of 8 workers (8, 8, 4), about 400 s a game |
+| **An iteration** | **about 45 min** | about 32 a day |
 
 Not in the estimate: the search at positions of people (`--human-positions`) runs in one process, about 8 s a position: 200 positions would add 27 minutes, so the plan
 uses 0 and takes the **value of the positions of the games of people without a search** (`--people`), which costs nothing.
@@ -53,8 +53,8 @@ uses 0 and takes the **value of the positions of the games of people without a s
 - **Buffer: the last 6 iterations** (144 games, about 20,000 examples, about 3 hours of play, about 0.5 GB of RAM as the pickled buffers of the last run were
   85 MB each). A larger window keeps value targets that were made by a much weaker network; a smaller one forgets too fast. The first iterations have a shorter buffer.
 - **Epochs 2, batch 64, learning rate 1e-4** (as the last run).
-- **Total: 40 iterations, about 21 hours**, in three stages with a stop after each (the run saves a checkpoint at every iteration and pauses at the end of one):
-  1. **Iterations 1 to 12 (about 6.5 hours).** Question: does it learn? Look at the value error (it must fall under 8 points; the last run stood at 4 to 6 with a network almost 5 times larger and 13 iterations of data), the share of its own searched move that the policy picks, and the score against the heuristic bot.
+- **Total: 40 iterations, about 30 hours**, in three stages with a stop after each (the run saves a checkpoint at every iteration and pauses at the end of one):
+  1. **Iterations 1 to 12 (about 9 hours).** Question: does it learn? Look at the value error (it must fall under 8 points; the last run stood at 4 to 6 with a network almost 5 times larger and 13 iterations of data), the share of its own searched move that the policy picks, and the score against the heuristic bot.
   2. **Iteration 12: the match that decides whether the tree is worth it.** 20 games (seats swapped), the same network with the tree search and with the old search at the same
      time per move. A tree that does not win here is dropped and the run goes on with the old search (`--search bundle`) at no loss.
   3. **Iterations 13 to 40.** At the end a 40-game match against Alpha (both at the time per move that the lobby allows), the evidence for a promotion to the lobby. A promotion
@@ -68,7 +68,7 @@ uses 0 and takes the **value of the positions of the games of people without a s
 cd services/ai
 python -m uv run python -m seti_ai.iterate run --owner-approved --preset medium --models models_beta --start models_alpha/v002 \
   --people <the downloaded archive of games> --human-positions 0 --search mcts --simulations 32 --worlds 4 --leaves 4 --branch 5 \
-  --workers 8 --selfplay-games 24 --epochs 2 --batch 64 --lr 1e-4 --buffer 6 --gate-games 8 --eval-games 6 --iterations 40 --seed 11
+  --workers 8 --selfplay-games 24 --epochs 2 --batch 64 --lr 1e-4 --buffer 6 --gate-games 20 --eval-games 6 --iterations 40 --seed 11
 ```
 
 `--start` is only the first champion of the gate (the old small v002, which any early Beta network beats). Pause with `python -m seti_ai.iterate pause --models models_beta`;
@@ -78,6 +78,6 @@ go on with `--resume`. Resident cost: 8 workers each hold a copy of the network 
 
 1. **A go** for the run above (or for Stage 1 only, iterations 1 to 12).
 2. **The irreversible mark left out of the Beta views** (section 2): yes or no. No means about 10 times fewer searches in the same time.
-3. **The budget**: 32 simulations a turn and 8 workers (about 32 minutes an iteration), or a smaller tree for a faster look (16 simulations, about 20 minutes).
+3. **The budget**: 32 simulations a turn and 8 workers (about 45 minutes an iteration with a gate of 20 games), or a smaller tree for a faster look (16 simulations, about 30 minutes).
 4. **The people's games**: their value positions in the training (cost-free, included above), and whether to pay for the search at their positions later (needs a parallel version).
-5. The champion of the gate: v002 (cheap, weak) or Alpha (a better yardstick but a search 20 s a turn with the mark: a gate of 8 games would take about 1.5 hours).
+5. The champion of the gate: v002 (cheap, weak) or Alpha (a better yardstick but a search 20 s a turn with the mark: a gate of 20 games would take about 4 hours).
