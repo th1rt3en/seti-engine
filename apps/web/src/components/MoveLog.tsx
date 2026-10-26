@@ -178,7 +178,7 @@ function rivalLine(ev: GameEvent): ReactNode {
     case "rival_gold":
       return `marks the ${String(ev.tile)} gold scoring tile`;
     case "rival_grows":
-      return "gets an advanced action card in its deck";
+      return "has progressed past the growth icon: an advanced action card is added on top of its action deck";
     default:
       return null;
   }

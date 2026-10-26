@@ -97,8 +97,8 @@ def advance(s: GameState, n: int, events: Events | None = None) -> None:
         r.progress = (r.progress + 1) % len(TRACK)
         if r.progress == 0 and r.advanced:  # A-012: with none left, nothing happens
             r.deck.insert(0, r.advanced.pop(0))
-            if events is not None:
-                events.append({"type": "rival_grows"})
+            # the log says so whoever advanced the rival (a trail record: it also works where no events list is at hand)
+            s.trail.append({"player": r.index, "changes": {}, "grows": True})
         elif r.progress == 0 and s.options.expansion:  # EXP-SOLO-07: no advanced card left to gain, so one more advance instead
             r.progress = 1
 

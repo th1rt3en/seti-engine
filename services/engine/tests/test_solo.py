@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from test_engine import do, with_state
 
-from seti_engine import cards, objectives, rewards, rival, scoring, solar, species, tables
+from seti_engine import cards, objectives, rewards, rival, scoring, solar, species, tables, trail
 from seti_engine.engine import StepResult, apply, start
 from seti_engine.models import GameState, Options, Probe, SpeciesSlot
 
@@ -148,6 +148,18 @@ def test_crossing_the_growth_icon_adds_an_advanced_card_to_the_top_of_the_deck()
     rv(s).progress = 11
     rival.advance(s, 1)  # nothing is left to add: nothing happens
     assert len(rv(s).deck) == deck + 1
+
+
+def test_the_log_says_when_the_rival_gains_an_advanced_card_whoever_moved_it() -> None:
+    """SOLO-12: a `rival_grows` event, also when the progress came from a place that has no list of events (the computer of the rival)."""
+    s = solo(3)
+    rv(s).progress = 11
+    rv(s).computer = 3
+    rival.gain_data(s)  # the fourth space of its computer is 4 progress: it crosses the growth icon
+    assert [e["type"] for e in trail.events_of(s)].count("rival_grows") == 1
+    rv(s).progress = 11
+    rival.advance(s, 1, [])  # an advance with an events list gives the same single line
+    assert [e["type"] for e in trail.events_of(s)].count("rival_grows") == 1
 
 
 def test_rival_victory_points_trigger_milestones_like_a_player() -> None:

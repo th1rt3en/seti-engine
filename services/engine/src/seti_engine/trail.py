@@ -73,6 +73,9 @@ def events_of(s: GameState) -> list[dict[str, Any]]:
                     ev["source"] = rec["source"]
                 out.append(ev)
             continue
+        if rec.get("grows"):  # SOLO-12: the rival crossed the growth icon and put an advanced action card on top of its deck
+            out.append({"type": "rival_grows", "player": rec["player"]})
+            continue
         if "draw" in rec:  # a card drawn from the deck: the log names it for the player who drew it (the others are not told which)
             out.append({"type": "draw_card", "player": rec["player"], "card": rec["draw"], "changes": {}})
             continue
@@ -87,5 +90,5 @@ def events_of(s: GameState) -> list[dict[str, Any]]:
             if "turn" in rec:
                 out[-1]["turn"] = rec["turn"]
     s.trail = []
-    kept = [e for e in out if e["type"] in ("draw_card", "capped") or any(v != 0 for v in e["changes"].values())]
+    kept = [e for e in out if e["type"] in ("draw_card", "capped", "rival_grows") or any(v != 0 for v in e["changes"].values())]
     return [{k: v for k, v in e.items() if k != "changes"} if e["type"] == "draw_card" else e for e in kept]
