@@ -61,6 +61,13 @@ def scope(s: GameState, source: dict[str, Any], turn: str | None = None) -> Iter
             rec.setdefault("turn", turn)
 
 
+def cost(s: GameState, what: str) -> Any:
+    """What a player pays or gives up inside the block (a cost, a card that leaves the hand, data that goes to the computer)
+    is recorded apart as `{"kind": "cost", "what": ...}`: it does not cancel what the effect that follows gives.
+    The statistics count it as what the resource was spent on."""
+    return scope(s, {"kind": "cost", "what": what})
+
+
 def events_of(s: GameState) -> list[dict[str, Any]]:
     """The `gains` events of a step: one for each source and player, in the order each first gained something. The trail is emptied."""
     out: list[dict[str, Any]] = []

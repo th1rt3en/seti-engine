@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import rng, solar, tables
+from . import rng, solar, tables, trail
 from .models import Decision, GameState, PlayerState, Probe
 
 PUBLICITY_CAP = 10  # SETUP-37 / RES-02
@@ -128,8 +128,9 @@ def gain_income_resource(state: GameState, p: PlayerState, kind: str, n: int = 1
 
 def tuck_card(state: GameState, p: PlayerState, card: str) -> None:
     """Tuck a card under the income card and gain its resource at once (INCOME-01)."""
-    p.hand.remove(card)
-    p.tucked.append(card)
+    with trail.cost(state, "tuck"):
+        p.hand.remove(card)
+        p.tucked.append(card)
     gain_income_resource(state, p, tables.cards()[card]["income"])
 
 

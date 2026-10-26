@@ -17,7 +17,9 @@ from typing import Any
 
 from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, species, tables
 
-VERSION = 3  # 3: the cards played by round (`card.<id>.r<round>`) and the parts of the final score (`final.<part>`)
+# 3: the cards played by round (`card.<id>.r<round>`) and the parts of the final score (`final.<part>`);
+# 4: what each resource was spent on (`spend.<what>.<resource>`, the `cost` scopes of the trail), the quick start cards kept (`quick.<id>`)
+VERSION = 4
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
@@ -43,7 +45,10 @@ def gain_counts(c: Counter[str], e: dict[str, Any]) -> None:
     """What one `gains` event adds: the data, the publicity of the sectors and signals, and every resource by the source that gave it."""
     src = e["source"].get("kind", "other")
     alien = alien_source(e["source"])
+    what = str(e["source"].get("what")) if src == "cost" else src  # a cost is told by what it paid for (launch, scan, trade ...)
     for res, amount in e["changes"].items():
+        if amount < 0 and res in RESOURCES:
+            c[f"spend.{what}.{res}"] += -amount
         if res == "data":
             c["data.gained" if amount > 0 else "data.lost"] += abs(amount)
         if res == "publicity" and src in ("sector", "signal"):
@@ -301,6 +306,8 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             c[f"tech.{tech}"] += 1
             c[f"techcat.{tech.split('-')[0]}"] += 1
         c["missions.done_end"] = len(p.completed_missions)
+        for cid in p.quick_start:  # the quick start cards that the player kept (Space Agencies)
+            c[f"quick.{cid}"] = 1
         alien_end(c, end, p)
         c["stats.version"] = VERSION  # the page counts the newer counters (techuse, from effects) over the rows that have this mark only
         players.append(

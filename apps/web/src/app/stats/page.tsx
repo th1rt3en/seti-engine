@@ -1,5 +1,6 @@
 import { AlienStatsSection } from "@/components/AlienStats";
 import { CardStats } from "@/components/CardStats";
+import { FilterPill } from "@/components/FilterPill";
 // Statistics of the games that were played to their end, averaged for each player of each game (the counters come from the engine: stats.py).
 // The filter chooses which games count: the number of players, the expansion, rated or friendly. Nothing is worked out here that is a rule.
 // Drawn as tiles and charts (components/StatCharts.tsx), every block with its numbers as a table behind a button.
@@ -17,6 +18,7 @@ import {
 } from "@/components/Icons";
 import { MultiChoice } from "@/components/MultiChoice";
 import { OrgName } from "@/components/OrgName";
+import { QuickStats } from "@/components/QuickStats";
 import { ResourcePies } from "@/components/ResourcePies";
 import { BarList, Histogram, LineChart, Panel, Pills, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
@@ -98,6 +100,15 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   );
 }
 
+const STAT_TABS = [
+  { id: "resources", label: "Resources" },
+  { id: "orgs", label: "Organization & Quickstart" },
+  { id: "tech", label: "Technologies" },
+  { id: "aliens", label: "Aliens" },
+  { id: "planets", label: "Planets & Sectors" },
+  { id: "others", label: "Others" },
+];
+
 const Blank = () => <span className="icon-blank" aria-hidden="true" />;
 
 export default async function StatsPage({
@@ -111,9 +122,11 @@ export default async function StatsPage({
     species?: string;
     org?: string;
     osort?: string;
+    tab?: string;
   }>;
 }) {
   const sp = await searchParams;
+  const tab = STAT_TABS.some((t) => t.id === sp.tab) ? (sp.tab as string) : "resources";
   const filter = parseFilter(sp);
   const s = await cachedStats(getDb(), filter);
   const m = (k: string): number => s.mean[k] ?? 0;
@@ -128,9 +141,16 @@ export default async function StatsPage({
   if (filter.expansion !== null) base.expansion = filter.expansion ? "yes" : "no";
   if (filter.rated !== null) base.rated = filter.rated ? "yes" : "no";
   if (filter.who !== "people") base.who = filter.who ?? "all"; // "people" is the default and is not written in the address
+  if (tab !== "resources") base.tab = tab; // the tab is kept by the links of the filters (the default is not written)
   if (filter.species.length > 0) base.species = filter.species.join(",");
   if (filter.org.length > 0) base.org = filter.org.join(",");
   // the other filters, for the choices of species and organizations (which change those two themselves)
+  const tabHref = (id: string): string => {
+    const q = new URLSearchParams(Object.fromEntries(Object.entries(base).filter(([k]) => k !== "tab")));
+    if (id !== "resources") q.set("tab", id);
+    const text = q.toString();
+    return text === "" ? "/stats" : `/stats?${text}`;
+  };
   const withoutAdvanced = Object.fromEntries(Object.entries(base).filter(([k]) => k !== "species" && k !== "org"));
 
   // the organizations, in the order that was asked for (those that nobody picked last)
@@ -317,567 +337,617 @@ export default async function StatsPage({
             <Tile icon={<ScoreIcon size={30} />} label="Best final score" value={s.bestScore} />
           </div>
 
+          <nav className="stat-tabs" aria-label="Statistics">
+            {STAT_TABS.map((t) => (
+              <FilterPill key={t.id} href={tabHref(t.id)} label={t.label} on={t.id === tab} />
+            ))}
+          </nav>
+
           <div className="stat-grid">
-            <Panel title="Final scores" icon={<ScoreIcon size={24} />} note="How many players ended in each band of 25 points." wide>
-              <Histogram values={s.scores} label="Number of players by final score" />
-            </Panel>
+            {tab === "resources" ? (
+              <>
+                <ResourcePies gains={s.gains} spends={s.spends} />
 
-            <h2 className="stat-section">Where the resources came from</h2>
-            <ResourcePies gains={s.gains} />
-
-            <h2 className="stat-section">The cards</h2>
-            <Panel
-              title="Cards played"
-              note="Every card of the main deck and of the species that was played, with what happened to the players who played it."
-              wide
-            >
-              <CardStats cards={s.cards} rows={s.cardRows} rounds={s.rounds} />
-            </Panel>
-
-            <h2 className="stat-section">Organizations and species</h2>
-            <Panel
-              title="Organizations"
-              note="How often each was picked of the times it was offered, how often the players who picked it won, and their average final score."
-              wide
-              table={
-                s.orgs.length === 0 ? undefined : (
-                  <Table
-                    head={["Organization", "Offered", "Picked", "Pick rate", "Win rate", "Average score", "Elo change (rated)"]}
-                    rows={orgsSorted.map((o) => [
-                      ORG_NAMES[o.org] ?? o.org,
-                      o.offered,
-                      o.picked,
-                      pct(o.pickRate),
-                      o.winRate === null ? "–" : pct(o.winRate),
-                      o.avgScore === null ? "–" : round(o.avgScore),
-                      o.eloDelta === null ? "–" : `${signed(o.eloDelta)} (${o.eloGames})`,
-                    ])}
+                <Panel
+                  title="Cards tucked for income"
+                  icon={<IncomeDot />}
+                  note="Which kind of income the tucked cards were tucked for, per game."
+                >
+                  <BarList
+                    label="Cards tucked for income"
+                    rows={tuckKinds.map((k) => ({
+                      key: k.key,
+                      label: (
+                        <span className="icon-label">
+                          {k.icon}
+                          {k.label}
+                        </span>
+                      ),
+                      value: m(`tucked.${k.key}`),
+                      spread: sd(`tucked.${k.key}`),
+                      text: <b>{round(m(`tucked.${k.key}`))}</b>,
+                    }))}
                   />
-                )
-              }
-            >
-              {s.orgs.length === 0 ? (
-                <p className="muted">No game with organizations matches.</p>
-              ) : (
-                <>
-                  <div className="stat-sort">
-                    <span className="stat-filter-name">Sort by</span>
-                    <Pills
-                      name="osort"
-                      current={orgSort === "pick" ? "" : orgSort}
-                      base={base}
-                      choices={[
-                        { value: "", label: "Pick rate" },
-                        { value: "win", label: "Win rate" },
-                        { value: "score", label: "Average score" },
-                      ]}
+                </Panel>
+
+                <Panel
+                  title="Income at the end of each round"
+                  note="What the player's income was in that round. The expansion has no round 1."
+                  wide
+                  table={
+                    <Table
+                      head={["Round", ...INCOME_KINDS.map(cap)]}
+                      rows={s.rounds.map((r) => [r, ...INCOME_KINDS.map((k) => round(m(`incomerate.r${r}.${k}`)))])}
                     />
-                  </div>
-                  <ul className="orgbars" aria-label="The organizations: pick rate, win rate and average score">
-                    {orgsSorted.map((o) => (
-                      <li key={o.org} title={`${ORG_NAMES[o.org] ?? o.org}: offered ${o.offered} times, picked ${o.picked}`}>
-                        <OrgName id={o.org} banner />
-                        <OrgBar
-                          label="Pick rate"
-                          share={o.pickRate}
-                          color={VIZ[0] as string}
-                          text={
-                            <>
-                              <b>{pct(o.pickRate)}</b>
-                              <span className="muted small">
-                                {" "}
-                                {o.picked} of {o.offered}
-                              </span>
-                            </>
-                          }
-                        />
-                        <OrgBar
-                          label="Win rate"
-                          share={o.winRate ?? 0}
-                          color={VIZ[1] as string}
-                          text={
-                            o.winRate === null ? (
-                              <span className="muted small">not picked</span>
-                            ) : (
-                              <>
-                                <b>{pct(o.winRate)}</b>
-                                <span className="muted small"> of {o.picked}</span>
-                              </>
-                            )
-                          }
-                        />
-                        <OrgBar
-                          label="Average score"
-                          share={o.avgScore === null || bestScore <= 0 ? 0 : o.avgScore / bestScore}
-                          color={VIZ[2] as string}
-                          text={
-                            o.avgScore === null ? (
-                              <span className="muted small">not picked</span>
-                            ) : (
-                              <WithSpread spread={o.scoreSpread}>
-                                <b>{round(o.avgScore)}</b>
-                              </WithSpread>
-                            )
-                          }
-                        />
-                        {o.eloDelta === null ? null : (
-                          <span className="muted small orgelo">
-                            Elo {signed(o.eloDelta)} ({o.eloGames})
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </Panel>
+                  }
+                >
+                  <LineChart
+                    label="Income of each kind at the end of each round"
+                    xName="Round"
+                    xs={s.rounds.map(String)}
+                    series={INCOME_KINDS.map((k) => ({
+                      key: k,
+                      label: cap(k),
+                      color: INCOME_HEX[k] as string,
+                      icon:
+                        k === "credit" ? <CreditIcon size={18} /> : k === "energy" ? <EnergyIcon size={18} /> : <DeckCardIcon size={18} />,
+                      values: s.rounds.map((r) => m(`incomerate.r${r}.${k}`)),
+                      spreads: s.rounds.map((r) => sd(`incomerate.r${r}.${k}`) ?? { min: 0, max: 0, std: 0 }),
+                    }))}
+                  />
+                </Panel>
 
-            <Panel
-              title="Alien species"
-              note="The average final score of the players of the games that have the species, discovered or not."
-              table={
-                <Table
-                  head={["Species", "Games", "Average final score"]}
-                  rows={s.species.map((x) => [SPECIES_NAMES[x.species] ?? cap(x.species), x.games, round(x.avgScore)])}
-                />
-              }
-            >
-              <BarList
-                label="Average final score by alien species"
-                rows={s.species.map((x) => ({
-                  key: x.species,
-                  label: (
-                    <span className="icon-label">
-                      {BOARDS[x.species] ? <img src={BOARDS[x.species]} alt="" width={22} height={40} className="mini-board" /> : <Blank />}
-                      {SPECIES_NAMES[x.species] ?? cap(x.species)}
-                    </span>
-                  ),
-                  value: x.avgScore,
-                  spread: x.spread,
-                  text: (
+                <Panel title="Data" icon={<DataIcon size={24} />} note="Data per game: what came in, and where it went.">
+                  <BarList
+                    label="Data gained and what it was used for"
+                    rows={dataRows.map((r) => ({
+                      key: r.key,
+                      label: r.label,
+                      value: r.value,
+                      spread: r.spread,
+                      text: <b>{round(r.value)}</b>,
+                    }))}
+                  />
+                </Panel>
+              </>
+            ) : null}
+            {tab === "orgs" ? (
+              <>
+                <Panel
+                  title="Organizations"
+                  note="How often each was picked of the times it was offered, how often the players who picked it won, and their average final score."
+                  wide
+                  table={
+                    s.orgs.length === 0 ? undefined : (
+                      <Table
+                        head={["Organization", "Offered", "Picked", "Pick rate", "Win rate", "Average score", "Elo change (rated)"]}
+                        rows={orgsSorted.map((o) => [
+                          ORG_NAMES[o.org] ?? o.org,
+                          o.offered,
+                          o.picked,
+                          pct(o.pickRate),
+                          o.winRate === null ? "–" : pct(o.winRate),
+                          o.avgScore === null ? "–" : round(o.avgScore),
+                          o.eloDelta === null ? "–" : `${signed(o.eloDelta)} (${o.eloGames})`,
+                        ])}
+                      />
+                    )
+                  }
+                >
+                  {s.orgs.length === 0 ? (
+                    <p className="muted">No game with organizations matches.</p>
+                  ) : (
                     <>
-                      <b>{round(x.avgScore)}</b>
-                      <span className="muted small">
-                        {" "}
-                        · {x.games} game{x.games === 1 ? "" : "s"}
-                      </span>
+                      <div className="stat-sort">
+                        <span className="stat-filter-name">Sort by</span>
+                        <Pills
+                          name="osort"
+                          current={orgSort === "pick" ? "" : orgSort}
+                          base={base}
+                          choices={[
+                            { value: "", label: "Pick rate" },
+                            { value: "win", label: "Win rate" },
+                            { value: "score", label: "Average score" },
+                          ]}
+                        />
+                      </div>
+                      <ul className="orgbars" aria-label="The organizations: pick rate, win rate and average score">
+                        {orgsSorted.map((o) => (
+                          <li key={o.org} title={`${ORG_NAMES[o.org] ?? o.org}: offered ${o.offered} times, picked ${o.picked}`}>
+                            <OrgName id={o.org} banner />
+                            <OrgBar
+                              label="Pick rate"
+                              share={o.pickRate}
+                              color={VIZ[0] as string}
+                              text={
+                                <>
+                                  <b>{pct(o.pickRate)}</b>
+                                  <span className="muted small">
+                                    {" "}
+                                    {o.picked} of {o.offered}
+                                  </span>
+                                </>
+                              }
+                            />
+                            <OrgBar
+                              label="Win rate"
+                              share={o.winRate ?? 0}
+                              color={VIZ[1] as string}
+                              text={
+                                o.winRate === null ? (
+                                  <span className="muted small">not picked</span>
+                                ) : (
+                                  <>
+                                    <b>{pct(o.winRate)}</b>
+                                    <span className="muted small"> of {o.picked}</span>
+                                  </>
+                                )
+                              }
+                            />
+                            <OrgBar
+                              label="Average score"
+                              share={o.avgScore === null || bestScore <= 0 ? 0 : o.avgScore / bestScore}
+                              color={VIZ[2] as string}
+                              text={
+                                o.avgScore === null ? (
+                                  <span className="muted small">not picked</span>
+                                ) : (
+                                  <WithSpread spread={o.scoreSpread}>
+                                    <b>{round(o.avgScore)}</b>
+                                  </WithSpread>
+                                )
+                              }
+                            />
+                            {o.eloDelta === null ? null : (
+                              <span className="muted small orgelo">
+                                Elo {signed(o.eloDelta)} ({o.eloGames})
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
                     </>
-                  ),
-                }))}
-              />
-            </Panel>
+                  )}
+                </Panel>
 
-            <Panel title="Actions per game" note="How many times a player took each main action, on average.">
-              <BarList
-                label="Main actions per game"
-                rows={actions.map((a) => ({
-                  key: a.key,
-                  label: (
-                    <span className="icon-label">
-                      {a.icon}
-                      {a.label}
-                    </span>
-                  ),
-                  value: m(`action.${a.key}`),
-                  spread: sd(`action.${a.key}`),
-                  text: <b>{round(m(`action.${a.key}`))}</b>,
-                }))}
-              />
-            </Panel>
+                <Panel
+                  title="Quick start cards"
+                  note="How often each quick start card of the Space Agencies expansion was kept, and what the players who kept it scored and won."
+                  wide
+                >
+                  <QuickStats quick={s.quick} />
+                </Panel>
+              </>
+            ) : null}
+            {tab === "tech" ? (
+              <>
+                <Panel
+                  title="Tech"
+                  wide
+                  table={
+                    <Table
+                      head={["Tech", "Researched in"]}
+                      rows={s.techs.map((t) => [TECH_INFO[t.tech]?.name ?? t.tech, `${pct(t.share)} of the games of a player`])}
+                    />
+                  }
+                >
+                  <div className="stat-two">
+                    <div>
+                      <h3>Researched per game</h3>
+                      <BarList
+                        label="Techs researched per game by category"
+                        rows={TECH_CATEGORIES.map((c, i) => ({
+                          key: c,
+                          label: cap(c),
+                          value: m(`techcat.${c}`),
+                          spread: sd(`techcat.${c}`),
+                          text: <b>{round(m(`techcat.${c}`))}</b>,
+                          color: TECH_COLOR[c],
+                        }))}
+                      />
+                      <h3>How they were researched</h3>
+                      <BarList
+                        label="Techs researched per game: by the research action or in another way"
+                        rows={[
+                          {
+                            key: "all",
+                            label: "In all",
+                            value: techTotal,
+                            spread: sdOf(techsOf),
+                            text: <b>{round(techTotal)}</b>,
+                          },
+                          {
+                            key: "manual",
+                            label: "Research action (6 publicity)",
+                            value: techManual,
+                            spread: sd("action.research"),
+                            text: <b>{round(techManual)}</b>,
+                          },
+                          {
+                            key: "other",
+                            label: "Other ways (cards, rewards, bonuses)",
+                            value: Math.max(0, techTotal - techManual),
+                            spread: sdOf((c) => Math.max(0, techsOf(c) - (c["action.research"] ?? 0))),
+                            text: <b>{round(Math.max(0, techTotal - techManual))}</b>,
+                          },
+                        ]}
+                      />
+                    </div>
+                    <div>
+                      <h3>Researched in x% of games</h3>
+                      <BarList
+                        label="Share of the players who researched each tech"
+                        max={1}
+                        rows={s.techs.map((t) => ({
+                          key: t.tech,
+                          label: (
+                            <span className="icon-label">
+                              {TECH_FRONTS[t.tech] ? (
+                                <img
+                                  src={TECH_FRONTS[t.tech]}
+                                  alt={TECH_INFO[t.tech]?.name ?? t.tech}
+                                  width={28}
+                                  height={39}
+                                  className="mini-tech"
+                                />
+                              ) : (
+                                (TECH_INFO[t.tech]?.name ?? t.tech)
+                              )}
+                            </span>
+                          ),
+                          color: TECH_COLOR[techKind(t.tech)],
+                          value: t.share,
+                          text: <b>{pct(t.share)}</b>,
+                          title: TECH_INFO[t.tech] ? `${TECH_INFO[t.tech]?.name}: ${TECH_INFO[t.tech]?.effect}` : undefined,
+                        }))}
+                      />
+                    </div>
+                  </div>
+                </Panel>
 
-            <Panel title="Probes, planets and cards" wide>
-              <div className="stat-tiles small">
-                <Tile
-                  icon={<ActionIcon name="launch" size={28} />}
-                  label="Probes launched"
-                  value={round(fm("probes.launched"))}
-                  spread={fsd("probes.launched")}
-                />
-                <Tile
-                  icon={<ActionIcon name="launch" size={28} />}
-                  label="Probes from effects"
-                  note="Launched without the launch action"
-                  value={round(fm("probes.launched.other"))}
-                  spread={fsd("probes.launched.other")}
-                />
-                <Tile
-                  icon={<ActionIcon name="orbit" size={28} />}
-                  label="Orbiters"
-                  value={round(fm("orbiters"))}
-                  spread={fsd("orbiters")}
-                />
-                <Tile
-                  icon={<ActionIcon name="orbit" size={28} />}
-                  label="Orbiters from effects"
-                  note="Placed without the orbit action"
-                  value={round(fm("orbits.other"))}
-                  spread={fsd("orbits.other")}
-                />
-                <Tile icon={<ActionIcon name="land" size={28} />} label="Landers" value={round(fm("landers"))} spread={fsd("landers")} />
-                <Tile
-                  icon={<ActionIcon name="land" size={28} />}
-                  label="Landers from effects"
-                  note="Placed without the land action"
-                  value={round(fm("lands.other"))}
-                  spread={fsd("lands.other")}
-                />
-                <Tile icon={<DisplayCardIcon size={26} />} label="Cards drawn" value={round(m("cards.drawn"))} spread={sd("cards.drawn")} />
-                <Tile icon={<DeckCardIcon size={26} />} label="Cards played" value={round(m("cards.played"))} spread={sd("cards.played")} />
-                <Tile
-                  icon={<MissionIcon size={30} />}
-                  label="Missions played"
-                  value={round(m("missions.played"))}
-                  spread={sd("missions.played")}
-                />
-                <Tile
-                  icon={<MissionIcon done size={30} />}
-                  label="Missions completed"
-                  value={round(m("missions.completed"))}
-                  spread={sd("missions.completed")}
-                />
-                <Tile
-                  icon={<MissionIcon done size={30} />}
-                  label="Mission completion rate"
-                  note="Missions completed out of missions played"
-                  value={m("missions.played") > 0 ? `${Math.round((m("missions.completed") / m("missions.played")) * 100)}%` : "–"}
-                />
-              </div>
-              {s.fresh.rows < s.rows ? (
-                <p className="muted small">
-                  Probes launched, orbiters, landers and the "from effects" numbers are counted over the {s.fresh.rows} of {s.rows} players
-                  whose games could be replayed with the current rules; the other games only have older figures.
-                </p>
-              ) : null}
-            </Panel>
-
-            <Panel title="Life traces" icon={<TraceIcon size={24} />} note="Traces marked per game, by color.">
-              <BarList
-                label="Life traces by color"
-                rows={TRACE_COLORS.map((c) => ({
-                  key: c,
-                  label: (
-                    <span className="icon-label">
-                      <span className="dot" style={{ background: TRACE_HEX[c] }} />
-                      {cap(c)}
-                    </span>
-                  ),
-                  value: m(`trace.${c}`),
-                  spread: sd(`trace.${c}`),
-                  text: <b>{round(m(`trace.${c}`))}</b>,
-                  color: TRACE_HEX[c],
-                }))}
-              />
-            </Panel>
-
-            <Panel
-              title="Cards tucked for income"
-              icon={<IncomeDot />}
-              note="Which kind of income the tucked cards were tucked for, per game."
-            >
-              <BarList
-                label="Cards tucked for income"
-                rows={tuckKinds.map((k) => ({
-                  key: k.key,
-                  label: (
-                    <span className="icon-label">
-                      {k.icon}
-                      {k.label}
-                    </span>
-                  ),
-                  value: m(`tucked.${k.key}`),
-                  spread: sd(`tucked.${k.key}`),
-                  text: <b>{round(m(`tucked.${k.key}`))}</b>,
-                }))}
-              />
-            </Panel>
-
-            <Panel
-              title="Income at the end of each round"
-              note="What the player's income was in that round. The expansion has no round 1."
-              wide
-              table={
-                <Table
-                  head={["Round", ...INCOME_KINDS.map(cap)]}
-                  rows={s.rounds.map((r) => [r, ...INCOME_KINDS.map((k) => round(m(`incomerate.r${r}.${k}`)))])}
-                />
-              }
-            >
-              <LineChart
-                label="Income of each kind at the end of each round"
-                xName="Round"
-                xs={s.rounds.map(String)}
-                series={INCOME_KINDS.map((k) => ({
-                  key: k,
-                  label: cap(k),
-                  color: INCOME_HEX[k] as string,
-                  icon: k === "credit" ? <CreditIcon size={18} /> : k === "energy" ? <EnergyIcon size={18} /> : <DeckCardIcon size={18} />,
-                  values: s.rounds.map((r) => m(`incomerate.r${r}.${k}`)),
-                  spreads: s.rounds.map((r) => sd(`incomerate.r${r}.${k}`) ?? { min: 0, max: 0, std: 0 }),
-                }))}
-              />
-            </Panel>
-
-            <Panel title="Data" icon={<DataIcon size={24} />} note="Data per game: what came in, and where it went.">
-              <BarList
-                label="Data gained and what it was used for"
-                rows={dataRows.map((r) => ({
-                  key: r.key,
-                  label: r.label,
-                  value: r.value,
-                  spread: r.spread,
-                  text: <b>{round(r.value)}</b>,
-                }))}
-              />
-            </Panel>
-
-            <Panel title="Sectors and signals" note="Per game, by the color of the sector." wide>
-              <div className="stat-two">
-                <div>
-                  <h3>Sectors won</h3>
-                  <BarList
-                    label="Sectors won by color"
-                    rows={SECTOR_COLORS.map((c) => ({
-                      key: c,
-                      label: (
-                        <span className="icon-label">
-                          <span className="dot" style={{ background: SECTOR_HEX[c] }} />
-                          {cap(c)}
-                        </span>
-                      ),
-                      value: m(`sectorwin.${c}`),
-                      spread: sd(`sectorwin.${c}`),
-                      text: <b>{round(m(`sectorwin.${c}`))}</b>,
-                      color: SECTOR_HEX[c],
-                      outline: c === "black",
-                    }))}
-                  />
-                </div>
-                <div>
-                  <h3>Signals marked</h3>
-                  <BarList
-                    label="Signals marked by color"
-                    rows={SECTOR_COLORS.map((c) => ({
-                      key: c,
-                      label: (
-                        <span className="icon-label">
-                          <span className="dot" style={{ background: SECTOR_HEX[c] }} />
-                          {cap(c)}
-                        </span>
-                      ),
-                      value: m(`signal.${c}`),
-                      spread: sd(`signal.${c}`),
-                      text: <b>{round(m(`signal.${c}`))}</b>,
-                      color: SECTOR_HEX[c],
-                      outline: c === "black",
-                    }))}
-                  />
-                </div>
-              </div>
-            </Panel>
-
-            <Panel
-              title="Tech"
-              wide
-              table={
-                <Table
-                  head={["Tech", "Researched in"]}
-                  rows={s.techs.map((t) => [TECH_INFO[t.tech]?.name ?? t.tech, `${pct(t.share)} of the games of a player`])}
-                />
-              }
-            >
-              <div className="stat-two">
-                <div>
-                  <h3>Researched per game</h3>
-                  <BarList
-                    label="Techs researched per game by category"
-                    rows={TECH_CATEGORIES.map((c, i) => ({
-                      key: c,
-                      label: cap(c),
-                      value: m(`techcat.${c}`),
-                      spread: sd(`techcat.${c}`),
-                      text: <b>{round(m(`techcat.${c}`))}</b>,
-                      color: TECH_COLOR[c],
-                    }))}
-                  />
-                  <h3>How they were researched</h3>
-                  <BarList
-                    label="Techs researched per game: by the research action or in another way"
-                    rows={[
-                      {
-                        key: "all",
-                        label: "In all",
-                        value: techTotal,
-                        spread: sdOf(techsOf),
-                        text: <b>{round(techTotal)}</b>,
-                      },
-                      {
-                        key: "manual",
-                        label: "Research action (6 publicity)",
-                        value: techManual,
-                        spread: sd("action.research"),
-                        text: <b>{round(techManual)}</b>,
-                      },
-                      {
-                        key: "other",
-                        label: "Other ways (cards, rewards, bonuses)",
-                        value: Math.max(0, techTotal - techManual),
-                        spread: sdOf((c) => Math.max(0, techsOf(c) - (c["action.research"] ?? 0))),
-                        text: <b>{round(Math.max(0, techTotal - techManual))}</b>,
-                      },
-                    ]}
-                  />
-                </div>
-                <div>
-                  <h3>Researched in x% of games</h3>
-                  <BarList
-                    label="Share of the players who researched each tech"
-                    max={1}
-                    rows={s.techs.map((t) => ({
-                      key: t.tech,
-                      label: (
-                        <span className="icon-label">
+                <Panel
+                  title="What the techs did"
+                  wide
+                  note="What each tech gave on average for the rest of the game after it was researched."
+                  table={
+                    <Table
+                      head={["Tech", "Researched", "What", "Average"]}
+                      rows={s.techUse.flatMap((t) =>
+                        t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean)]),
+                      )}
+                    />
+                  }
+                >
+                  <div className="techuse">
+                    {s.techUse
+                      .filter((t) => t.metrics.length > 0)
+                      .map((t) => (
+                        <div key={t.tech} className="techuse-card" style={{ borderLeftColor: TECH_COLOR[techKind(t.tech)] }}>
                           {TECH_FRONTS[t.tech] ? (
                             <img
                               src={TECH_FRONTS[t.tech]}
                               alt={TECH_INFO[t.tech]?.name ?? t.tech}
+                              title={`${TECH_INFO[t.tech]?.name ?? t.tech}: ${TECH_INFO[t.tech]?.effect ?? ""}`}
                               width={28}
                               height={39}
                               className="mini-tech"
                             />
-                          ) : (
-                            (TECH_INFO[t.tech]?.name ?? t.tech)
-                          )}
-                        </span>
-                      ),
-                      color: TECH_COLOR[techKind(t.tech)],
-                      value: t.share,
-                      text: <b>{pct(t.share)}</b>,
-                      title: TECH_INFO[t.tech] ? `${TECH_INFO[t.tech]?.name}: ${TECH_INFO[t.tech]?.effect}` : undefined,
-                    }))}
-                  />
-                </div>
-              </div>
-            </Panel>
-
-            <Panel
-              title="What the techs did"
-              wide
-              note="What each tech gave on average for the rest of the game after it was researched."
-              table={
-                <Table
-                  head={["Tech", "Researched", "What", "Average"]}
-                  rows={s.techUse.flatMap((t) =>
-                    t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean)]),
-                  )}
-                />
-              }
-            >
-              <div className="techuse">
-                {s.techUse
-                  .filter((t) => t.metrics.length > 0)
-                  .map((t) => (
-                    <div key={t.tech} className="techuse-card" style={{ borderLeftColor: TECH_COLOR[techKind(t.tech)] }}>
-                      {TECH_FRONTS[t.tech] ? (
-                        <img
-                          src={TECH_FRONTS[t.tech]}
-                          alt={TECH_INFO[t.tech]?.name ?? t.tech}
-                          title={`${TECH_INFO[t.tech]?.name ?? t.tech}: ${TECH_INFO[t.tech]?.effect ?? ""}`}
-                          width={28}
-                          height={39}
-                          className="mini-tech"
-                        />
-                      ) : null}
-                      <div>
-                        {t.players === 0 ? (
-                          <span className="muted small">not researched in these games yet</span>
-                        ) : (
-                          <>
-                            {t.metrics.map((m) => (
-                              <div key={m.key} className="techuse-line">
-                                <span>{m.label}:</span>{" "}
-                                <b>
-                                  <WithSpread spread={m.spread}>{round(m.mean)}</WithSpread>
-                                </b>
-                              </div>
-                            ))}
-                            <span className="muted small">
-                              researched {t.players} time{t.players === 1 ? "" : "s"}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </Panel>
-
-            <Panel
-              title="End-of-game scoring"
-              wide
-              table={
-                s.gold.length === 0 ? undefined : (
-                  <Table
-                    head={["Gold scoring tile (face)", "Times scored", "Average points each time"]}
-                    rows={s.gold.map((g) => [g.face, g.times, round(g.avgPoints)])}
-                  />
-                )
-              }
-            >
-              <div className="stat-tiles small">
-                <Tile
-                  icon={<DeckCardIcon size={26} />}
-                  label="End-of-game cards played"
-                  value={round(m("endcards.played"))}
-                  spread={sd("endcards.played")}
-                />
-                <Tile
-                  icon={<ScoreIcon size={28} />}
-                  label="Points from them"
-                  value={round(m("endcards.points"))}
-                  spread={sd("endcards.points")}
-                />
-              </div>
-              {s.gold.length > 0 ? (
-                <>
-                  <h3>Gold scoring tiles</h3>
+                          ) : null}
+                          <div>
+                            {t.players === 0 ? (
+                              <span className="muted small">not researched in these games yet</span>
+                            ) : (
+                              <>
+                                {t.metrics.map((m) => (
+                                  <div key={m.key} className="techuse-line">
+                                    <span>{m.label}:</span>{" "}
+                                    <b>
+                                      <WithSpread spread={m.spread}>{round(m.mean)}</WithSpread>
+                                    </b>
+                                  </div>
+                                ))}
+                                <span className="muted small">
+                                  researched {t.players} time{t.players === 1 ? "" : "s"}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </Panel>
+              </>
+            ) : null}
+            {tab === "aliens" ? (
+              <>
+                <Panel
+                  title="Alien species"
+                  note="The average final score of the players of the games that have the species, discovered or not."
+                  table={
+                    <Table
+                      head={["Species", "Games", "Average final score"]}
+                      rows={s.species.map((x) => [SPECIES_NAMES[x.species] ?? cap(x.species), x.games, round(x.avgScore)])}
+                    />
+                  }
+                >
                   <BarList
-                    label="Times each gold scoring tile was scored"
-                    rows={s.gold.map((g) => ({
-                      key: g.face,
+                    label="Average final score by alien species"
+                    rows={s.species.map((x) => ({
+                      key: x.species,
                       label: (
                         <span className="icon-label">
-                          {GOLD[g.face] ? (
-                            <span
-                              className="mini-gold"
-                              style={{ backgroundImage: `url(${GOLD[g.face]?.src})` }}
-                              role="img"
-                              aria-label={g.face}
-                            />
+                          {BOARDS[x.species] ? (
+                            <img src={BOARDS[x.species]} alt="" width={22} height={40} className="mini-board" />
                           ) : (
-                            g.face
+                            <Blank />
                           )}
+                          {SPECIES_NAMES[x.species] ?? cap(x.species)}
                         </span>
                       ),
-                      color: "var(--gold)",
-                      title: GOLD[g.face]?.per ? `${g.face}: ${GOLD[g.face]?.per}` : g.face,
-                      value: g.times,
+                      value: x.avgScore,
+                      spread: x.spread,
                       text: (
                         <>
-                          <b>{g.times}</b>
+                          <b>{round(x.avgScore)}</b>
                           <span className="muted small">
                             {" "}
-                            times · <WithSpread spread={g.spread}>{round(g.avgPoints)}</WithSpread> points each
+                            · {x.games} game{x.games === 1 ? "" : "s"}
                           </span>
                         </>
                       ),
                     }))}
                   />
-                </>
-              ) : null}
-            </Panel>
+                </Panel>
 
-            <h2 className="stat-section">The alien species in detail</h2>
-            <AlienStatsSection alien={s.alien} boards={BOARDS} />
+                <Panel title="Life traces" icon={<TraceIcon size={24} />} note="Traces marked per game, by color.">
+                  <BarList
+                    label="Life traces by color"
+                    rows={TRACE_COLORS.map((c) => ({
+                      key: c,
+                      label: (
+                        <span className="icon-label">
+                          <span className="dot" style={{ background: TRACE_HEX[c] }} />
+                          {cap(c)}
+                        </span>
+                      ),
+                      value: m(`trace.${c}`),
+                      spread: sd(`trace.${c}`),
+                      text: <b>{round(m(`trace.${c}`))}</b>,
+                      color: TRACE_HEX[c],
+                    }))}
+                  />
+                </Panel>
+
+                <h2 className="stat-section">The alien species in detail</h2>
+                <AlienStatsSection alien={s.alien} boards={BOARDS} />
+              </>
+            ) : null}
+            {tab === "planets" ? (
+              <>
+                <Panel title="Probes, planets and cards" wide>
+                  <div className="stat-tiles small">
+                    <Tile
+                      icon={<ActionIcon name="launch" size={28} />}
+                      label="Probes launched"
+                      value={round(fm("probes.launched"))}
+                      spread={fsd("probes.launched")}
+                    />
+                    <Tile
+                      icon={<ActionIcon name="launch" size={28} />}
+                      label="Probes from effects"
+                      note="Launched without the launch action"
+                      value={round(fm("probes.launched.other"))}
+                      spread={fsd("probes.launched.other")}
+                    />
+                    <Tile
+                      icon={<ActionIcon name="orbit" size={28} />}
+                      label="Orbiters"
+                      value={round(fm("orbiters"))}
+                      spread={fsd("orbiters")}
+                    />
+                    <Tile
+                      icon={<ActionIcon name="orbit" size={28} />}
+                      label="Orbiters from effects"
+                      note="Placed without the orbit action"
+                      value={round(fm("orbits.other"))}
+                      spread={fsd("orbits.other")}
+                    />
+                    <Tile
+                      icon={<ActionIcon name="land" size={28} />}
+                      label="Landers"
+                      value={round(fm("landers"))}
+                      spread={fsd("landers")}
+                    />
+                    <Tile
+                      icon={<ActionIcon name="land" size={28} />}
+                      label="Landers from effects"
+                      note="Placed without the land action"
+                      value={round(fm("lands.other"))}
+                      spread={fsd("lands.other")}
+                    />
+                    <Tile
+                      icon={<DisplayCardIcon size={26} />}
+                      label="Cards drawn"
+                      value={round(m("cards.drawn"))}
+                      spread={sd("cards.drawn")}
+                    />
+                    <Tile
+                      icon={<DeckCardIcon size={26} />}
+                      label="Cards played"
+                      value={round(m("cards.played"))}
+                      spread={sd("cards.played")}
+                    />
+                    <Tile
+                      icon={<MissionIcon size={30} />}
+                      label="Missions played"
+                      value={round(m("missions.played"))}
+                      spread={sd("missions.played")}
+                    />
+                    <Tile
+                      icon={<MissionIcon done size={30} />}
+                      label="Missions completed"
+                      value={round(m("missions.completed"))}
+                      spread={sd("missions.completed")}
+                    />
+                    <Tile
+                      icon={<MissionIcon done size={30} />}
+                      label="Mission completion rate"
+                      note="Missions completed out of missions played"
+                      value={m("missions.played") > 0 ? `${Math.round((m("missions.completed") / m("missions.played")) * 100)}%` : "–"}
+                    />
+                  </div>
+                  {s.fresh.rows < s.rows ? (
+                    <p className="muted small">
+                      Probes launched, orbiters, landers and the "from effects" numbers are counted over the {s.fresh.rows} of {s.rows}{" "}
+                      players whose games could be replayed with the current rules; the other games only have older figures.
+                    </p>
+                  ) : null}
+                </Panel>
+
+                <Panel title="Sectors and signals" note="Per game, by the color of the sector." wide>
+                  <div className="stat-two">
+                    <div>
+                      <h3>Sectors won</h3>
+                      <BarList
+                        label="Sectors won by color"
+                        rows={SECTOR_COLORS.map((c) => ({
+                          key: c,
+                          label: (
+                            <span className="icon-label">
+                              <span className="dot" style={{ background: SECTOR_HEX[c] }} />
+                              {cap(c)}
+                            </span>
+                          ),
+                          value: m(`sectorwin.${c}`),
+                          spread: sd(`sectorwin.${c}`),
+                          text: <b>{round(m(`sectorwin.${c}`))}</b>,
+                          color: SECTOR_HEX[c],
+                          outline: c === "black",
+                        }))}
+                      />
+                    </div>
+                    <div>
+                      <h3>Signals marked</h3>
+                      <BarList
+                        label="Signals marked by color"
+                        rows={SECTOR_COLORS.map((c) => ({
+                          key: c,
+                          label: (
+                            <span className="icon-label">
+                              <span className="dot" style={{ background: SECTOR_HEX[c] }} />
+                              {cap(c)}
+                            </span>
+                          ),
+                          value: m(`signal.${c}`),
+                          spread: sd(`signal.${c}`),
+                          text: <b>{round(m(`signal.${c}`))}</b>,
+                          color: SECTOR_HEX[c],
+                          outline: c === "black",
+                        }))}
+                      />
+                    </div>
+                  </div>
+                </Panel>
+              </>
+            ) : null}
+            {tab === "others" ? (
+              <>
+                <Panel title="Final scores" icon={<ScoreIcon size={24} />} note="How many players ended in each band of 25 points." wide>
+                  <Histogram values={s.scores} label="Number of players by final score" />
+                </Panel>
+
+                <Panel
+                  title="Cards played"
+                  note="Every card of the main deck and of the species that was played, with what happened to the players who played it."
+                  wide
+                >
+                  <CardStats cards={s.cards} rows={s.cardRows} rounds={s.rounds} />
+                </Panel>
+
+                <Panel title="Actions per game" note="How many times a player took each main action, on average.">
+                  <BarList
+                    label="Main actions per game"
+                    rows={actions.map((a) => ({
+                      key: a.key,
+                      label: (
+                        <span className="icon-label">
+                          {a.icon}
+                          {a.label}
+                        </span>
+                      ),
+                      value: m(`action.${a.key}`),
+                      spread: sd(`action.${a.key}`),
+                      text: <b>{round(m(`action.${a.key}`))}</b>,
+                    }))}
+                  />
+                </Panel>
+
+                <Panel
+                  title="End-of-game scoring"
+                  wide
+                  table={
+                    s.gold.length === 0 ? undefined : (
+                      <Table
+                        head={["Gold scoring tile (face)", "Times scored", "Average points each time"]}
+                        rows={s.gold.map((g) => [g.face, g.times, round(g.avgPoints)])}
+                      />
+                    )
+                  }
+                >
+                  <div className="stat-tiles small">
+                    <Tile
+                      icon={<DeckCardIcon size={26} />}
+                      label="End-of-game cards played"
+                      value={round(m("endcards.played"))}
+                      spread={sd("endcards.played")}
+                    />
+                    <Tile
+                      icon={<ScoreIcon size={28} />}
+                      label="Points from them"
+                      value={round(m("endcards.points"))}
+                      spread={sd("endcards.points")}
+                    />
+                  </div>
+                  {s.gold.length > 0 ? (
+                    <>
+                      <h3>Gold scoring tiles</h3>
+                      <BarList
+                        label="Times each gold scoring tile was scored"
+                        rows={s.gold.map((g) => ({
+                          key: g.face,
+                          label: (
+                            <span className="icon-label">
+                              {GOLD[g.face] ? (
+                                <span
+                                  className="mini-gold"
+                                  style={{ backgroundImage: `url(${GOLD[g.face]?.src})` }}
+                                  role="img"
+                                  aria-label={g.face}
+                                />
+                              ) : (
+                                g.face
+                              )}
+                            </span>
+                          ),
+                          color: "var(--gold)",
+                          title: GOLD[g.face]?.per ? `${g.face}: ${GOLD[g.face]?.per}` : g.face,
+                          value: g.times,
+                          text: (
+                            <>
+                              <b>{g.times}</b>
+                              <span className="muted small">
+                                {" "}
+                                times · <WithSpread spread={g.spread}>{round(g.avgPoints)}</WithSpread> points each
+                              </span>
+                            </>
+                          ),
+                        }))}
+                      />
+                    </>
+                  ) : null}
+                </Panel>
+              </>
+            ) : null}
           </div>
         </>
       )}

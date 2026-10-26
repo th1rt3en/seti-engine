@@ -149,6 +149,19 @@ export interface FreshStats {
 export const FRESH_VERSION = 2;
 /** The version of the statistics that counts the cards played by round and the parts of the final score. */
 export const CARDS_VERSION = 3;
+/** The version that counts what each resource was spent on and the quick start cards kept. */
+export const SPEND_VERSION = 4;
+
+/** What a quick start card did for the players who kept it (the counters `quick.<id>`, from version 4). */
+export interface QuickStat {
+  id: string;
+  players: number;
+  /** of the players of the games with organizations (version 4 rows that kept two quick start cards) */
+  share: number;
+  avgScore: number;
+  scoreSpread: Spread;
+  winRate: number;
+}
 
 /** One slice of a pie: where a resource came from (the mean per player, and how the players differ). */
 export interface Slice {
@@ -186,6 +199,10 @@ export interface AlienStats {
 export interface Stats {
   /** by resource: where it came from, in slices (the mean per player of each source) */
   gains: Record<string, Slice[]>;
+  /** by resource: what it was spent on, in slices (version 4 rows) */
+  spends: Record<string, Slice[]>;
+  /** the quick start cards that were kept (version 4 rows) */
+  quick: QuickStat[];
   /** the cards played, over the rows of version 3 */
   cards: CardStat[];
   /** the rows of version 3 (the cards and the parts of the final score are counted over them) */
@@ -318,6 +335,9 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   const v3 = rows.filter((r) => (r.counters["stats.version"] ?? 0) >= CARDS_VERSION);
   const gains = gainSlices(rows, v3);
   const cards = cardStats(v3);
+  const v4 = rows.filter((r) => (r.counters["stats.version"] ?? 0) >= SPEND_VERSION);
+  const spends = spendSlices(v4);
+  const quick = quickStats(v4);
 
   const techUse: TechUseStat[] = TECH_ORDER.map((tech) => {
     const owners = fresh.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0);
@@ -340,6 +360,8 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   for (const k of Object.keys(totals)) spread[k] = spreadOf(rows.map((r) => r.counters[k] ?? 0));
   return {
     gains,
+    spends,
+    quick,
     cards,
     cardRows: v3.length,
     games: new Set(rows.map((r) => r.gameId)).size,
@@ -457,4 +479,52 @@ function cardStats(v3: StatRow[]): CardStat[] {
       };
     })
     .sort((a, b) => b.plays - a.plays);
+}
+
+/** What each resource was spent on: the counters `spend.<what>.<resource>`, the mean per player of the rows that have them. */
+function spendSlices(v4: StatRow[]): Record<string, Slice[]> {
+  const out: Record<string, Slice[]> = {};
+  for (const res of GAIN_RESOURCES) {
+    const whats = new Set<string>();
+    for (const r of v4) {
+      for (const k of Object.keys(r.counters)) {
+        const m = /^spend\.([a-z_]+)\.([a-z]+)$/.exec(k);
+        if (m && m[2] === res) whats.add(m[1] as string);
+      }
+    }
+    out[res] = [...whats]
+      .map((what) => {
+        const values = v4.map((r) => r.counters[`spend.${what}.${res}`] ?? 0);
+        return { key: what, mean: values.length === 0 ? 0 : sum(values) / values.length, spread: spreadOf(values) };
+      })
+      .filter((x) => x.mean > 0)
+      .sort((a, b) => b.mean - a.mean);
+  }
+  return out;
+}
+
+/** The quick start cards that the players kept, by what those players scored and how often they won. */
+function quickStats(v4: StatRow[]): QuickStat[] {
+  const withCards = v4.filter((r) => Object.keys(r.counters).some((k) => k.startsWith("quick.")));
+  const byCard = new Map<string, StatRow[]>();
+  for (const r of withCards) {
+    for (const k of Object.keys(r.counters)) {
+      if (!k.startsWith("quick.")) continue;
+      const id = k.slice("quick.".length);
+      byCard.set(id, [...(byCard.get(id) ?? []), r]);
+    }
+  }
+  return [...byCard.entries()]
+    .map(([id, rs]) => {
+      const scores = rs.map((r) => r.score);
+      return {
+        id,
+        players: rs.length,
+        share: withCards.length === 0 ? 0 : rs.length / withCards.length,
+        avgScore: sum(scores) / scores.length,
+        scoreSpread: spreadOf(scores),
+        winRate: rs.filter((r) => r.won).length / rs.length,
+      };
+    })
+    .sort((a, b) => b.players - a.players || a.id.localeCompare(b.id));
 }

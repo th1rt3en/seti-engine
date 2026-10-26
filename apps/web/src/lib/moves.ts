@@ -25,7 +25,7 @@ const ORGS = organizations as unknown as Record<string, { name: string; number: 
 const QUICK = quickStart as unknown as Record<string, { marks: string; lower: { effect: string; n: number }[] }>;
 export const ORG_NAMES: Record<string, string> = Object.fromEntries(Object.entries(ORGS).map(([id, o]) => [id, o.name]));
 export const orgName = (id: unknown): string => ORGS[String(id)]?.name ?? String(id);
-const quickText = (id: unknown): string => {
+export const quickText = (id: unknown): string => {
   const q = QUICK[String(id)];
   if (!q) return String(id);
   const gains = q.lower.map((e) => `${e.n} ${e.effect === "score" ? "VP" : e.effect.replace("_", " ")}`).join(", ");

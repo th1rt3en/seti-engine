@@ -51,8 +51,48 @@ export const SOURCE_NAMES: Record<string, string> = {
   final_glyphs: "Glyph tokens left",
 };
 
+/** What a resource was spent on, as the engine names it (`spend.<what>.<resource>`: a `cost` scope, or the kind of a source that took something away). */
+export const SPEND_NAMES: Record<string, string> = {
+  launch: "Launching probes",
+  scan: "Scanning",
+  scan_mercury: "Signal in Mercury's sector",
+  scan_probe: "Launching a probe with the scan",
+  analyze: "Analyzing data",
+  research: "Researching techs",
+  orbit: "Orbiting",
+  land: "Landing",
+  play_card: "Playing cards",
+  buy_card: "Buying a card of the display",
+  trade: "Trading resources",
+  movement: "Turned into movement",
+  computer: "Placed in the computer",
+  corner_discard: "Cards discarded for their free corner",
+  tuck: "Cards tucked for income",
+  pass_discard: "Cards discarded down to four",
+  signal_discard: "Cards discarded for a signal",
+  move: "Other actions",
+};
+
 /** The color of each source in the pies: it follows the source, not its rank, so a source keeps its color from one pie to the next (the legend names every slice). */
 export const SOURCE_COLORS: Record<string, string> = {
+  // what was spent on (the same colors serve the other pies)
+  launch: "#3987e5",
+  scan: "#e0b04a",
+  scan_mercury: "#b09a7a",
+  scan_probe: "#6fd0e8",
+  analyze: "#9b7ede",
+  research: "#d55181",
+  orbit: "#4ec3b0",
+  land: "#d0a06a",
+  play_card: "#d95926",
+  buy_card: "#7fcf8a",
+  trade: "#8f7ae0",
+  movement: "#5fb8d6",
+  computer: "#199e70",
+  corner_discard: "#c98500",
+  tuck: "#e8c15a",
+  pass_discard: "#9aa0a6",
+  signal_discard: "#c27bd1",
   move: "#3987e5",
   card: "#d95926",
   income: "#199e70",

@@ -79,6 +79,27 @@ const MOVE_WORDS: Record<string, string> = {
   tuck: "Tucking a card",
 };
 
+/** What a cost paid for (trail.cost in the engine). */
+const COST_WORDS: Record<string, string> = {
+  launch: "Cost of launching a probe",
+  scan: "Cost of scanning",
+  scan_mercury: "Publicity paid for the signal in Mercury's sector",
+  scan_probe: "Energy paid to launch a probe with the scan",
+  analyze: "Cost of analyzing data",
+  research: "Cost of researching a tech",
+  orbit: "Cost of orbiting",
+  land: "Cost of landing",
+  play_card: "Cost of playing the card",
+  buy_card: "Publicity paid for a card of the display",
+  trade: "What was traded away",
+  movement: "Energy turned into movement",
+  computer: "Data placed in the computer",
+  corner_discard: "Card discarded for its free corner",
+  tuck: "Card tucked for income",
+  pass_discard: "Card discarded down to four",
+  signal_discard: "Card discarded for a signal",
+};
+
 /** The name of a player in the log, in the color of the player. */
 function Who({ seat, ctx, suffix = "" }: { seat: number; ctx: LogContext; suffix?: string }) {
   const color = useContext(PlayerColorsContext)[seat];
@@ -93,6 +114,8 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
       return MOVE_WORDS[action.type] ?? cap(action.type.replace(/_/g, " "));
     case "card":
       return `Playing ${cardName(src.card)}`;
+    case "cost":
+      return COST_WORDS[String(src.what)] ?? `Paying for ${String(src.what).replace(/_/g, " ")}`;
     case "corner":
       return `Free corner of ${cardName(src.card)}`;
     case "signal":

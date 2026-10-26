@@ -193,6 +193,29 @@ describe("statistics", () => {
     expect(pub).toEqual({ visit_comet: 1, visit_asteroid: 0.5, visit_planet: 0.5, move: 1 }); // 5 + 1 = 6 in all: 3 + 1 + 1 + ... per player 3
   });
 
+  it("what a resource was spent on, and the quick start cards that were kept (version 4 rows only)", () => {
+    const v = { "stats.version": 4 };
+    const rows = [
+      row({
+        gameId: "a",
+        score: 90,
+        won: true,
+        counters: { ...v, "spend.play_card.credit": 6, "spend.launch.credit": 2, "quick.SR.1": 1, "quick.SR.3": 1 },
+      }),
+      row({ gameId: "b", score: 70, won: false, counters: { ...v, "spend.play_card.credit": 2, "quick.SR.1": 1 } }),
+      row({ gameId: "c", score: 300, counters: { "spend.play_card.credit": 50 } }), // an older row: nothing was counted
+    ];
+    const a = aggregate(rows, any);
+    expect(a.spends.credit?.map((x) => [x.key, x.mean])).toEqual([
+      ["play_card", 4],
+      ["launch", 1],
+    ]);
+    const sr1 = a.quick.find((q) => q.id === "SR.1");
+    expect(sr1).toMatchObject({ players: 2, share: 1, winRate: 0.5 });
+    expect(sr1?.avgScore).toBe(80);
+    expect(a.quick.map((q) => q.id)).toEqual(["SR.1", "SR.3"]);
+  });
+
   it("the final score comes in parts (version 3 rows only)", () => {
     const rows = [
       row({ counters: { "stats.version": 3, "gain.card.vp": 10, "final.cards": 12, "final.gold": 8 } }),

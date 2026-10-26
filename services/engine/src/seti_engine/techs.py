@@ -96,7 +96,8 @@ def lower_moves(p: PlayerState) -> list[Action]:
 
 
 def place_lower(s: GameState, p: PlayerState, slot: int, events: Events) -> None:
-    p.data_pool -= 1
+    with trail.cost(s, "computer"):
+        p.data_pool -= 1
     p.computer_techs[slot].lower_filled = True
     tech = p.computer_techs[slot].tech
     lower = next(t["lower"] for t in tables.tech_board()["stacks"]["computer"] if tech_name("computer", t["glyph"]) == tech)
@@ -116,7 +117,8 @@ def can_analyze(p: PlayerState) -> bool:
 
 def analyze(s: GameState, p: PlayerState, events: Events) -> None:
     if not orgs.analyze_free(p):
-        effects.pay(p, energy=1)
+        with trail.cost(s, "analyze"):
+            effects.pay(p, energy=1)
     p.computer = [False] * 6  # ANALYZE-02: every data token in the computer, bottom row too
     for t in p.computer_techs.values():
         t.lower_filled = False
@@ -224,19 +226,22 @@ def resolve_scan(s: GameState, p: PlayerState, a: Action, events: Events) -> Non
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[cid]["sector"]}))
     elif t == "scan_hand_discard":
         s.scan_steps.remove("tt:branch")
-        p.hand.remove(a["card"])
-        s.discard.append(a["card"])
+        with trail.cost(s, "signal_discard"):
+            p.hand.remove(a["card"])
+            s.discard.append(a["card"])
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[a["card"]]["sector"]}))
     elif t == "scan_mercury":
         s.scan_steps.remove("tt:link")
-        effects.pay(p, publicity=1)
+        with trail.cost(s, "scan_mercury"):
+            effects.pay(p, publicity=1)
         pos = solar.find_cell(s, "PLANET:MERCURY")
         assert pos is not None
         rewards.mark_signal(s, p, pos[1], events)
     elif t == "scan_probe":
         s.scan_steps.remove("tt:cross")
         if a["mode"] == "launch":
-            effects.pay(p, energy=1)
+            with trail.cost(s, "scan_probe"):
+                effects.pay(p, energy=1)
             launch_probe(s, p, events)
         else:
             p.movement += 1  # the movement is free

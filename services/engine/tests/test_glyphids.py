@@ -309,11 +309,11 @@ def test_gains_of_a_move_are_listed_by_source() -> None:  # the log: what was ga
     me.hand = [cid]
     r = apply(s, {"type": "discard_free", "card": cid})
     gains = [e for e in r.events if e["type"] == "gains" and e["player"] == 0]
-    # the credit is the glyph's, the discarded card is the move's
+    # the credit is the glyph's, the discarded card is a cost of the move
     assert {"kind": "glyph", "glyph": "orange", "what": "icon"} in [g["source"] for g in gains]
     credit = next(g for g in gains if g["source"]["kind"] == "glyph")
     assert credit["changes"] == {"credit": 1}
-    assert next(g for g in gains if g["source"]["kind"] == "move")["changes"] == {"card": -1}
+    assert next(g for g in gains if g["source"]["kind"] == "cost")["changes"] == {"card": -1}
     # nothing is counted twice: the gains add up to the net change
     net = next(e for e in r.events if e["type"] == "delta" and e["player"] == 0)["changes"]
     total: dict[str, int] = {}

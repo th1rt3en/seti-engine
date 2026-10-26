@@ -100,13 +100,22 @@ def test_the_service_makes_the_same_statistics_from_the_options_and_the_actions(
 def test_the_cards_played_are_counted_by_round_and_the_final_score_by_part() -> None:
     options, actions = play(5, 3)
     s = stats.game_stats(file_of(options, actions))
-    assert s["version"] == 3
+    assert s["version"] == stats.VERSION
     for p in s["players"]:
         c = p["counters"]
         by_round = {k: v for k, v in c.items() if k.startswith("card.")}
         assert sum(by_round.values()) == c.get("cards.played", 0)  # every card played is in exactly one round
         assert all(int(k.rsplit(".r", 1)[1]) in range(1, 6) for k in by_round)
         assert c.get("final.board", 0) > 0  # the page adds the parts up: board + cards + gold + Exertian + glyphs - loss is the final score
+
+
+def test_what_each_resource_was_spent_on_is_counted() -> None:
+    options, actions = play(5, 3)
+    s = stats.game_stats(file_of(options, actions))
+    assert s["version"] == 4
+    keys = {k for p in s["players"] for k in p["counters"] if k.startswith("spend.")}
+    assert {"spend.scan.credit", "spend.play_card.credit", "spend.computer.data", "spend.trade.card"} <= keys
+    assert not [k for k in keys if k.endswith(".vp")]  # points are not spent
 
 
 def test_the_publicity_that_the_aliens_gave_is_counted_by_species() -> None:

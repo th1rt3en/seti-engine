@@ -538,7 +538,8 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     p = s.players[s.current_player]
     t = a["type"]
     if t == "launch":  # LAUNCH-01: pay 2 credits, place a probe on Earth; a main action
-        effects.pay(p, credits=2)
+        with trail.cost(s, "launch"):
+            effects.pay(p, credits=2)
         effects.launch_probe(s, p, events)
         s.main_done = True
     elif t == "play_card":
@@ -555,13 +556,15 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     elif t == "land":
         _land(s, p, a, events)
     elif t == "scan":  # SCAN-01, SCAN-02: pay, a signal in Earth's sector, then discard a row card for a second signal (SCAN-03)
-        effects.pay(p, credits=1, energy=2)
+        with trail.cost(s, "scan"):
+            effects.pay(p, credits=1, energy=2)
         s.main_done = True
         techs.start_scan(s, p)
         events.append({"type": "scan", "player": p.index})
         cards.fire(s, p, [{"e": "scan"}], events)  # FAQ-C101
     elif t == "research":  # TECHACT-01, TECHACT-02: pay 6 publicity, rotate, then take the tech
-        effects.pay(p, publicity=orgs.research_cost(p, techs.RESEARCH_COST))  # EXP-ORG-13: Fenwick needs 5
+        with trail.cost(s, "research"):
+            effects.pay(p, publicity=orgs.research_cost(p, techs.RESEARCH_COST))  # EXP-ORG-13: Fenwick needs 5
         s.main_done = True
         _rotate(s, events)
         techs.take_tech(s, p, a["stack"], events)
@@ -583,7 +586,8 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
     elif t == "end_turn":
         s.stage = "turn_end"
     elif t == "move_energy":
-        p.energy -= 1
+        with trail.cost(s, "movement"):  # 1 energy for 1 movement (the movement itself is not a gain that the statistics count)
+            p.energy -= 1
         p.movement += 1
     elif t == "move_probe":
         probe = next(pr for pr in s.probes if pr.id == a["probe"])
@@ -601,17 +605,19 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         events.append({"type": "move", "player": p.index, "probe": probe.id, "to": a["to"]})
         cards.on_move(s, p, old_ring, probe.ring, cell, events)
     elif t == "buy_card":
-        effects.pay(p, publicity=3)
+        with trail.cost(s, "buy_card"):
+            effects.pay(p, publicity=3)
         effects.take_from_row_or_deck(s, p, a["source"], events)
     elif t == "exchange":  # RES-06
-        if a["give"] == "card":
-            for cid in a["cards"]:
-                p.hand.remove(cid)
-                s.discard.append(cid)
-        elif a["give"] == "credit":
-            p.credits -= 2
-        else:
-            p.energy -= 2
+        with trail.cost(s, "trade"):
+            if a["give"] == "card":
+                for cid in a["cards"]:
+                    p.hand.remove(cid)
+                    s.discard.append(cid)
+            elif a["give"] == "credit":
+                p.credits -= 2
+            else:
+                p.energy -= 2
         if a["get"] == "card":
             effects.take_from_row_or_deck(s, p, a["source"], events)
         elif a["get"] == "credit":
@@ -619,8 +625,9 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         else:
             p.energy += 1
     elif t == "discard_free":
-        p.hand.remove(a["card"])
-        s.discard.append(a["card"])
+        with trail.cost(s, "corner_discard"):
+            p.hand.remove(a["card"])
+            s.discard.append(a["card"])
         with trail.scope(s, {"kind": "corner", "card": a["card"]}):
             cards.gain_corner(s, p, a["card"], events)
         corners = {k for k, _ in tables.cards()[a["card"]]["free"] if k in ("publicity", "data", "move")}
@@ -650,15 +657,18 @@ def _org_main(s: GameState, p: PlayerState, a: Action, events: list[dict[str, An
         return
     p.org_data["tiles"][a["tile"]] = False
     if a["tile"] == "launch":
-        effects.pay(p, credits=1)
+        with trail.cost(s, "launch"):
+            effects.pay(p, credits=1)
         effects.launch_probe(s, p, events)
     elif a["tile"] == "scan":
-        effects.pay(p, energy=2)
+        with trail.cost(s, "scan"):
+            effects.pay(p, energy=2)
         techs.start_scan(s, p)
         events.append({"type": "scan", "player": p.index})
         cards.fire(s, p, [{"e": "scan"}], events)
     else:
-        effects.pay(p, publicity=4)  # A-037: a tech of any type; the disc rotates as in a normal research (owner, 2026-10-22)
+        with trail.cost(s, "research"):
+            effects.pay(p, publicity=4)  # A-037: a tech of any type; the disc rotates as in a normal research (owner, 2026-10-22)
         _rotate(s, events)  # TECHACT-02
         techs.take_tech(s, p, a["stack"], events)
         cards.fire(s, p, [{"e": "tech", "cat": s.tech_stacks[a["stack"]].category}], events)
@@ -680,7 +690,8 @@ def _orbit(s: GameState, p: PlayerState, a: Action, events: Events, free: bool =
     assert planet is not None
     data = tables.planet_info(planet)
     if not free:
-        effects.pay(p, credits=1, energy=1)
+        with trail.cost(s, "orbit"):
+            effects.pay(p, credits=1, energy=1)
         s.main_done = True
     s.probes.remove(probe)  # ORBIT-02: no longer counts against the probe limit
     st = s.planets[planet]
@@ -718,7 +729,8 @@ def _land(s: GameState, p: PlayerState, a: Action, events: Events, free: bool = 
     assert planet is not None
     data = tables.planet_info(planet)
     if not free:
-        effects.pay(p, energy=land_cost(s, p, planet))
+        with trail.cost(s, "land"):
+            effects.pay(p, energy=land_cost(s, p, planet))
         s.main_done = True
     s.probes.remove(probe)
     st = s.planets[planet]
@@ -768,7 +780,8 @@ def _take_land_data(s: GameState, p: PlayerState, planet: str, slot: int) -> Non
 
 def _place_data(s: GameState, p: PlayerState, events: list[dict[str, Any]]) -> None:
     """FREE-03/FREE-04: move one data from the pool to the leftmost empty top-row space and resolve that space at once."""
-    p.data_pool -= 1
+    with trail.cost(s, "computer"):  # the data goes from the pool to the computer
+        p.data_pool -= 1
     pos = p.computer.index(False)
     p.computer[pos] = True
     if pos == COMPUTER_PUBLICITY_POS:
@@ -824,8 +837,9 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif t == "skip_tuck":
         pass
     elif t == "discard":
-        p.hand.remove(a["card"])
-        s.discard.append(a["card"])
+        with trail.cost(s, "pass_discard"):
+            p.hand.remove(a["card"])
+            s.discard.append(a["card"])
         if len(p.hand) > 4:
             s.pending.insert(0, Decision(kind="discard_to_four", player=p.index))
     elif t == "take_round_card":

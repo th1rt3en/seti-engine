@@ -49,11 +49,12 @@ def play(s: GameState, p: PlayerState, cid: str, events: Events, free: bool = Fa
     """PLAY-01: pay the cost, then resolve the effect. The card goes to the discard pile afterwards unless it stays (PLAY-02). `free` is
     Futurespan Institute's prepared card (EXP-ORG-12)."""
     cost = 0 if free else card_cost(cid)
-    if pays_energy(cid):
-        effects.pay(p, energy=cost)
-    else:
-        effects.pay(p, credits=cost)
-    p.hand.remove(cid)
+    with trail.cost(s, "play_card"):  # the cost, and the card leaving the hand
+        if pays_energy(cid):
+            effects.pay(p, energy=cost)
+        else:
+            effects.pay(p, credits=cost)
+        p.hand.remove(cid)
     s.playing = cid
     s.action_sectors = []
     s.play_return = False
@@ -824,8 +825,9 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         s.discard.append(cid)
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[cid]["sector"]}))
     elif t == "hand_signal":
-        p.hand.remove(a["card"])
-        s.discard.append(a["card"])
+        with trail.cost(s, "signal_discard"):
+            p.hand.remove(a["card"])
+            s.discard.append(a["card"])
         s.pending.append(Decision(kind="signal", player=p.index, data={"color": tables.cards()[a["card"]]["sector"]}))
         if d.data["left"] > 1:
             of = d.data.get("of", d.data["left"])

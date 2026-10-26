@@ -29,11 +29,22 @@ Publicity from moving a probe is split by what the probe moved onto: **a comet**
 Points have four more slices that are not gains but parts of the final score: **end-of-game cards**, **gold scoring tiles**, **Exertian cards**, **glyph tokens left**
 (the Exertian danger loss is taken off the total and is not a slice). They come from the rows of version 3 of the statistics.
 
-Not tracked as a source (say if one is missing): points of the gold milestones before the end (they are only marked; the tile scores at the end), resources
-spent or lost (only gains are counted), exofossils, signal tokens, movement.
+Not tracked as a source (say if one is missing): points of the gold milestones before the end (they are only marked; the tile scores at the end), exofossils,
+signal tokens, movement (what resources were spent on is below).
 
 ## Cards
 
 Version 3 of the statistics counts, for each player, every card played as a main action by the round it was played in (`card.<id>.r<round>`); the page joins
 that with the final score, the win and the organization of the player's row. Exertian cards (played face down at milestones) are not part of it. The rows of
 games that ended before version 3 have no cards until their statistics are made again: `python tools/engine/backfill_stats.py --all` (see its header).
+
+## What resources were spent on (version 4)
+
+The costs are recorded apart (`trail.cost` in the engine, the source kind `cost`) so that they do not cancel what an effect gives: the pies of what was spent
+have these slices. Credits: launching probes, scanning, orbiting, playing cards, trading resources. Energy: scanning, orbiting, landing, analyzing, a probe
+launched by the scan, turned into movement, trading. Publicity: researching techs, buying a card of the display, the signal in Mercury's sector. Data: placed in
+the computer. Cards: played, tucked for income, discarded for their free corner, discarded for a signal, discarded down to four at the pass, traded.
+Points are not spent. Not counted yet (it falls under the source around it, or nowhere): costs paid inside a card's own effect (an optional cost), the
+Exertian cards' cost, the organizations' costs, and exofossils spent.
+
+The quick start cards that a player kept are counted as `quick.<id>` (the Organization & Quickstart tab).
