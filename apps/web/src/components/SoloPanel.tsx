@@ -170,13 +170,11 @@ function Rival({ view }: { view: View }) {
         </div>
         <div className="rcgroup">
           <h4>Action deck</h4>
-          <figure
+          <button
+            type="button"
             className="rcard rcpile rcpeek"
-            role="button"
-            tabIndex={0}
             title={`${view.counts.rival_deck} cards left in the rival's deck: click to see which`}
             onClick={() => openRivalDeck()}
-            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && openRivalDeck()}
           >
             <img
               src={RIVAL_CARDS.back as string}
@@ -184,8 +182,8 @@ function Rival({ view }: { view: View }) {
               width={330}
               height={367}
             />
-            <figcaption className="rccount">{view.counts.rival_deck}</figcaption>
-          </figure>
+            <span className="rccount">{view.counts.rival_deck}</span>
+          </button>
           <p className="muted small">Click the deck to see the cards that are left.</p>
         </div>
       </div>

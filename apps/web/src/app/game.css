@@ -1024,7 +1024,12 @@ button:disabled {
   border: 1px solid #fff;
   border-radius: 999px;
 }
-.rcard figcaption.rccount {
+.rcard figcaption.rccount,
+.rcard span.rccount {
+  position: absolute;
+  background: rgba(8, 12, 26, 0.85);
+  font-weight: 800;
+  border-radius: 6px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -3673,6 +3678,12 @@ html:has(.setupchoice) .hand {
   background: rgba(255, 255, 255, 0.14);
 }
 .rcpeek {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
 }
 .rcpeek:hover img,

@@ -42,8 +42,8 @@ export function RivalDeckPanel({ view }: { view: View }) {
       <div className="offercards">
         {rival.deck.length === 0 ? <span className="muted">No card is left: the rival passes.</span> : null}
         {rival.deck.map((id, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: the unseen cards are all alike; the order of the list is the identity
           <figure
+            // biome-ignore lint/suspicious/noArrayIndexKey: the unseen cards are all alike; the order of the list is the identity
             key={`${id}-${i}`}
             className="rcard"
             title={id === "?" ? "An advanced action card that has not been played yet" : `Card ${id}`}
