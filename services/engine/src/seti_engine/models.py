@@ -273,6 +273,7 @@ class GameState(BaseModel):
     first_pass_done: bool = False  # this round
     oumuamua_placed: bool = False
     neutral_quick: list[str] = Field(default_factory=list)  # the quick start cards revealed for the neutral pieces (EXP-QS-03)
+    neutral_quick_logged: bool = False  # the log has told what the neutral cards marked (once)
     pluto_owner: int | None = None  # the player who played the promo card SE EN 01: only they can orbit or land at Pluto (PROMO-02)
     probes: list[Probe] = Field(default_factory=list)
     planets: dict[str, PlanetState] = Field(default_factory=dict)

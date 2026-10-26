@@ -310,6 +310,11 @@
           "title": "Neutral Quick",
           "type": "array"
         },
+        "neutral_quick_logged": {
+          "default": false,
+          "title": "Neutral Quick Logged",
+          "type": "boolean"
+        },
         "objectives": {
           "anyOf": [
             {
@@ -614,6 +619,7 @@
         "main_done",
         "neutral_markers",
         "neutral_quick",
+        "neutral_quick_logged",
         "objectives",
         "options",
         "oumuamua_placed",

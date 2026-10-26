@@ -342,6 +342,10 @@ function eventLine(ev: GameEvent, ctx: LogContext, action?: LogEntry["action"]):
       return `${who} shows ${cardName(ev.card)} from their hand`;
     case "mission_completed":
       return `${who} completes a mission`;
+    case "neutral_quick": {
+      const marks = Array.isArray(ev.marks) ? (ev.marks as string[]) : [];
+      return `Neutral quick start card ${String(ev.card)}: the neutral pieces mark ${marks.length > 0 ? marks.join(", ") : "nothing"}`;
+    }
     case "neutral_marker":
       return `a neutral marker blocks a discovery space (${String(ev.milestone)} points)`;
     case "round":

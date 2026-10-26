@@ -272,6 +272,7 @@ def start(s: GameState, p: PlayerState, events: Events) -> None:
     resolution that needs a choice is put in front of the player's own tuck."""
     assert p.organization is not None
     org = by_id(p.organization)
+    announce_neutral(s, events)
     for cid in p.quick_start:
         place_marks(s, p, cid)  # EXP-QS-01: no benefits
     with trail.scope(s, {"kind": "organization", "org": p.organization}):  # the log shows the organization apart from each quick start card
@@ -330,6 +331,28 @@ def place_marks(s: GameState, p: PlayerState | None, cid: str) -> None:
                 slot.overflow_kinds.append(m["trace"])
             if p is not None:
                 p.trace_log.append((m["alienIndex"] - 1, m["trace"]))
+
+
+def describe_marks(cid: str) -> list[str]:
+    """EXP-QS-01, EXP-QS-03: what the top half of a quick start card marks, in words, for the log."""
+    out: list[str] = []
+    for m in tables.quick_start_cards()[cid]["marks"]:
+        if "starName" in m:
+            n = int(m["count"])
+            out.append(f"{n} signal{'' if n == 1 else 's'} in the sector of {STAR_NAMES[m['starName']]}")
+        elif "planet" in m:
+            out.append(f"an orbiter at {str(m['planet']).capitalize()}")
+        elif "trace" in m:
+            out.append(f"a {m['trace']} trace on the discovery space of species {int(m['alienIndex'])}")
+    return out
+
+
+def announce_neutral(s: GameState, events: Events) -> None:
+    """EXP-QS-03: when the first start is resolved, one line for each quick start card of the neutral pieces (marked at the deal)."""
+    if s.neutral_quick and not s.neutral_quick_logged:
+        s.neutral_quick_logged = True
+        for cid in s.neutral_quick:
+            events.append({"type": "neutral_quick", "card": cid, "marks": describe_marks(cid)})
 
 
 def lower(s: GameState, p: PlayerState, cid: str) -> None:

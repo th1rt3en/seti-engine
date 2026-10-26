@@ -1,6 +1,7 @@
 """The Space Agencies organization module: EXP-01, EXP-SIG-01, EXP-ORG-02 to EXP-ORG-10, EXP-QS-01 to EXP-QS-04, A-031, A-036."""
 
 import random
+from typing import Any
 
 import pytest
 
@@ -154,6 +155,21 @@ def test_neutral_quick_start_cards() -> None:  # EXP-QS-03, EXP-QS-04
     assert len(s.neutral_quick) == 4
     assert all(q not in p.offered_quick for q in s.neutral_quick for p in s.players)
     assert all(p.score <= 2 for p in s.players)  # no benefit for the neutral pieces
+
+
+def test_the_neutral_quick_start_cards_have_their_own_log_lines() -> None:  # EXP-QS-03
+    s = new(2, neutral_quick_start=True)
+    p = s.players[0]
+    events: list[dict[str, Any]] = []
+    p.organization, p.quick_start = "orbital_dynamics", ["SR.3"]
+    orgs.start(s, p, events)
+    lines = [e for e in events if e["type"] == "neutral_quick"]
+    assert [e["card"] for e in lines] == s.neutral_quick
+    assert s.neutral_quick_logged
+    again: list[dict[str, Any]] = []
+    s.players[1].organization, s.players[1].quick_start = "orbital_dynamics", ["SR.4"]
+    orgs.start(s, s.players[1], again)  # told once
+    assert not [e for e in again if e["type"] == "neutral_quick"]
 
 
 def test_income_replaces_the_income_card_and_resets_the_ability() -> None:  # EXP-ORG-08, EXP-ORG-10, A-031

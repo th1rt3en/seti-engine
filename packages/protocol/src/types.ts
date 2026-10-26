@@ -24,6 +24,7 @@ export type LastTraceKind = string;
 export type Log = string[];
 export type MainDone = boolean;
 export type NeutralQuick = string[];
+export type NeutralQuickLogged = boolean;
 export type LongTerm = string[];
 export type Pile = string[];
 export type Row = string[];
@@ -290,6 +291,7 @@ export interface GameState {
   main_done: MainDone;
   neutral_markers: NeutralMarkers;
   neutral_quick: NeutralQuick;
+  neutral_quick_logged: NeutralQuickLogged;
   objectives: ObjectiveState | null;
   options: Options;
   oumuamua_placed: OumuamuaPlaced;
