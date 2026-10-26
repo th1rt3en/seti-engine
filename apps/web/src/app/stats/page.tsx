@@ -20,6 +20,7 @@ import { MultiChoice } from "@/components/MultiChoice";
 import { OrgName } from "@/components/OrgName";
 import { QuickStats } from "@/components/QuickStats";
 import { ResourcePies } from "@/components/ResourcePies";
+import { KindIcon } from "@/components/Reward";
 import { BarList, Histogram, LineChart, Panel, Pills, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
@@ -54,11 +55,11 @@ const TECH_FRONTS = assets.techFronts as Record<string, string>;
 const GOLD = assets.gold as Record<string, { src: string; per?: string }>;
 const SECTOR_COLORS = ["red", "yellow", "blue", "black"];
 const TRACE_COLORS = ["pink", "yellow", "blue"];
-const INCOME_KINDS = ["credit", "energy", "card"];
+const INCOME_KINDS = ["credit", "energy", "card", "publicity", "data"];
 // the colours of the things in the game (the same on every chart); `black` is a grey with a light edge, as it is dark on the dark page
 const SECTOR_HEX: Record<string, string> = { red: "#d9503c", yellow: "#e0b000", blue: "#3b82d6", black: "#4a515c" };
 const TRACE_HEX: Record<string, string> = { pink: "#d55181", yellow: "#c98500", blue: "#3987e5" };
-const INCOME_HEX: Record<string, string> = { credit: "#c98500", energy: "#199e70", card: "#3987e5" };
+const INCOME_HEX: Record<string, string> = { credit: "#c98500", energy: "#199e70", card: "#3987e5", publicity: "#d55181", data: "#8f7ae0" };
 const VIZ = ["var(--viz-1)", "var(--viz-2)", "var(--viz-3)", "var(--viz-4)", "var(--viz-5)"];
 
 /** One of the three bars of an organization: the name of the number, the bar, and the number. */
@@ -207,16 +208,6 @@ export default async function StatsPage({
   const techsOf = (c: Record<string, number>): number => TECH_CATEGORIES.reduce((n, k) => n + (c[`techcat.${k}`] ?? 0), 0);
   const techTotal = TECH_CATEGORIES.reduce((n, k) => n + m(`techcat.${k}`), 0);
   const techManual = m("action.research");
-  const dataRows = [
-    { key: "gained", label: "Gained", value: m("data.gained"), spread: sd("data.gained") },
-    { key: "computer", label: "Placed in the computer", value: m("data.computer"), spread: sd("data.computer") },
-    {
-      key: "other",
-      label: "Used in other ways",
-      value: Math.max(0, m("data.lost") - m("data.computer")),
-      spread: sdOf((c) => Math.max(0, (c["data.lost"] ?? 0) - (c["data.computer"] ?? 0))),
-    },
-  ];
   const tuckKinds = [
     { key: "credit", label: "Credit", icon: <CreditIcon size={20} /> },
     { key: "energy", label: "Energy", icon: <EnergyIcon size={20} /> },
@@ -349,10 +340,31 @@ export default async function StatsPage({
                 <ResourcePies gains={s.gains} spends={s.spends} />
 
                 <Panel
-                  title="Cards tucked for income"
-                  icon={<IncomeDot />}
-                  note="Which kind of income the tucked cards were tucked for, per game."
+                  title="Income"
+                  note="The income of a player at the end of each round (the expansion has no round 1), and which kind of income the cards tucked for it were tucked for, per game."
+                  wide
+                  table={
+                    <Table
+                      head={["Round", ...INCOME_KINDS.map(cap)]}
+                      rows={s.rounds.map((r) => [r, ...INCOME_KINDS.map((k) => round(m(`incomerate.r${r}.${k}`)))])}
+                    />
+                  }
                 >
+                  <h3>Income at the end of each round</h3>
+                  <LineChart
+                    label="Income of each kind at the end of each round"
+                    xName="Round"
+                    xs={s.rounds.map(String)}
+                    series={INCOME_KINDS.map((k) => ({
+                      key: k,
+                      label: cap(k),
+                      color: INCOME_HEX[k] as string,
+                      icon: <KindIcon kind={k} size={18} />,
+                      values: s.rounds.map((r) => m(`incomerate.r${r}.${k}`)),
+                      spreads: s.rounds.map((r) => sd(`incomerate.r${r}.${k}`) ?? { min: 0, max: 0, std: 0 }),
+                    }))}
+                  />
+                  <h3>Cards tucked for income</h3>
                   <BarList
                     label="Cards tucked for income"
                     rows={tuckKinds.map((k) => ({
@@ -366,46 +378,6 @@ export default async function StatsPage({
                       value: m(`tucked.${k.key}`),
                       spread: sd(`tucked.${k.key}`),
                       text: <b>{round(m(`tucked.${k.key}`))}</b>,
-                    }))}
-                  />
-                </Panel>
-
-                <Panel
-                  title="Income at the end of each round"
-                  note="What the player's income was in that round. The expansion has no round 1."
-                  wide
-                  table={
-                    <Table
-                      head={["Round", ...INCOME_KINDS.map(cap)]}
-                      rows={s.rounds.map((r) => [r, ...INCOME_KINDS.map((k) => round(m(`incomerate.r${r}.${k}`)))])}
-                    />
-                  }
-                >
-                  <LineChart
-                    label="Income of each kind at the end of each round"
-                    xName="Round"
-                    xs={s.rounds.map(String)}
-                    series={INCOME_KINDS.map((k) => ({
-                      key: k,
-                      label: cap(k),
-                      color: INCOME_HEX[k] as string,
-                      icon:
-                        k === "credit" ? <CreditIcon size={18} /> : k === "energy" ? <EnergyIcon size={18} /> : <DeckCardIcon size={18} />,
-                      values: s.rounds.map((r) => m(`incomerate.r${r}.${k}`)),
-                      spreads: s.rounds.map((r) => sd(`incomerate.r${r}.${k}`) ?? { min: 0, max: 0, std: 0 }),
-                    }))}
-                  />
-                </Panel>
-
-                <Panel title="Data" icon={<DataIcon size={24} />} note="Data per game: what came in, and where it went.">
-                  <BarList
-                    label="Data gained and what it was used for"
-                    rows={dataRows.map((r) => ({
-                      key: r.key,
-                      label: r.label,
-                      value: r.value,
-                      spread: r.spread,
-                      text: <b>{round(r.value)}</b>,
                     }))}
                   />
                 </Panel>
@@ -953,10 +925,4 @@ export default async function StatsPage({
       )}
     </div>
   );
-}
-
-/** The mark of an income: the printed income icon. */
-function IncomeDot() {
-  const src = (assets.printedIcons as Record<string, string>).income;
-  return src ? <img src={src} alt="" width={24} height={24} className="resicon" /> : null;
 }

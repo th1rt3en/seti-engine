@@ -1,3 +1,4 @@
+import { glyphToken } from "@/lib/glyphids";
 // Gains and costs as small icons with a number: the log shows what a move gave and took, and the confirmation of a move shows what it costs and
 // what it gives. The kinds are the engine's ("vp", "credit", "energy", "publicity", "data", "card", ...).
 import type { ReactNode } from "react";
@@ -17,6 +18,12 @@ import {
   TraceIcon,
 } from "./Icons";
 
+/** A glyph token of the Glyphids: the icon of the resource. */
+function GlyphTokenIcon({ size }: { size: number }) {
+  const src = glyphToken("orange");
+  return src ? <img src={src} alt="glyph token" width={size} height={size} /> : <span className="muted small">token</span>;
+}
+
 const ICONS: Record<string, (size: number) => ReactNode> = {
   vp: (s) => <ScoreIcon size={s} />,
   credit: (s) => <CreditIcon size={s} />,
@@ -32,6 +39,7 @@ const ICONS: Record<string, (size: number) => ReactNode> = {
   trace: (s) => <TraceIcon size={s} />,
   signal_token: (s) => <SignalTokenIcon size={s} />,
   move: (s) => <MoveIcon size={s} />,
+  token: (s) => <GlyphTokenIcon size={s} />,
 };
 
 const NAMES: Record<string, string> = {
@@ -49,6 +57,7 @@ const NAMES: Record<string, string> = {
   trace: "trace",
   signal_token: "signal token",
   move: "movement",
+  token: "glyph token",
 };
 
 /** Only the icon of a kind of resource (credit, energy, card ...), or its name when it has none. */

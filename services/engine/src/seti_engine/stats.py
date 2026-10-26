@@ -21,10 +21,14 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # 4: what each resource was spent on (`spend.<what>.<resource>`, the `cost` scopes of the trail), the quick start cards kept (`quick.<id>`)
 # 5: the costs inside card effects, of Exertian cards and of organizations, and the exofossils (gained and spent) are counted too
 # 6: the resource of a tucked card is income (`gain.income`), and what the actions gave is told by action (`gainmove.<action>.<resource>`)
-VERSION = 6
+# 7: the movement spent is told by what it moved into (`spend.move_<planet|asteroid|comet|earth|empty|capsule>.move`), the movement lost
+# at the
+# end of the turn, the exofossils left over (`spend.leftover.exofossil`), the glyph tokens as a resource (`gain.<source>.token`,
+# `spend.decipher.token`), and the publicity and data income of each round (`incomerate.r<round>.publicity|data`)
+VERSION = 7
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
-RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil")
+RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil", "token")
 # the sources of a gain that belong to one species (the others name it: {"kind": "alien", "species": ..., "what": ...})
 ALIEN_SOURCES = {"explore": "arkhos", "glyph": "glyphids", "anomaly": "anomalies"}
 
@@ -215,6 +219,10 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                     for kind, amount in projection.tracker(before, p).income.items():
                         if kind in ("credit", "energy", "card"):
                             counts[p.index][f"incomerate.r{rnd}.{kind}"] = amount
+                    for kind in ("publicity", "data"):  # no base income: only the cards tucked for it
+                        n = sum(1 for c in p.tucked if tables.cards()[c]["income"] == kind)
+                        if n > 0:
+                            counts[p.index][f"incomerate.r{rnd}.{kind}"] = n
         if seat in counts:
             kind = action.get("type")
             if kind in MAIN_ACTIONS:
@@ -310,6 +318,8 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             c[f"tech.{tech}"] += 1
             c[f"techcat.{tech.split('-')[0]}"] += 1
         c["missions.done_end"] = len(p.completed_missions)
+        if p.exofossils > 0:
+            c["spend.leftover.exofossil"] = p.exofossils  # wasted: the exofossils that are left at the end of the game
         for cid in p.quick_start:  # the quick start cards that the player kept (Space Agencies)
             c[f"quick.{cid}"] = 1
         alien_end(c, end, p)

@@ -1,5 +1,5 @@
 // The resources that the statistics follow, with the color of each (the color of its icon): the slices of the pies that are made of resources take them.
-export const GAIN_RESOURCES = ["credit", "energy", "card", "data", "publicity", "vp", "move", "exofossil"] as const;
+export const GAIN_RESOURCES = ["credit", "energy", "card", "data", "publicity", "vp", "move", "exofossil", "token"] as const;
 export type GainResource = (typeof GAIN_RESOURCES)[number];
 
 export const RESOURCE_NAMES: Record<string, string> = {
@@ -11,6 +11,7 @@ export const RESOURCE_NAMES: Record<string, string> = {
   vp: "Points",
   move: "Movement",
   exofossil: "Exofossils",
+  token: "Glyph tokens",
 };
 
 export const RESOURCE_COLORS: Record<string, string> = {
@@ -22,6 +23,7 @@ export const RESOURCE_COLORS: Record<string, string> = {
   vp: "#2fa56b",
   move: "#b58be0",
   exofossil: "#a46ed8",
+  token: "#e08a3c",
 };
 
 /** What a source of a gain is, as the engine names it (the kind of the scope that was open when the resource was gained, engine/trail.py). */
@@ -115,6 +117,15 @@ export const SPEND_NAMES: Record<string, string> = {
   pass_discard: "Cards discarded down to four",
   signal_discard: "Cards discarded for a signal",
   move: "Other actions",
+  decipher: "Placed on the translation board",
+  leftover: "Left over at the end of the game (wasted)",
+  move_planet: "Moving into planets",
+  move_asteroid: "Moving into asteroid fields",
+  move_comet: "Moving into comets",
+  move_earth: "Moving into Earth",
+  move_empty: "Moving into empty space",
+  move_capsule: "Moving a sample capsule",
+  movement_lost: "Lost: not used by the end of the turn",
   optional: "Optional effects that ask for it",
   exofossil_paid: "Paid by a card effect",
   trace_space: "Spaces of a species board that ask for it",
@@ -146,6 +157,15 @@ export const SOURCE_COLORS: Record<string, string> = {
   tuck: "#e8c15a",
   pass_discard: "#9aa0a6",
   signal_discard: "#c27bd1",
+  decipher: "#e08a3c",
+  leftover: "#8b949e",
+  move_planet: "#d0a06a",
+  move_asteroid: "#b09a7a",
+  move_comet: "#6fd0e8",
+  move_earth: "#4aa87a",
+  move_empty: "#6e7681",
+  move_capsule: "#c27bd1",
+  movement_lost: "#d45b3a",
   optional: "#a46ed8",
   exofossil_paid: "#c27bd1",
   trace_space: "#6fd0e8",

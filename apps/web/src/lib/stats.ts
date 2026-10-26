@@ -223,6 +223,7 @@ export const RESOURCE_GROUPS: Record<string, Record<string, string>> = (() => {
     },
     move: { ...common, move_move_energy: "energy", card: "card", corner: "corner", move_org_free: "organization", move_scan_probe: "tech" },
     exofossil: { ...common, planet: "planet", sector: "sector", card: "card" },
+    token: { ...common, planet: "planet", sector: "sector" },
   };
 })();
 
@@ -373,7 +374,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
       spreads[k] = spreadOf(values);
     }
     // everything the species gave, by resource (the parts of its rules added up for each player): `alien.<species>.all.<resource>`
-    for (const res of ["vp", "credit", "energy", "card", "publicity", "data", "move", "exofossil"]) {
+    for (const res of ["vp", "credit", "energy", "card", "publicity", "data", "move", "exofossil", "token"]) {
       const re = new RegExp(`^alien\\.${sp}\\.[a-z_]+\\.${res}$`);
       const values = mine.map((r) =>
         sum(

@@ -1,6 +1,7 @@
 ﻿"""The statistics of a game (stats.py): derived from the replay, not a rule."""
 
 import random
+from collections import Counter
 from typing import Any
 
 from fastapi.testclient import TestClient
@@ -116,6 +117,22 @@ def test_what_each_resource_was_spent_on_is_counted() -> None:
     keys = {k for p in s["players"] for k in p["counters"] if k.startswith("spend.")}
     assert {"spend.scan.credit", "spend.play_card.credit", "spend.computer.data", "spend.trade.card"} <= keys
     assert not [k for k in keys if k.endswith(".vp")]  # points are not spent
+
+
+def test_the_exofossils_left_at_the_end_and_the_glyph_tokens_are_counted() -> None:
+    from seti_engine import trail
+
+    s = start(Options(players=2, seed=1, expansion=True)).state.model_copy(deep=True)
+    p = s.players[0]
+    p.glyphs = ["red"]
+    with trail.scope(s, {"kind": "planet", "planet": "mars", "what": "orbit"}):
+        p.glyphs.append("blue")  # a token that an orbit gave
+    with trail.cost(s, "decipher"):
+        p.glyphs.remove("red")  # a token placed on the translation board
+    c: Counter[str] = Counter()
+    for e in trail.events_of(s):
+        stats.gain_counts(c, e)
+    assert c["gain.planet.token"] == 1 and c["spend.decipher.token"] == 1
 
 
 def test_the_exofossils_and_the_costs_of_effects_are_counted() -> None:

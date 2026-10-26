@@ -591,7 +591,9 @@ def _do_action(s: GameState, a: Action, events: list[dict[str, Any]]) -> None:
         p.movement += 1
     elif t == "move_probe":
         probe = next(pr for pr in s.probes if pr.id == a["probe"])
-        p.movement -= move_cost(s, p, probe)
+        into = solar.visible(s, a["to"][0], a["to"][1])[1]
+        with trail.cost(s, "move_capsule" if probe.capsule else f"move_{_space_kind(into)}"):  # the movement is told by what it moved into
+            p.movement -= move_cost(s, p, probe)
         old_ring = probe.ring
         probe.ring, probe.sector = a["to"]
         cell = solar.visible(s, probe.ring, probe.sector)[1]
@@ -1039,6 +1041,11 @@ def _neutral_marker(s: GameState, m: int, events: list[dict[str, Any]]) -> None:
                 return
 
 
+def _space_kind(cell: str) -> str:
+    """What a space is, for the movement statistics: a planet (a moon is on its planet), an asteroid field, a comet, Earth, or empty."""
+    return "planet" if cell.startswith("PLANET:") else cell.lower() if cell in ("ASTEROID", "COMET", "EARTH") else "empty"
+
+
 def _next_turn(s: GameState, events: list[dict[str, Any]]) -> None:
     if s.rival is not None and s.current_player != s.rival.index:
         objectives.end_turn(s)  # SOLO-OBJ-05
@@ -1048,7 +1055,8 @@ def _next_turn(s: GameState, events: list[dict[str, Any]]) -> None:
     s.turn_fx = []
     s.turn_completed = False
     p = s.players[s.current_player]
-    p.movement = 0  # unused movement is lost at the end of the turn (A-015)
+    with trail.cost(s, "movement_lost"):  # statistics: the movement that was not used
+        p.movement = 0  # unused movement is lost at the end of the turn (A-015)
     orgs.end_turn(s, p)
     n = len(s.players)
     for k in range(1, n + 1):

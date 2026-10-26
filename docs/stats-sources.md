@@ -60,3 +60,15 @@ The credit pie shows groups, as the owner chose: **Income** (the income of the r
 amount and the abilities), **Alien effects** (the species boards, the traces, the exploration of Arkhos, the glyphs, the anomaly tokens), **Missions**,
 **Quick start cards**, **Technologies**, and **Others** (everything else: the cards played, the planets, trading, the corners, the sectors ...). Pointing
 Others lists what it holds. The actions and free actions are told by action (`gainmove.<action>.<resource>`).
+
+## Movement, glyph tokens and the exofossils left over (version 7, 2026-10-26)
+
+- **Movement spent** is told by what it moved into: planets (a moon counts as its planet), asteroid fields, comets, Earth, empty space, and a **sample capsule** (moving a
+  picked-up sample). The movement that was **not used** and is lost at the end of the turn (no probe to move, a probe that cannot go anywhere, or the player did not
+  want to) is the slice "Lost". Movement gained by turning energy into movement is the group "Energy turned into movement" of the gain pie (and "Turned into movement" in
+  the energy's spent pie).
+- **Glyph tokens** (Glyphids) are a resource with their own panel: gained by source (the planets, the technologies, the sectors, the board) and spent by placing them on the
+  translation board. The tokens left at the end are not wasted (they score points).
+- **Exofossils left over** at the end of the game are a slice of the exofossils' spent pie ("Left over at the end of the game (wasted)").
+- The **publicity and data income** of each round (the cards tucked for it; there is no base income of either) are lines of the income chart of the Resources tab, which
+  also holds the cards tucked for income.

@@ -140,7 +140,8 @@ def decipher_moves(s: GameState, p: PlayerState) -> list[dict[str, Any]]:
 def decipher(s: GameState, p: PlayerState, a: dict[str, Any], events: Events) -> None:
     i = slot_index(s)
     assert i is not None
-    p.glyphs.remove(a["glyph"])
+    with trail.cost(s, "decipher"):  # the token leaves the player's tokens for the translation board
+        p.glyphs.remove(a["glyph"])
     s.species[i].extra[a["row"]][a["index"]] = a["glyph"]
     events.append({"type": "decipher", "player": p.index, "glyph": a["glyph"], "row": a["row"], "index": a["index"]})
     with trail.scope(s, {"kind": "glyph", "glyph": a["glyph"], "what": "decipher"}):
