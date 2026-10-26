@@ -112,10 +112,29 @@ def test_the_cards_played_are_counted_by_round_and_the_final_score_by_part() -> 
 def test_what_each_resource_was_spent_on_is_counted() -> None:
     options, actions = play(5, 3)
     s = stats.game_stats(file_of(options, actions))
-    assert s["version"] == 4
+    assert s["version"] == stats.VERSION
     keys = {k for p in s["players"] for k in p["counters"] if k.startswith("spend.")}
     assert {"spend.scan.credit", "spend.play_card.credit", "spend.computer.data", "spend.trade.card"} <= keys
     assert not [k for k in keys if k.endswith(".vp")]  # points are not spent
+
+
+def test_the_exofossils_and_the_costs_of_effects_are_counted() -> None:
+    from collections import Counter
+
+    from seti_engine import trail
+
+    s = start(Options(players=2, seed=1)).state.model_copy(deep=True)
+    p = s.players[0]
+    p.exofossils = 3
+    with trail.cost(s, "optional"):  # an optional effect that asks an exofossil
+        p.exofossils -= 1
+    with trail.scope(s, {"kind": "alien", "species": "oumuamua", "what": "tile"}):
+        p.exofossils += 2
+    c: Counter[str] = Counter()
+    for e in trail.events_of(s):
+        stats.gain_counts(c, e)
+    assert c["spend.optional.exofossil"] == 1
+    assert c["gain.alien.exofossil"] == 2 and c["alien.oumuamua.tile.exofossil"] == 2
 
 
 def test_the_publicity_that_the_aliens_gave_is_counted_by_species() -> None:

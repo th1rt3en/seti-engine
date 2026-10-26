@@ -44,7 +44,12 @@ The costs are recorded apart (`trail.cost` in the engine, the source kind `cost`
 have these slices. Credits: launching probes, scanning, orbiting, playing cards, trading resources. Energy: scanning, orbiting, landing, analyzing, a probe
 launched by the scan, turned into movement, trading. Publicity: researching techs, buying a card of the display, the signal in Mercury's sector. Data: placed in
 the computer. Cards: played, tucked for income, discarded for their free corner, discarded for a signal, discarded down to four at the pass, traded.
-Points are not spent. Not counted yet (it falls under the source around it, or nowhere): costs paid inside a card's own effect (an optional cost), the
-Exertian cards' cost, the organizations' costs, and exofossils spent.
+Points are not spent.
 
-The quick start cards that a player kept are counted as `quick.<id>` (the Organization & Quickstart tab).
+Version 5 adds the costs that were not counted before: the costs inside card effects (credits paid for media, the exofossils of an optional effect or of a
+card that pays them, the cards discarded to restructure or with the whole hand, the cards that a card discards for its free corner), the cost of an Exertian
+card, the costs of the organizations (the publicity of Fenwick Research Center and Mission Relay, the card that Futurespan Institute prepares), what the spaces
+of a species board ask (data or exofossils), and the **exofossils**, gained (by source) and spent, which have a pie of their own when 'Oumuamua was in the game.
+Still not counted: the card that Deep Sky Survey switches (it comes back), and what an organization gives back when a tuck of the setup is taken back.
+
+The quick start cards that a player kept are counted as `quick.<id>` (the Organization & Quickstart tab). Rows of version 4 lack the costs of version 5 and are left out of those pies (a backfill remakes them).

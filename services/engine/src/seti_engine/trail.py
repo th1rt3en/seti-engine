@@ -14,7 +14,7 @@ from typing import Any
 
 from .models import GameState
 
-KINDS = ("vp", "credit", "energy", "publicity", "data", "card", "move")
+KINDS = ("vp", "credit", "energy", "publicity", "data", "card", "move", "exofossil")
 
 
 def _snapshot(s: GameState) -> list[dict[str, int]]:
@@ -27,6 +27,7 @@ def _snapshot(s: GameState) -> list[dict[str, int]]:
             "data": p.data_pool,
             "card": len(p.hand),
             "move": p.movement,
+            "exofossil": p.exofossils,
         }
         for p in s.players
     ]

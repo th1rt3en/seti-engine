@@ -19,10 +19,11 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 
 # 3: the cards played by round (`card.<id>.r<round>`) and the parts of the final score (`final.<part>`);
 # 4: what each resource was spent on (`spend.<what>.<resource>`, the `cost` scopes of the trail), the quick start cards kept (`quick.<id>`)
-VERSION = 4
+# 5: the costs inside card effects, of Exertian cards and of organizations, and the exofossils (gained and spent) are counted too
+VERSION = 5
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
-RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
+RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil")
 # the sources of a gain that belong to one species (the others name it: {"kind": "alien", "species": ..., "what": ...})
 ALIEN_SOURCES = {"explore": "arkhos", "glyph": "glyphids", "anomaly": "anomalies"}
 

@@ -193,8 +193,8 @@ describe("statistics", () => {
     expect(pub).toEqual({ visit_comet: 1, visit_asteroid: 0.5, visit_planet: 0.5, move: 1 }); // 5 + 1 = 6 in all: 3 + 1 + 1 + ... per player 3
   });
 
-  it("what a resource was spent on, and the quick start cards that were kept (version 4 rows only)", () => {
-    const v = { "stats.version": 4 };
+  it("what a resource was spent on, and the quick start cards that were kept (version 5 rows only)", () => {
+    const v = { "stats.version": 5 };
     const rows = [
       row({
         gameId: "a",

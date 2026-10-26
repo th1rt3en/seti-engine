@@ -17,7 +17,7 @@ const CENTAURIAN_REWARDS: { t: string; n: number }[][] = [
   [{ t: "publicity", n: 3 }],
   [{ t: "vp", n: 8 }],
 ];
-const RESOURCES = ["vp", "credit", "energy", "card", "publicity", "data", "move"];
+const RESOURCES = ["vp", "credit", "energy", "card", "publicity", "data", "move", "exofossil"];
 const COLORS = ["pink", "yellow", "blue"];
 const COLOR_HEX: Record<string, string> = { pink: "#d55181", yellow: "#c98500", blue: "#3987e5" };
 const cap = (w: string): string => w.charAt(0).toUpperCase() + w.slice(1);

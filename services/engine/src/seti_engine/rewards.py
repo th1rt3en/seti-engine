@@ -83,7 +83,8 @@ def grant(
         elif t == "exofossil":
             species.gain_exofossil(s, p, n)
         elif t == "exofossil_pay":
-            p.exofossils -= n
+            with trail.cost(s, "exofossil_paid"):  # a card effect that pays exofossils
+                p.exofossils -= n
             species.return_exofossils(s, n)
         elif t == "sample_peek":  # a Mascamite mission reward: look at Jupiter's or Saturn's samples and gain one's reward
             planets = [pl for pl in species.SAMPLE_PLANETS if species.samples_on(s, pl)]

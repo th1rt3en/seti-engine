@@ -72,10 +72,12 @@ def mark_board_space(s: GameState, p: PlayerState, slot_index: int, color: str, 
     slot = s.species[slot_index]
     space = next(c for c in board_data(slot.species)["columns"] if c["color"] == color)["spaces"][k]
     for c in space.get("cost", []):  # ALIEN-CEN-05, ALIEN-OUM-02: data from the pool, exofossils
-        if c["t"] == "data":
-            p.data_pool -= c["n"]
-        else:
-            p.exofossils -= c["n"]
+        with trail.cost(s, "trace_space"):  # what a space of a species board asks
+            if c["t"] == "data":
+                p.data_pool -= c["n"]
+            else:
+                p.exofossils -= c["n"]
+        if c["t"] != "data":
             s.species[oumuamua_slot(s) or 0].extra["supply"] += c["n"]  # paid tokens go back to the supply
     slot.board[color][k].append(p.index)
     rewards.grant(s, p, space["rewards"], events, slot=slot_index)
@@ -416,7 +418,8 @@ def exertian_play_moves(s: GameState, d: Decision) -> list[dict[str, Any]]:
 
 
 def play_exertian(s: GameState, p: PlayerState, cid: str, cost: int) -> None:
-    p.credits -= cost  # ALIEN-EXE-04
+    with trail.cost(s, "exertian"):  # ALIEN-EXE-04
+        p.credits -= cost
     p.exertian_hand.remove(cid)
     p.exertian_played.append(cid)  # face down: other players do not see which card it is
 

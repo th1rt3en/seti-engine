@@ -182,7 +182,8 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
             p.hand += s.aside  # the third card is kept
             s.aside = []
     elif t == "opt_yes":
-        p.exofossils -= d.data.get("exo", 0)
+        with trail.cost(s, "optional"):  # the exofossils that an optional effect asks
+            p.exofossils -= d.data.get("exo", 0)
         species.return_exofossils(s, d.data.get("exo", 0))
         rewards.grant(s, p, d.data["r"], events)
         if d.data.get("repeat") and p.exofossils >= d.data.get("exo", 0):

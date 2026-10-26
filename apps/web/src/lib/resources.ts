@@ -1,5 +1,5 @@
 // The resources that the statistics follow, with the color of each (the color of its icon): the slices of the pies that are made of resources take them.
-export const GAIN_RESOURCES = ["credit", "energy", "card", "data", "publicity", "vp"] as const;
+export const GAIN_RESOURCES = ["credit", "energy", "card", "data", "publicity", "vp", "exofossil"] as const;
 export type GainResource = (typeof GAIN_RESOURCES)[number];
 
 export const RESOURCE_NAMES: Record<string, string> = {
@@ -10,6 +10,7 @@ export const RESOURCE_NAMES: Record<string, string> = {
   publicity: "Publicity",
   vp: "Points",
   move: "Movement",
+  exofossil: "Exofossils",
 };
 
 export const RESOURCE_COLORS: Record<string, string> = {
@@ -20,6 +21,7 @@ export const RESOURCE_COLORS: Record<string, string> = {
   publicity: "#e0525a",
   vp: "#2fa56b",
   move: "#b58be0",
+  exofossil: "#a46ed8",
 };
 
 /** What a source of a gain is, as the engine names it (the kind of the scope that was open when the resource was gained, engine/trail.py). */
@@ -71,6 +73,15 @@ export const SPEND_NAMES: Record<string, string> = {
   pass_discard: "Cards discarded down to four",
   signal_discard: "Cards discarded for a signal",
   move: "Other actions",
+  optional: "Optional effects that ask for it",
+  exofossil_paid: "Paid by a card effect",
+  trace_space: "Spaces of a species board that ask for it",
+  exertian: "Playing Exertian cards face down",
+  spend_credit: "Paid media (credits for points and publicity)",
+  discard_hand: "Discarding the whole hand",
+  restructure: "Cards discarded to restructure",
+  org_prepare: "Cards prepared with Futurespan Institute",
+  org_ability: "Organization abilities",
 };
 
 /** The color of each source in the pies: it follows the source, not its rank, so a source keeps its color from one pie to the next (the legend names every slice). */
@@ -93,6 +104,15 @@ export const SOURCE_COLORS: Record<string, string> = {
   tuck: "#e8c15a",
   pass_discard: "#9aa0a6",
   signal_discard: "#c27bd1",
+  optional: "#a46ed8",
+  exofossil_paid: "#c27bd1",
+  trace_space: "#6fd0e8",
+  exertian: "#d45b3a",
+  spend_credit: "#e8c15a",
+  discard_hand: "#8b949e",
+  restructure: "#7fcf8a",
+  org_prepare: "#d55181",
+  org_ability: "#5fb8d6",
   move: "#3987e5",
   card: "#d95926",
   income: "#199e70",

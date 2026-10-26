@@ -98,6 +98,15 @@ const COST_WORDS: Record<string, string> = {
   tuck: "Card tucked for income",
   pass_discard: "Card discarded down to four",
   signal_discard: "Card discarded for a signal",
+  optional: "Exofossils paid for an optional effect",
+  exofossil_paid: "Exofossils paid by a card effect",
+  trace_space: "What the space of the species board asks",
+  exertian: "Cost of playing the Exertian card",
+  spend_credit: "Credits paid for media",
+  discard_hand: "The hand that was discarded",
+  restructure: "Card discarded to restructure",
+  org_prepare: "Card prepared with Futurespan Institute",
+  org_ability: "Cost of the organization's ability",
 };
 
 /** The name of a player in the log, in the color of the player. */

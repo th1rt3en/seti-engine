@@ -576,7 +576,8 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
             # owner ruling, 2026-10-18: the card is taken from the card row or from the deck, like any card gained; the move names it
             effects.take_from_row_or_deck(s, p, a["source"], events)
         else:
-            p.hand.remove(a["card"])
+            with trail.cost(s, "org_prepare"):  # Futurespan Institute: the card is set aside
+                p.hand.remove(a["card"])
             p.org_data["fs_card"] = a["card"]
             p.org_data["fs_token"] = p.score + 10 * prepare_cost(a["card"]) + 5  # the card shows +15, +25, +35, +45 (A-052)
             # the card is face up for everybody: the log names it
@@ -587,12 +588,14 @@ def free_action(s: GameState, p: PlayerState, a: Action, events: Events) -> None
     p.org_used = True
     events.append({"type": "org_free", "player": p.index, "org": o})
     if o == "fenwick_research_center":  # spend 1 publicity: a card, then its free-action corner
-        p.publicity -= 1
+        with trail.cost(s, "org_ability"):
+            p.publicity -= 1
         cid = effects.take_from_row_or_deck(s, p, a["source"], events)
         if cid is not None:
             cards.gain_corner(s, p, cid)
     elif o == "mission_relay":  # spend 2 publicity: a card, then the resource of its income corner
-        p.publicity -= 2
+        with trail.cost(s, "org_ability"):
+            p.publicity -= 2
         cid = effects.take_from_row_or_deck(s, p, a["source"], events)
         if cid is not None:
             effects.gain_income_resource(s, p, tables.cards()[cid]["income"])

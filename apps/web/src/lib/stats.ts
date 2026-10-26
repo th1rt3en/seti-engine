@@ -150,7 +150,7 @@ export const FRESH_VERSION = 2;
 /** The version of the statistics that counts the cards played by round and the parts of the final score. */
 export const CARDS_VERSION = 3;
 /** The version that counts what each resource was spent on and the quick start cards kept. */
-export const SPEND_VERSION = 4;
+export const SPEND_VERSION = 5;
 
 /** What a quick start card did for the players who kept it (the counters `quick.<id>`, from version 4). */
 export interface QuickStat {
@@ -317,7 +317,7 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
       spreads[k] = spreadOf(values);
     }
     // everything the species gave, by resource (the parts of its rules added up for each player): `alien.<species>.all.<resource>`
-    for (const res of ["vp", "credit", "energy", "card", "publicity", "data", "move"]) {
+    for (const res of ["vp", "credit", "energy", "card", "publicity", "data", "move", "exofossil"]) {
       const re = new RegExp(`^alien\\.${sp}\\.[a-z_]+\\.${res}$`);
       const values = mine.map((r) =>
         sum(

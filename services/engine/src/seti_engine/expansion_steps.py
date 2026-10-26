@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import effects, rewards, solar, tables
+from . import effects, rewards, solar, tables, trail
 from .models import Decision, GameState, PlayerState
 
 Action = dict[str, Any]
@@ -60,8 +60,9 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         if any(tables.cards()[c]["species"] is None for c in p.hand):
             s.pending.append(Decision(kind="discard_corner", player=p.index, data={"times": st.get("times", 3)}))
     elif t == "discard_hand":  # SA.32
-        s.discard += p.hand
-        p.hand = []
+        with trail.cost(s, "discard_hand"):
+            s.discard += p.hand
+            p.hand = []
     elif t == "set_publicity":  # SA.18
         p.publicity = st.get("to", 0)
     elif t == "sig_each_marked":  # SA.37: a signal in each sector where the player already has one, without the data
@@ -209,7 +210,8 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         for g in d.data["groups"][a["group"]]:  # a repeated glyph gives its resource twice (A-045)
             glyphids.glyph_resource(s, p, g, events)
     elif t == "spend_credit":  # SA.17
-        p.credits -= 1
+        with trail.cost(s, "spend_credit"):
+            p.credits -= 1
         effects.gain_score(s, p, 2)
         effects.gain_publicity(s, p, 2)
         if p.credits >= 1:
@@ -217,8 +219,9 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
     elif t == "spend_done" or t == "hold_done":
         pass
     elif t == "restructure_card":  # SA.28: a discarded card gives its income resource
-        p.hand.remove(a["card"])
-        s.discard.append(a["card"])
+        with trail.cost(s, "restructure"):
+            p.hand.remove(a["card"])
+            s.discard.append(a["card"])
         effects.gain_income_resource(s, p, tables.cards()[a["card"]]["income"])
         if p.hand:
             s.pending.insert(0, Decision(kind="restructure", player=p.index))
@@ -230,8 +233,9 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
         p.hand.append(m.card)
         rewards.grant(s, p, d.data["r"], events)
     elif t == "discard_corner":  # SA.20
-        p.hand.remove(a["card"])
-        s.discard.append(a["card"])
+        with trail.cost(s, "corner_discard"):
+            p.hand.remove(a["card"])
+            s.discard.append(a["card"])
         for _ in range(d.data["times"]):
             cards.gain_corner(s, p, a["card"])
     else:

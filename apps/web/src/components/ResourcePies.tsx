@@ -7,7 +7,7 @@ import { PieChart } from "./PieChart";
 import { KindIcon } from "./Reward";
 import { Panel } from "./StatCharts";
 
-const PLURAL = new Set(["credit", "card", "vp"]); // credits, cards and points are plural
+const PLURAL = new Set(["credit", "card", "vp", "exofossil"]); // credits, cards and points are plural
 const sourceName = (key: string): string => SOURCE_NAMES[key] ?? key.replace(/_/g, " ");
 const spendName = (key: string): string => SPEND_NAMES[key] ?? SOURCE_NAMES[key] ?? key.replace(/_/g, " ");
 
@@ -17,6 +17,7 @@ export function ResourcePies({ gains, spends }: { gains: Record<string, Slice[]>
       {GAIN_RESOURCES.map((res) => {
         const gained = gains[res] ?? [];
         const spent = spends[res] ?? [];
+        if (res === "exofossil" && gained.length === 0 && spent.length === 0) return null; // only with 'Oumuamua
         const lower = (RESOURCE_NAMES[res] ?? res).toLowerCase();
         return (
           <Panel
