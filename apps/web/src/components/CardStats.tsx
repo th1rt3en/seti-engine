@@ -30,6 +30,16 @@ const SPECIES_NAMES: Record<string, string> = {
   glyphids: "Glyphids",
 };
 
+/** A card with a mission (with circles, or a quick mission) or with an end-of-game scoring (the catalog's type, made from the engine's definitions). */
+const isMission = (id: string): boolean => ["mission", "quick"].includes(CARDS.get(id)?.type ?? "");
+const isEnd = (id: string): boolean => CARDS.get(id)?.type === "end";
+
+const KINDS = [
+  { id: "", label: "Any card" },
+  { id: "mission", label: "Cards with a mission" },
+  { id: "end", label: "Cards with end-of-game scoring" },
+];
+
 /** The group a card belongs to in the tabs: the base deck, the expansion's deck, the promo cards, or its species. */
 function groupOf(id: string): string {
   const c = CARDS.get(id);
@@ -67,6 +77,7 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
   const [group, setGroup] = useState("");
   const [sort, setSort] = useState<Sort>("plays");
   const [min, setMin] = useState(1);
+  const [kind, setKind] = useState("");
   const [q, setQ] = useState("");
   const shown = useMemo(() => {
     const key = (c: CardStat): number =>
@@ -84,10 +95,15 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                   ? c.avgRound
                   : c.plays;
     return cards
-      .filter((c) => (group === "" || groupOf(c.id) === group) && c.plays >= min)
+      .filter(
+        (c) =>
+          (group === "" || groupOf(c.id) === group) &&
+          c.plays >= min &&
+          (kind === "" || (kind === "mission" ? isMission(c.id) : isEnd(c.id))),
+      )
       .filter((c) => q === "" || cardName(c.id).toLowerCase().includes(q.toLowerCase()) || c.id.toLowerCase().includes(q.toLowerCase()))
       .sort((a, b) => key(b) - key(a) || b.plays - a.plays);
-  }, [cards, group, sort, min, q]);
+  }, [cards, group, kind, sort, min, q]);
   const roundList = rounds.length > 0 ? rounds : [1, 2, 3, 4, 5];
   return (
     <div className="cardstats">
@@ -116,6 +132,16 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
             {SORTS.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="stat-filter-name">Card type</span>
+          <select value={kind} onChange={(e) => setKind(e.target.value)}>
+            {KINDS.map((k) => (
+              <option key={k.id} value={k.id}>
+                {k.label}
               </option>
             ))}
           </select>
@@ -179,7 +205,7 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                       <b>{c.discardRate === null ? "–" : pct(c.discardRate)}</b>
                     </dd>
                   </div>
-                  {CARDS.get(c.id)?.type === "mission" ? (
+                  {isMission(c.id) ? (
                     <div title="The share of its plays whose mission was completed (over the games that count it)">
                       <dt>Mission completed</dt>
                       <dd>
@@ -202,7 +228,7 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                     </dd>
                   </div>
                   <div title={`${Math.round(c.winRate * c.players)} of ${c.players} players won`}>
-                    <dt>Won the game</dt>
+                    <dt>Win rate</dt>
                     <dd>
                       <b>{pct(c.winRate)}</b>
                     </dd>
