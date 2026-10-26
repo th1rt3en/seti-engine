@@ -128,6 +128,8 @@ export interface TechUseStat {
   tech: string;
   /** the players who had the tech at the end of the game */
   players: number;
+  /** the share of the players of the rows who researched it (the research percentage) */
+  share: number;
   metrics: { key: string; label: string; mean: number; total: number; spread: Spread }[];
 }
 
@@ -151,6 +153,8 @@ export const FRESH_VERSION = 2;
 export const CARDS_VERSION = 3;
 /** The version that counts what each resource was spent on and the quick start cards kept. */
 export const SPEND_VERSION = 5;
+/** The version that counts where each tech came from (the research action, a card of the main deck, an alien card). */
+export const TECH_ORIGIN_VERSION = 9;
 /** The version that counts the quick start cards that were offered. */
 export const QUICK_VERSION = 8;
 
@@ -281,6 +285,9 @@ export interface Stats {
   techs: TechStat[];
   /** for each tech, what it did for the players who have it */
   techUse: TechUseStat[];
+  /** the techs by type and by where they came from (the mean per player; the origins from version 9 of the statistics) */
+  techTypes: Slice[];
+  techOrigins: Slice[];
   /** the rounds that have an income (the expansion has no round 1) */
   rounds: number[];
   /** the players counted (one row each), for the spread of a number that the page works out from the counters */
@@ -404,12 +411,27 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     return {
       tech,
       players: owners.length,
+      share: n === 0 ? 0 : rows.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0).length / n,
       metrics: (TECH_METRICS[tech] ?? []).map((m) => {
         const values = owners.map((r) => r.counters[`techuse.${tech}.${m.key}`] ?? 0);
         return { ...m, mean: values.length === 0 ? 0 : sum(values) / values.length, total: sum(values), spread: spreadOf(values) };
       }),
     };
   });
+
+  const meanSlices = (from: StatRow[], keys: string[], prefix: string): Slice[] =>
+    keys
+      .map((k) => {
+        const values = from.map((r) => r.counters[`${prefix}${k}`] ?? 0);
+        return { key: k, mean: values.length === 0 ? 0 : sum(values) / values.length, spread: spreadOf(values) };
+      })
+      .filter((x) => x.mean > 0);
+  const techTypes = meanSlices(rows, ["probe", "telescope", "computer"], "techcat.");
+  const techOrigins = meanSlices(
+    rows.filter((r) => (r.counters["stats.version"] ?? 0) >= TECH_ORIGIN_VERSION),
+    ["research", "card", "alien", "other"],
+    "techorigin.",
+  );
 
   const rounds = [
     ...new Set(Object.keys(totals).flatMap((k) => (k.startsWith("incomerate.r") ? [Number(k.split(".")[1]?.slice(1))] : []))),
@@ -452,6 +474,8 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     gold,
     techs,
     techUse,
+    techTypes,
+    techOrigins,
     fresh: { rows: fresh.length, mean: freshMean, spread: freshSpread },
     alien,
     rounds,

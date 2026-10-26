@@ -26,7 +26,7 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # end of the turn, the exofossils left over (`spend.leftover.exofossil`), the glyph tokens as a resource (`gain.<source>.token`,
 # `spend.decipher.token`), and the publicity and data income of each round (`incomerate.r<round>.publicity|data`)
 # 8: the quick start cards that were offered (`quickoffered.<id>`), for the keep rate
-VERSION = 8
+VERSION = 9
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil", "token")
@@ -199,6 +199,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
     counts: dict[int, Counter[str]] = {}
     org_offered: dict[int, list[str]] = {}
     org_picked: dict[int, str] = {}
+    tech_origin: dict[int, str] = {}  # the main action of each seat in its turn: what a tech gained in it is credited to
     final: Any = None
     before: Any = None
     for n, entry, result in replay.steps(file):
@@ -228,6 +229,12 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
             kind = action.get("type")
             if kind in MAIN_ACTIONS:
                 counts[seat][f"action.{kind}"] += 1
+                if kind == "research":
+                    tech_origin[seat] = "research"
+                elif kind == "play_card":
+                    tech_origin[seat] = "alien" if str(action.get("card")) in card_defs.ALIEN_CARDS else "card"
+                else:
+                    tech_origin[seat] = "other"
             if kind == "choose_quick":  # the quick start cards that were offered (a player may choose again: it is counted once)
                 for cid in before.players[seat].offered_quick:
                     counts[seat][f"quickoffered.{cid}"] = 1
@@ -246,6 +253,12 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                     counts[seat][f"publicity.visit.{where}"] += sum(moved)
         if seat in counts:
             tech_use(counts[seat], before, state, seat, action, result.events)
+        for q in state.players:  # the techs that a player took in this step, by where they came from (version 9)
+            if q.index in counts and q.index < len(before.players):
+                gained = Counter(q.techs) - Counter(before.players[q.index].techs)
+                if gained:
+                    origin = tech_origin.get(q.index, "other") if q.index == seat else "other"
+                    counts[q.index][f"techorigin.{origin}"] += sum(gained.values())
         basic_done: set[str] = set()  # the launch that the launch action itself made (the first launch of the step)
         # orbiters and landers placed in this step: the main action of that name places one, anything else is another source
         for q in state.players:

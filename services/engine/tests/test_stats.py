@@ -165,3 +165,15 @@ def test_the_publicity_that_the_aliens_gave_is_counted_by_species() -> None:
                 by_source = sum(v for k, v in c.items() if k in [f"gain.{s}.publicity" for s in ("explore", "glyph", "anomaly", "alien")])
                 assert sum(by_species.values()) == by_source
                 assert all(k.split(".")[-1] in SPECIES for k in by_species)
+
+
+def test_the_techs_are_counted_by_where_they_came_from() -> None:
+    options, actions = play(5, 3)
+    s = stats.game_stats(file_of(options, actions))
+    origins = Counter[str]()
+    for p in s["players"]:
+        for k, v in p["counters"].items():
+            if k.startswith("techorigin."):
+                origins[k] += v
+    assert origins["techorigin.research"] > 0
+    assert sum(origins.values()) >= sum(v for p in s["players"] for k, v in p["counters"].items() if k.startswith("techcat."))

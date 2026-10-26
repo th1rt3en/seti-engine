@@ -50,7 +50,7 @@ const TABS = [
 type Sort = "plays" | "score" | "win" | "early" | "late";
 const SORTS: { id: Sort; label: string }[] = [
   { id: "plays", label: "Most played" },
-  { id: "score", label: "Highest final score" },
+  { id: "score", label: "Highest average score" },
   { id: "win", label: "Highest win rate" },
   { id: "early", label: "Played earliest" },
   { id: "late", label: "Played latest" },
@@ -69,7 +69,7 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
     const key = (c: CardStat): number =>
       sort === "score" ? c.avgScore : sort === "win" ? c.winRate : sort === "early" ? -c.avgRound : sort === "late" ? c.avgRound : c.plays;
     return cards
-      .filter((c) => (group === "" || groupOf(c.id) === group) && c.players >= min)
+      .filter((c) => (group === "" || groupOf(c.id) === group) && c.plays >= min)
       .filter((c) => q === "" || cardName(c.id).toLowerCase().includes(q.toLowerCase()) || c.id.toLowerCase().includes(q.toLowerCase()))
       .sort((a, b) => key(b) - key(a) || b.plays - a.plays);
   }, [cards, group, sort, min, q]);
@@ -106,11 +106,11 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
           </select>
         </label>
         <label>
-          <span className="stat-filter-name">Played by at least</span>
+          <span className="stat-filter-name">Played at least</span>
           <select value={min} onChange={(e) => setMin(Number(e.target.value))}>
-            {[1, 3, 5, 10, 20].map((n) => (
+            {[1, 3, 5, 10, 20, 50].map((n) => (
               <option key={n} value={n}>
-                {n} player{n === 1 ? "" : "s"}
+                {n} time{n === 1 ? "" : "s"}
               </option>
             ))}
           </select>
@@ -135,9 +135,12 @@ export function CardStats({ cards, rows, rounds }: { cards: CardStat[]; rows: nu
                 </div>
                 <dl className="cs-nums">
                   <div title={`${c.plays} plays by ${c.players} players`}>
-                    <dt>Played by</dt>
+                    <dt>Played</dt>
                     <dd>
-                      <b>{c.players}</b> <span className="muted small">{pct(c.share)} of players</span>
+                      <b>{c.plays}</b>{" "}
+                      <span className="muted small">
+                        time{c.plays === 1 ? "" : "s"} by {c.players} player{c.players === 1 ? "" : "s"} ({pct(c.share)})
+                      </span>
                     </dd>
                   </div>
                   <div title={`The final score of the players who played it: ${spreadText(c.scoreSpread)}`}>

@@ -18,6 +18,7 @@ import {
 } from "@/components/Icons";
 import { MultiChoice } from "@/components/MultiChoice";
 import { OrgName } from "@/components/OrgName";
+import { PieChart } from "@/components/PieChart";
 import { QuickStats } from "@/components/QuickStats";
 import { ResourcePies } from "@/components/ResourcePies";
 import { KindIcon } from "@/components/Reward";
@@ -49,6 +50,18 @@ const TECH_COLOR: Record<string, string> = {
   probe: "var(--tech-probe)",
   telescope: "var(--tech-telescope)",
   computer: "var(--tech-computer)",
+};
+const TECH_ORIGIN_NAMES: Record<string, string> = {
+  research: "Research action",
+  card: "Playing a card of the main deck",
+  alien: "Playing an alien card",
+  other: "Other ways (rewards, bonuses, organizations)",
+};
+const TECH_ORIGIN_COLORS: Record<string, string> = {
+  research: "#58a6ff",
+  card: "#d29922",
+  alien: "#3fb950",
+  other: "#8b949e",
 };
 const techKind = (tech: string): string => tech.split("-")[0] ?? "";
 const TECH_FRONTS = assets.techFronts as Record<string, string>;
@@ -205,9 +218,6 @@ export default async function StatsPage({
       ...sumOf(["gain.organization.publicity", "gain.quick_start.publicity", "gain.income.publicity"]),
     },
   ];
-  const techsOf = (c: Record<string, number>): number => TECH_CATEGORIES.reduce((n, k) => n + (c[`techcat.${k}`] ?? 0), 0);
-  const techTotal = TECH_CATEGORIES.reduce((n, k) => n + m(`techcat.${k}`), 0);
-  const techManual = m("action.research");
   const tuckKinds = [
     { key: "credit", label: "Credit", icon: <CreditIcon size={20} /> },
     { key: "energy", label: "Energy", icon: <EnergyIcon size={20} /> },
@@ -494,138 +504,106 @@ export default async function StatsPage({
             {tab === "tech" ? (
               <>
                 <Panel
-                  title="Tech"
+                  title="Technologies"
                   wide
+                  note="For each tech: the share of the players who researched it, and what it did for them on average after that. Point a number for the lowest, the highest and the spread."
                   table={
                     <Table
-                      head={["Tech", "Researched in"]}
-                      rows={s.techs.map((t) => [TECH_INFO[t.tech]?.name ?? t.tech, `${pct(t.share)} of the games of a player`])}
-                    />
-                  }
-                >
-                  <div className="stat-two">
-                    <div>
-                      <h3>Researched per game</h3>
-                      <BarList
-                        label="Techs researched per game by category"
-                        rows={TECH_CATEGORIES.map((c, i) => ({
-                          key: c,
-                          label: cap(c),
-                          value: m(`techcat.${c}`),
-                          spread: sd(`techcat.${c}`),
-                          text: <b>{round(m(`techcat.${c}`))}</b>,
-                          color: TECH_COLOR[c],
-                        }))}
-                      />
-                      <h3>How they were researched</h3>
-                      <BarList
-                        label="Techs researched per game: by the research action or in another way"
-                        rows={[
-                          {
-                            key: "all",
-                            label: "In all",
-                            value: techTotal,
-                            spread: sdOf(techsOf),
-                            text: <b>{round(techTotal)}</b>,
-                          },
-                          {
-                            key: "manual",
-                            label: "Research action (6 publicity)",
-                            value: techManual,
-                            spread: sd("action.research"),
-                            text: <b>{round(techManual)}</b>,
-                          },
-                          {
-                            key: "other",
-                            label: "Other ways (cards, rewards, bonuses)",
-                            value: Math.max(0, techTotal - techManual),
-                            spread: sdOf((c) => Math.max(0, techsOf(c) - (c["action.research"] ?? 0))),
-                            text: <b>{round(Math.max(0, techTotal - techManual))}</b>,
-                          },
-                        ]}
-                      />
-                    </div>
-                    <div>
-                      <h3>Researched in x% of games</h3>
-                      <BarList
-                        label="Share of the players who researched each tech"
-                        max={1}
-                        rows={s.techs.map((t) => ({
-                          key: t.tech,
-                          label: (
-                            <span className="icon-label">
-                              {TECH_FRONTS[t.tech] ? (
-                                <img
-                                  src={TECH_FRONTS[t.tech]}
-                                  alt={TECH_INFO[t.tech]?.name ?? t.tech}
-                                  width={28}
-                                  height={39}
-                                  className="mini-tech"
-                                />
-                              ) : (
-                                (TECH_INFO[t.tech]?.name ?? t.tech)
-                              )}
-                            </span>
-                          ),
-                          color: TECH_COLOR[techKind(t.tech)],
-                          value: t.share,
-                          text: <b>{pct(t.share)}</b>,
-                          title: TECH_INFO[t.tech] ? `${TECH_INFO[t.tech]?.name}: ${TECH_INFO[t.tech]?.effect}` : undefined,
-                        }))}
-                      />
-                    </div>
-                  </div>
-                </Panel>
-
-                <Panel
-                  title="What the techs did"
-                  wide
-                  note="What each tech gave on average for the rest of the game after it was researched."
-                  table={
-                    <Table
-                      head={["Tech", "Researched", "What", "Average"]}
+                      head={["Tech", "Researched by", "What", "Average"]}
                       rows={s.techUse.flatMap((t) =>
-                        t.metrics.map((m) => [TECH_INFO[t.tech]?.name ?? t.tech, t.players, m.label, round(m.mean)]),
+                        t.metrics.length === 0
+                          ? [[TECH_INFO[t.tech]?.name ?? t.tech, pct(t.share), "", ""]]
+                          : t.metrics.map((x) => [TECH_INFO[t.tech]?.name ?? t.tech, pct(t.share), x.label, round(x.mean)]),
                       )}
                     />
                   }
                 >
-                  <div className="techuse">
-                    {s.techUse
-                      .filter((t) => t.metrics.length > 0)
+                  <ul className="tech-rows">
+                    {[...s.techUse]
+                      .sort((x, y) => y.share - x.share)
                       .map((t) => (
-                        <div key={t.tech} className="techuse-card" style={{ borderLeftColor: TECH_COLOR[techKind(t.tech)] }}>
+                        <li key={t.tech} className="tech-row" style={{ borderLeftColor: TECH_COLOR[techKind(t.tech)] }}>
                           {TECH_FRONTS[t.tech] ? (
                             <img
                               src={TECH_FRONTS[t.tech]}
                               alt={TECH_INFO[t.tech]?.name ?? t.tech}
-                              title={`${TECH_INFO[t.tech]?.name ?? t.tech}: ${TECH_INFO[t.tech]?.effect ?? ""}`}
                               width={28}
                               height={39}
                               className="mini-tech"
                             />
                           ) : null}
-                          <div>
-                            {t.players === 0 ? (
-                              <span className="muted small">not researched in these games yet</span>
+                          <div className="tech-name">
+                            <b>{TECH_INFO[t.tech]?.name ?? t.tech}</b>
+                            <span className="muted small">{TECH_INFO[t.tech]?.effect}</span>
+                          </div>
+                          <div className="tech-share" title={`Researched in ${pct(t.share)} of the games of a player`}>
+                            <b>{pct(t.share)}</b>
+                            <span className="muted small">researched</span>
+                            <span className="tech-bar">
+                              <span style={{ width: `${Math.round(t.share * 100)}%`, background: TECH_COLOR[techKind(t.tech)] }} />
+                            </span>
+                          </div>
+                          <div className="tech-effects">
+                            {t.metrics.length === 0 ? (
+                              <span className="muted small">Nothing to follow for this tech.</span>
+                            ) : t.players === 0 ? (
+                              <span className="muted small">Not researched in these games yet.</span>
                             ) : (
-                              <>
-                                {t.metrics.map((m) => (
-                                  <div key={m.key} className="techuse-line">
-                                    <span>{m.label}:</span>{" "}
-                                    <b>
-                                      <WithSpread spread={m.spread}>{round(m.mean)}</WithSpread>
-                                    </b>
-                                  </div>
-                                ))}
-                                <span className="muted small">
-                                  researched {t.players} time{t.players === 1 ? "" : "s"}
-                                </span>
-                              </>
+                              t.metrics.map((x) => (
+                                <div key={x.key} className="techuse-line">
+                                  <span>{x.label}:</span>{" "}
+                                  <b>
+                                    <WithSpread spread={x.spread}>{round(x.mean)}</WithSpread>
+                                  </b>
+                                </div>
+                              ))
                             )}
                           </div>
-                        </div>
+                        </li>
                       ))}
+                  </ul>
+                </Panel>
+
+                <Panel
+                  title="Where the techs came from"
+                  wide
+                  note="Averages per player and game. Point a slice or its legend row for the lowest, the highest and the spread of the players."
+                >
+                  <div className="pie-pair">
+                    <div>
+                      <h3>Techs by type</h3>
+                      <PieChart
+                        label="Techs researched per game, by type"
+                        unit="per player"
+                        slices={s.techTypes.map((x) => ({
+                          key: x.key,
+                          name: `${cap(x.key)} techs`,
+                          label: `${cap(x.key)} techs`,
+                          value: x.mean,
+                          spread: x.spread,
+                          color: TECH_COLOR[x.key] ?? "#8b949e",
+                        }))}
+                      />
+                    </div>
+                    <div>
+                      <h3>Techs by how they were researched</h3>
+                      {s.techOrigins.length === 0 ? (
+                        <p className="muted">Not counted in the games so far (it is counted from version 9 of the statistics).</p>
+                      ) : (
+                        <PieChart
+                          label="Techs researched per game, by origin"
+                          unit="per player"
+                          slices={s.techOrigins.map((x) => ({
+                            key: x.key,
+                            name: TECH_ORIGIN_NAMES[x.key] ?? x.key,
+                            label: TECH_ORIGIN_NAMES[x.key] ?? x.key,
+                            value: x.mean,
+                            spread: x.spread,
+                            color: TECH_ORIGIN_COLORS[x.key] ?? "#8b949e",
+                          }))}
+                        />
+                      )}
+                    </div>
                   </div>
                 </Panel>
               </>

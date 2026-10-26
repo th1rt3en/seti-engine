@@ -358,4 +358,18 @@ describe("statistics", () => {
     expect(a.mascamites?.spread["mascamites.delivered"]).toMatchObject({ min: 1, max: 3 });
     expect(a.amoeba?.rows).toBe(0); // no game with the species
   });
+  it("the techs by type and by where they came from (version 9 rows only), and the research share of each tech", () => {
+    const rows = [
+      row({ counters: { "stats.version": 9, "tech.probe-dot": 1, "techcat.probe": 1, "techcat.computer": 1, "techorigin.research": 2 } }),
+      row({ counters: { "stats.version": 9, "techcat.probe": 1, "techorigin.alien": 1, "techorigin.research": 0 } }),
+      row({ counters: { "stats.version": 8, "techcat.probe": 4, "techorigin.card": 9 } }), // an older row: no origins
+    ];
+    const a = aggregate(rows, any);
+    expect(a.techOrigins.map((x) => [x.key, x.mean])).toEqual([
+      ["research", 1],
+      ["alien", 0.5],
+    ]);
+    expect(a.techTypes.map((x) => x.key)).toEqual(["probe", "computer"]);
+    expect(a.techUse.find((t) => t.tech === "probe-dot")?.share).toBeCloseTo(1 / 3);
+  });
 });

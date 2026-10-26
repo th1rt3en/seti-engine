@@ -1699,3 +1699,51 @@ main:has(.stats-page) {
 .pie-tip .pie-part {
   display: contents;
 }
+.tech-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tech-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.3fr) 110px minmax(0, 1.6fr);
+  gap: 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border-left: 4px solid var(--border, #444);
+  background: var(--panel-2, rgba(128, 128, 128, 0.08));
+  border-radius: 6px;
+}
+.tech-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tech-share {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tech-bar {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(128, 128, 128, 0.25);
+  overflow: hidden;
+}
+.tech-bar > span {
+  display: block;
+  height: 100%;
+}
+@media (max-width: 700px) {
+  .tech-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .tech-share,
+  .tech-effects {
+    grid-column: 1 / -1;
+  }
+}
