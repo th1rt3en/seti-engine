@@ -53,3 +53,10 @@ of a species board ask (data or exofossils), and the **exofossils**, gained (by 
 Still not counted: the card that Deep Sky Survey switches (it comes back), and what an organization gives back when a tuck of the setup is taken back.
 
 The quick start cards that a player kept are counted as `quick.<id>` (the Organization & Quickstart tab). Rows of version 4 lack the costs of version 5 and are left out of those pies (a backfill remakes them).
+
+## The credits in groups (version 6, 2026-10-26)
+
+The credit pie shows groups, as the owner chose: **Income** (the income of the round, and the credit of a card tucked for income), **Organization** (the starting
+amount and the abilities), **Alien effects** (the species boards, the traces, the exploration of Arkhos, the glyphs, the anomaly tokens), **Missions**,
+**Quick start cards**, **Technologies**, and **Others** (everything else: the cards played, the planets, trading, the corners, the sectors ...). Pointing
+Others lists what it holds. The actions and free actions are told by action (`gainmove.<action>.<resource>`).

@@ -184,11 +184,13 @@ describe("statistics", () => {
       }),
     ];
     const g = aggregate(rows, any).gains;
+    // the credits are in groups: income, organization, alien effects, missions, quick start cards, technologies, and the others
     expect(g.credit?.map((x) => [x.key, x.mean])).toEqual([
-      ["income", 6],
-      ["card", 3],
+      ["group_income", 6],
+      ["other", 3],
     ]);
     expect(g.credit?.[1]?.spread).toEqual({ min: 2, max: 4, std: 1 });
+    expect(g.credit?.[1]?.parts).toEqual([{ key: "card", mean: 3 }]);
     const pub = Object.fromEntries((g.publicity ?? []).map((x) => [x.key, x.mean]));
     expect(pub).toEqual({ visit_comet: 1, visit_asteroid: 0.5, visit_planet: 0.5, move: 1 }); // 5 + 1 = 6 in all: 3 + 1 + 1 + ... per player 3
   });
@@ -214,6 +216,28 @@ describe("statistics", () => {
     expect(sr1).toMatchObject({ players: 2, share: 1, winRate: 0.5 });
     expect(sr1?.avgScore).toBe(80);
     expect(a.quick.map((q) => q.id)).toEqual(["SR.1", "SR.3"]);
+  });
+
+  it("the credits of the others are told by action, and the alien sources are one group", () => {
+    const rows = [
+      row({
+        counters: {
+          "gain.move.credit": 5,
+          "gainmove.exchange.credit": 3,
+          "gain.trace.credit": 1,
+          "gain.alien.credit": 2,
+          "gain.tech.credit": 4,
+        },
+      }),
+    ];
+    const credit = aggregate(rows, any).gains.credit ?? [];
+    const by = Object.fromEntries(credit.map((x) => [x.key, x]));
+    expect(by.group_alien?.mean).toBe(3);
+    expect(by.group_tech?.mean).toBe(4);
+    expect(by.other?.parts).toEqual([
+      { key: "move_exchange", mean: 3 },
+      { key: "move", mean: 2 }, // what the engine did not tell by action (older rows)
+    ]);
   });
 
   it("the final score comes in parts (version 3 rows only)", () => {

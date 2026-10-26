@@ -131,7 +131,8 @@ def tuck_card(state: GameState, p: PlayerState, card: str) -> None:
     with trail.cost(state, "tuck"):
         p.hand.remove(card)
         p.tucked.append(card)
-    gain_income_resource(state, p, tables.cards()[card]["income"])
+    with trail.scope(state, {"kind": "income", "what": "tuck"}):  # the resource of the tucked card is income, apart from the action
+        gain_income_resource(state, p, tables.cards()[card]["income"])
 
 
 def pay(p: PlayerState, credits: int = 0, energy: int = 0, publicity: int = 0) -> bool:

@@ -1690,3 +1690,12 @@ main:has(.stats-page) {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
   gap: 8px 40px;
 }
+.pie-tip .pie-parts {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+.pie-tip .pie-part {
+  display: contents;
+}

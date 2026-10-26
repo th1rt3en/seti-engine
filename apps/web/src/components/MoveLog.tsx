@@ -161,7 +161,7 @@ function sourceText(src: Source, ctx: LogContext, action: LogEntry["action"]): s
     case "explore":
       return `Exploration card ${String(src.card)} (${String(src.level)} reward)`;
     case "income":
-      return "Income of the round";
+      return src.what === "tuck" ? "Card tucked for income" : "Income of the round";
     case "organization":
       return `Organization ${ORG_NAMES[String(src.org)] ?? String(src.org)}${src.what === "mission" ? " (a card with a mission is played)" : ""}`;
     case "rival_computer":

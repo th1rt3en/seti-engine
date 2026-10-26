@@ -38,6 +38,7 @@ export function ResourcePies({ gains, spends }: { gains: Record<string, Slice[]>
                     label: sourceName(x.key),
                     value: x.mean,
                     spread: x.spread,
+                    parts: x.parts?.map((p) => ({ name: sourceName(p.key), value: p.mean })),
                     color: SOURCE_COLORS[x.key] ?? "#8b949e",
                   }))}
                 />

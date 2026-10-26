@@ -20,7 +20,8 @@ from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, s
 # 3: the cards played by round (`card.<id>.r<round>`) and the parts of the final score (`final.<part>`);
 # 4: what each resource was spent on (`spend.<what>.<resource>`, the `cost` scopes of the trail), the quick start cards kept (`quick.<id>`)
 # 5: the costs inside card effects, of Exertian cards and of organizations, and the exofossils (gained and spent) are counted too
-VERSION = 5
+# 6: the resource of a tucked card is income (`gain.income`), and what the actions gave is told by action (`gainmove.<action>.<resource>`)
+VERSION = 6
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move", "exofossil")
@@ -42,7 +43,7 @@ def alien_source(src: dict[str, Any]) -> tuple[str, str] | None:
     return None
 
 
-def gain_counts(c: Counter[str], e: dict[str, Any]) -> None:
+def gain_counts(c: Counter[str], e: dict[str, Any], action: str | None = None) -> None:
     """What one `gains` event adds: the data, the publicity of the sectors and signals, and every resource by the source that gave it."""
     src = e["source"].get("kind", "other")
     alien = alien_source(e["source"])
@@ -56,6 +57,8 @@ def gain_counts(c: Counter[str], e: dict[str, Any]) -> None:
             c[f"publicity.{src}"] += amount
         if res in RESOURCES and amount > 0:
             c[f"gain.{src}.{res}"] += amount
+            if src == "move" and action is not None:
+                c[f"gainmove.{action}.{res}"] += amount  # what the actions gave, by action (the page names them under Others)
             if alien is not None:
                 c[f"alien.{alien[0]}.{alien[1]}.{res}"] += amount
         if alien is not None and res == "publicity" and amount > 0:
@@ -258,7 +261,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                 else:
                     c["probes.launched.other"] += 1
             if t == "gains":
-                gain_counts(c, e)
+                gain_counts(c, e, str(action.get("type")))
             elif t == "place_data":
                 c["data.computer"] += 1
             elif t == "sector_won":

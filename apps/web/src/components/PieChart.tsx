@@ -14,6 +14,8 @@ export interface PieSlice {
   color: string;
   /** how the players differ (absent for a slice that is a sum of other slices) */
   spread?: Spread;
+  /** for a group: what it is made of, shown on the card */
+  parts?: { name: string; value: number }[];
 }
 
 const SIZE = 220;
@@ -89,6 +91,16 @@ export function PieChart({ slices, label, unit = "per player" }: { slices: PieSl
                 </>
               ) : null}
             </span>
+            {active.parts && active.parts.length > 0 ? (
+              <span className="tip-grid pie-parts">
+                {active.parts.map((p) => (
+                  <span key={p.name} className="pie-part">
+                    <span>{p.name}</span>
+                    <b>{round(p.value)}</b>
+                  </span>
+                ))}
+              </span>
+            ) : null}
             <span className="tip-foot">{unit}</span>
           </div>
         ) : null}

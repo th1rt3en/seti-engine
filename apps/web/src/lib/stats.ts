@@ -168,7 +168,23 @@ export interface Slice {
   key: string;
   mean: number;
   spread: Spread;
+  /** for a group of sources: what it is made of (the mean per player of each), the largest first */
+  parts?: { key: string; mean: number }[];
 }
+
+/** The sources of the credits, in groups (the owner's choice, 2026-10-26): what is not named here is "other". The keys are the kinds of the engine. */
+export const CREDIT_GROUPS: Record<string, string> = {
+  income: "income",
+  organization: "organization",
+  alien: "alien",
+  anomaly: "alien",
+  explore: "alien",
+  glyph: "alien",
+  trace: "alien",
+  mission: "mission",
+  quick_start: "quick_start",
+  tech: "tech",
+};
 
 /** What a card of the main deck or of a species did, over the players who played it (the counters `card.<id>.r<round>`, from version 3). */
 export interface CardStat {
@@ -437,8 +453,44 @@ function gainSlices(rows: StatRow[], v3: StatRow[]): Record<string, Slice[]> {
         if (v3.some((r) => (r.counters[`final.${part}`] ?? 0) > 0)) list.push(slice(`final_${part}`, v3, (c) => c[`final.${part}`] ?? 0));
     }
     out[res] = list.filter((x) => x.mean > 0).sort((a, b) => b.mean - a.mean);
+    if (res === "credit") out[res] = groupSlices(rows, out[res] ?? [], CREDIT_GROUPS, "credit");
   }
   return out;
+}
+
+/** The slices of a resource in groups: the mean and the spread are those of the sum of the group for each player. What is not in a group is "other",
+ * and the actions and free actions that it holds are told by action (`gainmove.<action>.<resource>`) in its parts. */
+function groupSlices(rows: StatRow[], slices: Slice[], groups: Record<string, string>, res: string): Slice[] {
+  const members = new Map<string, string[]>();
+  for (const x of slices) members.set(groups[x.key] ?? "other", [...(members.get(groups[x.key] ?? "other") ?? []), x.key]);
+  const out: Slice[] = [];
+  for (const [group, kinds] of members) {
+    const values = rows.map((r) => sum(kinds.map((k) => r.counters[`gain.${k}.${res}`] ?? 0)));
+    const parts = kinds
+      .flatMap((k) => {
+        if (k !== "move") return [{ key: k, mean: slices.find((x) => x.key === k)?.mean ?? 0 }];
+        const actions = new Map<string, number>();
+        for (const r of rows)
+          for (const [key, v] of Object.entries(r.counters)) {
+            const m = new RegExp(`^gainmove\.([a-z_]+)\.${res}$`).exec(key);
+            if (m) actions.set(m[1] as string, (actions.get(m[1] as string) ?? 0) + v);
+          }
+        const known = sum([...actions.values()]);
+        const all = sum(rows.map((r) => r.counters[`gain.move.${res}`] ?? 0));
+        const split = [...actions.entries()].map(([a, v]) => ({ key: `move_${a}`, mean: v / Math.max(1, rows.length) }));
+        if (all > known) split.push({ key: "move", mean: (all - known) / Math.max(1, rows.length) });
+        return split;
+      })
+      .filter((p) => p.mean > 0)
+      .sort((a, b) => b.mean - a.mean);
+    out.push({
+      key: group === "other" ? "other" : `group_${group}`,
+      mean: sum(values) / Math.max(1, values.length),
+      spread: spreadOf(values),
+      parts,
+    });
+  }
+  return out.sort((a, b) => (a.key === "other" ? 1 : b.key === "other" ? -1 : b.mean - a.mean));
 }
 
 /** The cards that were played (any card of the main deck or of a species), by what the players who played them scored, won and did. */
