@@ -161,7 +161,8 @@ export const LABELS: Record<string, Label> = {
   pol_pick: (m) => `Choose ${cardName(m.card)}`,
   opt_yes: () => "Yes, do it",
   opt_no: () => "No, skip it",
-  pick_sample: (m) => `Choose sample ${Number(m.sample) + 1} on ${planet(m.planet)}`,
+  pick_sample: (m) =>
+    m.sample === undefined ? `Choose a sample on ${planet(m.planet)}` : `Choose sample ${Number(m.sample) + 1} on ${planet(m.planet)}`,
   mark_objective: (m) => `Mark task ${Number(m.task) + 1} of the objective ${String(m.objective)}`,
   remove_orbiter: (m) => `Remove your orbiter at ${planet(m.planet)}${m.first ? " (the first space)" : ""}`,
   remove_lander: (m) => `Remove your lander ${m.moon ? `on ${String(m.moon)}` : `at ${planet(m.planet)}`}`,

@@ -25,6 +25,15 @@ describe("the log that every client sees (rule 6)", () => {
   });
 });
 
+describe("a Mascamite sample that is chosen (ALIEN-MASC-02)", () => {
+  it("is not named to the other players: the number of the token is its face", () => {
+    const e = entry({ type: "pick_sample", planet: "jupiter", sample: 4 });
+    expect(publicEntry(e, 0).action).toEqual({ type: "pick_sample", planet: "jupiter" }); // another player
+    expect(publicEntry(e, null).action).toEqual({ type: "pick_sample", planet: "jupiter" }); // a spectator
+    expect(publicEntry(e, 1).action).toEqual({ type: "pick_sample", planet: "jupiter", sample: 4 }); // the player who chose it
+  });
+});
+
 describe("a card drawn from the deck", () => {
   it("is named for the player who drew it and hidden from the others", () => {
     const e = entry({ type: "end_turn" }, [{ type: "draw_card", player: 1, card: "17" }]);

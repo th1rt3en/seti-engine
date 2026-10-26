@@ -40,11 +40,14 @@ export function publicEntry(e: LogEntry, viewer: number | null = null): PublicEn
   if (HIDDEN_SETUP_MOVES.has(type) && e.seat !== viewer) return hidden;
   // an observer (nobody's seat) is shown the setup when everybody has locked in: the last lock of a step carries the final choices
   if (SETUP_LOCKS.has(type) && viewer === null && !e.events.some((ev) => SETUP_REVEALS.has(String(ev.type)))) return hidden;
+  // the number of a Mascamite sample token is its face (ALIEN-MASC-02): the player who chose it knows it, the others are only told that one was chosen
   const action = HIDDEN_CARD_ACTIONS.has(type)
     ? without(e.action as Record<string, unknown>, "card")
-    : SECRET_CHOICES.has(type) && e.seat !== viewer
-      ? without(without(e.action as Record<string, unknown>, "org"), "cards")
-      : e.action;
+    : type === "pick_sample" && e.seat !== viewer
+      ? without(e.action as Record<string, unknown>, "sample")
+      : SECRET_CHOICES.has(type) && e.seat !== viewer
+        ? without(without(e.action as Record<string, unknown>, "org"), "cards")
+        : e.action;
   const events = e.events.map((ev) =>
     HIDDEN_CARD_EVENTS.has(String(ev.type)) || (ev.type === "draw_card" && ev.player !== viewer) ? without(ev, "card") : ev,
   );
