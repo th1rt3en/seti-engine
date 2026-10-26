@@ -10,6 +10,7 @@ import {
   DISCOVERY,
   LAND_SPACES,
   MOON,
+  OUMUAMUA_PLANET,
   OUMUAMUA_TILE,
   PLANET,
   RING_BOUNDS,
@@ -17,6 +18,7 @@ import {
   alienColumn,
   landSlot,
   orbitSlot,
+  oumuamuaOrbitSlot,
   polar,
   sectorDegrees,
 } from "./geometry";
@@ -126,6 +128,14 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
     if (n.alien && n.slot !== undefined) {
       const at = alienColumn(n.slot)[n.alien === "deck" ? "deck" : "faceUp"];
       spot = { id: `alien:${n.slot}:${n.alien}`, shape: { kind: "rect", x: at.x, y: at.y, w: ALIEN_COLUMN.w, h: ALIEN_COLUMN.h } };
+    } else if (n.action && n.planet === "oumuamua") {
+      // 'Oumuamua lies on its species board: the orbit is the next space of the green line, the landing is its reward
+      const st = s.planets.oumuamua;
+      const slot = s.species.findIndex((sp) => sp.discovered && sp.species === "oumuamua");
+      if (!st || slot < 0) return;
+      const inPicture = n.action === "orbit" ? oumuamuaOrbitSlot(st.orbiters.length) : OUMUAMUA_PLANET.landReward;
+      const at = onAlienBoard(slot, inPicture.x, inPicture.y);
+      spot = { id: `${n.action}:oumuamua`, shape: { kind: "circle", x: at.x, y: at.y, r: 62 } };
     } else if (n.action && n.planet) {
       const st = s.planets[n.planet];
       const pos = PLANET[n.planet];
@@ -141,8 +151,13 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
         spot = { id: `land:${n.planet}`, shape: { kind: "circle", x: at.x, y: at.y, r: 62 } };
       }
     } else if (n.land_data) {
-      // Mars: the two first-lander spaces, each with its own amount of data, are clicked on the planet
-      const at = LAND_SPACES[n.land_data.planet]?.circles[n.land_data.slot];
+      // Mars: the two first-lander spaces, each with its own amount of data, are clicked on the planet ('Oumuamua: on its species board)
+      let at = LAND_SPACES[n.land_data.planet]?.circles[n.land_data.slot];
+      if (n.land_data.planet === "oumuamua") {
+        const slot = s.species.findIndex((sp) => sp.discovered && sp.species === "oumuamua");
+        const circle = OUMUAMUA_PLANET.landCircles[n.land_data.slot];
+        at = slot < 0 || !circle ? undefined : onAlienBoard(slot, circle.x, circle.y);
+      }
       if (!at) return;
       spot = {
         id: `landdata:${n.land_data.planet}:${n.land_data.slot}`,
@@ -227,7 +242,9 @@ export function buildSpots(view: View): { spots: Spot[]; handled: Set<number> } 
       if (st && me !== null) {
         const from = m.first ? 0 : st.first_orbiter === me ? 1 : 0;
         const k = m.first ? 0 : st.orbiters.findIndex((o, j) => j >= from && o === me);
-        const at = k < 0 ? null : orbitSlot(planet, k);
+        const inPicture = planet === "oumuamua" ? oumuamuaOrbitSlot(k) : null;
+        const slot = s.species.findIndex((sp) => sp.discovered && sp.species === "oumuamua");
+        const at = k < 0 ? null : inPicture && slot >= 0 ? onAlienBoard(slot, inPicture.x, inPicture.y) : orbitSlot(planet, k);
         if (at) add(i, `orbiter:${planet}:${m.first ? "first" : "later"}`, { kind: "circle", x: at.x, y: at.y, r: 62 });
       }
     } else if (m.type === "pick_organelle" || m.type === "amoeba_remove") {

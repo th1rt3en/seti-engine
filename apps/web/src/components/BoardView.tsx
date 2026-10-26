@@ -36,6 +36,8 @@ import {
   goldSlot,
   landSlot,
   orbitSlot,
+  oumuamuaLandSlot,
+  oumuamuaOrbitSlot,
   polar,
   scoreDegrees,
   sectorDegrees,
@@ -766,6 +768,55 @@ export function BoardView({
             </g>
           );
         })}
+
+        {/* the orbiters and the landers of 'Oumuamua lie on the spaces of its species board (ALIEN-OUM-05), as on any planet */}
+        {(() => {
+          const st = s.planets.oumuamua;
+          const si = s.species.findIndex((sp) => sp.discovered && sp.species === "oumuamua");
+          if (!st || si < 0) return null;
+          const where = (p: { x: number; y: number }) => onAlienBoard(si, p.x, p.y);
+          const owners = st.first_land_owners ?? [];
+          return (
+            <g>
+              {st.orbiters.map((player, k) => {
+                const at = where(oumuamuaOrbitSlot(k));
+                return (
+                  <g
+                    // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
+                    key={`oo${k}`}
+                    transform={`translate(${at.x} ${at.y})`}
+                  >
+                    <ellipse cy={6} rx={54} ry={20} fill="none" stroke="#fff" strokeWidth={6} opacity={0.95} />
+                    <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: orbiter at 'Oumuamua`} />
+                  </g>
+                );
+              })}
+              {st.landers.map((player, k) => {
+                // the lander lies on the first-lander space that it covered; the later ones follow the gold line
+                let place = k;
+                if (k < owners.length) {
+                  const used = new Set<number>();
+                  for (let j = 0; j <= k; j++) {
+                    let slot = owners.findIndex((o, idx) => o === st.landers[j] && !used.has(idx));
+                    if (slot < 0) slot = owners.findIndex((_, idx) => !used.has(idx));
+                    used.add(slot);
+                    if (j === k) place = slot;
+                  }
+                }
+                const at = where(oumuamuaLandSlot(place));
+                return (
+                  <g
+                    // biome-ignore lint/suspicious/noArrayIndexKey: arrival order
+                    key={`ol${k}`}
+                    transform={`translate(${at.x} ${at.y})`}
+                  >
+                    <ProbePiece x={0} y={0} size={96} color={color(player)} title={`${who(player)}: lander at 'Oumuamua`} />
+                  </g>
+                );
+              })}
+            </g>
+          );
+        })()}
 
         {/* the message tiles that cover the reward hexes of the Centaurian board (ALIEN-CEN-04): the tile of the player who took the reward */}
         {s.species.flatMap((sp, i) => {

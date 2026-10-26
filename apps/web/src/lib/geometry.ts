@@ -230,6 +230,71 @@ export function landSlot(planet: string, k: number): { x: number; y: number } | 
   return { x: land.hex.x + radius * Math.cos(angle), y: land.hex.y + radius * Math.sin(angle) };
 }
 
+/**
+ * 'Oumuamua is a planet that lies on its species board (the picture is 777 x 1415 px, see ALIEN): the first orbiter covers the round space with the alien card
+ * (the green line leaves it), the later ones follow the green line up to the orbit reward; the three first-lander spaces take the first landers (the engine's
+ * slot k gives [3, 2, 1] data, so slot 0 is the lowest circle), the later landers follow the gold line. The places are in pixels of the picture; the
+ * board turns them into board pixels with `onAlienBoard` (lib/targets.ts). Measured on the picture.
+ */
+export const OUMUAMUA_PLANET = {
+  /** The first orbiter's space, then the green line up to the reward. */
+  orbitPath: [
+    { x: 126, y: 272 },
+    { x: 104, y: 220 },
+    { x: 120, y: 185 },
+    { x: 150, y: 150 },
+    { x: 200, y: 115 },
+    { x: 240, y: 95 },
+    { x: 290, y: 70 },
+  ],
+  /** The first-lander spaces by the engine's slot (3, 2 and 1 data). */
+  landCircles: [
+    { x: 283, y: 456 },
+    { x: 252, y: 357 },
+    { x: 300, y: 263 },
+  ],
+  /** The landing reward (9 points and 2 exofossils): the space that stands for the landing itself. */
+  landReward: { x: 350, y: 357 },
+  /** The gold line that the landers beyond the three circles follow. */
+  landPath: [
+    { x: 300, y: 263 },
+    { x: 300, y: 207 },
+    { x: 350, y: 192 },
+    { x: 400, y: 182 },
+    { x: 450, y: 187 },
+    { x: 500, y: 210 },
+    { x: 535, y: 245 },
+    { x: 550, y: 272 },
+  ],
+  spacing: 96,
+};
+
+/** The point at `distance` along a line of points (beyond its end the last segment goes on). */
+function along(path: { x: number; y: number }[], distance: number): { x: number; y: number } {
+  let rest = distance;
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1] as { x: number; y: number };
+    const b = path[i] as { x: number; y: number };
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (rest <= len || i === path.length - 1) {
+      const t = len === 0 ? 0 : rest / len;
+      return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    }
+    rest -= len;
+  }
+  return path[0] ?? { x: 0, y: 0 };
+}
+
+/** Where the `k`-th orbiter of 'Oumuamua lies on the picture of its board (0 is the first, on the space of the alien card). */
+export const oumuamuaOrbitSlot = (k: number): { x: number; y: number } => along(OUMUAMUA_PLANET.orbitPath, k * OUMUAMUA_PLANET.spacing);
+
+/** Where a lander of 'Oumuamua lies: `place` is the first-lander slot that it covered (0 to 2), or the order of arrival beyond them. */
+export function oumuamuaLandSlot(place: number): { x: number; y: number } {
+  const circle = OUMUAMUA_PLANET.landCircles[place];
+  if (circle) return circle;
+  return along(OUMUAMUA_PLANET.landPath, (place - OUMUAMUA_PLANET.landCircles.length + 1) * OUMUAMUA_PLANET.spacing);
+}
+
 /** The moons, by the lower-case first word of their name in the engine's data: the round landing space of each. */
 export const MOON: Record<string, { x: number; y: number }> = {
   io: at(953, 336),

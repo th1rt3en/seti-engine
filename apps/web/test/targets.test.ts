@@ -1,3 +1,4 @@
+import { OUMUAMUA_PLANET, oumuamuaLandSlot, oumuamuaOrbitSlot } from "@/lib/geometry";
 import { buildSpots } from "@/lib/targets";
 import type { View } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
@@ -283,5 +284,56 @@ describe("a signal in the sector of 'Oumuamua (ALIEN-OUM-03)", () => {
     const { spots, handled } = buildSpots(view(legal, notes));
     expect(spots.map((s) => s.id)).toEqual(["sector:0", "oumuamua-tile", "sector:4"]);
     expect([...handled].sort()).toEqual([0, 1, 2]);
+  });
+});
+
+describe("'Oumuamua on its species board (ALIEN-OUM-05)", () => {
+  /** A game with 'Oumuamua discovered in the second slot, and `orbiters` already orbiting it. */
+  function oumuamua(legal: Record<string, unknown>[], notes: (Record<string, unknown> | null)[], orbiters: number[] = []): View {
+    return {
+      state: {
+        planets: { oumuamua: { orbiters, landers: [], first_land_owners: [null, null, null] } },
+        species: [
+          { species: "mascamites", discovered: true },
+          { species: "oumuamua", discovered: true },
+        ],
+        disc_angles: [0, 0, 0],
+      },
+      legal,
+      notes,
+    } as unknown as View;
+  }
+
+  it("orbiting is the next space of the green line, landing its reward, and each first-lander space is a place with its data", () => {
+    const { spots, handled } = buildSpots(
+      oumuamua(
+        [
+          { type: "orbit", probe: "a" },
+          { type: "land", probe: "a" },
+          { type: "choose_land_slot", slot: 0 },
+          { type: "choose_land_slot", slot: 2 },
+        ],
+        [
+          { action: "orbit", planet: "oumuamua", moon: null, free: false, cost: {} },
+          { action: "land", planet: "oumuamua", moon: null, free: false, cost: {} },
+          { land_data: { planet: "oumuamua", slot: 0, data: 3 } },
+          { land_data: { planet: "oumuamua", slot: 2, data: 1 } },
+        ],
+      ),
+    );
+    expect(spots.map((s) => s.id)).toEqual(["orbit:oumuamua", "land:oumuamua", "landdata:oumuamua:0", "landdata:oumuamua:2"]);
+    expect(spots.map((s) => s.tag)).toEqual([undefined, undefined, "3 data", "1 data"]);
+    expect([...handled].sort()).toEqual([0, 1, 2, 3]); // no button of the bar is made for them
+  });
+
+  it("the first orbiter covers the space of the alien card, the later ones follow the line, and the first landers take the circle of their data", () => {
+    expect(oumuamuaOrbitSlot(0)).toEqual(OUMUAMUA_PLANET.orbitPath[0]);
+    const second = oumuamuaOrbitSlot(1);
+    const first = oumuamuaOrbitSlot(0);
+    expect(Math.hypot(second.x - first.x, second.y - first.y)).toBeGreaterThan(60);
+    expect(oumuamuaLandSlot(2)).toEqual(OUMUAMUA_PLANET.landCircles[2]);
+    expect(oumuamuaLandSlot(3)).not.toEqual(OUMUAMUA_PLANET.landCircles[2]); // beyond the three circles: along the gold line
+    // the engine's slot k gives 3, 2, 1 data: the lowest circle is the first slot
+    expect((OUMUAMUA_PLANET.landCircles[0]?.y ?? 0) > (OUMUAMUA_PLANET.landCircles[2]?.y ?? 0)).toBe(true);
   });
 });
