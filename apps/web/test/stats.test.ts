@@ -166,6 +166,64 @@ describe("statistics", () => {
     expect(use.map((t) => t.tech).slice(0, 5)).toEqual(["probe-dot", "probe-link", "probe-branch", "probe-cross", "telescope-dot"]);
   });
 
+  it("the sources of a resource: the mean of each over the players, with how they differ; the publicity of moving is split by what was visited", () => {
+    const rows = [
+      row({
+        gameId: "a",
+        counters: {
+          "gain.card.credit": 4,
+          "gain.income.credit": 6,
+          "gain.move.publicity": 5,
+          "publicity.visit.comet": 2,
+          "publicity.visit.mars": 1,
+        },
+      }),
+      row({
+        gameId: "b",
+        counters: { "gain.card.credit": 2, "gain.income.credit": 6, "gain.move.publicity": 1, "publicity.visit.asteroid": 1 },
+      }),
+    ];
+    const g = aggregate(rows, any).gains;
+    expect(g.credit?.map((x) => [x.key, x.mean])).toEqual([
+      ["income", 6],
+      ["card", 3],
+    ]);
+    expect(g.credit?.[1]?.spread).toEqual({ min: 2, max: 4, std: 1 });
+    const pub = Object.fromEntries((g.publicity ?? []).map((x) => [x.key, x.mean]));
+    expect(pub).toEqual({ visit_comet: 1, visit_asteroid: 0.5, visit_planet: 0.5, move: 1 }); // 5 + 1 = 6 in all: 3 + 1 + 1 + ... per player 3
+  });
+
+  it("the final score comes in parts (version 3 rows only)", () => {
+    const rows = [
+      row({ counters: { "stats.version": 3, "gain.card.vp": 10, "final.cards": 12, "final.gold": 8 } }),
+      row({ gameId: "b", counters: { "gain.card.vp": 20 } }), // an older row: no parts
+    ];
+    const vp = Object.fromEntries((aggregate(rows, any).gains.vp ?? []).map((x) => [x.key, x.mean]));
+    expect(vp).toEqual({ card: 15, final_cards: 12, final_gold: 8 });
+  });
+
+  it("the cards played: by the players who played them, with the round, the final score, the win and the organization", () => {
+    const v = { "stats.version": 3 };
+    const rows = [
+      row({ gameId: "a", score: 100, won: true, org: "xenolab", counters: { ...v, "card.17.r2": 1, "card.40.r3": 1 } }),
+      row({ gameId: "b", score: 80, won: false, org: "xenolab", counters: { ...v, "card.17.r4": 1 } }),
+      row({ gameId: "c", score: 60, won: false, org: "stratus_core", counters: { ...v, "card.17.r4": 2 } }),
+      row({ gameId: "d", score: 200, counters: { "card.17.r2": 5 } }), // an old row: its cards were not counted
+    ];
+    const a = aggregate(rows, any);
+    expect(a.cardRows).toBe(3);
+    const c17 = a.cards.find((x) => x.id === "17");
+    expect(c17).toMatchObject({ players: 3, plays: 4, winRate: 1 / 3, rounds: { 2: 1, 4: 3 } });
+    expect(c17?.avgScore).toBeCloseTo(80);
+    expect(c17?.avgRound).toBeCloseTo((2 + 4 * 3) / 4);
+    expect(c17?.share).toBe(1);
+    expect(c17?.orgs).toEqual([
+      { org: "xenolab", n: 2 },
+      { org: "stratus_core", n: 1 },
+    ]);
+    expect(a.cards[0]?.id).toBe("17"); // the most played first
+  });
+
   it("several species or organizations count as any of them", () => {
     const r1 = row({ gameId: "a", species: ["anomalies", "mascamites"], org: "xenolab" });
     const r2 = row({ gameId: "b", species: ["oumuamua", "centaurians"], org: "stratus_core" });

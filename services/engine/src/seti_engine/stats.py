@@ -17,7 +17,7 @@ from typing import Any
 
 from . import amoeba, card_defs, effects, glyphids, projection, replay, solar, species, tables
 
-VERSION = 2
+VERSION = 3  # 3: the cards played by round (`card.<id>.r<round>`) and the parts of the final score (`final.<part>`)
 SECURITY_CARDS = frozenset(str(x["id"]) for x in tables.arkhos()["security"])
 MAIN_ACTIONS = ("launch", "scan", "analyze", "research", "orbit", "land", "play_card", "pass")
 RESOURCES = ("credit", "energy", "card", "publicity", "data", "vp", "move")
@@ -64,6 +64,9 @@ def alien_end(c: Counter[str], end: Any, p: Any) -> None:
     c["oumuamua.orbiters"] = p.orbiters.get("oumuamua", 0)
     c["oumuamua.landers"] = p.landers.get("oumuamua", 0)
     row = next((r for r in end.final_scores if r["player"] == p.index), None)
+    if row is not None:  # where the final score came from: board, end-of-game cards, gold tiles, Exertian cards, glyph tokens
+        for part in ("board", "cards", "gold", "exertian", "glyphs", "loss"):
+            c[f"final.{part}"] = int(row[part])
     if row is not None and species.exertian_slot(end) is not None:  # ALIEN-EXE-06, ALIEN-EXE-07
         c["exertians.danger"] = species.danger(end, p)
         c["exertians.danger.cards"] = species.cards_danger(p)
@@ -262,6 +265,7 @@ def game_stats(file: dict[str, Any]) -> dict[str, Any]:
                 c["cards.drawn"] += 1
             elif t == "play_card":
                 c["cards.played"] += 1
+                c[f"card.{e['card']}.r{rnd}"] += 1  # a card of the main deck or of a species, by the round in which it was played
                 card = card_defs.CARDS.get(str(e["card"]), {})
                 if "mission" in card:
                     c["missions.played"] += 1

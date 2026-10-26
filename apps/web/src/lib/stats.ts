@@ -1,3 +1,4 @@
+import { GAIN_RESOURCES } from "./resources";
 import { TECH_METRICS, TECH_ORDER } from "./techs";
 
 // Statistics of the finished games: the averages of the counters that the engine made for each player of each game (services/engine stats.py, table
@@ -146,6 +147,34 @@ export interface FreshStats {
 }
 
 export const FRESH_VERSION = 2;
+/** The version of the statistics that counts the cards played by round and the parts of the final score. */
+export const CARDS_VERSION = 3;
+
+/** One slice of a pie: where a resource came from (the mean per player, and how the players differ). */
+export interface Slice {
+  key: string;
+  mean: number;
+  spread: Spread;
+}
+
+/** What a card of the main deck or of a species did, over the players who played it (the counters `card.<id>.r<round>`, from version 3). */
+export interface CardStat {
+  id: string;
+  /** the players who played it, and how many times it was played */
+  players: number;
+  plays: number;
+  /** the share of the players of the version 3 rows who played it */
+  share: number;
+  /** the final score of the players who played it */
+  avgScore: number;
+  scoreSpread: Spread;
+  winRate: number;
+  /** the mean round of its plays, and the plays in each round */
+  avgRound: number;
+  rounds: Record<number, number>;
+  /** the organizations of the players who played it, the most frequent first */
+  orgs: { org: string; n: number }[];
+}
 
 /** The counters of one alien species over the players of the games where it was discovered (the counters `alien.<species>.games` marks them). */
 export interface AlienStats {
@@ -155,6 +184,12 @@ export interface AlienStats {
 }
 
 export interface Stats {
+  /** by resource: where it came from, in slices (the mean per player of each source) */
+  gains: Record<string, Slice[]>;
+  /** the cards played, over the rows of version 3 */
+  cards: CardStat[];
+  /** the rows of version 3 (the cards and the parts of the final score are counted over them) */
+  cardRows: number;
   /** by species: what each of them gave and did (see AlienStats) */
   alien: Record<string, AlienStats>;
   /** the counters of version 2 and later, over the rows that have them */
@@ -264,8 +299,25 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
       mean[k] = sum(values) / values.length;
       spreads[k] = spreadOf(values);
     }
+    // everything the species gave, by resource (the parts of its rules added up for each player): `alien.<species>.all.<resource>`
+    for (const res of ["vp", "credit", "energy", "card", "publicity", "data", "move"]) {
+      const re = new RegExp(`^alien\\.${sp}\\.[a-z_]+\\.${res}$`);
+      const values = mine.map((r) =>
+        sum(
+          Object.entries(r.counters)
+            .filter(([k]) => re.test(k) && !k.includes(".all."))
+            .map(([, v]) => v),
+        ),
+      );
+      mean[`alien.${sp}.all.${res}`] = values.length === 0 ? 0 : sum(values) / values.length;
+      spreads[`alien.${sp}.all.${res}`] = spreadOf(values);
+    }
     alien[sp] = { rows: mine.length, mean, spread: spreads };
   }
+
+  const v3 = rows.filter((r) => (r.counters["stats.version"] ?? 0) >= CARDS_VERSION);
+  const gains = gainSlices(rows, v3);
+  const cards = cardStats(v3);
 
   const techUse: TechUseStat[] = TECH_ORDER.map((tech) => {
     const owners = fresh.filter((r) => (r.counters[`tech.${tech}`] ?? 0) > 0);
@@ -287,6 +339,9 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   const spread: Record<string, Spread> = {};
   for (const k of Object.keys(totals)) spread[k] = spreadOf(rows.map((r) => r.counters[k] ?? 0));
   return {
+    gains,
+    cards,
+    cardRows: v3.length,
     games: new Set(rows.map((r) => r.gameId)).size,
     rows: n,
     players: rows,
@@ -319,4 +374,87 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
     alien,
     rounds,
   };
+}
+
+/** The sources of each resource. A source is the kind of the scope in which the resource was gained (`gain.<kind>.<resource>`). The publicity of the moves of
+ * probes is split by what the probe moved onto, and the points of the end of the game by the part of the final score they came from. */
+function gainSlices(rows: StatRow[], v3: StatRow[]): Record<string, Slice[]> {
+  const out: Record<string, Slice[]> = {};
+  const slice = (key: string, of: StatRow[], f: (c: Record<string, number>) => number): Slice => {
+    const values = of.map((r) => f(r.counters));
+    return { key, mean: values.length === 0 ? 0 : sum(values) / values.length, spread: spreadOf(values) };
+  };
+  for (const res of GAIN_RESOURCES) {
+    const kinds = new Set<string>();
+    for (const r of rows) {
+      for (const k of Object.keys(r.counters)) {
+        const m = /^gain\.([a-z_]+)\.([a-z]+)$/.exec(k);
+        if (m && m[2] === res) kinds.add(m[1] as string);
+      }
+    }
+    const list: Slice[] = [];
+    for (const kind of [...kinds].sort()) {
+      const key = `gain.${kind}.${res}`;
+      if (res === "publicity" && kind === "move") {
+        // the publicity of moving a probe: by what it moved onto; what is left is from the other free actions
+        const visits = (c: Record<string, number>, names: string[]): number =>
+          names.reduce((a, n) => a + (c[`publicity.visit.${n}`] ?? 0), 0);
+        const planets = (c: Record<string, number>): string[] =>
+          Object.keys(c)
+            .filter((k) => k.startsWith("publicity.visit."))
+            .map((k) => k.slice("publicity.visit.".length))
+            .filter((n) => !["comet", "asteroid", "asteroids"].includes(n));
+        list.push(slice("visit_comet", rows, (c) => visits(c, ["comet"])));
+        list.push(slice("visit_asteroid", rows, (c) => visits(c, ["asteroid", "asteroids"])));
+        list.push(slice("visit_planet", rows, (c) => visits(c, planets(c))));
+        list.push(slice("move", rows, (c) => Math.max(0, (c[key] ?? 0) - visits(c, ["comet", "asteroid", "asteroids", ...planets(c)]))));
+      } else list.push(slice(kind, rows, (c) => c[key] ?? 0));
+    }
+    if (res === "vp") {
+      for (const part of ["cards", "gold", "exertian", "glyphs"])
+        if (v3.some((r) => (r.counters[`final.${part}`] ?? 0) > 0)) list.push(slice(`final_${part}`, v3, (c) => c[`final.${part}`] ?? 0));
+    }
+    out[res] = list.filter((x) => x.mean > 0).sort((a, b) => b.mean - a.mean);
+  }
+  return out;
+}
+
+/** The cards that were played (any card of the main deck or of a species), by what the players who played them scored, won and did. */
+function cardStats(v3: StatRow[]): CardStat[] {
+  const byCard = new Map<string, { rows: StatRow[]; plays: number; rounds: Record<number, number> }>();
+  for (const r of v3) {
+    for (const [k, v] of Object.entries(r.counters)) {
+      const m = /^card\.(.+)\.r(\d+)$/.exec(k);
+      if (!m) continue;
+      const id = m[1] as string;
+      let e = byCard.get(id);
+      if (!e) {
+        e = { rows: [], plays: 0, rounds: {} };
+        byCard.set(id, e);
+      }
+      if (e.rows[e.rows.length - 1] !== r) e.rows.push(r);
+      e.plays += v;
+      e.rounds[Number(m[2])] = (e.rounds[Number(m[2])] ?? 0) + v;
+    }
+  }
+  return [...byCard.entries()]
+    .map(([id, e]) => {
+      const scores = e.rows.map((r) => r.score);
+      const orgs = new Map<string, number>();
+      for (const r of e.rows) if (r.org) orgs.set(r.org, (orgs.get(r.org) ?? 0) + 1);
+      const rounds = Object.entries(e.rounds);
+      return {
+        id,
+        players: e.rows.length,
+        plays: e.plays,
+        share: v3.length === 0 ? 0 : e.rows.length / v3.length,
+        avgScore: sum(scores) / scores.length,
+        scoreSpread: spreadOf(scores),
+        winRate: e.rows.filter((r) => r.won).length / e.rows.length,
+        avgRound: e.plays === 0 ? 0 : sum(rounds.map(([r, n]) => Number(r) * n)) / e.plays,
+        rounds: e.rounds,
+        orgs: [...orgs.entries()].map(([org, n]) => ({ org, n })).sort((a, b) => b.n - a.n),
+      };
+    })
+    .sort((a, b) => b.plays - a.plays);
 }

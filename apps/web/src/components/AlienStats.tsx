@@ -1,7 +1,9 @@
 // The statistics of the alien species: what each of them gave and did, averaged over the players of the games where it was discovered. The numbers
 // are counters of the engine (stats.py: `alien.<species>.<part>.<resource>`, `mascamites.delivered` ...); nothing here is a rule.
+import { RESOURCE_COLORS, RESOURCE_NAMES } from "@/lib/resources";
 import type { AlienStats } from "@/lib/stats";
 import type { ReactNode } from "react";
+import { PieChart } from "./PieChart";
 import { KindIcon, Rewards } from "./Reward";
 import { BarList, Panel, Tile, WithSpread, round } from "./StatCharts";
 
@@ -29,36 +31,63 @@ function ResourceTable({
   label,
 }: { a: AlienStats; species: string; parts: { key: string; label: string }[]; label: string }) {
   return (
-    <div className="tablewrap">
-      <table className="res-table" aria-label={label}>
-        <thead>
-          <tr>
-            <th scope="col">{label}</th>
-            {RESOURCES.map((res) => (
-              <th key={res} scope="col">
-                <KindIcon kind={res} size={20} />
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {parts.map((part) => (
-            <tr key={part.key}>
-              <th scope="row">{part.label}</th>
-              {RESOURCES.map((res) => {
-                const k = `alien.${species}.${part.key}.${res}`;
-                const v = a.mean[k] ?? 0;
-                return (
-                  <td key={res} className={v > 0 ? undefined : "muted"}>
-                    <WithSpread spread={a.spread[k]}>{round(v)}</WithSpread>
-                  </td>
-                );
-              })}
+    <details className="stat-table">
+      <summary>By part of its rules, as a table</summary>
+      <div className="tablewrap">
+        <table className="res-table" aria-label={label}>
+          <thead>
+            <tr>
+              <th scope="col">{label}</th>
+              {RESOURCES.map((res) => (
+                <th key={res} scope="col">
+                  <KindIcon kind={res} size={20} />
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {parts.map((part) => (
+              <tr key={part.key}>
+                <th scope="row">{part.label}</th>
+                {RESOURCES.map((res) => {
+                  const k = `alien.${species}.${part.key}.${res}`;
+                  const v = a.mean[k] ?? 0;
+                  return (
+                    <td key={res} className={v > 0 ? undefined : "muted"}>
+                      <WithSpread spread={a.spread[k]}>{round(v)}</WithSpread>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  );
+}
+
+/** What the species gave, by resource: the slices have the color of the resource (the parts of its rules are added up for each player). */
+function ResourcePie({ a, species }: { a: AlienStats; species: string }) {
+  const slices = RESOURCES.map((res) => ({
+    key: res,
+    name: RESOURCE_NAMES[res] ?? res,
+    label: (
+      <span className="icon-label">
+        <KindIcon kind={res} size={18} />
+        {RESOURCE_NAMES[res] ?? res}
+      </span>
+    ),
+    value: a.mean[`alien.${species}.all.${res}`] ?? 0,
+    spread: a.spread[`alien.${species}.all.${res}`],
+    color: RESOURCE_COLORS[res] ?? "#8b949e",
+  })).filter((x) => x.value > 0);
+  if (slices.length === 0) return null;
+  return (
+    <>
+      <h3>Resources it gave, per player</h3>
+      <PieChart slices={slices} label={`Resources gained through ${species}, by resource`} />
+    </>
   );
 }
 
@@ -82,6 +111,7 @@ function Species({
       wide
     >
       {a && a.rows > 0 ? children(a) : null}
+      {a && a.rows > 0 ? <ResourcePie a={a} species={species} /> : null}
     </Panel>
   );
 }

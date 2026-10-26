@@ -1508,3 +1508,163 @@ button.fpill {
   font-size: 13px;
   cursor: pointer;
 }
+
+/* the pies of the statistics (components/PieChart.tsx) */
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+  margin: 8px 0;
+}
+.pie-art {
+  position: relative;
+  width: 220px;
+  max-width: 100%;
+  flex: none;
+}
+.pie-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.pie-art path {
+  cursor: pointer;
+  transition: opacity 0.12s;
+  outline: none;
+}
+.pie-art path:focus-visible {
+  stroke: #fff;
+}
+.pie-tip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  min-width: 190px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  pointer-events: none;
+  display: grid;
+  gap: 4px;
+}
+.pie-tip .tip-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px 14px;
+}
+.pie-tip .tip-foot {
+  color: var(--muted);
+  font-size: 11px;
+}
+.pie-legend {
+  max-width: 440px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 200px;
+}
+.pie-legend li {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.pie-legend li.on {
+  background: rgba(139, 148, 158, 0.16);
+}
+.pie-legend .swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.pie-legend .pie-name {
+  overflow-wrap: anywhere;
+}
+
+/* the cards of the statistics (components/CardStats.tsx) */
+.cs-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  align-items: end;
+  margin: 8px 0 12px;
+}
+.cs-controls .fpills {
+  flex: 1 1 100%;
+}
+.cs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 10px;
+}
+.cs-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-width: 0;
+}
+.cs-card {
+  flex: none;
+}
+.cs-body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.cs-nums {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 12px;
+  margin: 0;
+}
+.cs-nums dt {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cs-nums dd {
+  margin: 0;
+}
+.cs-rounds {
+  display: flex;
+  gap: 6px;
+  align-items: end;
+  height: 44px;
+}
+.cs-round {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  width: 26px;
+  height: 100%;
+}
+.cs-bar {
+  align-self: end;
+  width: 14px;
+  background: var(--viz-1);
+  border-radius: 3px 3px 0 0;
+}
+.cs-orgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+}

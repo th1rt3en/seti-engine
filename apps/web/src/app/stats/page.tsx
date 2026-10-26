@@ -1,4 +1,5 @@
 import { AlienStatsSection } from "@/components/AlienStats";
+import { CardStats } from "@/components/CardStats";
 // Statistics of the games that were played to their end, averaged for each player of each game (the counters come from the engine: stats.py).
 // The filter chooses which games count: the number of players, the expansion, rated or friendly. Nothing is worked out here that is a rule.
 // Drawn as tiles and charts (components/StatCharts.tsx), every block with its numbers as a table behind a button.
@@ -16,6 +17,7 @@ import {
 } from "@/components/Icons";
 import { MultiChoice } from "@/components/MultiChoice";
 import { OrgName } from "@/components/OrgName";
+import { ResourcePies } from "@/components/ResourcePies";
 import { BarList, Histogram, LineChart, Panel, Pills, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
 import { ORG_NAMES } from "@/lib/moves";
@@ -320,6 +322,19 @@ export default async function StatsPage({
               <Histogram values={s.scores} label="Number of players by final score" />
             </Panel>
 
+            <h2 className="stat-section">Where the resources came from</h2>
+            <ResourcePies gains={s.gains} />
+
+            <h2 className="stat-section">The cards</h2>
+            <Panel
+              title="Cards played"
+              note="Every card of the main deck and of the species that was played, with what happened to the players who played it."
+              wide
+            >
+              <CardStats cards={s.cards} rows={s.cardRows} rounds={s.rounds} />
+            </Panel>
+
+            <h2 className="stat-section">Organizations and species</h2>
             <Panel
               title="Organizations"
               note="How often each was picked of the times it was offered, how often the players who picked it won, and their average final score."
@@ -600,38 +615,6 @@ export default async function StatsPage({
                   spreads: s.rounds.map((r) => sd(`incomerate.r${r}.${k}`) ?? { min: 0, max: 0, std: 0 }),
                 }))}
               />
-            </Panel>
-
-            <Panel title="Publicity gained" icon={<PublicityIcon size={24} />} note="Where the publicity of a player came from, per game.">
-              <BarList
-                label="Publicity gained by source"
-                rows={publicity.map((x, k) => ({
-                  key: x.key,
-                  label: x.label,
-                  value: x.value,
-                  spread: x.spread,
-                  color: VIZ[k % VIZ.length] as string,
-                  text: <b>{round(x.value)}</b>,
-                }))}
-              />
-              {alienKeys.length > 0 ? (
-                <details className="stat-table">
-                  <summary>Alien effects by species</summary>
-                  <BarList
-                    label="Publicity gained through alien effects, by species"
-                    rows={alienKeys
-                      .map((k) => ({ key: k, species: k.slice("publicity.alien.".length), value: m(k) }))
-                      .sort((a, b) => b.value - a.value)
-                      .map((x) => ({
-                        key: x.key,
-                        label: SPECIES_NAMES[x.species] ?? cap(x.species),
-                        value: x.value,
-                        spread: sd(x.key),
-                        text: <b>{round(x.value)}</b>,
-                      }))}
-                  />
-                </details>
-              ) : null}
             </Panel>
 
             <Panel title="Data" icon={<DataIcon size={24} />} note="Data per game: what came in, and where it went.">
