@@ -409,7 +409,8 @@ export function GameClient({
   const me = v.viewer === null ? null : (v.state.players[v.viewer] ?? null);
   const hand = me?.hand ?? [];
   // moves with a card of the hand are made by picking the card; moving a probe is made on the board
-  const handMoves = mine.filter((m) => isHandMove(m, hand));
+  // Deep Sky Survey's free action is made in the free actions of the move bar (its panel picks the card and the card of the display), not over a card of the hand
+  const handMoves = mine.filter((m) => isHandMove(m, hand) && !(m.type === "org_free" && m.org === "deep_sky_survey"));
   const reach = ended || v.reach.length === 0 ? [] : v.reach;
   // exchanges and buying a card are made by picking cards (of the hand, of the display) and not with buttons of their own
   const exchanges = mine.filter((m) => m.type === "exchange");
