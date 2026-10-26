@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type StatRow, aggregate, parseFilter, spreadOf } from "../src/lib/stats";
+import { type StatRow, aggregate, matches, parseFilter, spreadOf } from "../src/lib/stats";
 
 const row = (over: Partial<StatRow>): StatRow => ({
   gameId: "g1",
@@ -166,6 +166,18 @@ describe("statistics", () => {
     expect(use.map((t) => t.tech).slice(0, 5)).toEqual(["probe-dot", "probe-link", "probe-branch", "probe-cross", "telescope-dot"]);
   });
 
+  it("several species or organizations count as any of them", () => {
+    const r1 = row({ gameId: "a", species: ["anomalies", "mascamites"], org: "xenolab" });
+    const r2 = row({ gameId: "b", species: ["oumuamua", "centaurians"], org: "stratus_core" });
+    const r3 = row({ gameId: "c", species: ["exertians", "arkhos"], org: null });
+    const rows = [r1, r2, r3];
+    const kept = (f: Parameters<typeof parseFilter>[0]) => rows.filter((r) => matches(r, parseFilter(f))).map((r) => r.gameId);
+    expect(kept({ who: "all" })).toEqual(["a", "b", "c"]);
+    expect(kept({ who: "all", species: "mascamites,oumuamua" })).toEqual(["a", "b"]);
+    expect(kept({ who: "all", org: "xenolab,stratus_core" })).toEqual(["a", "b"]); // a player with no organization is in none of them
+    expect(kept({ who: "all", species: ["arkhos", "oumuamua"], org: "stratus_core" })).toEqual(["b"]);
+  });
+
   it("filters by the alien species of the game and by the organization the player picked", () => {
     const rows = [
       row({ gameId: "a", seat: 0, species: ["anomalies", "mascamites"], org: "xenolab", counters: { "action.launch": 4 } }),
@@ -183,7 +195,12 @@ describe("statistics", () => {
     expect([both.games, both.rows, both.mean["action.launch"]]).toEqual([1, 1, 6]);
     expect(aggregate(rows, parseFilter({ species: "arkhos" })).rows).toBe(0);
     // a name that is not a species or an organization of the engine is no filter
-    expect(parseFilter({ species: "klingons", org: "../x" })).toMatchObject({ species: null, org: null });
+    expect(parseFilter({ species: "klingons", org: "../x" })).toMatchObject({ species: [], org: [] });
+    // several: `a,b` or the name twice, in a fixed order, without repeats and without what is not known
+    expect(parseFilter({ species: "oumuamua,anomalies,anomalies,klingons", org: ["xenolab", "stratus_core"] })).toMatchObject({
+      species: ["anomalies", "oumuamua"],
+      org: ["stratus_core", "xenolab"],
+    });
     expect(aggregate(rows, parseFilter({ species: "klingons" })).rows).toBe(3);
   });
 

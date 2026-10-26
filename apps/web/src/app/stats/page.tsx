@@ -1,5 +1,4 @@
 import { AlienStatsSection } from "@/components/AlienStats";
-import { FilterForm } from "@/components/FilterForm";
 // Statistics of the games that were played to their end, averaged for each player of each game (the counters come from the engine: stats.py).
 // The filter chooses which games count: the number of players, the expansion, rated or friendly. Nothing is worked out here that is a rule.
 // Drawn as tiles and charts (components/StatCharts.tsx), every block with its numbers as a table behind a button.
@@ -15,6 +14,7 @@ import {
   ScoreIcon,
   TraceIcon,
 } from "@/components/Icons";
+import { MultiChoice } from "@/components/MultiChoice";
 import { OrgName } from "@/components/OrgName";
 import { BarList, Histogram, LineChart, Panel, Pills, Tile, WithSpread, round } from "@/components/StatCharts";
 import { getDb } from "@/lib/db";
@@ -126,8 +126,10 @@ export default async function StatsPage({
   if (filter.expansion !== null) base.expansion = filter.expansion ? "yes" : "no";
   if (filter.rated !== null) base.rated = filter.rated ? "yes" : "no";
   if (filter.who !== "people") base.who = filter.who ?? "all"; // "people" is the default and is not written in the address
-  if (filter.species !== null) base.species = filter.species;
-  if (filter.org !== null) base.org = filter.org;
+  if (filter.species.length > 0) base.species = filter.species.join(",");
+  if (filter.org.length > 0) base.org = filter.org.join(",");
+  // the other filters, for the choices of species and organizations (which change those two themselves)
+  const withoutAdvanced = Object.fromEntries(Object.entries(base).filter(([k]) => k !== "species" && k !== "org"));
 
   // the organizations, in the order that was asked for (those that nobody picked last)
   const orgSort = sp.osort === "win" || sp.osort === "score" ? sp.osort : "pick";
@@ -265,54 +267,40 @@ export default async function StatsPage({
         </div>
       </div>
 
-      <details className="card stat-advanced" open={filter.species !== null || filter.org !== null}>
+      <details className="card stat-advanced" open={filter.species.length > 0 || filter.org.length > 0}>
         <summary>Advanced filters</summary>
-        <FilterForm action="/stats" className="stat-advanced-form">
-          {Object.entries(base)
-            .filter(([k]) => k !== "species" && k !== "org")
-            .map(([k, v]) => (
-              <input key={k} type="hidden" name={k} value={v} />
-            ))}
-          <label>
-            <span className="stat-filter-name">Alien species in the game</span>
-            <select name="species" defaultValue={filter.species ?? ""}>
-              <option value="">Any</option>
-              {SPECIES_KEYS.map((k) => (
-                <option key={k} value={k}>
-                  {SPECIES_NAMES[k] ?? cap(k)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span className="stat-filter-name">Organization the player picked</span>
-            <select name="org" defaultValue={filter.org ?? ""}>
-              <option value="">Any</option>
-              {Object.entries(ORG_NAMES)
-                .sort((a, b) => a[1].localeCompare(b[1]))
-                .map(([id, name]) => (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                ))}
-            </select>
-          </label>
-          <button type="submit" className="secondary small">
-            Apply
-          </button>
-          {filter.species !== null || filter.org !== null ? (
+        <div className="stat-advanced-form">
+          <MultiChoice
+            name="species"
+            label="Alien species in the game (any of them)"
+            action="/stats"
+            base={base}
+            selected={filter.species}
+            choices={SPECIES_KEYS.map((k) => ({ value: k, label: SPECIES_NAMES[k] ?? cap(k) }))}
+          />
+          <MultiChoice
+            name="org"
+            label="Organization the player picked (any of them)"
+            action="/stats"
+            base={base}
+            selected={filter.org}
+            choices={Object.entries(ORG_NAMES)
+              .sort((a, b) => a[1].localeCompare(b[1]))
+              .map(([id, name]) => ({ value: id, label: name }))}
+          />
+          {filter.species.length > 0 || filter.org.length > 0 ? (
             <a
               className="small"
-              href={`/stats${Object.keys(base).length > 1 ? `?${new URLSearchParams(Object.fromEntries(Object.entries(base).filter(([k]) => k !== "species" && k !== "org"))).toString()}` : ""}`}
+              href={`/stats${Object.keys(withoutAdvanced).length > 0 ? `?${new URLSearchParams(withoutAdvanced).toString()}` : ""}`}
             >
               Clear these
             </a>
           ) : null}
-        </FilterForm>
+        </div>
         <p className="muted small">
-          The alien species keeps the games that have it, discovered or not, and counts every player of those games. The organization keeps
-          only the players who picked it, so the tables of organizations, species and techs then describe those players. Both go with the
-          filters above.
+          The alien species keeps the games that have at least one of the chosen species, discovered or not, and counts every player of
+          those games. The organization keeps only the players who picked one of the chosen ones, so the tables of organizations, species
+          and techs then describe those players. Both go with the filters above.
         </p>
       </details>
 

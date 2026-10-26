@@ -48,9 +48,11 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
             <option value="20">20 rated games</option>
           </select>
         </label>
-        <button type="submit" className="secondary">
-          Show
-        </button>
+        <noscript>
+          <button type="submit" className="secondary">
+            Show
+          </button>
+        </noscript>
       </FilterForm>
       <p className="muted small">A rating does not drop below 100: after that a loss costs nothing.</p>
       {rows.length === 0 ? (

@@ -1487,3 +1487,24 @@ table.shortcuts td:first-child {
     display: none;
   }
 }
+
+/* a filter with several choices that all count (the advanced filters of the statistics): each one is a button that is on or off */
+.multichoice {
+  flex: 1 1 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 6px;
+}
+.multichoice legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+button.fpill {
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}

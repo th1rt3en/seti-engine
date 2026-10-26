@@ -58,9 +58,11 @@ export default async function SoloLeaderboard({
             <option value="no">without</option>
           </select>
         </label>
-        <button type="submit" className="primary">
-          Show
-        </button>
+        <noscript>
+          <button type="submit" className="primary">
+            Show
+          </button>
+        </noscript>
       </FilterForm>
       {rows.length === 0 ? (
         <p>No solo game matches yet.</p>

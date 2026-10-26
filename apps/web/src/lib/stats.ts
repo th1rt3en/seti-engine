@@ -28,14 +28,20 @@ export interface StatFilter {
   expansion: boolean | null;
   rated: boolean | null;
   who: "people" | "ai" | null;
-  /** the games that have this alien species (discovered or not) */
-  species: string | null;
-  /** the players who picked this organization (the games where it was picked are not otherwise filtered) */
-  org: string | null;
+  /** the games that have at least one of these alien species (discovered or not); none chosen: any */
+  species: string[];
+  /** the players who picked one of these organizations (the games where it was picked are not otherwise filtered); none chosen: any */
+  org: string[];
 }
 
 /** The alien species of the game (the engine's names): the five of the base game and the three of the Space Agencies expansion. */
 export const SPECIES_KEYS = ["anomalies", "centaurians", "exertians", "mascamites", "oumuamua", "arkhos", "glyphids", "amoeba"];
+
+/** A list in the address: `a,b` (or the name twice), keeping only what `ok` accepts, without repeats, in a fixed order (it is the key of the cache). */
+function list(v: string | string[] | undefined, ok: (x: string) => boolean): string[] {
+  const all = (Array.isArray(v) ? v : [v ?? ""]).flatMap((x) => x.split(","));
+  return [...new Set(all.map((x) => x.trim()).filter((x) => x !== "" && ok(x)))].sort();
+}
 
 const flag = (v: string | undefined): boolean | null => (v === "yes" ? true : v === "no" ? false : null);
 
@@ -44,8 +50,8 @@ export function parseFilter(sp: {
   expansion?: string;
   rated?: string;
   who?: string;
-  species?: string;
-  org?: string;
+  species?: string | string[];
+  org?: string | string[];
 }): StatFilter {
   const n = Number(sp.players);
   return {
@@ -54,9 +60,9 @@ export function parseFilter(sp: {
     rated: flag(sp.rated),
     // the default is the people: the games of the AI are looked at on purpose ("ai"), or with everybody ("all")
     who: sp.who === "ai" ? "ai" : sp.who === "all" ? null : "people",
-    species: sp.species !== undefined && SPECIES_KEYS.includes(sp.species) ? sp.species : null,
+    species: list(sp.species, (x) => SPECIES_KEYS.includes(x)),
     // an organization is a short id of the engine (letters and underscores): anything else is no filter
-    org: sp.org !== undefined && /^[a-z_]{3,40}$/.test(sp.org) ? sp.org : null,
+    org: list(sp.org, (x) => /^[a-z_]{3,40}$/.test(x)),
   };
 }
 
@@ -68,8 +74,8 @@ export const matches = (r: StatRow, f: StatFilter): boolean =>
   (f.expansion === null || r.expansion === f.expansion) &&
   (f.rated === null || r.rated === f.rated) &&
   (f.who === null || isAi(r) === (f.who === "ai")) &&
-  (f.species === null || r.species.includes(f.species)) &&
-  (f.org === null || r.org === f.org);
+  (f.species.length === 0 || f.species.some((x) => r.species.includes(x))) &&
+  (f.org.length === 0 || (r.org !== null && f.org.includes(r.org)));
 
 export interface OrgStat {
   org: string;
