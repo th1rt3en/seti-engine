@@ -139,7 +139,7 @@ def test_pushed_probe_gains_publicity_on_an_icon_space() -> None:
 
 
 def test_a_probe_pushed_onto_asteroids_gains_publicity_with_the_skimmer() -> None:  # TECH-PT03, MOVE-07, ROTATE-03
-    """The tech gives 1 publicity when a probe moves onto asteroids; a push is a free move, so the owner gains it, also on another's turn."""
+    """The tech gives 1 publicity when a probe moves onto asteroids; a push is a free move, so the owner gains it, on any turn."""
     from seti_engine import techs
 
     seen = {"with": 0, "without": 0}
