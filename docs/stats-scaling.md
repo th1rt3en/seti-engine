@@ -64,3 +64,17 @@ Keep the cache layer. Replace what it loads: instead of every row, a precomputed
 - Exact percentiles (a median score, say) cannot be made from totals. If they are wanted, keep a histogram per counter that matters (like the score
   histogram), not a general solution.
 - Whether to keep the per-player rows readable by anybody (the players' own pages) is unchanged by this plan.
+
+## Done 2026-10-27: the summary is stored (a first step; the design above is still the way past a few thousand rows)
+
+The owner chose to stop computing the summary on the request path (the stats page took 100 to 500 ms of CPU, which delays every other request of the isolate, and had a
+Worker error 1102). `apps/web/src/lib/statsCache.ts` now keeps the summary of each filter in the table `stats_summary` (migration `0009_stats_summary.sql`), in parts:
+the core, the fresh numbers, the cards (read by the tab "Others") and one part for each alien species (read by the tab "Aliens"). A part is stored with the highest rowid
+of `game_stats` it was made from; it is worked out again, from the rows, only after a row was written (a game that ended, a backfill), and the older summaries are deleted.
+`SUMMARY_SHAPE` in that file is bumped whenever `aggregate` changes, so that the summaries of the older code are not read.
+
+- Measured on the 97 real rows: working it out 134 ms (once for each change of the table, instead of once for each isolate and visit); reading it 7 to 11 ms; in an
+  isolate that has it 0.1 ms.
+- Without the table (the migration is not applied yet) or when D1 fails, it works as before (in the isolate), so the deploy order does not matter.
+- Still read on a cold isolate: all the rows (they are the `players` of the summary: the page works out the spread of some sums over them). That is the part that grows with
+  the number of games; the totals table above is the answer to it.

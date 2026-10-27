@@ -142,7 +142,8 @@ export default async function StatsPage({
   const sp = await searchParams;
   const tab = STAT_TABS.some((t) => t.id === sp.tab) ? (sp.tab as string) : "resources";
   const filter = parseFilter(sp);
-  const s = await cachedStats(getDb(), filter);
+  // the summary is kept in parts (the migration 0009): a tab reads only the parts that it shows (the cards are in "Others", the species in "Aliens")
+  const s = await cachedStats(getDb(), filter, { cards: tab === "others", alien: tab === "aliens" });
   const m = (k: string): number => s.mean[k] ?? 0;
   // how the players differ in a counter, and in a number that is worked out from several counters (a player without the counter counts as 0)
   const sd = (k: string): Spread | undefined => s.spread[k];
