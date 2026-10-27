@@ -138,6 +138,33 @@ def test_pushed_probe_gains_publicity_on_an_icon_space() -> None:
     assert found
 
 
+def test_a_probe_pushed_onto_asteroids_gains_publicity_with_the_skimmer() -> None:  # TECH-PT03, MOVE-07, ROTATE-03 (owner, 2026-10-27)
+    """The tech gives 1 publicity when a probe moves onto asteroids; a push is a free move, so the owner gains it, also on another's turn."""
+    from seti_engine import techs
+
+    seen = {"with": 0, "without": 0}
+    for a1 in range(8):
+        for a2 in range(8):
+            for a3 in range(8):
+                for ring in (1, 2, 3):
+                    for sector in range(8):
+                        for tech in (True, False):
+                            s = fresh((a1, a2, a3))
+                            if solar.visible(s, ring, sector)[0] <= s.rotations % 3 + 1:
+                                continue
+                            s.probes.append(Probe(id="p", player=1, ring=ring, sector=sector))
+                            if tech:
+                                s.players[1].techs.append("probe-link")
+                            before = s.players[1].publicity
+                            techs.rotate_solar_system(s, [])
+                            landed = solar.visible(s, s.probes[0].ring, s.probes[0].sector)[1]
+                            if landed == "ASTEROID" and (s.probes[0].ring, s.probes[0].sector) != (ring, sector):
+                                gained = s.players[1].publicity - before
+                                assert gained == (1 if tech else 0)
+                                seen["with" if tech else "without"] += 1
+    assert seen["with"] > 0 and seen["without"] > 0
+
+
 def test_oumuamua_tile_is_a_cutout_until_discovered() -> None:
     s = fresh((0, 0, 0))
     cells_before = [solar.visible(s, 3, c)[1] for c in range(8)]
