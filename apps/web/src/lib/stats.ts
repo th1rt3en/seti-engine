@@ -320,6 +320,62 @@ export interface Stats {
 
 const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
 
+/** Every counter name of the rows, once: the rows have almost the same names, and a name is looked at once, not once for each row. */
+function counterNames(rows: StatRow[]): string[] {
+  const names = new Set<string>();
+  for (const r of rows) for (const k in r.counters) names.add(k);
+  return [...names];
+}
+
+const ALIEN_RESOURCES = ["vp", "credit", "energy", "card", "publicity", "data", "move", "exofossil", "token"];
+const ALIEN_KEYS = new Map<string, { sp: string; res: string } | null>();
+/** `alien.<species>.<part>.<resource>` (the parts that are not `all`), read once for each name. */
+function alienKey(k: string): { sp: string; res: string } | null {
+  let hit = ALIEN_KEYS.get(k);
+  if (hit === undefined) {
+    const p = k.split(".");
+    hit =
+      p.length === 4 && p[0] === "alien" && p[2] !== "all" && ALIEN_RESOURCES.includes(p[3] as string)
+        ? { sp: p[1] as string, res: p[3] as string }
+        : null;
+    ALIEN_KEYS.set(k, hit);
+  }
+  return hit;
+}
+const ALIEN_SUMS = new WeakMap<StatRow, Map<string, Record<string, number>>>();
+/** What each species gave a player, by resource: the parts of its rules added up (one pass over the counters of the row, kept with the row). */
+function alienSums(r: StatRow): Map<string, Record<string, number>> {
+  let out = ALIEN_SUMS.get(r);
+  if (out === undefined) {
+    out = new Map();
+    for (const k in r.counters) {
+      const a = alienKey(k);
+      if (a === null) continue;
+      const by = out.get(a.sp) ?? {};
+      by[a.res] = (by[a.res] ?? 0) + (r.counters[k] as number);
+      out.set(a.sp, by);
+    }
+    ALIEN_SUMS.set(r, out);
+  }
+  return out;
+}
+
+const GAIN_KEY = /^gain\.([a-z_]+)\.([a-z]+)$/;
+const GAINMOVE_KEY = /^gainmove\.([a-z_]+)\.([a-z]+)$/;
+const SPEND_KEY = /^spend\.([a-z_]+)\.([a-z]+)$/;
+/** For each resource, the names that follow a prefix (`gain.<kind>.<resource>`): read from the names of the counters once. */
+function namesByResource(names: string[], key: RegExp): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  for (const k of names) {
+    const m = key.exec(k);
+    if (!m) continue;
+    const set = out.get(m[2] as string) ?? new Set<string>();
+    set.add(m[1] as string);
+    out.set(m[2] as string, set);
+  }
+  return out;
+}
+
 export function aggregate(all: StatRow[], filter: StatFilter): Stats {
   const rows = all.filter((r) => matches(r, filter));
   const n = rows.length;
@@ -400,15 +456,8 @@ export function aggregate(all: StatRow[], filter: StatFilter): Stats {
       spreads[k] = spreadOf(values);
     }
     // everything the species gave, by resource (the parts of its rules added up for each player): `alien.<species>.all.<resource>`
-    for (const res of ["vp", "credit", "energy", "card", "publicity", "data", "move", "exofossil", "token"]) {
-      const re = new RegExp(`^alien\\.${sp}\\.[a-z_]+\\.${res}$`);
-      const values = mine.map((r) =>
-        sum(
-          Object.entries(r.counters)
-            .filter(([k]) => re.test(k) && !k.includes(".all."))
-            .map(([, v]) => v),
-        ),
-      );
+    for (const res of ALIEN_RESOURCES) {
+      const values = mine.map((r) => alienSums(r).get(sp)?.[res] ?? 0);
       mean[`alien.${sp}.all.${res}`] = values.length === 0 ? 0 : sum(values) / values.length;
       spreads[`alien.${sp}.all.${res}`] = spreadOf(values);
     }
@@ -519,17 +568,12 @@ function gainSlices(rows: StatRow[], v3: StatRow[]): Record<string, Slice[]> {
       .map((k) => k.slice("publicity.visit.".length))
       .filter((n) => !["comet", "asteroid", "asteroids"].includes(n));
   const allVisits = (c: Record<string, number>): number => visits(c, ["comet", "asteroid", "asteroids", ...planets(c)]);
+  const names = counterNames(rows);
+  const kindsOf = namesByResource(names, GAIN_KEY);
+  const actionsOf = namesByResource(names, GAINMOVE_KEY);
   for (const res of GAIN_RESOURCES) {
-    const kinds = new Set<string>();
-    const actions = new Set<string>();
-    for (const r of rows) {
-      for (const k of Object.keys(r.counters)) {
-        const m = /^gain\.([a-z_]+)\.([a-z]+)$/.exec(k);
-        if (m && m[2] === res) kinds.add(m[1] as string);
-        const a = new RegExp(`^gainmove\.([a-z_]+)\.${res}$`).exec(k);
-        if (a) actions.add(a[1] as string);
-      }
-    }
+    const kinds = kindsOf.get(res) ?? new Set<string>();
+    const actions = actionsOf.get(res) ?? new Set<string>();
     const getters = new Map<string, (c: Record<string, number>) => number>();
     for (const kind of [...kinds].sort()) {
       const key = `gain.${kind}.${res}`;
@@ -600,14 +644,26 @@ function groupSlices(
   return out;
 }
 
+const CARD_KEYS = new Map<string, { id: string; round: number } | null>();
+/** `card.<id>.r<round>` (the plays of a card in a round), read once for each name. */
+function cardKey(k: string): { id: string; round: number } | null {
+  let hit = CARD_KEYS.get(k);
+  if (hit === undefined) {
+    const m = /^card\.(.+)\.r(\d+)$/.exec(k);
+    hit = m ? { id: m[1] as string, round: Number(m[2]) } : null;
+    CARD_KEYS.set(k, hit);
+  }
+  return hit;
+}
+
 /** The cards that were played (any card of the main deck or of a species), by what the players who played them scored, won and did. */
 function cardStats(v3: StatRow[], v10: StatRow[]): CardStat[] {
   const byCard = new Map<string, { rows: StatRow[]; plays: number; rounds: Record<number, number> }>();
   for (const r of v3) {
     for (const [k, v] of Object.entries(r.counters)) {
-      const m = /^card\.(.+)\.r(\d+)$/.exec(k);
+      const m = cardKey(k);
       if (!m) continue;
-      const id = m[1] as string;
+      const id = m.id;
       let e = byCard.get(id);
       if (!e) {
         e = { rows: [], plays: 0, rounds: {} };
@@ -615,18 +671,22 @@ function cardStats(v3: StatRow[], v10: StatRow[]): CardStat[] {
       }
       if (e.rows[e.rows.length - 1] !== r) e.rows.push(r);
       e.plays += v;
-      e.rounds[Number(m[2])] = (e.rounds[Number(m[2])] ?? 0) + v;
+      e.rounds[m.round] = (e.rounds[m.round] ?? 0) + v;
     }
   }
   const held = new Map<string, { held: number; played: number; discards: number; completed: number; endPoints: number }>();
   for (const r of v10) {
+    const played = new Map<string, number>(); // the plays of each card in this row, all rounds
     for (const [k, v] of Object.entries(r.counters)) {
-      const m = /^cardheld\.(.+)$/.exec(k);
-      if (!m || v <= 0) continue;
-      const id = m[1] as string;
+      const m = cardKey(k);
+      if (m) played.set(m.id, (played.get(m.id) ?? 0) + v);
+    }
+    for (const [k, v] of Object.entries(r.counters)) {
+      if (!k.startsWith("cardheld.") || v <= 0) continue;
+      const id = k.slice("cardheld.".length);
       const e = held.get(id) ?? { held: 0, played: 0, discards: 0, completed: 0, endPoints: 0 };
       e.held += v;
-      for (const [k2, v2] of Object.entries(r.counters)) if (k2.startsWith(`card.${id}.r`)) e.played += v2;
+      e.played += played.get(id) ?? 0;
       e.discards += r.counters[`cardcorner.${id}`] ?? 0;
       e.completed += r.counters[`cardmission.${id}`] ?? 0;
       e.endPoints += r.counters[`cardend.${id}`] ?? 0;
@@ -666,14 +726,9 @@ function cardStats(v3: StatRow[], v10: StatRow[]): CardStat[] {
 /** What each resource was spent on: the counters `spend.<what>.<resource>`, the mean per player of the rows that have them. */
 function spendSlices(v4: StatRow[]): Record<string, Slice[]> {
   const out: Record<string, Slice[]> = {};
+  const whatsOf = namesByResource(counterNames(v4), SPEND_KEY);
   for (const res of GAIN_RESOURCES) {
-    const whats = new Set<string>();
-    for (const r of v4) {
-      for (const k of Object.keys(r.counters)) {
-        const m = /^spend\.([a-z_]+)\.([a-z]+)$/.exec(k);
-        if (m && m[2] === res) whats.add(m[1] as string);
-      }
-    }
+    const whats = whatsOf.get(res) ?? new Set<string>();
     out[res] = [...whats]
       .map((what) => {
         const values = v4.map((r) => r.counters[`spend.${what}.${res}`] ?? 0);

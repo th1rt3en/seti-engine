@@ -8,8 +8,9 @@ import { statRows } from "./queries";
 import { type StatFilter, type Stats, aggregate } from "./stats";
 import type { StatRow } from "./stats";
 
-/** The most summaries kept for one version of the table (there are at most a few hundred filters; the cache is emptied whenever the table changes). */
-const MAX_SUMMARIES = 200;
+/** The most summaries kept for one version of the table. A summary is about 1 MB of objects (the spread of every counter, the cards, the aliens) and a Worker has
+ * 128 MB for everything: 200 of them were a way to run out of memory (error 1102). The cache is emptied whenever the table changes. */
+const MAX_SUMMARIES = 12;
 
 interface Memo {
   version: number;

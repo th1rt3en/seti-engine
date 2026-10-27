@@ -397,4 +397,29 @@ describe("statistics", () => {
     expect(by("9")).toMatchObject({ held: 2, playRate: 0.5, discardRate: 0.5, discards: 1 });
     expect(by("12")).toMatchObject({ held: 1, playRate: 1, endAvg: 6 });
   });
+
+  it("works out the statistics of many rows with many counters in a time a Worker can afford (error 1102)", () => {
+    // the real rows have about 250 counters each; the page used to scan every counter name for every row, resource and species (quadratic)
+    const species = ["centaurians", "mascamites", "exertians", "oumuamua", "amoeba", "arkhos", "glyphids", "anomalies"];
+    const rows = Array.from({ length: 300 }, (_, i) => {
+      const counters: Record<string, number> = { "stats.version": 12, "alien.arkhos.games": 1 };
+      for (const res of ["credit", "energy", "card", "publicity", "data", "vp", "move"]) {
+        for (let k = 0; k < 12; k++) {
+          counters[`gain.src${k}.${res}`] = k + 1;
+          counters[`spend.use${k}.${res}`] = k;
+        }
+        for (const sp of species) counters[`alien.${sp}.part.${res}`] = 1;
+      }
+      for (let c = 0; c < 60; c++) {
+        counters[`card.${c}.r${(c % 5) + 1}`] = 1;
+        counters[`cardheld.${c}`] = 1;
+      }
+      return row({ gameId: `g${i}`, score: 100 + i, won: i % 2 === 0, counters });
+    });
+    const t = performance.now();
+    const a = aggregate(rows, any);
+    expect(performance.now() - t).toBeLessThan(1500); // about 150 ms here; the quadratic version took several seconds
+    expect(a.cards.find((c) => c.id === "7")).toMatchObject({ players: 300, plays: 300, held: 300, playRate: 1 });
+    expect(a.alien.arkhos?.mean["alien.arkhos.all.credit"]).toBe(1);
+  });
 });
