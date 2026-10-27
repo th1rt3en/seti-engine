@@ -20,15 +20,22 @@ const COLUMNS: { key: Key; label: string }[] = [
 /** The number of the card ("SR.12" is after "SR.3"). */
 const idNumber = (id: string): number => Number(id.split(".")[1] ?? 0);
 
+const CARD_WIDTH = 240;
+const GAP = 18; // between the pointer and the card
+
 /** The id of a card, underlined with dashes: the picture of the card shows beside it on hover, or after a click (on a touch screen). */
 function CardId({ id }: { id: string }) {
   const [at, setAt] = useState<{ x: number; y: number } | null>(null);
   const src = cardImage(id);
-  const show = (el: HTMLElement) => {
-    const r = el.getBoundingClientRect();
-    const w = 240;
-    const x = Math.max(8, Math.min(r.right + 12, window.innerWidth - w - 8));
-    setAt({ x, y: Math.max(8, Math.min(r.top - 40, window.innerHeight - 360)) });
+  // the card shows beside the pointer (right of it, or left when there is no room), centred on it vertically; the keyboard has no pointer: the id is used
+  const show = (e: { clientX: number; clientY: number; currentTarget: HTMLElement }) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const px = e.clientX === 0 && e.clientY === 0 ? r.left + r.width / 2 : e.clientX;
+    const py = e.clientX === 0 && e.clientY === 0 ? r.top + r.height / 2 : e.clientY;
+    const w = CARD_WIDTH;
+    const h = Math.round(w * 1.4);
+    const x = px + GAP + w > window.innerWidth - 8 ? Math.max(8, px - GAP - w) : px + GAP;
+    setAt({ x, y: Math.max(8, Math.min(py - h / 2, window.innerHeight - h - 8)) });
   };
   useEffect(() => {
     if (at === null) return;
@@ -44,15 +51,16 @@ function CardId({ id }: { id: string }) {
         className="card-id"
         aria-expanded={at !== null}
         aria-label={`${id}: show the card`}
-        onMouseEnter={(e) => matchMedia("(hover: hover)").matches && show(e.currentTarget)}
+        onMouseEnter={(e) => matchMedia("(hover: hover)").matches && show(e)}
+        onMouseMove={(e) => at !== null && matchMedia("(hover: hover)").matches && show(e)}
         onMouseLeave={() => setAt(null)}
-        onClick={(e) => (at === null ? show(e.currentTarget) : setAt(null))}
+        onClick={(e) => (at === null ? show(e) : setAt(null))}
         onBlur={() => setAt(null)}
       >
         {id}
       </button>
       {at !== null ? (
-        <img className="card-peek" src={src} alt={`Quick start card ${id}`} width={240} style={{ left: at.x, top: at.y }} />
+        <img className="card-peek" src={src} alt={`Quick start card ${id}`} width={CARD_WIDTH} style={{ left: at.x, top: at.y }} />
       ) : null}
     </>
   );
