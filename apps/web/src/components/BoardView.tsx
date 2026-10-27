@@ -69,7 +69,7 @@ const SAMPLES = assets.samples as Record<string, string> & { back: string };
 /** The radius of the button of the preview: just outside the last ring, between the sectors at 3 o'clock. */
 const SOLAR_BUTTON_RADIUS = 1030;
 // how far above the centre of its top space (in pixels of the species board) the first marker of a top capsule lies, for the boards whose top space has a reward in it
-const TOP_CAPSULE_RISE: Record<string, number> = { centaurians: 80 };
+const TOP_CAPSULE_RISE: Record<string, number> = { centaurians: 80, oumuamua: 80 };
 
 /** The size of a marker on the single-marker spaces: a space of a species board, a discovery or an overflow space, a sample space, the places of the gold tiles. */
 const SLOT_MARKER = GOLD_MARKER;
