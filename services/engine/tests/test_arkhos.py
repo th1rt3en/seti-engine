@@ -93,6 +93,21 @@ def test_marking_an_overflow_space_lets_the_player_breach_that_color() -> None: 
     assert "yellow" in declined.players[0].security and card not in declined.players[0].hand
 
 
+def test_the_breach_of_a_trace_is_answered_before_the_next_trace() -> None:  # EXP-ARK-06 (owner, 2026-10-27: Titan, Europa)
+    s = discovered()
+    s.phase, s.current_player = "play", 0
+    s.pending = [Decision(kind="trace", player=0, data={"color": "yellow", "slots": [0]}) for _ in range(2)]
+    first = {"type": "place_trace", "slot": 0, "space": "overflow", "color": "yellow"}
+    assert first in legal_moves(s)
+    s = apply(s, first).state
+    assert [d.kind for d in s.pending] == ["breach", "trace"]  # the breach first: its card may open a deeper space for the second trace
+    declined = apply(s.model_copy(deep=True), {"type": "skip_breach"}).state
+    s = apply(s, {"type": "breach"}).state
+    deeper = {"type": "place_trace", "slot": 0, "space": "board", "color": "yellow", "index": 1}
+    assert [d.kind for d in s.pending] == ["trace"] and "yellow" not in s.players[0].security
+    assert deeper in legal_moves(s) and deeper not in legal_moves(declined)  # the breached card opens the deeper space for the 2nd trace
+
+
 def test_two_overflow_marks_of_one_color_breach_the_card_once() -> None:  # EXP-ARK-06 (a crash found by the training on a real game)
     s = discovered()
     p = s.players[0]

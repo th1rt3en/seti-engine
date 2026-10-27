@@ -901,7 +901,10 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     elif t == "place_computer_tech":
         techs.place_computer_tech(s, p, d, a["slot"])
     elif t == "place_trace":
+        waiting = len(s.pending)  # what the other traces of the reward (and anything else) have queued
         rewards.place_trace(s, p, a, events)
+        # a trace is resolved before the next one (owner, 2026-10-27): what it set off (an Arkhos breach, a mission circle) comes first
+        s.pending[:] = [*s.pending[waiting:], *s.pending[:waiting]]
         if d.data.get("then_vp") and s.last_trace_kind != "any":  # #75: points for each trace in that color
             effects.gain_score(s, p, d.data["then_vp"] * sum(1 for _, k in p.trace_log if k == s.last_trace_kind))
     elif t == "choose_land_slot":
