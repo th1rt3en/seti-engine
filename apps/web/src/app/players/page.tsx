@@ -1,4 +1,4 @@
-import { PlayerLink } from "@/components/PlayerLink";
+import { PlayersTable } from "@/components/PlayersTable";
 import { getDb } from "@/lib/db";
 import { allPlayers } from "@/lib/queries";
 import Link from "next/link";
@@ -22,34 +22,7 @@ export default async function Players({ searchParams }: { searchParams: Promise<
         {rows.length} registered player{rows.length === 1 ? "" : "s"}
         {q ? ` with “${q}” in their name` : ""}. Players who have not played a rated game have the starting rating, 0.
       </p>
-      {rows.length === 0 ? (
-        <p>No player found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Player</th>
-              <th>Rating</th>
-              <th>Rated games</th>
-              <th>Games</th>
-              <th>Joined</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.user_id}>
-                <td>
-                  <PlayerLink num={r.num} name={r.name} />
-                </td>
-                <td>{r.rating}</td>
-                <td>{r.rated_games}</td>
-                <td>{r.games}</td>
-                <td>{new Date(r.joined).toISOString().slice(0, 10)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      {rows.length === 0 ? <p>No player found.</p> : <PlayersTable rows={rows} />}
     </>
   );
 }

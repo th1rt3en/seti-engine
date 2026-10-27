@@ -185,6 +185,8 @@ export interface PlayerRow {
   /** every game the player sat in that has started */
   games: number;
   joined: number;
+  /** the latest of: signing up, the last login, and the last game the player sat in (when it ended, else started, else was made); the site keeps no other trace */
+  last_active: number;
 }
 
 /** All registered players (guests are left out), by name; `q` keeps the names that contain it. */
@@ -194,7 +196,11 @@ export async function allPlayers(db: Db, q = "", limit = 500): Promise<PlayerRow
     `SELECT u.id AS user_id, un.num AS num, u.name, COALESCE(r.rating, 0) AS rating, COALESCE(r.games, 0) AS rated_games,
        (SELECT COUNT(*) FROM game_players gp JOIN games g ON g.id = gp.game_id
          WHERE gp.user_id = u.id AND g.status IN ('playing', 'finished')) AS games,
-       u.created_at AS joined
+       u.created_at AS joined,
+       MAX(u.created_at,
+         COALESCE((SELECT MAX(s.created_at) FROM sessions s WHERE s.user_id = u.id), 0),
+         COALESCE((SELECT MAX(COALESCE(g.ended_at, g.started_at, g.created_at)) FROM game_players gp JOIN games g ON g.id = gp.game_id
+                    WHERE gp.user_id = u.id), 0)) AS last_active
      FROM users u LEFT JOIN ratings r ON r.user_id = u.id LEFT JOIN user_nums un ON un.user_id = u.id
      WHERE u.is_guest = 0 AND u.name LIKE ? ESCAPE '\\' ORDER BY u.name COLLATE NOCASE LIMIT ?`,
     like,
