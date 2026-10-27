@@ -389,7 +389,14 @@ def main() -> None:
     ap.add_argument("--owner-approved", action="store_true", help="the owner has said go for this run (training never starts without it)")
     ap.add_argument("--models", default="models_v3")
     ap.add_argument("--start", default="models_alpha/v002", help="the version to start from (its folder, or a model.pt)")
-    ap.add_argument("--preset", default="", choices=["", *PRESETS], help="start from a new network of this size instead of --start")
+    ap.add_argument("--preset", default="", choices=["", *PRESETS], help="start from a new network of this size instead of --start (needs --cold-start)")
+    ap.add_argument(
+        "--cold-start",
+        action="store_true",
+        help="allow a network that has been taught nothing (see --preset). Self-play with a search does not lift a network that plays at "
+        "random: the first Beta run scored 3 points against the heuristic bot's 45 after 8 iterations (docs/AI-BETA-PLAN.md). "
+        "Teach it first with `bundle_train alpha`, then use --start",
+    )
     ap.add_argument("--people", default="", help="the downloaded archive of games")
     ap.add_argument("--people-share", type=float, default=0.3)
     ap.add_argument("--people-solo", action="store_true")
@@ -423,6 +430,14 @@ def main() -> None:
         return
     if not a.owner_approved:
         raise SystemExit("training starts only with the owner's go: add --owner-approved when they have said it (docs/AI-DECISIONS.md)")
+    if a.preset and not a.cold_start and not a.resume:
+        raise SystemExit(
+            "a new network that has been taught nothing plays at random, and self-play does not improve it (the first Beta run: 3 points against 45 after 8 "
+            "iterations).\n"
+            f"First teach it what the heuristic bot does: python -m seti_ai.bundle_train alpha --preset {a.preset} --models <folder>, then --start "
+            "<folder>/v001 (docs/AI-BETA-PLAN.md). --cold-start allows it anyway."
+        )
+
     s = Settings(
         models=Path(a.models),
         people=Path(a.people) if a.people else None,

@@ -1,10 +1,39 @@
 ﻿# Beta lineage: the training plan (2026-10-26, for the owner's approval)
 
-Status: a plan. **Nothing was trained.** The only runs were short measurements with a new network that was thrown away (`python -m seti_ai.iter_benchmark`), which wrote
+Status: a plan (section 0 says what the first run taught). **Nothing is being trained.** The only runs were short measurements with a new network that was thrown away (`python -m seti_ai.iter_benchmark`), which wrote
 no checkpoint, buffer or version. Training starts only with the owner's explicit go (`docs/AI-DECISIONS.md`).
 
 The Beta line is a **new network** (the `medium` preset, 30.1M parameters: 384 wide, 6 layers, 6 heads, 1536 feed-forward, 2 move layers), trained from nothing with the
 tree search of `docs/AI-MCTS.md` (Steps 0 to 2, built). Alpha (v003, the 144M `large` network, one-turn search) stays as it is.
+
+## 0. What went wrong in the first run (2026-10-27), and the fix
+
+The first Beta run started from a new, random network ("from nothing") and ran 9 iterations of self-play with the tree search (about 7 hours). It did not improve: the owner
+stopped it and **all its progress was deleted**. What its 8 finished iterations measured:
+
+- the network alone scored 1.5 to 3.2 points against the heuristic bot's 42 to 48 (the random bot scores 3 to 7; Alpha's first saved version scored 46.5);
+- its self-play games scored 5.6 to 10.3 points; in a game it played cards and passed (2 launches, 1 scan, 1 probe move), no research, orbit or landing;
+- the share of its own searched moves that it picked rose from 24% to 67% and the policy loss fell from 2.5 to 1.1, while the play stayed at random level; the value error
+  stood at 4.5 to 5 points from iteration 4 on, as large as the 5 to 10 points that a game scored.
+
+- **Cause:** a network that plays at random cannot be improved by self-play with a search at this scale. The search builds its candidates from the policy, so a random policy
+  offers it nothing worth choosing, and the network then learns its own search. Each game also gives only about 15 searches, so an iteration of 24 games is 2,000 to 4,000
+  examples. Alpha did not have this problem because it **started from a network taught what the heuristic bot does** (`bundle_train alpha`: games of bots cut into bundles;
+  no human move is imitated); its self-play began from a network that already scored about 45.
+- **Test of the fix (a throwaway run, nothing kept):** a new medium network taught from only **120 bot games, 6 epochs, 6 minutes of training** scores **40.8 against the
+  heuristic bot's 43.0 (38% wins)** with its best micro move alone. The first Beta run had reached 2.8 in 7 hours. So the start was the cause.
+- **Does search add to the taught network?** Not shown yet. Over 8 games each, against the heuristic bot: the network alone 40.8 (bot 43.0), with the one-turn search 43.5
+  (bot 51.8, 4 wins of 8), with the tree search 45.6 (bot 57.6, 4 wins of 8). The standard error of 8 games is about 12 points, so this says neither that the search helps nor
+  that it does not. The measure of the loop is therefore the **score against the heuristic bot after each iteration** (the network alone), and the run is stopped if it does
+  not rise from the taught level within a few iterations.
+- **Changes:** `bundle_train alpha` makes its examples with the views of the preset (the irreversible mark is left out for `medium`; its workers are told, `views.py`);
+  `iterate run --preset` refuses a network that was taught nothing unless `--cold-start` is given (it is how the first run was started; there is a test).
+
+**The order for the next run (it needs the owner's go, as every training does):**
+1. Teach the network: `python -m seti_ai.bundle_train alpha --preset medium --games 300 --epochs 6 --models models_beta` (the throwaway run took 6 minutes for 120 games;
+   it writes `models_beta/v001`, the taught network, and its score against the heuristic bot).
+2. Self-play iterations from it with `--start models_beta/v001` and no `--preset` (the taught network is also the first champion of the gate), and the other settings of
+   section 5. Stop after 3 to 4 iterations if the score against the heuristic bot is not rising.
 
 ## 1. What was built for it
 
@@ -66,12 +95,12 @@ uses 0 and takes the **value of the positions of the games of people without a s
 
 ```
 cd services/ai
-python -m uv run python -m seti_ai.iterate run --owner-approved --preset medium --models models_beta --start models_alpha/v002 \
+python -m uv run python -m seti_ai.iterate run --owner-approved --models models_beta --start models_beta/v001 \
   --people <the downloaded archive of games> --human-positions 0 --search mcts --simulations 32 --worlds 4 --leaves 4 --branch 5 \
   --workers 8 --selfplay-games 24 --epochs 2 --batch 64 --lr 1e-4 --buffer 6 --gate-games 20 --eval-games 6 --iterations 40 --seed 11
 ```
 
-`--start` is only the first champion of the gate (the old small v002, which any early Beta network beats). Pause with `python -m seti_ai.iterate pause --models models_beta`;
+`--start` is the taught network of section 0: the run goes on training it, and it is also the first champion of the gate (the gate then asks for 55% wins against it). Pause with `python -m seti_ai.iterate pause --models models_beta`;
 go on with `--resume`. Resident cost: 8 workers each hold a copy of the network on the GPU (about 0.5 GB each of the 12 GB) and a core each of the 12; the PC is busy while it runs.
 
 ## 6. Decisions for the owner

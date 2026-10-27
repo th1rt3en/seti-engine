@@ -26,7 +26,7 @@ import torch
 from seti_engine.models import Options
 from torch import nn
 
-from . import arena, bots, checkpoint, dataset, features, gate, registry
+from . import arena, bots, checkpoint, dataset, features, gate, registry, views
 from .agent import PRESETS, VALUE_SCALE, LocalNet, NNAgent, PolicyNet, collate, new_net
 from .bundle_data import Examples, examples_from_log
 
@@ -37,7 +37,9 @@ DUMMY_NUMS = np.zeros((1, features.MOVE_NUM), dtype=np.float32)
 
 
 def bot_game_examples(job: dict[str, Any]) -> tuple[Examples, list[int]]:
-    """One game of two bots (in a worker): played, cut into bundles, made into examples."""
+    """One game of two bots (in a worker): played, cut into bundles, made into examples. The views are made as the network is (`views.py`): a worker is a new
+    process, so it is told."""
+    views.set_irreversible(bool(job["irreversible"]))
     opts = dict(OPTIONS[job["kind"]])
     a, b = bots.BOTS[job["bot_a"]](), bots.BOTS[job["bot_b"]]()
     seed = job["seed"]
@@ -45,8 +47,11 @@ def bot_game_examples(job: dict[str, Any]) -> tuple[Examples, list[int]]:
     return examples_from_log(Options(players=2, seed=seed, **opts), res.actions), res.scores
 
 
-def make_data(games: int, seed: int, workers: int) -> tuple[Examples, list[int]]:
-    jobs = [{"kind": k % 2, "bot_a": PAIRS[(k // 2) % 4][0], "bot_b": PAIRS[(k // 2) % 4][1], "seed": seed * 100_000 + k} for k in range(games)]
+def make_data(games: int, seed: int, workers: int, irreversible: bool = True) -> tuple[Examples, list[int]]:
+    jobs = [
+        {"kind": k % 2, "bot_a": PAIRS[(k // 2) % 4][0], "bot_b": PAIRS[(k // 2) % 4][1], "seed": seed * 100_000 + k, "irreversible": irreversible}
+        for k in range(games)
+    ]
     out = Examples()
     scores: list[int] = []
     t0 = time.time()
@@ -195,8 +200,9 @@ def alpha(a: argparse.Namespace) -> None:
     checkpoint.clear_pause(root)
     checkpoint.install_signal_handler()
     print(f"the alpha: network {a.preset}, {a.games} games of bots, {a.epochs} epochs, on {device}", flush=True)
+    views.set_irreversible(PRESETS[a.preset].irreversible)  # the examples, the games of the evaluation and the network all see the same views
     t0 = time.time()
-    ex, scores = make_data(a.games, a.seed, a.workers)
+    ex, scores = make_data(a.games, a.seed, a.workers, PRESETS[a.preset].irreversible)
     lengths = [b for b in [ex.bundles]]
     print(
         f"data: {len(ex.policy)} choices, {len(ex.value)} positions after a bundle, {ex.bundles} bundles "

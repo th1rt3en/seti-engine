@@ -135,3 +135,10 @@ def test_a_pause_is_asked_for_with_a_file(monkeypatch: pytest.MonkeyPatch, tmp_p
     monkeypatch.setattr(sys, "argv", ["iterate", "pause", "--models", str(tmp_path)])
     iterate.main()
     assert checkpoint.pause_requested(tmp_path)
+
+
+def test_a_network_that_was_taught_nothing_is_not_trained_by_self_play_alone(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """The first Beta run started from random weights and scored 3 points against the heuristic bot's 45 after 8 iterations: it has to be taught first."""
+    monkeypatch.setattr(sys, "argv", ["iterate", "run", "--owner-approved", "--preset", "small", "--models", str(tmp_path)])
+    with pytest.raises(SystemExit, match="taught nothing"):
+        iterate.main()
