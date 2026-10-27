@@ -39,7 +39,7 @@ DUMMY_NUMS = np.zeros((1, features.MOVE_NUM), dtype=np.float32)
 def bot_game_examples(job: dict[str, Any]) -> tuple[Examples, list[int]]:
     """One game of two bots (in a worker): played, cut into bundles, made into examples. The views are made as the network is (`views.py`): a worker is a new
     process, so it is told."""
-    views.set_irreversible(bool(job["irreversible"]))
+    views.set_irreversible(bool(job.get("irreversible", True)))
     opts = dict(OPTIONS[job["kind"]])
     a, b = bots.BOTS[job["bot_a"]](), bots.BOTS[job["bot_b"]]()
     seed = job["seed"]
