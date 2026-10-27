@@ -1747,3 +1747,33 @@ main:has(.stats-page) {
     grid-column: 1 / -1;
   }
 }
+.card-id {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
+}
+.card-peek {
+  position: fixed;
+  z-index: 60;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  height: auto;
+}
+.sort-head {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
+}
+.sort-head:hover {
+  text-decoration: underline;
+}
