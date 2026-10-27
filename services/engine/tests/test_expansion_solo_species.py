@@ -77,6 +77,17 @@ def test_a_055_with_no_security_card_left_the_rival_marks_a_trace_of_any_color()
     assert len([e for e in ev if e.get("type") == "explore"]) >= 2  # the trace may itself give one
 
 
+def test_a_wild_trace_on_undiscovered_species_follows_the_arrow() -> None:  # SOLO-RIVAL-11, EXP-ARK-08 (owner, 2026-10-27)
+    """The rival does not know that the second species is Arkhos while it is face down: with the arrow left it marks the left species."""
+    s = solo_with("amoeba", "arkhos")
+    for sl in s.species:
+        sl.discovered = False
+        sl.discovery_spaces = [None, None, None]
+    s.rival.arrow = "left"  # type: ignore[union-attr]
+    rival.trace(s, "any", [])
+    assert s.species[0].discovery_spaces[0] == "p1" and s.species[1].discovery_spaces == [None, None, None]
+
+
 def test_exp_ark_08_the_rival_ignores_arkhos_spaces_it_cannot_reach() -> None:
     s = solo_with("arkhos", "amoeba")
     p = s.players[1]

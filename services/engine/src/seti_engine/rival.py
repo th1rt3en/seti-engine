@@ -236,8 +236,10 @@ def trace(s: GameState, kind: str, events: Events, only_slot: int | None = None)
     if options:
         lowest = max(o[0] for o in options)
         best = [o for o in options if o[0] == lowest]
-        arkhos_first = [o for o in best if s.species[o[1]].species == "arkhos"]
-        best = arkhos_first or best  # EXP-ARK-08: with equally low spaces on both species the rival prefers Arkhos
+        # EXP-ARK-08: with equally low spaces on both species the rival prefers Arkhos, once it is discovered: it does not know which
+        # species lies under a face-down card, so the arrow decides until then (SOLO-RIVAL-11; owner, 2026-10-27)
+        arkhos_first = [o for o in best if s.species[o[1]].discovered and s.species[o[1]].species == "arkhos"]
+        best = arkhos_first or best
         chosen = pick(s, sorted(best, key=lambda o: (o[1], colors.index(o[2]["color"]))))
         action = chosen[2]
     else:
