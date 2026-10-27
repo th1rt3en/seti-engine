@@ -32,7 +32,7 @@ def rotate_solar_system(s: GameState, events: Events) -> None:
     for player, _why in solar.rotate(s):
         effects.gain_publicity(s, s.players[player])
         events.append({"type": "publicity", "player": player, "reason": "pushed"})
-    for player, cell in s.pushed:  # TECH-PT03, MOVE-07: a probe pushed onto asteroids gains the Asteroid Skimmer's publicity (owner, 2026-10-27)
+    for player, cell in s.pushed:  # TECH-PT03, MOVE-07: a probe pushed onto asteroids gains the Skimmer's publicity (owner, 2026-10-27)
         if cell == "ASTEROID" and effects.tech_active(s.players[player], "probe-link"):
             effects.gain_publicity(s, s.players[player])
             events.append({"type": "publicity", "player": player, "reason": "pushed"})
