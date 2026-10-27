@@ -66,7 +66,8 @@
  ],
  "launch": [],
  "mark_signal": [
-  "sector"
+  "sector",
+  "where"
  ],
  "move_energy": [],
  "move_probe": [
@@ -167,9 +168,6 @@
  ],
  "show_energy_done": [],
  "show_move_done": [],
- "signal_where": [
-  "where"
- ],
  "skip_breach": [],
  "skip_land": [],
  "skip_tuck": [],

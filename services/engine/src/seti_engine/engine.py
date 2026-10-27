@@ -136,6 +136,7 @@ MOVE_CLASSES = ("free", "main", "answer", "end", "control")
 
 def legal_classified(state: GameState) -> list[tuple[Action, str]]:
     """The legal moves, each with its class, in the order of `legal_moves` (which is this list without the classes)."""
+    state = cards.legacy_missions(state)
     if state.phase == "finished":
         return []
     if state.pending and state.pending[0].kind == "setup_choice":  # EXP-ORG-14: every player who has not locked in may move
@@ -392,6 +393,7 @@ NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lowe
 
 
 def apply(state: GameState, action: Action) -> StepResult:
+    state = cards.legacy_missions(state)
     legal = legal_moves(state)
     if state.pending and state.pending[0].kind == "hold" and action not in legal and not sandbox.is_sandbox_action(action):
         # EXP-SA5-01: the logs of games played before 2026-10-23 have no `hold_done`: any other move ends the wait first

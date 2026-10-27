@@ -212,6 +212,7 @@ def rival_preview(deck: list[str], seen: list[str]) -> list[str]:
 
 
 def project(state: GameState, viewer: int | None, previews: bool = True, irreversible: bool = True) -> View:
+    state = cards.legacy_missions(state)
     s = state.model_copy(deep=True)
     counts = Counts(
         deck=len(s.deck),

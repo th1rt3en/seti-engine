@@ -534,28 +534,50 @@ def test_sa40_hall_effect_thruster() -> None:  # SA.40
 def test_sa41_exoplanet_survey() -> None:  # SA.41
     r = go(ready(publicity=0), 41)
     p = me(r)
-    assert p.signal_tokens == 1 and p.publicity == 1 and "SA.41" in p.end_cards
+    assert p.signal_tokens == 1 and p.publicity == 1 and "SA.41" not in p.end_cards  # a quick mission, not an end card
     st = r.state
-    assert cards.end_points(st, p) == 0
+    done = {"type": "complete_mission", "card": "SA.41"}
+    assert done not in legal_moves(st)
     for color in ("yellow", "red", "blue", "black"):
         i = next(k for k, sec in enumerate(st.sectors) if sec.color == color)
         st.sectors[i].markers.append(p.index)
-    assert cards.end_points(st, p) == 4
+    assert done in legal_moves(st)
+    score = p.score
+    after = apply(st, done).state
+    assert after.players[p.index].score == score + 4 and "SA.41" in after.players[p.index].completed_missions
 
 
 def test_sa42_lofar_array() -> None:  # SA.42
     r = go(ready(), 42)
     st, p = r.state, me(r)
-    assert "SA.42" in p.end_cards
+    assert "SA.42" not in p.end_cards  # a quick mission, not an end card (the picture: a gray banner)
+    done = {"type": "complete_mission", "card": "SA.42"}
     for sec in st.sectors:
         sec.markers = [x for x in sec.markers if x != p.index]
         sec.winners = [x for x in sec.winners if x != p.index]
-    assert cards.end_points(st, p) == 0
+    assert done not in legal_moves(st)
     for sec in st.sectors[:7]:
         sec.markers.append(p.index)
-    assert cards.end_points(st, p) == 0
+    assert done not in legal_moves(st)
     st.sectors[7].winners.append(p.index)  # a won sector counts as well
-    assert cards.end_points(st, p) == 8
+    assert done in legal_moves(st)
+    score = p.score
+    after = apply(st, done).state
+    assert after.players[p.index].score == score + 8 and "SA.42" in after.players[p.index].completed_missions
+
+
+def test_a_running_game_with_sa41_or_sa42_as_an_end_card_gets_the_mission() -> None:  # SA.41, SA.42
+    """Games that were running when the two cards became quick missions had them in front of their players as end cards."""
+    s = ready()
+    p = s.players[s.current_player]
+    p.end_cards += ["SA.41", "SA.42"]
+    for sec in s.sectors:
+        sec.markers.append(p.index)
+    moves = legal_moves(cards.legacy_missions(s))
+    assert {"type": "complete_mission", "card": "SA.41"} in moves and {"type": "complete_mission", "card": "SA.42"} in moves
+    after = apply(s, {"type": "complete_mission", "card": "SA.42"}).state  # apply does the same
+    q = after.players[after.current_player]
+    assert "SA.42" in q.completed_missions and any(m.card == "SA.41" for m in q.missions) and not q.end_cards
 
 
 def test_effects_resolve_from_left_to_right() -> None:  # EXP-ORDER-01, A-053

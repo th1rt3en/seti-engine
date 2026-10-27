@@ -2230,7 +2230,7 @@
     ],
     [
      "card_type",
-     "end_scoring"
+     "quick_mission"
     ],
     [
      "text",
@@ -2238,7 +2238,7 @@
     ],
     [
      "effect",
-     "Gain 1 signal token, 1 publicity and 1 card of your choice.\nEnd of game: have a signal in a yellow, a red, a blue and a black sector -> 4 VP."
+     "Gain 1 signal token, 1 publicity and 1 card of your choice.\nQuick mission (gray banner, green laurel): have a signal in a yellow, a red, a blue and a black sector -> complete it for 4 VP (owner, 2026-10-27: not an end-of-game card)."
     ],
     [
      "flavor",
@@ -2285,7 +2285,7 @@
     ],
     [
      "card_type",
-     "end_scoring"
+     "quick_mission"
     ],
     [
      "text",
@@ -2293,7 +2293,7 @@
     ],
     [
      "effect",
-     "Perform a scan action (scan hexagon) for free.\nEnd of game: have a signal or a won-sector marker in each sector -> 8 VP."
+     "Perform a scan action (scan hexagon) for free.\nQuick mission (gray banner, green laurel): have a signal or a won-sector marker in each sector -> complete it for 8 VP (owner, 2026-10-27: not an end-of-game card)."
     ],
     [
      "flavor",

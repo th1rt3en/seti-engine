@@ -492,8 +492,9 @@ CARDS.update(
         "SA.38": {"fx": [pub(1), move(1), R("hold", cond={"c": "probe_shared"}), when({"c": "probe_shared"}, vp(3))]},
         "SA.39": {"fx": [move(2)], "end": end("per_planets_orb_or_land", 2)},
         "SA.40": {"fx": [move(5)]},
-        "SA.41": {"fx": [R("signal_token"), pub(1), card(1)], "end": end("sig_all_colors", 4)},
-        "SA.42": {"fx": [scan_free()], "end": end("signals_each_sector", 8)},
+        # SA.41, SA.42: quick missions (gray banner, green laurel), not end-of-game cards (owner, 2026-10-27)
+        "SA.41": {"fx": [R("signal_token"), pub(1), card(1)], "mission": quick({"c": "sig_all_colors"}, vp(4))},
+        "SA.42": {"fx": [scan_free()], "mission": quick({"c": "signals_each_sector"}, vp(8))},
     }
 )
 

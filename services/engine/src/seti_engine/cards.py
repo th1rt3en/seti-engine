@@ -493,6 +493,23 @@ def _probe_on(s: GameState, pr: Any, where: str) -> bool:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
+# SA.41 and SA.42 were first made end-of-game cards; they are quick missions (owner, 2026-10-27, from the pictures). A game that was
+# running then has them in front of its players as end cards: they become missions (nothing was lost: an end card scores only at the end).
+LEGACY_END_MISSIONS = ("SA.41", "SA.42")
+
+
+def legacy_missions(s: GameState) -> GameState:
+    if not any(c in p.end_cards for p in s.players for c in LEGACY_END_MISSIONS):
+        return s
+    s = s.model_copy(deep=True)
+    for p in s.players:
+        for cid in LEGACY_END_MISSIONS:
+            if cid in p.end_cards:
+                p.end_cards.remove(cid)
+                p.missions.append(MissionState(card=cid, kind="quick", used=[]))
+    return s
+
+
 def mission_moves(s: GameState, p: PlayerState) -> list[Action]:
     """FREE-07: complete a conditional mission whose condition is met (never forced, CARD-11), or deliver a sample (ALIEN-MASC-04)."""
     out: list[Action] = [

@@ -3939,7 +3939,7 @@
 "sector": "blue",
 "species": null,
 "tags": [],
-"type": "end"
+"type": "quick"
 },
 {
 "cost": 2,
@@ -3956,7 +3956,7 @@
 "tags": [
 "scan"
 ],
-"type": "end"
+"type": "quick"
 },
 {
 "cost": 1,

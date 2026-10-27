@@ -132,6 +132,10 @@ def cond_ok(s: GameState, p: PlayerState, c: dict[str, Any]) -> bool | None:
     if k == "adjacent_earth":  # SA.5: a probe on a space adjacent to Earth
         near = solar.adjacent(*solar.earth(s))
         return bool(any((pr.ring, pr.sector) in near for pr in _own_probes(s, p)))
+    if k == "sig_all_colors":  # SA.41: a signal in a sector of each of the four colors
+        return {sec.color for sec in s.sectors if p.index in sec.markers} >= set(SECTOR_COLORS)
+    if k == "signals_each_sector":  # SA.42: a signal or a won-sector marker in each sector
+        return all(p.index in sec.markers or p.index in sec.winners for sec in s.sectors)
     if k == "other_on_earth":  # SA.14: another player has a probe on Earth
         return bool(any(pr.player != p.index and not pr.capsule and (pr.ring, pr.sector) == solar.earth(s) for pr in s.probes))
     return None
@@ -159,11 +163,6 @@ def end_points(s: GameState, p: PlayerState, e: dict[str, Any]) -> int | None:
         return int(n * len(set(p.glyphs)))
     if w == "per_planets_two_landers":  # SA.31 (owner): planets with 2 of the player's landers, moons not counted
         return int(n * sum(1 for planet in s.planets if p.landers.get(planet, 0) >= 2))
-    if w == "sig_all_colors":  # SA.41: a signal in a sector of each of the four colors
-        got = {sec.color for sec in s.sectors if p.index in sec.markers}
-        return n if got >= set(SECTOR_COLORS) else 0
-    if w == "signals_each_sector":  # SA.42: a signal or a won sector in each sector
-        return n if all(p.index in sec.markers or p.index in sec.winners for sec in s.sectors) else 0
     return None
 
 
