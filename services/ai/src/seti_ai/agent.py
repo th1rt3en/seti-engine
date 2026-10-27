@@ -57,6 +57,14 @@ PRESETS = {
 }
 
 
+def move_embedding(tok: nn.Embedding, toks: torch.Tensor) -> torch.Tensor:
+    """The embedding of each move: the sum of the vectors of its tokens [B, M, K] -> [B, M, d]. `embedding_bag` adds the vectors as it reads them
+    (the padding token 0 is left out, as `nn.Embedding(padding_idx=0)` makes it a zero vector), so the [B, M, K, d] tensor of the vectors of all the
+    tokens of all the moves, K times the size of the result, is never made: with a few hundred moves in a batch it was gigabytes."""
+    b, m, k = toks.shape
+    return nn.functional.embedding_bag(toks.reshape(b * m, k), tok.weight, mode="sum", padding_idx=0).reshape(b, m, -1)
+
+
 class PolicyNet(nn.Module):
     def __init__(self, cfg: NetConfig | None = None) -> None:
         super().__init__()
@@ -95,7 +103,7 @@ class PolicyNet(nn.Module):
     def forward(self, batch: Batch) -> tuple[torch.Tensor, torch.Tensor]:
         """The logits of the moves [B, M] (-1e9 where there is no move) and the values [B]."""
         memory, pad = self.encode(batch)
-        e = self.tok(batch.toks).sum(dim=2)
+        e = move_embedding(self.tok, batch.toks)
         q = self.move_in(e + self.num(batch.nums))
         out = self.decoder(q, memory, tgt_key_padding_mask=~batch.move_mask, memory_key_padding_mask=pad)
         logits = self.score(out).squeeze(-1).float().masked_fill(~batch.move_mask, -1e9)
@@ -215,6 +223,10 @@ class NNAgent:
         return keep[a]
 
 
+MAX_ITEMS = 256  # positions in one pass of the network
+MAX_SLOTS = 8192  # positions x moves in one pass: about 0.3 GB of the largest tensor of the medium network
+
+
 class LocalNet:
     """A network used in this process (a test, an evaluation by hand): the same `evaluate` as the client of the server."""
 
@@ -229,19 +241,29 @@ class LocalNet:
         return logits[0, : toks.shape[0]].cpu().numpy(), float(value[0].item())
 
     def evaluate_many(
-        self, items: list[tuple[features.Tokens, NDArray[np.int32], NDArray[np.float32]]], chunk: int = 64
+        self, items: list[tuple[features.Tokens, NDArray[np.int32], NDArray[np.float32]]], chunk: int = MAX_ITEMS, slots: int = MAX_SLOTS
     ) -> list[tuple[NDArray[np.float32], float]]:
-        """The answers to many positions at once (the network is called once for each `chunk`): what the batched search uses."""
-        out: list[tuple[NDArray[np.float32], float]] = []
-        for at in range(0, len(items), chunk):
-            part = items[at : at + chunk]
+        """The answers to many positions at once, in the order of `items`: what the batched search uses. The positions go through the network in
+        groups of at most `chunk` positions and `slots` move places (positions in a group x the most moves of one of them: a batch is padded to its
+        largest position, so the memory of a group is proportional to that). They are grouped by their number of moves: a position with hundreds of
+        moves among positions that have one (the values asked of positions after a bundle) no longer makes all of them as big as itself."""
+        order = sorted(range(len(items)), key=lambda i: items[i][1].shape[0])
+        out: list[tuple[NDArray[np.float32], float] | None] = [None] * len(items)
+        at = 0
+        while at < len(order):
+            take = [order[at]]
+            at += 1
+            while at < len(order) and len(take) < chunk and (len(take) + 1) * max(1, items[order[at]][1].shape[0]) <= slots:
+                take.append(order[at])
+                at += 1
+            part = [items[i] for i in take]
             with torch.no_grad():
-                batch = collate(part, self.device)
-                logits, value = self.net(batch)
+                logits, value = self.net(collate(part, self.device))
             lg = logits.float().cpu().numpy()
             vs = value.float().cpu().numpy()
-            out += [(lg[i, : it[1].shape[0]], float(vs[i])) for i, it in enumerate(part)]
-        return out
+            for k, i in enumerate(take):
+                out[i] = (lg[k, : items[i][1].shape[0]].copy(), float(vs[k]))
+        return [o for o in out if o is not None]
 
 
 def new_net(preset: str = "base") -> PolicyNet:

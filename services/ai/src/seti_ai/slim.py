@@ -22,7 +22,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.ao.nn.quantized.dynamic import Linear as QLinear
 
-from .agent import Batch, NetConfig, PolicyNet
+from .agent import Batch, NetConfig, PolicyNet, move_embedding
 
 # The kinds of linear layers that stay in 32 bits: the small ones, which the 8 bit copy gets wrong the most (measured with `--check` on the large network of the
 # run v003: the best move is the same in 100% of 39 positions with these two kept, 95% without; they weigh 1.5M parameters of 144M).
@@ -152,7 +152,7 @@ class SlimNet(nn.Module):
         for layer in self.encoder:
             x = layer(x, allow)
         memory = self.norm_out(x)
-        e = self.tok(batch.toks).sum(dim=2)
+        e = move_embedding(self.tok, batch.toks)
         q = self.move_in2(F.gelu(self.move_in1(e + self.num(batch.nums))))
         move_allow = batch.move_mask[:, None, None, :]
         for dec in self.decoder:
