@@ -29,11 +29,12 @@ const KINDS = [
   { key: "card", label: "Cards", icon: <RandomCardIcon size={18} /> },
 ] as const;
 
-/** The income rows: publicity and data (organizations) show only when some player has that income. */
+/** The income rows: publicity, data and signal tokens (organizations) show only when some player has that income. */
 const INCOME_ROWS = [
   ...KINDS.map((k) => ({ ...k, optional: false })),
   { key: "publicity", label: "Publicity", icon: <PublicityIcon size={18} />, optional: true },
   { key: "data", label: "Data", icon: <DataIcon size={18} />, optional: true },
+  { key: "signal", label: "Signal tokens", icon: <SignalTokenIcon size={18} />, optional: true },
 ];
 
 /** A label with its icon in front of it. */

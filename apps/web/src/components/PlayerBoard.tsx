@@ -50,6 +50,7 @@ const INCOME_ICONS: [string, string | undefined][] = [
   ["credit", ICON["tokens/icon-credit"]],
   ["publicity", ICON["tokens/icon-publicity"]], // shown only when the player has that income (an organization)
   ["data", ICON["tokens/icon-data"]],
+  ["signal", ICON["tokens/token-signal"]], // shown only when the player has that income (Deep Sky Survey, Sentinel Probe Network)
 ];
 
 /** Picking the slot of a computer tech that was just taken: the free slots (the engine's numbers), the one that is picked, and the click. */
