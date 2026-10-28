@@ -60,6 +60,12 @@ export interface SlotChoice {
   onPick: (slot: number) => void;
 }
 
+/** Picking one of the open missions (Abandoned Mission, SA.29): the cards that can be returned to the hand (the engine's choices), and the click. */
+export interface MissionChoice {
+  cards: string[];
+  onPick: (card: string) => void;
+}
+
 /** Placing data on the lower space of a computer tech (a free action, TECH-21): the slots (the engine's numbers) that can take it, and the click. */
 export interface LowerChoice {
   slots: number[];
@@ -145,7 +151,8 @@ function Board({
   choice,
   onPlaceData,
   lower,
-}: { view: View; player: number; choice?: SlotChoice; onPlaceData?: () => void; lower?: LowerChoice }) {
+  missionChoice,
+}: { view: View; player: number; choice?: SlotChoice; onPlaceData?: () => void; lower?: LowerChoice; missionChoice?: MissionChoice }) {
   const p = view.state.players[player];
   if (!p) return null;
   const techs = new Set(p.techs);
@@ -361,9 +368,33 @@ function Board({
         const x = MISSIONS.x + col * (MISSIONS.w + MISSIONS.gap);
         const y = HEAD + BOARD.h + strip + 26 + row * (MISSIONS.h + 50);
         const src = cardImage(m.card);
+        const pickable = missionChoice?.cards.includes(m.card) ?? false;
         return (
-          <g key={m.card}>
+          <g
+            key={m.card}
+            {...(pickable
+              ? {
+                  role: "button",
+                  tabIndex: 0,
+                  "aria-label": `Return the mission ${m.card} to your hand`,
+                  className: "spot",
+                  onClick: () => missionChoice?.onPick(m.card),
+                  onKeyDown: (e: React.KeyboardEvent) => (e.key === "Enter" || e.key === " ") && missionChoice?.onPick(m.card),
+                }
+              : {})}
+          >
             {src ? <image href={src} x={x} y={y} width={MISSIONS.w} height={MISSIONS.h} /> : null}
+            {pickable ? (
+              <rect
+                x={x - 4}
+                y={y - 4}
+                width={MISSIONS.w + 8}
+                height={MISSIONS.h + 8}
+                rx="12"
+                className="spotshape"
+                style={{ strokeWidth: 5 }}
+              />
+            ) : null}
             {m.kind === "trigger" ? (
               m.used.map((u, k) => (
                 <circle
@@ -399,6 +430,7 @@ export function PlayerBoardPanel({
   choice,
   onPlaceData,
   lower,
+  missionChoice,
 }: {
   view: View;
   names: string[];
@@ -410,6 +442,8 @@ export function PlayerBoardPanel({
   onPlaceData?: () => void;
   /** The free action "place data on a computer tech's lower space": the slots that can take it, highlighted on the board. */
   lower?: LowerChoice;
+  /** Abandoned Mission: the open missions that can be returned, highlighted on the board. */
+  missionChoice?: MissionChoice;
 }) {
   const s = view.state;
   const players = s.players.filter((p) => !(s.rival && p.index === s.rival.index));
@@ -436,6 +470,7 @@ export function PlayerBoardPanel({
         </button>
       </header>
       {choice ? <p className="handhint">Click the slot of the computer where the new tech goes.</p> : null}
+      {missionChoice && shown === view.viewer ? <p className="handhint">Click the highlighted mission to return it to your hand.</p> : null}
       {lower && lower.slots.length > 0 && shown === view.viewer ? (
         <p className="handhint">Click a highlighted data space under a computer tech to place a data from your pool there (free action).</p>
       ) : null}
@@ -448,6 +483,7 @@ export function PlayerBoardPanel({
         choice={shown === view.viewer ? choice : undefined}
         onPlaceData={shown === view.viewer ? onPlaceData : undefined}
         lower={shown === view.viewer ? lower : undefined}
+        missionChoice={shown === view.viewer ? missionChoice : undefined}
       />
     </section>
   );

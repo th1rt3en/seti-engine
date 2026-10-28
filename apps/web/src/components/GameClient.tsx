@@ -56,7 +56,7 @@ import { OfferPanel } from "./OfferPanel";
 import { OrgFreePanel } from "./OrgFreePanel";
 import { OrgMarkPick } from "./OrgMarkPick";
 import { pieceColor } from "./Pieces";
-import { PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
+import { type MissionChoice, PlayerBoardPanel, type SlotChoice } from "./PlayerBoard";
 import { PlayerLink } from "./PlayerLink";
 import { PlayerColorsContext, PlayerName, PlayerNumsContext } from "./PlayerName";
 import { PolPanel } from "./PolPanel";
@@ -337,7 +337,7 @@ export function GameClient({
     window.addEventListener(OPEN_BOARD_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_BOARD_EVENT, onOpen);
   }, []);
-  const choosing = view?.view.legal.some((m) => m.type === "place_computer_tech") ?? false;
+  const choosing = view?.view.legal.some((m) => m.type === "place_computer_tech" || m.type === "return_mission") ?? false;
   const viewer = view?.view.viewer ?? null;
   useEffect(() => {
     if (choosing && viewer !== null) {
@@ -590,6 +590,7 @@ export function GameClient({
       m.type !== "cover" &&
       !orgMarkMoves.includes(m) &&
       m.type !== "complete_mission" &&
+      m.type !== "return_mission" && // Abandoned Mission: the mission is picked on the player board
       m.type !== "move_energy" &&
       m.type !== "place_data" &&
       m.type !== "place_lower",
@@ -721,6 +722,18 @@ export function GameClient({
   const slotTech = String(v.state.pending[0]?.data?.tech ?? "");
   const slotChoice: SlotChoice | undefined =
     slotMoves.length > 0 ? { slots: slotMoves.map((m) => Number(m.slot)), selected: pickedSlot, onPick: setPickedSlot } : undefined;
+  // Abandoned Mission (SA.29): the mission that returns to the hand is clicked on the player board
+  const returnMoves = mine.filter((m) => m.type === "return_mission");
+  const missionChoice: MissionChoice | undefined =
+    returnMoves.length > 0
+      ? {
+          cards: returnMoves.map((m) => String(m.card)),
+          onPick: (card) => {
+            const m = returnMoves.find((x) => x.card === card);
+            if (m) play(m);
+          },
+        }
+      : undefined;
   // a gold scoring tile is marked by clicking its free place on the board
   const goldMoves = mine.filter((m) => m.type === "choose_gold");
   const goldTile = pickedGold === null ? undefined : v.state.gold_tiles.find((g) => g.tile === pickedGold);
@@ -1008,6 +1021,7 @@ export function GameClient({
     );
   if (pickable.length > 0) hints.push(`${handHint(new Set(handMoves.map((m) => m.type)))}`);
   if (goldMoves.length > 0) hints.push("Click the highlighted place of a gold scoring tile beside the board to mark it.");
+  if (returnMoves.length > 0) hints.push("Click the mission on your player board that returns to your hand.");
   if (slotMoves.length > 0) hints.push("Click the slot of the computer on your player board where the new tech goes.");
   if (mine.some((m) => m.type === "place_data" || m.type === "place_lower"))
     hints.push(
@@ -1516,6 +1530,7 @@ export function GameClient({
                   onShow={setBoardPlayer}
                   onClose={() => setBoardOpen(false)}
                   choice={slotChoice}
+                  missionChoice={missionChoice}
                   onPlaceData={mine.some((m) => m.type === "place_data") && !ended ? () => play({ type: "place_data" }) : undefined}
                   lower={
                     ended
