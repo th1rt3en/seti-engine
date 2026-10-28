@@ -16,6 +16,12 @@ export default function Demo() {
     planets.jupiter.moon_landers = { Io: 1 };
   }
   if (planets.mars) planets.mars.landers = [0];
+  // a full sector with markers beyond its data slots (the overflow markers continue along the line of the slots)
+  const full = view.state.sectors[6];
+  if (full) {
+    full.markers = [0, 1, 2, 0, 1, 2].slice(0, full.capacity + 2);
+    full.data_remaining = 0;
+  }
   // nobody has passed yet in this round, so the moon token lies on this round's pile
   view.state.first_pass_done = false;
   const stack = view.state.tech_stacks[1];

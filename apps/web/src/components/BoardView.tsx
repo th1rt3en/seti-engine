@@ -594,10 +594,18 @@ export function BoardView({
                 );
               })}
               {extra.map((player, k) => {
-                const at = polar(radius - 120, centre + slot.hi - 2 - k * 3.2);
+                // a marker beyond the data slots goes on along the line of the slots, at the same distance from one another (the printed dotted line goes on there)
+                const at = polar(radius, centre + slot.hi - (sec.capacity + k + 0.5) * pitch);
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: markers are placed in order and never reorder
-                  <Marker key={`x${k}`} x={at.x} y={at.y} size={64} color={color(player)} />
+                  <Marker
+                    // biome-ignore lint/suspicious/noArrayIndexKey: markers are placed in order and never reorder
+                    key={`x${k}`}
+                    x={at.x}
+                    y={at.y}
+                    size={size}
+                    color={color(player)}
+                    title={`${who(player)}: marker in ${sec.star} beyond its data slots`}
+                  />
                 );
               })}
               <title>{`${sec.star}: ${sec.data_remaining} of ${sec.capacity} data left; markers: ${sec.markers.map(who).join(", ") || "none"}; won by ${sec.winners.map(who).join(", ") || "nobody"}`}</title>
