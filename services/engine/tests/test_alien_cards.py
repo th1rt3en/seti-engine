@@ -200,7 +200,31 @@ def test_species_trace_mission_lets_the_player_look_at_samples() -> None:
     assert {"type": "complete_mission", "card": "ET.10"} not in legal_moves(s2)
     s2.players[pl].trace_log.append((0, "blue"))
     r2 = do(with_state(s2), "complete_mission", card="ET.10")
-    assert first_pending(r2) == "mascamite_sample" and {m["planet"] for m in r2.legal} == {"jupiter", "saturn"}
+    assert first_pending(r2) == "mascamite_planet" and {m["planet"] for m in decisions(r2.legal)} == {"jupiter", "saturn"}  # ALIEN-MASC-07
+    assert {m["type"] for m in decisions(r2.legal)} == {"pick_planet"}
+
+
+def test_alien_masc_07_the_player_chooses_the_planet_before_looking_at_any_sample() -> None:
+    """ALIEN-MASC-07 (ET.8 to ET.10: "Choose Jupiter or Saturn. Look at all its samples, pick one, ..."): the choice comes first, and
+    only the samples of the chosen planet are shown (owner, 2026-10-28)."""
+    s = world("mascamites")
+    pl = s.current_player
+    r = settle(play(s, "ET.8"))
+    s2 = r.state.model_copy(deep=True)
+    s2.players[pl].trace_log = [(0, "yellow"), (0, "yellow")]
+    r2 = do(with_state(s2), "complete_mission", card="ET.8")
+    assert first_pending(r2) == "mascamite_planet"
+    slot = next(sl for sl in r2.state.species if sl.species == "mascamites")
+    assert not slot.extra.get("seen", {}).get(str(pl)), "nothing has been looked at before the planet is chosen"
+    r3 = do(r2, "pick_planet", planet="saturn")
+    assert first_pending(r3) == "mascamite_sample"
+    assert {m["planet"] for m in decisions(r3.legal)} == {"saturn"} and {m["type"] for m in decisions(r3.legal)} == {"pick_sample"}
+    slot3 = next(sl for sl in r3.state.species if sl.species == "mascamites")
+    seen = set(slot3.extra["seen"][str(pl)])
+    assert seen == set(species.samples_on(r3.state, "saturn")), "only the tokens of the chosen planet were seen"
+    token = species.samples_on(r3.state, "saturn")[0]
+    r4 = do(r3, "pick_sample", planet="saturn", sample=token)
+    assert not r4.state.pending and species.samples_on(r4.state, "saturn") == species.samples_on(r3.state, "saturn")  # put back
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

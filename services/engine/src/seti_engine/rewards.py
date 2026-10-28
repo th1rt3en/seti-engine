@@ -24,7 +24,7 @@ NEUTRAL = -1  # EXP-QS-03: the marker color of the neutral quick start pieces
 def grant(
     s: GameState, p: PlayerState, rewards: list[dict[str, Any]], events: Events, planet: str | None = None, slot: int | None = None
 ) -> None:
-    from . import arkhos, cards, glyphids, rival, species  # noqa: PLC0415 - these import this module
+    from . import alien_steps, arkhos, cards, glyphids, rival, species  # noqa: PLC0415 - these import this module
 
     if rival.is_rival(s, p.index):  # SOLO-10: the rival takes rewards in its own way
         rival.grant(s, rewards, events, planet, slot)
@@ -87,10 +87,7 @@ def grant(
                 p.exofossils -= n
             species.return_exofossils(s, n)
         elif t == "sample_peek":  # a Mascamite mission reward: look at Jupiter's or Saturn's samples and gain one's reward
-            planets = [pl for pl in species.SAMPLE_PLANETS if species.samples_on(s, pl)]
-            if planets:
-                species.record_seen(s, p.index, planets)
-                s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "peek", "planets": planets}))
+            alien_steps.start_peek(s, p, [pl for pl in species.SAMPLE_PLANETS if species.samples_on(s, pl)])  # ALIEN-MASC-07
         elif t == "signal_any":
             s.pending += [Decision(kind="signal", player=p.index, data={"color": "any"}) for _ in range(n)]
         elif t == "signal_oumuamua":

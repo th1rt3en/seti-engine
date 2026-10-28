@@ -94,10 +94,7 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
             species.record_seen(s, p.index, [st["planet"]])
             s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "collect", "planets": [st["planet"]]}))
     elif t == "sample_peek":
-        planets = _peek_planets(s, p, st.get("probe", False))
-        if planets:
-            species.record_seen(s, p.index, planets)
-            s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "peek", "planets": planets}))
+        start_peek(s, p, _peek_planets(s, p, st.get("probe", False)))
     elif t == "sig_next_anomaly":
         tok = next_anomaly(s)
         if tok is not None:
@@ -128,6 +125,17 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
     return True
 
 
+def start_peek(s: GameState, p: PlayerState, planets: list[str]) -> None:
+    """ALIEN-MASC-07 (ET.8 to ET.10: "Choose Jupiter or Saturn. Look at all its samples, pick one, gain its reward, and put it back"):
+    with two planets that have samples the player first chooses the planet, and only then looks at the samples there. Nothing is shown
+    before the choice, and the choice cannot be taken back (it shows hidden tokens, UNDO-01). One planet only: its samples show at once."""
+    if len(planets) == 1:
+        species.record_seen(s, p.index, planets)
+        s.pending.append(Decision(kind="mascamite_sample", player=p.index, data={"mode": "peek", "planets": planets}))
+    elif planets:
+        s.pending.append(Decision(kind="mascamite_planet", player=p.index, data={"planets": planets}))
+
+
 def _peek_planets(s: GameState, p: PlayerState, with_probe: bool) -> list[str]:
     out: list[str] = []
     for planet in species.SAMPLE_PLANETS:
@@ -147,6 +155,8 @@ def _peek_planets(s: GameState, p: PlayerState, with_probe: bool) -> list[str]:
 
 def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
     p = s.players[d.player]
+    if d.kind == "mascamite_planet":
+        return [{"type": "pick_planet", "planet": pl} for pl in d.data["planets"]]
     if d.kind == "mascamite_sample":
         return [{"type": "pick_sample", "planet": pl, "sample": t} for pl in d.data["planets"] for t in species.samples_on(s, pl)]
     if d.kind == "pol_corner":
@@ -161,7 +171,10 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
 
 def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, events: Events) -> bool:
     t = a["type"]
-    if t == "pick_sample":
+    if t == "pick_planet":  # ALIEN-MASC-07: the planet is chosen; its samples are shown now (and only its samples)
+        species.record_seen(s, p.index, [a["planet"]])
+        s.pending.insert(0, Decision(kind="mascamite_sample", player=p.index, data={"mode": "peek", "planets": [a["planet"]]}))
+    elif t == "pick_sample":
         if d.data["mode"] == "collect":
             species.collect_sample(s, p, a["planet"], a["sample"], events)
         else:  # peek: gain its reward and put it back (FAQ-C201)

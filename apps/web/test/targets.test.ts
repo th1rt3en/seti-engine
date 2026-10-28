@@ -240,24 +240,24 @@ describe("the help of the context bar", () => {
   });
 });
 
-describe("the planets whose samples can be looked at (Mascamites, ET.8)", () => {
-  const moves = (planets: string[]) =>
-    planets.flatMap((planet, k) => [0, 1].map((t) => ({ type: "pick_sample", planet, sample: k * 2 + t })));
-
-  it("is a place for each planet when there is a choice of planets, and the samples of a planet share it", () => {
-    const legal = moves(["jupiter", "saturn"]);
+describe("the planets whose samples can be looked at (Mascamites, ET.8, ALIEN-MASC-07)", () => {
+  it("is a place to click for each planet of the choice, and no button of the bar", () => {
+    const legal = [
+      { type: "pick_planet", planet: "jupiter" },
+      { type: "pick_planet", planet: "saturn" },
+    ];
     const { spots, handled } = buildSpots(
       view(
         legal,
-        legal.map(() => ({ planet: "x", rewards: [] })),
+        legal.map(() => ({})),
       ),
     );
     expect(spots.map((s) => s.id)).toEqual(["samplepick:jupiter", "samplepick:saturn"]);
-    expect([...handled].sort()).toEqual([0, 1, 2, 3]); // no button of the bar for a sample: the panel shows them
+    expect([...handled].sort()).toEqual([0, 1]);
   });
 
-  it("has no place to click when there is one planet only (its panel opens at once), but no button either", () => {
-    const legal = moves(["jupiter"]);
+  it("has no place to click once the planet is chosen: its samples are in the panel, with no button", () => {
+    const legal = [0, 1].map((t) => ({ type: "pick_sample", planet: "jupiter", sample: t }));
     const { spots, handled } = buildSpots(
       view(
         legal,
