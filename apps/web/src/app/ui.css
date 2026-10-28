@@ -621,6 +621,16 @@ tbody tr:hover td {
   }
 }
 
+/* a wide table scrolls inside its box: it used to make the whole page wider than the window, and the background (as wide as the window) ended
+   where the window did */
+.tablewrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+main {
+  min-width: 0;
+}
+
 /* a phone: the menu is one row that scrolls sideways instead of four rows that push the game down */
 @media (max-width: 760px) {
   .bar {
