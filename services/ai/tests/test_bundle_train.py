@@ -45,3 +45,36 @@ def test_the_network_plays_against_a_bot_after_training_on_the_processor() -> No
     net = new_net("small")
     out = bundle_train.evaluate_vs_bots(net, 2, torch.device("cpu"), opponents=("random",))
     assert out["random"]["games"] == 2 and out["random"]["agent_score"] >= 0
+
+
+def test_the_win_head_learns_the_result_of_the_game() -> None:
+    torch.manual_seed(0)
+    data = Examples()
+    for k in range(2):
+        ex, _ = bundle_train.bot_game_examples({"kind": k % 2, "bot_a": "heuristic", "bot_b": "greedy", "seed": 700 + k})
+        data.extend(ex)
+    won = [v for v in data.value if v.win == 1.0][:6]
+    lost = [v for v in data.value if v.win == 0.0][:6]
+    assert won and lost, "a game of two bots has a winner and a loser"
+    data.policy = data.policy[:64]
+    data.value = won + lost  # a dozen positions: the head has to be able to fit them (a head that learns nothing stays at the 0.69 of a coin)
+    net = new_net("small")
+    opt = torch.optim.AdamW(net.parameters(), lr=1e-3)
+    rng = np.random.default_rng(0)
+    device = torch.device("cpu")
+    first = bundle_train.train_epoch(net, opt, data, device, rng, 64)
+    for _ in range(70):  # the policy loss is large at first and the gradient is clipped: the head starts to move after a few dozen steps
+        last = bundle_train.train_epoch(net, opt, data, device, rng, 64)
+    assert first["win_loss"] > 0.5, "an untrained head is near the 0.69 of a coin"
+    assert last["win_loss"] < first["win_loss"] - 0.1, (first, last)
+    assert last["win_accuracy"] > 0.75
+
+
+def test_positions_without_a_label_are_left_out_of_the_win_loss() -> None:
+    data = small_data()
+    for v in data.value:
+        v.win = -1.0  # made before the win target (the buffer of an older run)
+    data.policy = data.policy[:100]
+    net = new_net("small")
+    st = bundle_train.train_epoch(net, torch.optim.AdamW(net.parameters(), lr=3e-4), data, torch.device("cpu"), np.random.default_rng(0), 64)
+    assert st["win_loss"] == 0.0 and st["value_rmse_points"] > 0

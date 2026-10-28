@@ -98,3 +98,35 @@ def test_a_game_without_the_model_counts_once() -> None:
 def test_the_weights_of_a_lost_game_can_be_set() -> None:
     policy, value = game_weights([10, 20, 30], model_seats={0}, lost_weight=5.0, value_lost_weight=2.0)
     assert policy == {0: 0.0, 1: 5.0, 2: 5.0} and value == {0: 2.0, 1: 2.0, 2: 2.0}
+
+
+# --- the result of the game as a target (the win head) ------------------------------------------------------------------------------------------
+def test_every_position_of_a_game_carries_the_result_of_the_whole_game() -> None:
+    """A turn that set up a win many turns later is credited for it: each position after a bundle is labelled with how the game ended for its seat."""
+    opts = Options(players=2, seed=5)
+    res = arena.play_game([bots.heuristic(), bots.greedy()], 5, random.Random(5), {})
+    assert res.finished
+    by_seat: dict[int, set[float]] = {0: set(), 1: set()}
+    for seat in (0, 1):
+        ex = examples_from_log(opts, res.actions, value_weight=lambda s, seat=seat: 1.0 if s == seat else 0.0)
+        by_seat[seat] = {v.win for v in ex.value}
+    assert all(len(labels) == 1 for labels in by_seat.values()), "one label for all the positions of a seat"
+    a, b = by_seat[0].pop(), by_seat[1].pop()
+    if res.scores[0] == res.scores[1]:
+        assert a == b == 0.5
+    else:
+        assert {a, b} == {0.0, 1.0}
+        assert a == (1.0 if res.scores[0] > res.scores[1] else 0.0)
+
+
+def test_the_label_is_a_win_a_shared_first_place_or_a_loss() -> None:
+    """The engine's `winners` decides (it also knows the solo rule: the player wins only with more points than the rival)."""
+    from seti_engine import engine
+
+    from seti_ai.bundle_data import win_label
+
+    state = engine.start(Options(players=2, seed=1)).state
+    alone = state.model_copy(update={"winners": [1]})
+    assert (win_label(alone, 1), win_label(alone, 0)) == (1.0, 0.0)
+    shared = state.model_copy(update={"winners": [0, 1]})
+    assert win_label(shared, 0) == win_label(shared, 1) == 0.5

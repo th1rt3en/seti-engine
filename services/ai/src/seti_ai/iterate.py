@@ -264,7 +264,8 @@ def train_on(net: PolicyNet, opt: torch.optim.Optimizer, data: Examples, s: Sett
         st = bundle_train.train_epoch(net, opt, data, device, rng, s.batch, s.log_every)
         print(
             f"  epoch {e}/{s.epochs}: policy loss {st['policy_loss']:.3f}, picks the searched move {st['accuracy']:.1%}, "
-            f"value error {st['value_rmse_points']:.1f} points ({time.time() - t:.0f}s, {st['seconds_per_batch']:.2f}s a batch)",
+            f"value error {st['value_rmse_points']:.1f} points, win loss {st['win_loss']:.3f} (right on {st['win_accuracy']:.0%}) "
+            f"({time.time() - t:.0f}s, {st['seconds_per_batch']:.2f}s a batch)",
             flush=True,
         )
         out.append(st)
@@ -356,7 +357,7 @@ def run(s: Settings, start: Path, resume: bool, brain: BrainFactory = net_brain,
     if resume and checkpoint.exists(root):
         net, opt_state, meta, rng_state = checkpoint.load(root, device)
         opt = torch.optim.AdamW(net.parameters(), lr=s.lr, weight_decay=0.01)
-        opt.load_state_dict(opt_state)
+        checkpoint.restore_optimizer(opt, opt_state)
         checkpoint.restore_rng(rng_state)
         first = int(meta["iteration"]) + 1
         champion = meta.get("champion") or champion

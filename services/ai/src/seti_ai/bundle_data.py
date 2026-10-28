@@ -6,7 +6,7 @@ Two kinds of example, both from the view of the seat as it saw the game (its own
   offered);
 - **value**: the position right after the last move of a bundle (the seat is not the one to act there: the network is given a blank move and ignores
   it), and the points that the seat gained from there to the end of the game, end-of-game scoring included (divided by `VALUE_SCALE`, like the value
-  of the network).
+  of the network). The same position also has the result of the game for the seat (won, shared first place, lost): the target of the win head.
 
 Moves that were taken back by `undo` make no example. A game that was not played to its end gives policy examples only (there is no final score to
 learn the value from). `game_weights` is the rule for games of people against the model: a game that the model lost counts, with more weight; a game
@@ -49,6 +49,9 @@ class ValueExample:
     tokens: features.Tokens
     target: float  # points from here to the end of the game, divided by VALUE_SCALE
     weight: float
+    # how the game ended for the seat: 1 it won alone, 0.5 it shares the first place, 0 it lost; -1 no label (examples made before the win target, from the
+    # buffer of an older run). Every position of the game gets the result of the whole game: a turn that set up a win many turns later is credited for it.
+    win: float = -1.0
 
 
 @dataclass
@@ -73,6 +76,14 @@ def _final_total(state: GameState, seat: int) -> float:
         if row.get("player") == seat:
             return float(row.get("total", state.players[seat].score))
     return float(state.players[seat].score)
+
+
+def win_label(state: GameState, seat: int) -> float:
+    """The result of a finished game for the seat: 1 for a win, 0.5 for a shared first place, 0 for a loss (the engine's `winners`, which also knows the
+    solo rule: the player wins only with more points than the rival)."""
+    if seat not in state.winners:
+        return 0.0
+    return 1.0 if len(state.winners) == 1 else 0.5
 
 
 def public_move(move: dict[str, Any], events: list[dict[str, Any]], seat: int) -> dict[str, Any]:
@@ -135,7 +146,7 @@ def examples_from_log(
             after = project(state, seat, previews=False)
             tokens = features.encode_view(after, history if memory else None, know if memory else None)
             target = (_final_total(final, seat) - state.players[seat].score) / VALUE_SCALE
-            out.value.append(ValueExample(tokens, target, _w(value_weight, seat)))
+            out.value.append(ValueExample(tokens, target, _w(value_weight, seat), win_label(final, seat)))
     return out
 
 

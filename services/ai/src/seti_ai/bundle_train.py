@@ -32,6 +32,7 @@ from .bundle_data import Examples, examples_from_log
 
 OPTIONS = [{}, {"expansion": True, "organizations": True}]  # the base game and the expansion, half of the games each
 PAIRS = [("heuristic", "heuristic"), ("heuristic", "greedy"), ("greedy", "heuristic"), ("heuristic", "random")]
+WIN_WEIGHT = 0.5  # the weight of the win head's loss (the value head's is 0.5 too)
 DUMMY_TOKS = np.zeros((1, features.MAX_TOKENS), dtype=np.int32)  # a position with nobody to act has no move to choose: a blank one that the network ignores
 DUMMY_NUMS = np.zeros((1, features.MOVE_NUM), dtype=np.float32)
 
@@ -87,7 +88,7 @@ def train_epoch(
     memory; the numbers of the whole epoch come back with the result."""
     net.train()
     order = rng.permutation(len(ex.policy))
-    tot = {"policy": 0.0, "acc": 0.0, "value": 0.0, "n": 0.0, "nv": 0.0, "grad": 0.0, "batches": 0.0}
+    tot = {"policy": 0.0, "acc": 0.0, "value": 0.0, "n": 0.0, "nv": 0.0, "grad": 0.0, "batches": 0.0, "win": 0.0, "nw": 0.0, "wacc": 0.0, "nwa": 0.0}
     batches = -(-len(order) // batch)
     started = last = time.time()
     if device.type == "cuda":
@@ -98,7 +99,7 @@ def train_epoch(
         steps = [(p.tokens, p.toks, p.nums) for p in pol] + [(v.tokens, DUMMY_TOKS, DUMMY_NUMS) for v in val]
         bt = collate(steps, device)
         with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
-            logits, value = net(bt)
+            logits, value, win = net.forward_all(bt)
         n = len(pol)
         act = torch.tensor([p.action for p in pol], device=device)
         w = torch.tensor([p.weight for p in pol], dtype=torch.float32, device=device)
@@ -111,6 +112,19 @@ def train_epoch(
             vw = torch.tensor([v.weight for v in val], dtype=torch.float32, device=device)
             value_loss = (((value[n:] - target) ** 2) * vw).sum() / vw.sum()
             loss = loss + 0.5 * value_loss
+            # the result of the game (won, shared first place, lost) for the position after a bundle: examples without the label (-1) are left out
+            result = torch.tensor([v.win for v in val], dtype=torch.float32, device=device)
+            labelled = result >= 0
+            if bool(labelled.any()):
+                ww = vw * labelled
+                bce = nn.functional.binary_cross_entropy_with_logits(win[n:], result.clamp(min=0.0), reduction="none")
+                win_loss = (bce * ww).sum() / ww.sum()
+                loss = loss + WIN_WEIGHT * win_loss
+                tot["win"] += float(win_loss.detach()) * int(labelled.sum())
+                tot["nw"] += int(labelled.sum())
+                decided = labelled & (result != 0.5)
+                tot["wacc"] += float(((win[n:] > 0) == (result > 0.5))[decided].float().sum())
+                tot["nwa"] += int(decided.sum())
         opt.zero_grad()
         loss.backward()  # type: ignore[no-untyped-call]
         grad = float(nn.utils.clip_grad_norm_(net.parameters(), 1.0))
@@ -134,6 +148,7 @@ def train_epoch(
                 f"    batch {done}/{batches} ({done / batches:.0%}), {now - started:.0f}s so far, "
                 f"about {(batches - done) / speed:.0f}s left ({speed:.2f} batches/s, {1 / speed:.2f}s a batch): "
                 f"policy loss {mean_loss:.3f}, picks the bot's move {acc:.1%}, value error {rmse:.1f} points, "
+                f"win loss {tot['win'] / max(tot['nw'], 1):.3f} (right on {tot['wacc'] / max(tot['nwa'], 1):.0%}), "
                 f"gradient {tot['grad'] / done:.2f}{gpu_memory(device)}",
                 flush=True,
             )
@@ -142,6 +157,8 @@ def train_epoch(
         "policy_loss": tot["policy"] / max(tot["n"], 1),
         "accuracy": tot["acc"] / max(tot["n"], 1),
         "value_rmse_points": (tot["value"] / max(tot["nv"], 1)) ** 0.5 * VALUE_SCALE,
+        "win_loss": tot["win"] / max(tot["nw"], 1),
+        "win_accuracy": tot["wacc"] / max(tot["nwa"], 1),
         "batches": tot["batches"],
         "seconds": seconds,
         "seconds_per_batch": seconds / max(tot["batches"], 1),
@@ -220,7 +237,7 @@ def alpha(a: argparse.Namespace) -> None:
     if a.resume and checkpoint.exists(root):
         net, opt_state, meta, rng_state = checkpoint.load(root, device)
         opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=0.01)
-        opt.load_state_dict(opt_state)
+        checkpoint.restore_optimizer(opt, opt_state)
         checkpoint.restore_rng(rng_state)
         start_epoch = int(meta["iteration"]) + 1
         print(f"resuming after epoch {meta['iteration']}", flush=True)
@@ -235,7 +252,8 @@ def alpha(a: argparse.Namespace) -> None:
         st = train_epoch(net, opt, ex, device, rng, a.batch, a.log_every)
         print(
             f"epoch {epoch}/{a.epochs}: policy loss {st['policy_loss']:.3f}, picks the bot's move {st['accuracy']:.1%}, "
-            f"value error {st['value_rmse_points']:.1f} points ({time.time() - t1:.0f}s; {int(st['batches'])} batches, {st['seconds_per_batch']:.2f}s a batch, "
+            f"value error {st['value_rmse_points']:.1f} points, win loss {st['win_loss']:.3f} (right on {st['win_accuracy']:.0%}) "
+            f"({time.time() - t1:.0f}s; {int(st['batches'])} batches, {st['seconds_per_batch']:.2f}s a batch, "
             f"mean gradient {st['mean_gradient']:.2f}{gpu_memory(device)}); "
             f"about {(time.time() - t1) * (a.epochs - epoch) / 3600:.1f} hours for the epochs left",
             flush=True,

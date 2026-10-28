@@ -4,6 +4,7 @@ import random
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 
 from seti_ai import checkpoint
@@ -39,3 +40,29 @@ def test_a_pause_is_asked_for_with_a_file_and_cleared(tmp_path: Path) -> None:
     checkpoint.clear_pause(tmp_path)
     assert not checkpoint.pause_requested(tmp_path)
     assert checkpoint.status(tmp_path) == "no checkpoint"
+
+
+def test_weights_from_before_the_win_head_still_load_and_other_gaps_do_not(tmp_path: Path) -> None:
+    from seti_ai.agent import load_weights
+
+    net = new_net("small")
+    old = {k: v.clone() for k, v in net.state_dict().items() if not k.startswith("win.")}
+    other = new_net("small")
+    before = {k: v.clone() for k, v in other.state_dict().items() if k.startswith("win.")}
+    load_weights(other, old)
+    assert all(torch.equal(v, other.state_dict()[k]) for k, v in before.items()), "the head that the file does not have keeps its values"
+    assert torch.equal(other.state_dict()["feat.weight"], net.state_dict()["feat.weight"])
+    broken = {k: v for k, v in old.items() if k != "feat.weight"}
+    with pytest.raises(RuntimeError):
+        load_weights(new_net("small"), broken)
+
+
+def test_the_state_of_an_optimizer_without_the_new_head_is_dropped_not_fatal() -> None:
+    from seti_ai.checkpoint import restore_optimizer
+
+    net = new_net("small")
+    opt = torch.optim.AdamW(net.parameters(), lr=1e-3)
+    ok = torch.optim.AdamW(net.parameters(), lr=1e-3)
+    assert restore_optimizer(ok, opt.state_dict())
+    short = torch.optim.AdamW([p for k, p in net.named_parameters() if not k.startswith("win.")], lr=1e-3)
+    assert not restore_optimizer(torch.optim.AdamW(net.parameters(), lr=1e-3), short.state_dict())

@@ -86,6 +86,9 @@ class PolicyNet(nn.Module):
         self.decoder = nn.TransformerDecoder(dec, c.move_layers)
         self.score = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d // 2), nn.GELU(), nn.Linear(d // 2, 1))
         self.value = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d // 2), nn.GELU(), nn.Linear(d // 2, 1))
+        # the chance that the seat wins the game from this position (a logit); trained on the result of the game, so that a turn that only pays off many
+        # turns later gets credit for it (docs/AI-MCTS.md). Checkpoints from before it have no such head: `load_weights` leaves it as it was made.
+        self.win = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d // 2), nn.GELU(), nn.Linear(d // 2, 1))
         nn.init.normal_(self.cls, std=0.02)
         nn.init.normal_(self.feat.weight, std=0.02)
 
@@ -102,12 +105,17 @@ class PolicyNet(nn.Module):
 
     def forward(self, batch: Batch) -> tuple[torch.Tensor, torch.Tensor]:
         """The logits of the moves [B, M] (-1e9 where there is no move) and the values [B]."""
+        logits, value, _ = self.forward_all(batch)
+        return logits, value
+
+    def forward_all(self, batch: Batch) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """The logits of the moves [B, M], the values [B] (points still to gain, in units of VALUE_SCALE) and the win logits [B]."""
         memory, pad = self.encode(batch)
         e = move_embedding(self.tok, batch.toks)
         q = self.move_in(e + self.num(batch.nums))
         out = self.decoder(q, memory, tgt_key_padding_mask=~batch.move_mask, memory_key_padding_mask=pad)
         logits = self.score(out).squeeze(-1).float().masked_fill(~batch.move_mask, -1e9)
-        return logits, self.value(memory[:, 0]).squeeze(-1).float()
+        return logits, self.value(memory[:, 0]).squeeze(-1).float(), self.win(memory[:, 0]).squeeze(-1).float()
 
 
 @dataclass
@@ -176,11 +184,20 @@ def collate(steps: list[tuple[features.Tokens, NDArray[np.int32], NDArray[np.flo
     return Batch(t(idx.astype(np.int64)), t(val), t(offsets), t(kinds), t(sample), t(pos), t(mask), t(toks), t(nums), t(move_mask))
 
 
+def load_weights(net: PolicyNet, weights: dict[str, torch.Tensor]) -> None:
+    """Fill the network from saved weights. A file from before the win head has no `win.` entries: the head keeps the values it was made with. Any
+    other missing or unknown entry is an error, as it was."""
+    missing, unexpected = net.load_state_dict(weights, strict=False)
+    bad = [k for k in missing if not k.startswith("win.")]
+    if bad or unexpected:
+        raise RuntimeError(f"the weights do not fit the network: missing {bad}, unexpected {list(unexpected)}")
+
+
 def net_from(path: str, device: torch.device | str = "cpu") -> PolicyNet:
     saved = torch.load(path, map_location=device)
     cfg = NetConfig(**saved["config"]) if "config" in saved else PRESETS["base"]
     net = PolicyNet(cfg).to(device)
-    net.load_state_dict(saved["weights"] if "weights" in saved else saved)
+    load_weights(net, saved["weights"] if "weights" in saved else saved)
     return net
 
 

@@ -21,7 +21,7 @@ from typing import Any
 import numpy as np
 import torch
 
-from .agent import NetConfig, PolicyNet
+from .agent import NetConfig, PolicyNet, load_weights
 
 _STOP = {"requested": False}
 
@@ -82,8 +82,19 @@ def load(root: Path, device: torch.device) -> tuple[PolicyNet, dict[str, Any], d
     """The network, the optimizer state, the meta data and the random generators of the last checkpoint."""
     saved = torch.load(path(root), map_location="cpu", weights_only=False)
     net = PolicyNet(NetConfig(**saved["config"])).to(device)
-    net.load_state_dict(saved["net"])
+    load_weights(net, saved["net"])
     return net, saved["opt"], saved["meta"], saved["rng"]
+
+
+def restore_optimizer(opt: torch.optim.Optimizer, state: dict[str, Any]) -> bool:
+    """Put the saved state of the optimizer back. A checkpoint from before the win head has a state for fewer parameters: the optimizer then starts again
+    (the network is kept). True if the state was restored."""
+    try:
+        opt.load_state_dict(state)
+    except ValueError:
+        print("the saved state of the optimizer does not fit the network (it has a new head): the optimizer starts again", flush=True)
+        return False
+    return True
 
 
 def restore_rng(rng: dict[str, Any]) -> None:
