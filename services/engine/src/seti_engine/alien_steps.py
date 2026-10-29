@@ -139,10 +139,11 @@ def start_peek(s: GameState, p: PlayerState, planets: list[str]) -> None:
 def _peek_planets(s: GameState, p: PlayerState, with_probe: bool) -> list[str]:
     out: list[str] = []
     for planet in species.SAMPLE_PLANETS:
-        if not species.samples_on(s, planet):
+        if not species.peek_samples(s, p.index, planet):
             continue
         pos = solar.find_cell(s, f"PLANET:{planet.upper()}")
-        if with_probe and not any(pr.player == p.index and not pr.capsule and (pr.ring, pr.sector) == pos for pr in s.probes):
+        # ALIEN-MASC-03: a sample capsule is a probe for the card effects (owner, 2026-10-29), so it counts here too
+        if with_probe and not any(pr.player == p.index and (pr.ring, pr.sector) == pos for pr in s.probes):
             continue
         out.append(planet)
     return out
@@ -158,7 +159,12 @@ def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
     if d.kind == "mascamite_planet":
         return [{"type": "pick_planet", "planet": pl} for pl in d.data["planets"]]
     if d.kind == "mascamite_sample":
-        return [{"type": "pick_sample", "planet": pl, "sample": t} for pl in d.data["planets"] for t in species.samples_on(s, pl)]
+        peek = d.data["mode"] == "peek"
+        return [
+            {"type": "pick_sample", "planet": pl, "sample": t}
+            for pl in d.data["planets"]
+            for t in (species.peek_samples(s, p.index, pl) if peek else species.samples_on(s, pl))
+        ]
     if d.kind == "pol_corner":
         return [{"type": "pol_pick", "card": c} for c in dict.fromkeys(s.aside)]
     if d.kind == "pol_income":

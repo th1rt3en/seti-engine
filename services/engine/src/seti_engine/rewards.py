@@ -87,7 +87,7 @@ def grant(
                 p.exofossils -= n
             species.return_exofossils(s, n)
         elif t == "sample_peek":  # a Mascamite mission reward: look at Jupiter's or Saturn's samples and gain one's reward
-            alien_steps.start_peek(s, p, [pl for pl in species.SAMPLE_PLANETS if species.samples_on(s, pl)])  # ALIEN-MASC-07
+            alien_steps.start_peek(s, p, [pl for pl in species.SAMPLE_PLANETS if species.peek_samples(s, p.index, pl)])  # ALIEN-MASC-07
         elif t == "signal_any":
             s.pending += [Decision(kind="signal", player=p.index, data={"color": "any"}) for _ in range(n)]
         elif t == "signal_oumuamua":

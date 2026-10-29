@@ -553,7 +553,7 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
         return [{**base, "tech": t} for t in techs]  # the card to tuck is chosen next, like any tuck (owner, 2026-10-16)
     if o == "sentinel_probe_network" and p.org_data.get("corner"):
         return [base]
-    if o == "orbital_dynamics" and any(pr.player == p.index and not pr.capsule for pr in s.probes):
+    if o == "orbital_dynamics" and any(pr.player == p.index for pr in s.probes):
         return [base]  # A-039: two different probes move 1 step each
     if o == "turing_systems":
         names = sorted(

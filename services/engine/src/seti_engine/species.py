@@ -272,6 +272,19 @@ def samples_on(s: GameState, planet: str) -> list[int]:
     return list(samples.get(planet, []))
 
 
+def peek_samples(s: GameState, player: int, planet: str) -> list[int]:
+    """The samples that a card effect that looks at a planet's samples offers: the tokens lying there, and the token under each of the
+    player's own sample capsules on that planet's space (ALIEN-MASC-03: the capsule is a probe on the planet, owner 2026-10-29)."""
+    from . import solar  # noqa: PLC0415
+
+    out = samples_on(s, planet)
+    pos = solar.find_cell(s, f"PLANET:{planet.upper()}")
+    for pr in s.probes:
+        if pr.capsule and pr.player == player and pr.sample is not None and (pr.ring, pr.sector) == pos:
+            out.append(pr.sample)
+    return out
+
+
 def record_seen(s: GameState, player: int, planets: list[str]) -> None:
     """ALIEN-MASC-02: a player who looks at the samples on a planet has seen every token there. The page shows them their faces from then on
     (the projection hides the tokens of the others); the memory is no rule: nothing in the game reads it."""

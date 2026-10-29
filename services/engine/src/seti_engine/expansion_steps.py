@@ -24,7 +24,7 @@ def _probe_cell(s: GameState, pr: Any) -> str:
 
 
 def _own_probes(s: GameState, p: PlayerState) -> list[Any]:
-    return [pr for pr in s.probes if pr.player == p.index and not pr.capsule]
+    return [pr for pr in s.probes if pr.player == p.index]  # a capsule is a probe here (ALIEN-MASC-03)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ def cond_ok(s: GameState, p: PlayerState, c: dict[str, Any]) -> bool | None:
         lower = sum(1 for t in p.computer_techs.values() if t.lower_filled)  # EXP-SA35-01: the lower spaces count (ANALYZE-02)
         return bool(sum(p.computer) + lower + p.data_pool >= c["n"])
     if k == "probe_shared":  # SA.38: a probe on a space with another probe
-        spaces = [(pr.ring, pr.sector) for pr in s.probes if not pr.capsule]
+        spaces = [(pr.ring, pr.sector) for pr in s.probes]
         return any(spaces.count((pr.ring, pr.sector)) >= 2 for pr in _own_probes(s, p))
     if k == "adjacent_earth":  # SA.5: a probe on a space adjacent to Earth
         near = solar.adjacent(*solar.earth(s))
@@ -137,7 +137,7 @@ def cond_ok(s: GameState, p: PlayerState, c: dict[str, Any]) -> bool | None:
     if k == "signals_each_sector":  # SA.42: a signal or a won-sector marker in each sector
         return all(p.index in sec.markers or p.index in sec.winners for sec in s.sectors)
     if k == "other_on_earth":  # SA.14: another player has a probe on Earth
-        return bool(any(pr.player != p.index and not pr.capsule and (pr.ring, pr.sector) == solar.earth(s) for pr in s.probes))
+        return bool(any(pr.player != p.index and (pr.ring, pr.sector) == solar.earth(s) for pr in s.probes))
     return None
 
 

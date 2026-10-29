@@ -568,3 +568,57 @@ def test_sample_choices_come_with_the_reward_of_each_token() -> None:
     notes = move_notes.notes(s, legal)
     assert len(legal) == 3
     assert all(n is not None and n["rewards"] == species.sample_faces()[m["sample"]] for m, n in zip(legal, notes, strict=True))
+
+
+def put_capsule(s: GameState, planet: str, token: int) -> None:
+    """A capsule of the current player on a planet's space, carrying `token` (taken off the planet)."""
+    from seti_engine.models import Probe
+
+    i = next(k for k, sl in enumerate(s.species) if sl.species == "mascamites")
+    pos = solar.find_cell(s, f"PLANET:{planet.upper()}")
+    assert pos is not None
+    s.species[i].extra["samples"][planet].remove(token)
+    s.probes.append(Probe(id="capsule1", player=s.current_player, ring=pos[0], sector=pos[1], capsule=True, sample=token))
+
+
+def test_alien_masc_03_a_capsule_is_a_probe_for_ecosystem_study_and_its_sample_is_offered() -> None:
+    """ET.5 Ecosystem Study needs a probe on Jupiter's or Saturn's space: a capsule is one (owner, 2026-10-29); the samples that it shows
+    are those lying on the planet and the one under the capsule."""
+    s = world("mascamites")
+    token = species.samples_on(s, "saturn")[0]
+    put_capsule(s, "saturn", token)
+    r = play(s, "ET.5")
+    assert first_pending(r) == "mascamite_sample", "the capsule alone is a probe on the planet"
+    offered = {m["sample"] for m in decisions(r.legal)}
+    assert offered == set(species.samples_on(r.state, "saturn")) | {token}
+    assert {m["planet"] for m in decisions(r.legal)} == {"saturn"}
+    r2 = do(r, "pick_sample", planet="saturn", sample=token)  # the sample under the capsule: its reward, and it stays under the capsule
+    assert not r2.state.pending
+    assert any(pr.capsule and pr.sample == token for pr in r2.state.probes)
+
+
+def test_alien_masc_03_a_capsule_counts_only_on_the_planet_where_it_is() -> None:
+    s = world("mascamites")
+    token = species.samples_on(s, "jupiter")[0]
+    put_capsule(s, "jupiter", token)
+    r = play(s, "ET.5")
+    assert {m["planet"] for m in decisions(r.legal)} == {"jupiter"}, "only the planet where a probe or a capsule is"
+
+
+def test_alien_masc_03_a_capsule_is_a_probe_for_card_conditions_but_not_for_the_limit() -> None:
+    """SA.38 (a probe on a space with another probe) and SA.5 (a probe next to Earth): the capsule is a probe (owner 2026-10-29); the probe
+    limit does not count it (ALIEN-MASC-03)."""
+    s = world("mascamites")
+    pl = s.current_player
+    p = s.players[pl]
+    probe = put_probe(s, "jupiter", "t1")
+    assert not cards.cond_ok(s, p, {"c": "probe_shared"})
+    token = species.samples_on(s, "jupiter")[0]
+    put_capsule(s, "jupiter", token)
+    assert cards.cond_ok(s, p, {"c": "probe_shared"}), "the capsule shares the space with the probe"
+    s.probes.remove(probe)
+    near = solar.adjacent(*solar.earth(s))[0]
+    s.probes = [pr for pr in s.probes if pr.capsule]
+    s.probes[0].ring, s.probes[0].sector = near
+    assert cards.cond_ok(s, p, {"c": "adjacent_earth"}), "a capsule next to Earth"
+    assert sum(1 for pr in s.probes if pr.player == pl and not pr.capsule) == 0
