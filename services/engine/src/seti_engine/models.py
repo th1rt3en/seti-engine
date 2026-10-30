@@ -41,6 +41,9 @@ class Options(BaseModel):
     # EXP-ORG-14 (owner, 2026-10-23): every player chooses the organization and the quick start cards at the same time, in secret, and
     # locks the choice in; nothing is shown until all have locked in. Off for a game started before (its log has the choices one by one).
     simul_setup: bool = False
+    # EXP-ORG-15 (owner, 2026-10-31): a Futurespan Institute player gains every point by a move (`gain_vp`), so that the free action that
+    # prepares a card can come first: its token is put ahead of the score as it is before the points. Off for a game started before.
+    manual_vp: bool = False
     # sandbox only: the two face-down alien species, left to right; None leaves a slot to chance (SANDBOX-06)
     sandbox_species: list[str | None] = Field(default_factory=lambda: list[str | None]([None, None]))
     seed: int = 0

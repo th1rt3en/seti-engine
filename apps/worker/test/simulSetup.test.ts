@@ -130,6 +130,17 @@ async function game(options: Options = withOrgs, clock: Parameters<ReturnType<ty
 
 const count = async (t: Awaited<ReturnType<typeof game>>) => ((await t.store.get("logcount")) as number | undefined) ?? 0;
 
+describe("manual points (EXP-ORG-15)", () => {
+  it("are switched on for a game with organizations, and not for one without (a free action of Futurespan Institute comes before the points)", async () => {
+    expect((await (await game()).room.meta())?.options).toMatchObject({ manual_vp: true });
+    const plain = makeRoom({ engine: new SimulEngine() });
+    await plain.room.init("g3", { players: 2 } as Options, none, false, alice);
+    await plain.room.join(bob);
+    await plain.room.startGame(alice);
+    expect((await plain.room.meta())?.options.manual_vp).toBeUndefined();
+  });
+});
+
 describe("the simultaneous setup", () => {
   it("is switched on for a game of 2 or more players (organizations or not), and not for a solo game", async () => {
     expect((await (await game()).room.meta())?.options).toMatchObject({ simul_setup: true });

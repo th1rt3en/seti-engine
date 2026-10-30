@@ -33,6 +33,7 @@ export type Stack = string[];
 export type BeginnerOrganizations = boolean;
 export type Difficulty = number;
 export type Expansion = boolean;
+export type ManualVp = boolean;
 export type NeutralQuickStart = boolean;
 export type Organizations = boolean;
 export type Players = number;
@@ -358,6 +359,7 @@ export interface Options {
   beginner_organizations?: BeginnerOrganizations;
   difficulty?: Difficulty;
   expansion?: Expansion;
+  manual_vp?: ManualVp;
   neutral_quick_start?: NeutralQuickStart;
   organizations?: Organizations;
   players: Players;

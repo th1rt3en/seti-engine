@@ -85,6 +85,7 @@ const DECISION: Record<string, string> = {
   discard_corner: "Discard a non-alien card to gain x3 its free corner effect",
   glyph_group: "Choose a glyph group",
   hold: "Use your movement, or continue",
+  gain_vp: "Gain your victory points (a free action can come first)",
   mascamite_planet: "Choose Jupiter or Saturn to look at its samples",
   mascamite_sample: "Choose a sample token to gain its reward",
   mission_trigger: "Choose a mission reward",

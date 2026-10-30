@@ -6,6 +6,7 @@ import type { ClockSettings } from "./clock.js";
 const BOOLEAN_OPTIONS = [
   "beginner_organizations",
   "expansion",
+  "manual_vp",
   "neutral_quick_start",
   "organizations",
   "promo_cards",

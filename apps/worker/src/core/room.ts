@@ -724,7 +724,9 @@ export class GameRoom {
     if (meta.seats.some((s) => s?.bot)) meta.rated = false; // a game with an AI is never rated
     // EXP-ORG-14: with organizations every player chooses the organization and the quick start cards at the same time (a game for one player has nobody to wait for)
     const simul = meta.options.players >= 2 ? { simul_setup: true } : {}; // the choices and the tucks of the setup are made at the same time (EXP-ORG-14)
-    meta.options = { ...meta.options, ...simul, seed: meta.options.seed ?? this.d.newSeed() }; // the host may have chosen it (init)
+    // EXP-ORG-15 (owner, 2026-10-31): with organizations the points are gained by a move of the player (Futurespan Institute needs the free action before them)
+    const manual = meta.options.organizations === true ? { manual_vp: true } : {};
+    meta.options = { ...meta.options, ...simul, ...manual, seed: meta.options.seed ?? this.d.newSeed() }; // the host may have chosen it (init)
     const res = await this.d.engine.newGame(meta.options);
     // Decision D28: the seats are drawn now, so neither the host nor the order of joining decides who sits where. (The engine draws the first player.)
     // The players are put in the order of their ids first: the draw of one seed then gives the same seating to the same players however they joined

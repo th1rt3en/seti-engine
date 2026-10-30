@@ -859,6 +859,11 @@
           "title": "Expansion",
           "type": "boolean"
         },
+        "manual_vp": {
+          "default": false,
+          "title": "Manual Vp",
+          "type": "boolean"
+        },
         "neutral_quick_start": {
           "default": false,
           "title": "Neutral Quick Start",

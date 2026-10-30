@@ -55,8 +55,29 @@ def can_place_data(p: PlayerState) -> bool:
     return (p.data_pool >= 1 and not all(p.computer)) or bool(techs.lower_moves(p))
 
 
+def manual_vp(state: GameState, p: PlayerState) -> bool:
+    """EXP-ORG-15 (owner, 2026-10-31): the points of a Futurespan Institute player wait for their `gain_vp` move where a free action may
+    interrupt (the same places as FREE-00: inside the main action of the player's own turn); elsewhere they are gained at once."""
+    return bool(
+        state.options.manual_vp
+        and p.organization == "futurespan_institute"
+        and state.phase == "play"
+        and state.stage is None
+        and not state.free_active
+        and p.index == state.current_player
+    )
+
+
 def gain_score(state: GameState, p: PlayerState, n: int) -> None:
     """Add points and remember which milestones were reached or passed; they are resolved at the end of the turn (MILE-01)."""
+    if n > 0 and manual_vp(state, p):
+        state.pending.append(Decision(kind="gain_vp", player=p.index, data={"n": n}))
+        return
+    add_score(state, p, n)
+
+
+def add_score(state: GameState, p: PlayerState, n: int) -> None:
+    """The points themselves, and the milestones that they reach."""
     from . import species  # noqa: PLC0415 - species imports this module's neighbours
 
     before = p.score

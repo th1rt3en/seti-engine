@@ -195,6 +195,8 @@ def _decision_moves(state: GameState, d: Decision) -> list[Action]:
     if d.kind == "data_overflow":  # RES-01 (owner ruling 2026-10-14): place pool data first, or take the data and lose the extra
         place: list[Action] = [{"type": "place_data"}] if p.data_pool >= 1 and not all(p.computer) else []
         return [*place, *techs.lower_moves(p), {"type": "data_done"}]
+    if d.kind == "gain_vp":  # EXP-ORG-15 (owner, 2026-10-31): the points wait for the player; a free action may come first
+        return [{"type": "gain_vp", "n": d.data["n"]}]
     if d.kind == "sector_order":  # TURN-05 (owner ruling 2026-10-14): the player chooses which completed sector is resolved next
         return [{"type": "resolve_sector", "sector": i} for i in d.data["sectors"] if i in state.completed]
     if d.kind in ("choose_org", "choose_quick"):
@@ -826,6 +828,10 @@ def _resolve_decision(s: GameState, a: Action, events: list[dict[str, Any]]) -> 
     t = a["type"]
     if d.kind == "data_overflow":
         _resolve_data_overflow(s, p, d, a, events)
+        return
+    if d.kind == "gain_vp":  # EXP-ORG-15: the points are gained now, under the name of what gave them
+        with trail.scope(s, d.source or {"kind": "vp"}):
+            effects.add_score(s, p, int(d.data["n"]))
         return
     if d.kind == "sector_order":
         s.completed.remove(a["sector"])

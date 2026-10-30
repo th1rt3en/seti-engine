@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from seti_engine import orgs, tables
+from seti_engine import effects, orgs, tables
 from seti_engine.engine import apply, legal_moves, start
 from seti_engine.models import SPECIES_BASE, SPECIES_EXPANSION, GameState, Options
 from seti_engine.projection import project
@@ -596,3 +596,74 @@ def test_signal_tokens_are_used_during_a_scan_to_discard_another_card_of_the_row
     r = apply(r.state, token_moves[0])
     assert r.state.players[r.state.current_player].signal_tokens == 0
     assert len(r.state.card_row) <= row  # the card left the row (the row is refilled after the whole scan)
+
+
+# --- Futurespan Institute: the points are gained by a move of the player (EXP-ORG-12, owner 2026-10
+
+
+def test_a_futurespan_player_gains_points_by_a_move_so_that_a_card_can_be_prepared_first() -> None:  # EXP-ORG-15
+    s = with_org("futurespan_institute", credits=0)
+    s.options.manual_vp = True
+    p = cur(s)
+    score = p.score
+    effects.gain_score(s, p, 5)
+    assert p.score == score and s.pending[0].kind == "gain_vp", "the points wait"
+    moves = legal_moves(s)
+    assert {"type": "gain_vp", "n": 5} in moves
+    card = next(c for c in p.hand if 1 <= int(tables.cards()[c]["cost"]) <= 4)
+    cost = int(tables.cards()[card]["cost"])
+    s = pick(s, "org_free", org="futurespan_institute", card=card)  # the free action interrupts: the token goes ahead of the score
+    assert cur(s).org_data["fs_token"] == score + 10 * cost + 5
+    assert cur(s).score == score and s.pending[0].kind == "gain_vp"
+    s = act(s, type="gain_vp", n=5)
+    assert cur(s).score == score + 5 and not s.pending
+    # the same points after the card would have made the token 5 farther
+    assert cur(s).org_data["fs_token"] - cur(s).score == 10 * cost
+
+
+def test_the_points_of_other_players_and_of_games_without_the_option_come_at_once() -> None:  # EXP-ORG-15
+    s = with_org("futurespan_institute")
+    p = cur(s)
+    score = p.score
+    effects.gain_score(s, p, 3)  # the option is off (a game started before it)
+    assert p.score == score + 3 and not s.pending
+    s2 = with_org("fenwick_research_center")
+    s2.options.manual_vp = True
+    q = cur(s2)
+    before = q.score
+    effects.gain_score(s2, q, 3)
+    assert not s2.pending and q.score == before + 3, "only Futurespan"
+
+
+def test_a_futurespan_player_scores_nothing_without_the_move_but_a_free_action_does_not_wait_for_it() -> None:  # EXP-ORG-15
+    s = with_org("futurespan_institute")
+    s.options.manual_vp = True
+    p = cur(s)
+    s.free_active = True  # inside a free action nothing can interrupt: the points come at once
+    score = p.score
+    effects.gain_score(s, p, 4)
+    assert p.score == score + 4 and not s.pending
+
+
+@pytest.mark.parametrize("seed", range(4))
+def test_whole_games_of_futurespan_with_manual_points_finish_and_replay(seed: int) -> None:  # EXP-ORG-15, fuzz
+    rng = random.Random(seed)
+    s = new(2, seed, manual_vp=True)
+    for p in s.players:
+        p.offered_orgs = ["futurespan_institute"]
+    log: list[dict[str, object]] = []
+    for _ in range(8000):
+        if s.phase == "finished":
+            break
+        m = [x for x in legal_moves(s) if x["type"] != "undo"]
+        a = rng.choice(m)
+        log.append(a)
+        s = act(s, **a)
+    assert s.phase == "finished"
+    assert any(a["type"] == "gain_vp" for a in log), "the points were gained by moves"
+    again = start(Options(players=2, seed=seed, **OPTS, manual_vp=True)).state  # type: ignore[arg-type]
+    for p in again.players:
+        p.offered_orgs = ["futurespan_institute"]
+    for a in log:
+        again = act(again, **a)
+    assert again.model_dump() == s.model_dump(), "replay equals live"
