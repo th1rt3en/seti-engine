@@ -284,10 +284,8 @@ describe("play", () => {
   });
 
   it("a connecting client gets a long log in pieces that follow each other, and the next move continues it", async () => {
-    const t = await started();
-    for (let i = 0; i < 95; i++)
-      await t.store.put(`log:${String(i).padStart(7, "0")}`, { seq: i, seat: 0, action: { type: "score" }, at: 0, events: [] });
-    await t.store.put("logcount", 95);
+    const t = await started(false, 200);
+    for (let i = 0; i < 95; i++) expect(await t.room.submit(i % 2 === 0 ? alice : bob, i, { type: "score" })).toMatchObject({ ok: true });
     const c = new Conn("c", alice.id);
     await t.room.connect(c);
     const pieces = c.got.filter((m): m is Extract<ServerMessage, { t: "log" }> => m.t === "log");

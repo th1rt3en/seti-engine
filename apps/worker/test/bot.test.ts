@@ -2,7 +2,7 @@ import type { Options } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
 import { headerOf } from "../src/core/archive.js";
 import { BOT_PLAYERS, BOT_RETRY_MS, toAct } from "../src/core/room.js";
-import { FakeBot, alice, bob, makeRoom } from "./helpers.js";
+import { Conn, FakeBot, alice, bob, makeRoom } from "./helpers.js";
 
 const two = { players: 2 } as Options;
 const three = { players: 3 } as Options;
@@ -168,5 +168,36 @@ describe("an AI playing", () => {
     const header = headerOf((await t.room.meta()) as never);
     expect(header.consent).toBeUndefined();
     expect(header.seats.every((s) => s.bot === undefined)).toBe(true);
+  });
+});
+
+describe("the rows that a game reads from the storage of the Durable Object", () => {
+  /** The storage counts how many rows its `list` and `get` give back: the plan of Cloudflare allows 5 million rows read a day. */
+  function counted(store: { list: <T>(p: string) => Promise<T[]> }): { rows: () => number; lists: () => number } {
+    let rows = 0;
+    let lists = 0;
+    const list = store.list.bind(store);
+    store.list = async <T>(prefix: string) => {
+      const out = await list<T>(prefix);
+      rows += out.length;
+      lists += 1;
+      return out;
+    };
+    return { rows: () => rows, lists: () => lists };
+  }
+
+  it("reads the whole log from storage once, not at every move of the AI, every connection and every flush of the archive", async () => {
+    const t = await lobbyWithBot(false, 60);
+    const read = counted(t.store);
+    expect(await t.room.addBot(alice, "v001", true)).toMatchObject({ ok: true });
+    expect(await t.room.startGame(alice)).toEqual({ ok: true });
+    await playOut(t);
+    expect((await t.room.meta())?.status).toBe("finished");
+    const actions = ((await t.store.get("logcount")) as number) ?? 0;
+    expect(actions).toBeGreaterThanOrEqual(60);
+    for (let i = 0; i < 5; i++) await t.room.connect(new Conn(`c${i}`, alice.id));
+    // a log is listed once for the whole life of the room (and once more when the game ends before anything cached it): never once for each action
+    expect(read.lists()).toBeLessThanOrEqual(2);
+    expect(read.rows()).toBeLessThanOrEqual(2 * actions);
   });
 });

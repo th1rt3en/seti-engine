@@ -424,6 +424,7 @@ export class GameRoom {
       await this.broadcastLobby(meta);
       await this.d.sink.removeLobby(meta.id);
       await this.d.store.clear();
+      this.logCache = null;
       await this.d.setAlarm(null);
       return true;
     }
@@ -453,7 +454,7 @@ export class GameRoom {
   } | null> {
     const meta = await this.meta();
     if (meta === undefined) return null;
-    const log = await this.d.store.list<LogEntry>("log:");
+    const log = await this.readLog();
     const seen = Object.values((await this.d.store.get<Record<string, number>>("seen")) ?? {});
     const last = Math.max(meta.createdAt, meta.startedAt ?? 0, ...seen, ...log.map((e) => e.at));
     return {
@@ -479,7 +480,7 @@ export class GameRoom {
       const meta = await this.meta();
       if (meta === undefined || meta.status !== "playing")
         return { ok: false as const, code: "not_playing", message: "the game is not being played" };
-      const log = await this.d.store.list<LogEntry>("log:");
+      const log = await this.readLog();
       return {
         ok: true as const,
         total: log.length,
@@ -514,7 +515,7 @@ export class GameRoom {
       if (meta === undefined || meta.status !== "playing") return fail("not_playing", "only a game that is being played can be taken back");
       if (!this.d.engine.replayState) return fail("no_replay", "the engine cannot rebuild the game");
       if (!Number.isInteger(count) || count < 1 || count > max) return fail("bad_count", `take back 1 to ${max} actions`);
-      const log = await this.d.store.list<LogEntry>("log:");
+      const log = await this.readLog();
       const left = Math.max(0, log.length - count);
       const removed = log.length - left;
       if (removed === 0) return fail("nothing", "the game has no action to take back");
@@ -533,6 +534,7 @@ export class GameRoom {
         );
       }
       for (let i = left; i < log.length; i++) await this.d.store.delete(logKey(i));
+      this.logCache = log.slice(0, left);
       await this.d.store.put("logcount", left);
       await this.d.store.put("state", state);
       await this.runClock(meta, state);
@@ -660,6 +662,7 @@ export class GameRoom {
         await this.broadcastLobby(meta);
         await this.d.sink.removeLobby(meta.id);
         await this.d.store.clear();
+        this.logCache = null;
       } else {
         meta.status = "cancelled";
         meta.endedAt = this.d.now();
@@ -804,6 +807,10 @@ export class GameRoom {
     const now = this.d.now();
     const entry: LogEntry = { seq: count, seat, action, at: now, events: res.events };
     await this.d.store.put(logKey(count), entry);
+    if (this.logCache !== null) {
+      if (this.logCache.length === count) this.logCache = [...this.logCache, entry];
+      else this.logCache = null; // not the log that this move continues: read it again when it is needed
+    }
     await this.d.store.put("logcount", count + 1);
     await this.d.store.put("state", res.state);
     if ((await this.d.store.get<UndoProposal>("undo")) !== undefined) {
@@ -863,7 +870,7 @@ export class GameRoom {
         const seat = actors(state).find((s) => meta.seats[s]?.bot);
         const who = seat === undefined ? undefined : meta.seats[seat];
         if (seat === undefined || !who?.bot) return null;
-        const log = await this.d.store.list<LogEntry>("log:");
+        const log = await this.readLog();
         const kept = await this.d.store.get<{ count: number; seat: number; plan: Action[] }>("botplan");
         const plan = kept !== undefined && kept.count === log.length && kept.seat === seat ? kept.plan : [];
         return {
@@ -985,7 +992,7 @@ export class GameRoom {
     meta.result = result;
     await this.d.store.put("meta", meta);
     await this.d.setAlarm(null);
-    const log = await this.d.store.list<LogEntry>("log:");
+    const log = await this.readLog();
     // A rated game with registered players always counts, however it ends and however short it was (decision D24).
     const counts = meta.rated && meta.seats.every((s) => s?.registered === true && !s.bot) && players >= 2;
     await this.d.store.put("counted", counts);
@@ -1040,7 +1047,7 @@ export class GameRoom {
         const table = await this.d.sink.gameNum?.(meta.id);
         if (table) progress.table = table;
       }
-      const log = await this.d.store.list<LogEntry>("log:");
+      const log = await this.readLog();
       const replay = replayOf(meta, log, (await this.d.store.get<boolean>("counted")) ?? false, progress.table);
       await this.d.archive.put(gamePath(meta, progress.table), replay);
       progress.header = true;
@@ -1058,12 +1065,7 @@ export class GameRoom {
     const meta = await this.meta();
     if (meta === undefined || meta.status !== "finished") return null;
     const progress = await this.d.store.get<ArchiveProgress>("archive");
-    return replayOf(
-      meta,
-      await this.d.store.list<LogEntry>("log:"),
-      (await this.d.store.get<boolean>("counted")) ?? false,
-      progress?.table,
-    );
+    return replayOf(meta, await this.readLog(), (await this.d.store.get<boolean>("counted")) ?? false, progress?.table);
   }
 
   // --- connections ---------------------------------------------------------------------------------------------------------
@@ -1093,7 +1095,7 @@ export class GameRoom {
   private async sendLog(conn: Connection, meta: Meta): Promise<void> {
     // the log goes in pieces of LOG_CHUNK moves: a long game (a solo rival can play several turns in one move) would make one very large message
     const seat = this.connSeat(meta, conn);
-    const log = (await this.d.store.list<LogEntry>("log:")).map((e) => publicEntry(e, seat));
+    const log = (await this.readLog()).map((e) => publicEntry(e, seat));
     for (let from = 0; from === 0 || from < log.length; from += LOG_CHUNK)
       conn.send({ t: "log", from, entries: log.slice(from, from + LOG_CHUNK) });
   }
@@ -1133,7 +1135,18 @@ export class GameRoom {
   }
 
   async log(): Promise<LogEntry[]> {
-    return this.d.store.list<LogEntry>("log:");
+    return this.readLog();
+  }
+
+  // The log is one stored row for each action, and a game has hundreds. Reading all of them (a list) on every move of an AI seat, every connection and
+  // every flush of the archive was most of the rows that the Durable Object read (the plan allows 5 million a day). The log is read from storage once
+  // in the life of this object and kept in memory; a move adds its entry, taking actions back cuts it, and a game that is cleared forgets it.
+  private logCache: LogEntry[] | null = null;
+
+  /** The log of the game, oldest first. Do not change the array that comes back. */
+  private async readLog(): Promise<LogEntry[]> {
+    if (this.logCache === null) this.logCache = await this.d.store.list<LogEntry>("log:");
+    return this.logCache;
   }
 
   async meta(): Promise<Meta | undefined> {
