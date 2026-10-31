@@ -8,6 +8,7 @@ import { type DecisionSource, sourceLabel } from "@/lib/sources";
 import { firstRoundOrder, ordinal, turnOrder } from "@/lib/turnOrder";
 import type { View } from "@seti/protocol";
 import type { CSSProperties, ReactNode } from "react";
+import { AlienDecksPanel } from "./AlienDecksPanel";
 import { ArkhosPanel } from "./ArkhosPanel";
 import { BarFold } from "./BarFold";
 import { BarHeight } from "./BarHeight";
@@ -518,6 +519,7 @@ export function GameView({
           <TechStacks view={view} pick={tech} />
           <OrgPanel view={view} names={names} spots={spots} />
           <MissionsPanel view={view} names={names} />
+          <AlienDecksPanel view={view} />
           <ArkhosPanel view={view} names={names} spots={spots} />
           <GlyphidsPanel view={view} names={names} spots={spots} />
           <PublicitySlot view={view} names={names} />

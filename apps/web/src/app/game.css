@@ -1926,6 +1926,18 @@ button:disabled {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+.aliencards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.aliencards img {
+  width: 5.5rem;
+  height: auto;
+}
+.exppanel p .link + .link {
+  margin-left: 0.9rem;
+}
 .explorationrow img {
   width: min(11rem, 44%);
   height: auto;

@@ -1,4 +1,5 @@
 "use client";
+import { ALIEN_PREVIEW_EVENT } from "@/lib/alienDecks";
 import { EXPLORATION_PREVIEW_EVENT } from "@/lib/arkhosExploration";
 import { alienBack, cardImage } from "@/lib/cardImages";
 // The base board with everything on it: the three discs turned to where the game has them, the four star boards in the order they were
@@ -316,7 +317,19 @@ export function BoardView({
           return (
             <g key={`alien-deck-${sp.species}`}>
               {back ? (
-                <g>
+                <g
+                  // a click on the deck opens the preview of the cards of the species (AlienDecksPanel); the Exertian deck is empty but still there
+                  // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: "pointer" }}
+                  aria-label={`Look at the ${sp.species} cards`}
+                  onClick={() => window.dispatchEvent(new CustomEvent(ALIEN_PREVIEW_EVENT, { detail: sp.species }))}
+                  onKeyDown={(e) =>
+                    (e.key === "Enter" || e.key === " ") &&
+                    window.dispatchEvent(new CustomEvent(ALIEN_PREVIEW_EVENT, { detail: sp.species }))
+                  }
+                >
                   <image
                     href={back}
                     x={at.deck.x}
@@ -334,7 +347,7 @@ export function BoardView({
                   >
                     {sp.deck.length}
                   </text>
-                  <title>{`${sp.deck.length} cards left in the deck of ${sp.species}`}</title>
+                  <title>{`${sp.deck.length} cards left in the deck of ${sp.species}. Click to see which cards could still be hidden`}</title>
                 </g>
               ) : null}
               {faceUp ? (
