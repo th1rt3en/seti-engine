@@ -520,11 +520,13 @@ def _sources(s: GameState) -> list[str]:
 
 
 def prepare_cost(cid: str) -> int:
-    """The cost of a card for Futurespan: credits, or energy for a Centaurian card (A-036 c)."""
+    """The credit cost of a card, for the distance of Futurespan's token (a Centaurian card costs energy and is never prepared)."""
     return int(tables.cards()[cid]["cost"])
 
 
 def free_moves(s: GameState, p: PlayerState) -> list[Action]:
+    from . import cards  # noqa: PLC0415 - cards imports this module
+
     if p.organization is None:
         return []
     o = p.organization
@@ -532,7 +534,12 @@ def free_moves(s: GameState, p: PlayerState) -> list[Action]:
     if o == "futurespan_institute":
         if not p.org_data.get("fs_card"):  # EXP-ORG-12: one prepared card at a time
             # A-052: costs 1 to 4 only; "ahead" is how far in front of the score the token is put, for the button
-            return [{**base, "card": c, "ahead": 10 * prepare_cost(c) + 5} for c in dict.fromkeys(p.hand) if 1 <= prepare_cost(c) <= 4]
+            # owner, 2026-10-31: only a card with a credit cost; a Centaurian card costs energy and cannot be prepared
+            return [
+                {**base, "card": c, "ahead": 10 * prepare_cost(c) + 5}
+                for c in dict.fromkeys(p.hand)
+                if not cards.pays_energy(c) and 1 <= prepare_cost(c) <= 4
+            ]
         if not p.org_used:  # once per round while the token is on the scoring track: 3 spaces farther, and a card
             return [{**base, "delay": True, "source": x} for x in _sources(s)]  # the card is picked in the same move: the row or the deck
         return []

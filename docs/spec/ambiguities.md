@@ -367,6 +367,7 @@ Entry format:
 - Proposed ruling: (a) it takes the first orbiter space (the bonus is lost, but the orbiter counts for landing costs and the planet); (b) it goes to the overflow space of that color; (c) +5 for cost 0, energy cost counts as the cost; (d) the income-only quick start cards SR.15 and SR.16 gain their resource at once when tucked (INCOME-01).
 - Questions for the owner: confirm or rule otherwise.
 - Ruling (owner), 2026-10-15: reading (a) of the orbiter: it takes the first orbiter space and the first-orbiter bonus is lost; the other readings (b), (c), (d) are accepted as proposed.
+- Ruling (owner), 2026-10-31, on (c): a card that costs energy (a Centaurian card) cannot be prepared at all; only cards with a credit cost can.
 
 ## A-037: Xenolab tiles and traces
 - Status: ruled (owner, 2026-10-15)
