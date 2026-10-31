@@ -426,6 +426,19 @@ def test_futurespan_prepares_a_card_waits_for_the_token_and_plays_it_free() -> N
     assert "fs_card" not in cur(s).org_data and cur(s).credits == 0
 
 
+def test_futurespan_prepares_a_centaurian_card_by_its_energy_cost() -> None:  # EXP-ORG-12, A-036 (c): the energy cost counts as the cost
+    s = with_org("futurespan_institute", credits=0, energy=0)
+    cur(s).hand = ["ET.31", "ET.37"]
+    ahead = {m["card"]: m["ahead"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("card")}
+    assert ahead == {"ET.31": 15, "ET.37": 25}
+    score = cur(s).score
+    s = pick(s, "org_free", org="futurespan_institute", card="ET.37", ahead=25)
+    assert cur(s).org_data["fs_token"] == score + 25 and "ET.37" not in cur(s).hand
+    cur(s).score = cur(s).org_data["fs_token"]
+    s = act(s, type="org_main", org="futurespan_institute")  # played for free: no energy is paid, and its message marker is placed
+    assert cur(s).energy == 0 and [m.card for m in cur(s).message_cards] == ["ET.37"]
+
+
 def test_futurespan_prepared_card_is_face_up_for_everybody() -> None:  # EXP-ORG-12 (owner, 2026-10-25)
     s = with_org("futurespan_institute")
     card = next(m["card"] for m in legal_moves(s) if m["type"] == "org_free" and m.get("card"))
