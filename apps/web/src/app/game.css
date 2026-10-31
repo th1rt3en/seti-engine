@@ -1905,6 +1905,32 @@ button:disabled {
   width: 52px;
   height: auto;
 }
+.explorationpreview {
+  margin: 0.5rem 0 0.9rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.explorationpreview header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.explorationpreview h4,
+.explorationpreview h5 {
+  margin: 0.4rem 0;
+}
+.explorationrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.explorationrow img {
+  width: min(11rem, 44%);
+  height: auto;
+  border-radius: 6px;
+}
 .exppanel .sec {
   display: flex;
   gap: 4px;

@@ -1,4 +1,5 @@
 "use client";
+import { EXPLORATION_PREVIEW_EVENT } from "@/lib/arkhosExploration";
 import { alienBack, cardImage } from "@/lib/cardImages";
 // The base board with everything on it: the three discs turned to where the game has them, the four star boards in the order they were
 // placed, the data and markers of every sector, the probes, orbiters and landers (each shown as its owner's figure), the markers on the
@@ -359,7 +360,15 @@ export function BoardView({
           return (
             <g key="arkhos-exploration">
               {back ? (
-                <g>
+                <g
+                  // a click on the deck opens the preview of the exploration cards (ArkhosPanel)
+                  // biome-ignore lint/a11y/useSemanticElements: an SVG group cannot be a button element
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => window.dispatchEvent(new Event(EXPLORATION_PREVIEW_EVENT))}
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && window.dispatchEvent(new Event(EXPLORATION_PREVIEW_EVENT))}
+                >
                   <image href={back} x={at.deck.x} y={at.deck.y + dy} width={ALIEN_COLUMN.w} height={h} />
                   <circle cx={at.deck.x + ALIEN_COLUMN.w / 2} cy={at.deck.y + ALIEN_COLUMN.h / 2} r={70} className="deckcount" />
                   <text
@@ -370,7 +379,7 @@ export function BoardView({
                   >
                     {extra.explore_deck?.length ?? 0}
                   </text>
-                  <title>{`Exploration deck: ${extra.explore_deck?.length ?? 0} cards left, ${extra.explore_aside?.length ?? 0} set aside`}</title>
+                  <title>{`Exploration deck: ${extra.explore_deck?.length ?? 0} cards left, ${extra.explore_aside?.length ?? 0} set aside. Click to see which cards can come next`}</title>
                 </g>
               ) : null}
               {shown ? (
