@@ -48,6 +48,18 @@ export interface Meta {
   result?: Result;
   /** Set when the host added an AI model to the lobby: they agreed that the game is collected and used for training. Such a game is never rated. */
   consent?: { by: string; at: number };
+  /** The host's invitations of the lobby: a seat held for a registered player until they answer. A declined one stays on the seat until the host acts. */
+  invites?: Invite[];
+}
+
+export interface Invite {
+  seat: number;
+  /** The invited player. */
+  id: string;
+  name: string;
+  num?: number;
+  status: "pending" | "declined";
+  at: number;
 }
 
 export interface LogEntry {
@@ -166,6 +178,8 @@ export type ServerMessage =
       /** The host chose the seed of the game (it is not told). */
       seeded: boolean;
       seats: ({ name: string; num?: number; bot?: true } | null)[];
+      /** Seat by seat: the player that the host has invited to the seat (null: no invitation). A seat with an invitation is still free. */
+      invites: ({ name: string; num?: number; status: "pending" | "declined" } | null)[];
       host: string | null;
       rated: boolean;
       clock: clocks.ClockSettings;
@@ -327,15 +341,96 @@ export class GameRoom {
     if (seat >= 0) return { ok: true, seat };
     if (meta.status !== "lobby") return fail("started", "the game has already started");
     if (meta.rated && !who.registered) return fail("guest", "only registered players can play rated games");
-    const free = meta.seats.findIndex((s) => s === null);
-    if (free < 0) return fail("full", "the game is full");
+    // a seat held for an invited player is not free (a declined invitation does not hold it)
+    const held = new Set((meta.invites ?? []).filter((i) => i.status === "pending").map((i) => i.seat));
+    const free = meta.seats.findIndex((s, i) => s === null && !held.has(i));
+    if (free < 0)
+      return fail("full", meta.seats.some((s) => s === null) ? "the free seats are held for invited players" : "the game is full");
     meta.seats[free] = who;
     meta.joined.push(who.id);
+    const rest = (meta.invites ?? []).filter((i) => i.seat !== free && i.id !== who.id); // the seat is taken; the player's own invitation is moot
+    meta.invites = rest.length > 0 ? rest : undefined;
     await this.markSeen(who.id);
     await this.d.store.put("meta", meta);
     await this.d.sink.recordLobby(meta);
     await this.broadcastLobby(meta); // a full lobby waits for the host to start the game (startGame)
     return { ok: true, seat: free };
+  }
+
+  /** The host invites a registered player (`target`, looked up by the Worker) to a free seat; the seat is held until they answer. */
+  invite(who: Identity, seat: number, target: { id: string; name: string; num?: number }): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby");
+      if (meta.host !== who.id) return fail("not_host", "only the host can invite players");
+      if (!Number.isInteger(seat) || seat < 0 || seat >= meta.seats.length || meta.seats[seat] !== null)
+        return fail("seat_taken", "that seat is not free");
+      if (meta.seats.some((s) => s?.id === target.id)) return fail("already_seated", `${target.name} is already in this game`);
+      const mine = (meta.invites ?? []).find((i) => i.id === target.id && i.status === "pending");
+      if (mine !== undefined) return fail("already_invited", `${target.name} has already been invited`);
+      const kept = (meta.invites ?? []).filter((i) => i.seat !== seat && i.id !== target.id);
+      meta.invites = [
+        ...kept,
+        {
+          seat,
+          id: target.id,
+          name: target.name,
+          ...(target.num === undefined ? {} : { num: target.num }),
+          status: "pending",
+          at: this.d.now(),
+        },
+      ];
+      return this.saveInvites(meta);
+    });
+  }
+
+  /** The invited player accepts: they take the seat that was held for them. */
+  acceptInvite(who: Identity): Promise<SubmitResult & { seat?: number }> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby any more");
+      const inv = (meta.invites ?? []).find((i) => i.id === who.id && i.status === "pending");
+      if (inv === undefined) return fail("no_invite", "you have no invitation to this game");
+      if (meta.seats[inv.seat] !== null) return fail("seat_taken", "that seat is not free any more");
+      meta.seats[inv.seat] = who;
+      meta.joined.push(who.id);
+      meta.invites = (meta.invites ?? []).filter((i) => i.id !== who.id);
+      await this.markSeen(who.id);
+      const out = await this.saveInvites(meta);
+      return out.ok ? { ok: true, seat: inv.seat } : out;
+    });
+  }
+
+  /** The invited player declines: the seat shows the refusal until the host invites somebody else or takes the invitation back. */
+  declineInvite(who: Identity): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby any more");
+      const inv = (meta.invites ?? []).find((i) => i.id === who.id && i.status === "pending");
+      if (inv === undefined) return fail("no_invite", "you have no invitation to this game");
+      inv.status = "declined";
+      return this.saveInvites(meta);
+    });
+  }
+
+  /** The host takes an invitation back (a pending one, or a declined one that is still shown). */
+  cancelInvite(who: Identity, seat: number): Promise<SubmitResult> {
+    return this.serial(async () => {
+      const meta = await this.meta();
+      if (meta === undefined || meta.status !== "lobby") return fail("not_in_lobby", "the game is not in its lobby");
+      if (meta.host !== who.id) return fail("not_host", "only the host can cancel an invitation");
+      if (!(meta.invites ?? []).some((i) => i.seat === seat)) return fail("no_invite", "that seat has no invitation");
+      meta.invites = (meta.invites ?? []).filter((i) => i.seat !== seat);
+      return this.saveInvites(meta);
+    });
+  }
+
+  private async saveInvites(meta: Meta): Promise<SubmitResult> {
+    if (meta.invites?.length === 0) meta.invites = undefined;
+    await this.d.store.put("meta", meta);
+    await this.d.sink.recordLobby(meta);
+    await this.broadcastLobby(meta);
+    return { ok: true };
   }
 
   /** The host starts the game once every seat is taken (the lobby never starts it by itself). */
@@ -721,6 +816,7 @@ export class GameRoom {
   }
 
   private async start(meta: Meta): Promise<void> {
+    meta.invites = undefined; // every seat is taken: what is left of the invitations is the refusals
     if (meta.seats.some((s) => s?.bot)) meta.rated = false; // a game with an AI is never rated
     // EXP-ORG-14: with organizations every player chooses the organization and the quick start cards at the same time (a game for one player has nobody to wait for)
     const simul = meta.options.players >= 2 ? { simul_setup: true } : {}; // the choices and the tucks of the setup are made at the same time (EXP-ORG-14)
@@ -1216,6 +1312,10 @@ function lobbyMessage(meta: Meta, who: string | null = null): ServerMessage {
     seats: meta.seats.map((s) =>
       s === null ? null : s.bot ? { name: s.name, bot: true as const } : { name: s.name, ...(s.num === undefined ? {} : { num: s.num }) },
     ),
+    invites: meta.seats.map((_, seat) => {
+      const i = (meta.invites ?? []).find((x) => x.seat === seat);
+      return i === undefined ? null : { name: i.name, ...(i.num === undefined ? {} : { num: i.num }), status: i.status };
+    }),
     host: meta.seats.find((s) => s?.id === meta.host)?.name ?? null,
     rated: meta.rated,
     clock: meta.clock,

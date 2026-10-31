@@ -12,7 +12,16 @@ import { gameMeta } from "@/lib/worker";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { addBotAction, joinAction, leaveAction, removeBotAction, startGameAction } from "../../actions";
+import {
+  addBotAction,
+  cancelInviteAction,
+  inviteAction,
+  joinAction,
+  leaveAction,
+  removeBotAction,
+  searchPlayersAction,
+  startGameAction,
+} from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -90,6 +99,7 @@ export default async function Game({
         nums={meta.seats.map((s) => s?.num ?? null)}
         signedIn={user !== null}
         startAction={startGameAction}
+        inviteActions={isHost ? { search: searchPlayersAction, invite: inviteAction, cancel: cancelInviteAction } : undefined}
       />
       {isHost && open && models.length > 0 && meta.options.players === 2 ? (
         // the AI is a side option, folded away: most games are played by people

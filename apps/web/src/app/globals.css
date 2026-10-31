@@ -807,6 +807,85 @@ form.inline {
 .addai-fold[open] summary {
   margin-bottom: 0.75rem;
 }
+/* a seat held for an invited player: it looks taken by them, tinted grey while the invitation waits; a refusal is tinted red */
+.lobbyseat.invited {
+  filter: grayscale(1);
+  opacity: 0.6;
+  border-style: dashed;
+}
+.lobbyseat.invited.declined {
+  filter: none;
+  opacity: 0.75;
+  border-color: rgba(248, 81, 73, 0.6);
+  background: rgba(248, 81, 73, 0.08);
+}
+.lobbyseat.invited .seatname {
+  font-style: italic;
+}
+.lobbyseat .seatinvite {
+  flex: 1;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  text-decoration: underline dotted;
+}
+.lobbyseat .seatcancel {
+  margin-left: 0.5rem;
+}
+.lobbyseat .invitebox {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.invitesearch {
+  display: flex;
+  gap: 0.4rem;
+}
+.invitesearch input {
+  flex: 1;
+  min-width: 0;
+}
+.inviteresults {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+.inviteresults button {
+  width: 100%;
+  text-align: left;
+}
+
+/* the invitations to a lobby: at the bottom right corner of every page */
+.invitetoasts {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: grid;
+  gap: 0.6rem;
+  width: min(22rem, calc(100vw - 2rem));
+}
+.invitetoast {
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(13, 17, 28, 0.96);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+.invitetoast p {
+  margin: 0 0 0.6rem;
+}
+.inviteanswer {
+  display: flex;
+  gap: 0.5rem;
+}
 @keyframes lobbypulse {
   50% {
     opacity: 0.45;

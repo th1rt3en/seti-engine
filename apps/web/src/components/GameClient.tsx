@@ -46,7 +46,7 @@ import { GameView } from "./GameView";
 import { setupStatus } from "./GameView";
 import { Hint } from "./Hint";
 import { ActionIcon, DeckCardIcon, PublicityIcon, ScoreIcon } from "./Icons";
-import { type LobbyInfo, LobbyPanel } from "./LobbyPanel";
+import { type InviteActions, type LobbyInfo, LobbyPanel } from "./LobbyPanel";
 import { SampleReward } from "./Mascamites";
 import { type CoverChoice, MissionCover } from "./MissionCover";
 import { MoveGroup } from "./MoveGroupLabel";
@@ -112,6 +112,7 @@ export function GameClient({
   nums: lobbyNums,
   signedIn,
   startAction,
+  inviteActions,
 }: {
   gameId: string;
   gameNum: number;
@@ -121,6 +122,8 @@ export function GameClient({
   signedIn: boolean;
   /** The host's button of the lobby starts the game (the game never starts by itself). */
   startAction?: (form: FormData) => Promise<void>;
+  /** The host's invitations of the lobby: the search box, sending and taking back. */
+  inviteActions?: InviteActions;
 }) {
   const [lobby, setLobby] = useState<Extract<Server, { t: "lobby" }> | null>(null);
   const [view, setView] = useState<Extract<Server, { t: "view" }> | null>(null);
@@ -388,7 +391,7 @@ export function GameClient({
 
   if (view === null) {
     return lobby ? (
-      <LobbyPanel gameId={gameId} lobby={lobby} startAction={startAction} />
+      <LobbyPanel gameId={gameId} lobby={lobby} startAction={startAction} inviteActions={inviteActions} />
     ) : (
       <section className="card">
         <h2>Connecting...</h2>

@@ -1,3 +1,4 @@
+import { InviteToasts } from "@/components/InviteToasts";
 import { PlayerLink } from "@/components/PlayerLink";
 import { SettingsSync } from "@/components/SettingsSync";
 import assets from "@/generated/assets.json";
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </nav>
         </header>
         {user ? <SettingsSync /> : null}
+        {user && !user.isGuest ? <InviteToasts /> : null}
         <main>{children}</main>
         <footer className="foot">
           <p>

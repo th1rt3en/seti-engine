@@ -5,6 +5,10 @@
 //   POST /games/:id/start       the host starts the game once every seat is taken (token)
 //   POST /games/:id/bot-add     the host adds an AI to the lobby (token), body {model, consent: true}
 //   POST /games/:id/bot-remove  the host removes an AI from the lobby (token), body {seat}
+//   POST /games/:id/invite      the host invites a registered player to a free seat (token), body {seat, name}
+//   POST /games/:id/invite-accept   the invited player takes the seat held for them (token)
+//   POST /games/:id/invite-decline  the invited player declines (token)
+//   POST /games/:id/invite-cancel   the host takes an invitation back (token), body {seat}
 //   POST /games/:id/resign      resign a game that is being played (token; the website uses it for "resign" on the profile page)
 //   GET  /games/:id             public data of the game
 //   GET  /games/:id/log         the action log (seed + log replay the game), once the game is over
@@ -111,9 +115,44 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const over = overTableLimit(who.registered, await openTables(env, who.id, gameId));
       if (over !== null) return json(over, 400);
     }
-    if ((action === "join" || action === "leave" || action === "start" || action === "resign") && request.method === "POST")
+    if (action === "invite-accept" && request.method === "POST" && who !== null) {
+      // an invitation is a seat like any other: it counts against the player's open tables
+      const over = overTableLimit(who.registered, await openTables(env, who.id, gameId));
+      if (over !== null) return json(over, 400);
+    }
+    if (
+      (action === "join" ||
+        action === "leave" ||
+        action === "start" ||
+        action === "resign" ||
+        action === "invite-accept" ||
+        action === "invite-decline") &&
+      request.method === "POST"
+    )
       return forward(stub, `/${action}`, headers, "POST");
-    if ((action === "bot-add" || action === "bot-remove") && request.method === "POST") {
+    if (action === "invite" && request.method === "POST") {
+      if (who === null) return json({ ok: false, code: "unauthorized", message: "sign in first" }, 401);
+      // the host names a registered player (by username); the Worker finds them, so that the room is told who they are by the one that knows
+      const body = (await request.json().catch(() => null)) as { seat?: unknown; name?: unknown } | null;
+      if (typeof body?.name !== "string" || typeof body.seat !== "number")
+        return json({ ok: false, code: "bad_request", message: "name and seat are needed" }, 400);
+      const target = await env.DB.prepare(
+        "SELECT u.id AS id, u.name AS name, n.num AS num FROM users u LEFT JOIN user_nums n ON n.user_id = u.id WHERE lower(u.name) = lower(?) AND u.is_guest = 0",
+      )
+        .bind(body.name.trim())
+        .first<{ id: string; name: string; num: number | null }>();
+      if (target === null)
+        return json({ ok: false, code: "no_player", message: `no registered player is called ${body.name.trim()}` }, 404);
+      return stub.fetch("https://room/invite", {
+        method: "POST",
+        headers: { ...headers, "content-type": "application/json" },
+        body: JSON.stringify({
+          seat: body.seat,
+          target: { id: target.id, name: target.name, ...(target.num === null ? {} : { num: target.num }) },
+        }),
+      });
+    }
+    if ((action === "bot-add" || action === "bot-remove" || action === "invite-cancel") && request.method === "POST") {
       return stub.fetch(`https://room/${action}`, {
         method: "POST",
         headers: { ...headers, "content-type": "application/json" },

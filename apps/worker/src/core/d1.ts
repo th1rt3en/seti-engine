@@ -47,6 +47,19 @@ export class D1Sink implements ResultSink {
               ),
             ],
       ),
+      q("DELETE FROM lobby_invites WHERE game_id = ?", meta.id),
+      ...(meta.invites ?? []).map((i) =>
+        q(
+          "INSERT INTO lobby_invites (game_id, seat, user_id, name, host_name, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          meta.id,
+          i.seat,
+          i.id,
+          i.name,
+          meta.seats.find((s) => s?.id === meta.host)?.name ?? "",
+          i.status,
+          i.at,
+        ),
+      ),
     ]);
   }
 
@@ -58,6 +71,7 @@ export class D1Sink implements ResultSink {
   async removeLobby(id: string): Promise<void> {
     await this.db.batch([
       this.db.prepare("DELETE FROM game_players WHERE game_id = ?").bind(id),
+      this.db.prepare("DELETE FROM lobby_invites WHERE game_id = ?").bind(id),
       this.db.prepare("DELETE FROM games WHERE id = ? AND status IN ('lobby', 'cancelled')").bind(id),
     ]);
   }
@@ -85,6 +99,7 @@ export class D1Sink implements ResultSink {
         meta.startedAt ?? null,
       ),
       q("INSERT INTO game_nums (game_id) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM game_nums WHERE game_id = ?)", meta.id, meta.id),
+      q("DELETE FROM lobby_invites WHERE game_id = ?", meta.id), // the game has started: no invitation is left to answer
       ...meta.seats.flatMap((s, seat) =>
         s === null
           ? []

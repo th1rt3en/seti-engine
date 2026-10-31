@@ -17,11 +17,25 @@ import {
 import { loadConfig } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { gameNum } from "@/lib/ids";
+import { findPlayers } from "@/lib/invites";
 import { botVersions, createdRecently } from "@/lib/queries";
 import { RECOVERY_COOKIE, currentUser, showRecoveryCode, startSession } from "@/lib/session";
 // Server actions: sign up, log in, play as a guest, upgrade a guest, log out, and the lobby buttons.
 import { TURNSTILE_FIELD, verifyTurnstile } from "@/lib/turnstile";
-import { CLOCK_PRESETS, addBot, createGame, gameMeta, joinGame, leaveGame, removeBot, resignGame, startGame } from "@/lib/worker";
+import {
+  CLOCK_PRESETS,
+  addBot,
+  answerInvite,
+  cancelInvite,
+  createGame,
+  gameMeta,
+  inviteToGame,
+  joinGame,
+  leaveGame,
+  removeBot,
+  resignGame,
+  startGame,
+} from "@/lib/worker";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -274,6 +288,41 @@ export async function removeBotAction(form: FormData): Promise<void> {
   const reply = await removeBot(me as NonNullable<typeof me>, id, Number(field(form, "seat")));
   if (!reply.ok) back(await gamePath(id), reply.message);
   redirect(await gamePath(id));
+}
+
+/** The host's search box: registered players by (part of) their username. */
+export async function searchPlayersAction(q: string): Promise<{ name: string; num: number | null }[]> {
+  const me = await currentUser();
+  if (me === null) return [];
+  return findPlayers(getDb(), String(q), (me as NonNullable<typeof me>).id);
+}
+
+type Answer = { ok: boolean; message: string };
+
+/** The host invites a registered player to a free seat. */
+export async function inviteAction(gameId: string, seat: number, name: string): Promise<Answer> {
+  const me = await currentUser();
+  if (me === null) return { ok: false, message: "Log in first." };
+  const reply = await inviteToGame(me as NonNullable<typeof me>, String(gameId), Number(seat), String(name));
+  return reply.ok ? { ok: true, message: "" } : { ok: false, message: reply.message };
+}
+
+/** The host takes an invitation back (or clears a refusal from the seat). */
+export async function cancelInviteAction(gameId: string, seat: number): Promise<Answer> {
+  const me = await currentUser();
+  if (me === null) return { ok: false, message: "Log in first." };
+  const reply = await cancelInvite(me as NonNullable<typeof me>, String(gameId), Number(seat));
+  return reply.ok ? { ok: true, message: "" } : { ok: false, message: reply.message };
+}
+
+/** The invited player accepts (and is taken to the lobby: `path`) or declines. */
+export async function answerInviteAction(gameId: string, accept: boolean): Promise<Answer & { path?: string }> {
+  const me = await currentUser();
+  if (me === null) return { ok: false, message: "Log in first." };
+  const id = String(gameId);
+  const reply = await answerInvite(me as NonNullable<typeof me>, id, accept === true);
+  if (!reply.ok) return { ok: false, message: reply.message };
+  return accept === true ? { ok: true, message: "", path: await gamePath(id) } : { ok: true, message: "" };
 }
 
 /** Resign one of the user's own solo games (from the profile page): the game ends as resigned, as when the player resigns at the table. */

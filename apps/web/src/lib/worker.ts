@@ -57,6 +57,15 @@ export const addBot = (user: User, id: string, model: string, consent: boolean, 
 export const removeBot = (user: User, id: string, seat: number, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
   call(user, `/games/${id}/bot-remove`, "POST", { seat }, cfg, fetcher);
 
+/** The host invites a registered player (by username) to a free seat; the seat is held until they answer. */
+export const inviteToGame = (user: User, id: string, seat: number, name: string, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
+  call(user, `/games/${id}/invite`, "POST", { seat, name }, cfg, fetcher);
+export const cancelInvite = (user: User, id: string, seat: number, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
+  call(user, `/games/${id}/invite-cancel`, "POST", { seat }, cfg, fetcher);
+/** The invited player answers: accepting takes the seat that was held for them. */
+export const answerInvite = (user: User, id: string, accept: boolean, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
+  call(user, `/games/${id}/${accept ? "invite-accept" : "invite-decline"}`, "POST", undefined, cfg, fetcher);
+
 export const resignGame = (user: User, id: string, cfg = loadConfig(), fetcher: typeof fetch = fetch) =>
   call(user, `/games/${id}/resign`, "POST", undefined, cfg, fetcher);
 

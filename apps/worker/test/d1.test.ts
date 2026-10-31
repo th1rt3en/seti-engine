@@ -16,6 +16,7 @@ class SqliteDb implements Db {
     this.sql.exec(readFileSync(new URL("../migrations/0001_init.sql", import.meta.url), "utf8"));
     this.sql.exec(readFileSync(new URL("../migrations/0006_game_stats.sql", import.meta.url), "utf8"));
     this.sql.exec(readFileSync(new URL("../migrations/0008_numeric_ids.sql", import.meta.url), "utf8"));
+    this.sql.exec(readFileSync(new URL("../migrations/0010_lobby_invites.sql", import.meta.url), "utf8"));
   }
   prepare(query: string): Statement {
     const run = (values: unknown[]): Statement => {
@@ -219,6 +220,25 @@ describe("D1 sink", () => {
     await sink.recordStart({ ...kept.meta, status: "playing" });
     await sink.removeLobby("kept");
     expect(db.sql.prepare("SELECT id FROM games WHERE id = 'kept'").all()).toHaveLength(1);
+  });
+
+  it("the invitations of a lobby are copied for the site: replaced at each change, gone when the game starts or the lobby is destroyed", async () => {
+    const db = new SqliteDb();
+    const sink = new D1Sink(db);
+    const rows = () => db.sql.prepare("SELECT seat, user_id, name, host_name, status FROM lobby_invites WHERE game_id = 'inv'").all();
+    const lobby = { ...record("inv", [alice, bob, alice], [1, 2, 3], false).meta, status: "lobby" as const, seats: [alice, null, null] };
+    await sink.recordLobby({ ...lobby, invites: [{ seat: 1, id: "u-bob", name: "Bob", status: "pending", at: 5 }] });
+    expect(rows()).toEqual([{ seat: 1, user_id: "u-bob", name: "Bob", host_name: "Alice", status: "pending" }]);
+    await sink.recordLobby({ ...lobby, invites: [{ seat: 1, id: "u-bob", name: "Bob", status: "declined", at: 5 }] });
+    expect(rows()).toEqual([{ seat: 1, user_id: "u-bob", name: "Bob", host_name: "Alice", status: "declined" }]);
+    await sink.recordLobby(lobby);
+    expect(rows()).toEqual([]);
+    await sink.recordLobby({ ...lobby, invites: [{ seat: 2, id: "u-bob", name: "Bob", status: "pending", at: 5 }] });
+    await sink.recordStart({ ...lobby, status: "playing", seats: [alice, bob, alice] });
+    expect(rows()).toEqual([]);
+    await sink.recordLobby({ ...lobby, invites: [{ seat: 2, id: "u-bob", name: "Bob", status: "pending", at: 5 }] });
+    await sink.removeLobby("inv");
+    expect(rows()).toEqual([]);
   });
 
   it("a game cancelled by an administrator is marked cancelled, with no rating and no history", async () => {

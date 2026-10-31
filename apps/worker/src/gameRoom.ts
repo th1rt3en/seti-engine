@@ -113,6 +113,18 @@ export class GameRoomDO implements DurableObject {
       const b = (await request.json()) as { seat?: number };
       return json(await this.room.removeBot(identity, Number(b.seat)));
     }
+    if (url.pathname === "/invite") {
+      // the Worker looked the invited player up; only it can reach this object
+      const b = (await request.json()) as { seat?: number; target?: { id: string; name: string; num?: number } };
+      if (b.target === undefined) return json({ ok: false, code: "bad_request", message: "no player to invite" }, 400);
+      return json(await this.room.invite(identity, Number(b.seat), b.target));
+    }
+    if (url.pathname === "/invite-accept") return json(await this.room.acceptInvite(identity));
+    if (url.pathname === "/invite-decline") return json(await this.room.declineInvite(identity));
+    if (url.pathname === "/invite-cancel") {
+      const b = (await request.json()) as { seat?: number };
+      return json(await this.room.cancelInvite(identity, Number(b.seat)));
+    }
     if (url.pathname === "/resign") return json(await this.room.resign(identity));
     return json({ ok: false, code: "not_found", message: "no such route" }, 404);
   }
