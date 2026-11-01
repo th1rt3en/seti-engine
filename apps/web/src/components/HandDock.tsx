@@ -111,13 +111,11 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
   const wanted = (selection?.offered?.length ?? 0) > 0 || selection?.autoOpen === true;
   const wasWanted = useRefHook(false);
   // the hand opens by itself when cards are offered, so that the player sees them
-  const firstLook = useRefHook(true);
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when cards become offered
   useEffect(() => {
-    // on a phone the page starts with the hand folded, whatever the game waits for: it opens by itself only when the wish comes later
-    if (wanted && !wasWanted.current && !(firstLook.current && isPhone())) set(true);
+    // on a phone the hand stays folded, whatever the game waits for (after a main action too): the player opens it from the bar
+    if (wanted && !wasWanted.current && !isPhone()) set(true);
     wasWanted.current = wanted;
-    firstLook.current = false;
   }, [wanted]);
   const dock = useRef<HTMLElement>(null);
   useBottomSpace(dock, "hand");
@@ -322,15 +320,13 @@ export function HandDock({ view, selection }: { view: View; selection?: HandSele
 /** On a phone: the Exertian cards held and played are a tab of the bottom bar of their own, beside the hand. */
 export function ExertianDock({ view, selection }: { view: View; selection?: HandSelection }) {
   const [folded, toggle, set] = useDock("exertian");
-  // the dock opens by itself when an Exertian card is to be played (on a phone it starts folded; not at the first look at the page)
+  // the dock opens by itself when an Exertian card is to be played (not on a phone: there it stays folded until the player opens it)
   const wantsCard = (selection?.exertian?.selectable.length ?? 0) > 0;
   const wasWanted = useRefHook(false);
-  const firstLook = useRefHook(true);
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when a card becomes playable
   useEffect(() => {
-    if (wantsCard && !wasWanted.current && !(firstLook.current && isPhone())) set(true);
+    if (wantsCard && !wasWanted.current && !isPhone()) set(true);
     wasWanted.current = wantsCard;
-    firstLook.current = false;
   }, [wantsCard]);
   const player = view.viewer === null ? undefined : view.state.players[view.viewer];
   const has = view.state.species.some((sp) => sp.discovered && sp.species === "exertians");

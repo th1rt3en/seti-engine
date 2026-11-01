@@ -25,13 +25,11 @@ export function RowDock({ view, row, inline, flash }: { view: View; row?: RowSel
   const shut = inline ? false : folded;
   // the panel opens by itself when a card of it can be picked (to buy it, or to take it in a trade), and can be folded again at any time
   const wasWanted = useRef(false);
-  const firstLook = useRef(true);
   // biome-ignore lint/correctness/useExhaustiveDependencies: only when a card of the row becomes pickable
   useEffect(() => {
-    // on a phone the page starts with the panels folded, whatever the game waits for
-    if (wanted && !wasWanted.current && !(firstLook.current && isPhone())) set(true);
+    // on a phone the panel stays folded, whatever the game waits for (after a main action too): the player opens it from the bar
+    if (wanted && !wasWanted.current && !isPhone()) set(true);
     wasWanted.current = wanted;
-    firstLook.current = false;
   }, [wanted]);
   // when the row is to blink (a card is to be taken), bring it into view if it is out of it
   const box = useRef<HTMLElement>(null);
