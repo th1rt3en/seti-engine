@@ -390,7 +390,7 @@ FREE_TYPES = frozenset(
     }
 )  # the free actions (FREE-01 to FREE-07, TECH-21)
 # moves that never show anything hidden, so there is no need to try them out to know whether they can be taken back
-SHOWS_A_CARD = frozenset({"show_move", "show_energy"})  # a card of the hand is shown to everybody: that cannot be taken back
+SHOWS_A_CARD = frozenset({"show_move", "show_energy", "corner_show"})  # a card of the hand is shown to everybody: that cannot be taken back
 NEVER_REVEAL = frozenset({"move_energy", "move_probe", "place_data", "place_lower", "launch", "undo", "sandbox"})
 
 

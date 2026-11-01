@@ -83,6 +83,7 @@ const DECISION: Record<string, string> = {
   choose_org: "Choose an organization",
   choose_quick: "Choose 2 quickstart cards to keep",
   corner_pick: "Choose {publicity}, {data} or 1 {move}",
+  corner_show: "Choose a card from your hand to show",
   discard_corner: "Discard a non-alien card to gain x3 its free corner effect",
   glyph_group: "Choose a glyph group",
   hold: "Use your movement, or continue",

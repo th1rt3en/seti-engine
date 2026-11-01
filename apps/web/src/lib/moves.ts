@@ -92,7 +92,9 @@ export const LABELS: Record<string, Label> = {
   org_free: (m) => orgFreeLabel(m),
   breach: () => "Breach your security card of that color (take it into your hand)",
   skip_breach: () => "Do not breach the security card",
-  corner_pick: (m) => `Choose ${String(m.kind)}: gain it for each card in your hand with that icon in its free-action corner`,
+  corner_pick: (m) => `Choose ${String(m.kind)}: gain it for each card you show from your hand with that icon in its free-action corner`,
+  corner_show: (m) => `Show ${cardName(m.card)} from your hand: gain 1 for its icon`,
+  corner_done: () => "Stop showing cards",
   decipher: (m) =>
     `Place the ${String(m.glyph)} glyph token in the ${String(m.row)} row, slot ${Number(m.index) + 1}, and gain its resource`,
   glyph_group: (m) => `Gain the resources of glyph group ${Number(m.group) + 1}`,
@@ -261,6 +263,7 @@ export const HAND_MOVE_TYPES = new Set([
   "discard_corner", // Sentinel Probe Network
   "show_move", // #74 Pre-launch Testing: the cards to show are picked in the hand
   "show_energy", // #90 Fuel Tanks Construction: the cards with an energy income to show are picked in the hand
+  "corner_show", // SA.2 Tracking and Data Relay Satellite: the cards with the chosen icon in the free-action corner are picked in the hand
   "org_free", // Futurespan, Deep Sky Survey, Helion Assembly: the card is picked in the hand
 ]);
 
@@ -354,6 +357,8 @@ export function handMoveText(m: Move, glyph?: { reward: { t: string; n: number }
       return `Show ${name} to everybody and gain 1 movement? The card stays in your hand.`;
     case "show_energy":
       return `Show ${name} to everybody and gain 1 energy? The card stays in your hand.`;
+    case "corner_show":
+      return `Show ${name} to everybody and gain 1 for its icon? The card stays in your hand.`;
     case "choose_org":
       return `Take the organization ${name}? The other one goes back to the box.`;
     case "choose_quick":

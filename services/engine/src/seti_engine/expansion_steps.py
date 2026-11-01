@@ -171,10 +171,20 @@ def end_points(s: GameState, p: PlayerState, e: dict[str, Any]) -> int | None:
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
+def _corner_cards(p: PlayerState, kind: str, shown: list[str]) -> list[str]:
+    """SA.2: the cards of the hand with that icon in the free-action corner that this effect has not shown yet."""
+    return [c for c in dict.fromkeys(p.hand) if c not in shown and any(k == kind for k, _ in tables.cards()[c]["free"])]
+
+
 def decision_moves(s: GameState, d: Decision) -> list[Action] | None:
     p = s.players[d.player]
     if d.kind == "corner_pick":
         return [{"type": "corner_pick", "kind": k} for k in CORNERS]
+    if d.kind == "corner_show":
+        return [
+            *({"type": "corner_show", "card": c} for c in _corner_cards(p, d.data["kind"], d.data["shown"])),
+            {"type": "corner_done"},
+        ]
     if d.kind == "glyph_group":
         return [{"type": "glyph_group", "group": i} for i in range(len(d.data["groups"]))]
     if d.kind == "hold":
@@ -195,14 +205,23 @@ def resolve_decision(s: GameState, p: PlayerState, d: Decision, a: Action, event
     from . import cards  # noqa: PLC0415 - cards imports this module
 
     t = a["type"]
-    if t == "corner_pick":  # SA.2: once for each card shown from the hand that has the icon in its free-action corner
-        n = sum(1 for c in p.hand if any(k == a["kind"] for k, _ in tables.cards()[c]["free"]))
-        if a["kind"] == "publicity":
-            effects.gain_publicity(s, p, n)
-        elif a["kind"] == "data":
-            effects.gain_data(s, p, n)
+    if t == "corner_pick":  # SA.2: the player chooses the icon, then shows the cards of the hand that have it in the free-action corner
+        if _corner_cards(p, a["kind"], []):
+            s.pending.insert(0, Decision(kind="corner_show", player=p.index, data={"kind": a["kind"], "shown": []}))
+    elif t == "corner_show":  # SA.2: once for each card shown; the card stays in the hand and everybody sees it (the log names it)
+        events.append({"type": "show_card", "player": p.index, "card": a["card"]})
+        kind = d.data["kind"]
+        if kind == "publicity":
+            effects.gain_publicity(s, p, 1)
+        elif kind == "data":
+            effects.gain_data(s, p, 1)
         else:
-            p.movement += n
+            p.movement += 1
+        shown = [*d.data["shown"], a["card"]]
+        if _corner_cards(p, kind, shown):
+            s.pending.insert(0, Decision(kind="corner_show", player=p.index, data={"kind": kind, "shown": shown}))
+    elif t == "corner_done":
+        pass
     elif t == "glyph_group":
         from . import glyphids  # noqa: PLC0415
 

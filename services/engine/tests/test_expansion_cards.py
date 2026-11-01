@@ -78,8 +78,30 @@ def test_sa2_tracking_satellite_gives_the_icon_once_per_card_shown() -> None:  #
     assert r.state.pending[0].kind == "corner_pick"
     data = me(r).data_pool
     r = apply(r.state, {"type": "corner_pick", "kind": "publicity"})
+    assert r.state.pending[0].kind == "corner_show"  # the cards are shown one by one, the player picks them in the hand
+    assert me(r).publicity == 5
+    assert {m["card"] for m in r.legal if m["type"] == "corner_show"} == {"SA.3", "SA.5", "SA.1"}
+    r = apply(r.state, {"type": "corner_show", "card": "SA.3"})
+    assert me(r).publicity == 5 + 1
+    assert any(e["type"] == "show_card" and e["card"] == "SA.3" for e in r.events)  # everybody sees it
+    assert "SA.3" in me(r).hand  # the card stays in the hand
+    assert "SA.3" not in {m["card"] for m in r.legal if m["type"] == "corner_show"}  # a card is shown once
+    r = apply(r.state, {"type": "corner_show", "card": "SA.5"})
+    r = apply(r.state, {"type": "corner_show", "card": "SA.1"})
     assert me(r).publicity == 5 + 3
     assert me(r).data_pool == data
+    assert not r.state.pending or r.state.pending[0].kind != "corner_show"  # every card has been shown
+
+
+def test_sa2_the_player_may_stop_showing_cards() -> None:  # SA.2
+    s = ready()
+    hand_of(s, "SA.2", "SA.3", "SA.5")
+    r = go(s, 2, answer=False)
+    r = apply(r.state, {"type": "corner_pick", "kind": "publicity"})
+    r = apply(r.state, {"type": "corner_show", "card": "SA.3"})
+    r = apply(r.state, {"type": "corner_done"})
+    assert me(r).publicity == 5 + 1
+    assert not r.state.pending or r.state.pending[0].kind != "corner_show"
 
 
 def test_sa3_deep_space_network_gives_three_signal_tokens() -> None:  # SA.3
