@@ -4,7 +4,7 @@
 // first group to the last. The Exertian deck is empty after the deal (ALIEN-EXE-02), and its preview is the way to check what the opponents may hold.
 import { ALIEN_PREVIEW_EVENT, deckPreview, speciesCards } from "@/lib/alienDecks";
 import type { View } from "@seti/protocol";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CardImage } from "./CardImage";
 
 const title = (species: string): string => species.charAt(0).toUpperCase() + species.slice(1);
@@ -21,18 +21,27 @@ function Cards({ ids, what }: { ids: string[]; what: string }) {
 
 export function AlienDecksPanel({ view }: { view: View }) {
   const [open, setOpen] = useState<string | null>(null);
+  const [asked, setAsked] = useState(0);
+  const box = useRef<HTMLElement>(null);
   useEffect(() => {
-    const on = (e: Event) => setOpen(String((e as CustomEvent<string>).detail));
+    const on = (e: Event) => {
+      setOpen(String((e as CustomEvent<string>).detail));
+      setAsked((n) => n + 1);
+    };
     window.addEventListener(ALIEN_PREVIEW_EVENT, on);
     return () => window.removeEventListener(ALIEN_PREVIEW_EVENT, on);
   }, []);
+  // a click on a deck of the board brings the panel (in the side column) into view
+  useEffect(() => {
+    if (asked > 0) box.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [asked]);
   const species = view.state.species.filter((sp) => sp.discovered && speciesCards(sp.species).length > 0);
   if (species.length === 0) return null;
   const shown = open !== null && species.some((sp) => sp.species === open) ? open : null;
   const preview = shown === null ? null : deckPreview(view, shown);
   const slot = species.find((sp) => sp.species === shown);
   return (
-    <section className="card exppanel" aria-label="Alien decks">
+    <section ref={box} className="card exppanel" aria-label="Alien decks">
       <h3>Alien cards</h3>
       <p className="small muted">
         {species.map((sp) => (

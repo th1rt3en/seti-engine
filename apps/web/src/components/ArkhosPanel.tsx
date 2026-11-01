@@ -5,7 +5,7 @@ import { EXPLORATION_PREVIEW_EVENT, possibleExploration } from "@/lib/arkhosExpl
 import { cardImage } from "@/lib/cardImages";
 import type { Spot } from "@/lib/targets";
 import type { View } from "@seti/protocol";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
@@ -45,8 +45,12 @@ function ExplorationPreview({ deck, aside, revealed, onClose }: { deck: number; 
 
 export function ArkhosPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
   const [previewing, setPreviewing] = useState(false);
+  const box = useRef<HTMLElement>(null);
   useEffect(() => {
-    const open = () => setPreviewing(true);
+    const open = () => {
+      setPreviewing(true);
+      box.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); // the panel is in the side column: bring it into view
+    };
     window.addEventListener(EXPLORATION_PREVIEW_EVENT, open);
     return () => window.removeEventListener(EXPLORATION_PREVIEW_EVENT, open);
   }, []);
@@ -57,7 +61,7 @@ export function ArkhosPanel({ view, names, spots }: { view: View; names: string[
   const last = extra.explore_discard?.[extra.explore_discard.length - 1];
   const breach = (spots?.items ?? []).filter((sp: Spot) => sp.panel === "arkhos");
   return (
-    <section className="card exppanel" aria-label="Arkhos">
+    <section ref={box} className="card exppanel" aria-label="Arkhos">
       <h3>Arkhos</h3>
       <p className="small muted">
         Exploration deck (beside the species board): {extra.explore_deck?.length ?? 0} cards · set aside: {extra.explore_aside?.length ?? 0}{" "}
