@@ -841,10 +841,11 @@ def test_a_mission_card_is_in_play_during_its_own_effect(monkeypatch: pytest.Mon
     assert r.state.pending[0].kind == "mission_trigger" and r.state.pending[0].data["options"] == [["117", 0]]
 
 
-def test_strategic_planning_can_cover_its_own_play_cost() -> None:
-    """A-019 reading 2 applied to #106: it is in play when its cost is paid."""
+def test_strategic_planning_cannot_cover_its_own_play_cost() -> None:
+    """A-019 (owner 2026-11-01), CARD-12, FAQ-C106: the cost paid to play #106 does not trigger #106 itself."""
     r = play(ready(), "106")
-    assert r.state.pending and r.state.pending[0].data["options"] == [["106", 0]]
+    assert not r.state.pending or r.state.pending[0].kind != "mission_trigger"
+    assert [m.card for m in r.state.players[r.state.current_player].missions] == ["106"]  # it is in play afterwards
 
 
 def test_signal_colour_triggers_control_center() -> None:

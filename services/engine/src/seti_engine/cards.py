@@ -62,11 +62,11 @@ def play(s: GameState, p: PlayerState, cid: str, events: Events, free: bool = Fa
     events.append({"type": "play_card", "player": p.index, "card": cid})
     m = card_defs.CARDS[cid].get("mission")
     orgs.on_card_played(s, p, cid, tables.cards()[cid]["deck"] == "alien")
+    if cost > 0 and not pays_energy(cid):  # FAQ-C106; A-019 (owner 2026-11-01): not in play yet, so #106 cannot cover its own cost
+        fire(s, p, [{"e": "play_cost", "cost": cost}], events)
     if m:  # A-019: a mission is in play from the moment its card is played, so its own effect can trigger it
         p.missions.append(MissionState(card=cid, kind=m["kind"], used=[False] * len(m.get("circles", []))))
         orgs.on_mission_played(s, p)  # Mission Relay (EXP-ORG-13)
-    if cost > 0 and not pays_energy(cid):
-        fire(s, p, [{"e": "play_cost", "cost": cost}], events)  # FAQ-C106
     if cid in card_defs.MARS_FLAVOR:
         fire(s, p, [{"e": "play_mars"}], events)  # PROMO-03: a card that names Mars in its flavor text
 

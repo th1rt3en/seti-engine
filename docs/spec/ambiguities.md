@@ -223,6 +223,7 @@ Entry format:
 - Proposed ruling: reading 1.
 - Questions for the owner: confirm reading 1 or choose reading 2.
 - Ruling (owner), 2026-10-13: Reading 2. A mission is in play from the moment its card is played, so the card's own effect (and the cost paid to play it) can trigger it.
+- Ruling (owner), 2026-11-01, amends the above: the cost paid to play a mission card cannot trigger that card (#106 Strategic Planning cannot cover its own cost). The card's own effect still can (for example #117 Lunar Gateway's free launch).
 
 ## A-020: Where discarded alien cards go
 - Status: ruled
