@@ -1936,10 +1936,23 @@ button:disabled {
   height: auto;
 }
 /* the preview of a deck: the panel over the page (offerpanel), wide enough for the cards of a species */
-.previewpanel {
-  z-index: 210; /* over the backdrop (.overlay, 200) */
+/* (two classes, so that it wins over .offerpanel, which is declared further down: the panel must lie over the backdrop, .overlay with z-index 200) */
+.offerpanel.previewpanel {
+  z-index: 210;
   justify-items: stretch;
   width: min(94vw, 980px);
+  max-height: 90dvh;
+  padding-top: 8px;
+  overscroll-behavior: contain;
+}
+/* the Close button stays at the top of the panel while the cards scroll */
+.offerpanel.previewpanel .offerhide {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  justify-self: end;
+  padding: 10px 16px;
+  font-size: 1rem;
 }
 .previewpanel h3 {
   margin: 0.4rem 0 0;
@@ -1950,6 +1963,11 @@ button:disabled {
 }
 .previewpanel .aliencards img {
   width: 7.5rem;
+}
+@media (max-width: 600px) {
+  .previewpanel .aliencards img {
+    width: calc((100vw - 3rem) / 3);
+  }
 }
 .previewpanel .explorationrow img {
   width: min(13rem, 44%);
