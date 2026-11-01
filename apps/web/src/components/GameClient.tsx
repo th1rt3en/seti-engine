@@ -45,7 +45,7 @@ import { FinalScores } from "./FinalScores";
 import { GameView } from "./GameView";
 import { setupStatus } from "./GameView";
 import { Hint } from "./Hint";
-import { ActionIcon, DeckCardIcon, PublicityIcon, ScoreIcon } from "./Icons";
+import { ActionIcon, DataIcon, DeckCardIcon, MoveIcon, PublicityIcon, ScoreIcon } from "./Icons";
 import { type InviteActions, type LobbyInfo, LobbyPanel } from "./LobbyPanel";
 import { SampleReward } from "./Mascamites";
 import { type CoverChoice, MissionCover } from "./MissionCover";
@@ -1298,7 +1298,12 @@ export function GameClient({
             <MoveGroup key={g.title} title={g.title} foldable={false}>
               <div className="moves">
                 {g.moves.map((m, i) => (
-                  <button key={`${m.type}-${i}`} type="button" onClick={() => play(m)}>
+                  <button
+                    key={`${m.type}-${i}`}
+                    type="button"
+                    onClick={() => play(m)}
+                    title={m.type === "corner_pick" ? describeMove(m) : undefined}
+                  >
                     {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? <ActionIcon name={m.type} /> : null}
                     {m.type === "launch" || m.type === "scan" || m.type === "analyze" ? (
                       // the name, then the cost as icons (the engine's note of the move says what it costs)
@@ -1313,6 +1318,18 @@ export function GameClient({
                       </>
                     ) : m.type === "undo" ? (
                       undoText
+                    ) : m.type === "corner_pick" ? (
+                      // Tracking and Data Relay Satellite (SA.2): "Choose" and the icon of the corner (publicity, data or movement)
+                      <>
+                        Choose{" "}
+                        {m.kind === "publicity" ? (
+                          <PublicityIcon size={20} />
+                        ) : m.kind === "data" ? (
+                          <DataIcon size={20} />
+                        ) : (
+                          <MoveIcon size={20} />
+                        )}
+                      </>
                     ) : (
                       describeMove(m)
                     )}
