@@ -5,11 +5,12 @@ import { EXPLORATION_PREVIEW_EVENT, possibleExploration } from "@/lib/arkhosExpl
 import { cardImage } from "@/lib/cardImages";
 import type { Spot } from "@/lib/targets";
 import type { View } from "@seti/protocol";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import expansionAssets from "../generated/expansion-assets.json";
 import type { BoardSpots } from "./BoardView";
 import { CardImage } from "./CardImage";
 import { PlayerName } from "./PlayerName";
+import { PreviewModal } from "./PreviewModal";
 
 const ASSET = expansionAssets as Record<string, string>;
 const COLORS = ["pink", "yellow", "blue"] as const;
@@ -24,33 +25,24 @@ function ExplorationPreview({ deck, aside, revealed, onClose }: { deck: number; 
     </div>
   );
   return (
-    <div className="explorationpreview">
-      <header>
-        <h4>Exploration deck</h4>
-        <button type="button" className="secondary" onClick={onClose} aria-label="Close">
-          ✕
-        </button>
-      </header>
+    <PreviewModal title="Exploration deck" onClose={onClose}>
       <p className="small muted">
         {deck} cards in the deck, {aside} set aside. The order is secret, so any card that is not revealed can come next. When the deck runs
         out all 9 cards are shuffled again (5 in the deck, 4 set aside) and this list starts over.
       </p>
-      <h5>Could be revealed next ({possible.length})</h5>
+      <h3>Could be revealed next ({possible.length})</h3>
       {row(possible, "Possible")}
-      <h5>Revealed ({revealed.length})</h5>
+      <h3>Revealed ({revealed.length})</h3>
       {revealed.length > 0 ? row(revealed, "Revealed") : <p className="small muted">No card has been revealed since the last shuffle.</p>}
-    </div>
+    </PreviewModal>
   );
 }
 
 export function ArkhosPanel({ view, names, spots }: { view: View; names: string[]; spots?: BoardSpots }) {
   const [previewing, setPreviewing] = useState(false);
-  const box = useRef<HTMLElement>(null);
+  const closePreview = useCallback(() => setPreviewing(false), []);
   useEffect(() => {
-    const open = () => {
-      setPreviewing(true);
-      box.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); // the panel is in the side column: bring it into view
-    };
+    const open = () => setPreviewing(true);
     window.addEventListener(EXPLORATION_PREVIEW_EVENT, open);
     return () => window.removeEventListener(EXPLORATION_PREVIEW_EVENT, open);
   }, []);
@@ -61,13 +53,13 @@ export function ArkhosPanel({ view, names, spots }: { view: View; names: string[
   const last = extra.explore_discard?.[extra.explore_discard.length - 1];
   const breach = (spots?.items ?? []).filter((sp: Spot) => sp.panel === "arkhos");
   return (
-    <section ref={box} className="card exppanel" aria-label="Arkhos">
+    <section className="card exppanel" aria-label="Arkhos">
       <h3>Arkhos</h3>
       <p className="small muted">
         Exploration deck (beside the species board): {extra.explore_deck?.length ?? 0} cards · set aside: {extra.explore_aside?.length ?? 0}{" "}
         · revealed: {extra.explore_discard?.length ?? 0}{" "}
-        <button type="button" className="link" onClick={() => setPreviewing((v) => !v)} aria-expanded={previewing}>
-          {previewing ? "Hide the exploration cards" : "Look at the exploration cards"}
+        <button type="button" className="link" onClick={() => setPreviewing(true)}>
+          Look at the exploration cards
         </button>
       </p>
       {previewing ? (
@@ -75,7 +67,7 @@ export function ArkhosPanel({ view, names, spots }: { view: View; names: string[
           deck={extra.explore_deck?.length ?? 0}
           aside={extra.explore_aside?.length ?? 0}
           revealed={extra.explore_discard ?? []}
-          onClose={() => setPreviewing(false)}
+          onClose={closePreview}
         />
       ) : null}
       {s.players.map((p) => {

@@ -1935,6 +1935,25 @@ button:disabled {
   width: 5.5rem;
   height: auto;
 }
+/* the preview of a deck: the panel over the page (offerpanel), wide enough for the cards of a species */
+.previewpanel {
+  z-index: 210; /* over the backdrop (.overlay, 200) */
+  justify-items: stretch;
+  width: min(94vw, 980px);
+}
+.previewpanel h3 {
+  margin: 0.4rem 0 0;
+  font-size: 1rem;
+}
+.previewpanel .aliencards {
+  justify-content: flex-start;
+}
+.previewpanel .aliencards img {
+  width: 7.5rem;
+}
+.previewpanel .explorationrow img {
+  width: min(13rem, 44%);
+}
 .exppanel p .link + .link {
   margin-left: 0.9rem;
 }
