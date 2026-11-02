@@ -116,7 +116,6 @@ export const SPEND_NAMES: Record<string, string> = {
   buy_card: "Buying a card of the display",
   trade: "Trading resources",
   movement: "Turned into movement",
-  computer: "Placed in the computer",
   computer_empty: "Empty space",
   computer_pub: "Space with 1 publicity",
   computer_tuck: "Space that tucks a card",

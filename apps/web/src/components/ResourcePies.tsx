@@ -17,7 +17,8 @@ export function ResourcePies({ gains, spends }: { gains: Record<string, Slice[]>
     <>
       {GAIN_RESOURCES.map((res) => {
         const gained = gains[res] ?? [];
-        const spent = spends[res] ?? [];
+        // data placed in the computer is named by the space it went to (computer_empty, computer_vp ...): the total `computer` of the older games repeats them
+        const spent = (spends[res] ?? []).filter((x) => !(res === "data" && x.key === "computer"));
         if (res === "exofossil" && gained.length === 0 && spent.length === 0) return null; // only with 'Oumuamua
         const lower = (RESOURCE_NAMES[res] ?? res).toLowerCase();
         return (
