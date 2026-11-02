@@ -19,6 +19,62 @@
       "title": "ApplyRequest",
       "type": "object"
     },
+    "ApplyViewsRequest": {
+      "properties": {
+        "action": {
+          "additionalProperties": true,
+          "description": "One of the `legal` moves returned with the state; an object with a `type`.",
+          "title": "Action",
+          "type": "object"
+        },
+        "state": {
+          "$ref": "#/$defs/GameState"
+        },
+        "viewers": {
+          "description": "The seats (null: a spectator) whose view of the new state is wanted, in one round trip.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Viewers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "action",
+        "state",
+        "viewers"
+      ],
+      "title": "ApplyViewsRequest",
+      "type": "object"
+    },
+    "ApplyViewsResponse": {
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/StepResult"
+        },
+        "views": {
+          "description": "The view of each of `viewers`, in the same order, of the state in `result`.",
+          "items": {
+            "$ref": "#/$defs/View"
+          },
+          "title": "Views",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result",
+        "views"
+      ],
+      "title": "ApplyViewsResponse",
+      "type": "object"
+    },
     "ComputerTech": {
       "properties": {
         "lower_filled": {
@@ -2053,6 +2109,12 @@
   "properties": {
     "ApplyRequest": {
       "$ref": "#/$defs/ApplyRequest"
+    },
+    "ApplyViewsRequest": {
+      "$ref": "#/$defs/ApplyViewsRequest"
+    },
+    "ApplyViewsResponse": {
+      "$ref": "#/$defs/ApplyViewsResponse"
     },
     "ErrorResponse": {
       "$ref": "#/$defs/ErrorResponse"

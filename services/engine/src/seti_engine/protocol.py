@@ -28,6 +28,17 @@ class ApplyRequest(BaseModel):
     action: Action = Field(description="One of the `legal` moves returned with the state; an object with a `type`.")
 
 
+class ApplyViewsRequest(BaseModel):
+    state: GameState
+    action: Action = Field(description="One of the `legal` moves returned with the state; an object with a `type`.")
+    viewers: list[int | None] = Field(description="The seats (null: a spectator) whose view of the new state is wanted, in one round trip.")
+
+
+class ApplyViewsResponse(BaseModel):
+    result: StepResult
+    views: list[View] = Field(description="The view of each of `viewers`, in the same order, of the state in `result`.")
+
+
 class LegalRequest(BaseModel):
     state: GameState
 
@@ -54,6 +65,8 @@ MODELS: dict[str, type[BaseModel]] = {
     "View": View,
     "NewGameRequest": NewGameRequest,
     "ApplyRequest": ApplyRequest,
+    "ApplyViewsRequest": ApplyViewsRequest,
+    "ApplyViewsResponse": ApplyViewsResponse,
     "LegalRequest": LegalRequest,
     "ProjectRequest": ProjectRequest,
     "LegalResponse": LegalResponse,

@@ -1,8 +1,8 @@
 """The stateless HTTP service around the engine (run it with `uvicorn seti_engine.service:app`).
 
 Every request carries the whole game state; nothing is kept between requests, so any number of instances can serve one game (decision D5).
-Endpoints: POST /new, POST /apply, POST /legal, POST /project, POST /stats, POST /replay/view, PUT /archive, PUT /errors, GET /schema,
-GET /health.
+Endpoints: POST /new, POST /apply, POST /apply/views, POST /legal, POST /project, POST /stats, POST /replay/view, PUT /archive,
+PUT /errors, GET /schema, GET /health.
 Callers sign their requests (request_auth.py, decision D16); deploy the service private as well (Cloud Run IAM).
 See docs/deploy-engine.md.
 """
@@ -24,6 +24,8 @@ from .projection import View, project
 from .protocol import (
     PROTOCOL_VERSION,
     ApplyRequest,
+    ApplyViewsRequest,
+    ApplyViewsResponse,
     ErrorResponse,
     LegalRequest,
     LegalResponse,
@@ -73,6 +75,21 @@ def apply(req: ApplyRequest) -> engine.StepResult | JSONResponse:
     except engine.IllegalAction as e:
         body = ErrorResponse(error="illegal_action", message=str(e)[:500], legal=engine.legal_moves(req.state))
         return JSONResponse(status_code=422, content=body.model_dump())
+
+
+@app.post("/apply/views", response_model=ApplyViewsResponse, responses={422: {"model": ErrorResponse}})
+def apply_views(req: ApplyViewsRequest) -> ApplyViewsResponse | JSONResponse:
+    """A move and the views that follow it in one round trip: the Worker would otherwise send the whole state again for each viewer."""
+    try:
+        res = engine.apply(req.state, req.action)
+    except engine.IllegalAction as e:
+        body = ErrorResponse(error="illegal_action", message=str(e)[:500], legal=engine.legal_moves(req.state))
+        return JSONResponse(status_code=422, content=body.model_dump())
+    seen: dict[int | None, View] = {}
+    for viewer in req.viewers:
+        if viewer not in seen:
+            seen[viewer] = project(res.state, viewer)
+    return ApplyViewsResponse(result=res, views=[seen[v] for v in req.viewers])
 
 
 @app.post("/legal", response_model=LegalResponse)

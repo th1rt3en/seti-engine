@@ -183,22 +183,14 @@ export type UndoLog = {
   [k: string]: unknown;
 }[];
 export type Winners1 = number[];
-export type Error = string;
-export type Legal = {
-  [k: string]: unknown;
-}[];
-export type Message = string;
-export type Legal1 = {
-  [k: string]: unknown;
-}[];
 /**
- * The player index, or null for a spectator.
+ * The seats (null: a spectator) whose view of the new state is wanted, in one round trip.
  */
-export type Viewer = number | null;
+export type Viewers = (number | null)[];
 export type Events = {
   [k: string]: unknown;
 }[];
-export type Legal2 = {
+export type Legal = {
   [k: string]: unknown;
 }[];
 export type Acting = number[];
@@ -211,7 +203,7 @@ export type Hands = number[];
 export type ObjectiveStack = number;
 export type RivalDeck = number;
 export type SpeciesDecks = number[];
-export type Legal3 = {
+export type Legal1 = {
   [k: string]: unknown;
 }[];
 export type Notes = ({
@@ -246,6 +238,22 @@ export type GoldEstimate = number;
 export type MissionsDone = number;
 export type Score1 = number;
 export type Trackers = PlayerTracker[];
+export type Viewer = number | null;
+/**
+ * The view of each of `viewers`, in the same order, of the state in `result`.
+ */
+export type Views = View[];
+export type Error = string;
+export type Legal2 = {
+  [k: string]: unknown;
+}[];
+export type Message = string;
+export type Legal3 = {
+  [k: string]: unknown;
+}[];
+/**
+ * The player index, or null for a spectator.
+ */
 export type Viewer1 = number | null;
 
 /**
@@ -253,6 +261,8 @@ export type Viewer1 = number | null;
  */
 export interface SetiProtocol {
   ApplyRequest?: ApplyRequest;
+  ApplyViewsRequest?: ApplyViewsRequest;
+  ApplyViewsResponse?: ApplyViewsResponse;
   ErrorResponse?: ErrorResponse;
   GameState?: GameState;
   LegalRequest?: LegalRequest;
@@ -534,27 +544,24 @@ export interface TechStack {
   tiles: Tiles;
   two_point_tile: TwoPointTile;
 }
-export interface ErrorResponse {
-  error: Error;
-  legal: Legal;
-  message: Message;
-}
-export interface LegalRequest {
+export interface ApplyViewsRequest {
+  action: Action1;
   state: GameState;
+  viewers: Viewers;
 }
-export interface LegalResponse {
-  legal: Legal1;
+/**
+ * One of the `legal` moves returned with the state; an object with a `type`.
+ */
+export interface Action1 {
+  [k: string]: unknown;
 }
-export interface NewGameRequest {
-  options: Options;
-}
-export interface ProjectRequest {
-  state: GameState;
-  viewer: Viewer;
+export interface ApplyViewsResponse {
+  result: StepResult;
+  views: Views;
 }
 export interface StepResult {
   events: Events;
-  legal: Legal2;
+  legal: Legal;
   state: GameState;
 }
 /**
@@ -564,7 +571,7 @@ export interface View {
   acting: Acting;
   classes: Classes;
   counts: Counts;
-  legal: Legal3;
+  legal: Legal1;
   notes: Notes;
   planet_cells: PlanetCells;
   reach: Reach;
@@ -572,7 +579,7 @@ export interface View {
   state: GameState;
   to_act: ToAct;
   trackers: Trackers;
-  viewer: Viewer1;
+  viewer: Viewer;
 }
 /**
  * How many of the hidden things there are.
@@ -639,4 +646,22 @@ export interface Income {
 }
 export interface Tucked1 {
   [k: string]: number;
+}
+export interface ErrorResponse {
+  error: Error;
+  legal: Legal2;
+  message: Message;
+}
+export interface LegalRequest {
+  state: GameState;
+}
+export interface LegalResponse {
+  legal: Legal3;
+}
+export interface NewGameRequest {
+  options: Options;
+}
+export interface ProjectRequest {
+  state: GameState;
+  viewer: Viewer1;
 }

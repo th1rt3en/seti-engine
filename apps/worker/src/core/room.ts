@@ -632,6 +632,7 @@ export class GameRoom {
       this.logCache = log.slice(0, left);
       await this.d.store.put("logcount", left);
       await this.d.store.put("state", state);
+      this.viewCache = null;
       await this.runClock(meta, state);
       await this.d.store.delete("undo");
       const line = say(removed);
@@ -834,6 +835,7 @@ export class GameRoom {
     meta.status = "playing";
     meta.startedAt = this.d.now();
     await this.d.store.put("state", res.state);
+    this.viewCache = null;
     await this.d.store.put("logcount", 0);
     await this.d.store.put("clock", clocks.initialClock(meta.clock, meta.seats.length));
     await this.d.store.put("meta", meta);
@@ -896,12 +898,21 @@ export class GameRoom {
   /** The move of the seat that is to act, checked: the engine applies it, the log and the views follow. */
   private async play(meta: Meta, seat: number, count: number, state: GameState, action: Action): Promise<SubmitResult> {
     let res: Awaited<ReturnType<Engine["apply"]>>;
+    // the views that the connected players are sent next come with the move (one round trip, the state is sent once): see viewFor
+    const viewers = [...new Set(this.d.connections().map((c) => this.connSeat(meta, c)))];
+    let views: View[] | undefined;
+    const t0 = Date.now();
     try {
-      res = await this.d.engine.apply(state, action);
+      if (this.d.engine.applyWithViews && viewers.length > 0) {
+        const out = await this.d.engine.applyWithViews(state, action, viewers);
+        res = out.result;
+        views = out.views;
+      } else res = await this.d.engine.apply(state, action);
     } catch (e) {
       if (e instanceof IllegalAction) return { ok: false, code: "illegal", message: e.message, legal: e.legal };
       throw e;
     }
+    const engineMs = Date.now() - t0;
     const now = this.d.now();
     const entry: LogEntry = { seq: count, seat, action, at: now, events: res.events };
     await this.d.store.put(logKey(count), entry);
@@ -911,6 +922,9 @@ export class GameRoom {
     }
     await this.d.store.put("logcount", count + 1);
     await this.d.store.put("state", res.state);
+    const cached = new Map<number, Promise<View>>();
+    if (views) viewers.forEach((v, i) => cached.set(v ?? -1, Promise.resolve(views[i] as View)));
+    this.viewCache = { count: count + 1, views: cached };
     if ((await this.d.store.get<UndoProposal>("undo")) !== undefined) {
       await this.d.store.delete("undo"); // a move was made: the proposal was about the game before it
       await this.broadcastUndo(meta);
@@ -929,7 +943,20 @@ export class GameRoom {
       return { ok: true };
     }
     await this.runClock(meta, res.state);
+    const t1 = Date.now();
     await this.broadcastViews();
+    // where the time of a move goes (the engine round trip, the storage writes, the views): read it in the logs of the Worker
+    console.info(
+      JSON.stringify({
+        move: "timing",
+        game: meta.id,
+        seq: count,
+        engineMs,
+        storeMs: t1 - t0 - engineMs,
+        viewsMs: Date.now() - t1,
+        viewers: viewers.length,
+      }),
+    );
     this.archiveSoon();
     this.botSoon();
     return { ok: true };
@@ -1212,9 +1239,8 @@ export class GameRoom {
   }
 
   private async sendView(conn: Connection, meta: Meta): Promise<void> {
-    const state = await this.state();
     const seat = conn.who === null ? -1 : meta.seats.findIndex((s) => s?.id === conn.who);
-    const view = await this.d.engine.project(state, seat >= 0 ? seat : null);
+    const view = await this.viewFor(seat >= 0 ? seat : null);
     const stored = await this.d.store.get<clocks.ClockState>("clock");
     const remaining = stored === undefined ? null : clocks.remaining(meta.clock, clocks.normalize(stored), this.d.now(), meta.seats.length);
     conn.send({
@@ -1226,6 +1252,24 @@ export class GameRoom {
       nums: meta.seats.map((s) => s?.num ?? null),
       remaining,
     });
+  }
+
+  // The view of a seat is worked out once for each state: the engine sent the views of the connected players with the move (see play), and a
+  // second device of the same player, or a connection that comes later, shares the answer. Whatever replaces the state forgets them.
+  private viewCache: { count: number; views: Map<number, Promise<View>> } | null = null;
+
+  private async viewFor(seat: number | null): Promise<View> {
+    const count = (await this.d.store.get<number>("logcount")) ?? 0;
+    if (this.viewCache === null || this.viewCache.count !== count) this.viewCache = { count, views: new Map() };
+    const cache = this.viewCache;
+    const key = seat ?? -1;
+    let view = cache.views.get(key);
+    if (view === undefined) {
+      view = this.state().then((state) => this.d.engine.project(state, seat));
+      cache.views.set(key, view);
+      view.catch(() => cache.views.delete(key)); // a failure is not remembered
+    }
+    return view;
   }
 
   private async broadcastLobby(meta: Meta): Promise<void> {

@@ -1,5 +1,5 @@
 // The engine service as the Worker sees it (docs/deploy-engine.md).
-import type { GameState, Options, StepResult, View } from "@seti/protocol";
+import type { ApplyViewsResponse, GameState, Options, StepResult, View } from "@seti/protocol";
 
 import type { Signer } from "./engineAuth.js";
 
@@ -29,6 +29,8 @@ export interface Engine {
   apply(state: GameState, action: Action): Promise<StepResult>;
   /** What `viewer` may see of the state (null for a spectator). */
   project(state: GameState, viewer: number | null): Promise<View>;
+  /** `apply` and the views of the new state for these viewers in one round trip (`views[i]` is the view of `viewers[i]`). Throws `IllegalAction` too. */
+  applyWithViews?(state: GameState, action: Action, viewers: (number | null)[]): Promise<{ result: StepResult; views: View[] }>;
   /** The state after these actions, replayed from the start (an administrator takes actions back). */
   replayState?(options: Options, actions: Action[], rngEncoding?: "exact" | "double"): Promise<GameState>;
   /** The statistics of a finished game, from its options and its actions (the engine replays it). */
@@ -68,6 +70,25 @@ export class HttpEngine implements Engine {
     if (status === 422) throw new IllegalAction(json.message ?? "illegal action", json.legal);
     if (status !== 200) throw new Error(`engine /apply failed with ${status}`);
     return json;
+  }
+
+  /** An engine that is older than this Worker has no /apply/views: it answers 404 once, and the two calls are used from then on. */
+  private noViewsEndpoint = false;
+
+  async applyWithViews(state: GameState, action: Action, viewers: (number | null)[]): Promise<{ result: StepResult; views: View[] }> {
+    if (!this.noViewsEndpoint) {
+      const { status, json } = await this.post<ApplyViewsResponse & { message?: string; legal: Action[] }>("/apply/views", {
+        state,
+        action,
+        viewers,
+      });
+      if (status === 422) throw new IllegalAction(json.message ?? "illegal action", json.legal);
+      if (status === 200) return { result: json.result, views: json.views };
+      if (status !== 404) throw new Error(`engine /apply/views failed with ${status}`);
+      this.noViewsEndpoint = true;
+    }
+    const result = await this.apply(state, action);
+    return { result, views: await Promise.all(viewers.map((v) => this.project(result.state, v))) };
   }
 
   async project(state: GameState, viewer: number | null): Promise<View> {

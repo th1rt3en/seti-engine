@@ -120,6 +120,22 @@ def test_legal_and_project_endpoints() -> None:
     assert client.post("/project", json={"state": st, "viewer": None}).json()["legal"] == []
 
 
+def test_apply_views_gives_the_move_and_the_views_in_one_round_trip() -> None:
+    r = start(Options(players=2, seed=1))
+    st = r.state.model_dump(mode="json")
+    actor = r.state.pending[0].player
+    move = r.legal[0]
+    body = client.post("/apply/views", json={"state": st, "action": move, "viewers": [actor, None, actor, 1 - actor]}).json()
+    one = client.post("/apply", json={"state": st, "action": move}).json()
+    assert body["result"] == one  # the same as /apply
+    assert len(body["views"]) == 4 and body["views"][0] == body["views"][2]  # a viewer asked for twice is the same view
+    for viewer, view in zip([actor, None, actor, 1 - actor], body["views"], strict=True):
+        # the same as /project of the new state
+        assert view == client.post("/project", json={"state": one["state"], "viewer": viewer}).json()
+    res = client.post("/apply/views", json={"state": st, "action": {"type": "launch"}, "viewers": [actor]})
+    assert res.status_code == 422 and res.json()["error"] == "illegal_action"
+
+
 def test_the_service_keeps_no_state_between_requests() -> None:
     first = client.post("/new", json={"options": {"players": 1, "seed": 3, "difficulty": 2}}).json()
     again = client.post("/new", json={"options": {"players": 1, "seed": 3, "difficulty": 2}}).json()

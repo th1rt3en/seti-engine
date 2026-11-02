@@ -41,6 +41,7 @@ form `seti-engine/games/YYYY/MM/DD/<table number>.json` (one file for a whole ga
 
 - Keep the game state and the action log; call `POST /apply` with the stored state and the player's action.
 - Send each client only `POST /project` output for that player, never the raw state (rule 6).
+- `POST /apply/views` does both in one round trip: the move, and the views of the new state for the seats listed in `viewers` (null is a spectator). The Worker uses it so that a move costs one call to the service instead of one plus one for each connected seat, each sending the whole state again.
 - Send a player only the `legal` moves of their own view.
 
 ## Error reports (2026-10-19)
