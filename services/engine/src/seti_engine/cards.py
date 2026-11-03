@@ -912,6 +912,7 @@ def markers_on_species(s: GameState, p: PlayerState, slot_index: int) -> int:
     """Traces a player has marked for a species: discovery spaces, overflow spaces and the board all count (LIFE-02, FAQ-41)."""
     slot = s.species[slot_index]
     n = sum(1 for x in slot.discovery_spaces if x == f"p{p.index}") + slot.overflow.count(p.index)
+    n += sum(1 for sp in slot.extra.get("sample_spaces", []) if sp["marker"] == p.index)  # ALIEN-MASC-05: a marker on a sample space
     return n + sum(m.count(p.index) for column in slot.board.values() for m in column)
 
 

@@ -541,6 +541,8 @@ def test_end_scoring_counts_the_traces_for_a_species() -> None:
     slot.board["pink"][0].append(p.index)
     slot.discovery_spaces[0] = f"p{p.index}"
     assert cards.end_points(s, p) == 4
+    slot.extra["sample_spaces"][0]["marker"] = p.index  # ALIEN-MASC-05: a marker on a sample space of the Mascamite board counts too
+    assert cards.end_points(s, p) == 5
 
 
 def test_a_collected_sample_is_hidden_from_everyone_but_its_owner() -> None:
