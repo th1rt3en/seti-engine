@@ -80,7 +80,7 @@ Card clarifications from pp. 12 to 26 of the FAQ. They are rules for those cards
 - **FAQ-C067** #67 Yevpatoria and #114 Planet Hunters: discarding cards for signals from hand follows the sector color of each card.
 - **FAQ-C073** #73 Clean Space Initiative / #74 Pre-launch Testing: if not all free-action corners can be used the three row cards are still discarded.
 - **FAQ-C078** #78 to #80 missions: when the action is performed, only one reward of the player's choice is marked; the spaces can be covered in any order.
-- **FAQ-C081** #81 International Collaboration: the tech is one another player already has, the solar system is not rotated, and the tile's 3 VP, publicity, energy and card bonuses are not gained, but the free probe launch and the 2 data of the two particular techs are.
+- **FAQ-C081** #81 International Collaboration: the tech is one that somebody researched before (owner ruling 2026-11-04: a tech stack without its 2-point marker, whether a player or the rival took it or it was discarded), the solar system is not rotated, and the tile's 3 VP, publicity, energy and card bonuses are not gained, but the free probe launch and the 2 data of the two particular techs are.
 - **FAQ-C084** #84 Sample Return: as #15, removing the lander from the 1st space (2 data) frees that space again.
 - **FAQ-C088** #88 Chandra and #134 Herschel: the 4 signals in different sectors must be present on the board at completion; signals removed earlier do not count. The two signals marked by the card can complete the mission before the sector they might complete is resolved.
 - **FAQ-C089** #89 NIAC Program: Exertian cards are not in hand.

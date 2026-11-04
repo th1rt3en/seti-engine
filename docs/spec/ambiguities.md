@@ -567,3 +567,7 @@ The owner found that SA.42 (LOFAR Array) had no completion button with a signal 
 ## Ruling 2026-10-27: a probe pushed onto asteroids gains the publicity of the Asteroid Skimmer
 
 TECH-PT03 (MOVE-07) gives 1 publicity when the player moves onto asteroids; ROTATE-03 says a pushed probe moves for free and gains the publicity of an icon space at once, even on another player's turn, but did not say whether asteroids (no icon) pay with the tech. The owner found a game (the player took the Asteroid Skimmer, then the rival's rotation pushed their probe onto asteroids and nothing was gained) and ruled that it should give the publicity. A push is a move (free), so the tech pays for it, on the player's own rotation and on another player's (`techs.rotate_solar_system`; the test is in `test_solar.py`). Games already played keep their results.
+
+## Ruling 2026-11-04: "a tech another player has" means a stack without its 2-point marker
+
+Cards that ask for a tech that someone else has researched (#81 International Collaboration, SA.18 Contracted Research, and the 2 publicity of #72 Scientific Cooperation) looked only at the techs of the other players, so a tech that the rival took, or whose tile was discarded, did not count. The owner ruled that these cards work on **any tech stack that no longer has its 2-point marker** (somebody researched it first, the rival included, or the marker was discarded). `cards._researched_before` is the one test; the tests are in `test_cards.py`, `test_solo.py` and `test_expansion_cards.py`. Games already played keep their results.
