@@ -860,6 +860,8 @@ def test_a_tech_the_rival_has_can_be_copied_by_international_collaboration() -> 
 
     s = solo()
     s.rival.techs = ["probe-dot", "telescope-link"]  # type: ignore[union-attr]
+    for ts in s.tech_stacks:  # the rival took them: their 2-point markers are gone
+        ts.two_point_tile = f"{ts.category}-{ts.glyph}" not in s.rival.techs  # type: ignore[union-attr]
     r = play(s, "81")
     assert {cards_name(r.state, i) for i in r.state.pending[0].data["stacks"]} == {"probe-dot", "telescope-link"}
     assert r.state.rotations == 0  # a copied tech does not rotate the solar system
@@ -870,6 +872,8 @@ def test_a_card_that_copies_a_tech_has_nothing_to_take_when_the_rival_has_none()
 
     s = solo()
     s.rival.techs = []  # type: ignore[union-attr]
+    for ts in s.tech_stacks:
+        ts.two_point_tile = True
     r = play(s, "81")
     assert not r.state.pending or r.state.pending[0].kind != "research_tech"
 
@@ -883,6 +887,8 @@ def test_contracted_research_takes_a_tech_the_rival_has() -> None:  # SA.18, SOL
     s = r0.state.model_copy(deep=True)
     s.current_player, s.stage, s.main_done, s.pending = 0, None, False, []
     s.rival.techs = ["computer-dot"]  # type: ignore[union-attr]
+    for ts in s.tech_stacks:
+        ts.two_point_tile = f"{ts.category}-{ts.glyph}" != "computer-dot"
     r = go(s, 18, answer=False)
     assert me(r).publicity == 0
     stacks = {m["stack"] for m in r.legal if m["type"] == "take_tech"}

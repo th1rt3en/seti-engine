@@ -279,8 +279,8 @@ def test_focused_research_scores_for_each_tech_of_the_type() -> None:
 def test_international_collaboration_copies_a_tech_without_rotating_or_tile_bonus() -> None:
     """#81, FAQ-C081."""
     s = ready()
-    other = 1 - s.current_player
-    s.players[other].techs = ["probe-dot", "telescope-dot"]
+    for ts in s.tech_stacks:  # FAQ-C081, owner ruling 2026-11-04: a stack without its 2-point marker (researched or discarded by anyone)
+        ts.two_point_tile = f"{ts.category}-{ts.glyph}" not in ("probe-dot", "telescope-dot")
     r = play(s, "81")
     assert r.state.rotations == 0
     names = {cards_name(r.state, i) for i in r.state.pending[0].data["stacks"]}
@@ -298,12 +298,18 @@ def cards_name(s: GameState, i: int) -> str:
 def test_scientific_cooperation_pays_publicity_for_a_copied_tech() -> None:
     """#72."""
     s = ready()
-    s.players[1 - s.current_player].techs = ["probe-dot"]
+    for ts in s.tech_stacks:  # owner ruling 2026-11-04: a stack without its 2-point marker (a player, the rival or a discard took it)
+        ts.two_point_tile = f"{ts.category}-{ts.glyph}" != "probe-dot"
     r = play(s, "72")
     idx = next(i for i in r.state.pending[0].data["stacks"] if cards_name(r.state, i) == "probe-dot")
     pub = me(r).publicity
     r2 = settle(do(r, "take_tech", stack=idx))
-    assert me(r2).publicity >= min(10, pub + 2)
+    assert me(r2).publicity == min(10, pub + 2)
+    # a stack that still has its 2-point marker gives the 2 points of the first taker and no publicity
+    other = next(i for i in r.state.pending[0].data["stacks"] if cards_name(r.state, i) != "probe-dot")
+    score = me(r).score
+    r3 = settle(do(r, "take_tech", stack=other))
+    assert me(r3).publicity <= pub + 1 and me(r3).score >= score + 2  # at most the 1 publicity of a tile bonus, not the 2 of the card
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------

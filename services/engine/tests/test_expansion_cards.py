@@ -323,7 +323,8 @@ def test_sa17_paid_media_coverage_turns_credits_into_points_and_publicity() -> N
 
 def test_sa18_contracted_research_copies_a_tech_someone_has() -> None:  # SA.18
     s = ready()
-    s.players[other(s)].techs = ["probe-dot"]
+    for ts in s.tech_stacks:  # owner ruling 2026-11-04: a stack without its 2-point marker (researched or discarded by anyone)
+        ts.two_point_tile = f"{ts.category}-{ts.glyph}" != "probe-dot"
     r = go(s, 18, answer=False)
     assert me(r).publicity == 0
     stacks = {m["stack"] for m in r.legal if m["type"] == "take_tech"}

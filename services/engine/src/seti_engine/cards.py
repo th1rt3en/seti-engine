@@ -12,7 +12,7 @@ from collections import deque
 from typing import Any
 
 from . import alien_steps, amoeba, card_defs, effects, expansion_steps, objectives, orgs, rewards, solar, tables, techs, trail
-from .models import Decision, GameState, MissionState, PlanetState, PlayerState, Probe
+from .models import Decision, GameState, MissionState, PlanetState, PlayerState, Probe, TechStack
 
 Action = dict[str, Any]
 Events = list[dict[str, Any]]
@@ -282,10 +282,10 @@ def _trace_step(s: GameState, p: PlayerState, st: dict[str, Any]) -> None:
         s.pending.append(Decision(kind="trace", player=p.index, data=data))
 
 
-def _another_has(s: GameState, p: PlayerState, tech: str) -> bool:
-    """FAQ-C081, SA.18: does another player have this tech? In the solo game the rival is the other player, and its techs are the ones
-    it has stored (`RivalState.techs`, SOLO-18: the rival's own player entry holds none)."""
-    return any(tech in q.techs for q in s.players if q.index != p.index) or (s.rival is not None and tech in s.rival.techs)
+def _researched_before(st: TechStack) -> bool:
+    """FAQ-C081, SA.18, #72 (owner ruling 2026-11-04, see the ruling in faq.md): a tech that somebody researched before, or whose tile was
+    discarded: the stack no longer has its 2-point marker. The rival's techs count (SOLO-18) as every other way that the marker goes."""
+    return not st.two_point_tile
 
 
 def _research_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -> None:
@@ -297,10 +297,7 @@ def _research_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Eve
         if ts.category in cats
         and ts.tiles
         and techs.tech_name(ts.category, ts.glyph) not in p.techs  # TECHACT-07
-        and (
-            not (st.get("copy") or st.get("owned_by_other"))
-            or _another_has(s, p, techs.tech_name(ts.category, ts.glyph))
-        )  # FAQ-C081, SA.18
+        and (not (st.get("copy") or st.get("owned_by_other")) or _researched_before(ts))  # FAQ-C081, SA.18
     ]
     if stacks:  # TECHACT-06: with all techs of the type already owned the tech part is ignored
         s.pending.append(
@@ -369,8 +366,7 @@ def research_moves(d: Decision) -> list[Action]:
 
 def take_free_tech(s: GameState, p: PlayerState, d: Decision, a: Action, events: Events) -> None:
     st = s.tech_stacks[a["stack"]]
-    name = techs.tech_name(st.category, st.glyph)
-    other_has = any(name in q.techs for q in s.players if q.index != p.index)
+    other_has = _researched_before(st)  # #72: before the take clears the 2-point marker
     tile = techs.take_tech(s, p, a["stack"], events, tile_bonus=not d.data.get("copy"), first_bonus=not d.data.get("copy"))
     if d.data.get("tile_again"):  # SA.15: the bonus printed on the tech tile again
         rewards.grant(s, p, [techs.TILE_BONUS[tile]], events)
