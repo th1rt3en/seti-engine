@@ -145,8 +145,10 @@ export const BOT_PLAYERS = 2;
 
 /** The AI is asked again this long after a failure. */
 export const BOT_RETRY_MS = 10_000;
-/** A request to the AI that keeps failing is made again after twice as long each time, up to this (a game that the service cannot replay was asked every 10 seconds, all day). */
-export const BOT_RETRY_MAX_MS = 10 * 60_000;
+/** A request to the AI that fails is made again after twice as long each time (10 s, 20 s, 40 s ...), BOT_RETRY_TRIES times; after that the service is taken
+ * for broken and asked again only after BOT_RETRY_MAX_MS (a game that the service cannot replay was asked every 10 seconds, all day). */
+export const BOT_RETRY_TRIES = 5;
+export const BOT_RETRY_MAX_MS = 12 * 60 * 60_000;
 export const botId = (model: string, n: number): string => `bot:${model}:${n}`;
 
 export interface Deps {
@@ -970,9 +972,10 @@ export class GameRoom {
   private botBusy = false;
   private botFailures = 0;
 
-  /** The time of the next request to the AI: BOT_RETRY_MS after the first failure, then twice as long each time (BOT_RETRY_MAX_MS at most). */
+  /** The time of the next request to the AI: BOT_RETRY_MS after the first failure, twice as long after each next one, and BOT_RETRY_MAX_MS after the BOT_RETRY_TRIES-th. */
   private botRetryAt(): number {
-    return this.d.now() + Math.min(BOT_RETRY_MS * 2 ** Math.max(0, this.botFailures - 1), BOT_RETRY_MAX_MS);
+    const wait = this.botFailures > BOT_RETRY_TRIES ? BOT_RETRY_MAX_MS : BOT_RETRY_MS * 2 ** Math.max(0, this.botFailures - 1);
+    return this.d.now() + wait;
   }
 
   /** Resolves when the AI has nothing more to do right now (tests wait for it). */
