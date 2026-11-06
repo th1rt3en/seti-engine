@@ -12,6 +12,7 @@ Run: `uvicorn seti_ai.lobby_server:app --port 8090` (needs the extra `lobby`).
 from __future__ import annotations
 
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -20,12 +21,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from seti_engine import request_auth
+from seti_engine.engine import IllegalAction
 from seti_engine.models import Options
 
 from .bundle_search import SearchConfig
 from .lobby import Lobby, NoSuchModel, NotYourTurn, load_lobby
 
 app = FastAPI(title="SETI AI lobby")
+log = logging.getLogger("seti_ai.lobby_server")
 _replays = request_auth.ReplayCache()
 _lobby: Lobby | None = None
 
@@ -82,4 +85,9 @@ def move(req: MoveRequest) -> MoveResponse | JSONResponse:
         return JSONResponse(status_code=404, content={"error": "no_such_model", "message": f"no approved model {req.model}"})
     except NotYourTurn as e:
         return JSONResponse(status_code=409, content={"error": "not_your_turn", "message": str(e)})
+    except IllegalAction as e:
+        # the log of the game does not replay on the engine inside this image (the rules changed since the image was built): say so in one line
+        # instead of a traceback of 400 lines, and answer 409 (the caller backs off) instead of a 500
+        log.error("the log of a game does not replay (model %s, %d actions): %s", req.model, len(req.actions), str(e)[:200])
+        return JSONResponse(status_code=409, content={"error": "log_not_replayable", "message": str(e)[:300]})
     return MoveResponse(action=reply.action, plan=reply.plan)

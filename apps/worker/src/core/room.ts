@@ -145,6 +145,8 @@ export const BOT_PLAYERS = 2;
 
 /** The AI is asked again this long after a failure. */
 export const BOT_RETRY_MS = 10_000;
+/** A request to the AI that keeps failing is made again after twice as long each time, up to this (a game that the service cannot replay was asked every 10 seconds, all day). */
+export const BOT_RETRY_MAX_MS = 10 * 60_000;
 export const botId = (model: string, n: number): string => `bot:${model}:${n}`;
 
 export interface Deps {
@@ -966,6 +968,12 @@ export class GameRoom {
 
   private botWork: Promise<void> = Promise.resolve();
   private botBusy = false;
+  private botFailures = 0;
+
+  /** The time of the next request to the AI: BOT_RETRY_MS after the first failure, then twice as long each time (BOT_RETRY_MAX_MS at most). */
+  private botRetryAt(): number {
+    return this.d.now() + Math.min(BOT_RETRY_MS * 2 ** Math.max(0, this.botFailures - 1), BOT_RETRY_MAX_MS);
+  }
 
   /** Resolves when the AI has nothing more to do right now (tests wait for it). */
   botIdle(): Promise<void> {
@@ -977,7 +985,10 @@ export class GameRoom {
     if (!this.d.bot || this.botBusy) return;
     this.botBusy = true;
     this.botWork = this.runBot()
-      .catch(() => this.serial(() => this.d.setAlarm(this.d.now() + BOT_RETRY_MS)))
+      .catch(() => {
+        this.botFailures += 1;
+        return this.serial(() => this.d.setAlarm(this.botRetryAt()));
+      })
       .finally(() => {
         this.botBusy = false;
       });
@@ -1015,6 +1026,7 @@ export class GameRoom {
         const res = await this.play(meta, step.seat, count, state, reply.action);
         if (!res.ok) throw new Error(`the AI played an illegal move: ${res.message}`);
         await this.d.store.put("botplan", { count: count + 1, seat: step.seat, plan: reply.plan });
+        this.botFailures = 0;
         return true;
       });
       if (!again) return;
@@ -1063,7 +1075,7 @@ export class GameRoom {
     if (clock === undefined) return;
     const seat = clocks.expired(meta.clock, clocks.normalize(clock), this.d.now());
     // an AI seat has no clock that can run out; its request is retried
-    if (seat !== null && meta.seats[seat]?.bot) await this.d.setAlarm(this.d.now() + BOT_RETRY_MS);
+    if (seat !== null && meta.seats[seat]?.bot) await this.d.setAlarm(this.botRetryAt());
     else if (seat !== null) await this.finish(meta, await this.state(), "timeout", seat);
     else await this.d.setAlarm(clocks.deadline(meta.clock, clocks.normalize(clock)));
   }

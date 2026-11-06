@@ -152,6 +152,10 @@ def test_the_service_answers_a_signed_free_request_with_a_move(monkeypatch: pyte
     assert client.post("/move", json={"model": "v001", "options": options.model_dump(), "actions": actions, "seat": 1 - seat}).status_code == 409
     assert client.get("/models").json() == {"models": ["v001"]}
     assert client.get("/health").status_code == 200
+    # a log that the engine of this image cannot replay (the rules changed since the image was built) is a 409 with a short message, not a 500
+    broken = [*actions[:5], {"type": "gain_vp", "n": 3}]
+    refused = client.post("/move", json={"model": "v001", "options": options.model_dump(), "actions": broken, "seat": seat})
+    assert refused.status_code == 409 and refused.json()["error"] == "log_not_replayable" and len(refused.json()["message"]) <= 300
 
 
 def test_the_export_copies_only_the_approved_versions(tmp_path: Path) -> None:

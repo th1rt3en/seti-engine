@@ -1,7 +1,7 @@
 import type { Options } from "@seti/protocol";
 import { describe, expect, it } from "vitest";
 import { headerOf } from "../src/core/archive.js";
-import { BOT_PLAYERS, BOT_RETRY_MS, toAct } from "../src/core/room.js";
+import { BOT_PLAYERS, BOT_RETRY_MAX_MS, BOT_RETRY_MS, toAct } from "../src/core/room.js";
 import { Conn, FakeBot, alice, bob, makeRoom } from "./helpers.js";
 
 const two = { players: 2 } as Options;
@@ -134,6 +134,24 @@ describe("an AI playing", () => {
     await t.room.onAlarm();
     await playOut(t);
     expect((await t.room.meta())?.status).toBe("finished");
+  });
+
+  it("a service that keeps failing is asked after twice as long each time, not every 10 seconds", async () => {
+    const t = await lobbyWithBot();
+    t.bot.failing = true;
+    await t.room.addBot(alice, "v001", true);
+    await t.room.startGame(alice);
+    await playOut(t);
+    const wait = () => (t.alarms.at(-1) ?? 0) - t.clock();
+    const waits: number[] = [wait()];
+    for (let i = 0; i < 8; i++) {
+      t.advance(wait());
+      await t.room.onAlarm();
+      await playOut(t);
+      waits.push(wait());
+    }
+    expect(waits.slice(0, 4)).toEqual([BOT_RETRY_MS, 2 * BOT_RETRY_MS, 4 * BOT_RETRY_MS, 8 * BOT_RETRY_MS]);
+    expect(Math.max(...waits)).toBe(BOT_RETRY_MAX_MS);
   });
 
   it("a game with an AI is never rated, even if the record of its start or its end says so", async () => {
