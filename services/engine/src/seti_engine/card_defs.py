@@ -475,9 +475,10 @@ CARDS.update(
         "SA.21": {"mission": trig(*(circle({"e": "visit", "planet": "*", "own_orbiter": True}, energy(1)) for _ in range(2)))},
         "SA.22": {"fx": [R("sig_in_rich_sector", 2, min=3)]},
         "SA.23": {"fx": [pub(1)], "mission": trig(circle({"e": "launch"}, rnd(1)), circle({"e": "orbit_or_land"}, vp(3)))},
-        "SA.24": {"fx": [pub(1)], "mission": trig(*(circle({"e": "tech", "cat": "probe"}, LAUNCH) for _ in range(2)))},
-        "SA.25": {"fx": [pub(1)], "mission": trig(*(circle({"e": "tech", "cat": "telescope"}, R("signal_token")) for _ in range(2)))},
-        "SA.26": {"fx": [pub(1)], "mission": trig(*(circle({"e": "tech", "cat": "computer"}, data(1)) for _ in range(2)))},
+        # SA.24 to SA.26 (game 881, 2026-11-14): no instant effect on the cards (the publicity icon is their free-action corner), only the mission
+        "SA.24": {"mission": trig(*(circle({"e": "tech", "cat": "probe"}, LAUNCH) for _ in range(2)))},
+        "SA.25": {"mission": trig(*(circle({"e": "tech", "cat": "telescope"}, R("signal_token")) for _ in range(2)))},
+        "SA.26": {"mission": trig(*(circle({"e": "tech", "cat": "computer"}, data(1)) for _ in range(2)))},
         "SA.27": {"fx": [R("energy_per_probe")]},
         "SA.28": {"fx": [R("restructure")], "mission": quick({"c": "no_resources"}, pub(2), card(1))},
         "SA.29": {"fx": [R("return_mission", r=[data(2)])]},

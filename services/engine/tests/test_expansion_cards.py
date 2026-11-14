@@ -391,9 +391,10 @@ def test_sa23_neutral_buoyancy_training() -> None:  # SA.23
 def test_sa24_to_26_research_missions(n: int, cat: str, check: str) -> None:  # SA.24, SA.25, SA.26
     s = ready()
     s.players[s.current_player].techs = ["probe-dot"]  # the probe limit is 2, so that two launches fit
+    publicity = s.players[s.current_player].publicity
     r = go(s, n)
     st, p = r.state, me(r)
-    assert p.publicity >= 1
+    assert p.publicity == publicity  # the cards have no instant effect: the publicity icon is the free-action corner (game 881)
     before = (len(st.probes), p.signal_tokens, p.data_pool)
     for circle in range(2):
         cards.fire(st, p, [{"e": "tech", "cat": cat}], [])
@@ -443,6 +444,12 @@ def test_sa30_akatsuki_orbiter_orbits_and_counts_computer_techs() -> None:  # SA
     data = s.players[s.current_player].data_pool
     r = go(s, 30)
     assert me(r).orbiters["venus"] == 1 and me(r).publicity >= 1 and me(r).data_pool - data >= 2
+
+
+def test_sa30_without_a_probe_on_a_planet_the_orbit_is_ignored() -> None:  # SA.30
+    s = ready(publicity=0)  # a random game was stuck here: the orbit decision had no move
+    r = go(s, 30)
+    assert not r.state.pending and me(r).publicity >= 1
 
 
 def test_sa31_ingenuity_helicopter_lands_and_scores_planets_with_two_landers() -> None:  # SA.31

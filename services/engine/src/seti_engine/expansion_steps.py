@@ -93,7 +93,10 @@ def run_step(s: GameState, p: PlayerState, st: dict[str, Any], events: Events) -
         }[color]
         rewards.grant(s, p, [reward], events)
     elif t == "orbit_free":  # SA.30
-        s.pending.append(Decision(kind="orbit_land_free", player=p.index, data={"orbit_only": True}))
+        from . import cards  # noqa: PLC0415 - cards imports this module
+
+        if cards.land_free_moves(s, p, {}):  # a probe on a planet's space, as for orbiting; without one the part is ignored (no stuck game)
+            s.pending.append(Decision(kind="orbit_land_free", player=p.index, data={"orbit_only": True}))
     else:
         return False
     return True
