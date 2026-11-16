@@ -224,6 +224,7 @@ export function GameClient({
     [send, endWait],
   );
 
+  const inLobby = useRef(true); // the game has not begun: the room needs a ping every 15 seconds
   useEffect(() => {
     let closed = false;
     let retry = 1000;
@@ -241,13 +242,21 @@ export function GameClient({
       ws.onopen = () => {
         setOnline(true);
         retry = 1000;
-        // the room takes a player of a lobby who has not pinged for a minute to have left
-        pinger = setInterval(() => ws.readyState === WebSocket.OPEN && ws.send(JSON.stringify({ t: "ping" })), 15_000);
+        // The room takes a player of a lobby who has not pinged for a minute to have left, so a lobby is pinged every 15 seconds. A game that has begun
+        // only needs the socket kept alive: every ping wakes the room (its memory is lost between them), so it is pinged once a minute.
+        let ticks = 0;
+        pinger = setInterval(() => {
+          ticks += 1;
+          if (ws.readyState === WebSocket.OPEN && (inLobby.current || ticks % 4 === 0)) ws.send(JSON.stringify({ t: "ping" }));
+        }, 15_000);
       };
       ws.onmessage = (e) => {
         const m = JSON.parse(String(e.data)) as Server;
-        if (m.t === "lobby") setLobby(m);
-        else if (m.t === "view") {
+        if (m.t === "lobby") {
+          inLobby.current = true;
+          setLobby(m);
+        } else if (m.t === "view") {
+          inLobby.current = false;
           seq.current = m.seq;
           setPreviews({}); // an answer belongs to the position it was asked in
           endWait();

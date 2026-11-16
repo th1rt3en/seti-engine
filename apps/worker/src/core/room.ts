@@ -553,16 +553,18 @@ export class GameRoom {
   } | null> {
     const meta = await this.meta();
     if (meta === undefined) return null;
-    const log = await this.readLog();
+    // the actions are one stored row each: the last one says when the game last moved (the whole log is not read for it)
+    const count = (await this.d.store.get<number>("logcount")) ?? 0;
+    const lastAction = count > 0 ? await this.d.store.get<LogEntry>(logKey(count - 1)) : undefined;
     const seen = Object.values((await this.d.store.get<Record<string, number>>("seen")) ?? {});
-    const last = Math.max(meta.createdAt, meta.startedAt ?? 0, ...seen, ...log.map((e) => e.at));
+    const last = Math.max(meta.createdAt, meta.startedAt ?? 0, ...seen, lastAction?.at ?? 0);
     return {
       status: meta.status,
       rated: meta.rated,
       players: meta.seats.flatMap((s) => (s === null ? [] : [s.name])),
       createdAt: meta.createdAt,
       lastActivity: last,
-      actions: log.length,
+      actions: count,
     };
   }
 

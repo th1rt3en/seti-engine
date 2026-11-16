@@ -227,7 +227,21 @@ export class GameRoomDO implements DurableObject {
   }
 
   async webSocketClose(ws: WebSocket, code: number): Promise<void> {
-    ws.close(code, "closed");
+    // A client that just goes away reports 1005 (no code), 1006 or 1015, which a Worker cannot send: close() throws a RangeError for them, and the
+    // invocation counted as an error each time somebody closed a tab. Close with a code that can be sent; a socket that is shut already is no error.
+    try {
+      ws.close(code >= 1000 && code <= 4999 && ![1004, 1005, 1006, 1015].includes(code) ? code : 1000, "closed");
+    } catch {
+      /* closed already */
+    }
+  }
+
+  async webSocketError(ws: WebSocket): Promise<void> {
+    try {
+      ws.close(1011, "error");
+    } catch {
+      /* closed already */
+    }
   }
 
   async alarm(): Promise<void> {

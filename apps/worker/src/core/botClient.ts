@@ -2,6 +2,9 @@
 import type { Signer } from "./engineAuth.js";
 import type { BotClient, BotReply, BotRequest } from "./room.js";
 
+/** A request to the AI is given up after this long, below the 300 s that Cloud Run allows a request: a request that hangs keeps the room's invocation open and counts as an error. */
+export const BOT_TIMEOUT_MS = 280_000;
+
 export class HttpBotClient implements BotClient {
   private readonly fetcher: typeof fetch;
 
@@ -21,6 +24,7 @@ export class HttpBotClient implements BotClient {
       method: "POST",
       headers: { "content-type": "application/json", ...(this.sign ? await this.sign("POST", path, payload) : {}) },
       body: payload,
+      signal: AbortSignal.timeout(BOT_TIMEOUT_MS),
     });
     if (res.status !== 200) throw new Error(`the AI service answered ${res.status}`);
     return (await res.json()) as BotReply;
