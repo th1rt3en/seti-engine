@@ -11,6 +11,12 @@ class_name = "GameRoom"
 tag = "v1"
 new_sqlite_classes = ["GameRoom"]
 
+# Workers Logs (enabled in the dashboard on 2026-11-16; this keeps the file in sync, so that a deploy does not switch them off).
+[observability.logs]
+enabled = true
+invocation_logs = true
+persist = true
+
 [[d1_databases]]
 binding = "DB"
 database_name = "seti"
